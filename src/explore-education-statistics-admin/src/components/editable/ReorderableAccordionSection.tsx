@@ -15,20 +15,12 @@ export interface DraggableAccordionSectionProps {
 export interface ReorderableAccordionSectionProps
   extends AccordionSectionProps {
   id: string;
-  onRemoveSection?: () => void;
 }
 
 const ReorderableAccordionSection = (
   props: ReorderableAccordionSectionProps,
 ) => {
-  const {
-    children,
-    heading,
-    headingTag = 'h2',
-    id,
-    onRemoveSection,
-    ...restProps
-  } = props;
+  const { children, heading, headingTag = 'h2', id, ...restProps } = props;
 
   const { index, isReordering } = restProps as DraggableAccordionSectionProps;
 

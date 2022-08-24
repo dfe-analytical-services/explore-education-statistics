@@ -1,6 +1,9 @@
 import PublicationScheduledReleases from '@admin/pages/publication/components/PublicationScheduledReleases';
 import { testContact } from '@admin/pages/publication/__data__/testPublication';
-import _releaseService, { MyRelease } from '@admin/services/releaseService';
+import _releaseService, {
+  Release,
+  ReleaseWithPermissions,
+} from '@admin/services/releaseService';
 import {
   render as baseRender,
   screen,
@@ -14,7 +17,7 @@ jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('PublicationScheduledReleases', () => {
-  const testRelease1: MyRelease = {
+  const testRelease1: ReleaseWithPermissions = {
     amendment: false,
     approvalStatus: 'Approved',
     id: 'release-1',
@@ -33,7 +36,8 @@ describe('PublicationScheduledReleases', () => {
     publicationSummary: 'Publication 1 summary',
     published: '2022-01-01T00:00:00',
     publishScheduled: '2022-01-01T00:00:00',
-    releaseName: 'Release name',
+    year: 2021,
+    yearTitle: '2021/22',
     slug: 'release-1-slug',
     title: 'Release 1',
     timePeriodCoverage: {
@@ -45,7 +49,7 @@ describe('PublicationScheduledReleases', () => {
     preReleaseAccessList: '',
   };
 
-  const testRelease2: MyRelease = {
+  const testRelease2: Release = {
     ...testRelease1,
     approvalStatus: 'Approved',
     id: 'release-2',

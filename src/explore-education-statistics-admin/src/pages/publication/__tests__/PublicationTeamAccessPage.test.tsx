@@ -1,3 +1,4 @@
+import { testPaginatedReleaseSummaries } from '@admin/pages/publication/__data__/testReleases';
 import PublicationTeamAccessPage from '@admin/pages/publication/PublicationTeamAccessPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
@@ -6,7 +7,6 @@ import {
   PublicationTeamRouteParams,
 } from '@admin/routes/publicationRoutes';
 import _publicationService from '@admin/services/publicationService';
-import { ReleaseSummary } from '@admin/services/releaseService';
 import _releasePermissionService, {
   ContributorInvite,
   ContributorViewModel,
@@ -29,39 +29,6 @@ const releasePermissionService = _releasePermissionService as jest.Mocked<
   typeof _releasePermissionService
 >;
 
-const testReleases: ReleaseSummary[] = [
-  {
-    id: 'release-1',
-    timePeriodCoverage: {
-      value: 'AY',
-      label: 'Academic Year',
-    },
-    title: 'Release 1',
-    releaseName: '2000',
-    type: 'AdHocStatistics',
-    publishScheduled: '',
-    latestInternalReleaseNote: 'release1-release-note',
-    approvalStatus: 'Draft',
-    yearTitle: '2000/01',
-    live: false,
-  },
-  {
-    id: 'release-2',
-    timePeriodCoverage: {
-      value: 'AY',
-      label: 'Academic Year',
-    },
-    title: 'Release 2',
-    releaseName: '2001',
-    type: 'AdHocStatistics',
-    publishScheduled: '',
-    latestInternalReleaseNote: 'release2-release-note',
-    approvalStatus: 'Approved',
-    yearTitle: '2001/02',
-    live: true,
-  },
-];
-
 const testContributors: ContributorViewModel[] = [
   {
     userId: 'user-1',
@@ -83,7 +50,11 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly with no releases', async () => {
-    publicationService.getReleases.mockResolvedValue([]);
+    publicationService.listReleases.mockResolvedValue({
+      results: [],
+      paging: { page: 1, pageSize: 1, totalPages: 1, totalResults: 0 },
+    });
+
     await renderPage({});
 
     expect(
@@ -94,21 +65,25 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly with releases', async () => {
-    publicationService.getReleases.mockResolvedValue(testReleases);
+    publicationService.listReleases.mockResolvedValue(
+      testPaginatedReleaseSummaries,
+    );
     await renderPage({});
 
     const releaseSelect = screen.getByLabelText('Select release');
     expect(releaseSelect).toHaveValue('release-1');
     const releases = within(releaseSelect).queryAllByRole('option');
-    expect(releases).toHaveLength(2);
-    expect(releases[0]).toHaveTextContent('Release 1');
+    expect(releases).toHaveLength(3);
+    expect(releases[0]).toHaveTextContent('Academic Year 2023/24');
     expect(releases[0]).toHaveValue('release-1');
-    expect(releases[1]).toHaveTextContent('Release 2');
+    expect(releases[1]).toHaveTextContent('Academic Year 2022/23');
     expect(releases[1]).toHaveValue('release-2');
+    expect(releases[2]).toHaveTextContent('Academic Year 2021/22');
+    expect(releases[2]).toHaveValue('release-3');
 
     expect(
       screen.getByRole('heading', {
-        name: 'Release 1 (Not live) Draft',
+        name: 'Academic Year 2023/24 (Not live) Draft',
       }),
     ).toBeInTheDocument();
 
@@ -131,22 +106,28 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('selects the release from the id in the url', async () => {
-    publicationService.getReleases.mockResolvedValue(testReleases);
+    publicationService.listReleases.mockResolvedValue(
+      testPaginatedReleaseSummaries,
+    );
+
     await renderPage({
-      releaseId: 'release-2',
+      releaseId: 'release-3',
     });
 
     expect(
       screen.getByRole('heading', {
-        name: 'Release 2 Approved',
+        name: 'Academic Year 2021/22 Approved',
       }),
     ).toBeInTheDocument();
 
-    expect(screen.getByLabelText('Select release')).toHaveValue('release-2');
+    expect(screen.getByLabelText('Select release')).toHaveValue('release-3');
   });
 
   test('selects the first release if no release is set in the url', async () => {
-    publicationService.getReleases.mockResolvedValue(testReleases);
+    publicationService.listReleases.mockResolvedValue(
+      testPaginatedReleaseSummaries,
+    );
+
     const history = createMemoryHistory();
     await renderPage({ history });
 
@@ -154,7 +135,7 @@ describe('PublicationTeamAccessPage', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: 'Release 1 (Not live) Draft',
+        name: 'Academic Year 2023/24 (Not live) Draft',
       }),
     ).toBeInTheDocument();
 
@@ -164,14 +145,17 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('updates the page and url when select a different release', async () => {
-    publicationService.getReleases.mockResolvedValue(testReleases);
+    publicationService.listReleases.mockResolvedValue(
+      testPaginatedReleaseSummaries,
+    );
+
     const history = createMemoryHistory();
     await renderPage({ history });
 
     expect(screen.getByLabelText('Select release')).toHaveValue('release-1');
     expect(
       screen.getByRole('heading', {
-        name: 'Release 1 (Not live) Draft',
+        name: 'Academic Year 2023/24 (Not live) Draft',
       }),
     ).toBeInTheDocument();
     expect(history.location.pathname).toBe(
@@ -188,7 +172,7 @@ describe('PublicationTeamAccessPage', () => {
     await waitFor(() => {
       expect(
         screen.getByRole('heading', {
-          name: 'Release 2 Approved',
+          name: 'Academic Year 2022/23 (Not live) Draft',
         }),
       ).toBeInTheDocument();
     });

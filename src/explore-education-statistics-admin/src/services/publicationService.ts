@@ -6,15 +6,12 @@ import {
   BasicMethodologyVersion,
   MyMethodologyVersion,
 } from '@admin/services/methodologyService';
-import {
-  MyRelease,
-  Release,
-  ReleaseSummary,
-} from '@admin/services/releaseService';
+import { Release, ReleaseSummary } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import { OmitStrict } from '@common/types';
 import { PublicationSummary } from '@common/services/publicationService';
+import { PaginatedList } from '@common/services/types/pagination';
 
 export interface PublicationContactDetails {
   id: string;
@@ -40,7 +37,7 @@ export interface MyPublication {
   id: string;
   title: string;
   summary: string;
-  releases: MyRelease[];
+  releases: Release[];
   methodologies: MyPublicationMethodology[];
   externalMethodology?: ExternalMethodology;
   topicId: string;
@@ -95,6 +92,13 @@ export interface SavePublicationRequest {
   topicId: string;
 }
 
+export interface ListReleasesParams {
+  live?: boolean;
+  page?: number;
+  pageSize?: number;
+  permissions?: boolean;
+}
+
 export type CreatePublicationRequest = SavePublicationRequest;
 export type UpdatePublicationRequest = SavePublicationRequest;
 
@@ -136,9 +140,13 @@ const publicationService = {
     return client.get<MyPublication>(`/me/publication/${publicationId}`);
   },
 
-  getReleases(publicationId: string): Promise<ReleaseSummary[]> {
-    return client.get<ReleaseSummary[]>(
+  listReleases<TReleaseSummary extends ReleaseSummary = ReleaseSummary>(
+    publicationId: string,
+    params?: ListReleasesParams,
+  ): Promise<PaginatedList<TReleaseSummary>> {
+    return client.get<PaginatedList<TReleaseSummary>>(
       `/publication/${publicationId}/releases`,
+      { params },
     );
   },
 

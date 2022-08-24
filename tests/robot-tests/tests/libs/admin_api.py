@@ -174,7 +174,7 @@ def user_create_test_release_via_api(
             "timePeriodCoverage": {
                 "value": time_period,
             },
-            "releaseName": int(year),
+            "year": int(year),
             "type": type,
             "templateReleaseId": "",
         }

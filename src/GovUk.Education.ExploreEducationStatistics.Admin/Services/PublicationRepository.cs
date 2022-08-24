@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -26,18 +25,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _mapper = mapper;
         }
 
-        public async Task<List<MyPublicationViewModel>> GetAllPublicationsForTopic(Guid topicId)
+        public async Task<List<Publication>> GetAllPublicationsForTopic(Guid topicId)
         {
-            var results = await HydratePublicationForPublicationViewModel(_context.Publications)
+            return await HydratePublicationForPublicationViewModel(_context.Publications)
                 .Where(publication => publication.TopicId == topicId)
                 .ToListAsync();
-
-            return results
-                .Select(GenerateMyPublicationViewModel)
-                .ToList();
         }
 
-        public async Task<List<MyPublicationViewModel>> GetPublicationsForTopicRelatedToUser(
+        public async Task<List<Publication>> GetPublicationsForTopicRelatedToUser(
             Guid topicId,
             Guid userId)
         {
@@ -63,16 +58,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(userReleaseRole => userReleaseRole.Release)
                 .ToListAsync();
 
-            var publicationViewModels = new List<MyPublicationViewModel>();
+            var publications = new List<Publication>();
 
             // Add publication view models for the Publications granted directly via Publication roles
-            publicationViewModels.AddRange(await publicationsGrantedByPublicationRole
+            publications.AddRange(await publicationsGrantedByPublicationRole
                 .SelectAsync(async publication =>
                     // Include all Releases of the Publication unconditionally
-                    await GetPublicationWithAllReleases(publication.Id)));
+                    await HydratePublicationForPublicationViewModel(_context.Publications)
+                        .FirstAsync(p => p.Id == publication.Id)));
 
             // Add publication view models for the Publications granted indirectly via Release roles
-            publicationViewModels.AddRange(await releasesGrantedByReleaseRoles
+            publications.AddRange(await releasesGrantedByReleaseRoles
                 .GroupBy(release => release.Publication)
                 .Where(publicationWithReleases =>
                 {
@@ -88,12 +84,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await GetPublicationWithFilteredReleases(publication.Id, releaseIds);
                 }));
 
-            return publicationViewModels
-                .OrderBy(model => model.Title)
-                .ToList();
+            return publications;
         }
 
-        public async Task<MyPublicationViewModel> GetPublicationForUser(Guid publicationId, Guid userId)
+        public async Task<Publication> GetPublicationForUser(Guid publicationId, Guid userId)
         {
             var userReleaseIdsForPublication = await _context
                 .UserReleaseRoles
@@ -108,12 +102,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await GetPublicationWithFilteredReleases(publicationId, userReleaseIdsForPublication);
         }
 
-        public async Task<MyPublicationViewModel> GetPublicationWithAllReleases(Guid publicationId)
+        public async Task<Publication> GetPublicationWithAllReleases(Guid publicationId)
         {
-            var hydratedPublication = await HydratePublicationForPublicationViewModel(_context.Publications)
+            return await HydratePublicationForPublicationViewModel(_context.Publications)
                 .FirstAsync(p => p.Id == publicationId);
-
-            return GenerateMyPublicationViewModel(hydratedPublication);
         }
 
         public async Task<List<Release>> ListActiveReleases(Guid publicationId)
@@ -136,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return publication.LatestRelease();
         }
 
-        private async Task<MyPublicationViewModel> GetPublicationWithFilteredReleases(Guid publicationId,
+        private async Task<Publication> GetPublicationWithFilteredReleases(Guid publicationId,
             IEnumerable<Guid> releaseIds)
         {
             // Use AsNoTracking:
@@ -153,17 +145,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             hydratedPublication.Releases = hydratedPublication.Releases
                 .FindAll(r => releaseIds.Contains(r.Id));
 
-            return GenerateMyPublicationViewModel(hydratedPublication);
+            return hydratedPublication;
         }
 
-        private MyPublicationViewModel GenerateMyPublicationViewModel(Publication publication)
-        {
-            var viewModel = _mapper.Map<MyPublicationViewModel>(publication);
-            viewModel.IsSuperseded = IsSuperseded(publication);
-            return viewModel;
-        }
-
-        private bool IsSuperseded(Publication publication)
+        public bool IsSuperseded(Publication publication)
         {
             return publication.SupersededById != null
                    // To be superseded, superseding publication must have Live release

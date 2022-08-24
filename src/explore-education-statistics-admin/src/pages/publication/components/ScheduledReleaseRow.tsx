@@ -6,14 +6,14 @@ import {
   ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
-import { MyRelease } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseService';
 import FormattedDate from '@common/components/FormattedDate';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import React from 'react';
 import { generatePath } from 'react-router';
 
 interface Props {
-  release: MyRelease;
+  release: Release;
 }
 
 const ScheduledReleaseRow = ({ release }: Props) => {
@@ -49,7 +49,7 @@ const ScheduledReleaseRow = ({ release }: Props) => {
             releaseId: release.id,
           })}
         >
-          {release.permissions.canUpdateRelease ? 'Edit' : 'View'}
+          {release.permissions?.canUpdateRelease ? 'Edit' : 'View'}
           <VisuallyHidden> {release.title}</VisuallyHidden>
         </Link>
       </td>

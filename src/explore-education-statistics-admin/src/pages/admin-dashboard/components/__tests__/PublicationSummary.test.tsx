@@ -8,7 +8,7 @@ import {
   PublicationContactDetails,
 } from '@admin/services/publicationService';
 import _releaseService, {
-  MyRelease,
+  Release,
   ReleaseStageStatuses,
 } from '@admin/services/releaseService';
 import { MemoryRouter } from 'react-router-dom';
@@ -57,7 +57,7 @@ describe('PublicationSummary', () => {
     },
   };
 
-  const testReleases: MyRelease[] = [
+  const testReleases: Release[] = [
     {
       id: 'rel-1',
       latestRelease: true,
@@ -69,7 +69,7 @@ describe('PublicationSummary', () => {
         canUpdateRelease: false,
       },
       approvalStatus: 'Draft',
-    } as MyRelease,
+    } as Release,
     {
       id: 'rel-3',
       latestRelease: false,
@@ -84,7 +84,7 @@ describe('PublicationSummary', () => {
         canDeleteRelease: true,
       },
       approvalStatus: 'Draft',
-    } as MyRelease,
+    } as Release,
     {
       id: 'rel-2',
       latestRelease: true,
@@ -96,7 +96,7 @@ describe('PublicationSummary', () => {
         canUpdateRelease: false,
       },
       approvalStatus: 'Approved',
-    } as MyRelease,
+    } as Release,
   ];
 
   const testMethodologies: MyPublicationMethodology[] = [

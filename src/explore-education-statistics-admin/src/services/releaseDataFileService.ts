@@ -3,7 +3,6 @@ import { DataFilePermissions } from '@admin/services/permissionService';
 import client from '@admin/services/utils/service';
 import { FileInfo } from '@common/services/types/file';
 import downloadFile from '@common/utils/file/downloadFile';
-import { Dictionary } from '@common/types';
 
 interface DataFileInfo extends FileInfo {
   type: 'Data';

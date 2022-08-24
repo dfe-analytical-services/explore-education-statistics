@@ -1,6 +1,6 @@
 import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
 import _releaseService, {
-  MyRelease,
+  Release,
   ReleaseStageStatuses,
 } from '@admin/services/releaseService';
 import { render, screen, waitFor, within } from '@testing-library/react';
@@ -12,7 +12,7 @@ jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('ReleaseSummary', () => {
-  const testRelease: MyRelease = {
+  const testRelease: Release = {
     amendment: false,
     approvalStatus: 'Approved',
     contact: {
@@ -44,7 +44,6 @@ describe('ReleaseSummary', () => {
     publicationSummary: 'Test publication summary',
     publicationSlug: 'test-publication',
     published: '2021-01-01T11:21:17',
-    releaseName: 'Test release name',
     slug: 'rel-3-slug',
     timePeriodCoverage: {
       label: 'Academic year',
@@ -52,6 +51,8 @@ describe('ReleaseSummary', () => {
     },
     title: 'Test release title',
     type: 'AdHocStatistics',
+    year: 2021,
+    yearTitle: '2021/22',
   };
   const testActions = <button type="button">Test action</button>;
 

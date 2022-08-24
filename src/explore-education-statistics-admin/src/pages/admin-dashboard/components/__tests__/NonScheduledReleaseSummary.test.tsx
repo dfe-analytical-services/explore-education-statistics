@@ -1,23 +1,23 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
-import { noop } from 'lodash';
-import { MemoryRouter, Router } from 'react-router-dom';
-import _releaseService, {
-  MyRelease,
-  ReleaseSummary,
-  ReleaseStageStatuses,
-} from '@admin/services/releaseService';
-import userEvent from '@testing-library/user-event';
 import NonScheduledReleaseSummary from '@admin/pages/admin-dashboard/components/NonScheduledReleaseSummary';
-import produce from 'immer';
+import _releaseService, {
+  Release,
+  ReleaseStageStatuses,
+  ReleaseWithPermissions,
+} from '@admin/services/releaseService';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
+import produce from 'immer';
+import { noop } from 'lodash';
+import React from 'react';
+import { MemoryRouter, Router } from 'react-router-dom';
 
 jest.mock('@admin/services/releaseService');
 
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('NonScheduledReleaseSummary', () => {
-  const testRelease: MyRelease = {
+  const testRelease: ReleaseWithPermissions = {
     id: 'rel-3',
     latestRelease: false,
     published: '2021-01-01T11:21:17',
@@ -29,9 +29,10 @@ describe('NonScheduledReleaseSummary', () => {
       canUpdateRelease: false,
       canDeleteRelease: false,
       canMakeAmendmentOfRelease: false,
+      canAddPrereleaseUsers: false,
     },
     approvalStatus: 'Draft',
-  } as MyRelease;
+  } as ReleaseWithPermissions;
 
   const completeReleaseStatus: ReleaseStageStatuses = {
     overallStage: 'Complete',
@@ -332,7 +333,7 @@ describe('NonScheduledReleaseSummary', () => {
     // Confirm the amending of the Release.
     releaseService.createReleaseAmendment.mockResolvedValue({
       id: 'release-amendment-id',
-    } as ReleaseSummary);
+    } as Release);
 
     userEvent.click(
       screen.getByRole('button', {

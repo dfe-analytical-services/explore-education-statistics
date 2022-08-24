@@ -1,6 +1,6 @@
 import Link from '@admin/components/Link';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
-import releaseService, { MyRelease } from '@admin/services/releaseService';
+import releaseService, { Release } from '@admin/services/releaseService';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
@@ -14,7 +14,7 @@ import React from 'react';
 import { generatePath } from 'react-router';
 
 interface Props {
-  release: MyRelease;
+  release: Release;
   onDelete: () => void;
 }
 
@@ -53,10 +53,10 @@ const DraftReleaseRow = ({ release, onDelete }: Props) => {
             releaseId: release.id,
           })}
         >
-          {release.permissions.canUpdateRelease ? 'Edit' : 'View'}
+          {release.permissions?.canUpdateRelease ? 'Edit' : 'View'}
           <VisuallyHidden> {release.title}</VisuallyHidden>
         </Link>
-        {release.permissions.canDeleteRelease && release.amendment && (
+        {release.permissions?.canDeleteRelease && release.amendment && (
           <ButtonText className="govuk-!-margin-left-4" onClick={onDelete}>
             Cancel amendment
             <VisuallyHidden> for {release.title}</VisuallyHidden>

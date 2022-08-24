@@ -5,6 +5,13 @@ import { PublicationContactDetails } from '@admin/services/publicationService';
 import { ReleaseType } from '@common/services/types/releaseType';
 import { PartialDate } from '@common/utils/date/partialDate';
 
+export interface ReleasePermissions {
+  canAddPrereleaseUsers: boolean;
+  canUpdateRelease: boolean;
+  canDeleteRelease: boolean;
+  canMakeAmendmentOfRelease: boolean;
+}
+
 export interface Release {
   id: string;
   slug: string;
@@ -13,7 +20,6 @@ export interface Release {
   latestRelease: boolean;
   live: boolean;
   amendment: boolean;
-  releaseName: string;
   publicationId: string;
   publicationTitle: string;
   publicationSummary: string;
@@ -28,37 +34,39 @@ export interface Release {
   latestInternalReleaseNote?: string;
   previousVersionId: string;
   preReleaseAccessList: string;
-  yearTitle?: string;
+  year: number;
+  yearTitle: string;
+  permissions?: ReleasePermissions;
 }
 
-export interface MyRelease extends Release {
-  permissions: {
-    canAddPrereleaseUsers: boolean;
-    canUpdateRelease: boolean;
-    canDeleteRelease: boolean;
-    canMakeAmendmentOfRelease: boolean;
-  };
+export interface ReleaseWithPermissions extends Release {
+  permissions: ReleasePermissions;
 }
 
 export interface ReleaseSummary {
   id: string;
-  timePeriodCoverage: {
-    value: string;
-    label: string;
-  };
   title: string;
-  releaseName: string;
-  type: ReleaseType;
-  publishScheduled: string;
-  nextReleaseDate?: PartialDate;
-  latestInternalReleaseNote: string;
-  live: boolean;
-  approvalStatus: ReleaseApprovalStatus;
+  slug: string;
+  year: number;
   yearTitle: string;
+  timePeriodCoverage: ValueLabelPair;
+  approvalStatus: ReleaseApprovalStatus;
+  publishScheduled?: string;
+  published?: string;
+  live: boolean;
+  nextReleaseDate?: PartialDate;
+  type: ReleaseType;
+  amendment: boolean;
+  previousVersionId?: string;
+  permissions?: ReleasePermissions;
+}
+
+export interface ReleaseSummaryWithPermissions extends ReleaseSummary {
+  permissions: ReleasePermissions;
 }
 
 interface BaseReleaseRequest {
-  releaseName: string;
+  year: number;
   timePeriodCoverage: {
     value: string;
   };
@@ -70,12 +78,7 @@ export interface CreateReleaseRequest extends BaseReleaseRequest {
   templateReleaseId?: string;
 }
 
-export interface UpdateReleaseRequest {
-  releaseName: string;
-  timePeriodCoverage: {
-    value: string;
-  };
-  type: ReleaseType;
+export interface UpdateReleaseRequest extends BaseReleaseRequest {
   preReleaseAccessList?: string;
 }
 
@@ -184,7 +187,7 @@ export interface DeleteReleasePlan {
 }
 
 const releaseService = {
-  createRelease(createRequest: CreateReleaseRequest): Promise<ReleaseSummary> {
+  createRelease(createRequest: CreateReleaseRequest): Promise<Release> {
     return client.post(
       `/publications/${createRequest.publicationId}/releases`,
       createRequest,
@@ -221,11 +224,11 @@ const releaseService = {
     return client.delete(`/release/${releaseId}`);
   },
 
-  getDraftReleases(): Promise<MyRelease[]> {
+  getDraftReleases(): Promise<Release[]> {
     return client.get('/releases/draft');
   },
 
-  getScheduledReleases(): Promise<MyRelease[]> {
+  getScheduledReleases(): Promise<Release[]> {
     return client.get('/releases/scheduled');
   },
 
@@ -247,7 +250,7 @@ const releaseService = {
     return client.get(`/releases/${releaseId}/checklist`);
   },
 
-  createReleaseAmendment(releaseId: string): Promise<ReleaseSummary> {
+  createReleaseAmendment(releaseId: string): Promise<Release> {
     return client.post(`/release/${releaseId}/amendment`);
   },
 };

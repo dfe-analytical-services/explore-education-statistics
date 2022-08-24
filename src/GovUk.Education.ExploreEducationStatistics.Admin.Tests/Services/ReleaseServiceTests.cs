@@ -59,10 +59,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releaseService = BuildReleaseService(context);
 
                 var result = (await releaseService.CreateRelease(
-                    new ReleaseCreateViewModel
+                    new ReleaseCreateRequest
                     {
                         PublicationId = publication.Id,
-                        ReleaseName = "2018",
+                        Year = 2018,
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                         PublishScheduled = "2050-06-30",
                         Type = ReleaseType.OfficialStatistics
@@ -72,6 +72,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publishScheduled = new DateTime(2050, 6, 30, 0, 0, 0, DateTimeKind.Unspecified);
 
                 Assert.Equal("Academic Year 2018/19", result.Title);
+                Assert.Equal(2018, result.Year);
+                Assert.Equal("2018/19", result.YearTitle);
                 Assert.Null(result.Published);
                 Assert.Equal(publishScheduled, result.PublishScheduled);
                 Assert.False(result.LatestRelease); // Most recent - but not published yet.
@@ -193,11 +195,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releaseService = BuildReleaseService(context);
 
                 var result = releaseService.CreateRelease(
-                    new ReleaseCreateViewModel
+                    new ReleaseCreateRequest
                     {
                         PublicationId = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
                         TemplateReleaseId = templateReleaseId,
-                        ReleaseName = "2018",
+                        Year = 2018,
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                         PublishScheduled = "2050-01-01",
                         Type = ReleaseType.OfficialStatistics
@@ -658,10 +660,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .UpdateRelease(
                         release.Id,
-                        new ReleaseUpdateViewModel
+                        new ReleaseUpdateRequest
                         {
                             Type = ReleaseType.OfficialStatistics,
-                            ReleaseName = "2035",
+                            Year = 2035,
                             TimePeriodCoverage = TimeIdentifier.March,
                             PreReleaseAccessList = "New access list",
                         }
@@ -672,7 +674,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Publication.Id, viewModel.PublicationId);
                 Assert.Equal(release.NextReleaseDate, viewModel.NextReleaseDate);
                 Assert.Equal(ReleaseType.OfficialStatistics, viewModel.Type);
-                Assert.Equal("2035", viewModel.ReleaseName);
+                Assert.Equal(2035, viewModel.Year);
+                Assert.Equal("2035", viewModel.YearTitle);
                 Assert.Equal(TimeIdentifier.March, viewModel.TimePeriodCoverage);
                 Assert.Equal("New access list", viewModel.PreReleaseAccessList);
             }
@@ -734,10 +737,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .UpdateRelease(
                         release.Id,
-                        new ReleaseUpdateViewModel
+                        new ReleaseUpdateRequest
                         {
                             Type = ReleaseType.AdHocStatistics,
-                            ReleaseName = "2035",
+                            Year = 2035,
                             TimePeriodCoverage = TimeIdentifier.CalendarYear,
                             PreReleaseAccessList = "Test"
                         }
@@ -831,7 +834,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var viewModel = result.AssertRight();
 
-                Assert.Equal("2035", viewModel.ReleaseName);
+                Assert.Equal("January 2035", viewModel.Title);
+                Assert.Equal(2035, viewModel.Year);
+                Assert.Equal("2035", viewModel.YearTitle);
                 Assert.Equal("2035-1", viewModel.Slug);
                 Assert.Equal(publication.Id, viewModel.PublicationId);
                 Assert.Equal("Test publication", viewModel.PublicationTitle);
@@ -844,7 +849,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(nextReleaseDate, viewModel.NextReleaseDate);
                 Assert.Equal(ReleaseType.AdHocStatistics, viewModel.Type);
                 Assert.Equal(TimeIdentifier.January, viewModel.TimePeriodCoverage);
-                Assert.Equal("2035", viewModel.YearTitle);
 
                 Assert.Null(viewModel.PreviousVersionId);
                 Assert.True(viewModel.LatestRelease);

@@ -32,7 +32,6 @@ const testRelease: Release = {
   contact: testContact,
   id: 'release-1',
   latestInternalReleaseNote: 'release1-release-note',
-  releaseName: '2000',
   latestRelease: true,
   live: false,
   preReleaseAccessList: '',
@@ -49,6 +48,7 @@ const testRelease: Release = {
   },
   title: 'Release 1',
   type: 'AdHocStatistics',
+  year: 2000,
   yearTitle: '2000/01',
 };
 

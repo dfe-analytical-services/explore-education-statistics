@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseViewModel;
+using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -62,11 +63,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("api/publication/{publicationId}/releases")]
-        public async Task<ActionResult<List<ReleaseViewModel>>> ListActiveReleases(
-            [Required] Guid publicationId)
+        public async Task<ActionResult<PaginatedListViewModel<ReleaseSummaryViewModel>>> ListActiveReleases(
+            [Required] Guid publicationId,
+            [FromQuery, Range(1, double.PositiveInfinity)] int page = 1,
+            [FromQuery, Range(0, double.PositiveInfinity)] int pageSize = 5,
+            [FromQuery] bool permissions = false,
+            [FromQuery] bool? live = null)
         {
             return await _publicationService
-                .ListActiveReleases(publicationId)
+                .ListActiveReleasesPaginated(publicationId, page, pageSize, live, includePermissions: permissions)
                 .HandleFailuresOrOk();
         }
 

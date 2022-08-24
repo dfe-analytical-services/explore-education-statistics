@@ -100,6 +100,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         NoTableHighlights,
         NoPublicPreReleaseAccessList,
         MethodologyNotApproved,
-
     }
 }

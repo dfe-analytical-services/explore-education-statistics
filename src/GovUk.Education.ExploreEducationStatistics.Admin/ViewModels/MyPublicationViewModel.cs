@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public DateTime? NextUpdate { get; set; }
 
-        public List<MyReleaseViewModel> Releases { get; set; }
+        public List<ReleaseViewModel> Releases { get; set; }
 
         public List<MyPublicationMethodologyVersionViewModel> Methodologies { get; set; }
 
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public PermissionsSet Permissions { get; set; }
 
-        public class PermissionsSet
+        public record PermissionsSet
         {
             public bool CanUpdatePublication { get; set; }
             public bool CanUpdatePublicationTitle { get; set; }

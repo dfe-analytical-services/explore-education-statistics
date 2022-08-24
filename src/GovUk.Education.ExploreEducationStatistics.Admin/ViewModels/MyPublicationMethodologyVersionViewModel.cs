@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public PermissionsSet Permissions { get; set; } = new PermissionsSet();
 
-        public class PermissionsSet
+        public record PermissionsSet
         {
             public bool CanDropMethodology { get; set; }
         }
