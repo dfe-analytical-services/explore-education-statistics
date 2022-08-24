@@ -1,13 +1,9 @@
-/* eslint-disable no-case-declarations */
-/* eslint-disable no-await-in-loop */
-/* eslint-disable no-console */
 import chalk from 'chalk';
 import { prompt } from 'inquirer';
 import promptService from '../services/promptService';
 import errorHandler from './errorHandler';
 import logger from './logger';
 
-// eslint-disable-next-line no-shadow
 const getAnswers = async (choices: readonly string[]) => {
   const answers = await prompt({
     name: 'test',
