@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("publications/{publicationId}/releases")]
-        public async Task<ActionResult<ReleaseViewModel>> CreateRelease(ReleaseCreateViewModel release,
+        public async Task<ActionResult<ReleaseViewModel>> CreateRelease(ReleaseCreateRequest release,
             Guid publicationId)
         {
             release.PublicationId = publicationId;
@@ -170,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPut("releases/{releaseId}")]
-        public async Task<ActionResult<ReleaseViewModel>> UpdateRelease(ReleaseUpdateViewModel request,
+        public async Task<ActionResult<ReleaseViewModel>> UpdateRelease(ReleaseUpdateRequest request,
             Guid releaseId)
         {
             return await _releaseService

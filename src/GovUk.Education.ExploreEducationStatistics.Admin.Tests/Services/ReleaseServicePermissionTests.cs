@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         var service = BuildReleaseService(userService.Object);
                         return service.CreateRelease(
-                            new ReleaseCreateViewModel
+                            new ReleaseCreateRequest
                             {
                                 PublicationId = Publication.Id,
                             }

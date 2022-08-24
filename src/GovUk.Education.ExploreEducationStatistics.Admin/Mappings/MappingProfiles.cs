@@ -44,9 +44,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                             ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
                             : (DateTime?)null));
 
-            CreateMap<ReleaseCreateViewModel, Release>()
-                .ForMember(dest => dest.PublishScheduled, m => m.MapFrom(model =>
-                    model.PublishScheduledDate));
+            CreateMap<ReleaseCreateRequest, Release>()
+                .ForMember(dest => dest.PublishScheduled,
+                    m => m.MapFrom(model => model.PublishScheduledDate))
+                .ForMember(dest => dest.ReleaseName,
+                    m => m.MapFrom(r => r.Year.ToString()));
 
             CreateMap<Release, ReleaseSummaryViewModel>()
                 .ForMember(model => model.PublishScheduled,

@@ -66,7 +66,7 @@ export interface ReleaseSummaryWithPermissions extends ReleaseSummary {
 }
 
 interface BaseReleaseRequest {
-  releaseName: string;
+  year: number;
   timePeriodCoverage: {
     value: string;
   };
@@ -78,12 +78,7 @@ export interface CreateReleaseRequest extends BaseReleaseRequest {
   templateReleaseId?: string;
 }
 
-export interface UpdateReleaseRequest {
-  releaseName: string;
-  timePeriodCoverage: {
-    value: string;
-  };
-  type: ReleaseType;
+export interface UpdateReleaseRequest extends BaseReleaseRequest {
   preReleaseAccessList?: string;
 }
 

@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public bool CanMakeAmendmentOfRelease { get; init; }
     }
 
-    public class ReleaseCreateViewModel
+    public class ReleaseCreateRequest
     {
         public Guid PublicationId { get; set; }
 
@@ -116,18 +116,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         [PartialDateValidator] public PartialDate? NextReleaseDate { get; set; } = null!;
 
-        [RegularExpression(@"^([0-9]{4})?$")] public string ReleaseName { get; init; } = string.Empty;
-
         public string Slug => SlugFromTitle(Title);
 
         private string Title => Format(Year, TimePeriodCoverage);
 
-        private int Year => int.Parse(ReleaseName);
+        [Range(1000, 9999)]
+        public int Year { get; init; }
 
         public Guid? TemplateReleaseId { get; init; }
     }
 
-    public class ReleaseUpdateViewModel
+    public class ReleaseUpdateRequest
     {
         [Required] public ReleaseType Type { get; init; }
 
@@ -137,13 +136,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string PreReleaseAccessList { get; init; } = String.Empty;
 
-        [RegularExpression(@"^([0-9]{4})?$")] public string ReleaseName { get; init; } = string.Empty;
-
         public string Slug => SlugFromTitle(Title);
 
         private string Title => Format(Year, TimePeriodCoverage);
 
-        private int Year => int.Parse(ReleaseName);
+        [Range(1000, 9999)]
+        public int Year { get; init; }
     }
 
     public class ReleaseStatusCreateViewModel

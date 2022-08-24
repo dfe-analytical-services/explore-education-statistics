@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(release => _mapper.Map<ReleaseViewModel>(release));
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateViewModel releaseCreate)
+        public async Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(releaseCreate.PublicationId)
@@ -309,7 +309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(
-            Guid releaseId, ReleaseUpdateViewModel request)
+            Guid releaseId, ReleaseUpdateRequest request)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, ReleaseChecklistService.HydrateReleaseForChecklist)
@@ -319,7 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     release.Slug = request.Slug;
                     release.Type = request.Type;
-                    release.ReleaseName = request.ReleaseName;
+                    release.ReleaseName = request.Year.ToString();
                     release.TimePeriodCoverage = request.TimePeriodCoverage;
                     release.PreReleaseAccessList = request.PreReleaseAccessList;
 

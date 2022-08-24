@@ -102,7 +102,7 @@ const ReleasePreReleaseAccessPage = () => {
                 const updatedRelease = await releaseService.updateRelease(
                   release.id,
                   {
-                    releaseName: release?.year.toString(),
+                    year: release.year,
                     timePeriodCoverage: release.timePeriodCoverage,
                     type: release.type,
                     preReleaseAccessList,
