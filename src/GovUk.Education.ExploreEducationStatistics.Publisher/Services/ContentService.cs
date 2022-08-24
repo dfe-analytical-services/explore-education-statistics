@@ -152,9 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task UpdateCachedTaxonomyBlobs()
         {
             await _contentCacheService.UpdateMethodologyTree();
-
-            await _publicBlobCacheService.SetItem(new PublicationTreeCacheKey(), 
-                await _themeService.GenerateFullPublicationTree());
+            await _contentCacheService.UpdatePublicationTree();
         }
 
         private async Task CacheLatestRelease(Publication publication, PublishContext context, params Guid[] includedReleaseIds)

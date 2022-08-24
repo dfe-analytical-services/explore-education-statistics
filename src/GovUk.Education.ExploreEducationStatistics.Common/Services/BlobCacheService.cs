@@ -31,7 +31,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             // Attempt to read blob from the storage container
             try
             {
-                return await _blobStorageService.GetDeserializedJson(cacheKey.Container, cacheKey.Key, targetType);
+                var result = await _blobStorageService.GetDeserializedJson(cacheKey.Container, cacheKey.Key, targetType);
+
+                if (result != null)
+                {
+                    _logger.LogInformation("Blob cache hit - for key {CacheKey}", key);
+                }
+                else
+                {
+                    _logger.LogInformation("Blob cache miss - for key {CacheKey}", key);
+                }
+
+                return result;
             }
             catch (JsonException e)
             {
@@ -59,6 +70,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             // Write result to cache as a json blob before returning
             await _blobStorageService.UploadAsJson(cacheKey.Container, cacheKey.Key, item);
+
+            _logger.LogInformation("Blob cache set - for key {CacheKey}", cacheKey.Key);
         }
         
         public async Task DeleteItem(IBlobCacheKey cacheKey)

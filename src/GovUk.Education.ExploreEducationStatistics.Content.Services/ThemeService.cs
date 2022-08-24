@@ -3,16 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services
@@ -26,25 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<Either<ActionResult, IList<ThemeTree<PublicationTreeNode>>>> GetPublicationTree(
-            PublicationTreeFilter filter)
-        {
-            var fullPublicationTree = await GetCachedFullPublicationTree();
-
-            return await fullPublicationTree
-                .ToAsyncEnumerable()
-                .SelectAwait(async theme => await FilterThemeTree(theme, filter))
-                .Where(theme => theme.Topics.Any())
-                .OrderBy(theme => theme.Title)
-                .ToListAsync();
-        }
-
-        [BlobCache(typeof(PublicationTreeCacheKey))]
-        private Task<IList<ThemeTree<PublicationTreeNode>>> GetCachedFullPublicationTree()
-        {
-            return GenerateFullPublicationTree();
-        }
-        
         public async Task<IList<ThemeTree<PublicationTreeNode>>> GenerateFullPublicationTree()
         {
             var themes = await _contentDbContext.Themes
@@ -122,65 +99,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     .AnyAwaitAsync(async r => r.IsLatestPublishedVersionOfRelease()
                                               && await HasAnyDataFiles(r))
             };
-        }
-
-        private async Task<ThemeTree<PublicationTreeNode>> FilterThemeTree(
-            ThemeTree<PublicationTreeNode> themeTree,
-            PublicationTreeFilter filter)
-        {
-            var topics = await themeTree.Topics
-                .ToAsyncEnumerable()
-                .SelectAwait(async topic => await FilterTopicTree(topic, filter))
-                .Where(topic => topic.Publications.Any())
-                .OrderBy(topic => topic.Title)
-                .ToListAsync();
-
-            return new ThemeTree<PublicationTreeNode>
-            {
-                Id = themeTree.Id,
-                Title = themeTree.Title,
-                Summary = themeTree.Summary,
-                Topics = topics,
-            };
-        }
-
-        private async Task<TopicTree<PublicationTreeNode>> FilterTopicTree(
-            TopicTree<PublicationTreeNode> topicTree,
-            PublicationTreeFilter filter)
-        {
-            var publications = await topicTree.Publications
-                .ToAsyncEnumerable()
-                .Where(publication => FilterPublicationTreeNode(publication, filter))
-                .OrderBy(publication => publication.Title)
-                .ToListAsync();
-
-            return new TopicTree<PublicationTreeNode>
-            {
-                Id = topicTree.Id,
-                Title = topicTree.Title,
-                Publications = publications
-            };
-        }
-
-        private bool FilterPublicationTreeNode(
-            PublicationTreeNode publicationTreeNode,
-            PublicationTreeFilter filter)
-        {
-            switch (filter)
-            {
-                case PublicationTreeFilter.FindStatistics:
-                    return !publicationTreeNode.IsSuperseded
-                           && (publicationTreeNode.HasLiveRelease
-                               || publicationTreeNode.Type == PublicationType.Legacy);
-                case PublicationTreeFilter.DataTables:
-                    return publicationTreeNode.LatestReleaseHasData
-                           && !publicationTreeNode.IsSuperseded;
-                case PublicationTreeFilter.DataCatalogue:
-                case PublicationTreeFilter.FastTrack:
-                    return publicationTreeNode.AnyLiveReleaseHasData;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(filter), filter, null);
-            }
         }
 
         private bool IsSuperseded(Publication publication)

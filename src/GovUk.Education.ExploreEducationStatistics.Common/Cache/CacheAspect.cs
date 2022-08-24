@@ -66,6 +66,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 
             foreach (var cacheTrigger in cacheTriggers)
             {
+                // Don't attempt to get a cached value from any triggers that are requesting that the cached value be
+                // updated rather than fetched from the cache. 
+                if (cacheTrigger.UpdateOnly)
+                {
+                    continue;
+                }
+                
                 var cacheKey = cacheKeys.GetOrSet(
                     cacheTrigger.Key,
                     () => GetCacheKey(cacheTrigger.Key, args, method)

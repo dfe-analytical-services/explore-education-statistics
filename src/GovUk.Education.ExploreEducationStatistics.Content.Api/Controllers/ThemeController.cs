@@ -14,14 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [Produces(MediaTypeNames.Application.Json)]
     public class ThemeController : ControllerBase
     {
-        private readonly IThemeService _themeService;
         private readonly IContentCacheService _contentCacheService;
 
-        public ThemeController(
-            IThemeService themeService,
-            IContentCacheService contentCacheService)
+        public ThemeController(IContentCacheService contentCacheService)
         {
-            _themeService = themeService;
             _contentCacheService = contentCacheService;
         }
 
@@ -33,7 +29,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             {
                 return new BadRequestResult();
             }
-            return await _themeService.GetPublicationTree(filter.Value)
+            
+            return await _contentCacheService
+                .GetPublicationTree(filter.Value)
                 .HandleFailuresOrOk();
         }
 

@@ -94,6 +94,10 @@ using ReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Serv
 using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseRepository;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
+using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
+using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
+using IContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
+using ContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.ThemeService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -395,6 +399,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             
+            services.AddTransient<IContentThemeService, ContentThemeService>();
+            services.AddTransient<IContentMethodologyService, ContentMethodologyService>();
             services.AddTransient<IContentCacheService, ContentCacheService>();
             services.AddTransient<IMyPublicationPermissionsResolver,
                 MyPublicationPermissionsResolver>();

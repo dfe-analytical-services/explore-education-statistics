@@ -76,8 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                                     await _contentCacheService.UpdateMethodologyTree();
                                     break;
                                 case ClearPublicCacheTreePathsViewModel.CacheEntry.PublicationTree:
-                                    // TODO EES-3643 - update rather than delete (for both Methodology and Publication Trees)
-                                    await _publicBlobStorageService.DeleteBlob(BlobContainers.PublicContent, path);
+                                    await _contentCacheService.UpdatePublicationTree();
                                     break;
                                 default:
                                     throw new ArgumentException($"Unsupported cache clearing path {path}");

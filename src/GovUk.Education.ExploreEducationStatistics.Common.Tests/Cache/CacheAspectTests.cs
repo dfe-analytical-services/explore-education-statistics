@@ -10,10 +10,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 {
@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
         private class TestCacheAttribute : CacheAttribute
         {
-            public TestCacheAttribute(Type key) : base(key)
+            public TestCacheAttribute(Type key, bool updateOnly = false) : base(key, updateOnly)
             {
             }
 
@@ -578,6 +578,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             {
                 return new();
             }
+            
+            [TestCache(typeof(TestCacheKey), updateOnly: true)]
+            public static TestValue UpdateOnly()
+            {
+                return new();
+            }
         }
         // ReSharper enable UnusedParameter.Local
 
@@ -621,7 +627,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             Assert.True(result.IsLeft);
 
-            MockUtils.VerifyAllMocks(CacheService);
+            VerifyAllMocks(CacheService);
         }
 
         [Fact]
@@ -643,7 +649,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             TestMethods.NoParams_ActionResult_NotFound().AssertNotFoundResult();
 
-            MockUtils.VerifyAllMocks(CacheService);
+            VerifyAllMocks(CacheService);
         }
 
         [Fact]
@@ -667,7 +673,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             Assert.Equal("Something went wrong", exception.Message);
 
-            MockUtils.VerifyAllMocks(CacheService);
+            VerifyAllMocks(CacheService);
         }
 
         [Fact]
@@ -700,7 +706,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             Assert.Equal("Something went wrong", exception.Message);
 
-            MockUtils.VerifyAllMocks(CacheService);
+            VerifyAllMocks(CacheService);
         }
 
         [Fact]
@@ -716,7 +722,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             Assert.True(result.IsLeft);
 
-            MockUtils.VerifyAllMocks(CacheService);
+            VerifyAllMocks(CacheService);
         }
 
         [Fact]
@@ -740,7 +746,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             result.AssertNotFoundResult();
 
-            MockUtils.VerifyAllMocks(CacheService);
+            VerifyAllMocks(CacheService);
         }
 
         [Fact]
@@ -1224,7 +1230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             Assert.Equal(expected, result);
 
-            MockUtils.VerifyAllMocks(CacheService);
+            VerifyAllMocks(CacheService);
         }
 
         [Fact]
@@ -1246,7 +1252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             Assert.Equal(expected, result);
 
-            MockUtils.VerifyAllMocks(CacheService);
+            VerifyAllMocks(CacheService);
         }
 
         [Fact]
@@ -1276,7 +1282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             Assert.Equal(args[0], result);
             Assert.Equal(args[1], result);
 
-            MockUtils.VerifyAllMocks(CacheService);
+            VerifyAllMocks(CacheService);
         }
 
         [Fact]
@@ -1296,7 +1302,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             Assert.Equal(expected, result);
 
-            MockUtils.VerifyAllMocks(CacheService);
+            VerifyAllMocks(CacheService);
         }
 
         [Fact]
@@ -1320,7 +1326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             Assert.Equal(expected, result);
 
-            MockUtils.VerifyAllMocks(CacheService);
+            VerifyAllMocks(CacheService);
         }
 
         [Fact]
@@ -1350,7 +1356,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             Assert.Equal(args[0], result);
             Assert.Equal(args[1], result);
 
-            MockUtils.VerifyAllMocks(CacheService);
+            VerifyAllMocks(CacheService);
         }
 
         [Fact]
@@ -1371,6 +1377,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
                 exception.Message
             );
         }
+        
+        [Fact]
+        public void UpdateOnly()
+        {
+            var cacheKey = new TestCacheKey();
+
+            var args = new List<object>();
+            
+            // Verify that there is no attempt to "get" a currently-cached value when the "UpdateOnly" flag is set.
+            // This means that we're only ever getting fresh values for the item and then setting or updating the cached
+            // entry with that new value rather than ever attempting to retrieve it.
+            CacheService
+                .Setup(s => s.SetItem(cacheKey, Capture.In(args)))
+                .Returns(Task.CompletedTask);
+
+            var returnedItem = TestMethods.UpdateOnly();
+
+            var cachedItem = Assert.Single(args);
+            Assert.Equal(cachedItem, returnedItem);
+
+            VerifyAllMocks(CacheService);
+        }
 
         private static void AssertCacheHit(ICacheKey cacheKey, object expectedResult, Func<TestValue> run)
         {
@@ -1382,7 +1410,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             Assert.Equal(expectedResult, result);
 
-            MockUtils.VerifyAllMocks(CacheService);
+            VerifyAllMocks(CacheService);
         }
 
         private static void AssertCacheMiss(ICacheKey cacheKey, Func<object> run)
@@ -1406,7 +1434,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             Assert.Equal(args[0], result);
 
-            MockUtils.VerifyAllMocks(CacheService);
+            VerifyAllMocks(CacheService);
         }
 
         private static MissingMemberException AssertNoMatchingConstructorException(

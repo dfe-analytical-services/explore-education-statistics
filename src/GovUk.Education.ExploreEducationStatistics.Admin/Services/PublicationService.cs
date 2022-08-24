@@ -17,7 +17,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -252,9 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task UpdateCachedTaxonomyBlobs()
         {
             await _contentCacheService.UpdateMethodologyTree();
-            
-            // TODO EES-3643 - update rather than delete
-            await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey());
+            await _contentCacheService.UpdatePublicationTree();
         }
 
         private async Task DeleteCachedSupersededPublicationBlobs(Publication publication)

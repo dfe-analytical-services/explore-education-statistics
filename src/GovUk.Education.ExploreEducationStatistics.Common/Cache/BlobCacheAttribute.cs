@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         /// </summary>
         public string? ServiceName { get; set; }
 
-        public BlobCacheAttribute(Type key) : base(key)
+        public BlobCacheAttribute(Type key, bool updateOnly = false) : base(key, updateOnly)
         {
         }
 

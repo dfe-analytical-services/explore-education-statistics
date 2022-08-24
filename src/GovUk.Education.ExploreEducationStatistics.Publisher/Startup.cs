@@ -2,6 +2,7 @@
 using System;
 using AutoMapper;
 using Azure.Storage.Blobs;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -19,6 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -31,6 +33,8 @@ using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Ser
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.MethodologyService;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.PublicationService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseService;
+using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
+using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 
@@ -51,7 +55,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("PublicStatisticsDb")))
                 .AddSingleton<IFileStorageService, FileStorageService>(provider =>
                     new FileStorageService(GetConfigurationValue(provider, "PublisherStorage")))
-                .AddScoped(provider => GetBlobCacheService(provider, "PublicStorage"))
+                .AddScoped(provider =>
+                {
+                    var publicBlobCacheService = GetBlobCacheService(provider, "PublicStorage");
+                    CacheAspect.Enabled = true;
+                    BlobCacheAttribute.AddService("default", publicBlobCacheService);
+                    return publicBlobCacheService;
+                })
+                .AddScoped<IContentMethodologyService, ContentMethodologyService>()
                 .AddScoped<IContentCacheService, ContentCacheService>()
                 .AddScoped<IThemeService, ThemeService>()
                 .AddScoped<IPublishingService, PublishingService>(provider =>
