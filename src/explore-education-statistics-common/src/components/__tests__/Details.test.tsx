@@ -200,4 +200,20 @@ describe('Details', () => {
       expect.objectContaining({ target: summary }),
     );
   });
+
+  test('passing a visuallyHiddenText prop displays visually hidden text', () => {
+    const { container } = render(
+      <Details
+        summary="Test summary"
+        id="test-details"
+        visuallyHiddenText="publication 1"
+      >
+        Key stats
+      </Details>,
+    );
+
+    expect(container.querySelector('.govuk-visually-hidden')).toHaveTextContent(
+      'publication 1',
+    );
+  });
 });

@@ -11,6 +11,7 @@ import React, {
   useState,
 } from 'react';
 import styles from './Details.module.scss';
+import VisuallyHidden from './VisuallyHidden';
 
 let hasNativeDetails: boolean;
 let idCounter = 0;
@@ -41,6 +42,7 @@ export interface DetailsProps {
   open?: boolean;
   summary: string;
   summaryAfter?: ReactNode;
+  visuallyHiddenText?: string;
 }
 
 const Details = ({
@@ -53,6 +55,7 @@ const Details = ({
   onToggle,
   summary,
   summaryAfter,
+  visuallyHiddenText,
 }: DetailsProps) => {
   const [id] = useState(propId);
   const ref = useRef<HTMLElement>(null);
@@ -138,8 +141,10 @@ const Details = ({
           data-testid={formatTestId(`Expand Details Section ${summary}`)}
         >
           {summary}
+          {visuallyHiddenText && (
+            <VisuallyHidden> {visuallyHiddenText}</VisuallyHidden>
+          )}
         </span>
-
         {summaryAfter}
       </summary>
       <div
