@@ -1,0 +1,14 @@
+@import '~govuk-frontend/govuk/base';
+
+.button {
+  @include govuk-media-query($from: desktop) {
+    float: right;
+    margin: -#{govuk-spacing(1)} govuk-spacing(4) 0 govuk-spacing(2);
+  }
+}
+
+.formContainer {
+  background: govuk-colour('light-grey');
+  margin-bottom: govuk-spacing(4);
+  padding: govuk-spacing(2);
+}

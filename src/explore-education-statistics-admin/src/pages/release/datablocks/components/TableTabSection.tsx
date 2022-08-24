@@ -1,4 +1,6 @@
 import { ReleaseDataBlock } from '@admin/services/dataBlockService';
+import Button from '@common/components/Button';
+import useToggle from '@common/hooks/useToggle';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
@@ -9,28 +11,37 @@ interface Props {
   dataBlock: ReleaseDataBlock;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
-  onSave?: (tableHeaders: TableHeadersConfig) => void;
+  onReorderTableHeaders?: (tableHeaders: TableHeadersConfig) => void;
 }
 
-const TableTabSection = ({ dataBlock, table, tableHeaders, onSave }: Props) => {
+const TableTabSection = ({
+  dataBlock,
+  table,
+  tableHeaders,
+  onReorderTableHeaders,
+}: Props) => {
   const dataTableRef = useRef<HTMLElement>(null);
+
   return (
     <>
-      {onSave && (
-        <TableHeadersForm
-          initialValues={tableHeaders}
-          id="dataBlockTabs-tableHeadersForm"
-          onSubmit={async nextTableHeaders => {
-            await onSave(nextTableHeaders);
-
-            if (dataTableRef.current) {
-              dataTableRef.current.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
-            }
-          }}
-        />
+      {onReorderTableHeaders && (
+        <>
+          <TableHeadersForm
+            initialValues={tableHeaders}
+            onSubmit={nextTableHeaders => {
+              onReorderTableHeaders(nextTableHeaders);
+              if (dataTableRef.current) {
+                // add a short delay so the reordering form is closed before it scrolls.
+                setTimeout(() => {
+                  dataTableRef?.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                  });
+                }, 200);
+              }
+            }}
+          />
+        </>
       )}
 
       <TimePeriodDataTable

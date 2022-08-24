@@ -1,47 +1,30 @@
+import styles from '@common/components/ButtonText.module.scss';
+import useButton, { ButtonOptions } from '@common/hooks/useButton';
 import classNames from 'classnames';
-import React, { MouseEventHandler, ReactNode } from 'react';
-import styles from './ButtonText.module.scss';
+import React, { forwardRef, Ref } from 'react';
 
-interface Props {
-  children: ReactNode;
-  className?: string;
-  disabled?: boolean;
-  id?: string;
-  testId?: string;
-  onClick?: MouseEventHandler<HTMLButtonElement>;
-  type?: 'button' | 'submit' | 'reset';
-  underline?: boolean;
-  variant?: 'warning';
-}
+const ButtonText = (props: ButtonOptions, ref: Ref<HTMLButtonElement>) => {
+  const { className, isDisabled, underline, variant, ...button } = useButton(
+    props,
+  );
 
-const ButtonText = ({
-  children,
-  className,
-  testId,
-  type = 'button',
-  underline = true,
-  variant,
-  ...props
-}: Props) => {
   return (
+    // eslint-disable-next-line react/button-has-type
     <button
       // eslint-disable-next-line react/jsx-props-no-spreading
-      {...props}
+      {...button}
       className={classNames(
         styles.button,
         {
           [styles.noUnderline]: !underline,
           [styles.warning]: variant === 'warning',
+          [styles.disabled]: isDisabled,
         },
         className,
       )}
-      data-testid={testId}
-      // eslint-disable-next-line react/button-has-type
-      type={type}
-    >
-      {children}
-    </button>
+      ref={ref}
+    />
   );
 };
 
-export default ButtonText;
+export default forwardRef(ButtonText);

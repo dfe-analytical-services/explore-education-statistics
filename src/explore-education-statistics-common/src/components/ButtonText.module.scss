@@ -18,8 +18,10 @@
     @include govuk-focused-text;
   }
 
-  &:disabled {
+  &.disabled {
+    color: govuk-colour('light-blue');
     cursor: not-allowed;
+    text-decoration: none;
   }
 }
 

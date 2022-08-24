@@ -8,7 +8,7 @@ import {
   testDataFiltersWithNoResults,
   testDataNoFiltersTable,
   testDataNoFiltersTableHeadersConfig,
-} from '@common/modules/table-tool/components/__tests__/__data__/TimePeriodDataTable.data';
+} from '@common/modules/table-tool/components/__tests__/__data__/timePeriodDataTable.data';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import {

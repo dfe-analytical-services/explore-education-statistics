@@ -1,77 +1,19 @@
-import useMountedRef from '@common/hooks/useMountedRef';
-import useToggle from '@common/hooks/useToggle';
+import styles from '@common/components/Button.module.scss';
+import useButton, { ButtonOptions } from '@common/hooks/useButton';
 import classNames from 'classnames';
-import React, {
-  forwardRef,
-  MouseEventHandler,
-  ReactNode,
-  Ref,
-  useCallback,
-} from 'react';
-import styles from './Button.module.scss';
+import React, { forwardRef, Ref } from 'react';
 
-export interface ButtonProps {
-  ariaDisabled?: boolean;
-  children: ReactNode;
-  className?: string;
-  disabled?: boolean;
-  disableDoubleClick?: boolean;
-  id?: string;
-  testId?: string;
-  type?: 'button' | 'submit' | 'reset';
-  variant?: 'secondary' | 'warning';
-  onClick?: MouseEventHandler<HTMLButtonElement>;
-}
-
-function Button(
-  {
-    ariaDisabled,
-    children,
-    className,
-    disabled = false,
-    disableDoubleClick = true,
-    id,
-    testId,
-    type = 'button',
-    variant,
-    onClick,
-  }: ButtonProps,
-  ref: Ref<HTMLButtonElement>,
-) {
-  const [isClicking, toggleClicking] = useToggle(false);
-  const isMountedRef = useMountedRef();
-
-  const handleClick: MouseEventHandler<HTMLButtonElement> = useCallback(
-    async event => {
-      if (ariaDisabled || disabled) {
-        return;
-      }
-
-      if (disableDoubleClick) {
-        toggleClicking.on();
-      }
-
-      await onClick?.(event);
-
-      if (disableDoubleClick && isMountedRef.current) {
-        toggleClicking.off();
-      }
-    },
-    [
-      ariaDisabled,
-      disabled,
-      disableDoubleClick,
-      isMountedRef,
-      onClick,
-      toggleClicking,
-    ],
+function Button(props: ButtonOptions, ref: Ref<HTMLButtonElement>) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { className, isDisabled, underline, variant, ...button } = useButton(
+    props,
   );
 
-  const isDisabled = ariaDisabled || disabled || isClicking;
-
   return (
+    // eslint-disable-next-line react/button-has-type
     <button
-      aria-disabled={isDisabled}
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...button}
       className={classNames(
         'govuk-button',
         {
@@ -82,16 +24,8 @@ function Button(
         },
         className,
       )}
-      data-testid={testId}
-      disabled={ariaDisabled ? undefined : disabled || isClicking}
-      id={id}
       ref={ref}
-      onClick={handleClick}
-      // eslint-disable-next-line react/button-has-type
-      type={type}
-    >
-      {children}
-    </button>
+    />
   );
 }
 

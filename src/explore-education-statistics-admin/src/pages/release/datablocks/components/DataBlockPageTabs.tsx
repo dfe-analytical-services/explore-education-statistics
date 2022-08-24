@@ -317,7 +317,7 @@ const DataBlockPageTabs = ({
                   dataBlock={dataBlock}
                   table={response.table}
                   tableHeaders={response.tableHeaders}
-                  onSave={handleTableHeadersSave}
+                  onReorderTableHeaders={handleTableHeadersSave}
                 />
               </TabsSection>,
               <TabsSection

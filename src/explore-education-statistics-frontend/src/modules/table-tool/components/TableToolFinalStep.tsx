@@ -70,21 +70,9 @@ const TableToolFinalStep = ({
       className="govuk-!-margin-bottom-4"
       data-testid="Table tool final step container"
     >
-      <TableHeadersForm
-        initialValues={tableHeaders}
-        onSubmit={nextTableHeaders => {
-          onReorderTableHeaders(nextTableHeaders);
-          if (dataTableRef.current) {
-            dataTableRef.current.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            });
-          }
-        }}
-      />
       {table && tableHeaders && (
         <>
-          <div className="govuk-!-margin-bottom-3">
+          <div className="govuk-!-margin-bottom-3 dfe-flex dfe-align-items-start dfe-justify-content--space-between">
             {selectedPublication.selectedRelease.latestData && (
               <Tag strong>This is the latest data</Tag>
             )}
@@ -111,6 +99,22 @@ const TableToolFinalStep = ({
               </>
             )}
           </div>
+
+          <TableHeadersForm
+            initialValues={tableHeaders}
+            onSubmit={nextTableHeaders => {
+              onReorderTableHeaders(nextTableHeaders);
+              if (dataTableRef.current) {
+                // add a short delay so the reordering form is closed before it scrolls.
+                setTimeout(() => {
+                  dataTableRef?.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                  });
+                }, 200);
+              }
+            }}
+          />
 
           <TimePeriodDataTable
             ref={dataTableRef}

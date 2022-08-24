@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Button renders correctly with required props 1`] = `
+exports[`ButtonText renders correctly with required props 1`] = `
 <button aria-disabled="false"
         type="button"
-        class="govuk-button"
+        class="button"
 >
   Test button
 </button>
