@@ -3,9 +3,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -33,14 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             {
                 var result = await _blobStorageService.GetDeserializedJson(cacheKey.Container, cacheKey.Key, targetType);
 
-                if (result != null)
-                {
-                    _logger.LogInformation("Blob cache hit - for key {CacheKey}", key);
-                }
-                else
-                {
-                    _logger.LogInformation("Blob cache miss - for key {CacheKey}", key);
-                }
+                _logger.LogInformation("Blob cache {HitOrMiss} - for key {CacheKey}", 
+                    result != null ? "hit" : "miss", key);
 
                 return result;
             }

@@ -106,13 +106,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         methodology.Published = DateTime.UtcNow;
 
                         await _publishingService.PublishMethodologyFiles(methodology.Id);
-
-                        // Update the 'All Methodologies' cache item
-                        await _contentCacheService.UpdateMethodologyTree();
                     }
 
                     _context.MethodologyVersions.Update(methodology);
                     await _context.SaveChangesAsync();
+
+                    // Update the 'All Methodologies' cache item
+                    await _contentCacheService.UpdateMethodologyTree();
+                    
                     return methodology;
                 });
         }
