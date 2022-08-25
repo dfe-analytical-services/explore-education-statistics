@@ -89,6 +89,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         }
 
         /// <summary>
+        ///   Removes all user resource roles for the given user.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [HttpDelete("user/{userId:guid}/resource-roles/all")] [ProducesResponseType(204)]
+        public async Task<ActionResult<Unit>> DeleteAllUserResourceRoles(Guid userId)
+        {
+            return await _userRoleService
+                .RemoveAllUserResourceRoles(userId)
+                .HandleFailuresOrNoContent();
+        }
+        
+        /// <summary>
         /// Provides a list of releases that are available within the service
         /// </summary>
         /// <returns>Id and Title of the releases</returns>

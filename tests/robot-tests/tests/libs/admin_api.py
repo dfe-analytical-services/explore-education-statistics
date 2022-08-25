@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+from robot.libraries.BuiltIn import BuiltIn
 
 # To prevent InsecureRequestWarning
 requests.packages.urllib3.disable_warnings()
@@ -160,6 +161,39 @@ def user_adds_publication_role_to_user_via_api(
     )
     assert response.status_code < 300, \
         f'Adding publication role to user API request failed with {response.status_code} and {response.text}'
+
+
+def user_removes_all_release_and_publication_roles_from_user(user_id: str) -> None:
+    response = admin_client.delete(
+        f'/api/user-management/user/{user_id}/resource-roles/all'
+    )
+    assert response.status_code < 300, \
+        f'Removing release role from user API request failed with {response.status_code} and {response.text}'
+
+
+def user_resets_user_roles_via_api_if_required(user_emails: list) -> None:
+    allowed_users = [
+        'ees-prerelease1@education.gov.uk',
+        'ees-prerelease2@education.gov.uk',
+        'ees-prerelease3@education.gov.uk']
+
+    user_ids = []
+
+    for user_email in user_emails:
+        if user_email not in allowed_users:
+            raise AssertionError(f'`User emails` must contain only allowed users: {allowed_users}')
+        try:
+            user_ids = [get_user_details_via_api(user_email)['id']]
+        except IndexError:
+            BuiltIn().log(f'User with email {user_email} does not exist')
+
+        try:
+            result = [user_removes_all_release_and_publication_roles_from_user(user_id) for user_id in user_ids]
+            assert(all(result))
+            BuiltIn().log(f'All userReleaseRoles & userPublicationRoles reset for user: {user_email}')
+
+        except AssertionError:
+            BuiltIn().log(f'Failed to remove roles from user {user_email}')
 
 
 def user_create_test_release_via_api(
