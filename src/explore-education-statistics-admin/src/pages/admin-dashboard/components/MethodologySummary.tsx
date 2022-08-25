@@ -84,19 +84,13 @@ const MethodologySummary = ({
     <>
       {methodologies.length > 0 || externalMethodology?.url ? (
         <ul className="govuk-list govuk-!-margin-top-2">
-          {methodologies.map(publicationMethodologyLink => {
-            const {
-              owner,
-              permissions,
-              methodology,
-            } = publicationMethodologyLink;
-
+          {methodologies.map(methodology => {
             const canEdit =
-              methodology.permissions.canApproveMethodology ||
-              methodology.permissions.canMarkMethodologyAsDraft ||
-              methodology.permissions.canUpdateMethodology;
+              methodology.permissions.canApproveMethodologyVersion ||
+              methodology.permissions.canMarkMethodologyVersionAsDraft ||
+              methodology.permissions.canUpdateMethodologyVersion;
 
-            const displayTitle = owner
+            const displayTitle = methodology.owned
               ? `${methodology.title} (Owned)`
               : `${methodology.title} (Adopted)`;
 
@@ -130,9 +124,9 @@ const MethodologySummary = ({
                             'Not yet published'
                           )}
                         </SummaryListItem>
-                        {methodology.latestInternalReleaseNote && (
+                        {methodology.internalReleaseNote && (
                           <SummaryListItem term="Internal release note">
-                            {methodology.latestInternalReleaseNote}
+                            {methodology.internalReleaseNote}
                           </SummaryListItem>
                         )}
                       </SummaryList>
@@ -197,7 +191,7 @@ const MethodologySummary = ({
                           )}
                         </>
                       )}
-                      {methodology.permissions.canDeleteMethodology && (
+                      {methodology.permissions.canDeleteMethodologyVersion && (
                         <Button
                           variant="warning"
                           onClick={() =>
@@ -212,7 +206,7 @@ const MethodologySummary = ({
                             : 'Remove'}
                         </Button>
                       )}
-                      {permissions.canDropMethodology && (
+                      {methodology.permissions.canRemoveMethodologyLink && (
                         <Button
                           variant="warning"
                           onClick={() => {

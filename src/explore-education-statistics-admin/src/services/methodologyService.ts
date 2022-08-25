@@ -33,14 +33,24 @@ export interface BasicMethodologyVersion {
   methodologyId: string;
 }
 
-export interface MyMethodologyVersion extends BasicMethodologyVersion {
+export interface MethodologyVersionListItem {
+  id: string;
+  amendment: boolean;
+  published?: string;
+  status: MethodologyStatus;
+  owned: boolean;
   permissions: {
-    canApproveMethodology: boolean;
-    canUpdateMethodology: boolean;
-    canDeleteMethodology: boolean;
+    canDeleteMethodologyVersion: boolean;
+    canUpdateMethodologyVersion: boolean;
+    canApproveMethodologyVersion: boolean;
+    canMarkMethodologyVersionAsDraft: boolean;
     canMakeAmendmentOfMethodology: boolean;
-    canMarkMethodologyAsDraft: boolean;
+    canRemoveMethodologyLink: boolean;
   };
+  title: string;
+  internalReleaseNote?: string;
+  methodologyId: string;
+  previousVersionId?: string;
 }
 
 const methodologyService = {
@@ -65,6 +75,12 @@ const methodologyService = {
     return client.get<IdTitlePair[]>(
       `/methodology/${methodologyId}/unpublished-releases`,
     );
+  },
+
+  listMethodologyVersions(
+    publicationId: string,
+  ): Promise<MethodologyVersionListItem[]> {
+    return client.get(`/publication/${publicationId}/methodologies`);
   },
 
   createMethodologyAmendment(

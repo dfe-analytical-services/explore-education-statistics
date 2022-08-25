@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -1013,6 +1014,216 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .AssertRight();
 
                 Assert.Empty(result);
+            }
+        }
+
+        [Fact]
+        public async Task ListMethodologies()
+        {
+            var methodology1 = new Methodology
+            {
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Version = 0,
+                        AlternativeTitle = "Methodology 1 Version 1",
+                        InternalReleaseNote = "Methodology 1 Version 1 release note",
+                        Published = new DateTime(2021, 1, 1),
+                        Status = Approved
+                    }
+                }
+            };
+
+            var methodology2 = new Methodology
+            {
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Version = 0,
+                        AlternativeTitle = "Methodology 2 Version 1",
+                        InternalReleaseNote = "Methodology 2 Version 1 release note",
+                        Published = new DateTime(2021, 1, 1),
+                        Status = Approved
+                    },
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Version = 1,
+                        AlternativeTitle = "Methodology 2 Version 2",
+                        Published = null,
+                        Status = Draft
+                    }
+                }
+            };
+
+            var methodology3 = new Methodology
+            {
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Version = 0,
+                        AlternativeTitle = "Methodology 3 Version 1",
+                        InternalReleaseNote = "Methodology 3 Version 1 release note",
+                        Published = new DateTime(2021, 1, 1),
+                        Status = Approved
+                    },
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Version = 1,
+                        AlternativeTitle = "Methodology 3 Version 2",
+                        InternalReleaseNote = "Methodology 3 Version 2 release note",
+                        Published = new DateTime(2022, 1, 1),
+                        Status = Approved
+                    }
+                }
+            };
+
+            methodology2.Versions[1].PreviousVersionId = methodology2.Versions[0].Id;
+            methodology3.Versions[1].PreviousVersionId = methodology3.Versions[0].Id;
+
+            var publication = new Publication
+            {
+                Methodologies = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Owner = false,
+                        Methodology = methodology2
+                    },
+                    new()
+                    {
+                        Owner = true,
+                        Methodology = methodology1
+                    },
+                    new()
+                    {
+                        Owner = false,
+                        Methodology = methodology3
+                    }
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var service = SetupMethodologyService(contentDbContext);
+
+                var result = await service.ListMethodologies(publication.Id);
+                var viewModels = result.AssertRight();
+
+                // Check that the latest versions of the methodologies are returned in title order
+                Assert.Equal(3, viewModels.Count);
+
+                Assert.Equal(methodology1.Versions[0].Id, viewModels[0].Id);
+                Assert.False(viewModels[0].Amendment);
+                Assert.True(viewModels[0].Owned);
+                Assert.Equal(new DateTime(2021, 1, 1), viewModels[0].Published);
+                Assert.Equal(Approved, viewModels[0].Status);
+                Assert.Equal("Methodology 1 Version 1", viewModels[0].Title);
+                Assert.Equal("Methodology 1 Version 1 release note", viewModels[0].InternalReleaseNote);
+                Assert.Equal(methodology1.Id, viewModels[0].MethodologyId);
+                Assert.Null(viewModels[0].PreviousVersionId);
+
+                Assert.Equal(methodology2.Versions[1].Id, viewModels[1].Id);
+                Assert.True(viewModels[1].Amendment);
+                Assert.False(viewModels[1].Owned);
+                Assert.Null(viewModels[1].Published);
+                Assert.Equal(Draft, viewModels[1].Status);
+                Assert.Equal("Methodology 2 Version 2", viewModels[1].Title);
+                Assert.Null(viewModels[1].InternalReleaseNote);
+                Assert.Equal(methodology2.Id, viewModels[1].MethodologyId);
+                Assert.Equal(methodology2.Versions[0].Id, viewModels[1].PreviousVersionId);
+
+                Assert.Equal(methodology3.Versions[1].Id, viewModels[2].Id);
+                Assert.False(viewModels[2].Amendment);
+                Assert.False(viewModels[2].Owned);
+                Assert.Equal(new DateTime(2022, 1, 1), viewModels[2].Published);
+                Assert.Equal(Approved, viewModels[2].Status);
+                Assert.Equal("Methodology 3 Version 2", viewModels[2].Title);
+                Assert.Equal("Methodology 3 Version 2 release note", viewModels[2].InternalReleaseNote);
+                Assert.Equal(methodology3.Id, viewModels[2].MethodologyId);
+                Assert.Equal(methodology3.Versions[0].Id, viewModels[2].PreviousVersionId);
+            }
+        }
+
+        [Fact]
+        public async Task ListMethodologies_VerifyPermissions()
+        {
+            var publication = new Publication
+            {
+                Methodologies = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Methodology = new Methodology
+                        {
+                            Versions = new List<MethodologyVersion>
+                            {
+                                new()
+                            }
+                        }
+                    }
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var userService = new Mock<IUserService>(Strict);
+
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<Publication>(), CanViewSpecificPublication))
+                .ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanDeleteSpecificMethodology))
+                .ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanUpdateSpecificMethodology))
+                .ReturnsAsync(false);
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanApproveSpecificMethodology))
+                .ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanMarkSpecificMethodologyAsDraft))
+                .ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanMakeAmendmentOfSpecificMethodology))
+                .ReturnsAsync(false);
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<PublicationMethodology>(), CanDropMethodologyLink))
+                .ReturnsAsync(true);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                    userService: userService.Object);
+
+                var result = await service.ListMethodologies(publication.Id);
+                var viewModels = result.AssertRight();
+
+                VerifyAllMocks(userService);
+
+                var viewModel = Assert.Single(viewModels);
+                var permissions = viewModel.Permissions;
+
+                Assert.True(permissions.CanDeleteMethodologyVersion);
+                Assert.False(permissions.CanUpdateMethodologyVersion);
+                Assert.True(permissions.CanApproveMethodologyVersion);
+                Assert.True(permissions.CanMarkMethodologyVersionAsDraft);
+                Assert.False(permissions.CanMakeAmendmentOfMethodology);
+                Assert.True(permissions.CanRemoveMethodologyLink);
             }
         }
 

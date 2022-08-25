@@ -160,6 +160,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
+        public async Task ListMethodologies()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_publication, CanViewSpecificPublication)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupMethodologyService(
+                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Publication>(
+                                _publication.Id, _publication).Object,
+                            userService: userService.Object);
+                        return service.ListMethodologies(_publication.Id);
+                    }
+                );
+        }
+
+        [Fact]
         public async Task UpdateMethodology()
         {
             await PolicyCheckBuilder<SecurityPolicies>()

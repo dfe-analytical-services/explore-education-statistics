@@ -4,7 +4,7 @@ import {
 } from '@admin/services/legacyReleaseService';
 import {
   BasicMethodologyVersion,
-  MyMethodologyVersion,
+  MethodologyVersionListItem,
 } from '@admin/services/methodologyService';
 import { Release, ReleaseSummary } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
@@ -38,7 +38,7 @@ export interface MyPublication {
   title: string;
   summary: string;
   releases: Release[];
-  methodologies: MyPublicationMethodology[];
+  methodologies: MethodologyVersionListItem[];
   externalMethodology?: ExternalMethodology;
   topicId: string;
   themeId: string;
@@ -54,14 +54,6 @@ export interface MyPublication {
   };
   supersededById?: string;
   isSuperseded?: boolean;
-}
-
-export interface MyPublicationMethodology {
-  owner: boolean;
-  methodology: MyMethodologyVersion;
-  permissions: {
-    canDropMethodology: boolean;
-  };
 }
 
 export interface BasicPublicationDetails {
@@ -138,6 +130,15 @@ const publicationService = {
 
   getMyPublication(publicationId: string): Promise<MyPublication> {
     return client.get<MyPublication>(`/me/publication/${publicationId}`);
+  },
+
+  getExternalMethodology(
+    publicationId: string,
+  ): Promise<ExternalMethodology | undefined> {
+    // TODO EES-3666 Replace with external methodology request
+    return client
+      .get<MyPublication>(`/me/publication/${publicationId}`)
+      .then(response => response.externalMethodology);
   },
 
   listReleases<TReleaseSummary extends ReleaseSummary = ReleaseSummary>(

@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MethodologyVersionViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
 {
@@ -129,14 +130,63 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(BuildMethodologySummaryViewModel);
         }
 
+        public async Task<Either<ActionResult, List<MethodologyVersionViewModel>>> ListMethodologies(Guid publicationId)
+        {
+            return await _persistenceHelper.CheckEntityExists<Publication>(publicationId,
+                    q => q.Include(p => p.Methodologies)
+                        .ThenInclude(p => p.Methodology)
+                        .ThenInclude(p => p.Versions))
+                .OnSuccess(publication => _userService.CheckCanViewPublication(publication))
+                .OnSuccess(async publication =>
+                {
+                    return await publication.Methodologies
+                        .ToAsyncEnumerable()
+                        .SelectAwait(async publicationMethodology =>
+                        {
+                            var latestVersion = publicationMethodology.Methodology.LatestVersion();
+                            var permissions = new MethodologyVersionPermissions
+                            {
+                                CanDeleteMethodologyVersion =
+                                    await _userService.CheckCanDeleteMethodologyVersion(latestVersion).IsRight(),
+                                CanUpdateMethodologyVersion =
+                                    await _userService.CheckCanUpdateMethodologyVersion(latestVersion).IsRight(),
+                                CanApproveMethodologyVersion =
+                                    await _userService.CheckCanApproveMethodologyVersion(latestVersion).IsRight(),
+                                CanMarkMethodologyVersionAsDraft =
+                                    await _userService.CheckCanMarkMethodologyVersionAsDraft(latestVersion).IsRight(),
+                                CanMakeAmendmentOfMethodology =
+                                    await _userService.CheckCanMakeAmendmentOfMethodology(latestVersion).IsRight(),
+                                CanRemoveMethodologyLink =
+                                    await _userService.CheckCanDropMethodologyLink(publicationMethodology).IsRight()
+                            };
+
+                            return new MethodologyVersionViewModel
+                            {
+                                Id = latestVersion.Id,
+                                Amendment = latestVersion.Amendment,
+                                Owned = publicationMethodology.Owner,
+                                Published = latestVersion.Published,
+                                Status = latestVersion.Status,
+                                Title = latestVersion.Title,
+                                InternalReleaseNote = latestVersion.InternalReleaseNote,
+                                MethodologyId = latestVersion.MethodologyId,
+                                PreviousVersionId = latestVersion.PreviousVersionId,
+                                Permissions = permissions
+                            };
+                        })
+                        .OrderBy(viewModel => viewModel.Title)
+                        .ToListAsync();
+                });
+        }
+
         public async Task<Either<ActionResult, List<TitleAndIdViewModel>>> GetUnpublishedReleasesUsingMethodology(
             Guid methodologyVersionId)
         {
             return await _persistenceHelper.CheckEntityExists<MethodologyVersion>(methodologyVersionId, queryable =>
                     queryable.Include(m => m.Methodology)
                         .ThenInclude(mp => mp.Publications))
-                .OnSuccess(methodologyVersion => _userService.CheckCanApproveMethodology(methodologyVersion)
-                    .OrElse(() => _userService.CheckCanMarkMethodologyAsDraft(methodologyVersion)))
+                .OnSuccess(methodologyVersion => _userService.CheckCanApproveMethodologyVersion(methodologyVersion)
+                    .OrElse(() => _userService.CheckCanMarkMethodologyVersionAsDraft(methodologyVersion)))
                 .OnSuccess(async methodologyVersion =>
                 {
                     // Get all Publications using the Methodology including adopting Publications
@@ -243,7 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 return methodologyVersionToUpdate;
             }
 
-            return await _userService.CheckCanUpdateMethodology(methodologyVersionToUpdate)
+            return await _userService.CheckCanUpdateMethodologyVersion(methodologyVersionToUpdate)
                 // Check that the Methodology will have a unique slug.  It is possible to have a clash in the case where
                 // another Methodology has previously set its AlternativeTitle (and Slug) to something specific and then
                 // this Methodology attempts to set its AlternativeTitle (and Slug) to the same value.  Whilst an
@@ -321,7 +371,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private async Task<Either<ActionResult, Unit>> DeleteVersion(MethodologyVersion methodologyVersion,
             bool forceDelete = false)
         {
-            return await _userService.CheckCanDeleteMethodology(methodologyVersion, forceDelete)
+            return await _userService.CheckCanDeleteMethodologyVersion(methodologyVersion, forceDelete)
                 .OnSuccess(() => _methodologyImageService.DeleteAll(methodologyVersion.Id, forceDelete))
                 .OnSuccessVoid(async () =>
                 {

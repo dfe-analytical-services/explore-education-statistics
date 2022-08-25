@@ -1,13 +1,13 @@
 import PublicationMethodologiesPage from '@admin/pages/publication/PublicationMethodologiesPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
-import { testPublication as baseTestPublication } from '@admin/pages/publication/__data__/testPublication';
+import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import _methodologyService, {
   BasicMethodologyVersion,
+  MethodologyVersionListItem,
 } from '@admin/services/methodologyService';
 import _publicationService, {
   ExternalMethodology,
   MyPublication,
-  MyPublicationMethodology,
   UpdatePublicationRequest,
 } from '@admin/services/publicationService';
 import { render, screen, within, waitFor } from '@testing-library/react';
@@ -30,108 +30,73 @@ const publicationService = _publicationService as jest.Mocked<
 
 describe('PublicationMethodologiesPage', () => {
   const noMethodologyPermissions = {
-    canApproveMethodology: false,
-    canUpdateMethodology: false,
-    canDeleteMethodology: false,
+    canApproveMethodologyVersion: false,
+    canUpdateMethodologyVersion: false,
+    canDeleteMethodologyVersion: false,
     canMakeAmendmentOfMethodology: false,
-    canMarkMethodologyAsDraft: false,
+    canMarkMethodologyVersionAsDraft: false,
+    canRemoveMethodologyLink: false,
   };
   const testDraftMethodologyPermissions = {
-    canApproveMethodology: true,
-    canUpdateMethodology: true,
-    canDeleteMethodology: true,
+    canApproveMethodologyVersion: true,
+    canUpdateMethodologyVersion: true,
+    canDeleteMethodologyVersion: true,
     canMakeAmendmentOfMethodology: false,
-    canMarkMethodologyAsDraft: true,
+    canMarkMethodologyVersionAsDraft: true,
+    canRemoveMethodologyLink: false,
   };
-  const testMethodology1: MyPublicationMethodology = {
-    methodology: {
-      amendment: false,
-      id: 'methodology-v1',
-      latestInternalReleaseNote: 'this is the release note',
-      methodologyId: 'methodology-1',
-      published: '2021-06-08T00:00:00',
-      slug: 'methodology-slug-1',
-      status: 'Approved',
-      title: 'Methodology 1',
-      owningPublication: {
-        id: 'publication-1',
-        title: 'Publication 1',
-      },
-      permissions: noMethodologyPermissions,
-    },
-    permissions: {
-      canDropMethodology: false,
-    },
-    owner: true,
+  const testMethodology1: MethodologyVersionListItem = {
+    amendment: false,
+    id: 'methodology-v1',
+    methodologyId: 'methodology-1',
+    owned: true,
+    published: '2021-06-08T00:00:00',
+    status: 'Approved',
+    title: 'Methodology 1',
+    permissions: noMethodologyPermissions,
   };
   const testMethodology1Draft = produce(testMethodology1, draft => {
-    draft.methodology.status = 'Draft';
-    draft.methodology.permissions = testDraftMethodologyPermissions;
-    delete draft.methodology.published;
+    draft.status = 'Draft';
+    draft.permissions = testDraftMethodologyPermissions;
+    delete draft.published;
   });
   const testMethodology1Amendment = produce(testMethodology1, draft => {
-    draft.methodology.amendment = true;
-    draft.methodology.status = 'Draft';
-    draft.methodology.permissions = testDraftMethodologyPermissions;
-    draft.methodology.previousVersionId = 'previous-version-id';
-    delete draft.methodology.published;
+    draft.amendment = true;
+    draft.status = 'Draft';
+    draft.permissions = testDraftMethodologyPermissions;
+    draft.previousVersionId = 'previous-version-id';
+    delete draft.published;
   });
 
-  const testMethodology2: MyPublicationMethodology = {
-    methodology: {
-      amendment: false,
-      id: 'methodology-v2',
-      latestInternalReleaseNote: 'this is another release note',
-      methodologyId: 'methodology-2',
-      published: '2021-06-10T00:00:00',
-      slug: 'meth-2',
-      status: 'Approved',
-      title: 'Methodology 2',
-      owningPublication: {
-        id: 'owning-publication-1',
-        title: 'Owning publication title 1',
-      },
-      permissions: noMethodologyPermissions,
-    },
-    owner: false,
-    permissions: {
-      canDropMethodology: true,
-    },
+  const testMethodology2: MethodologyVersionListItem = {
+    amendment: false,
+    id: 'methodology-v2',
+    methodologyId: 'methodology-2',
+    owned: false,
+    published: '2021-06-10T00:00:00',
+    status: 'Approved',
+    title: 'Methodology 2',
+    permissions: noMethodologyPermissions,
   };
-
   const testMethodology2Draft = produce(testMethodology2, draft => {
-    draft.methodology.status = 'Draft';
-    draft.methodology.permissions = testDraftMethodologyPermissions;
-    delete draft.methodology.published;
+    draft.status = 'Draft';
+    draft.permissions = testDraftMethodologyPermissions;
+    delete draft.published;
   });
-
-  const testExternalMethodology: ExternalMethodology = {
-    title: 'External methodolology title',
-    url: 'http://test.com',
-  };
-
-  const testPublication: MyPublication = {
-    ...baseTestPublication,
-    methodologies: [testMethodology1, testMethodology2],
-  };
-
-  const testPublicationNoMethodologies = {
-    ...testPublication,
-    methodologies: [],
-  };
-
-  const testPublicationMethodologyAmendment = {
-    ...testPublication,
-    methodologies: [testMethodology1Amendment],
-  };
-
-  const testPublicationExternalMethodology: MyPublication = {
-    ...testPublication,
-    externalMethodology: testExternalMethodology,
-  };
+  const testMethodology2Amendment = produce(testMethodology2, draft => {
+    draft.amendment = true;
+    draft.status = 'Draft';
+    draft.permissions = testDraftMethodologyPermissions;
+    draft.previousVersionId = 'previous-version-id';
+    delete draft.published;
+  });
 
   test('renders the methodologies page correctly with methodologies', async () => {
-    renderPage(testPublication);
+    methodologyService.listMethodologyVersions.mockResolvedValue([
+      testMethodology1,
+      testMethodology2,
+    ]);
+    renderPage();
 
     await waitFor(() =>
       expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -162,7 +127,8 @@ describe('PublicationMethodologiesPage', () => {
   });
 
   test('renders the methodologies page correctly with no methodologies', async () => {
-    renderPage(testPublicationNoMethodologies);
+    methodologyService.listMethodologyVersions.mockResolvedValue([]);
+    renderPage();
 
     await waitFor(() =>
       expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -175,11 +141,22 @@ describe('PublicationMethodologiesPage', () => {
 
   describe('create methodology', () => {
     test('clicking the Create new methodology button creates the Methodology and takes the user to the Methodology summary', async () => {
-      publicationService.getMyPublication.mockResolvedValue(
-        testPublicationNoMethodologies,
-      );
+      const createdMethodology: BasicMethodologyVersion = {
+        id: 'methodology-v1',
+        amendment: false,
+        methodologyId: 'methodology-1',
+        title: 'Methodology 1',
+        slug: 'methodology-slug-1',
+        owningPublication: {
+          id: 'p1',
+          title: 'Publication title',
+        },
+        status: 'Draft',
+      };
+
+      methodologyService.listMethodologyVersions.mockResolvedValue([]);
       methodologyService.createMethodology.mockResolvedValue(
-        testMethodology1.methodology,
+        createdMethodology,
       );
 
       const history = createMemoryHistory();
@@ -187,7 +164,7 @@ describe('PublicationMethodologiesPage', () => {
       render(
         <Router history={history}>
           <PublicationContextProvider
-            publication={testPublicationNoMethodologies}
+            publication={testPublication}
             onPublicationChange={noop}
             onReload={noop}
           >
@@ -209,12 +186,13 @@ describe('PublicationMethodologiesPage', () => {
           testPublication.id,
         );
         expect(history.location.pathname).toBe(
-          `/methodology/${testMethodology1.methodology.id}/summary`,
+          `/methodology/${createdMethodology.id}/summary`,
         );
       });
     });
 
     test('does not render the Create Methodology button if the user does not have permission to create one', async () => {
+      methodologyService.listMethodologyVersions.mockResolvedValue([]);
       renderPage(
         produce(testPublication, draft => {
           draft.permissions.canCreateMethodologies = false;
@@ -234,10 +212,10 @@ describe('PublicationMethodologiesPage', () => {
   describe('owned methodology', () => {
     describe('draft', () => {
       test('renders a draft owned methodology correctly', async () => {
-        renderPage({
-          ...testPublication,
-          methodologies: [testMethodology1Draft],
-        });
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          testMethodology1Draft,
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -257,13 +235,12 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the view link is shown when a user does not have permission to edit the methodology', async () => {
-        const testMethodology = produce(testMethodology1Draft, draft => {
-          draft.methodology.permissions = noMethodologyPermissions;
-        });
-        renderPage({
-          ...testPublication,
-          methodologies: [testMethodology],
-        });
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology1Draft, draft => {
+            draft.permissions = noMethodologyPermissions;
+          }),
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -286,15 +263,14 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the edit link is shown when a user can approve the methodology', async () => {
-        const testMethodology = produce(testMethodology1Draft, draft => {
-          draft.methodology.permissions.canUpdateMethodology = false;
-          draft.methodology.permissions.canMarkMethodologyAsDraft = false;
-          draft.methodology.permissions.canApproveMethodology = true;
-        });
-        renderPage({
-          ...testPublication,
-          methodologies: [testMethodology],
-        });
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology1Draft, draft => {
+            draft.permissions.canUpdateMethodologyVersion = false;
+            draft.permissions.canMarkMethodologyVersionAsDraft = false;
+            draft.permissions.canApproveMethodologyVersion = true;
+          }),
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -316,15 +292,14 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the edit link is shown when a user can mark the methodology as draft', async () => {
-        const testMethodology = produce(testMethodology1Draft, draft => {
-          draft.methodology.permissions.canUpdateMethodology = false;
-          draft.methodology.permissions.canMarkMethodologyAsDraft = true;
-          draft.methodology.permissions.canApproveMethodology = false;
-        });
-        renderPage({
-          ...testPublication,
-          methodologies: [testMethodology],
-        });
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology1Draft, draft => {
+            draft.permissions.canUpdateMethodologyVersion = false;
+            draft.permissions.canMarkMethodologyVersionAsDraft = true;
+            draft.permissions.canApproveMethodologyVersion = false;
+          }),
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -346,15 +321,14 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the edit link is shown when a user can update the methodology', async () => {
-        const testMethodology = produce(testMethodology1Draft, draft => {
-          draft.methodology.permissions.canUpdateMethodology = true;
-          draft.methodology.permissions.canMarkMethodologyAsDraft = false;
-          draft.methodology.permissions.canApproveMethodology = false;
-        });
-        renderPage({
-          ...testPublication,
-          methodologies: [testMethodology],
-        });
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology1Draft, draft => {
+            draft.permissions.canUpdateMethodologyVersion = true;
+            draft.permissions.canMarkMethodologyVersionAsDraft = false;
+            draft.permissions.canApproveMethodologyVersion = false;
+          }),
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -376,10 +350,10 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the delete draft button is shown when a user can delete the methodology', async () => {
-        renderPage({
-          ...testPublication,
-          methodologies: [testMethodology1Draft],
-        });
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          testMethodology1Draft,
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -396,7 +370,12 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the delete draft button is not shown when a user does not have permission to delete the methodology', async () => {
-        renderPage(testPublication);
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology1Draft, draft => {
+            draft.permissions.canDeleteMethodologyVersion = false;
+          }),
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -415,13 +394,10 @@ describe('PublicationMethodologiesPage', () => {
 
     describe('deleting a draft methodology', () => {
       test('shows the confirm modal when clicking the delete button', async () => {
-        const testMethodology = produce(testMethodology1Draft, draft => {
-          draft.methodology.permissions.canDeleteMethodology = true;
-        });
-        renderPage({
-          ...testPublication,
-          methodologies: [testMethodology],
-        });
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          testMethodology1Draft,
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -455,10 +431,10 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('calls the service to delete the Methodology when the confirm button is clicked', async () => {
-        renderPage({
-          ...testPublication,
-          methodologies: [testMethodology1Draft],
-        });
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          testMethodology1Draft,
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -479,7 +455,7 @@ describe('PublicationMethodologiesPage', () => {
 
         await waitFor(() => {
           expect(methodologyService.deleteMethodology).toHaveBeenCalledWith(
-            testPublication.methodologies[0].methodology.id,
+            testMethodology1Draft.id,
           );
         });
       });
@@ -487,7 +463,10 @@ describe('PublicationMethodologiesPage', () => {
 
     describe('approved', () => {
       test('renders an approved owned methodology correctly', async () => {
-        renderPage(testPublication);
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          testMethodology1,
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -509,7 +488,10 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('shows the published tag and the date if the methodology has been published', async () => {
-        renderPage(testPublication);
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          testMethodology1,
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -525,11 +507,12 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('shows the approved tag if the methodology has not been published', async () => {
-        renderPage(
-          produce(testPublication, draft => {
-            delete draft.methodologies[0].methodology.published;
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology1, draft => {
+            delete draft.published;
           }),
-        );
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -545,11 +528,12 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the amend methodology button is shown if user has permission', async () => {
-        renderPage(
-          produce(testPublication, draft => {
-            draft.methodologies[0].methodology.permissions.canMakeAmendmentOfMethodology = true;
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology1, draft => {
+            draft.permissions.canMakeAmendmentOfMethodology = true;
           }),
-        );
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -567,7 +551,10 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the amend methodology button is not shown if user does not have permission', async () => {
-        renderPage(testPublication);
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          testMethodology1,
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -587,7 +574,10 @@ describe('PublicationMethodologiesPage', () => {
 
     describe('amendments', () => {
       test('renders an amendment correctly', async () => {
-        renderPage(testPublicationMethodologyAmendment);
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          testMethodology1Amendment,
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -615,13 +605,12 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the cancel amendment button is shown when a user can delete the methodology', async () => {
-        const testMethodology = produce(testMethodology1Amendment, draft => {
-          draft.methodology.permissions.canDeleteMethodology = true;
-        });
-        renderPage({
-          ...testPublication,
-          methodologies: [testMethodology],
-        });
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology1Amendment, draft => {
+            draft.permissions.canDeleteMethodologyVersion = true;
+          }),
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -638,7 +627,12 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the cancel amendment button is not shown when a user does not have permission to delete the methodology', async () => {
-        renderPage(testPublication);
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology1Amendment, draft => {
+            draft.permissions.canDeleteMethodologyVersion = false;
+          }),
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -657,11 +651,13 @@ describe('PublicationMethodologiesPage', () => {
 
     describe('amending a methodology', () => {
       test('shows the confirm modal when clicking the amend button', async () => {
-        renderPage(
-          produce(testPublication, draft => {
-            draft.methodologies[0].methodology.permissions.canMakeAmendmentOfMethodology = true;
+        renderPage();
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology1, draft => {
+            draft.permissions.canMakeAmendmentOfMethodology = true;
           }),
-        );
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -686,32 +682,32 @@ describe('PublicationMethodologiesPage', () => {
       test('calls the service to amend the methodology when the confirm button is clicked', async () => {
         const history = createMemoryHistory();
 
-        const mockMethodology: BasicMethodologyVersion = {
+        const createdAmendment: BasicMethodologyVersion = {
           amendment: true,
           id: 'methodology-v1',
-          latestInternalReleaseNote: 'this is the release note',
           methodologyId: 'methodology-1',
-          previousVersionId: 'methodology-previous-version-1',
-          owningPublication: {
-            id: 'owning-publication-1',
-            title: 'Owning publication title',
-          },
-          published: '2021-06-08T09:04:17',
+          title: 'Methodology 1',
           slug: 'methodology-slug-1',
-          status: 'Approved',
-          title: 'I am a methodology amendment',
+          owningPublication: {
+            id: 'p1',
+            title: 'Publication title',
+          },
+          status: 'Draft',
+          previousVersionId: 'methodology-previous-version-1',
         };
+
         methodologyService.createMethodologyAmendment.mockImplementation(() =>
-          Promise.resolve(mockMethodology),
+          Promise.resolve(createdAmendment),
         );
-        const publication = produce(testPublication, draft => {
-          draft.methodologies[0].methodology.permissions.canMakeAmendmentOfMethodology = true;
-        });
-        publicationService.getMyPublication.mockResolvedValue(publication);
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology1, draft => {
+            draft.permissions.canMakeAmendmentOfMethodology = true;
+          }),
+        ]);
         render(
           <Router history={history}>
             <PublicationContextProvider
-              publication={publication}
+              publication={testPublication}
               onPublicationChange={noop}
               onReload={noop}
             >
@@ -733,19 +729,22 @@ describe('PublicationMethodologiesPage', () => {
         await waitFor(() => {
           expect(
             methodologyService.createMethodologyAmendment,
-          ).toHaveBeenCalledWith(
-            testPublication.methodologies[0].methodology.id,
-          );
+          ).toHaveBeenCalledWith(testMethodology1.id);
           expect(history.location.pathname).toBe(
-            `/methodology/${mockMethodology.id}/summary`,
+            `/methodology/${createdAmendment.id}/summary`,
           );
         });
       });
     });
 
     describe('cancelling an amendment', () => {
-      test('shows the confirm modal when clicking the cancel amendment  button', async () => {
-        renderPage(testPublicationMethodologyAmendment);
+      test('shows the confirm modal when clicking the cancel amendment button', async () => {
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology1Amendment, draft => {
+            draft.permissions.canDeleteMethodologyVersion = true;
+          }),
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -776,7 +775,12 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('calls the service to cancel the amendment when the confirm button is clicked', async () => {
-        renderPage(testPublicationMethodologyAmendment);
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology1Amendment, draft => {
+            draft.permissions.canDeleteMethodologyVersion = true;
+          }),
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -798,7 +802,7 @@ describe('PublicationMethodologiesPage', () => {
 
         await waitFor(() => {
           expect(methodologyService.deleteMethodology).toHaveBeenCalledWith(
-            testPublication.methodologies[0].methodology.id,
+            testMethodology1Amendment.id,
           );
         });
       });
@@ -806,18 +810,12 @@ describe('PublicationMethodologiesPage', () => {
   });
 
   describe('adopted methodology', () => {
-    const testPublicationDraftAdoptedMethodology = {
-      ...testPublication,
-      methodologies: [testMethodology2Draft],
-    };
-    const testPublicationAmendedAdoptedMethodology = {
-      ...testPublication,
-      methodologies: [{ ...testMethodology1Amendment, owner: false }],
-    };
-
     describe('draft', () => {
       test('renders a draft adopted methodology correctly', async () => {
-        renderPage(testPublicationDraftAdoptedMethodology);
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          testMethodology2Draft,
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -843,13 +841,12 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the view link is shown when a user does not have permission to edit the methodology', async () => {
-        const testMethodology = produce(testMethodology2Draft, draft => {
-          draft.methodology.permissions = noMethodologyPermissions;
-        });
-        renderPage({
-          ...testPublication,
-          methodologies: [testMethodology],
-        });
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology2Draft, draft => {
+            draft.permissions = noMethodologyPermissions;
+          }),
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -872,15 +869,14 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the edit link is shown when a user can approve the methodology', async () => {
-        const testMethodology = produce(testMethodology2Draft, draft => {
-          draft.methodology.permissions.canUpdateMethodology = false;
-          draft.methodology.permissions.canMarkMethodologyAsDraft = false;
-          draft.methodology.permissions.canApproveMethodology = true;
-        });
-        renderPage({
-          ...testPublication,
-          methodologies: [testMethodology],
-        });
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology2Draft, draft => {
+            draft.permissions.canUpdateMethodologyVersion = false;
+            draft.permissions.canMarkMethodologyVersionAsDraft = false;
+            draft.permissions.canApproveMethodologyVersion = true;
+          }),
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -902,15 +898,14 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the edit link is shown when a user can mark the methodology as draft', async () => {
-        const testMethodology = produce(testMethodology2Draft, draft => {
-          draft.methodology.permissions.canUpdateMethodology = false;
-          draft.methodology.permissions.canMarkMethodologyAsDraft = true;
-          draft.methodology.permissions.canApproveMethodology = false;
-        });
-        renderPage({
-          ...testPublication,
-          methodologies: [testMethodology],
-        });
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology2Draft, draft => {
+            draft.permissions.canUpdateMethodologyVersion = false;
+            draft.permissions.canMarkMethodologyVersionAsDraft = true;
+            draft.permissions.canApproveMethodologyVersion = false;
+          }),
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -932,15 +927,14 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the edit link is shown when a user can update the methodology', async () => {
-        const testMethodology = produce(testMethodology2Draft, draft => {
-          draft.methodology.permissions.canUpdateMethodology = true;
-          draft.methodology.permissions.canMarkMethodologyAsDraft = false;
-          draft.methodology.permissions.canApproveMethodology = false;
-        });
-        renderPage({
-          ...testPublication,
-          methodologies: [testMethodology],
-        });
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology2Draft, draft => {
+            draft.permissions.canUpdateMethodologyVersion = true;
+            draft.permissions.canMarkMethodologyVersionAsDraft = false;
+            draft.permissions.canApproveMethodologyVersion = false;
+          }),
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -962,7 +956,12 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the remove button is shown when a user can drop the methodology', async () => {
-        renderPage(testPublicationDraftAdoptedMethodology);
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology2Draft, draft => {
+            draft.permissions.canRemoveMethodologyLink = true;
+          }),
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -979,13 +978,12 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the remove button is not shown when a user does not have permission to drop the methodology', async () => {
-        const testMethodology = produce(testMethodology2Draft, draft => {
-          draft.permissions.canDropMethodology = false;
-        });
-        renderPage({
-          ...testPublication,
-          methodologies: [testMethodology],
-        });
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology2Draft, draft => {
+            draft.permissions.canRemoveMethodologyLink = false;
+          }),
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -1003,8 +1001,12 @@ describe('PublicationMethodologiesPage', () => {
     });
 
     describe('approved', () => {
-      test('renders an approved owned methodology correctly', async () => {
-        renderPage(testPublication);
+      test('renders an approved adopted methodology correctly', async () => {
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          testMethodology1,
+          testMethodology2,
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -1036,7 +1038,13 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the remove button is shown when a user can drop the methodology', async () => {
-        renderPage(testPublication);
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          testMethodology1,
+          produce(testMethodology2, draft => {
+            draft.permissions.canRemoveMethodologyLink = true;
+          }),
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -1053,11 +1061,13 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the remove button is not shown when a user does not have permission to drop the methodology', async () => {
-        renderPage(
-          produce(testPublication, draft => {
-            draft.methodologies[1].permissions.canDropMethodology = false;
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          testMethodology1,
+          produce(testMethodology2, draft => {
+            draft.permissions.canRemoveMethodologyLink = false;
           }),
-        );
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -1076,7 +1086,10 @@ describe('PublicationMethodologiesPage', () => {
 
     describe('amendments', () => {
       test('renders an amendment correctly', async () => {
-        renderPage(testPublicationAmendedAdoptedMethodology);
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          testMethodology2Amendment,
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -1086,7 +1099,7 @@ describe('PublicationMethodologiesPage', () => {
           'cell',
         );
         expect(
-          within(row1Cells[0]).getByText('Methodology 1'),
+          within(row1Cells[0]).getByText('Methodology 2'),
         ).toBeInTheDocument();
         expect(within(row1Cells[1]).getByText('Adopted')).toBeInTheDocument();
         expect(
@@ -1098,13 +1111,13 @@ describe('PublicationMethodologiesPage', () => {
 
         expect(
           within(row1Cells[4]).queryByRole('link', {
-            name: 'View original for Methodology 1',
+            name: 'View original for Methodology 2',
           }),
         ).not.toBeInTheDocument();
 
         expect(
           within(row1Cells[4]).queryByRole('button', {
-            name: 'Cancel amendment for Methodology 1',
+            name: 'Cancel amendment for Methodology 2',
           }),
         ).not.toBeInTheDocument();
       });
@@ -1112,7 +1125,12 @@ describe('PublicationMethodologiesPage', () => {
 
     describe('removing an adopted methodology', () => {
       test('shows the confirm modal when clicking the remove button', async () => {
-        renderPage(testPublication);
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology2, draft => {
+            draft.permissions.canRemoveMethodologyLink = true;
+          }),
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -1139,7 +1157,12 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('calls the service to remove the adopted Methodology when the confirm button is clicked', async () => {
-        renderPage(testPublication);
+        methodologyService.listMethodologyVersions.mockResolvedValue([
+          produce(testMethodology2, draft => {
+            draft.permissions.canRemoveMethodologyLink = true;
+          }),
+        ]);
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -1158,7 +1181,7 @@ describe('PublicationMethodologiesPage', () => {
         await waitFor(() => {
           expect(publicationService.dropMethodology).toHaveBeenCalledWith(
             testPublication.id,
-            testPublication.methodologies[1].methodology.methodologyId,
+            testMethodology2.methodologyId,
           );
         });
       });
@@ -1166,8 +1189,19 @@ describe('PublicationMethodologiesPage', () => {
   });
 
   describe('external methodology', () => {
+    const testExternalMethodology: ExternalMethodology = {
+      title: 'External methodolology title',
+      url: 'http://test.com',
+    };
     test('renders an external methodology correctly', async () => {
-      renderPage(testPublicationExternalMethodology);
+      methodologyService.listMethodologyVersions.mockResolvedValue([
+        testMethodology1,
+        testMethodology2,
+      ]);
+      publicationService.getExternalMethodology.mockResolvedValue(
+        testExternalMethodology,
+      );
+      renderPage();
 
       await waitFor(() =>
         expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -1188,10 +1222,11 @@ describe('PublicationMethodologiesPage', () => {
     });
 
     test('renders the table when there is only an external methodology', async () => {
-      renderPage({
-        ...testPublicationExternalMethodology,
-        methodologies: [],
-      });
+      methodologyService.listMethodologyVersions.mockResolvedValue([]);
+      publicationService.getExternalMethodology.mockResolvedValue(
+        testExternalMethodology,
+      );
+      renderPage();
 
       await waitFor(() =>
         expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -1214,7 +1249,14 @@ describe('PublicationMethodologiesPage', () => {
     });
 
     test('shows the edit and delete buttons if have permission to manage external methodologies', async () => {
-      renderPage(testPublicationExternalMethodology);
+      methodologyService.listMethodologyVersions.mockResolvedValue([
+        testMethodology1,
+        testMethodology2,
+      ]);
+      publicationService.getExternalMethodology.mockResolvedValue(
+        testExternalMethodology,
+      );
+      renderPage();
 
       await waitFor(() =>
         expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -1238,8 +1280,15 @@ describe('PublicationMethodologiesPage', () => {
     });
 
     test('does not show the edit and delete buttons if do not have permission to manage external methodologies', async () => {
+      methodologyService.listMethodologyVersions.mockResolvedValue([
+        testMethodology1,
+        testMethodology2,
+      ]);
+      publicationService.getExternalMethodology.mockResolvedValue(
+        testExternalMethodology,
+      );
       renderPage({
-        ...testPublicationExternalMethodology,
+        ...testPublication,
         permissions: {
           ...testPublication.permissions,
           canManageExternalMethodology: false,
@@ -1269,7 +1318,11 @@ describe('PublicationMethodologiesPage', () => {
 
     describe('removing an external methodology', () => {
       test('shows the confirm modal when clicking the remove button', async () => {
-        renderPage(testPublicationExternalMethodology);
+        methodologyService.listMethodologyVersions.mockResolvedValue([]);
+        publicationService.getExternalMethodology.mockResolvedValue(
+          testExternalMethodology,
+        );
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -1305,7 +1358,11 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('calls the service to delete the Methodology when the confirm button is clicked', async () => {
-        renderPage(testPublicationExternalMethodology);
+        methodologyService.listMethodologyVersions.mockResolvedValue([]);
+        publicationService.getExternalMethodology.mockResolvedValue(
+          testExternalMethodology,
+        );
+        renderPage();
 
         await waitFor(() =>
           expect(screen.getByText('Manage methodologies')).toBeInTheDocument(),
@@ -1336,9 +1393,7 @@ describe('PublicationMethodologiesPage', () => {
   });
 });
 
-function renderPage(publication: MyPublication) {
-  publicationService.getMyPublication.mockResolvedValue(publication);
-
+function renderPage(publication: MyPublication = testPublication) {
   render(
     <MemoryRouter>
       <PublicationContextProvider

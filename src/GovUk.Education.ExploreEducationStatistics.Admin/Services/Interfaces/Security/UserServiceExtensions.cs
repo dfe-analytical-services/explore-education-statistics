@@ -68,27 +68,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(methodologyVersion, SecurityPolicies.CanViewSpecificMethodology);
         }
 
-        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanUpdateMethodology(
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanUpdateMethodologyVersion(
             this IUserService userService, MethodologyVersion methodologyVersion)
         {
             return userService.CheckPolicy(methodologyVersion, SecurityPolicies.CanUpdateSpecificMethodology);
         }
 
-        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanUpdateMethodology(
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanUpdateMethodologyVersion(
             this IUserService userService, MethodologyVersion methodologyVersion, bool ignoreCheck)
         {
             return ignoreCheck
                 ? Task.FromResult(new Either<ActionResult, MethodologyVersion>(methodologyVersion))
-                : userService.CheckCanUpdateMethodology(methodologyVersion);
+                : userService.CheckCanUpdateMethodologyVersion(methodologyVersion);
         }
 
-        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanMarkMethodologyAsDraft(
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanMarkMethodologyVersionAsDraft(
             this IUserService userService, MethodologyVersion methodologyVersion)
         {
             return userService.CheckPolicy(methodologyVersion, SecurityPolicies.CanMarkSpecificMethodologyAsDraft);
         }
 
-        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanApproveMethodology(
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanApproveMethodologyVersion(
             this IUserService userService, MethodologyVersion methodologyVersion)
         {
             return userService.CheckPolicy(methodologyVersion, SecurityPolicies.CanApproveSpecificMethodology);
@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(methodologyVersion, SecurityPolicies.CanMakeAmendmentOfSpecificMethodology);
         }
 
-        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanDeleteMethodology(
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanDeleteMethodologyVersion(
             this IUserService userService, MethodologyVersion methodologyVersion, bool ignoreCheck = false)
         {
             return ignoreCheck

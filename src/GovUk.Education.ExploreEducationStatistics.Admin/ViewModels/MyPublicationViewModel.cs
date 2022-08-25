@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
@@ -17,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public List<ReleaseViewModel> Releases { get; set; }
 
-        public List<MyPublicationMethodologyVersionViewModel> Methodologies { get; set; }
+        public List<MethodologyVersionViewModel> Methodologies { get; set; }
 
         public ExternalMethodology ExternalMethodology { get; set; }
 

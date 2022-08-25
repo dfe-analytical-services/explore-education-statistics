@@ -4,7 +4,6 @@ import { noop } from 'lodash';
 import PublicationSummary from '@admin/pages/admin-dashboard/components/PublicationSummary';
 import {
   MyPublication,
-  MyPublicationMethodology,
   PublicationContactDetails,
 } from '@admin/services/publicationService';
 import _releaseService, {
@@ -12,6 +11,7 @@ import _releaseService, {
   ReleaseStageStatuses,
 } from '@admin/services/releaseService';
 import { MemoryRouter } from 'react-router-dom';
+import { MethodologyVersionListItem } from 'src/services/methodologyService';
 
 jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
@@ -99,33 +99,23 @@ describe('PublicationSummary', () => {
     } as Release,
   ];
 
-  const testMethodologies: MyPublicationMethodology[] = [
+  const testMethodologies: MethodologyVersionListItem[] = [
     {
-      owner: true,
-      methodology: {
-        amendment: false,
-        id: 'methodology-v1',
-        latestInternalReleaseNote: 'this is the release note',
-        methodologyId: 'methodology-1',
-        previousVersionId: 'methodology-previous-version-1',
-        published: '2021-06-08T09:04:17.9805585',
-        slug: 'methodology-slug-1',
-        status: 'Approved',
-        title: 'Methodology 1',
-        owningPublication: {
-          id: 'owning-publication-1',
-          title: 'Owning publication title',
-        },
-        permissions: {
-          canApproveMethodology: false,
-          canUpdateMethodology: false,
-          canDeleteMethodology: false,
-          canMakeAmendmentOfMethodology: false,
-          canMarkMethodologyAsDraft: false,
-        },
-      },
+      amendment: false,
+      id: 'methodology-v1',
+      methodologyId: 'methodology-1',
+      previousVersionId: 'methodology-previous-version-1',
+      owned: true,
+      published: '2021-06-08T09:04:17.9805585',
+      status: 'Approved',
+      title: 'Methodology 1',
       permissions: {
-        canDropMethodology: false,
+        canApproveMethodologyVersion: false,
+        canUpdateMethodologyVersion: false,
+        canDeleteMethodologyVersion: false,
+        canMakeAmendmentOfMethodology: false,
+        canMarkMethodologyVersionAsDraft: false,
+        canRemoveMethodologyLink: false,
       },
     },
   ];
@@ -326,7 +316,7 @@ describe('PublicationSummary', () => {
     // PublicationSummary.
     expect(
       screen.getByRole('button', {
-        name: `${testMethodologies[0].methodology.title} (Owned) Published`,
+        name: `${testMethodologies[0].title} (Owned) Published`,
       }),
     ).toBeInTheDocument();
 

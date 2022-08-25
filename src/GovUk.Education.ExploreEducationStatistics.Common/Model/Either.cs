@@ -96,6 +96,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
     public static class EitherTaskExtensions
     {
+        public static async Task<bool> IsRight<TFailure, TSuccess>(this Task<Either<TFailure, TSuccess>> task)
+        {
+            return (await task).IsRight;
+        }
+
         public static async Task<Either<TFailure, TSuccess>> OnSuccessDo<TFailure, TSuccess>(
             this Task<Either<TFailure, TSuccess>> task,
             Func<Task> successTask)

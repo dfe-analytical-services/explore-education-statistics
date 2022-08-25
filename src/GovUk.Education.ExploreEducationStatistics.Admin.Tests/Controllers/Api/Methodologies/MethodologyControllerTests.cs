@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             methodologyService
                 .Setup(s => s.GetAdoptableMethodologies(_id))
-                .ReturnsAsync(AsList(new MethodologyVersionSummaryViewModel()));
+                .ReturnsAsync(ListOf(new MethodologyVersionSummaryViewModel()));
 
             var controller = SetupMethodologyController(methodologyService.Object);
 
@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             methodologyService
                 .Setup(s => s.GetUnpublishedReleasesUsingMethodology(_id))
-                .ReturnsAsync(AsList(new TitleAndIdViewModel()));
+                .ReturnsAsync(ListOf(new TitleAndIdViewModel()));
 
             var controller = SetupMethodologyController(methodologyService.Object);
 
@@ -168,6 +168,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             VerifyAllMocks(methodologyService);
 
             result.AssertNotFoundResult();
+        }
+
+        [Fact]
+        public async Task ListMethodologies_Returns_Ok()
+        {
+            var methodologyService = new Mock<IMethodologyService>(Strict);
+
+            methodologyService
+                .Setup(s => s.ListMethodologies(_id))
+                .ReturnsAsync(ListOf(new MethodologyVersionViewModel()));
+
+            var controller = SetupMethodologyController(methodologyService.Object);
+
+            var result = await controller.ListMethodologies(_id);
+
+            VerifyAllMocks(methodologyService);
+
+            result.AssertOkResult();
         }
 
         [Fact]
@@ -216,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             methodologyService
                 .Setup(s => s.DeleteMethodologyVersion(_id, false))
-                .ReturnsAsync(new Either<ActionResult, Unit>(Unit.Instance));
+                .ReturnsAsync(Unit.Instance);
 
             var controller = SetupMethodologyController(methodologyService.Object);
 
