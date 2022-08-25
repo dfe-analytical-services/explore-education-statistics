@@ -553,7 +553,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
     userEvent.click(
       group2.getByRole('button', {
-        name: 'Select all 2 subgroup options',
+        name: /Select all 2 subgroup options/i,
       }),
     );
 
@@ -605,7 +605,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
     expect(checkbox3.checked).toBe(true);
 
     userEvent.click(
-      group2.getByRole('button', { name: 'Unselect all 2 subgroup options' }),
+      group2.getByRole('button', { name: /Unselect all 2 subgroup options/i }),
     );
 
     expect(checkbox1.checked).toBe(false);
@@ -653,7 +653,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
     expect(checkbox3.checked).toBe(false);
 
     expect(
-      group2.getByRole('button', { name: 'Select all 2 subgroup options' }),
+      group2.getByRole('button', { name: /Select all 2 subgroup options/i }),
     ).toBeInTheDocument();
     expect(
       group2.queryByRole('button', { name: 'Unselect all 2 subgroup options' }),
@@ -669,7 +669,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
       group2.queryByRole('button', { name: 'Select all 2 subgroup options' }),
     ).not.toBeInTheDocument();
     expect(
-      group2.getByRole('button', { name: 'Unselect all 2 subgroup options' }),
+      group2.getByRole('button', { name: /Unselect all 2 subgroup options/i }),
     ).toBeInTheDocument();
   });
 
@@ -716,7 +716,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
       group2.queryByRole('button', { name: 'Select all 2 subgroup options' }),
     ).not.toBeInTheDocument();
     expect(
-      group2.getByRole('button', { name: 'Unselect all 2 subgroup options' }),
+      group2.getByRole('button', { name: /Unselect all 2 subgroup options/i }),
     ).toBeInTheDocument();
 
     userEvent.click(checkbox2);
@@ -725,7 +725,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
     expect(checkbox3.checked).toBe(true);
 
     expect(
-      group2.getByRole('button', { name: 'Select all 2 subgroup options' }),
+      group2.getByRole('button', { name: /Select all 2 subgroup options/i }),
     ).toBeInTheDocument();
     expect(
       group2.queryByRole('name', { name: 'Unselect all 2 subgroup options' }),

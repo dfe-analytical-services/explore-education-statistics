@@ -16,6 +16,7 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
+import VisuallyHidden from '../VisuallyHidden';
 import FormCheckbox, {
   CheckboxChangeEventHandler,
   FormCheckboxProps,
@@ -53,6 +54,7 @@ interface BaseFormCheckboxGroupProps {
   onAllChange?: CheckboxGroupAllChangeEventHandler;
   onBlur?: FocusEventHandler<HTMLInputElement>;
   onChange?: CheckboxChangeEventHandler;
+  visuallyHiddenText?: string;
 }
 
 const getDefaultSelectAllText = (
@@ -80,6 +82,7 @@ export const BaseFormCheckboxGroup = ({
   onBlur,
   onChange,
   onAllChange,
+  visuallyHiddenText,
 }: BaseFormCheckboxGroupProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -151,6 +154,9 @@ export const BaseFormCheckboxGroup = ({
           underline={false}
         >
           {selectAllText(isAllChecked, options)}
+          {visuallyHiddenText && (
+            <VisuallyHidden> {visuallyHiddenText}</VisuallyHidden>
+          )}
         </ButtonText>
       )}
       {showResults && (
