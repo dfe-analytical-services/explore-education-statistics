@@ -11,10 +11,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 
 public interface IMethodologyCacheService
 {
-    Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetMethodologyTree();
+    Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetSummariesTree();
     
-    Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> UpdateMethodologyTree();
+    Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> UpdateSummariesTree();
 
-    Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetMethodologiesByPublication(
+    Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetSummariesByPublication(
         Guid publicationId);
 }

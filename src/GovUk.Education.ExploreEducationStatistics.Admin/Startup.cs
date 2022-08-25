@@ -404,7 +404,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContentThemeService, ContentThemeService>();
             services.AddTransient<IContentMethodologyService, ContentMethodologyService>();
             services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
-            services.AddTransient<IPublicationCacheService, PublicationCacheService>();
+            services.AddTransient<IThemeCacheService, ThemeCacheService>();
             services.AddTransient<IMyPublicationPermissionsResolver,
                 MyPublicationPermissionsResolver>();
             services.AddTransient<IMyPublicationMethodologyVersionPermissionsResolver,
@@ -462,7 +462,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         GetBlobStorageService(provider, "PublicStorage"),
                         provider.GetRequiredService<ILogger<BlobCacheService>>()),
                     methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
-                    publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()
+                    themeCacheService: provider.GetRequiredService<IThemeCacheService>()
                 )
             );
             services.AddTransient<IPublicationRepository, PublicationRepository>();
@@ -619,7 +619,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage"),
                     publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
                     methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
-                    publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()
+                    themeCacheService: provider.GetRequiredService<IThemeCacheService>()
                 )
             );
 

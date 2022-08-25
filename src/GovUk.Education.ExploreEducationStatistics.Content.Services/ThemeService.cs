@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<IList<ThemeTree<PublicationTreeNode>>> GenerateFullPublicationTree()
+        public async Task<IList<ThemeTree<PublicationTreeNode>>> GetPublicationTree()
         {
             var themes = await _contentDbContext.Themes
                 .Include(theme => theme.Topics)

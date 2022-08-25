@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GenerateSummariesTree()
+        public async Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetSummariesTree()
         {
             var themes = await _contentDbContext.Themes
                 .Include(theme => theme.Topics)

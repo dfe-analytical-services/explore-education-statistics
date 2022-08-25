@@ -12,5 +12,5 @@ public interface IMethodologyService
 {
     public Task<Either<ActionResult, MethodologyVersionViewModel>> GetLatestMethodologyBySlug(string slug);
 
-    public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GenerateSummariesTree();
+    public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetSummariesTree();
 }

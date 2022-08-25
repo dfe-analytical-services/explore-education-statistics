@@ -26,18 +26,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
         private readonly IBlobStorageService _privateBlobStorageService;
         private readonly IBlobStorageService _publicBlobStorageService;
         private readonly IMethodologyCacheService _methodologyCacheService;
-        private readonly IPublicationCacheService _publicationCacheService;
+        private readonly IThemeCacheService _themeCacheService;
 
         public BauCacheController(
             IBlobStorageService privateBlobStorageService,
             IBlobStorageService publicBlobStorageService, 
             IMethodologyCacheService methodologyCacheService, 
-            IPublicationCacheService publicationCacheService)
+            IThemeCacheService themeCacheService)
         {
             _privateBlobStorageService = privateBlobStorageService;
             _publicBlobStorageService = publicBlobStorageService;
             _methodologyCacheService = methodologyCacheService;
-            _publicationCacheService = publicationCacheService;
+            _themeCacheService = themeCacheService;
         }
 
         [HttpDelete("private-cache")]
@@ -68,21 +68,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
                         
-                        async path =>
+                        async entry =>
                         {
                             var allowedPath =
-                                EnumUtil.GetFromString<ClearPublicCacheTreePathsViewModel.CacheEntry>(path);
+                                EnumUtil.GetFromString<ClearPublicCacheTreePathsViewModel.CacheEntry>(entry);
                             
                             switch (allowedPath)
                             {
                                 case ClearPublicCacheTreePathsViewModel.CacheEntry.MethodologyTree: 
-                                    await _methodologyCacheService.UpdateMethodologyTree();
+                                    await _methodologyCacheService.UpdateSummariesTree();
                                     break;
                                 case ClearPublicCacheTreePathsViewModel.CacheEntry.PublicationTree:
-                                    await _publicationCacheService.UpdatePublicationTree();
+                                    await _themeCacheService.UpdatePublicationTree();
                                     break;
                                 default:
-                                    throw new ArgumentException($"Unsupported cache clearing path {path}");
+                                    throw new ArgumentException($"Unsupported cache clearing entry {entry}");
                             }
                         });
             }

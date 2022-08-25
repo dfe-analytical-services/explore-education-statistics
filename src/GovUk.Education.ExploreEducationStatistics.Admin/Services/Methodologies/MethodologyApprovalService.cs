@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     if (isPubliclyAccessible)
                     {
                         // Update the 'All Methodologies' cache item
-                        await _methodologyCacheService.UpdateMethodologyTree();
+                        await _methodologyCacheService.UpdateSummariesTree();
                     }
 
                     return methodology;

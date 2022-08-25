@@ -31,21 +31,21 @@ public class MethodologyCacheService : IMethodologyCacheService
     }
 
     [BlobCache(typeof(AllMethodologiesCacheKey))]
-    public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetMethodologyTree()
+    public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetSummariesTree()
     {
-        return _methodologyService.GenerateSummariesTree();
+        return _methodologyService.GetSummariesTree();
     }
 
     [BlobCache(typeof(AllMethodologiesCacheKey), updateOnly: true)]
-    public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> UpdateMethodologyTree()
+    public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> UpdateSummariesTree()
     {
         _logger.LogInformation("Updating cached Methodology Tree");
-        return _methodologyService.GenerateSummariesTree();
+        return _methodologyService.GetSummariesTree();
     }
     
-    public Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetMethodologiesByPublication(Guid publicationId)
+    public Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetSummariesByPublication(Guid publicationId)
     {
-        return GetMethodologyTree()
+        return GetSummariesTree()
             .OnSuccess(methodologiesByTheme => 
                 methodologiesByTheme
                     .SelectMany(theme => theme.Topics)

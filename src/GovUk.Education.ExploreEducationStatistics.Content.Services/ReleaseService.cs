@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         public async Task<Either<ActionResult, ReleaseViewModel>> GetCachedViewModel(string publicationSlug, string? releaseSlug = null)
         {
             return await _publicationService.Get(publicationSlug)
-                .OnSuccessCombineWith(publication => _methodologyCacheService.GetMethodologiesByPublication(publication.Id))
+                .OnSuccessCombineWith(publication => _methodologyCacheService.GetSummariesByPublication(publication.Id))
                 .OnSuccess(async tuple =>
                 {
                     var (publication, methodologies) = tuple;

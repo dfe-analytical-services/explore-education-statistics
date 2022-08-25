@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 
-public interface IPublicationCacheService
+public interface IThemeCacheService
 {
     Task<Either<ActionResult, IList<ThemeTree<PublicationTreeNode>>>> GetPublicationTree(
         PublicationTreeFilter filter);

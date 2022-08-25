@@ -14,18 +14,15 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 
-public class PublicationCacheService : IPublicationCacheService
+public class ThemeCacheService : IThemeCacheService
 {
-    private readonly IMethodologyService _methodologyService;
     private readonly IThemeService _themeService;
-    private readonly ILogger<MethodologyCacheService> _logger;
+    private readonly ILogger<ThemeCacheService> _logger;
 
-    public PublicationCacheService(
-        IMethodologyService methodologyService, 
+    public ThemeCacheService(
         IThemeService themeService, 
-        ILogger<MethodologyCacheService> logger)
+        ILogger<ThemeCacheService> logger)
     {
-        _methodologyService = methodologyService;
         _themeService = themeService;
         _logger = logger;
     }
@@ -33,14 +30,14 @@ public class PublicationCacheService : IPublicationCacheService
     [BlobCache(typeof(PublicationTreeCacheKey))]
     private Task<IList<ThemeTree<PublicationTreeNode>>> GetFullPublicationTree()
     {
-        return _themeService.GenerateFullPublicationTree();
+        return _themeService.GetPublicationTree();
     }
     
     [BlobCache(typeof(PublicationTreeCacheKey), updateOnly: true)]
     public Task<IList<ThemeTree<PublicationTreeNode>>> UpdatePublicationTree()
     {
         _logger.LogInformation("Updating cached Publication Tree");
-        return _themeService.GenerateFullPublicationTree();
+        return _themeService.GetPublicationTree();
     }
 
     public async Task<Either<ActionResult, IList<ThemeTree<PublicationTreeNode>>>> GetPublicationTree(

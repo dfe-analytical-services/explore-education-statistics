@@ -15,14 +15,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     public class ThemeController : ControllerBase
     {
         private readonly IMethodologyCacheService _methodologyCacheService;
-        private readonly IPublicationCacheService _publicationCacheService;
+        private readonly IThemeCacheService _themeCacheService;
 
         public ThemeController(
             IMethodologyCacheService methodologyCacheService,
-            IPublicationCacheService publicationCacheService)
+            IThemeCacheService themeCacheService)
         {
             _methodologyCacheService = methodologyCacheService;
-            _publicationCacheService = publicationCacheService;
+            _themeCacheService = themeCacheService;
         }
 
         [HttpGet("themes")]
@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 return new BadRequestResult();
             }
             
-            return await _publicationCacheService
+            return await _themeCacheService
                 .GetPublicationTree(filter.Value)
                 .HandleFailuresOrOk();
         }
@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         public async Task<ActionResult<List<AllMethodologiesThemeViewModel>>> GetMethodologyThemes()
         {
             return await _methodologyCacheService
-                .GetMethodologyTree()
+                .GetSummariesTree()
                 .HandleFailuresOrOk();
         }
     }

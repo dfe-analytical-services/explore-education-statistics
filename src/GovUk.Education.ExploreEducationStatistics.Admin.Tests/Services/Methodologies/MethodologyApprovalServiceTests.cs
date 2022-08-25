@@ -385,7 +385,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             publishingService.Setup(mock => mock.PublishMethodologyFiles(methodologyVersion.Id))
                 .ReturnsAsync(Unit.Instance);
 
-            methodologyCacheService.Setup(mock => mock.UpdateMethodologyTree())
+            methodologyCacheService.Setup(mock => mock.UpdateSummariesTree())
                 .ReturnsAsync(
                     new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
                         new List<AllMethodologiesThemeViewModel>()));

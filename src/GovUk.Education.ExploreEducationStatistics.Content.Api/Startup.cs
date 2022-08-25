@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
-            services.AddTransient<IPublicationCacheService, PublicationCacheService>();
+            services.AddTransient<IThemeCacheService, ThemeCacheService>();
             services.AddTransient<IReleaseService, Services.ReleaseService>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();

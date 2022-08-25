@@ -68,17 +68,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public async Task GetPublicationTree()
         {
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+            var themeCacheService = new Mock<IThemeCacheService>(Strict);
             
-            var controller = BuildController(publicationCacheService: publicationCacheService.Object);
+            var controller = BuildController(themeCacheService: themeCacheService.Object);
 
-            publicationCacheService
+            themeCacheService
                 .Setup(s => s.GetPublicationTree(PublicationTreeFilter.FindStatistics))
                 .ReturnsAsync(Themes);
 
             var result = await controller.GetPublicationTree(PublicationTreeFilter.FindStatistics);
             
-            VerifyAllMocks(publicationCacheService);
+            VerifyAllMocks(themeCacheService);
 
             var publicationTree = result.Value;
             
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var controller = BuildController(methodologyCacheService.Object);
 
             methodologyCacheService
-                .Setup(mock => mock.GetMethodologyTree())
+                .Setup(mock => mock.GetSummariesTree())
                 .ReturnsAsync(MethodologyThemes);
 
             var result = await controller.GetMethodologyThemes();
@@ -125,11 +125,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
         private static ThemeController BuildController(
             IMethodologyCacheService? methodologyCacheService = null,
-            IPublicationCacheService? publicationCacheService = null)
+            IThemeCacheService? themeCacheService = null)
         {
             return new ThemeController(
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
-                publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict));
+                themeCacheService ?? Mock.Of<IThemeCacheService>(Strict));
         }
     }
 }

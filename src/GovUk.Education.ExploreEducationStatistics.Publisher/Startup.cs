@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 })
                 .AddScoped<IContentMethodologyService, ContentMethodologyService>()
                 .AddScoped<IMethodologyCacheService, MethodologyCacheService>()
-                .AddScoped<IPublicationCacheService, PublicationCacheService>()
+                .AddScoped<IThemeCacheService, ThemeCacheService>()
                 .AddScoped<IThemeService, ThemeService>()
                 .AddScoped<IPublishingService, PublishingService>(provider =>
                     new PublishingService(
@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         releaseService: provider.GetRequiredService<IReleaseService>(),
                         publicationService: provider.GetRequiredService<IPublicationService>(),
                         methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
-                        publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()))
+                        themeCacheService: provider.GetRequiredService<IThemeCacheService>()))
                 .AddScoped<IReleaseService, ReleaseService>(provider =>
                     new ReleaseService(
                         contentDbContext: provider.GetRequiredService<ContentDbContext>(),

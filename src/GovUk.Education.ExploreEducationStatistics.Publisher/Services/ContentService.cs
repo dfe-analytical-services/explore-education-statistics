@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IReleaseService _releaseService;
         private readonly IPublicationService _publicationService;
         private readonly IMethodologyCacheService _methodologyCacheService;
-        private readonly IPublicationCacheService _publicationCacheService;
+        private readonly IThemeCacheService _themeCacheService;
 
         private readonly JsonSerializerSettings _jsonSerializerSettingsCamelCase =
             GetJsonSerializerSettings(new CamelCaseNamingStrategy());
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             IReleaseService releaseService,
             IPublicationService publicationService,
             IMethodologyCacheService methodologyCacheService,
-            IPublicationCacheService publicationCacheService)
+            IThemeCacheService themeCacheService)
         {
             _privateBlobCacheService = privateBlobCacheService;
             _publicBlobCacheService = publicBlobCacheService;
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _releaseService = releaseService;
             _publicationService = publicationService;
             _methodologyCacheService = methodologyCacheService;
-            _publicationCacheService = publicationCacheService;
+            _themeCacheService = themeCacheService;
         }
 
         public async Task DeletePreviousVersionsContent(params Guid[] releaseIds)
@@ -148,8 +148,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task UpdateCachedTaxonomyBlobs()
         {
-            await _methodologyCacheService.UpdateMethodologyTree();
-            await _publicationCacheService.UpdatePublicationTree();
+            await _methodologyCacheService.UpdateSummariesTree();
+            await _themeCacheService.UpdatePublicationTree();
         }
 
         private async Task CacheLatestRelease(Publication publication, PublishContext context, params Guid[] includedReleaseIds)

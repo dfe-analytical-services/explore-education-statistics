@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IBlobCacheService _publicBlobCacheService;
         private readonly IMethodologyCacheService _methodologyCacheService;
-        private readonly IPublicationCacheService _publicationCacheService;
+        private readonly IThemeCacheService _themeCacheService;
 
         public PublicationService(
             ContentDbContext context,
@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IMethodologyVersionRepository methodologyVersionRepository,
             IBlobCacheService publicBlobCacheService, 
             IMethodologyCacheService methodologyCacheService, 
-            IPublicationCacheService publicationCacheService)
+            IThemeCacheService themeCacheService)
         {
             _context = context;
             _mapper = mapper;
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _methodologyVersionRepository = methodologyVersionRepository;
             _publicBlobCacheService = publicBlobCacheService;
             _methodologyCacheService = methodologyCacheService;
-            _publicationCacheService = publicationCacheService;
+            _themeCacheService = themeCacheService;
         }
 
         public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(
@@ -252,8 +252,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task UpdateCachedTaxonomyBlobs()
         {
-            await _methodologyCacheService.UpdateMethodologyTree();
-            await _publicationCacheService.UpdatePublicationTree();
+            await _methodologyCacheService.UpdateSummariesTree();
+            await _themeCacheService.UpdatePublicationTree();
         }
 
         private async Task DeleteCachedSupersededPublicationBlobs(Publication publication)
