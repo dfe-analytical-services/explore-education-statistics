@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             {
                 var result = await _blobStorageService.GetDeserializedJson(cacheKey.Container, cacheKey.Key, targetType);
 
-                _logger.LogInformation("Blob cache {HitOrMiss} - for key {CacheKey}", 
+                _logger.LogDebug("Blob cache {HitOrMiss} - for key {CacheKey}", 
                     result != null ? "hit" : "miss", key);
 
                 return result;
@@ -63,17 +63,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             // Write result to cache as a json blob before returning
             await _blobStorageService.UploadAsJson(cacheKey.Container, cacheKey.Key, item);
 
-            _logger.LogInformation("Blob cache set - for key {CacheKey}", cacheKey.Key);
+            _logger.LogDebug("Blob cache set - for key {CacheKey}", cacheKey.Key);
         }
         
         public async Task DeleteItem(IBlobCacheKey cacheKey)
         {
             await _blobStorageService.DeleteBlob(cacheKey.Container, cacheKey.Key);
+
+            _logger.LogDebug("Blob cache delete - for key {CacheKey}", cacheKey.Key);
         }
 
         public async Task DeleteCacheFolder(IBlobCacheKey cacheFolderKey)
         {
             await _blobStorageService.DeleteBlobs(cacheFolderKey.Container, cacheFolderKey.Key);
+
+            _logger.LogDebug("Blob cache folder delete - for key {CacheKey}", cacheFolderKey.Key);
         }
     }
 }
