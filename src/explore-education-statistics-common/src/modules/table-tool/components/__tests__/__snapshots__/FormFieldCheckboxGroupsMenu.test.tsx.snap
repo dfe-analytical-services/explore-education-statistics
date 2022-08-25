@@ -56,6 +56,12 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
             type="button"
           >
             Select all 2 subgroup options
+            <span
+              class="govuk-visually-hidden"
+            >
+               
+              for Group A
+            </span>
           </button>
           <div
             class="govuk-checkboxes__item"
@@ -117,6 +123,12 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
             type="button"
           >
             Select all 2 subgroup options
+            <span
+              class="govuk-visually-hidden"
+            >
+               
+              for Group B
+            </span>
           </button>
           <div
             class="govuk-checkboxes__item"
