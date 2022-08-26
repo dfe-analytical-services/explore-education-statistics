@@ -3,7 +3,11 @@ import publicationService from '@admin/services/publicationService';
 import themeService from '@admin/services/themeService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import { FormFieldSelect, FormFieldset } from '@common/components/form';
+import {
+  FormFieldSelect,
+  FormFieldset,
+  FormFieldTextArea,
+} from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -139,10 +143,11 @@ const PublicationForm = ({
               />
             )}
 
-            <FormFieldTextInput<FormValues>
+            <FormFieldTextArea<FormValues>
               label="Publication summary"
               name="summary"
               className="govuk-!-width-one-half"
+              maxLength={160}
             />
 
             {themes && initialValues?.topicId && (
