@@ -385,8 +385,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(CanViewAllReleases))
                 .ReturnsAsync(true);
-            userService.Setup(s => s.GetUserId())
-                .Returns(Guid.NewGuid());
             userService
                 .Setup(s => s.MatchesPolicy(
                     It.IsAny<Release>(), CanUpdateSpecificRelease))
