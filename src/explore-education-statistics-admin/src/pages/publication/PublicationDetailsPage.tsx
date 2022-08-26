@@ -60,7 +60,7 @@ const PublicationDetailsPage = () => {
           <SummaryList>
             <SummaryListItem term="Publication title">{title}</SummaryListItem>
             <SummaryListItem term="Publication summary">
-              {summary}
+              {summary ?? 'Not set'}
             </SummaryListItem>
             <SummaryListItem term="Theme">{theme?.title}</SummaryListItem>
             <SummaryListItem term="Topic">{topic?.title}</SummaryListItem>
