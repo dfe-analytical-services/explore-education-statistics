@@ -17,7 +17,7 @@ const Breadcrumbs = ({
   const currentBreadcrumbIndex = breadcrumbs.length - 1;
 
   return (
-    <div className="govuk-breadcrumbs">
+    <nav className="govuk-breadcrumbs" aria-label="Breadcrumb">
       <ol className="govuk-breadcrumbs__list" data-testid="breadcrumbs--list">
         {homePath && (
           <li className="govuk-breadcrumbs__list-item">
@@ -43,7 +43,7 @@ const Breadcrumbs = ({
           );
         })}
       </ol>
-    </div>
+    </nav>
   );
 };
 

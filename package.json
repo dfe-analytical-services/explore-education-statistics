@@ -54,6 +54,7 @@
     "start:frontend": "cd src/explore-education-statistics-frontend && npm run start:local",
     "start:processor": "cd src/GovUk.Education.ExploreEducationStatistics.Data.Processor && func start --build",
     "test": "lerna run test",
+    "test:snapshot": "lerna run test:snapshot",
     "test:ci": "lerna run test:ci",
     "test:coverage": "lerna run test:coverage",
     "tsc": "lerna run tsc",
