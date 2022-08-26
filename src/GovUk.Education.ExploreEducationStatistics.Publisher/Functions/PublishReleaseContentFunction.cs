@@ -2,9 +2,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -20,24 +19,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class PublishReleaseContentFunction
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly IBlobCacheService _blobCacheService;
         private readonly IContentService _contentService;
         private readonly INotificationsService _notificationsService;
+        private readonly IPublicationCacheService _publicationCacheService;
         private readonly IReleaseService _releaseService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
 
         public PublishReleaseContentFunction(
             ContentDbContext contentDbContext,
-            IBlobCacheService blobCacheService,
             IContentService contentService,
             INotificationsService notificationsService,
+            IPublicationCacheService publicationCacheService,
             IReleaseService releaseService,
             IReleasePublishingStatusService releasePublishingStatusService)
         {
             _contentDbContext = contentDbContext;
-            _blobCacheService = blobCacheService;
             _contentService = contentService;
             _notificationsService = notificationsService;
+            _publicationCacheService = publicationCacheService;
             _releaseService = releaseService;
             _releasePublishingStatusService = releasePublishingStatusService;
         }
@@ -79,20 +78,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     await _releaseService.DeletePreviousVersionsStatisticalData(message.ReleaseId);
                 }
 
-                // Invalidate publication cache for release
                 var release = await _contentDbContext.Releases
-                    .Include(r => r.Publication)
-                    .Where(r => r.Id == message.ReleaseId)
-                    .SingleAsync();
-                await _blobCacheService.DeleteItem(new PublicationCacheKey(release.Publication.Slug));
+                    .SingleAsync(r => r.Id == message.ReleaseId);
 
-                // Invalidate publication cache for superseded publications, as potentially affected. If newly
-                // published release is first Live release for the publication, the superseding is now enforced
-                await _contentDbContext.Publications
-                    .Where(p => p.SupersededById == release.Publication.Id)
+                // Update the cached publication and any cached superseded publications.
+                // If this is the first live release of the publication, the superseding is now enforced
+                var publicationsToUpdate = await _contentDbContext.Publications
+                    .Where(p => p.Id == release.PublicationId || p.SupersededById == release.PublicationId)
+                    .ToListAsync();
+
+                await publicationsToUpdate
                     .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(publication =>
-                        _blobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug)));
+                    .ForEachAwaitAsync(
+                        publication => _publicationCacheService.UpdatePublication(publication.Slug));
 
                 await _contentService.DeletePreviousVersionsDownloadFiles(message.ReleaseId);
                 await _contentService.DeletePreviousVersionsContent(message.ReleaseId);
