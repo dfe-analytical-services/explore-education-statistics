@@ -70,6 +70,32 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         result.AssertRight(_publicationViewModel);
     }
 
+    [Fact]
+    public async Task UpdatePublication()
+    {
+        var cacheKey = new PublicationCacheKey(PublicationSlug);
+
+        var publicationService = new Mock<IPublicationService>(Strict);
+
+        publicationService
+            .Setup(s => s.Get(PublicationSlug))
+            .ReturnsAsync(_publicationViewModel);
+
+        BlobCacheService
+            .Setup(s => s.SetItem<object>(cacheKey, _publicationViewModel))
+            .Returns(Task.CompletedTask);
+
+        var service = BuildService(publicationService: publicationService.Object);
+
+        var result = await service.UpdatePublication(PublicationSlug);
+
+        // There should be no attempt on the cache service to get the cached resource
+
+        VerifyAllMocks(publicationService, BlobCacheService);
+
+        result.AssertRight(_publicationViewModel);
+    }
+
     private static PublicationCacheService BuildService(
         IPublicationService? publicationService = null
     )

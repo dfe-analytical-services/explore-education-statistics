@@ -7,13 +7,12 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,20 +24,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IBlobCacheService _publicBlobCacheService;
+        private readonly IPublicationCacheService _publicationCacheService;
 
-        public LegacyReleaseService(
-            ContentDbContext context,
+        public LegacyReleaseService(ContentDbContext context,
             IMapper mapper,
             IUserService userService,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IBlobCacheService publicBlobCacheService)
+            IPublicationCacheService publicationCacheService)
         {
             _context = context;
             _mapper = mapper;
             _userService = userService;
             _persistenceHelper = persistenceHelper;
-            _publicBlobCacheService = publicBlobCacheService;
+            _publicationCacheService = publicationCacheService;
         }
 
         public async Task<Either<ActionResult, LegacyReleaseViewModel>> GetLegacyRelease(Guid id)
@@ -94,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.SaveChangesAsync();
 
-                    await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug));
+                    await _publicationCacheService.UpdatePublication(publication.Slug);
 
                     return _mapper.Map<LegacyReleaseViewModel>(saved.Entity);
                 });
@@ -148,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.SaveChangesAsync();
 
-                    await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug));
+                    await _publicationCacheService.UpdatePublication(publication.Slug);
 
                     return _mapper.Map<LegacyReleaseViewModel>(legacyRelease);
                 });
@@ -181,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.SaveChangesAsync();
 
-                    await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug));
+                    await _publicationCacheService.UpdatePublication(publication.Slug);
 
                     return true;
                 });
