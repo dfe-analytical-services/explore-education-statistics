@@ -186,15 +186,15 @@ def user_resets_user_roles_via_api_if_required(user_emails: list) -> None:
             user_ids = [get_prerelease_user_details_via_api(user_email)['id']]
             _ = [user_removes_all_release_and_publication_roles_from_user(user_id) for user_id in user_ids]
             BuiltIn().log(f'All userReleaseRoles & userPublicationRoles reset for user: {user_email}')
-        except IndexError:
-            BuiltIn().log(f'User with email {user_email} does not exist in pre-release user list')
+        except TypeError or IndexError:
+            BuiltIn().log(f'User with email {user_email} does not exist in pre-release user list', 'WARN')
 
             try:
                 user_ids = [get_user_details_via_api(user_email)['id']]
                 _ = [user_removes_all_release_and_publication_roles_from_user(user_id) for user_id in user_ids]
                 BuiltIn().log(f'All userReleaseRoles & userPublicationRoles reset for user: {user_email}')
-            except IndexError:
-                BuiltIn().log(f'User with email {user_email} does not exist in user list')
+            except TypeError or IndexError:
+                BuiltIn().log(f'User with email {user_email} does not exist in user list', 'WARN')
 
 
 def user_create_test_release_via_api(
