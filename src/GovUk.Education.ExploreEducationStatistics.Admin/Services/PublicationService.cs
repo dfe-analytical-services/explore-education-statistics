@@ -65,13 +65,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(
             Guid topicId)
         {
-            var userId = _userService.GetUserId();
-
             return await _userService
                 .CheckCanAccessSystem()
                 .OnSuccess(_ => _userService.CheckCanViewAllReleases()
                     .OnSuccess(() => _publicationRepository.GetAllPublicationsForTopic(topicId))
-                    .OrElse(() => _publicationRepository.GetPublicationsForTopicRelatedToUser(topicId, userId))
+                    .OrElse(() =>
+                        _publicationRepository.GetPublicationsForTopicRelatedToUser(topicId, _userService.GetUserId()))
                 )
                 .OnSuccess(async publicationViewModels =>
                 {

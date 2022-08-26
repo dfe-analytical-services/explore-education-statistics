@@ -40,32 +40,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetMyPublicationsAndReleasesByTopic_NoAccessOfSystem()
         {
-            var userService = AlwaysTrueUserService();
-            var publicationRepository = new Mock<IPublicationRepository>(Strict);
-
-            var topicId = Guid.NewGuid();
-
-            var publicationService = BuildPublicationService(
-                context: Mock.Of<ContentDbContext>(Strict),
-                userService: userService.Object,
-                publicationRepository: publicationRepository.Object);
-
-            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem)).ReturnsAsync(false);
-
-            var list = new List<Publication> {
-                new()
+            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectCheckToFail(SecurityPolicies.CanAccessSystem)
+                .AssertForbidden(async userService =>
                 {
-                    Id = Guid.NewGuid()
-                }
-            };
-
-            publicationRepository.Setup(s => s.GetAllPublicationsForTopic(topicId)).ReturnsAsync(list);
-
-            var result = await publicationService.GetMyPublicationsAndReleasesByTopic(topicId);
-
-            VerifyAllMocks(userService, publicationRepository);
-
-            result.AssertForbidden();
+                    var service = BuildPublicationService(
+                        context: Mock.Of<ContentDbContext>(Strict),
+                        userService: userService.Object);
+                    return await service.GetMyPublicationsAndReleasesByTopic(Guid.NewGuid());
+                });
         }
 
         [Fact]
@@ -104,7 +87,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Single(publicationViewModels);
             Assert.Equal(list[0].Id, publicationViewModels[0].Id);
 
-            userService.Verify(s => s.GetUserId());
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases));
             userService.VerifyNoOtherCalls();
