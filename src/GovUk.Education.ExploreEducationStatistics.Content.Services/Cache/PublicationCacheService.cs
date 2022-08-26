@@ -23,4 +23,10 @@ public class PublicationCacheService : IPublicationCacheService
     {
         return _publicationService.Get(publicationSlug);
     }
+
+    [BlobCache(typeof(PublicationCacheKey), forceUpdate: true)]
+    public Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(string publicationSlug)
+    {
+        return _publicationService.Get(publicationSlug);
+    }
 }

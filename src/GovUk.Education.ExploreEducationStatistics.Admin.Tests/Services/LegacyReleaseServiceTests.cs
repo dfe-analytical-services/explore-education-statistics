@@ -6,56 +6,61 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
+using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels.PublicationViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class LegacyReleaseServiceTests
     {
+        private const string PublicationSlug = "publication-slug";
+
         [Fact]
         public async Task GetLegacyRelease()
         {
             var id = Guid.NewGuid();
-            var publicationId = Guid.NewGuid();
 
-            using (var context = InMemoryApplicationDbContext())
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 context.Add(new Publication
                 {
-                    Id = publicationId,
                     LegacyReleases = new List<LegacyRelease>
+                    {
+                        new()
                         {
-                            new()
-                            {
-                                Id = id,
-                                Description = "Test description",
-                                Url = "http://test.com",
-                                Order = 1,
-                            }
+                            Id = id,
+                            Description = "Test description",
+                            Url = "https://test.com",
+                            Order = 1,
                         }
+                    }
                 });
 
                 await context.SaveChangesAsync();
+            }
 
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
                 var legacyReleaseService = BuildLegacyReleaseService(context);
 
                 // Service method under test
                 var result = await legacyReleaseService.GetLegacyRelease(id);
 
                 Assert.Equal("Test description", result.Right.Description);
-                Assert.Equal("http://test.com", result.Right.Url);
+                Assert.Equal("https://test.com", result.Right.Url);
                 Assert.Equal(1, result.Right.Order);
             }
         }
@@ -124,44 +129,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var publicationId = Guid.NewGuid();
 
-            using (var context = InMemoryApplicationDbContext())
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 context.Add(new Publication
                 {
                     Id = publicationId,
+                    Slug = PublicationSlug
                 });
 
-                context.SaveChanges();
+                await context.SaveChangesAsync();
+            }
 
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
-                    .Returns(Task.CompletedTask);
+            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
+                .ReturnsAsync(new PublicationViewModel());
 
+            using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
                 var legacyReleaseService = BuildLegacyReleaseService(
                     context: context,
-                    publicBlobCacheService: publicBlobCacheService.Object);
+                    publicationCacheService: publicationCacheService.Object);
 
                 // Service method under test
                 var result = await legacyReleaseService.CreateLegacyRelease(
-                    new LegacyReleaseCreateViewModel()
+                    new LegacyReleaseCreateViewModel
                     {
                         Description = "Test description",
-                        Url = "http://test.com",
+                        Url = "https://test.com",
                         PublicationId = publicationId
                     });
 
-
-                VerifyAllMocks(publicBlobCacheService);
+                VerifyAllMocks(publicationCacheService);
 
                 Assert.Equal("Test description", result.Right.Description);
-                Assert.Equal("http://test.com", result.Right.Url);
+                Assert.Equal("https://test.com", result.Right.Url);
                 Assert.Equal(1, result.Right.Order);
 
                 var savedLegacyRelease = context.LegacyReleases.Single(release => release.Id == result.Right.Id);
 
                 Assert.Equal("Test description", savedLegacyRelease.Description);
-                Assert.Equal("http://test.com", savedLegacyRelease.Url);
+                Assert.Equal("https://test.com", savedLegacyRelease.Url);
                 Assert.Equal(1, savedLegacyRelease.Order);
                 Assert.Equal(publicationId, savedLegacyRelease.PublicationId);
             }
@@ -172,50 +182,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var publicationId = Guid.NewGuid();
 
-            using (var context = InMemoryApplicationDbContext())
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 context.Add(new Publication
                 {
                     Id = publicationId,
+                    Slug = PublicationSlug,
                     LegacyReleases = new List<LegacyRelease>
+                    {
+                        new()
                         {
-                            new LegacyRelease
-                            {
-                                Id = Guid.NewGuid(),
-                                Description = "Test description 1",
-                                Url = "http://test1.com",
-                                Order = 1,
-                                PublicationId = publicationId,
-                            }
+                            Id = Guid.NewGuid(),
+                            Description = "Test description 1",
+                            Url = "https://test1.com",
+                            Order = 1,
+                            PublicationId = publicationId,
                         }
+                    }
                 });
 
-                context.SaveChanges();
+                await context.SaveChangesAsync();
+            }
 
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
-                    .Returns(Task.CompletedTask);
+            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
+                .ReturnsAsync(new PublicationViewModel());
 
+            using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
                 var legacyReleaseService = BuildLegacyReleaseService(
                     context: context,
-                    publicBlobCacheService: publicBlobCacheService.Object);
+                    publicationCacheService: publicationCacheService.Object);
 
                 // Service method under test
                 var result = await legacyReleaseService.CreateLegacyRelease(
-                    new LegacyReleaseCreateViewModel()
+                    new LegacyReleaseCreateViewModel
                     {
                         Description = "Test description 2",
-                        Url = "http://test2.com",
+                        Url = "https://test2.com",
                         PublicationId = publicationId
                     });
 
-                VerifyAllMocks(publicBlobCacheService);
+                VerifyAllMocks(publicationCacheService);
 
                 var legacyRelease = context.LegacyReleases.Single(release => release.Id == result.Right.Id);
 
                 Assert.Equal("Test description 2", legacyRelease.Description);
-                Assert.Equal("http://test2.com", legacyRelease.Url);
+                Assert.Equal("https://test2.com", legacyRelease.Url);
                 Assert.Equal(2, legacyRelease.Order);
                 Assert.Equal(publicationId, legacyRelease.PublicationId);
             }
@@ -227,33 +243,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var id = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
 
-            using (var context = InMemoryApplicationDbContext())
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 context.Add(new Publication
                 {
                     Id = publicationId,
+                    Slug = PublicationSlug,
                     LegacyReleases = new List<LegacyRelease>
+                    {
+                        new()
                         {
-                            new LegacyRelease
-                            {
-                                Id = id,
-                                Description = "Test description",
-                                Url = "http://test.com",
-                                Order = 2,
-                            },
-                        }
+                            Id = id,
+                            Description = "Test description",
+                            Url = "https://test.com",
+                            Order = 2,
+                        },
+                    }
                 });
 
-                context.SaveChanges();
+                await context.SaveChangesAsync();
+            }
 
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
-                    .Returns(Task.CompletedTask);
+            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
+                .ReturnsAsync(new PublicationViewModel());
 
+            using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
                 var legacyReleaseService = BuildLegacyReleaseService(
                     context: context,
-                    publicBlobCacheService: publicBlobCacheService.Object);
+                    publicationCacheService: publicationCacheService.Object);
 
                 // Service method under test
                 var result = await legacyReleaseService.UpdateLegacyRelease(
@@ -261,21 +283,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new LegacyReleaseUpdateViewModel()
                     {
                         Description = "Updated test description",
-                        Url = "http://updated-test.com",
+                        Url = "https://updated-test.com",
                         Order = 1,
                         PublicationId = publicationId,
                     });
 
-                VerifyAllMocks(publicBlobCacheService);
+                VerifyAllMocks(publicationCacheService);
 
                 Assert.Equal("Updated test description", result.Right.Description);
-                Assert.Equal("http://updated-test.com", result.Right.Url);
+                Assert.Equal("https://updated-test.com", result.Right.Url);
                 Assert.Equal(1, result.Right.Order);
 
                 var savedLegacyRelease = context.LegacyReleases.Single(release => release.Id == result.Right.Id);
 
                 Assert.Equal("Updated test description", savedLegacyRelease.Description);
-                Assert.Equal("http://updated-test.com", savedLegacyRelease.Url);
+                Assert.Equal("https://updated-test.com", savedLegacyRelease.Url);
                 Assert.Equal(1, savedLegacyRelease.Order);
                 Assert.Equal(publicationId, savedLegacyRelease.PublicationId);
             }
@@ -287,58 +309,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var id = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
 
-            using (var context = InMemoryApplicationDbContext())
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 context.Add(new Publication
                 {
                     Id = publicationId,
+                    Slug = PublicationSlug,
                     LegacyReleases = new List<LegacyRelease>
+                    {
+                        new()
                         {
-                            new LegacyRelease
-                            {
-                                Description = "Test description 1",
-                                Url = "http://test1.com",
-                                Order = 1,
-                            },
-                            new LegacyRelease
-                            {
-                                Description = "Test description 2",
-                                Url = "http://test2.com",
-                                Order = 2,
-                            },
-                            new LegacyRelease
-                            {
-                                Id = id,
-                                Description = "Test description 3",
-                                Url = "http://test3.com",
-                                Order = 3,
-                            }
+                            Description = "Test description 1",
+                            Url = "https://test1.com",
+                            Order = 1,
+                        },
+                        new()
+                        {
+                            Description = "Test description 2",
+                            Url = "https://test2.com",
+                            Order = 2,
+                        },
+                        new()
+                        {
+                            Id = id,
+                            Description = "Test description 3",
+                            Url = "https://test3.com",
+                            Order = 3,
                         }
+                    }
                 });
 
-                context.SaveChanges();
+                await context.SaveChangesAsync();
+            }
 
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
-                    .Returns(Task.CompletedTask);
+            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
+                .ReturnsAsync(new PublicationViewModel());
 
+            using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
                 var legacyReleaseService = BuildLegacyReleaseService(
                     context: context,
-                    publicBlobCacheService: publicBlobCacheService.Object);
+                    publicationCacheService: publicationCacheService.Object);
 
                 // Service method under test
                 await legacyReleaseService.UpdateLegacyRelease(
                     id,
-                    new LegacyReleaseUpdateViewModel()
+                    new LegacyReleaseUpdateViewModel
                     {
                         Description = "Updated test description 3",
-                        Url = "http://updated-test3.com",
+                        Url = "https://updated-test3.com",
                         Order = 1,
                         PublicationId = publicationId,
                     });
 
-                VerifyAllMocks(publicBlobCacheService);
+                VerifyAllMocks(publicationCacheService);
 
                 var legacyReleases = context.LegacyReleases
                     .AsQueryable()
@@ -365,45 +393,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var id = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
 
-            using (var context = InMemoryApplicationDbContext())
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 context.Add(new Publication
                 {
                     Id = publicationId,
+                    Slug = PublicationSlug,
                     LegacyReleases = new List<LegacyRelease>
+                    {
+                        new()
                         {
-                            new LegacyRelease
-                            {
-                                Id = id,
-                                Description = "Test description 1",
-                                Url = "http://test1.com",
-                                Order = 1,
-                            },
-                            new LegacyRelease
-                            {
-                                Description = "Test description 2",
-                                Url = "http://test2.com",
-                                Order = 2,
-                            },
-                            new LegacyRelease
-                            {
-                                Description = "Test description 3",
-                                Url = "http://test3.com",
-                                Order = 3,
-                            }
+                            Id = id,
+                            Description = "Test description 1",
+                            Url = "https://test1.com",
+                            Order = 1,
+                        },
+                        new()
+                        {
+                            Description = "Test description 2",
+                            Url = "https://test2.com",
+                            Order = 2,
+                        },
+                        new()
+                        {
+                            Description = "Test description 3",
+                            Url = "https://test3.com",
+                            Order = 3,
                         }
+                    }
                 });
 
-                context.SaveChanges();
+                await context.SaveChangesAsync();
+            }
 
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
-                    .Returns(Task.CompletedTask);
+            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
+                .ReturnsAsync(new PublicationViewModel());
 
+            using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
                 var legacyReleaseService = BuildLegacyReleaseService(
                     context: context,
-                    publicBlobCacheService: publicBlobCacheService.Object);
+                    publicationCacheService: publicationCacheService.Object);
 
                 // Service method under test
                 await legacyReleaseService.UpdateLegacyRelease(
@@ -411,12 +445,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new LegacyReleaseUpdateViewModel()
                     {
                         Description = "Updated test description 1",
-                        Url = "http://updated-test1.com",
+                        Url = "https://updated-test1.com",
                         Order = 5,
                         PublicationId = publicationId,
                     });
 
-                VerifyAllMocks(publicBlobCacheService);
+                VerifyAllMocks(publicationCacheService);
 
                 var legacyReleases = context.LegacyReleases
                     .AsQueryable()
@@ -440,38 +474,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var id = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
 
-            using (var context = InMemoryApplicationDbContext())
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 context.Add(new Publication
                 {
                     Id = publicationId,
+                    Slug = PublicationSlug,
                     LegacyReleases = new List<LegacyRelease>
+                    {
+                        new()
                         {
-                            new LegacyRelease
-                            {
-                                Id = id,
-                                Description = "Test description",
-                                Url = "http://test.com",
-                                Order = 2,
-                            },
-                        }
+                            Id = id,
+                            Description = "Test description",
+                            Url = "https://test.com",
+                            Order = 2,
+                        },
+                    }
                 });
 
-                context.SaveChanges();
+                await context.SaveChangesAsync();
+            }
 
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
-                    .Returns(Task.CompletedTask);
+            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
+                .ReturnsAsync(new PublicationViewModel());
 
+            using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
                 var legacyReleaseService = BuildLegacyReleaseService(
                     context: context,
-                    publicBlobCacheService: publicBlobCacheService.Object);
+                    publicationCacheService: publicationCacheService.Object);
 
                 // Service method under test
                 await legacyReleaseService.DeleteLegacyRelease(id);
 
-                VerifyAllMocks(publicBlobCacheService);
+                VerifyAllMocks(publicationCacheService);
+
                 Assert.Empty(context.LegacyReleases);
                 Assert.Empty(
                     context.Publications
@@ -487,50 +528,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var id = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
 
-            using (var context = InMemoryApplicationDbContext())
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 context.Add(new Publication
                 {
                     Id = publicationId,
+                    Slug = PublicationSlug,
                     LegacyReleases = new List<LegacyRelease>
+                    {
+                        new()
                         {
-                            new LegacyRelease
-                            {
-                                Id = id,
-                                Description = "Test description 1",
-                                Url = "http://test1.com",
-                                Order = 1,
-                            },
-                            new LegacyRelease
-                            {
-                                Id = Guid.NewGuid(),
-                                Description = "Test description 2",
-                                Url = "http://test2.com",
-                                Order = 2,
-                            },
-                            new LegacyRelease
-                            {
-                                Id = Guid.NewGuid(),
-                                Description = "Test description 3",
-                                Url = "http://test3.com",
-                                Order = 3,
-                            }
+                            Id = id,
+                            Description = "Test description 1",
+                            Url = "https://test1.com",
+                            Order = 1,
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Description = "Test description 2",
+                            Url = "https://test2.com",
+                            Order = 2,
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Description = "Test description 3",
+                            Url = "https://test3.com",
+                            Order = 3,
                         }
+                    }
                 });
 
-                context.SaveChanges();
+                await context.SaveChangesAsync();
+            }
 
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
-                    .Returns(Task.CompletedTask);
+            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
+                .ReturnsAsync(new PublicationViewModel());
 
+            using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
                 var legacyReleaseService = BuildLegacyReleaseService(
                     context: context,
-                    publicBlobCacheService: publicBlobCacheService.Object);
+                    publicationCacheService: publicationCacheService.Object);
 
                 // Service method under test
                 await legacyReleaseService.DeleteLegacyRelease(id);
+
+                VerifyAllMocks(publicationCacheService);
 
                 var legacyReleases = context.LegacyReleases
                     .AsQueryable()
@@ -557,15 +606,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext context,
             IMapper? mapper = null,
             IUserService? userService = null,
-            IBlobCacheService? publicBlobCacheService = null)
+            IPublicationCacheService? publicationCacheService = null)
         {
-                return new LegacyReleaseService(
-                    context,
-                    mapper ?? AdminMapper(),
-                    userService ?? AlwaysTrueUserService().Object,
-                    new PersistenceHelper<ContentDbContext>(context),
-                    publicBlobCacheService ?? Mock.Of<IBlobCacheService>(Strict)
-                );
+            return new LegacyReleaseService(
+                context,
+                mapper ?? AdminMapper(),
+                userService ?? AlwaysTrueUserService().Object,
+                new PersistenceHelper<ContentDbContext>(context),
+                publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict)
+            );
         }
     }
 }

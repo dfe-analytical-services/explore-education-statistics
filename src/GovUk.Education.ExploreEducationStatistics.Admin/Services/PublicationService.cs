@@ -8,9 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -38,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly IPublicationRepository _publicationRepository;
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
-        private readonly IBlobCacheService _publicBlobCacheService;
+        private readonly IPublicationCacheService _publicationCacheService;
         private readonly IMethodologyCacheService _methodologyCacheService;
         private readonly IThemeCacheService _themeCacheService;
 
@@ -49,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IPublicationRepository publicationRepository,
             IMethodologyVersionRepository methodologyVersionRepository,
-            IBlobCacheService publicBlobCacheService, 
+            IPublicationCacheService publicationCacheService, 
             IMethodologyCacheService methodologyCacheService, 
             IThemeCacheService themeCacheService)
         {
@@ -59,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _publicationRepository = publicationRepository;
             _methodologyVersionRepository = methodologyVersionRepository;
-            _publicBlobCacheService = publicBlobCacheService;
+            _publicationCacheService = publicationCacheService;
             _methodologyCacheService = methodologyCacheService;
             _themeCacheService = themeCacheService;
         }
@@ -244,34 +242,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         publication.Published = DateTime.UtcNow;
                         await _context.SaveChangesAsync();
 
-                        await UpdateCachedTaxonomyBlobs();
+                        await _methodologyCacheService.UpdateSummariesTree();
+                        await _themeCacheService.UpdatePublicationTree();
+                        await _publicationCacheService.UpdatePublication(publication.Slug);
 
-                        await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug));
-
-                        await DeleteCachedSupersededPublicationBlobs(publication);
+                        await UpdateCachedSupersededPublications(publication);
                     }
 
                     return await GetPublication(publication.Id);
                 });
         }
 
-        private async Task UpdateCachedTaxonomyBlobs()
-        {
-            await _methodologyCacheService.UpdateSummariesTree();
-            await _themeCacheService.UpdatePublicationTree();
-        }
-
-        private async Task DeleteCachedSupersededPublicationBlobs(Publication publication)
+        private async Task UpdateCachedSupersededPublications(Publication publication)
         {
             // NOTE: When a publication is updated, any publication that is superseded by it can be affected, so
-            // invalidate the superseded publications' caches
+            // update any superseded publications that are cached
             var supersededPublications = await _context.Publications
                 .Where(p => p.SupersededById == publication.Id)
                 .ToListAsync();
-            foreach (var p in supersededPublications)
-            {
-                await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(p.Slug));
-            }
+
+            await supersededPublications
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(p => _publicationCacheService.UpdatePublication(p.Slug));
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateSelectedTopic(
@@ -376,7 +368,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     _context.Update(publication);
                     await _context.SaveChangesAsync();
 
-                    await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug));
+                    await _publicationCacheService.UpdatePublication(publication.Slug);
 
                     return _mapper.Map<List<LegacyReleaseViewModel>>(
                         publication.LegacyReleases.OrderByDescending(release => release.Order)

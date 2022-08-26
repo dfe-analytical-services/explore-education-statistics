@@ -80,6 +80,8 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
 using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
+using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
+using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using IContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
 using ContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.ThemeService;
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
@@ -406,8 +408,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // being done from Admin directly, and so these DI dependencies should eventually be removed.
             services.AddTransient<IContentThemeService, ContentThemeService>();
             services.AddTransient<IContentMethodologyService, ContentMethodologyService>();
+            services.AddTransient<IContentPublicationService, ContentPublicationService>();
             services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
             services.AddTransient<IThemeCacheService, ThemeCacheService>();
+            services.AddTransient<IPublicationCacheService, PublicationCacheService>();
 
             services.AddTransient<IMyPublicationPermissionsResolver,
                 MyPublicationPermissionsResolver>();
@@ -458,10 +462,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     userService: provider.GetRequiredService<IUserService>(),
                     publicationRepository: provider.GetRequiredService<IPublicationRepository>(),
                     methodologyVersionRepository: provider.GetRequiredService<IMethodologyVersionRepository>(),
-                    publicBlobCacheService: new BlobCacheService(
-                        GetBlobStorageService(provider, "PublicStorage"),
-                        provider.GetRequiredService<ILogger<BlobCacheService>>()),
                     methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
+                    publicationCacheService: provider.GetRequiredService<IPublicationCacheService>(),
                     themeCacheService: provider.GetRequiredService<IThemeCacheService>()
                 )
             );
@@ -473,11 +475,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     mapper: provider.GetService<IMapper>(),
                     userService: provider.GetService<IUserService>(),
                     persistenceHelper: provider.GetService<IPersistenceHelper<ContentDbContext>>(),
-                    publicBlobCacheService: new BlobCacheService(
-                        GetBlobStorageService(provider, "PublicStorage"),
-                        provider.GetRequiredService<ILogger<BlobCacheService>>())
-                )
-            );
+                    publicationCacheService: provider.GetRequiredService<IPublicationCacheService>())
+                );
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IReleaseApprovalService, ReleaseApprovalService>();
             services.AddTransient<ReleaseSubjectRepository.SubjectDeleter, ReleaseSubjectRepository.SubjectDeleter>();

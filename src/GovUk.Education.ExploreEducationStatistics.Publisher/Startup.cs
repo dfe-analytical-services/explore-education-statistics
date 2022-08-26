@@ -26,6 +26,8 @@ using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
 using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
+using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
+using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
 using IContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
 using ContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.ThemeService;
 using FileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.FileStorageService;
@@ -69,6 +71,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 // being done from Publisher directly, and so these DI dependencies should eventually be removed.
                 .AddScoped<IContentMethodologyService, ContentMethodologyService>()
                 .AddScoped<IMethodologyCacheService, MethodologyCacheService>()
+                .AddScoped<IContentPublicationService, ContentPublicationService>()
+                .AddScoped<IPublicationCacheService, PublicationCacheService>()
                 .AddScoped<IThemeCacheService, ThemeCacheService>()
                 .AddScoped<IContentThemeService, ContentThemeService>()
 
