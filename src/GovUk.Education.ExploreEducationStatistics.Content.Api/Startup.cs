@@ -36,6 +36,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
+using IPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 using IThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.ThemeService;
@@ -139,7 +140,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IFilterRepository, FilterRepository>();
             services.AddTransient<IIndicatorRepository, IndicatorRepository>();
             services.AddTransient<IDataGuidanceService, DataGuidanceService>();
-            services.AddTransient<Services.Interfaces.IPublicationService, Services.PublicationService>();
+            services.AddTransient<IPublicationCacheService, PublicationCacheService>();
+            services.AddTransient<IPublicationService, Services.PublicationService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IDataGuidanceSubjectService, DataGuidanceSubjectService>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();

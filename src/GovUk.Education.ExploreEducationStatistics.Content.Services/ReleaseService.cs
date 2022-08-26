@@ -26,31 +26,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IFileStorageService _fileStorageService;
         private readonly IMethodologyCacheService _methodologyCacheService;
+        private readonly IPublicationCacheService _publicationCacheService;
         private readonly IUserService _userService;
-        private readonly IPublicationService _publicationService;
         private readonly IMapper _mapper;
 
-        public ReleaseService(
-            IPersistenceHelper<ContentDbContext> persistenceHelper,
+        public ReleaseService(IPersistenceHelper<ContentDbContext> persistenceHelper,
             IFileStorageService fileStorageService,
             IMethodologyCacheService methodologyCacheService,
+            IPublicationCacheService publicationCacheService,
             IUserService userService,
-            IPublicationService publicationService,
             IMapper mapper)
-
         {
             _persistenceHelper = persistenceHelper;
             _fileStorageService = fileStorageService;
             _methodologyCacheService = methodologyCacheService;
+            _publicationCacheService = publicationCacheService;
             _userService = userService;
-            _publicationService = publicationService;
             _mapper = mapper;
         }
 
         // TODO EES-3643 - move into a ReleaseCacheService?
         public async Task<Either<ActionResult, ReleaseViewModel>> GetCachedViewModel(string publicationSlug, string? releaseSlug = null)
         {
-            return await _publicationService.Get(publicationSlug)
+            return await _publicationCacheService.GetPublication(publicationSlug)
                 .OnSuccessCombineWith(publication => _methodologyCacheService.GetSummariesByPublication(publication.Id))
                 .OnSuccess(async tuple =>
                 {
@@ -77,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         public async Task<Either<ActionResult, ReleaseSummaryViewModel>> GetSummary(string publicationSlug,
             string? releaseSlug)
         {
-            return await _publicationService.Get(publicationSlug)
+            return await _publicationCacheService.GetPublication(publicationSlug)
                 .OnSuccessCombineWith(_ => GetCachedRelease(publicationSlug, releaseSlug))
                 .OnSuccess(publicationAndRelease =>
                 {

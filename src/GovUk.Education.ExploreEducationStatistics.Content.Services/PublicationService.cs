@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -32,7 +31,6 @@ public class PublicationService : IPublicationService
         _mapper = mapper;
     }
 
-    [BlobCache(typeof(PublicationCacheKey), ServiceName = "public")]
     public async Task<Either<ActionResult, PublicationViewModel>> Get(string publicationSlug)
     {
         return await _contentPersistenceHelper
@@ -43,7 +41,6 @@ public class PublicationService : IPublicationService
                 .Include(p => p.Topic)
                 .ThenInclude(topic => topic.Theme)
                 .Where(p => p.Slug == publicationSlug))
-            // NOTE: BlobCache won't cache result if GetLatestRelease returns an Either.IsLeft - i.e. if there is no latestRelease
             .OnSuccessCombineWith(GetLatestRelease)
             .OnSuccess(tuple =>
             {
