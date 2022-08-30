@@ -12,7 +12,7 @@ const Breadcrumbs = ({ breadcrumbs = [] }: BreadcrumbsProps) => {
   const currentBreadcrumbIndex = breadcrumbs.length - 1;
 
   return (
-    <div className="govuk-breadcrumbs">
+    <nav className="govuk-breadcrumbs" aria-label="Breadcrumb">
       <ol className="govuk-breadcrumbs__list" data-testid="breadcrumbs--list">
         <li className="govuk-breadcrumbs__list-item">
           <Link className="govuk-breadcrumbs__link" to="/">
@@ -36,7 +36,7 @@ const Breadcrumbs = ({ breadcrumbs = [] }: BreadcrumbsProps) => {
           );
         })}
       </ol>
-    </div>
+    </nav>
   );
 };
 
