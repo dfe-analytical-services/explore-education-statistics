@@ -34,8 +34,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 }
             }
         };
-        
-        private static readonly List<AllMethodologiesThemeViewModel> MethodologyThemes = new() {
+
+        private static readonly List<AllMethodologiesThemeViewModel> MethodologyThemes = new()
+        {
             new AllMethodologiesThemeViewModel
             {
                 Id = Guid.NewGuid(),
@@ -64,12 +65,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 )
             }
         };
-        
+
         [Fact]
         public async Task GetPublicationTree()
         {
             var themeCacheService = new Mock<IThemeCacheService>(Strict);
-            
+
             var controller = BuildController(themeCacheService: themeCacheService.Object);
 
             themeCacheService
@@ -77,25 +78,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 .ReturnsAsync(Themes);
 
             var result = await controller.GetPublicationTree(PublicationTreeFilter.FindStatistics);
-            
+
             VerifyAllMocks(themeCacheService);
 
-            var publicationTree = result.Value;
-            
-            var theme = Assert.Single(publicationTree!);
+            var publicationTree = result.AssertOkResult();
+
+            var theme = Assert.Single(publicationTree);
 
             Assert.IsType<ThemeTree<PublicationTreeNode>>(theme);
 
-            var topic = Assert.Single(theme!.Topics);
+            var topic = Assert.Single(theme.Topics);
 
-            Assert.Single(topic!.Publications);
+            Assert.Single(topic.Publications);
         }
 
         [Fact]
         public async Task GetMethodologyThemes()
         {
             var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
-            
+
             var controller = BuildController(methodologyCacheService.Object);
 
             methodologyCacheService
@@ -110,14 +111,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         }
 
         [Fact]
-        public void ThemeTree_SerialiseAndDeserialise()
+        public void ThemeTree_SerialiseAndDeserialize()
         {
             var converted = DeserializeObject<ThemeTree<PublicationTreeNode>>(SerializeObject(Themes[0]));
             converted.AssertDeepEqualTo(Themes[0]);
         }
-        
+
         [Fact]
-        public void AllMethodologiesThemeViewModel_SerialiseAndDeserialise()
+        public void AllMethodologiesThemeViewModel_SerialiseAndDeserialize()
         {
             var converted = DeserializeObject<AllMethodologiesThemeViewModel>(SerializeObject(MethodologyThemes[0]));
             converted.AssertDeepEqualTo(MethodologyThemes[0]);

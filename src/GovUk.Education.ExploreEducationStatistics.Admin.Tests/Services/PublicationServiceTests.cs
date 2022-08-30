@@ -297,9 +297,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "publication1",
                 Releases = ListOf(
-                    publication1Release2, 
-                    publication1Release3, 
-                    publication1Release4, 
+                    publication1Release2,
+                    publication1Release3,
+                    publication1Release4,
                     publication1Release1),
             };
 
@@ -935,7 +935,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Version = 0,
                 Status = Draft
             };
-            
+
             var methodology2Version1 = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
@@ -943,7 +943,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Version = 0,
                 Status = Approved
             };
-            
+
             var methodology2Version2 = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
@@ -1024,10 +1024,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication.Contact.TeamName, result.Contact.TeamName);
 
                 Assert.Equal(2, result.Methodologies.Count);
-                
+
                 Assert.Equal(methodology1Version1.Id, result.Methodologies[0].Id);
                 Assert.Equal(methodology1Version1.Title, result.Methodologies[0].Title);
-                
+
                 Assert.Equal(methodology2Version2.Id, result.Methodologies[1].Id);
                 Assert.Equal(methodology2Version2.Title, result.Methodologies[1].Title);
             }
@@ -1693,8 +1693,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationCacheKey(publication.Slug)))
                     .Returns(Task.CompletedTask);
-                
-                publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationCacheKey(supersededPublication.Slug)))
+
+                publicBlobCacheService
+                    .Setup(mock => mock.DeleteItem(new PublicationCacheKey(supersededPublication.Slug)))
                     .Returns(Task.CompletedTask);
 
                 themeCacheService.Setup(mock => mock.UpdatePublicationTree())
@@ -1703,7 +1704,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 methodologyCacheService.Setup(mock => mock.UpdateSummariesTree())
                     .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
                         new List<AllMethodologiesThemeViewModel>()));
-                
+
                 var publicationService = BuildPublicationService(context,
                     methodologyVersionRepository: methodologyVersionRepository.Object,
                     publicBlobCacheService: publicBlobCacheService.Object,
@@ -1740,7 +1741,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                VerifyAllMocks(methodologyVersionRepository, publicBlobCacheService, themeCacheService);
+                VerifyAllMocks(methodologyCacheService,
+                    methodologyVersionRepository,
+                    publicBlobCacheService,
+                    themeCacheService);
 
                 var viewModel = result.AssertRight();
 
@@ -1888,11 +1892,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
 
                 methodologyVersionRepository.Setup(mock =>
-                    mock.PublicationTitleChanged(
-                        publication.Id,
-                        publication.Slug,
-                        "New title",
-                        "new-slug"))
+                        mock.PublicationTitleChanged(
+                            publication.Id,
+                            publication.Slug,
+                            "New title",
+                            "new-slug"))
                     .Returns(Task.CompletedTask);
 
                 var publicationService = BuildPublicationService(context,
@@ -1974,11 +1978,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
 
                 methodologyVersionRepository.Setup(mock =>
-                    mock.PublicationTitleChanged(
-                        publication.Id,
-                        publication.Slug,
-                        "New title",
-                        "new-title"))
+                        mock.PublicationTitleChanged(
+                            publication.Id,
+                            publication.Slug,
+                            "New title",
+                            "new-title"))
                     .Returns(Task.CompletedTask);
 
                 var publicationService = BuildPublicationService(context,
@@ -2078,7 +2082,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(
                         new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
                             new List<AllMethodologiesThemeViewModel>()));
-                
+
                 var publicationService = BuildPublicationService(context,
                     publicBlobCacheService: publicBlobCacheService.Object,
                     themeCacheService: themeCacheService.Object,
@@ -2100,7 +2104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TopicId = publication.TopicId,
                     }
                 );
-                
+
                 VerifyAllMocks(publicBlobCacheService, themeCacheService, methodologyCacheService);
 
                 var viewModel = result.AssertRight();
@@ -2582,7 +2586,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release1Amendment.Id, releases[1].Id);
             }
         }
-        
+
         [Fact]
         public async Task ListActiveReleases_IncludePermissions_True()
         {
@@ -2597,7 +2601,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Title = "Publication title",
                 },
             };
-            
+
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -2615,7 +2619,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releases = result.AssertRight();
 
                 var resultRelease = Assert.Single(releases);
-                
+
                 Assert.NotNull(resultRelease.Permissions);
                 Assert.True(resultRelease.Permissions!.CanDeleteRelease);
                 Assert.True(resultRelease.Permissions!.CanUpdateRelease);
@@ -2656,11 +2660,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releases = result.AssertRight();
 
                 var resultRelease = Assert.Single(releases);
-                
+
                 Assert.Null(resultRelease.Permissions);
             }
         }
-        
+
         [Fact]
         public async Task ListActiveReleasesPaginated()
         {
@@ -2726,7 +2730,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(4, pagedResult.Paging.TotalResults);
             }
         }
-        
+
         private static PublicationService BuildPublicationService(
             ContentDbContext context,
             IUserService? userService = null,

@@ -250,7 +250,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        MethodologyContent = new MethodologyVersionContent {
+                        MethodologyContent = new MethodologyVersionContent
+                        {
                             Annexes = new List<ContentSection>
                             {
                                 new()
@@ -515,7 +516,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 result.AssertNotFound();
             }
         }
-        
+
         [Fact]
         public async Task GetSummariesTree()
         {
@@ -540,10 +541,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 new MethodologyVersion
                 {
                     Id = Guid.NewGuid(),
-                    MethodologyContent = new MethodologyVersionContent {
-                        Annexes = new List<ContentSection>(),
-                        Content = new List<ContentSection>(),
-                    },
+                    MethodologyContent = new MethodologyVersionContent(),
                     PreviousVersionId = null,
                     PublishingStrategy = Immediately,
                     Status = Approved,
@@ -557,10 +555,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 new MethodologyVersion
                 {
                     Id = Guid.NewGuid(),
-                    MethodologyContent = new MethodologyVersionContent {
-                        Annexes = new List<ContentSection>(),
-                        Content = new List<ContentSection>(),
-                    },
+                    MethodologyContent = new MethodologyVersionContent(),
                     PreviousVersionId = null,
                     PublishingStrategy = Immediately,
                     Status = Approved,
@@ -579,7 +574,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.Themes.AddAsync(theme);
                 await contentDbContext.SaveChangesAsync();
             }
-            
+
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
             methodologyVersionRepository.Setup(mock => mock.GetLatestPublishedVersionByPublication(publication.Id))
@@ -593,7 +588,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var result = await service.GetSummariesTree();
                 VerifyAllMocks(methodologyVersionRepository);
 
-                // Assert that the cached result is what was returned by the method.
                 var themes = result.AssertRight();
 
                 // Assert the details of the result are correct.
@@ -626,7 +620,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal("Methodology 2 v0 title", methodologies[1].Title);
             }
         }
-        
+
         [Fact]
         public async Task GetSummariesTree_ThemeWithoutTopicsIsNotIncluded()
         {
@@ -645,7 +639,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.Themes.AddAsync(theme);
                 await contentDbContext.SaveChangesAsync();
             }
-            
+
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -685,7 +679,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.Themes.AddAsync(theme);
                 await contentDbContext.SaveChangesAsync();
             }
-            
+
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -742,7 +736,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.Themes.AddAsync(theme);
                 await contentDbContext.SaveChangesAsync();
             }
-            
+
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
             methodologyVersionRepository.Setup(mock => mock.GetLatestPublishedVersionByPublication(publication.Id))

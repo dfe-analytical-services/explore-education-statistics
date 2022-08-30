@@ -3,34 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
-using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
-    [Collection(CacheServiceTests)]
-    public class ThemeServiceTests : CacheServiceTestFixture
+    public class ThemeServiceTests
     {
-        public ThemeServiceTests()
-        {
-            BlobCacheService
-                .Setup(s => s.GetItem(
-                    It.IsAny<PublicationTreeCacheKey>(), typeof(IList<ThemeTree<PublicationTreeNode>>)))
-                .ReturnsAsync(null);
-
-            BlobCacheService
-                .Setup(s => s.SetItem<object>(
-                    It.IsAny<PublicationTreeCacheKey>(), It.IsAny<List<ThemeTree<PublicationTreeNode>>>()))
-                .Returns(Task.CompletedTask);
-        }
-
         [Fact]
         public async Task GetPublicationTree_NoThemes()
         {
