@@ -15,6 +15,7 @@ interface PublicationRowProps {
   publication: string;
   releases: Release[];
 }
+
 const PublicationRow = ({ publication, releases }: PublicationRowProps) => {
   return (
     <>
@@ -24,7 +25,11 @@ const PublicationRow = ({ publication, releases }: PublicationRowProps) => {
         </th>
       </tr>
       {releases.map(release => (
-        <ScheduledReleaseRow key={release.id} release={release} />
+        <ScheduledReleaseRow
+          key={release.id}
+          publicationId={release.publicationId}
+          release={release}
+        />
       ))}
     </>
   );

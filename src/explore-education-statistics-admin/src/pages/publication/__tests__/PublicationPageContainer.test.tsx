@@ -1,14 +1,17 @@
-import PublicationPageContainer from '@admin/pages/publication/PublicationPageContainer';
+import render from '@admin-test/render';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
+import PublicationPageContainer from '@admin/pages/publication/PublicationPageContainer';
 import {
   publicationReleasesRoute,
   PublicationRouteParams,
 } from '@admin/routes/publicationRoutes';
 import { publicationRoute } from '@admin/routes/routes';
 import _publicationService from '@admin/services/publicationService';
-import { generatePath, MemoryRouter } from 'react-router';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { ReleaseSummaryWithPermissions } from '@admin/services/releaseService';
+import { PaginatedList } from '@common/services/types/pagination';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
+import { generatePath, MemoryRouter } from 'react-router';
 import { Route } from 'react-router-dom';
 
 jest.mock('@admin/services/publicationService');
@@ -17,8 +20,19 @@ const publicationService = _publicationService as jest.Mocked<
 >;
 
 describe('PublicationPageContainer', () => {
+  const testEmptyReleases: PaginatedList<ReleaseSummaryWithPermissions> = {
+    paging: {
+      page: 1,
+      pageSize: 5,
+      totalPages: 1,
+      totalResults: 0,
+    },
+    results: [],
+  };
+
   test('renders the page with the releases tab', async () => {
     publicationService.getMyPublication.mockResolvedValue(testPublication);
+    publicationService.listReleases.mockResolvedValue(testEmptyReleases);
 
     renderPage();
 
@@ -58,6 +72,7 @@ describe('PublicationPageContainer', () => {
       isSuperseded: true,
       supersededById: 'publication-2',
     });
+    publicationService.listReleases.mockResolvedValue(testEmptyReleases);
 
     renderPage();
 
@@ -76,6 +91,7 @@ describe('PublicationPageContainer', () => {
       isSuperseded: false,
       supersededById: 'publication-2',
     });
+    publicationService.listReleases.mockResolvedValue(testEmptyReleases);
 
     renderPage();
 
