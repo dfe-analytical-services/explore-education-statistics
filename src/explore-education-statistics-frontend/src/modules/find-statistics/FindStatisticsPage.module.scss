@@ -1,0 +1,22 @@
+@import '~govuk-frontend/govuk/base';
+
+.sortControlsContainer {
+  border-bottom: 1px solid govuk-colour('mid-grey');
+  border-top: 1px solid govuk-colour('mid-grey');
+  display: flex;
+  justify-content: space-between;
+  padding: govuk-spacing(3) 0;
+
+  @include govuk-media-query($from: desktop) {
+    padding: govuk-spacing(4) 0;
+  }
+
+  :global(.govuk-form-group) {
+    margin-bottom: 0;
+  }
+}
+
+.mobileFilterButton {
+  font-weight: bold;
+  width: 150px;
+}

@@ -99,6 +99,14 @@ export interface ContentSection<BlockType> {
   content: BlockType[];
 }
 
+export type PublicationSortOptions = 'newest' | 'oldest' | 'alphabetical';
+
+// TODO EES-3517 expand to include filters and search
+export interface GetPublicationsRequest {
+  page?: number;
+  sortBy?: PublicationSortOptions;
+}
+
 export interface Release<
   ContentBlockType extends ContentBlock = ContentBlock,
   DataBlockType extends DataBlock = DataBlock,

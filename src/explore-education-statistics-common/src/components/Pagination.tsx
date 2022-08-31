@@ -2,6 +2,7 @@ import { ArrowLeft, ArrowRight } from '@common/components/ArrowIcons';
 import generatePageNumbers from '@common/components/util/generatePageNumbers';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import appendQuery from '@common/utils/url/appendQuery';
+import { PublicationSortOptions } from '@common/services/publicationService';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 
@@ -10,6 +11,7 @@ const paginationLinkClassName = 'govuk-link govuk-pagination__link';
 type Params = {
   newDesign?: boolean;
   page?: number;
+  sortBy?: PublicationSortOptions;
 };
 
 interface LinkRenderProps {
@@ -34,7 +36,7 @@ const Pagination = ({
   baseUrl = '',
   currentPage,
   label = 'Pagination',
-  queryParams = {},
+  queryParams,
   renderLink,
   totalPages,
 }: PaginationProps) => {
