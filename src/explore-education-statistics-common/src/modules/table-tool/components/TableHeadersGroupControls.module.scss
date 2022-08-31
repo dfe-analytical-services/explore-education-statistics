@@ -1,0 +1,27 @@
+@import '~govuk-frontend/govuk/base';
+@import '@common/styles/variables';
+
+.buttonsContainer {
+  background: govuk-colour('light-grey');
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  padding-top: govuk-spacing(2);
+
+  button {
+    flex-grow: 1;
+    margin-bottom: 0;
+  }
+}
+
+.showMoreButton {
+  line-height: 1;
+}
+
+.moveButton {
+  margin-top: govuk-spacing(2);
+
+  @include govuk-media-query($from: tablet) {
+    margin: 0 0 0 govuk-spacing(2);
+  }
+}

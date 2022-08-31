@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ButtonText renders correctly with required props 1`] = `
+<button aria-disabled="false"
+        type="button"
+        class="button"
+>
+  Test button
+</button>
+`;

@@ -259,13 +259,18 @@
       {
         "publication_types": [
           {
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Childcare and early years survey of parents"
+              }
+            ]
+          },
+          {
             "publication_type_heading": "Not yet on this service",
             "publications": [
               {
                 "publication_heading": "Childcare and early years provider survey"
-              },
-              {
-                "publication_heading": "Childcare and early years survey of parents"
               }
             ]
           }

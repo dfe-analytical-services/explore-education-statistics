@@ -1,8 +1,10 @@
 /* eslint-disable no-console */
 import chalk from 'chalk';
+import spinner from '../../utils/spinner';
 import methodologyService from '../../services/methodologyService';
 
 const addMethodlogyTextContentBlock = async (methodologyId: string) => {
+  spinner.start();
   const sectionId = await methodologyService.addContentSection(methodologyId);
   if (!sectionId) {
     throw new Error(
@@ -25,6 +27,6 @@ const addMethodlogyTextContentBlock = async (methodologyId: string) => {
   }
 
   await methodologyService.addContent(methodologyId, sectionId, blockId);
-  console.log(chalk.green('successfully added methodology content block'));
+  spinner.succeed('successfully added methodology content block');
 };
 export default addMethodlogyTextContentBlock;

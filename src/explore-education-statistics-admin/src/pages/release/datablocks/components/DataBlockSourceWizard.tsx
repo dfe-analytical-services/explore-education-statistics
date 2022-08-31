@@ -2,6 +2,8 @@ import DataBlockDetailsForm, {
   DataBlockDetailsFormValues,
 } from '@admin/pages/release/datablocks/components/DataBlockDetailsForm';
 import { ReleaseDataBlock } from '@admin/services/dataBlockService';
+import Button from '@common/components/Button';
+import useToggle from '@common/hooks/useToggle';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TableToolWizard, {
   InitialTableToolState,
@@ -62,14 +64,16 @@ const DataBlockSourceWizardFinalStep = ({
       <div className="govuk-!-margin-bottom-4">
         <TableHeadersForm
           initialValues={tableHeaders}
-          id="dataBlockSourceWizard-tableHeadersForm"
-          onSubmit={async nextTableHeaders => {
+          onSubmit={nextTableHeaders => {
             onReorderTableHeaders(nextTableHeaders);
             if (dataTableRef.current) {
-              dataTableRef.current.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
+              // add a short delay so the reordering form is closed before it scrolls.
+              setTimeout(() => {
+                dataTableRef?.current?.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                });
+              }, 200);
             }
           }}
         />

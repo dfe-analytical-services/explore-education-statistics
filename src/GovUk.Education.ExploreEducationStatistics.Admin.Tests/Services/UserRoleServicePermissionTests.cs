@@ -196,6 +196,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 });
         }
+        
+        [Fact]
+        public async Task RemoveAllUserResourceRoles()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectCheckToFail(CanManageUsersOnSystem)
+                .AssertForbidden(async userService =>
+                {
+                    var service = SetupUserRoleService(userService: userService.Object);
+                    return await service.RemoveAllUserResourceRoles(Guid.NewGuid());
+                });
+        }
 
         private static UserRoleService SetupUserRoleService(
             ContentDbContext? contentDbContext = null,

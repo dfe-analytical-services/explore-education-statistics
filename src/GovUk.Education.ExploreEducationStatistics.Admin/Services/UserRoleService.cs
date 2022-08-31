@@ -44,7 +44,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository,
-            UserManager<ApplicationUser> identityUserManager)
+            UserManager<ApplicationUser> identityUserManager
+            )
         {
             _usersAndRolesDbContext = usersAndRolesDbContext;
             _contentDbContext = contentDbContext;
@@ -428,6 +429,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, Unit>> RemoveAllUserResourceRoles(Guid userId)
+        
+        {
+            return await _userService.CheckCanManageAllUsers()
+                .OnSuccess(async _ =>
+                {
+                    return await _contentPersistenceHelper
+                        .CheckEntityExists<User>(userId)
+                        .OnSuccess(async _ =>
+                        {
+                            var userReleaseRoles =
+                                await _contentDbContext.UserReleaseRoles.Where(urr => urr.UserId == userId)
+                                    .ToListAsync();
+                            
+                            if (userReleaseRoles.Any())
+                            {
+                                await _userReleaseRoleRepository.RemoveMany(
+                                    userReleaseRoles,
+                                    deletedById: _userService.GetUserId()
+                                );
+                            }
+
+                            var userPublicationRoles =
+                                await _contentDbContext.UserPublicationRoles
+                                    .Where(upr => upr.UserId == userId)
+                                    .ToListAsync();
+                            
+                            if (userPublicationRoles.Any())
+                            {
+                                await _userPublicationRoleRepository.RemoveMany(
+                                    userPublicationRoles,
+                                    deletedById: _userService.GetUserId()
+                                );
+                            }
+                            
+                            await _usersAndRolesPersistenceHelper
+                                .CheckEntityExists<ApplicationUser, string>(userId.ToString())
+                                .OnSuccessDo(async user =>
+                                {
+                                    var existingRoleNames = await _identityUserManager.GetRolesAsync(user) ?? new List<string>();
+                                    
+                                    await _identityUserManager.RemoveFromRolesAsync(user, existingRoleNames);
+                                });
+                            
+                            return Unit.Instance;
+                        });
+                });
+        }
+        
         private async Task<Either<ActionResult, Unit>> ValidatePublicationRoleCanBeAdded(Guid userId,
             Guid publicationId,
             PublicationRole role)

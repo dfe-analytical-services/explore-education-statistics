@@ -1,6 +1,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-console */
 import chalk from 'chalk';
+import spinner from '../utils/spinner';
 import { ReleaseProgressResponse } from '../types/ReleaseProgressResponse';
 import sleep from '../utils/sleep';
 import { ReleaseData } from '../types/ReleaseData';
@@ -9,6 +10,7 @@ import adminApi from '../utils/adminApi';
 const { ADMIN_URL } = process.env;
 const releaseService = {
   createRelease: async (publicationId: string): Promise<string> => {
+    spinner.start();
     console.time('createRelease');
     const res = await adminApi.post(
       `/api/publications/${publicationId}/releases`,
@@ -21,10 +23,8 @@ const releaseService = {
     );
     console.timeEnd('createRelease');
     const releaseId = res.data.id;
-    console.log(
-      chalk.green(
-        `Release URL: ${ADMIN_URL}/publication/${publicationId}/release/${releaseId}/data`,
-      ),
+    spinner.succeed(
+      `Release URL: ${ADMIN_URL}/publication/${publicationId}/release/${releaseId}/data`,
     );
     return releaseId;
   },
@@ -42,26 +42,29 @@ const releaseService = {
     releaseId: string,
     url?: string,
   ): Promise<ReleaseProgressResponse> => {
+    spinner.start();
     const res = await adminApi.get(`/api/releases/${releaseId}/stage-status`, {
       maxContentLength: Infinity,
       maxBodyLength: Infinity,
     });
     // eslint-disable-next-line no-constant-condition
     if (res.data.publishingStage !== 'Complete') {
-      console.log(
-        'Overall stage of publication:',
-        chalk.blue(res.data.overallStage),
+      spinner.info(
+        `Overall stage of publication: ${chalk.blue(res.data.overallStage)}`,
       );
       await sleep(1500);
       await releaseService.getReleaseProgress(releaseId);
     }
-    console.log(chalk.green(`Published release: ${url}`));
+    if (url) {
+      spinner.succeed(`Published release: ${url}`);
+    }
     return res.data;
   },
   publishRelease: async (obj: ReleaseData, releaseId: string) => {
     await adminApi.post(`/api/releases/${releaseId}/status`, obj);
   },
   getRelease: async (releaseId: string) => {
+    spinner.start();
     const res = await adminApi.get(`/api/releases/${releaseId}`);
     const releaseData: ReleaseData = res.data;
     await sleep(1000);
@@ -72,6 +75,7 @@ const releaseService = {
       latestInternalReleaseNote: 'Approved by publisher testing',
       publishMethod: 'Immediate',
     };
+    spinner.succeed();
   },
 
   addContentSection: async (releaseId: string): Promise<string> => {

@@ -48,7 +48,12 @@ Check correct test users are present in table
     user checks row cell contains text    ${ROW}    3    Manage
 
 Assert prerelease users are present in table
+    ${list}=    create list    ees-prerelease1@education.gov.uk    ees-prerelease2@education.gov.uk
+    user resets user roles via api if required    ${list}
+    user reloads page
+
     ${ROW}=    user gets table row with heading    Prerelease2 User2
+
     user checks row cell contains text    ${ROW}    1    ees-prerelease2@education.gov.uk
     user checks row cell contains text    ${ROW}    2    No role
     user checks row cell contains text    ${ROW}    3    Manage

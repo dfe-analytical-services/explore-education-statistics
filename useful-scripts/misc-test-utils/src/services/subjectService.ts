@@ -4,12 +4,12 @@ import path from 'path';
 import { v4 } from 'uuid';
 import fs from 'fs';
 import FormData from 'form-data';
-import chalk from 'chalk';
 import { projectRoot } from '../config';
 import { SubjectData } from '../types/SubjectData';
 import sleep from '../utils/sleep';
 import adminApi from '../utils/adminApi';
 import { importStages } from '../modules/subject/uploadSubject';
+import spinner from '../utils/spinner';
 
 const cwd = projectRoot;
 
@@ -17,6 +17,7 @@ const { SUBJECT_POLL_TIME } = process.env;
 
 const subjectService = {
   addSubject: async (releaseId: string): Promise<string> => {
+    spinner.start('Uploading subject \n');
     const finalZipFileGlob = await globby(
       `${cwd}/zip-files/clean-test-zip-*.zip`,
     );
@@ -36,7 +37,7 @@ const subjectService = {
         maxBodyLength: 1024 ** 1000000,
       },
     );
-    console.log(res.data.status);
+    spinner.succeed(`Subject uploaded: (status: ${res.data.status})`);
     return res.data.id;
   },
 
@@ -56,17 +57,18 @@ const subjectService = {
     releaseId: string,
     subjectId: string,
   ): Promise<importStages> => {
+    spinner.start();
     const res = await adminApi.get(
       `/api/release/${releaseId}/data/${subjectId}/import/status`,
     );
     if (!res.data.status) {
-      console.info(
-        chalk.cyan(
-          'No import status available. Waiting 3 seconds before polling the API',
-        ),
+      spinner.info(
+        'No import status available. Waiting 3 seconds before polling the API',
       );
       await sleep(parseInt(SUBJECT_POLL_TIME, 12));
     }
+
+    spinner.stop();
     return res.data.status;
   },
 };

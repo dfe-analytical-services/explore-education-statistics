@@ -1,0 +1,52 @@
+@import '~govuk-frontend/govuk/base';
+
+.group {
+  background: govuk-colour('light-grey');
+  border: 2px solid govuk-colour('mid-grey');
+  box-sizing: border-box;
+  display: block;
+  padding: govuk-spacing(2);
+  position: relative;
+
+  @include govuk-media-query($from: desktop) {
+    width: 320px;
+  }
+
+  legend {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  &.focused {
+    border-color: transparent;
+    outline: $govuk-focus-colour solid $govuk-focus-width;
+  }
+
+  &.dragEnabled:hover {
+    background: govuk-colour('light-grey');
+    // Fallback if grab is unsupported
+    cursor: move;
+    cursor: grab;
+  }
+
+  &.isDragging {
+    background: govuk-colour('white');
+    border-color: transparent;
+    outline: $govuk-focus-width solid govuk-colour('blue');
+  }
+
+  &.isDraggingActive {
+    border-bottom: 2px solid govuk-colour('mid-grey');
+  }
+
+  &.isDraggedOutside {
+    opacity: 0.4;
+    outline: none;
+  }
+}
+
+// Removing focus style here as we apply it to the containing group instead.
+.groupDragHandle:focus {
+  outline: none;
+}

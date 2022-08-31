@@ -1,12 +1,13 @@
 /* eslint-disable no-console */
-import chalk from 'chalk';
 import { v4 } from 'uuid';
+import spinner from '../utils/spinner';
 import adminApi from '../utils/adminApi';
 
 const { TOPIC_ID } = process.env;
 
 const publicationService = {
   createPublication: async (): Promise<string> => {
+    spinner.start();
     console.time('createPublication');
     const res = await adminApi.post('/api/publications', {
       title: `importer-testing-${v4()}`,
@@ -19,7 +20,7 @@ const publicationService = {
       },
     });
     console.timeEnd('createPublication');
-    console.log(chalk.green(`Created publication. Status code ${res.status}`));
+    spinner.succeed(`Created publication ${res.data.id}`);
     return res.data.id;
   },
 };

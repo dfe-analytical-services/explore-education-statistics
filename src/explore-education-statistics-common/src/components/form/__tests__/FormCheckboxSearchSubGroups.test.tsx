@@ -201,7 +201,7 @@ describe('FormCheckboxSearchSubGroups', () => {
 
     expect(
       group2.getByRole('button', {
-        name: 'Select all 2 subgroup options',
+        name: /Select all 2 subgroup options/i,
       }),
     ).toBeInTheDocument();
   });

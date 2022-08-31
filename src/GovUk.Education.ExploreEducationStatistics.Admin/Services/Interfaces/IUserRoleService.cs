@@ -34,5 +34,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid userPublicationRoleId);
 
         Task<Either<ActionResult, Unit>> RemoveUserReleaseRole(Guid userReleaseRoleId);
+        
+        Task<Either<ActionResult, Unit>> RemoveAllUserResourceRoles(Guid userId);
+        
     }
 }

@@ -1,5 +1,7 @@
 import Link from '@admin/components/Link';
 import { BasicPublicationDetails } from '@admin/services/publicationService';
+import Button from '@common/components/Button';
+import useToggle from '@common/hooks/useToggle';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
@@ -48,15 +50,18 @@ const ReleasePreviewTableToolFinalStep = ({
         initialValues={tableHeaders}
         onSubmit={nextTableHeaders => {
           onReorderTableHeaders(nextTableHeaders);
-
           if (dataTableRef.current) {
-            dataTableRef.current.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            });
+            // add a short delay so the reordering form is closed before it scrolls.
+            setTimeout(() => {
+              dataTableRef?.current?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+              });
+            }, 200);
           }
         }}
       />
+
       {table && tableHeaders && (
         <TimePeriodDataTable
           ref={dataTableRef}

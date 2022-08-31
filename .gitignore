@@ -64,5 +64,7 @@ lerna-debug.log
 admin-start.sh
 remote-profile
 
+.DS_Store
+
 ## IdentityServer Developer Signing key
 **/*/tempkey.rsa
