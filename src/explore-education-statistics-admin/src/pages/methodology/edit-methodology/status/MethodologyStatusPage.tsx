@@ -113,6 +113,9 @@ const MethodologyStatusPage = () => {
                   </SummaryListItem>
                   {currentMethodology.status === 'Approved' && (
                     <>
+                      <SummaryListItem term="Internal note">
+                        {currentMethodology.latestInternalReleaseNote}
+                      </SummaryListItem>
                       <SummaryListItem term="When to publish">
                         {currentMethodology.publishingStrategy === 'WithRelease'
                           ? 'With a specific release'

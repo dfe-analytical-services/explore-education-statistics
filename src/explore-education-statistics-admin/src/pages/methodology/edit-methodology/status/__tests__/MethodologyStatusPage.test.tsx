@@ -68,6 +68,7 @@ describe('MethodologyStatusPage', () => {
       expect(screen.getByTestId('Status-value')).toHaveTextContent('In Draft');
     });
 
+    expect(screen.queryByTestId('Internal note-key')).not.toBeInTheDocument();
     expect(screen.queryByTestId('When to publish-key')).not.toBeInTheDocument();
     expect(
       screen.queryByTestId('Publish with release-key'),
@@ -76,13 +77,14 @@ describe('MethodologyStatusPage', () => {
     expect(screen.queryByText('Edit status')).not.toBeInTheDocument();
   });
 
-  test('renders Approved details for publishing immediatately', async () => {
+  test('renders Approved details for publishing immediately', async () => {
     permissionService.canApproveMethodology.mockResolvedValue(false);
     permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
 
     renderPage({
       ...testMethodology,
       status: 'Approved',
+      latestInternalReleaseNote: 'Test internal release note',
       publishingStrategy: 'Immediately',
     });
 
@@ -91,6 +93,13 @@ describe('MethodologyStatusPage', () => {
 
       expect(screen.getByTestId('Status-key')).toHaveTextContent('Status');
       expect(screen.getByTestId('Status-value')).toHaveTextContent('Approved');
+
+      expect(screen.getByTestId('Internal note-key')).toHaveTextContent(
+        'Internal note',
+      );
+      expect(screen.getByTestId('Internal note-value')).toHaveTextContent(
+        'Test internal release note',
+      );
 
       expect(screen.getByTestId('When to publish-key')).toHaveTextContent(
         'When to publish',
@@ -114,6 +123,7 @@ describe('MethodologyStatusPage', () => {
     renderPage({
       ...testMethodology,
       status: 'Approved',
+      latestInternalReleaseNote: 'Test internal release note',
       publishingStrategy: 'WithRelease',
       scheduledWithRelease: {
         id: 'dependant-release',
@@ -126,6 +136,13 @@ describe('MethodologyStatusPage', () => {
 
       expect(screen.getByTestId('Status-key')).toHaveTextContent('Status');
       expect(screen.getByTestId('Status-value')).toHaveTextContent('Approved');
+
+      expect(screen.getByTestId('Internal note-key')).toHaveTextContent(
+        'Internal note',
+      );
+      expect(screen.getByTestId('Internal note-value')).toHaveTextContent(
+        'Test internal release note',
+      );
 
       expect(screen.getByTestId('When to publish-key')).toHaveTextContent(
         'When to publish',
