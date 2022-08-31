@@ -54,7 +54,7 @@ interface BaseFormCheckboxGroupProps {
   onAllChange?: CheckboxGroupAllChangeEventHandler;
   onBlur?: FocusEventHandler<HTMLInputElement>;
   onChange?: CheckboxChangeEventHandler;
-  visuallyHiddenText?: string;
+  hiddenText?: string;
 }
 
 const getDefaultSelectAllText = (
@@ -82,7 +82,7 @@ export const BaseFormCheckboxGroup = ({
   onBlur,
   onChange,
   onAllChange,
-  visuallyHiddenText,
+  hiddenText,
 }: BaseFormCheckboxGroupProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -154,9 +154,7 @@ export const BaseFormCheckboxGroup = ({
           underline={false}
         >
           {selectAllText(isAllChecked, options)}
-          {visuallyHiddenText && (
-            <VisuallyHidden> {visuallyHiddenText}</VisuallyHidden>
-          )}
+          {hiddenText && <VisuallyHidden> {hiddenText}</VisuallyHidden>}
         </ButtonText>
       )}
       {showResults && (

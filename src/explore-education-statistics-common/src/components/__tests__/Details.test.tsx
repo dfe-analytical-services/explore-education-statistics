@@ -201,12 +201,12 @@ describe('Details', () => {
     );
   });
 
-  test('passing a visuallyHiddenText prop displays visually hidden text', () => {
+  test('passing a hiddenText prop displays visually hidden text', () => {
     const { container } = render(
       <Details
         summary="Test summary"
         id="test-details"
-        visuallyHiddenText="publication 1"
+        hiddenText="publication 1"
       >
         Key stats
       </Details>,

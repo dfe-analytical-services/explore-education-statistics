@@ -42,7 +42,7 @@ export interface DetailsProps {
   open?: boolean;
   summary: string;
   summaryAfter?: ReactNode;
-  visuallyHiddenText?: string;
+  hiddenText?: string;
 }
 
 const Details = ({
@@ -55,7 +55,7 @@ const Details = ({
   onToggle,
   summary,
   summaryAfter,
-  visuallyHiddenText,
+  hiddenText,
 }: DetailsProps) => {
   const [id] = useState(propId);
   const ref = useRef<HTMLElement>(null);
@@ -141,9 +141,7 @@ const Details = ({
           data-testid={formatTestId(`Expand Details Section ${summary}`)}
         >
           {summary}
-          {visuallyHiddenText && (
-            <VisuallyHidden> {visuallyHiddenText}</VisuallyHidden>
-          )}
+          {hiddenText && <VisuallyHidden> {hiddenText}</VisuallyHidden>}
         </span>
         {summaryAfter}
       </summary>
