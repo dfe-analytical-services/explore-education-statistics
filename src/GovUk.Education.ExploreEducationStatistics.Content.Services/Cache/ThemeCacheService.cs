@@ -33,7 +33,7 @@ public class ThemeCacheService : IThemeCacheService
         return _themeService.GetPublicationTree();
     }
     
-    [BlobCache(typeof(PublicationTreeCacheKey), updateOnly: true)]
+    [BlobCache(typeof(PublicationTreeCacheKey), forceUpdate: true)]
     public Task<IList<ThemeTree<PublicationTreeNode>>> UpdatePublicationTree()
     {
         _logger.LogInformation("Updating cached Publication Tree");

@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             {
                 // Don't attempt to get a cached value from any triggers that are requesting that the cached value be
                 // updated rather than fetched from the cache. 
-                if (cacheTrigger.UpdateOnly)
+                if (cacheTrigger.ForceUpdate)
                 {
                     continue;
                 }

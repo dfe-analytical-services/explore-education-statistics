@@ -165,15 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             string Key { get; }
         }
 
-        private record TestParam : ITestParam
-        {
-            public string Key { get; }
-
-            public TestParam(string value)
-            {
-                Key = value;
-            }
-        }
+        private record TestParam(string Key) : ITestParam;
 
         private record TestValue
         {
@@ -182,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
         private class TestCacheAttribute : CacheAttribute
         {
-            public TestCacheAttribute(Type key, bool updateOnly = false) : base(key, updateOnly)
+            public TestCacheAttribute(Type key, bool forceUpdate = false) : base(key, forceUpdate)
             {
             }
 
@@ -578,9 +570,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             {
                 return new();
             }
-            
-            [TestCache(typeof(TestCacheKey), updateOnly: true)]
-            public static TestValue UpdateOnly()
+
+            [TestCache(typeof(TestCacheKey), forceUpdate: true)]
+            public static TestValue ForceUpdate()
             {
                 return new();
             }
@@ -1052,7 +1044,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
                 () => TestMethods.TwoParamsOfDifferentType_NoMatch(10, "test")
             );
         }
-        
+
         [Fact]
         public void TwoParamsOfSameType_DefaultRecordConstructor()
         {
@@ -1377,22 +1369,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
                 exception.Message
             );
         }
-        
+
         [Fact]
-        public void UpdateOnly()
+        public void ForceUpdate()
         {
             var cacheKey = new TestCacheKey();
 
             var args = new List<object>();
-            
-            // Verify that there is no attempt to "get" a currently-cached value when the "UpdateOnly" flag is set.
+
+            // Verify that there is no attempt to "get" a currently-cached value when the "ForceUpdate" flag is set.
             // This means that we're only ever getting fresh values for the item and then setting or updating the cached
             // entry with that new value rather than ever attempting to retrieve it.
             CacheService
                 .Setup(s => s.SetItem(cacheKey, Capture.In(args)))
                 .Returns(Task.CompletedTask);
 
-            var returnedItem = TestMethods.UpdateOnly();
+            var returnedItem = TestMethods.ForceUpdate();
 
             var cachedItem = Assert.Single(args);
             Assert.Equal(cachedItem, returnedItem);

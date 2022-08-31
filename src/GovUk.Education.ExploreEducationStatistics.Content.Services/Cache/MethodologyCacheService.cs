@@ -36,7 +36,7 @@ public class MethodologyCacheService : IMethodologyCacheService
         return _methodologyService.GetSummariesTree();
     }
 
-    [BlobCache(typeof(AllMethodologiesCacheKey), updateOnly: true)]
+    [BlobCache(typeof(AllMethodologiesCacheKey), forceUpdate: true)]
     public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> UpdateSummariesTree()
     {
         _logger.LogInformation("Updating cached Methodology Tree");

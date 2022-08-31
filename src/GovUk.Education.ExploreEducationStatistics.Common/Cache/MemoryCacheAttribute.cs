@@ -42,8 +42,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             Type key, 
             int durationInSeconds, 
             string? expiryScheduleCron = null,
-            bool updateOnly = false
-            ) : base(key, updateOnly)
+            bool forceUpdate = false
+            ) : base(key, forceUpdate)
         {
             DurationInSeconds = OverrideDurationInSeconds ?? durationInSeconds;
             ExpirySchedule = OverrideExpirySchedule ?? (
