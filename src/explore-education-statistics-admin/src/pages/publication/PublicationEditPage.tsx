@@ -17,7 +17,7 @@ import publicationService, {
 import legacyReleaseService, {
   LegacyRelease,
 } from '@admin/services/legacyReleaseService';
-import appendQuery from '@admin/utils/url/appendQuery';
+import appendQuery from '@common/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import LegacyReleasesTable from '@admin/pages/publication/components/LegacyReleasesTable';

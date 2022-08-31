@@ -24,12 +24,14 @@ describe('PublicationSummary', () => {
     render(<PublicationSummary publication={testPublications[2]} />);
 
     const heading = screen.getByRole('heading', { name: 'Publication 3' });
-    expect(within(heading).queryByRole('link')).not.toBeInTheDocument();
     expect(
-      screen.getByRole('link', {
-        name: 'Statistics at DfE for Publication 3',
-      }),
+      within(heading).getByRole('link', { name: 'Publication 3' }),
     ).toHaveAttribute('href', 'http://test.com');
+    expect(
+      screen.getByText(
+        'Not yet on this service. Currently available via Statistics at DfE.',
+      ),
+    ).toBeInTheDocument();
     expect(screen.queryByRole('list')).not.toBeInTheDocument();
   });
 });

@@ -1,11 +1,11 @@
 import generatePageNumbers from '@common/components/util/generatePageNumbers';
 
 describe('generatePageNumbers', () => {
-  test('returns an array of all numbers when totalPages is less than maxReturnSize', () => {
+  test('returns an array of all numbers when totalPages is less than maxItems', () => {
     expect(
       generatePageNumbers({
         currentPage: 1,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 4,
       }),
     ).toEqual([1, 2, 3, 4]);
@@ -13,7 +13,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 2,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 4,
       }),
     ).toEqual([1, 2, 3, 4]);
@@ -21,7 +21,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 3,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 4,
       }),
     ).toEqual([1, 2, 3, 4]);
@@ -29,17 +29,17 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 4,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 4,
       }),
     ).toEqual([1, 2, 3, 4]);
   });
 
-  test('returns an array of all numbers when totalPages equals maxReturnSize', () => {
+  test('returns an array of all numbers when totalPages equals maxItems', () => {
     expect(
       generatePageNumbers({
         currentPage: 1,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 7,
       }),
     ).toEqual([1, 2, 3, 4, 5, 6, 7]);
@@ -47,7 +47,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 2,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 7,
       }),
     ).toEqual([1, 2, 3, 4, 5, 6, 7]);
@@ -55,7 +55,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 3,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 7,
       }),
     ).toEqual([1, 2, 3, 4, 5, 6, 7]);
@@ -63,7 +63,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 4,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 7,
       }),
     ).toEqual([1, 2, 3, 4, 5, 6, 7]);
@@ -71,7 +71,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 5,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 7,
       }),
     ).toEqual([1, 2, 3, 4, 5, 6, 7]);
@@ -79,7 +79,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 6,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 7,
       }),
     ).toEqual([1, 2, 3, 4, 5, 6, 7]);
@@ -87,17 +87,17 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 7,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 7,
       }),
     ).toEqual([1, 2, 3, 4, 5, 6, 7]);
   });
 
-  test('returns an array with pages around the current page and spacers up to the maxReturnSize if totalPages is greater than maxReturnSize', () => {
+  test('returns an array with pages around the current page and spacers up to the maxItems if totalPages is greater than maxItems', () => {
     expect(
       generatePageNumbers({
         currentPage: 1,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 10,
       }),
     ).toEqual([1, 2, 3, 4, 5, null, 10]);
@@ -105,7 +105,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 2,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 10,
       }),
     ).toEqual([1, 2, 3, 4, 5, null, 10]);
@@ -113,7 +113,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 3,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 10,
       }),
     ).toEqual([1, 2, 3, 4, 5, null, 10]);
@@ -121,7 +121,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 4,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 10,
       }),
     ).toEqual([1, 2, 3, 4, 5, null, 10]);
@@ -129,7 +129,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 5,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 10,
       }),
     ).toEqual([1, null, 4, 5, 6, null, 10]);
@@ -137,7 +137,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 6,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 10,
       }),
     ).toEqual([1, null, 5, 6, 7, null, 10]);
@@ -145,7 +145,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 7,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 10,
       }),
     ).toEqual([1, null, 6, 7, 8, 9, 10]);
@@ -153,7 +153,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 8,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 10,
       }),
     ).toEqual([1, null, 6, 7, 8, 9, 10]);
@@ -161,7 +161,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 9,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 10,
       }),
     ).toEqual([1, null, 6, 7, 8, 9, 10]);
@@ -169,17 +169,17 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 10,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 10,
       }),
     ).toEqual([1, null, 6, 7, 8, 9, 10]);
   });
 
-  test('handles a smaller than default maxReturnSize', () => {
+  test('handles a smaller than default maxItems', () => {
     expect(
       generatePageNumbers({
         currentPage: 1,
-        maxReturnSize: 6,
+        maxItems: 6,
         totalPages: 7,
       }),
     ).toEqual([1, 2, 3, 4, null, 7]);
@@ -187,7 +187,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 2,
-        maxReturnSize: 6,
+        maxItems: 6,
         totalPages: 7,
       }),
     ).toEqual([1, 2, 3, 4, null, 7]);
@@ -195,7 +195,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 3,
-        maxReturnSize: 6,
+        maxItems: 6,
         totalPages: 7,
       }),
     ).toEqual([1, 2, 3, 4, null, 7]);
@@ -203,7 +203,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 4,
-        maxReturnSize: 6,
+        maxItems: 6,
         totalPages: 7,
       }),
     ).toEqual([1, null, 4, 5, 6, 7]);
@@ -211,7 +211,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 5,
-        maxReturnSize: 6,
+        maxItems: 6,
         totalPages: 7,
       }),
     ).toEqual([1, null, 4, 5, 6, 7]);
@@ -219,17 +219,17 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 6,
-        maxReturnSize: 6,
+        maxItems: 6,
         totalPages: 7,
       }),
     ).toEqual([1, null, 4, 5, 6, 7]);
   });
 
-  test('handles a larger than default maxReturnSize', () => {
+  test('handles a larger than default maxItems', () => {
     expect(
       generatePageNumbers({
         currentPage: 1,
-        maxReturnSize: 12,
+        maxItems: 12,
         totalPages: 15,
       }),
     ).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, null, 15]);
@@ -237,7 +237,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 2,
-        maxReturnSize: 12,
+        maxItems: 12,
         totalPages: 15,
       }),
     ).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, null, 15]);
@@ -245,7 +245,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 3,
-        maxReturnSize: 12,
+        maxItems: 12,
         totalPages: 15,
       }),
     ).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, null, 15]);
@@ -253,7 +253,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 4,
-        maxReturnSize: 12,
+        maxItems: 12,
         totalPages: 15,
       }),
     ).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, null, 15]);
@@ -261,7 +261,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 5,
-        maxReturnSize: 12,
+        maxItems: 12,
         totalPages: 15,
       }),
     ).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, null, 15]);
@@ -269,7 +269,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 6,
-        maxReturnSize: 12,
+        maxItems: 12,
         totalPages: 15,
       }),
     ).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, null, 15]);
@@ -277,7 +277,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 7,
-        maxReturnSize: 12,
+        maxItems: 12,
         totalPages: 15,
       }),
     ).toEqual([1, null, 4, 5, 6, 7, 8, 9, 10, null, 15]);
@@ -285,7 +285,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 8,
-        maxReturnSize: 12,
+        maxItems: 12,
         totalPages: 15,
       }),
     ).toEqual([1, null, 5, 6, 7, 8, 9, 10, 11, null, 15]);
@@ -293,7 +293,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 9,
-        maxReturnSize: 12,
+        maxItems: 12,
         totalPages: 15,
       }),
     ).toEqual([1, null, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
@@ -301,7 +301,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 10,
-        maxReturnSize: 12,
+        maxItems: 12,
         totalPages: 15,
       }),
     ).toEqual([1, null, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
@@ -309,7 +309,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 11,
-        maxReturnSize: 12,
+        maxItems: 12,
         totalPages: 15,
       }),
     ).toEqual([1, null, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
@@ -317,7 +317,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 12,
-        maxReturnSize: 12,
+        maxItems: 12,
         totalPages: 15,
       }),
     ).toEqual([1, null, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
@@ -325,7 +325,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 13,
-        maxReturnSize: 12,
+        maxItems: 12,
         totalPages: 15,
       }),
     ).toEqual([1, null, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
@@ -333,7 +333,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 14,
-        maxReturnSize: 12,
+        maxItems: 12,
         totalPages: 15,
       }),
     ).toEqual([1, null, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
@@ -341,7 +341,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 15,
-        maxReturnSize: 12,
+        maxItems: 12,
         totalPages: 15,
       }),
     ).toEqual([1, null, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
@@ -351,7 +351,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 6,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 4,
       }),
     ).toEqual([1, 2, 3, 4]);
@@ -359,7 +359,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 12,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 10,
       }),
     ).toEqual([1, null, 6, 7, 8, 9, 10]);
@@ -369,7 +369,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 0,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 4,
       }),
     ).toEqual([1, 2, 3, 4]);
@@ -377,17 +377,35 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 0,
-        maxReturnSize: 7,
+        maxItems: 7,
         totalPages: 10,
       }),
     ).toEqual([1, 2, 3, 4, 5, null, 10]);
   });
 
-  test('uses the minimum return size if maxReturnSize below it', () => {
+  test('uses the first page as the current page when currentPage is less than 0', () => {
+    expect(
+      generatePageNumbers({
+        currentPage: -2,
+        maxItems: 7,
+        totalPages: 4,
+      }),
+    ).toEqual([1, 2, 3, 4]);
+
+    expect(
+      generatePageNumbers({
+        currentPage: -2,
+        maxItems: 7,
+        totalPages: 10,
+      }),
+    ).toEqual([1, 2, 3, 4, 5, null, 10]);
+  });
+
+  test('uses the minimum return size if maxItems is less than it', () => {
     expect(
       generatePageNumbers({
         currentPage: 1,
-        maxReturnSize: 3,
+        maxItems: 3,
         totalPages: 6,
       }),
     ).toEqual([1, 2, 3, null, 6]);
@@ -395,7 +413,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 2,
-        maxReturnSize: 3,
+        maxItems: 3,
         totalPages: 6,
       }),
     ).toEqual([1, 2, 3, null, 6]);
@@ -403,7 +421,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 3,
-        maxReturnSize: 3,
+        maxItems: 3,
         totalPages: 6,
       }),
     ).toEqual([1, 2, 3, null, 6]);
@@ -411,7 +429,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 4,
-        maxReturnSize: 3,
+        maxItems: 3,
         totalPages: 6,
       }),
     ).toEqual([1, null, 4, 5, 6]);
@@ -419,7 +437,7 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 5,
-        maxReturnSize: 3,
+        maxItems: 3,
         totalPages: 6,
       }),
     ).toEqual([1, null, 4, 5, 6]);
@@ -427,10 +445,30 @@ describe('generatePageNumbers', () => {
     expect(
       generatePageNumbers({
         currentPage: 6,
-        maxReturnSize: 3,
+        maxItems: 3,
         totalPages: 6,
       }),
     ).toEqual([1, null, 4, 5, 6]);
+  });
+
+  test('uses the minimum return size if maxItems is 0', () => {
+    expect(
+      generatePageNumbers({
+        currentPage: 1,
+        maxItems: 0,
+        totalPages: 6,
+      }),
+    ).toEqual([1, 2, 3, null, 6]);
+  });
+
+  test('uses the minimum return size if maxItems is less than 0', () => {
+    expect(
+      generatePageNumbers({
+        currentPage: 1,
+        maxItems: -2,
+        totalPages: 6,
+      }),
+    ).toEqual([1, 2, 3, null, 6]);
   });
 
   test('returns an empty array when totalPages is 0', () => {
@@ -447,6 +485,15 @@ describe('generatePageNumbers', () => {
       generatePageNumbers({
         currentPage: 1,
         totalPages: 1,
+      }),
+    ).toEqual([]);
+  });
+
+  test('returns an empty array when totalPages is less than 0', () => {
+    expect(
+      generatePageNumbers({
+        currentPage: 1,
+        totalPages: -3,
       }),
     ).toEqual([]);
   });

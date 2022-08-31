@@ -1,5 +1,4 @@
 import FormattedDate from '@common/components/FormattedDate';
-import VisuallyHidden from '@common/components/VisuallyHidden';
 import { PublicationSummaryWithRelease } from '@common/services/publicationService';
 import { releaseTypes } from '@common/services/types/releaseType';
 import styles from '@frontend/modules/find-statistics/components/PublicationSummary.module.scss';
@@ -21,24 +20,16 @@ const PublicationSummary = ({ publication }: Props) => {
   } = publication;
   return (
     <li className={`${styles.container} govuk-!-margin-top-4`}>
-      {legacyPublicationUrl ? (
-        <>
-          <h3 className="govuk-!-margin-bottom-2">{title}</h3>
-          <p>
-            Currently available via{' '}
-            <a href={legacyPublicationUrl}>
-              Statistics at DfE <VisuallyHidden>for {title}</VisuallyHidden>
-            </a>
-          </p>
-        </>
-      ) : (
-        <>
-          <h3 className="govuk-!-margin-bottom-2">
-            <Link to={`/find-statistics/${slug}`}>{title}</Link>
-          </h3>
-          <p>{summary}</p>
-        </>
-      )}
+      <h3 className="govuk-!-margin-bottom-2">
+        <Link to={legacyPublicationUrl ?? `/find-statistics/${slug}`}>
+          {title}
+        </Link>
+      </h3>
+      <p>
+        {legacyPublicationUrl
+          ? 'Not yet on this service. Currently available via Statistics at DfE.'
+          : summary}
+      </p>
 
       {latestRelease && (
         <dl>

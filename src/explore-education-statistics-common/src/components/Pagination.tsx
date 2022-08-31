@@ -1,9 +1,15 @@
 import { ArrowLeft, ArrowRight } from '@common/components/ArrowIcons';
+import appendQuery from '@common/utils/url/appendQuery';
 import generatePageNumbers from '@common/components/util/generatePageNumbers';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 
 const paginationLinkClassName = 'govuk-link govuk-pagination__link';
+
+type Params = {
+  newDesign?: boolean;
+  page?: number;
+};
 
 interface LinkRenderProps {
   'aria-current'?: 'page' | undefined;
@@ -15,19 +21,19 @@ interface LinkRenderProps {
 }
 
 export interface PaginationProps {
-  baseUrl: string;
+  baseUrl?: string;
   currentPage: number;
   label?: string;
-  queryParams?: Record<string, unknown>;
+  queryParams?: Params;
   renderLink: (props: LinkRenderProps) => ReactNode;
   totalPages: number;
 }
 
 const Pagination = ({
-  baseUrl,
+  baseUrl = '',
   currentPage,
   label = 'Pagination',
-  queryParams,
+  queryParams = {},
   renderLink,
   totalPages,
 }: PaginationProps) => {
@@ -40,12 +46,6 @@ const Pagination = ({
     return null;
   }
 
-  const queryString = queryParams
-    ? `&${Object.keys(queryParams)
-        .map(key => `${key}=${queryParams[key]}`)
-        .join('&')}`
-    : '';
-
   return (
     <nav className="govuk-pagination" role="navigation" aria-label={label}>
       {currentPage !== 1 && (
@@ -53,7 +53,10 @@ const Pagination = ({
           {renderLink({
             className: paginationLinkClassName,
             rel: 'prev',
-            to: `${baseUrl}?page=${currentPage - 1}${queryString}`,
+            to: appendQuery<Params>(baseUrl, {
+              ...queryParams,
+              page: currentPage - 1,
+            }),
             children: (
               <>
                 <ArrowLeft className="govuk-pagination__icon govuk-pagination__icon--prev" />
@@ -87,7 +90,10 @@ const Pagination = ({
                 'aria-current': currentPage === pageNumber ? 'page' : undefined,
                 'aria-label': `Page ${pageNumber}`,
                 className: paginationLinkClassName,
-                to: `${baseUrl}?page=${pageNumber}${queryString}`,
+                to: appendQuery<Params>(baseUrl, {
+                  ...queryParams,
+                  page: pageNumber,
+                }),
                 children: <>{pageNumber}</>,
               })}
             </li>
@@ -100,7 +106,10 @@ const Pagination = ({
           {renderLink({
             className: paginationLinkClassName,
             rel: 'next',
-            to: `${baseUrl}?page=${currentPage + 1}${queryString}`,
+            to: appendQuery<Params>(baseUrl, {
+              ...queryParams,
+              page: currentPage + 1,
+            }),
             children: (
               <>
                 <span className="govuk-pagination__link-title">Next</span>

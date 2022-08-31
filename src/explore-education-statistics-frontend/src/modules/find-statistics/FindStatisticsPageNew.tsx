@@ -7,7 +7,7 @@ import Pagination from '@frontend/components/Pagination';
 import useRouterLoading from '@frontend/hooks/useRouterLoading';
 import PublicationSummary from '@frontend/modules/find-statistics/components/PublicationSummary';
 import { NextPage } from 'next';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 interface Props {
   paging: Paging;
@@ -15,27 +15,15 @@ interface Props {
 }
 
 const FindStatisticsPageNew: NextPage<Props> = ({ paging, publications }) => {
-  // TODO EES-3517 - update totalResults when search / filter
-  const { totalResults } = paging;
-  // const [totalResults, setTotalResults] = useState<number>(paging.totalResults);
-  const [currentPage, setCurrentPage] = useState<number>(paging.page);
-  const [currentPublications, setCurrentPublications] = useState<
-    PublicationSummaryWithRelease[]
-  >(publications);
-
-  useEffect(() => {
-    setCurrentPage(paging.page);
-    setCurrentPublications(publications);
-  }, [paging.page, publications]);
-
+  const { page, totalPages, totalResults } = paging;
   const isLoading = useRouterLoading();
 
   return (
     <>
       <Page
         metaTitle={
-          paging.totalPages > 1
-            ? `Find statistics and data (page ${currentPage} of ${paging.totalPages})`
+          totalPages > 1
+            ? `Find statistics and data (page ${page} of ${totalPages})`
             : undefined
         }
         title="Find statistics and data"
@@ -101,7 +89,7 @@ const FindStatisticsPageNew: NextPage<Props> = ({ paging, publications }) => {
                 aria-live="polite"
                 aria-atomic="true"
               >
-                {totalResults} {totalResults !== 1 ? 'results' : 'result'}
+                {`${totalResults} ${totalResults !== 1 ? 'results' : 'result'}`}
               </h2>
 
               <a href="#searchResults" className="govuk-skip-link ">
@@ -111,7 +99,7 @@ const FindStatisticsPageNew: NextPage<Props> = ({ paging, publications }) => {
                 aria-live="polite"
                 aria-atomic="true"
                 className="govuk-!-margin-top-1"
-              >{`Page ${currentPage} of ${paging.totalPages}, showing all publications`}</p>
+              >{`Page ${page} of ${paging.totalPages}, showing all publications`}</p>
 
               {/* TODO EES-3517
              <p className="govuk-visually-hidden">
@@ -123,13 +111,13 @@ const FindStatisticsPageNew: NextPage<Props> = ({ paging, publications }) => {
               <hr />
 
               {/* TODO EES-3517 show different message if search / filter returns no results  */}
-              {currentPublications.length === 0 ? (
+              {publications.length === 0 ? (
                 <div className="govuk-inset-text" id="searchResults">
                   No data currently published.
                 </div>
               ) : (
                 <ul className="govuk-list" id="searchResults">
-                  {currentPublications.map(publication => (
+                  {publications.map(publication => (
                     <PublicationSummary
                       key={publication.id}
                       publication={publication}
@@ -139,9 +127,7 @@ const FindStatisticsPageNew: NextPage<Props> = ({ paging, publications }) => {
               )}
 
               <Pagination
-                baseUrl="/find-statistics"
-                queryParams={{ newDesign: true }} // TO DO EES-3517 make sure params for filters / search are included here
-                currentPage={currentPage ?? 1}
+                currentPage={page ?? 1}
                 totalPages={paging.totalPages}
               />
             </LoadingSpinner>

@@ -53,7 +53,7 @@ export interface PublicationSummaryWithRelease {
   };
   slug: string;
   summary?: string;
-  theme?: {
+  theme: {
     title: string;
   };
   title: string;

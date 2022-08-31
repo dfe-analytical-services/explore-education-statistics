@@ -35,6 +35,9 @@ export const testPublications: PublicationSummaryWithRelease[] = [
     legacyPublicationUrl: 'http://test.com',
     slug: 'publication-3-slug',
     title: 'Publication 3',
+    theme: {
+      title: 'Theme 2',
+    },
   },
   {
     id: '4',

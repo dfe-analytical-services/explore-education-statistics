@@ -5,7 +5,7 @@ import PublicationForm from '@admin/pages/publication/components/PublicationForm
 import { dashboardRoute, ThemeTopicParams } from '@admin/routes/routes';
 import publicationService from '@admin/services/publicationService';
 import topicService from '@admin/services/topicService';
-import appendQuery from '@admin/utils/url/appendQuery';
+import appendQuery from '@common/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';

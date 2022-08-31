@@ -56,19 +56,19 @@ describe('FindStatisticsPageNew', () => {
     );
     expect(pagination.getByRole('link', { name: 'Page 1' })).toHaveAttribute(
       'href',
-      '/find-statistics?page=1&newDesign=true',
+      '/?page=1',
     );
     expect(pagination.getByRole('link', { name: 'Page 2' })).toHaveAttribute(
       'href',
-      '/find-statistics?page=2&newDesign=true',
+      '/?page=2',
     );
     expect(pagination.getByRole('link', { name: 'Page 3' })).toHaveAttribute(
       'href',
-      '/find-statistics?page=3&newDesign=true',
+      '/?page=3',
     );
     expect(pagination.getByRole('link', { name: 'Next' })).toHaveAttribute(
       'href',
-      '/find-statistics?page=2&newDesign=true',
+      '/?page=2',
     );
 
     expect(
