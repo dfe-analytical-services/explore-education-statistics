@@ -129,6 +129,7 @@ const AccordionComponent = ({
 }: AccordionComponentProps) => {
   return includeAnalytics ? (
     <Accordion
+      toggleAllHiddenText="help and support sections"
       id={accordionId}
       onSectionOpen={accordionSection => {
         logEvent({
@@ -141,7 +142,9 @@ const AccordionComponent = ({
       {children}
     </Accordion>
   ) : (
-    <Accordion id={accordionId}>{children}</Accordion>
+    <Accordion id={accordionId} toggleAllHiddenText="help and support sections">
+      {children}
+    </Accordion>
   );
 };
 
