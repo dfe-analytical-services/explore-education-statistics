@@ -38,15 +38,18 @@ public class MethodologyCacheService : IMethodologyCacheService
         _logger.LogInformation("Updating cached Methodology Tree");
         return _methodologyService.GetSummariesTree();
     }
-    
-    public Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetSummariesByPublication(Guid publicationId)
+
+    public Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetSummariesByPublication(
+        Guid publicationId)
     {
         return GetSummariesTree()
-            .OnSuccess(methodologiesByTheme => 
-                methodologiesByTheme
+            .OnSuccess(methodologiesByTheme =>
+            {
+                var matchingPublication = methodologiesByTheme
                     .SelectMany(theme => theme.Topics)
                     .SelectMany(topic => topic.Publications)
-                    .SingleOrDefault(publication => publication.Id == publicationId))
-            .OnSuccess(matchingPublication => matchingPublication?.Methodologies ?? new List<MethodologyVersionSummaryViewModel>());
+                    .SingleOrDefault(publication => publication.Id == publicationId);
+                return matchingPublication?.Methodologies ?? new List<MethodologyVersionSummaryViewModel>();
+            });
     }
 }
