@@ -1,6 +1,8 @@
 import Link from '@admin/components/Link';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
-import releaseService, { Release } from '@admin/services/releaseService';
+import releaseService, {
+  ReleaseSummaryWithPermissions,
+} from '@admin/services/releaseService';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
@@ -14,11 +16,12 @@ import React from 'react';
 import { generatePath } from 'react-router';
 
 interface Props {
-  release: Release;
+  publicationId: string;
+  release: ReleaseSummaryWithPermissions;
   onDelete: () => void;
 }
 
-const DraftReleaseRow = ({ release, onDelete }: Props) => {
+const DraftReleaseRow = ({ publicationId, release, onDelete }: Props) => {
   const {
     value: checklist,
     isLoading: isLoadingChecklist,
@@ -49,7 +52,7 @@ const DraftReleaseRow = ({ release, onDelete }: Props) => {
       <td>
         <Link
           to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-            publicationId: release.publicationId,
+            publicationId,
             releaseId: release.id,
           })}
         >
@@ -63,11 +66,11 @@ const DraftReleaseRow = ({ release, onDelete }: Props) => {
           </ButtonText>
         )}
 
-        {release.amendment && (
+        {release.amendment && release.previousVersionId && (
           <Link
             className="govuk-!-margin-left-4"
             to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-              publicationId: release.publicationId,
+              publicationId,
               releaseId: release.previousVersionId,
             })}
           >

@@ -1,139 +1,157 @@
-import Link from '@admin/components/Link';
 import { PublishedStatusGuidanceModal } from '@admin/pages/publication/components/PublicationGuidance';
-import styles from '@admin/pages/publication//PublicationReleasesPage.module.scss';
-import releaseService, { Release } from '@admin/services/releaseService';
+import PublicationPublishedReleasesTable from '@admin/pages/publication/components/PublicationPublishedReleasesTable';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
+import publicationService from '@admin/services/publicationService';
+import releaseService, {
+  ReleaseSummaryWithPermissions,
+} from '@admin/services/releaseService';
 import ButtonText from '@common/components/ButtonText';
-import FormattedDate from '@common/components/FormattedDate';
-import InfoIcon from '@common/components/InfoIcon';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
-import Tag from '@common/components/Tag';
-import VisuallyHidden from '@common/components/VisuallyHidden';
+import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import last from 'lodash/last';
+import React, { MutableRefObject, useEffect, useMemo, useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
-
-const pageSize = 5;
 
 interface Props {
   publicationId: string;
-  releases: Release[];
+  pageSize?: number;
+  refetchRef?: MutableRefObject<() => void>;
 }
 
-const PublicationPublishedReleases = ({ publicationId, releases }: Props) => {
+export default function PublicationPublishedReleases({
+  publicationId,
+  pageSize = 5,
+  refetchRef,
+}: Props) {
   const history = useHistory();
 
-  const focusRef = useRef<HTMLTableRowElement>(null);
-
   const [amendReleaseId, setAmendReleaseId] = useState<string>();
-
-  const [focusIndex, setFocusIndex] = useState<number | undefined>(undefined);
+  const [focusReleaseId, setFocusReleaseId] = useState<string>();
 
   const [
     showPublishedStatusGuidance,
     togglePublishedStatusGuidance,
   ] = useToggle(false);
 
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
-  const currentReleases = useMemo(() => {
-    return releases.slice(0, pageSize * currentPage);
-  }, [releases, currentPage]);
-
-  const showMoreNumber =
-    pageSize < releases.length - currentReleases.length
-      ? pageSize
-      : releases.length - currentReleases.length;
+  const {
+    data: releases,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isSuccess,
+    refetch,
+  } = useInfiniteQuery(
+    ['publicationPublishedReleases', publicationId],
+    ({ pageParam = 1 }) => {
+      return publicationService.listReleases<ReleaseSummaryWithPermissions>(
+        publicationId,
+        {
+          live: true,
+          page: pageParam,
+          pageSize,
+          permissions: true,
+        },
+      );
+    },
+    {
+      getNextPageParam: lastPage =>
+        lastPage.paging.totalPages > lastPage.paging.page
+          ? lastPage.paging.page + 1
+          : undefined,
+    },
+  );
 
   useEffect(() => {
-    if (focusIndex) {
-      focusRef.current?.focus();
+    if (refetchRef) {
+      // eslint-disable-next-line no-param-reassign
+      refetchRef.current = refetch;
     }
-  }, [focusIndex]);
+  });
+
+  const lastPage = last(releases?.pages);
+
+  const allReleases = useMemo(
+    () => releases?.pages.flatMap(page => page.results) ?? [],
+    [releases?.pages],
+  );
+
+  const showMoreNumber = useMemo(() => {
+    if (!lastPage || !allReleases.length) {
+      return 0;
+    }
+
+    const remainingResults = lastPage.paging.totalResults - allReleases.length;
+
+    return remainingResults < pageSize ? remainingResults : pageSize;
+  }, [allReleases.length, lastPage, pageSize]);
 
   return (
     <>
-      <table
-        className="dfe-hide-empty-cells"
-        data-testid="publication-published-releases"
+      <h3 aria-atomic aria-live="polite">
+        {`Published releases${
+          lastPage
+            ? ` (${allReleases.length} of ${lastPage.paging.totalResults})`
+            : ''
+        }`}
+      </h3>
+
+      <LoadingSpinner
+        text="Loading published releases"
+        hideText
+        loading={isLoading}
       >
-        <caption
-          aria-live="polite"
-          aria-atomic
-          className="govuk-table__caption--m"
-        >
-          {`Published releases (${currentReleases.length} of ${releases.length})`}
-        </caption>
-        <thead>
-          <tr>
-            <th className="govuk-!-width-one-third">Release period</th>
-            <th className={styles.statusColumn}>
-              State{' '}
-              <ButtonText onClick={togglePublishedStatusGuidance.on}>
-                <InfoIcon description="Guidance on states" />
-              </ButtonText>
-            </th>
-            <th>Published date</th>
-            <th className={styles.actionsColumn}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentReleases.map((release, index) => (
-            <tr
-              className={styles.row}
-              key={release.id}
-              ref={focusIndex === index + 1 ? focusRef : undefined}
-              tabIndex={focusIndex === index + 1 ? -1 : undefined}
-            >
-              <td>{release.title}</td>
-              <td>
-                <Tag colour="green">Published</Tag>
-              </td>
-              <td>
-                {release.published && (
-                  <FormattedDate>{release.published}</FormattedDate>
-                )}
-              </td>
-              <td>
-                <Link
-                  to={generatePath<ReleaseRouteParams>(
-                    releaseSummaryRoute.path,
-                    {
-                      publicationId: release.publicationId,
-                      releaseId: release.id,
-                    },
-                  )}
+        {isSuccess ? (
+          <>
+            <PublicationPublishedReleasesTable
+              focusReleaseId={focusReleaseId}
+              publicationId={publicationId}
+              releases={allReleases}
+              onAmend={setAmendReleaseId}
+              onGuidanceClick={togglePublishedStatusGuidance.on}
+            />
+
+            {hasNextPage && showMoreNumber > 0 && (
+              <div className="dfe-flex dfe-align--centre">
+                <ButtonText
+                  onClick={async () => {
+                    const { data } = await fetchNextPage();
+                    const nextPage = last(data?.pages);
+
+                    if (nextPage) {
+                      setFocusReleaseId(nextPage.results[0]?.id);
+                    }
+                  }}
                 >
-                  View<VisuallyHidden> {release.title}</VisuallyHidden>
-                </Link>
-                {release.permissions?.canMakeAmendmentOfRelease && (
-                  <ButtonText
-                    className="govuk-!-margin-left-4"
-                    onClick={() => setAmendReleaseId(release.id)}
-                  >
-                    Amend<VisuallyHidden> {release.title}</VisuallyHidden>
-                  </ButtonText>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {currentReleases.length < releases.length && (
-        <ButtonText
-          onClick={() => {
-            setFocusIndex(pageSize * currentPage + 1);
-            setCurrentPage(currentPage + 1);
-          }}
-        >
-          {`Show ${showMoreNumber} more published release${
-            showMoreNumber > 1 ? 's' : ''
-          }`}
-        </ButtonText>
-      )}
+                  {`Show ${showMoreNumber} more published release${
+                    showMoreNumber > 1 ? 's' : ''
+                  }`}
+                </ButtonText>
+
+                <LoadingSpinner
+                  className="govuk-!-margin-left-2"
+                  loading={isFetchingNextPage}
+                  text={`Loading ${showMoreNumber} more releases`}
+                  alert
+                  hideText
+                  inline
+                  size="sm"
+                />
+              </div>
+            )}
+          </>
+        ) : (
+          <WarningMessage>
+            There was a problem loading the published releases.
+          </WarningMessage>
+        )}
+      </LoadingSpinner>
 
       <PublishedStatusGuidanceModal
         open={showPublishedStatusGuidance}
@@ -167,6 +185,4 @@ const PublicationPublishedReleases = ({ publicationId, releases }: Props) => {
       )}
     </>
   );
-};
-
-export default PublicationPublishedReleases;
+}
