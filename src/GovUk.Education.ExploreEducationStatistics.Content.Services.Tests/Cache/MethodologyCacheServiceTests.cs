@@ -195,12 +195,10 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
     }
 
     private static MethodologyCacheService SetupService(
-        IMethodologyService? methodologyService = null,
-        IThemeService? themeService = null)
+        IMethodologyService? methodologyService = null)
     {
         return new(
             methodologyService: methodologyService ?? Mock.Of<IMethodologyService>(Strict),
-            themeService: themeService ?? Mock.Of<IThemeService>(Strict),
             Mock.Of<ILogger<MethodologyCacheService>>()
         );
     }
