@@ -1,5 +1,5 @@
 import {
-  BasicMethodologyVersion,
+  MethodologyVersion,
   MethodologyPublishingStrategy,
   MethodologyStatus,
 } from '@admin/services/methodologyService';
@@ -25,7 +25,7 @@ export interface FormValues {
 
 interface Props {
   isPublished?: string;
-  methodologySummary: BasicMethodologyVersion;
+  methodologySummary: MethodologyVersion;
   unpublishedReleases: IdTitlePair[];
   onCancel: () => void;
   onSubmit: (values: FormValues) => void;
@@ -42,8 +42,7 @@ const MethodologyStatusForm = ({
     <Formik<FormValues>
       initialValues={{
         status: methodologySummary.status,
-        latestInternalReleaseNote:
-          methodologySummary.latestInternalReleaseNote ?? '',
+        latestInternalReleaseNote: methodologySummary.internalReleaseNote ?? '',
         publishingStrategy:
           methodologySummary.publishingStrategy ?? 'Immediately',
         withReleaseId: methodologySummary.scheduledWithRelease?.id,

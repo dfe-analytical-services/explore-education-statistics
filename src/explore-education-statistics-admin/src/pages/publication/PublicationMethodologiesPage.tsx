@@ -14,7 +14,7 @@ import {
   publicationExternalMethodologyRoute,
 } from '@admin/routes/publicationRoutes';
 import methodologyService, {
-  MethodologyVersion,
+  MethodologyVersionSummary,
 } from '@admin/services/methodologyService';
 import publicationService, {
   ExternalMethodology,
@@ -35,7 +35,7 @@ import { generatePath, useHistory } from 'react-router';
 
 interface Model {
   externalMethodology?: ExternalMethodology;
-  methodologyVersions: MethodologyVersion[];
+  methodologyVersions: MethodologyVersionSummary[];
 }
 
 const PublicationMethodologiesPage = () => {

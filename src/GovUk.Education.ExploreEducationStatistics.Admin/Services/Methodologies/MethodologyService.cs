@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public Task<Either<ActionResult, MethodologyVersionSummaryViewModel>> CreateMethodology(Guid publicationId)
+        public Task<Either<ActionResult, MethodologyVersionViewModel>> CreateMethodology(Guid publicationId)
         {
             return _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public async Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetAdoptableMethodologies(
+        public async Task<Either<ActionResult, List<MethodologyVersionViewModel>>> GetAdoptableMethodologies(
             Guid publicationId)
         {
             return await _persistenceHelper
@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public async Task<Either<ActionResult, MethodologyVersionSummaryViewModel>> GetSummary(Guid id)
+        public async Task<Either<ActionResult, MethodologyVersionViewModel>> GetSummary(Guid id)
         {
             return await _persistenceHelper
                 .CheckEntityExists<MethodologyVersion>(id)
@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(BuildMethodologySummaryViewModel);
         }
 
-        public async Task<Either<ActionResult, List<MethodologyVersionViewModel>>> ListMethodologies(Guid publicationId)
+        public async Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> ListMethodologies(Guid publicationId)
         {
             return await _persistenceHelper.CheckEntityExists<Publication>(publicationId,
                     q => q.Include(p => p.Methodologies)
@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                                     latestVersion,
                                     publicationMethodology);
 
-                            return new MethodologyVersionViewModel
+                            return new MethodologyVersionSummaryViewModel
                             {
                                 Id = latestVersion.Id,
                                 Amendment = latestVersion.Amendment,
@@ -198,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public async Task<Either<ActionResult, MethodologyVersionSummaryViewModel>> UpdateMethodology(Guid id,
+        public async Task<Either<ActionResult, MethodologyVersionViewModel>> UpdateMethodology(Guid id,
             MethodologyUpdateRequest request)
         {
             return await _persistenceHelper
@@ -209,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(_ => GetSummary(id));
         }
 
-        private async Task<MethodologyVersionSummaryViewModel> BuildMethodologySummaryViewModel(
+        private async Task<MethodologyVersionViewModel> BuildMethodologySummaryViewModel(
             MethodologyVersion methodologyVersion)
         {
             var loadedMethodology = _context.AssertEntityLoaded(methodologyVersion);
@@ -227,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OrderBy(model => model.Title)
                 .ToList();
 
-            var viewModel = _mapper.Map<MethodologyVersionSummaryViewModel>(loadedMethodology);
+            var viewModel = _mapper.Map<MethodologyVersionViewModel>(loadedMethodology);
 
             viewModel.OwningPublication = owningPublication;
             viewModel.OtherPublications = otherPublications;

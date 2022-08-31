@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public List<ReleaseViewModel> Releases { get; set; }
 
-        public List<MethodologyVersionViewModel> Methodologies { get; set; }
+        public List<MethodologyVersionSummaryViewModel> Methodologies { get; set; }
 
         public ExternalMethodology ExternalMethodology { get; set; }
 

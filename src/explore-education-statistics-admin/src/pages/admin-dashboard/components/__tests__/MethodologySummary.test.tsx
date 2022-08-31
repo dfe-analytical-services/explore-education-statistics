@@ -1,7 +1,7 @@
 import MethodologySummary from '@admin/pages/admin-dashboard/components/MethodologySummary';
 import _methodologyService, {
-  BasicMethodologyVersion,
   MethodologyVersion,
+  MethodologyVersionSummary,
 } from '@admin/services/methodologyService';
 import _publicationService, {
   ExternalMethodology,
@@ -35,7 +35,7 @@ const testContact: PublicationContactDetails = {
   teamName: 'Team Smith',
 };
 
-const testMethodology: MethodologyVersion = {
+const testMethodology: MethodologyVersionSummary = {
   amendment: false,
   id: 'methodology-v1',
   internalReleaseNote: 'this is the release note',
@@ -54,7 +54,7 @@ const testMethodology: MethodologyVersion = {
     canRemoveMethodologyLink: false,
   },
 };
-const testMethodology2: MethodologyVersion = {
+const testMethodology2: MethodologyVersionSummary = {
   amendment: false,
   id: 'methodology-v2',
   internalReleaseNote: 'this is another release note',
@@ -176,7 +176,7 @@ const testTopicId = 'topic-id';
 describe('MethodologySummary', () => {
   describe('Create Methodology', () => {
     test('clicking Create Methodology creates the Methodology and takes the user to the Methodology summary', async () => {
-      const createdMethodology: BasicMethodologyVersion = {
+      const createdMethodology: MethodologyVersion = {
         id: 'methodology-v1',
         amendment: false,
         methodologyId: 'methodology-1',
@@ -1015,10 +1015,10 @@ describe('MethodologySummary', () => {
     test('calls the service to amend the methodology when the confirm button is clicked', async () => {
       const history = createMemoryHistory();
 
-      const mockMethodology: BasicMethodologyVersion = {
+      const mockMethodology: MethodologyVersion = {
         amendment: true,
         id: 'methodology-v1',
-        latestInternalReleaseNote: 'this is the release note',
+        internalReleaseNote: 'Test internal release note',
         methodologyId: 'methodology-1',
         previousVersionId: 'methodology-previous-version-1',
         owningPublication: {

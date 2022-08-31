@@ -3,8 +3,8 @@ import {
   UpdateLegacyRelease,
 } from '@admin/services/legacyReleaseService';
 import {
-  BasicMethodologyVersion,
   MethodologyVersion,
+  MethodologyVersionSummary,
 } from '@admin/services/methodologyService';
 import { Release, ReleaseSummary } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
@@ -38,7 +38,7 @@ export interface MyPublication {
   title: string;
   summary: string;
   releases: Release[];
-  methodologies: MethodologyVersion[];
+  methodologies: MethodologyVersionSummary[];
   externalMethodology?: ExternalMethodology;
   topicId: string;
   themeId: string;
@@ -63,7 +63,7 @@ export interface BasicPublicationDetails {
   slug: string;
   contact: PublicationContactDetails;
   releases?: Release[];
-  methodologies?: BasicMethodologyVersion[];
+  methodologies?: MethodologyVersion[];
   externalMethodology?: ExternalMethodology;
   themeId: string;
   topicId: string;
@@ -159,8 +159,8 @@ const publicationService = {
 
   getAdoptableMethodologies(
     publicationId: string,
-  ): Promise<BasicMethodologyVersion[]> {
-    return client.get<BasicMethodologyVersion[]>(
+  ): Promise<MethodologyVersion[]> {
+    return client.get<MethodologyVersion[]>(
       `/publication/${publicationId}/adoptable-methodologies`,
     );
   },
@@ -168,7 +168,7 @@ const publicationService = {
   adoptMethodology(
     publicationId: string,
     methodologyId: string,
-  ): Promise<BasicMethodologyVersion> {
+  ): Promise<MethodologyVersion> {
     return client.put(
       `/publication/${publicationId}/methodology/${methodologyId}`,
     );
@@ -177,7 +177,7 @@ const publicationService = {
   dropMethodology(
     publicationId: string,
     methodologyId: string,
-  ): Promise<BasicMethodologyVersion> {
+  ): Promise<MethodologyVersion> {
     return client.delete(
       `/publication/${publicationId}/methodology/${methodologyId}`,
     );

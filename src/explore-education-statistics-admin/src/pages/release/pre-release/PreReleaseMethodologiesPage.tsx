@@ -6,7 +6,7 @@ import {
 } from '@admin/routes/preReleaseRoutes';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import methodologyService, {
-  MethodologyVersion,
+  MethodologyVersionSummary,
 } from '@admin/services/methodologyService';
 import publicationService, {
   ExternalMethodology,
@@ -21,7 +21,7 @@ import { generatePath, RouteComponentProps } from 'react-router';
 
 interface Model {
   externalMethodology?: ExternalMethodology;
-  methodologyVersions: MethodologyVersion[];
+  methodologyVersions: MethodologyVersionSummary[];
 }
 
 const PreReleaseMethodologiesPage = ({

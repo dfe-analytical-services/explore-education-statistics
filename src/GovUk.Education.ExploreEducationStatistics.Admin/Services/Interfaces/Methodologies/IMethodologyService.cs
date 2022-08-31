@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
     {
         Task<Either<ActionResult, Unit>> AdoptMethodology(Guid publicationId, Guid methodologyId);
 
-        Task<Either<ActionResult, MethodologyVersionSummaryViewModel>> CreateMethodology(Guid publicationId);
+        Task<Either<ActionResult, MethodologyVersionViewModel>> CreateMethodology(Guid publicationId);
 
         Task<Either<ActionResult, Unit>> DeleteMethodology(Guid methodologyId, bool forceDelete = false);
 
@@ -21,17 +21,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 
         Task<Either<ActionResult, Unit>> DropMethodology(Guid publicationId, Guid methodologyId);
 
-        Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetAdoptableMethodologies(
+        Task<Either<ActionResult, List<MethodologyVersionViewModel>>> GetAdoptableMethodologies(
             Guid publicationId);
 
-        Task<Either<ActionResult, MethodologyVersionSummaryViewModel>> GetSummary(Guid methodologyVersionId);
+        Task<Either<ActionResult, MethodologyVersionViewModel>> GetSummary(Guid methodologyVersionId);
 
-        Task<Either<ActionResult, List<MethodologyVersionViewModel>>> ListMethodologies(Guid publicationId);
+        Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> ListMethodologies(Guid publicationId);
 
         Task<Either<ActionResult, List<TitleAndIdViewModel>>> GetUnpublishedReleasesUsingMethodology(
             Guid methodologyVersionId);
 
-        Task<Either<ActionResult, MethodologyVersionSummaryViewModel>> UpdateMethodology(
+        Task<Either<ActionResult, MethodologyVersionViewModel>> UpdateMethodology(
             Guid methodologyVersionId,
             MethodologyUpdateRequest request);
     }

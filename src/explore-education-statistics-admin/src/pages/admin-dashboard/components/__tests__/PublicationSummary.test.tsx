@@ -11,7 +11,7 @@ import _releaseService, {
   ReleaseStageStatuses,
 } from '@admin/services/releaseService';
 import { MemoryRouter } from 'react-router-dom';
-import { MethodologyVersion } from '@admin/services/methodologyService';
+import { MethodologyVersionSummary } from '@admin/services/methodologyService';
 
 jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
@@ -99,7 +99,7 @@ describe('PublicationSummary', () => {
     } as Release,
   ];
 
-  const testMethodologies: MethodologyVersion[] = [
+  const testMethodologies: MethodologyVersionSummary[] = [
     {
       amendment: false,
       id: 'methodology-v1',

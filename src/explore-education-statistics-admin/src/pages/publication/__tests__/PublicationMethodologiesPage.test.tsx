@@ -2,8 +2,8 @@ import PublicationMethodologiesPage from '@admin/pages/publication/PublicationMe
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import _methodologyService, {
-  BasicMethodologyVersion,
   MethodologyVersion,
+  MethodologyVersionSummary,
 } from '@admin/services/methodologyService';
 import _publicationService, {
   ExternalMethodology,
@@ -45,7 +45,7 @@ describe('PublicationMethodologiesPage', () => {
     canMarkMethodologyAsDraft: true,
     canRemoveMethodologyLink: false,
   };
-  const testMethodology1: MethodologyVersion = {
+  const testMethodology1: MethodologyVersionSummary = {
     amendment: false,
     id: 'methodology-v1',
     methodologyId: 'methodology-1',
@@ -68,7 +68,7 @@ describe('PublicationMethodologiesPage', () => {
     delete draft.published;
   });
 
-  const testMethodology2: MethodologyVersion = {
+  const testMethodology2: MethodologyVersionSummary = {
     amendment: false,
     id: 'methodology-v2',
     methodologyId: 'methodology-2',
@@ -141,7 +141,7 @@ describe('PublicationMethodologiesPage', () => {
 
   describe('create methodology', () => {
     test('clicking the Create new methodology button creates the Methodology and takes the user to the Methodology summary', async () => {
-      const createdMethodology: BasicMethodologyVersion = {
+      const createdMethodology: MethodologyVersion = {
         id: 'methodology-v1',
         amendment: false,
         methodologyId: 'methodology-1',
@@ -682,7 +682,7 @@ describe('PublicationMethodologiesPage', () => {
       test('calls the service to amend the methodology when the confirm button is clicked', async () => {
         const history = createMemoryHistory();
 
-        const createdAmendment: BasicMethodologyVersion = {
+        const createdAmendment: MethodologyVersion = {
           amendment: true,
           id: 'methodology-v1',
           methodologyId: 'methodology-1',

@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import _methodologyService, {
-  BasicMethodologyVersion,
+  MethodologyVersion,
 } from '@admin/services/methodologyService';
 import _permissionService from '@admin/services/permissionService';
 import { generatePath, MemoryRouter } from 'react-router';
@@ -26,7 +26,7 @@ const permissionService = _permissionService as jest.Mocked<
 >;
 
 describe('MethodologyStatusPage', () => {
-  const testMethodology: BasicMethodologyVersion = {
+  const testMethodology: MethodologyVersion = {
     id: 'm1',
     amendment: false,
     title: 'Test methodology',
@@ -35,7 +35,7 @@ describe('MethodologyStatusPage', () => {
       id: 'p1',
       title: 'Owning publication title',
     },
-  } as BasicMethodologyVersion;
+  } as MethodologyVersion;
 
   const testMethodologyWithOtherPublications = {
     ...testMethodology,
@@ -84,7 +84,7 @@ describe('MethodologyStatusPage', () => {
     renderPage({
       ...testMethodology,
       status: 'Approved',
-      latestInternalReleaseNote: 'Test internal release note',
+      internalReleaseNote: 'Test internal release note',
       publishingStrategy: 'Immediately',
     });
 
@@ -123,7 +123,7 @@ describe('MethodologyStatusPage', () => {
     renderPage({
       ...testMethodology,
       status: 'Approved',
-      latestInternalReleaseNote: 'Test internal release note',
+      internalReleaseNote: 'Test internal release note',
       publishingStrategy: 'WithRelease',
       scheduledWithRelease: {
         id: 'dependant-release',
@@ -287,7 +287,7 @@ describe('MethodologyStatusPage', () => {
     });
   });
 
-  function renderPage(methodology: BasicMethodologyVersion) {
+  function renderPage(methodology: MethodologyVersion) {
     render(
       <MemoryRouter
         initialEntries={[

@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { BasicMethodologyVersion } from '@admin/services/methodologyService';
+import { MethodologyVersion } from '@admin/services/methodologyService';
 import { generatePath, MemoryRouter } from 'react-router';
 import MethodologySummaryPage from '@admin/pages/methodology/edit-methodology/summary/MethodologySummaryPage';
 import { MethodologyContextProvider } from '@admin/pages/methodology/contexts/MethodologyContext';
@@ -10,7 +10,7 @@ import {
 } from '@admin/routes/methodologyRoutes';
 import { Route } from 'react-router-dom';
 
-const testMethodology: BasicMethodologyVersion = {
+const testMethodology: MethodologyVersion = {
   id: 'm1',
   amendment: false,
   methodologyId: 'm-1',

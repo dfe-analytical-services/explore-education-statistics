@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             methodologyService
                 .Setup(s => s.CreateMethodology(_id))
-                .ReturnsAsync(new MethodologyVersionSummaryViewModel());
+                .ReturnsAsync(new MethodologyVersionViewModel());
 
             var controller = SetupMethodologyController(methodologyService.Object);
 
@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             methodologyService
                 .Setup(s => s.GetAdoptableMethodologies(_id))
-                .ReturnsAsync(ListOf(new MethodologyVersionSummaryViewModel()));
+                .ReturnsAsync(ListOf(new MethodologyVersionViewModel()));
 
             var controller = SetupMethodologyController(methodologyService.Object);
 
@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             methodologyService
                 .Setup(s => s.GetSummary(_id))
-                .ReturnsAsync(new MethodologyVersionSummaryViewModel());
+                .ReturnsAsync(new MethodologyVersionViewModel());
 
             var controller = SetupMethodologyController(methodologyService.Object);
 
@@ -177,7 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             methodologyService
                 .Setup(s => s.ListMethodologies(_id))
-                .ReturnsAsync(ListOf(new MethodologyVersionViewModel()));
+                .ReturnsAsync(ListOf(new MethodologyVersionSummaryViewModel()));
 
             var controller = SetupMethodologyController(methodologyService.Object);
 
@@ -197,7 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             methodologyService
                 .Setup(s => s.UpdateMethodology(_id, request))
-                .ReturnsAsync(new MethodologyVersionSummaryViewModel());
+                .ReturnsAsync(new MethodologyVersionViewModel());
 
             var controller = SetupMethodologyController(methodologyService.Object);
 
@@ -215,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             methodologyAmendmentService
                 .Setup(s => s.CreateMethodologyAmendment(_id))
-                .ReturnsAsync(new MethodologyVersionSummaryViewModel());
+                .ReturnsAsync(new MethodologyVersionViewModel());
 
             var controller =
                 SetupMethodologyController(methodologyAmendmentService: methodologyAmendmentService.Object);

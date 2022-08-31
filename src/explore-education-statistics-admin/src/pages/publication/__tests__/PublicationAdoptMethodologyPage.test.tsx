@@ -1,7 +1,7 @@
 import PublicationAdoptMethodologyPage from '@admin/pages/publication/PublicationAdoptMethodologyPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
-import { BasicMethodologyVersion } from '@admin/services/methodologyService';
+import { MethodologyVersion } from '@admin/services/methodologyService';
 import _publicationService, {
   MyPublication,
 } from '@admin/services/publicationService';
@@ -19,10 +19,10 @@ const publicationService = _publicationService as jest.Mocked<
 >;
 
 describe('PublicationAdoptMethodologyPage', () => {
-  const testMethodology1: BasicMethodologyVersion = {
+  const testMethodology1: MethodologyVersion = {
     amendment: false,
     id: 'methodology-v1',
-    latestInternalReleaseNote: 'this is the release note',
+    internalReleaseNote: 'this is the release note',
     methodologyId: 'methodology-1',
     published: '2021-06-08T00:00:00',
     slug: 'methodology-slug-1',
@@ -33,10 +33,10 @@ describe('PublicationAdoptMethodologyPage', () => {
       title: 'Publication 2',
     },
   };
-  const testMethodology2: BasicMethodologyVersion = {
+  const testMethodology2: MethodologyVersion = {
     amendment: false,
     id: 'methodology-v2',
-    latestInternalReleaseNote: 'this is the release note',
+    internalReleaseNote: 'this is the release note',
     methodologyId: 'methodology-2',
     published: '2021-06-08T00:00:00',
     slug: 'methodology-slug-2',
@@ -47,10 +47,10 @@ describe('PublicationAdoptMethodologyPage', () => {
       title: 'Publication 3',
     },
   };
-  const testMethodology3: BasicMethodologyVersion = {
+  const testMethodology3: MethodologyVersion = {
     amendment: false,
     id: 'methodology-v3',
-    latestInternalReleaseNote: 'this is the release note',
+    internalReleaseNote: 'this is the release note',
     methodologyId: 'methodology-3',
     published: '2021-06-08T00:00:00',
     slug: 'methodology-slug-3',
@@ -62,7 +62,7 @@ describe('PublicationAdoptMethodologyPage', () => {
     },
   };
 
-  const testMethodologies: BasicMethodologyVersion[] = [
+  const testMethodologies: MethodologyVersion[] = [
     testMethodology1,
     testMethodology2,
     testMethodology3,

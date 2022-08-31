@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _context = context;
         }
 
-        public async Task<Either<ActionResult, MethodologyVersionSummaryViewModel>> CreateMethodologyAmendment(
+        public async Task<Either<ActionResult, MethodologyVersionViewModel>> CreateMethodologyAmendment(
             Guid originalMethodologyVersionId)
         {
             return await _persistenceHelper.CheckEntityExists<MethodologyVersion>(originalMethodologyVersionId)

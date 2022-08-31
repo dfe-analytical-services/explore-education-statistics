@@ -1,5 +1,5 @@
 import methodologyService, {
-  BasicMethodologyVersion,
+  MethodologyVersion,
   MethodologyStatus,
 } from '@admin/services/methodologyService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -16,7 +16,7 @@ interface FormValues {
 }
 
 interface Props {
-  methodologySummary: BasicMethodologyVersion;
+  methodologySummary: MethodologyVersion;
   onCancel: () => void;
   onSubmit: (values: FormValues) => void;
 }

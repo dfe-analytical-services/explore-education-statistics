@@ -6,7 +6,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import noop from 'lodash/noop';
-import { BasicMethodologyVersion } from 'src/services/methodologyService';
+import { MethodologyVersion } from 'src/services/methodologyService';
 
 describe('MethodologyStatusForm', () => {
   const testUnpublishedReleases: IdTitlePair[] = [
@@ -26,7 +26,7 @@ describe('MethodologyStatusForm', () => {
         methodologySummary={
           {
             status: 'Draft',
-          } as BasicMethodologyVersion
+          } as MethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
@@ -63,8 +63,8 @@ describe('MethodologyStatusForm', () => {
         methodologySummary={
           {
             status: 'Approved',
-            latestInternalReleaseNote: 'The latest note',
-          } as BasicMethodologyVersion
+            internalReleaseNote: 'Test release note',
+          } as MethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
@@ -76,7 +76,7 @@ describe('MethodologyStatusForm', () => {
     expect(approvedRadio).toBeChecked();
 
     const noteField = screen.getByLabelText('Internal note');
-    expect(noteField).toHaveValue('The latest note');
+    expect(noteField).toHaveValue('Test release note');
 
     expect(
       screen.queryByRole('group', { name: 'When to publish' }),
@@ -89,12 +89,12 @@ describe('MethodologyStatusForm', () => {
         methodologySummary={
           {
             status: 'Approved',
-            latestInternalReleaseNote: 'The latest note',
+            internalReleaseNote: 'Test release note',
             publishingStrategy: 'WithRelease',
             scheduledWithRelease: {
               id: 'test-release-2',
             },
-          } as BasicMethodologyVersion
+          } as MethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
@@ -140,7 +140,7 @@ describe('MethodologyStatusForm', () => {
         methodologySummary={
           {
             status: 'Draft',
-          } as BasicMethodologyVersion
+          } as MethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
@@ -168,7 +168,7 @@ describe('MethodologyStatusForm', () => {
         methodologySummary={
           {
             status: 'Approved',
-          } as BasicMethodologyVersion
+          } as MethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
@@ -196,7 +196,7 @@ describe('MethodologyStatusForm', () => {
           {
             status: 'Approved',
             publishingStrategy: 'WithRelease',
-          } as BasicMethodologyVersion
+          } as MethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
@@ -228,7 +228,7 @@ describe('MethodologyStatusForm', () => {
           {
             status: 'Approved',
             publishingStrategy: 'WithRelease',
-          } as BasicMethodologyVersion
+          } as MethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}

@@ -23,10 +23,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MethodologyVersionViewModel;
 using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
-using MethodologyVersionViewModel =
-    GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MethodologyVersionViewModel;
+using MethodologyVersionSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MethodologyVersionSummaryViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
@@ -438,7 +436,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return viewModel;
         }
 
-        private async Task<List<MethodologyVersionViewModel>> HydrateMethodologyVersionViewModels(
+        private async Task<List<MethodologyVersionSummaryViewModel>> HydrateMethodologyVersionViewModels(
             Publication publication)
         {
             return await publication.Methodologies
@@ -450,7 +448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         latestVersion,
                         publicationMethodology);
 
-                    return new MethodologyVersionViewModel
+                    return new MethodologyVersionSummaryViewModel
                     {
                         Id = latestVersion.Id,
                         Amendment = latestVersion.Amendment,
