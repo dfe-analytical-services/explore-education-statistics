@@ -1,7 +1,7 @@
 import MethodologySummary from '@admin/pages/admin-dashboard/components/MethodologySummary';
 import _methodologyService, {
   BasicMethodologyVersion,
-  MethodologyVersionListItem,
+  MethodologyVersion,
 } from '@admin/services/methodologyService';
 import _publicationService, {
   ExternalMethodology,
@@ -35,7 +35,7 @@ const testContact: PublicationContactDetails = {
   teamName: 'Team Smith',
 };
 
-const testMethodology: MethodologyVersionListItem = {
+const testMethodology: MethodologyVersion = {
   amendment: false,
   id: 'methodology-v1',
   internalReleaseNote: 'this is the release note',
@@ -46,15 +46,15 @@ const testMethodology: MethodologyVersionListItem = {
   status: 'Approved',
   title: 'I am a methodology',
   permissions: {
-    canApproveMethodologyVersion: false,
-    canUpdateMethodologyVersion: false,
-    canDeleteMethodologyVersion: false,
+    canApproveMethodology: false,
+    canUpdateMethodology: false,
+    canDeleteMethodology: false,
     canMakeAmendmentOfMethodology: false,
-    canMarkMethodologyVersionAsDraft: false,
+    canMarkMethodologyAsDraft: false,
     canRemoveMethodologyLink: false,
   },
 };
-const testMethodology2: MethodologyVersionListItem = {
+const testMethodology2: MethodologyVersion = {
   amendment: false,
   id: 'methodology-v2',
   internalReleaseNote: 'this is another release note',
@@ -65,11 +65,11 @@ const testMethodology2: MethodologyVersionListItem = {
   status: 'Approved',
   title: 'I am a methodology 2',
   permissions: {
-    canApproveMethodologyVersion: false,
-    canUpdateMethodologyVersion: false,
-    canDeleteMethodologyVersion: false,
+    canApproveMethodology: false,
+    canUpdateMethodology: false,
+    canDeleteMethodology: false,
     canMakeAmendmentOfMethodology: false,
-    canMarkMethodologyVersionAsDraft: false,
+    canMarkMethodologyAsDraft: false,
     canRemoveMethodologyLink: false,
   },
 };
@@ -84,11 +84,11 @@ const testMethodologyCanAmend = produce(testMethodology, draft => {
 });
 const testMethodologyCanRemove = produce(testMethodology, draft => {
   draft.amendment = false;
-  draft.permissions.canDeleteMethodologyVersion = true;
+  draft.permissions.canDeleteMethodology = true;
 });
 const testMethodologyCanRemoveAmendment = produce(testMethodology, draft => {
   draft.amendment = true;
-  draft.permissions.canDeleteMethodologyVersion = true;
+  draft.permissions.canDeleteMethodology = true;
 });
 const testAdoptedMethodology = produce(testMethodology, draft => {
   draft.owned = false;
@@ -403,7 +403,7 @@ describe('MethodologySummary', () => {
                   ...testMethodology,
                   permissions: {
                     ...testMethodology.permissions,
-                    canApproveMethodologyVersion: true,
+                    canApproveMethodology: true,
                   },
                 },
               ],
@@ -438,7 +438,7 @@ describe('MethodologySummary', () => {
                   ...testMethodology,
                   permissions: {
                     ...testMethodology.permissions,
-                    canMarkMethodologyVersionAsDraft: true,
+                    canMarkMethodologyAsDraft: true,
                   },
                 },
               ],
@@ -473,7 +473,7 @@ describe('MethodologySummary', () => {
                   ...testMethodology,
                   permissions: {
                     ...testMethodology.permissions,
-                    canUpdateMethodologyVersion: true,
+                    canUpdateMethodology: true,
                   },
                 },
               ],
@@ -559,7 +559,7 @@ describe('MethodologySummary', () => {
                   amendment: true,
                   permissions: {
                     ...testMethodology.permissions,
-                    canApproveMethodologyVersion: true,
+                    canApproveMethodology: true,
                   },
                 },
               ],
@@ -595,7 +595,7 @@ describe('MethodologySummary', () => {
                   amendment: true,
                   permissions: {
                     ...testMethodology.permissions,
-                    canMarkMethodologyVersionAsDraft: true,
+                    canMarkMethodologyAsDraft: true,
                   },
                 },
               ],
@@ -631,7 +631,7 @@ describe('MethodologySummary', () => {
                   amendment: true,
                   permissions: {
                     ...testMethodology.permissions,
-                    canUpdateMethodologyVersion: true,
+                    canUpdateMethodology: true,
                   },
                 },
               ],

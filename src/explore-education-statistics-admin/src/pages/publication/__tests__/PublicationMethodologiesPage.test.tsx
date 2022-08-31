@@ -3,7 +3,7 @@ import { PublicationContextProvider } from '@admin/pages/publication/contexts/Pu
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import _methodologyService, {
   BasicMethodologyVersion,
-  MethodologyVersionListItem,
+  MethodologyVersion,
 } from '@admin/services/methodologyService';
 import _publicationService, {
   ExternalMethodology,
@@ -30,22 +30,22 @@ const publicationService = _publicationService as jest.Mocked<
 
 describe('PublicationMethodologiesPage', () => {
   const noMethodologyPermissions = {
-    canApproveMethodologyVersion: false,
-    canUpdateMethodologyVersion: false,
-    canDeleteMethodologyVersion: false,
+    canApproveMethodology: false,
+    canUpdateMethodology: false,
+    canDeleteMethodology: false,
     canMakeAmendmentOfMethodology: false,
-    canMarkMethodologyVersionAsDraft: false,
+    canMarkMethodologyAsDraft: false,
     canRemoveMethodologyLink: false,
   };
   const testDraftMethodologyPermissions = {
-    canApproveMethodologyVersion: true,
-    canUpdateMethodologyVersion: true,
-    canDeleteMethodologyVersion: true,
+    canApproveMethodology: true,
+    canUpdateMethodology: true,
+    canDeleteMethodology: true,
     canMakeAmendmentOfMethodology: false,
-    canMarkMethodologyVersionAsDraft: true,
+    canMarkMethodologyAsDraft: true,
     canRemoveMethodologyLink: false,
   };
-  const testMethodology1: MethodologyVersionListItem = {
+  const testMethodology1: MethodologyVersion = {
     amendment: false,
     id: 'methodology-v1',
     methodologyId: 'methodology-1',
@@ -68,7 +68,7 @@ describe('PublicationMethodologiesPage', () => {
     delete draft.published;
   });
 
-  const testMethodology2: MethodologyVersionListItem = {
+  const testMethodology2: MethodologyVersion = {
     amendment: false,
     id: 'methodology-v2',
     methodologyId: 'methodology-2',
@@ -265,9 +265,9 @@ describe('PublicationMethodologiesPage', () => {
       test('the edit link is shown when a user can approve the methodology', async () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           produce(testMethodology1Draft, draft => {
-            draft.permissions.canUpdateMethodologyVersion = false;
-            draft.permissions.canMarkMethodologyVersionAsDraft = false;
-            draft.permissions.canApproveMethodologyVersion = true;
+            draft.permissions.canUpdateMethodology = false;
+            draft.permissions.canMarkMethodologyAsDraft = false;
+            draft.permissions.canApproveMethodology = true;
           }),
         ]);
         renderPage();
@@ -294,9 +294,9 @@ describe('PublicationMethodologiesPage', () => {
       test('the edit link is shown when a user can mark the methodology as draft', async () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           produce(testMethodology1Draft, draft => {
-            draft.permissions.canUpdateMethodologyVersion = false;
-            draft.permissions.canMarkMethodologyVersionAsDraft = true;
-            draft.permissions.canApproveMethodologyVersion = false;
+            draft.permissions.canUpdateMethodology = false;
+            draft.permissions.canMarkMethodologyAsDraft = true;
+            draft.permissions.canApproveMethodology = false;
           }),
         ]);
         renderPage();
@@ -323,9 +323,9 @@ describe('PublicationMethodologiesPage', () => {
       test('the edit link is shown when a user can update the methodology', async () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           produce(testMethodology1Draft, draft => {
-            draft.permissions.canUpdateMethodologyVersion = true;
-            draft.permissions.canMarkMethodologyVersionAsDraft = false;
-            draft.permissions.canApproveMethodologyVersion = false;
+            draft.permissions.canUpdateMethodology = true;
+            draft.permissions.canMarkMethodologyAsDraft = false;
+            draft.permissions.canApproveMethodology = false;
           }),
         ]);
         renderPage();
@@ -372,7 +372,7 @@ describe('PublicationMethodologiesPage', () => {
       test('the delete draft button is not shown when a user does not have permission to delete the methodology', async () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           produce(testMethodology1Draft, draft => {
-            draft.permissions.canDeleteMethodologyVersion = false;
+            draft.permissions.canDeleteMethodology = false;
           }),
         ]);
         renderPage();
@@ -607,7 +607,7 @@ describe('PublicationMethodologiesPage', () => {
       test('the cancel amendment button is shown when a user can delete the methodology', async () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           produce(testMethodology1Amendment, draft => {
-            draft.permissions.canDeleteMethodologyVersion = true;
+            draft.permissions.canDeleteMethodology = true;
           }),
         ]);
         renderPage();
@@ -629,7 +629,7 @@ describe('PublicationMethodologiesPage', () => {
       test('the cancel amendment button is not shown when a user does not have permission to delete the methodology', async () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           produce(testMethodology1Amendment, draft => {
-            draft.permissions.canDeleteMethodologyVersion = false;
+            draft.permissions.canDeleteMethodology = false;
           }),
         ]);
         renderPage();
@@ -741,7 +741,7 @@ describe('PublicationMethodologiesPage', () => {
       test('shows the confirm modal when clicking the cancel amendment button', async () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           produce(testMethodology1Amendment, draft => {
-            draft.permissions.canDeleteMethodologyVersion = true;
+            draft.permissions.canDeleteMethodology = true;
           }),
         ]);
         renderPage();
@@ -777,7 +777,7 @@ describe('PublicationMethodologiesPage', () => {
       test('calls the service to cancel the amendment when the confirm button is clicked', async () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           produce(testMethodology1Amendment, draft => {
-            draft.permissions.canDeleteMethodologyVersion = true;
+            draft.permissions.canDeleteMethodology = true;
           }),
         ]);
         renderPage();
@@ -871,9 +871,9 @@ describe('PublicationMethodologiesPage', () => {
       test('the edit link is shown when a user can approve the methodology', async () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           produce(testMethodology2Draft, draft => {
-            draft.permissions.canUpdateMethodologyVersion = false;
-            draft.permissions.canMarkMethodologyVersionAsDraft = false;
-            draft.permissions.canApproveMethodologyVersion = true;
+            draft.permissions.canUpdateMethodology = false;
+            draft.permissions.canMarkMethodologyAsDraft = false;
+            draft.permissions.canApproveMethodology = true;
           }),
         ]);
         renderPage();
@@ -900,9 +900,9 @@ describe('PublicationMethodologiesPage', () => {
       test('the edit link is shown when a user can mark the methodology as draft', async () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           produce(testMethodology2Draft, draft => {
-            draft.permissions.canUpdateMethodologyVersion = false;
-            draft.permissions.canMarkMethodologyVersionAsDraft = true;
-            draft.permissions.canApproveMethodologyVersion = false;
+            draft.permissions.canUpdateMethodology = false;
+            draft.permissions.canMarkMethodologyAsDraft = true;
+            draft.permissions.canApproveMethodology = false;
           }),
         ]);
         renderPage();
@@ -929,9 +929,9 @@ describe('PublicationMethodologiesPage', () => {
       test('the edit link is shown when a user can update the methodology', async () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           produce(testMethodology2Draft, draft => {
-            draft.permissions.canUpdateMethodologyVersion = true;
-            draft.permissions.canMarkMethodologyVersionAsDraft = false;
-            draft.permissions.canApproveMethodologyVersion = false;
+            draft.permissions.canUpdateMethodology = true;
+            draft.permissions.canMarkMethodologyAsDraft = false;
+            draft.permissions.canApproveMethodology = false;
           }),
         ]);
         renderPage();

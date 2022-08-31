@@ -91,8 +91,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))
                         .OrderByDescending(r => r.Year)
                         .ThenByDescending(r => r.TimePeriodCoverage)))
-                .ForMember(dest => dest.Methodologies, m => m.Ignore())
-                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationPermissionsResolver>());
+                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationPermissionsResolver>())
+                // Methodologies are hydrated after executing the mapping from Publication to MyPublicationViewModel
+                .ForMember(dest => dest.Methodologies, m => m.Ignore());
 
             CreateMap<Contact, ContactViewModel>();
 

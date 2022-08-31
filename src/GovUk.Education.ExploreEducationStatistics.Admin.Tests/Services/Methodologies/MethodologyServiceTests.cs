@@ -1218,10 +1218,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = Assert.Single(viewModels);
                 var permissions = viewModel.Permissions;
 
-                Assert.True(permissions.CanDeleteMethodologyVersion);
-                Assert.False(permissions.CanUpdateMethodologyVersion);
-                Assert.True(permissions.CanApproveMethodologyVersion);
-                Assert.True(permissions.CanMarkMethodologyVersionAsDraft);
+                Assert.True(permissions.CanDeleteMethodology);
+                Assert.False(permissions.CanUpdateMethodology);
+                Assert.True(permissions.CanApproveMethodology);
+                Assert.True(permissions.CanMarkMethodologyAsDraft);
                 Assert.False(permissions.CanMakeAmendmentOfMethodology);
                 Assert.True(permissions.CanRemoveMethodologyLink);
             }

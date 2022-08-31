@@ -6,7 +6,7 @@ import {
 } from '@admin/routes/preReleaseRoutes';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import methodologyService, {
-  MethodologyVersionListItem,
+  MethodologyVersion,
 } from '@admin/services/methodologyService';
 import publicationService, {
   ExternalMethodology,
@@ -21,7 +21,7 @@ import { generatePath, RouteComponentProps } from 'react-router';
 
 interface Model {
   externalMethodology?: ExternalMethodology;
-  methodologyVersions: MethodologyVersionListItem[];
+  methodologyVersions: MethodologyVersion[];
 }
 
 const PreReleaseMethodologiesPage = ({
@@ -71,8 +71,9 @@ const PreReleaseMethodologiesPage = ({
                           },
                         )}
                       >
-                        {methodology.title}{' '}
-                        {methodology.owned ? '(Owned)' : '(Adopted)'}
+                        {`${methodology.title} ${
+                          methodology.owned ? '(Owned)' : '(Adopted)'
+                        }`}
                       </Link>
                       <TagGroup className="govuk-!-margin-left-2">
                         {methodology.status === 'Approved' &&

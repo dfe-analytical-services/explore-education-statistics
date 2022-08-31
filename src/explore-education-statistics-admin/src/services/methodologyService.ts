@@ -33,17 +33,17 @@ export interface BasicMethodologyVersion {
   methodologyId: string;
 }
 
-export interface MethodologyVersionListItem {
+export interface MethodologyVersion {
   id: string;
   amendment: boolean;
   published?: string;
   status: MethodologyStatus;
   owned: boolean;
   permissions: {
-    canDeleteMethodologyVersion: boolean;
-    canUpdateMethodologyVersion: boolean;
-    canApproveMethodologyVersion: boolean;
-    canMarkMethodologyVersionAsDraft: boolean;
+    canDeleteMethodology: boolean;
+    canUpdateMethodology: boolean;
+    canApproveMethodology: boolean;
+    canMarkMethodologyAsDraft: boolean;
     canMakeAmendmentOfMethodology: boolean;
     canRemoveMethodologyLink: boolean;
   };
@@ -79,7 +79,7 @@ const methodologyService = {
 
   listMethodologyVersions(
     publicationId: string,
-  ): Promise<MethodologyVersionListItem[]> {
+  ): Promise<MethodologyVersion[]> {
     return client.get(`/publication/${publicationId}/methodologies`);
   },
 

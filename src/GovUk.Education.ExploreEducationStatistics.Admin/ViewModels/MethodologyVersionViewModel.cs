@@ -12,7 +12,7 @@ public record MethodologyVersionViewModel
 
     public bool Amendment { get; set; }
 
-    // TODO EES-3596 Remove InternalReleaseNote added to support the old Admin dashboard
+    // TODO EES-3576 Remove InternalReleaseNote added to support the old Admin dashboard
     public string? InternalReleaseNote { get; set; }
 
     public DateTime? Published { get; set; }
@@ -32,10 +32,10 @@ public record MethodologyVersionViewModel
 
     public record MethodologyVersionPermissions
     {
-        public bool CanDeleteMethodologyVersion { get; set; }
-        public bool CanUpdateMethodologyVersion { get; set; }
-        public bool CanApproveMethodologyVersion { get; set; }
-        public bool CanMarkMethodologyVersionAsDraft { get; set; }
+        public bool CanDeleteMethodology { get; set; }
+        public bool CanUpdateMethodology { get; set; }
+        public bool CanApproveMethodology { get; set; }
+        public bool CanMarkMethodologyAsDraft { get; set; }
         public bool CanMakeAmendmentOfMethodology { get; set; }
         public bool CanRemoveMethodologyLink { get; set; }
     }

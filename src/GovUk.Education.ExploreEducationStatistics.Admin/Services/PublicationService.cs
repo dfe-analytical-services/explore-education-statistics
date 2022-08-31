@@ -71,7 +71,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .OnSuccess(() => _publicationRepository.GetAllPublicationsForTopic(topicId))
                     .OrElse(() => _publicationRepository.GetPublicationsForTopicRelatedToUser(topicId, userId))
                 )
-                .OnSuccess(async publicationViewModels => await HydrateMyPublicationsViewModels(publicationViewModels));
+                .OnSuccess(async publicationViewModels =>
+                {
+                    return (await HydrateMyPublicationsViewModels(publicationViewModels))
+                        .OrderBy(publicationViewModel => publicationViewModel.Title)
+                        .ToList();
+                });
         }
 
         public async Task<Either<ActionResult, MyPublicationViewModel>> GetMyPublication(Guid publicationId)
@@ -399,7 +404,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await publications
                 .ToAsyncEnumerable()
                 .SelectAwait(async publication => await HydrateMyPublicationViewModel(publication))
-                .OrderBy(publicationViewModel => publicationViewModel.Title)
                 .ToListAsync();
         }
 
@@ -415,7 +419,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 releaseViewModel.Permissions = PermissionsUtils.GetReleasePermissions(_userService, release);
             });
 
-            publicationViewModel.Methodologies = await HydrateMethodologyVersionViewModels(publication);
+            publicationViewModel.Methodologies = (await HydrateMethodologyVersionViewModels(publication))
+                .OrderBy(viewModel => viewModel.Title)
+                .ToList();
 
             return publicationViewModel;
         }
@@ -440,21 +446,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .SelectAwait(async publicationMethodology =>
                 {
                     var latestVersion = publicationMethodology.Methodology.LatestVersion();
-                    var permissions = new MethodologyVersionPermissions
-                    {
-                        CanDeleteMethodologyVersion =
-                            await _userService.CheckCanDeleteMethodologyVersion(latestVersion).IsRight(),
-                        CanUpdateMethodologyVersion =
-                            await _userService.CheckCanUpdateMethodologyVersion(latestVersion).IsRight(),
-                        CanApproveMethodologyVersion =
-                            await _userService.CheckCanApproveMethodologyVersion(latestVersion).IsRight(),
-                        CanMarkMethodologyVersionAsDraft =
-                            await _userService.CheckCanMarkMethodologyVersionAsDraft(latestVersion).IsRight(),
-                        CanMakeAmendmentOfMethodology =
-                            await _userService.CheckCanMakeAmendmentOfMethodology(latestVersion).IsRight(),
-                        CanRemoveMethodologyLink =
-                            await _userService.CheckCanDropMethodologyLink(publicationMethodology).IsRight()
-                    };
+                    var permissions = await PermissionsUtils.GetMethodologyVersionPermissions(_userService,
+                        latestVersion,
+                        publicationMethodology);
 
                     return new MethodologyVersionViewModel
                     {
@@ -470,7 +464,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Permissions = permissions
                     };
                 })
-                .OrderBy(viewModel => viewModel.Title)
                 .ToListAsync();
         }
     }

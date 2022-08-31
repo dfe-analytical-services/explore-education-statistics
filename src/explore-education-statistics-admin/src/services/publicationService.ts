@@ -4,7 +4,7 @@ import {
 } from '@admin/services/legacyReleaseService';
 import {
   BasicMethodologyVersion,
-  MethodologyVersionListItem,
+  MethodologyVersion,
 } from '@admin/services/methodologyService';
 import { Release, ReleaseSummary } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
@@ -38,7 +38,7 @@ export interface MyPublication {
   title: string;
   summary: string;
   releases: Release[];
-  methodologies: MethodologyVersionListItem[];
+  methodologies: MethodologyVersion[];
   externalMethodology?: ExternalMethodology;
   topicId: string;
   themeId: string;

@@ -14,7 +14,7 @@ import {
   publicationExternalMethodologyRoute,
 } from '@admin/routes/publicationRoutes';
 import methodologyService, {
-  MethodologyVersionListItem,
+  MethodologyVersion,
 } from '@admin/services/methodologyService';
 import publicationService, {
   ExternalMethodology,
@@ -35,7 +35,7 @@ import { generatePath, useHistory } from 'react-router';
 
 interface Model {
   externalMethodology?: ExternalMethodology;
-  methodologyVersions: MethodologyVersionListItem[];
+  methodologyVersions: MethodologyVersion[];
 }
 
 const PublicationMethodologiesPage = () => {
@@ -160,9 +160,9 @@ const PublicationMethodologiesPage = () => {
             <tbody>
               {methodologyVersions.map(methodology => {
                 const canEdit =
-                  methodology.permissions.canApproveMethodologyVersion ||
-                  methodology.permissions.canMarkMethodologyVersionAsDraft ||
-                  methodology.permissions.canUpdateMethodologyVersion;
+                  methodology.permissions.canApproveMethodology ||
+                  methodology.permissions.canMarkMethodologyAsDraft ||
+                  methodology.permissions.canUpdateMethodology;
 
                 return (
                   <tr key={methodology.id}>
@@ -248,8 +248,7 @@ const PublicationMethodologiesPage = () => {
                               </ButtonText>
                             )}
 
-                          {methodology.permissions
-                            .canDeleteMethodologyVersion && (
+                          {methodology.permissions.canDeleteMethodology && (
                             <ButtonText
                               className="govuk-!-margin-right-4"
                               variant="warning"

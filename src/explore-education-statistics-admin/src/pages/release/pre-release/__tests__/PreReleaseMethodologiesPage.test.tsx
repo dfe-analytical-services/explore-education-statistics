@@ -23,11 +23,11 @@ const publicationService = _publicationService as jest.Mocked<
 
 describe('PreReleaseMethodologiesPage', () => {
   const methodologyPermissions = {
-    canApproveMethodologyVersion: false,
-    canDeleteMethodologyVersion: false,
+    canApproveMethodology: false,
+    canDeleteMethodology: false,
     canMakeAmendmentOfMethodology: false,
-    canMarkMethodologyVersionAsDraft: false,
-    canUpdateMethodologyVersion: false,
+    canMarkMethodologyAsDraft: false,
+    canUpdateMethodology: false,
     canRemoveMethodologyLink: false,
   };
 

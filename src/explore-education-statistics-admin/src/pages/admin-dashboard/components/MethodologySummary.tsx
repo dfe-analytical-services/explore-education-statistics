@@ -86,9 +86,9 @@ const MethodologySummary = ({
         <ul className="govuk-list govuk-!-margin-top-2">
           {methodologies.map(methodology => {
             const canEdit =
-              methodology.permissions.canApproveMethodologyVersion ||
-              methodology.permissions.canMarkMethodologyVersionAsDraft ||
-              methodology.permissions.canUpdateMethodologyVersion;
+              methodology.permissions.canApproveMethodology ||
+              methodology.permissions.canMarkMethodologyAsDraft ||
+              methodology.permissions.canUpdateMethodology;
 
             const displayTitle = methodology.owned
               ? `${methodology.title} (Owned)`
@@ -191,7 +191,7 @@ const MethodologySummary = ({
                           )}
                         </>
                       )}
-                      {methodology.permissions.canDeleteMethodologyVersion && (
+                      {methodology.permissions.canDeleteMethodology && (
                         <Button
                           variant="warning"
                           onClick={() =>

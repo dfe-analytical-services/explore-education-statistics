@@ -7,6 +7,7 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -20,7 +21,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MethodologyVersionViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
 {
@@ -144,21 +144,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         .SelectAwait(async publicationMethodology =>
                         {
                             var latestVersion = publicationMethodology.Methodology.LatestVersion();
-                            var permissions = new MethodologyVersionPermissions
-                            {
-                                CanDeleteMethodologyVersion =
-                                    await _userService.CheckCanDeleteMethodologyVersion(latestVersion).IsRight(),
-                                CanUpdateMethodologyVersion =
-                                    await _userService.CheckCanUpdateMethodologyVersion(latestVersion).IsRight(),
-                                CanApproveMethodologyVersion =
-                                    await _userService.CheckCanApproveMethodologyVersion(latestVersion).IsRight(),
-                                CanMarkMethodologyVersionAsDraft =
-                                    await _userService.CheckCanMarkMethodologyVersionAsDraft(latestVersion).IsRight(),
-                                CanMakeAmendmentOfMethodology =
-                                    await _userService.CheckCanMakeAmendmentOfMethodology(latestVersion).IsRight(),
-                                CanRemoveMethodologyLink =
-                                    await _userService.CheckCanDropMethodologyLink(publicationMethodology).IsRight()
-                            };
+                            var permissions =
+                                await PermissionsUtils.GetMethodologyVersionPermissions(_userService,
+                                    latestVersion,
+                                    publicationMethodology);
 
                             return new MethodologyVersionViewModel
                             {
