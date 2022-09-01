@@ -210,7 +210,11 @@ const LocationFiltersForm = ({
                                 }))
                           }
                           searchOnly={searchOnly}
-                          searchHelpText="Search by school name or unique reference number (URN), and select at least one option before continuing to the next step."
+                          searchHelpText={
+                            searchOnly
+                              ? 'Search by school name or unique reference number (URN), and select at least one option before continuing to the next step.'
+                              : 'Search above and select at least one option before continuing to the next step.'
+                          }
                         />
                       );
                     })}
