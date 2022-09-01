@@ -62,9 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<MethodologyNote, MethodologyNoteViewModel>();
 
-            CreateMap<MethodologyVersion, MethodologyVersionSummaryViewModel>()
-                .ForMember(dest => dest.LatestInternalReleaseNote,
-                    m => m.MapFrom(model => model.InternalReleaseNote))
+            CreateMap<MethodologyVersion, MethodologyVersionViewModel>()
                 .ForMember(dest => dest.ScheduledWithRelease,
                     m => m.Ignore());
 
@@ -82,16 +80,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     dest => dest.ThemeId,
                     m => m.MapFrom(p => p.Topic.ThemeId));
 
-            CreateMap<MethodologyVersion, MyMethodologyVersionViewModel>()
-                .ForMember(dest => dest.LatestInternalReleaseNote,
-                    m => m.MapFrom(model => model.InternalReleaseNote))
-                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyMethodologyVersionPermissionsResolver>());
-
-            CreateMap<PublicationMethodology, MyPublicationMethodologyVersionViewModel>()
-                .ForMember(dest => dest.Methodology,
-                    m => m.MapFrom(pm => pm.Methodology.LatestVersion()))
-                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationMethodologyVersionPermissionsResolver>());
-
             CreateMap<Publication, MyPublicationViewModel>()
                 .ForMember(
                     dest => dest.ThemeId,
@@ -102,7 +90,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         .OrderByDescending(r => r.Year)
                         .ThenByDescending(r => r.TimePeriodCoverage)))
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationPermissionsResolver>())
-                .AfterMap((publication, model) => model.Methodologies = model.Methodologies.OrderBy(m => m.Methodology.Title).ToList());
+                // Methodologies are hydrated after executing the mapping from Publication to MyPublicationViewModel
+                .ForMember(dest => dest.Methodologies, m => m.Ignore());
 
             CreateMap<Contact, ContactViewModel>();
 

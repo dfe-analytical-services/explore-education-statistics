@@ -397,10 +397,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             
             services.AddTransient<IMyPublicationPermissionsResolver,
                 MyPublicationPermissionsResolver>();
-            services.AddTransient<IMyPublicationMethodologyVersionPermissionsResolver,
-                MyPublicationMethodologyVersionPermissionsResolver>();
-            services.AddTransient<IMyMethodologyVersionPermissionsResolver,
-                MyMethodologyVersionPermissionsResolver>();
 
             services.AddTransient<IFileRepository, FileRepository>();
             services.AddTransient<IDataImportRepository, DataImportRepository>();

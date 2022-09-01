@@ -3,8 +3,8 @@ import {
   UpdateLegacyRelease,
 } from '@admin/services/legacyReleaseService';
 import {
-  BasicMethodologyVersion,
-  MyMethodologyVersion,
+  MethodologyVersion,
+  MethodologyVersionSummary,
 } from '@admin/services/methodologyService';
 import { Release, ReleaseSummary } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
@@ -38,7 +38,7 @@ export interface MyPublication {
   title: string;
   summary: string;
   releases: Release[];
-  methodologies: MyPublicationMethodology[];
+  methodologies: MethodologyVersionSummary[];
   externalMethodology?: ExternalMethodology;
   topicId: string;
   themeId: string;
@@ -56,14 +56,6 @@ export interface MyPublication {
   isSuperseded?: boolean;
 }
 
-export interface MyPublicationMethodology {
-  owner: boolean;
-  methodology: MyMethodologyVersion;
-  permissions: {
-    canDropMethodology: boolean;
-  };
-}
-
 export interface BasicPublicationDetails {
   id: string;
   title: string;
@@ -71,7 +63,7 @@ export interface BasicPublicationDetails {
   slug: string;
   contact: PublicationContactDetails;
   releases?: Release[];
-  methodologies?: BasicMethodologyVersion[];
+  methodologies?: MethodologyVersion[];
   externalMethodology?: ExternalMethodology;
   themeId: string;
   topicId: string;
@@ -140,6 +132,15 @@ const publicationService = {
     return client.get<MyPublication>(`/me/publication/${publicationId}`);
   },
 
+  getExternalMethodology(
+    publicationId: string,
+  ): Promise<ExternalMethodology | undefined> {
+    // TODO EES-3666 Replace with external methodology request
+    return client
+      .get<MyPublication>(`/me/publication/${publicationId}`)
+      .then(response => response.externalMethodology);
+  },
+
   listReleases<TReleaseSummary extends ReleaseSummary = ReleaseSummary>(
     publicationId: string,
     params?: ListReleasesParams,
@@ -158,8 +159,8 @@ const publicationService = {
 
   getAdoptableMethodologies(
     publicationId: string,
-  ): Promise<BasicMethodologyVersion[]> {
-    return client.get<BasicMethodologyVersion[]>(
+  ): Promise<MethodologyVersion[]> {
+    return client.get<MethodologyVersion[]>(
       `/publication/${publicationId}/adoptable-methodologies`,
     );
   },
@@ -167,7 +168,7 @@ const publicationService = {
   adoptMethodology(
     publicationId: string,
     methodologyId: string,
-  ): Promise<BasicMethodologyVersion> {
+  ): Promise<MethodologyVersion> {
     return client.put(
       `/publication/${publicationId}/methodology/${methodologyId}`,
     );
@@ -176,7 +177,7 @@ const publicationService = {
   dropMethodology(
     publicationId: string,
     methodologyId: string,
-  ): Promise<BasicMethodologyVersion> {
+  ): Promise<MethodologyVersion> {
     return client.delete(
       `/publication/${publicationId}/methodology/${methodologyId}`,
     );

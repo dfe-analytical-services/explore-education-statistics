@@ -1,61 +1,43 @@
 import PreReleaseMethodologiesPage from '@admin/pages/release/pre-release/PreReleaseMethodologiesPage';
 import { preReleaseMethodologiesRoute } from '@admin/routes/preReleaseRoutes';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
+import _methodologyService from '@admin/services/methodologyService';
 import _publicationService, {
-  MyPublication,
-  PublicationContactDetails,
+  ExternalMethodology,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter, Route } from 'react-router';
 import { generatePath } from 'react-router-dom';
 
+jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/publicationService');
+
+const methodologyService = _methodologyService as jest.Mocked<
+  typeof _methodologyService
+>;
+
 const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
 
 describe('PreReleaseMethodologiesPage', () => {
-  const testContact: PublicationContactDetails = {
-    id: 'contact-1',
-    contactName: 'John Smith',
-    contactTelNo: '0777777777',
-    teamEmail: 'john.smith@test.com',
-    teamName: 'Team Smith',
-  };
-
-  const testPublicationNoMethodologies: MyPublication = {
-    contact: testContact,
-    id: 'pub-1-id',
-    title: 'Publication 1',
-    summary: 'Publication 1 summary',
-    releases: [],
-    methodologies: [],
-    topicId: 'topic-id',
-    themeId: 'theme-id',
-    permissions: {
-      canAdoptMethodologies: false,
-      canCreateMethodologies: false,
-      canCreateReleases: false,
-      canManageExternalMethodology: false,
-      canUpdatePublication: false,
-      canUpdatePublicationTitle: false,
-      canUpdatePublicationSupersededBy: false,
-    },
-  };
-
   const methodologyPermissions = {
     canApproveMethodology: false,
     canDeleteMethodology: false,
     canMakeAmendmentOfMethodology: false,
     canMarkMethodologyAsDraft: false,
     canUpdateMethodology: false,
+    canRemoveMethodologyLink: false,
+  };
+
+  const testExternalMethodology: ExternalMethodology = {
+    title: 'An external methodology',
+    url: 'http://hiveit.co.uk',
   };
 
   test('renders correctly with no methodologies', async () => {
-    publicationService.getMyPublication.mockResolvedValue(
-      testPublicationNoMethodologies,
-    );
+    methodologyService.listMethodologyVersions.mockResolvedValue([]);
     renderPage();
 
     expect(screen.getByRole('heading', { name: 'Methodologies' }));
@@ -66,56 +48,32 @@ describe('PreReleaseMethodologiesPage', () => {
   });
 
   test('renders correctly with published owned and adopted methodologies and external methodologies', async () => {
-    const testPublication: MyPublication = {
-      ...testPublicationNoMethodologies,
-      externalMethodology: {
-        title: 'An external methodology',
-        url: 'http://hiveit.co.uk',
+    methodologyService.listMethodologyVersions.mockResolvedValue([
+      {
+        id: 'methodology-1-id',
+        methodologyId: 'methodologyId-1',
+        title: 'Methodology 1',
+        permissions: methodologyPermissions,
+        amendment: false,
+        owned: true,
+        published: '2018-03-22T00:00:00',
+        status: 'Approved',
       },
-      methodologies: [
-        {
-          methodology: {
-            id: 'methodology-1-id',
-            methodologyId: 'methodologyId-1',
-            title: 'Methodology 1',
-            slug: 'methodology-1',
-            owningPublication: {
-              id: 'owning-publication-1-id',
-              title: 'Owning publication 1',
-            },
-            permissions: methodologyPermissions,
-            amendment: false,
-            published: '2018-03-22T00:00:00',
-            status: 'Approved',
-          },
-          owner: true,
-          permissions: {
-            canDropMethodology: false,
-          },
-        },
-        {
-          methodology: {
-            id: 'methodology-2-id',
-            methodologyId: 'methodologyId-2',
-            title: 'Methodology 2',
-            slug: 'methodology-2',
-            owningPublication: {
-              id: 'owning-publication-2-id',
-              title: 'Owning publication 2',
-            },
-            permissions: methodologyPermissions,
-            amendment: false,
-            published: '2018-03-22T00:00:00',
-            status: 'Approved',
-          },
-          owner: false,
-          permissions: {
-            canDropMethodology: false,
-          },
-        },
-      ],
-    };
-    publicationService.getMyPublication.mockResolvedValue(testPublication);
+      {
+        id: 'methodology-2-id',
+        methodologyId: 'methodologyId-2',
+        title: 'Methodology 2',
+        permissions: methodologyPermissions,
+        amendment: false,
+        owned: false,
+        published: '2018-03-22T00:00:00',
+        status: 'Approved',
+      },
+    ]);
+    publicationService.getExternalMethodology.mockResolvedValue({
+      title: 'An external methodology',
+      url: 'http://hiveit.co.uk',
+    });
     renderPage();
 
     await waitFor(() => {
@@ -149,31 +107,17 @@ describe('PreReleaseMethodologiesPage', () => {
   });
 
   test('renders approved and scheduled methodologies correctly', async () => {
-    const testPublication: MyPublication = {
-      ...testPublicationNoMethodologies,
-      methodologies: [
-        {
-          methodology: {
-            id: 'methodology-1-id',
-            methodologyId: 'methodologyId-1',
-            title: 'Methodology 1',
-            slug: 'methodology-1',
-            owningPublication: {
-              id: 'owning-publication-1-id',
-              title: 'Owning publication 1',
-            },
-            permissions: methodologyPermissions,
-            amendment: false,
-            status: 'Approved',
-          },
-          owner: true,
-          permissions: {
-            canDropMethodology: false,
-          },
-        },
-      ],
-    };
-    publicationService.getMyPublication.mockResolvedValue(testPublication);
+    methodologyService.listMethodologyVersions.mockResolvedValue([
+      {
+        id: 'methodology-1-id',
+        methodologyId: 'methodologyId-1',
+        title: 'Methodology 1',
+        permissions: methodologyPermissions,
+        amendment: false,
+        owned: true,
+        status: 'Approved',
+      },
+    ]);
     renderPage();
 
     await waitFor(() => {
@@ -193,31 +137,18 @@ describe('PreReleaseMethodologiesPage', () => {
   });
 
   test('does not show unapproved draft methodologies', async () => {
-    const testPublication: MyPublication = {
-      ...testPublicationNoMethodologies,
-      methodologies: [
-        {
-          methodology: {
-            id: 'methodology-1-id',
-            methodologyId: 'methodologyId-1',
-            title: 'Methodology 1',
-            slug: 'methodology-1',
-            owningPublication: {
-              id: 'owning-publication-1-id',
-              title: 'Owning publication 1',
-            },
-            permissions: methodologyPermissions,
-            amendment: false,
-            status: 'Draft',
-          },
-          owner: true,
-          permissions: {
-            canDropMethodology: false,
-          },
-        },
-      ],
-    };
-    publicationService.getMyPublication.mockResolvedValue(testPublication);
+    methodologyService.listMethodologyVersions.mockResolvedValue([
+      {
+        id: 'methodology-1-id',
+        methodologyId: 'methodologyId-1',
+        title: 'Methodology 1',
+        permissions: methodologyPermissions,
+        amendment: false,
+        owned: true,
+        published: '2018-03-22T00:00:00',
+        status: 'Draft',
+      },
+    ]);
     renderPage();
 
     await waitFor(() => {
@@ -230,32 +161,19 @@ describe('PreReleaseMethodologiesPage', () => {
   });
 
   test('renders correctly and links to the previous approved version for draft amendments', async () => {
-    const testPublication: MyPublication = {
-      ...testPublicationNoMethodologies,
-      methodologies: [
-        {
-          methodology: {
-            id: 'methodology-1-id',
-            methodologyId: 'methodologyId-1',
-            title: 'Methodology 1',
-            slug: 'methodology-1',
-            owningPublication: {
-              id: 'owning-publication-1-id',
-              title: 'Owning publication 1',
-            },
-            permissions: methodologyPermissions,
-            previousVersionId: 'methodology-1-previous-id',
-            amendment: true,
-            status: 'Draft',
-          },
-          owner: true,
-          permissions: {
-            canDropMethodology: false,
-          },
-        },
-      ],
-    };
-    publicationService.getMyPublication.mockResolvedValue(testPublication);
+    methodologyService.listMethodologyVersions.mockResolvedValue([
+      {
+        id: 'methodology-1-id',
+        methodologyId: 'methodologyId-1',
+        title: 'Methodology 1',
+        permissions: methodologyPermissions,
+        amendment: true,
+        owned: true,
+        published: '2018-03-22T00:00:00',
+        status: 'Draft',
+        previousVersionId: 'methodology-1-previous-id',
+      },
+    ]);
     renderPage();
 
     await waitFor(() => {
@@ -275,54 +193,30 @@ describe('PreReleaseMethodologiesPage', () => {
     expect(within(items[0]).getByText('Published'));
   });
 
-  test('renders the correctly for approved amendments', async () => {
-    const testPublication: MyPublication = {
-      ...testPublicationNoMethodologies,
-      methodologies: [
-        {
-          methodology: {
-            id: 'methodology-1-id',
-            methodologyId: 'methodologyId-1',
-            title: 'Methodology 1',
-            slug: 'methodology-1',
-            owningPublication: {
-              id: 'owning-publication-1-id',
-              title: 'Owning publication 1',
-            },
-            permissions: methodologyPermissions,
-            previousVersionId: 'methodology-1-previous-id',
-            amendment: true,
-            status: 'Approved',
-          },
-          owner: true,
-          permissions: {
-            canDropMethodology: false,
-          },
-        },
-        {
-          methodology: {
-            id: 'methodology-2-id',
-            methodologyId: 'methodologyId-2',
-            title: 'Methodology 2',
-            slug: 'methodology-2',
-            owningPublication: {
-              id: 'owning-publication-2-id',
-              title: 'Owning publication 2',
-            },
-            permissions: methodologyPermissions,
-            previousVersionId: 'methodology-2-previous-id',
-            published: '2018-03-22T00:00:00',
-            amendment: true,
-            status: 'Approved',
-          },
-          owner: false,
-          permissions: {
-            canDropMethodology: false,
-          },
-        },
-      ],
-    };
-    publicationService.getMyPublication.mockResolvedValue(testPublication);
+  test('renders correctly for approved amendments', async () => {
+    methodologyService.listMethodologyVersions.mockResolvedValue([
+      {
+        id: 'methodology-1-id',
+        methodologyId: 'methodologyId-1',
+        title: 'Methodology 1',
+        permissions: methodologyPermissions,
+        amendment: true,
+        owned: true,
+        status: 'Approved',
+        previousVersionId: 'methodology-1-previous-id',
+      },
+      {
+        id: 'methodology-2-id',
+        methodologyId: 'methodologyId-2',
+        title: 'Methodology 2',
+        permissions: methodologyPermissions,
+        amendment: true,
+        owned: false,
+        published: '2018-03-22T00:00:00',
+        status: 'Approved',
+        previousVersionId: 'methodology-2-previous-id',
+      },
+    ]);
     renderPage();
 
     await waitFor(() => {
@@ -352,15 +246,10 @@ describe('PreReleaseMethodologiesPage', () => {
   });
 
   test('renders when there is only a external methodology', async () => {
-    const testPublication: MyPublication = {
-      ...testPublicationNoMethodologies,
-      externalMethodology: {
-        title: 'An external methodology',
-        url: 'http://hiveit.co.uk',
-      },
-    };
-
-    publicationService.getMyPublication.mockResolvedValue(testPublication);
+    methodologyService.listMethodologyVersions.mockResolvedValue([]);
+    publicationService.getExternalMethodology.mockResolvedValue(
+      testExternalMethodology,
+    );
     renderPage();
 
     await waitFor(() => {

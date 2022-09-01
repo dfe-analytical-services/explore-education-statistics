@@ -164,8 +164,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return requestedStatus switch
             {
-                Draft => _userService.CheckCanMarkMethodologyAsDraft(methodologyVersion),
-                Approved => _userService.CheckCanApproveMethodology(methodologyVersion),
+                Draft => _userService.CheckCanMarkMethodologyVersionAsDraft(methodologyVersion),
+                Approved => _userService.CheckCanApproveMethodologyVersion(methodologyVersion),
                 _ => throw new ArgumentOutOfRangeException(nameof(requestedStatus), "Unexpected status")
             };
         }

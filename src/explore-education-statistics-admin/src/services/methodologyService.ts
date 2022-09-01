@@ -17,48 +17,52 @@ interface MethodologyPublication {
   title: string;
 }
 
-export interface BasicMethodologyVersion {
-  amendment: boolean;
+export interface BaseMethodologyVersion {
   id: string;
-  latestInternalReleaseNote?: string;
+  amendment: boolean;
   previousVersionId?: string;
-  publishingStrategy?: MethodologyPublishingStrategy;
   title: string;
-  slug: string;
   status: MethodologyStatus;
   published?: string;
-  owningPublication: MethodologyPublication;
-  otherPublications?: MethodologyPublication[];
-  scheduledWithRelease?: IdTitlePair;
   methodologyId: string;
 }
 
-export interface MyMethodologyVersion extends BasicMethodologyVersion {
+export interface MethodologyVersion extends BaseMethodologyVersion {
+  internalReleaseNote?: string;
+  publishingStrategy?: MethodologyPublishingStrategy;
+  scheduledWithRelease?: IdTitlePair;
+  slug: string;
+  owningPublication: MethodologyPublication;
+  otherPublications?: MethodologyPublication[];
+}
+
+export interface MethodologyVersionSummary extends BaseMethodologyVersion {
+  internalReleaseNote?: string; // TODO EES-3576 Remove internalReleaseNote added to support the old Admin dashboard
+  owned: boolean;
   permissions: {
-    canApproveMethodology: boolean;
-    canUpdateMethodology: boolean;
     canDeleteMethodology: boolean;
-    canMakeAmendmentOfMethodology: boolean;
+    canUpdateMethodology: boolean;
+    canApproveMethodology: boolean;
     canMarkMethodologyAsDraft: boolean;
+    canMakeAmendmentOfMethodology: boolean;
+    canRemoveMethodologyLink: boolean;
   };
 }
 
 const methodologyService = {
-  createMethodology(publicationId: string): Promise<BasicMethodologyVersion> {
+  createMethodology(publicationId: string): Promise<MethodologyVersion> {
     return client.post(`/publication/${publicationId}/methodology`);
   },
 
   updateMethodology(
     methodologyId: string,
     data: UpdateMethodology,
-  ): Promise<BasicMethodologyVersion> {
+  ): Promise<MethodologyVersion> {
     return client.put(`/methodology/${methodologyId}`, data);
   },
 
-  getMethodology(methodologyId: string): Promise<BasicMethodologyVersion> {
-    return client.get<BasicMethodologyVersion>(
-      `/methodology/${methodologyId}/summary`,
-    );
+  getMethodology(methodologyId: string): Promise<MethodologyVersion> {
+    return client.get<MethodologyVersion>(`/methodology/${methodologyId}`);
   },
 
   getUnpublishedReleases(methodologyId: string): Promise<IdTitlePair[]> {
@@ -67,9 +71,15 @@ const methodologyService = {
     );
   },
 
+  listMethodologyVersions(
+    publicationId: string,
+  ): Promise<MethodologyVersionSummary[]> {
+    return client.get(`/publication/${publicationId}/methodologies`);
+  },
+
   createMethodologyAmendment(
     methodologyId: string,
-  ): Promise<BasicMethodologyVersion> {
+  ): Promise<MethodologyVersion> {
     return client.post(`/methodology/${methodologyId}/amendment`);
   },
 

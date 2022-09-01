@@ -17,14 +17,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     typeof(IMyPublicationPermissionsResolver),
                     new Mock<IMyPublicationPermissionsResolver>().Object
-                },
-                {
-                    typeof(IMyPublicationMethodologyVersionPermissionsResolver),
-                    new Mock<IMyPublicationMethodologyVersionPermissionsResolver>().Object
-                },
-                {
-                    typeof(IMyMethodologyVersionPermissionsResolver),
-                    new Mock<IMyMethodologyVersionPermissionsResolver>().Object
                 }
             };
 

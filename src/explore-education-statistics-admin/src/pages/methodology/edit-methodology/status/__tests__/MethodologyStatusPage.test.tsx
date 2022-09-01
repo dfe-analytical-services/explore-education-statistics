@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import _methodologyService, {
-  BasicMethodologyVersion,
+  MethodologyVersion,
 } from '@admin/services/methodologyService';
 import _permissionService from '@admin/services/permissionService';
 import { generatePath, MemoryRouter } from 'react-router';
@@ -26,7 +26,7 @@ const permissionService = _permissionService as jest.Mocked<
 >;
 
 describe('MethodologyStatusPage', () => {
-  const testMethodology: BasicMethodologyVersion = {
+  const testMethodology: MethodologyVersion = {
     id: 'm1',
     amendment: false,
     title: 'Test methodology',
@@ -35,7 +35,7 @@ describe('MethodologyStatusPage', () => {
       id: 'p1',
       title: 'Owning publication title',
     },
-  } as BasicMethodologyVersion;
+  } as MethodologyVersion;
 
   const testMethodologyWithOtherPublications = {
     ...testMethodology,
@@ -68,6 +68,7 @@ describe('MethodologyStatusPage', () => {
       expect(screen.getByTestId('Status-value')).toHaveTextContent('In Draft');
     });
 
+    expect(screen.queryByTestId('Internal note-key')).not.toBeInTheDocument();
     expect(screen.queryByTestId('When to publish-key')).not.toBeInTheDocument();
     expect(
       screen.queryByTestId('Publish with release-key'),
@@ -76,13 +77,14 @@ describe('MethodologyStatusPage', () => {
     expect(screen.queryByText('Edit status')).not.toBeInTheDocument();
   });
 
-  test('renders Approved details for publishing immediatately', async () => {
+  test('renders Approved details for publishing immediately', async () => {
     permissionService.canApproveMethodology.mockResolvedValue(false);
     permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
 
     renderPage({
       ...testMethodology,
       status: 'Approved',
+      internalReleaseNote: 'Test internal release note',
       publishingStrategy: 'Immediately',
     });
 
@@ -91,6 +93,13 @@ describe('MethodologyStatusPage', () => {
 
       expect(screen.getByTestId('Status-key')).toHaveTextContent('Status');
       expect(screen.getByTestId('Status-value')).toHaveTextContent('Approved');
+
+      expect(screen.getByTestId('Internal note-key')).toHaveTextContent(
+        'Internal note',
+      );
+      expect(screen.getByTestId('Internal note-value')).toHaveTextContent(
+        'Test internal release note',
+      );
 
       expect(screen.getByTestId('When to publish-key')).toHaveTextContent(
         'When to publish',
@@ -114,6 +123,7 @@ describe('MethodologyStatusPage', () => {
     renderPage({
       ...testMethodology,
       status: 'Approved',
+      internalReleaseNote: 'Test internal release note',
       publishingStrategy: 'WithRelease',
       scheduledWithRelease: {
         id: 'dependant-release',
@@ -126,6 +136,13 @@ describe('MethodologyStatusPage', () => {
 
       expect(screen.getByTestId('Status-key')).toHaveTextContent('Status');
       expect(screen.getByTestId('Status-value')).toHaveTextContent('Approved');
+
+      expect(screen.getByTestId('Internal note-key')).toHaveTextContent(
+        'Internal note',
+      );
+      expect(screen.getByTestId('Internal note-value')).toHaveTextContent(
+        'Test internal release note',
+      );
 
       expect(screen.getByTestId('When to publish-key')).toHaveTextContent(
         'When to publish',
@@ -270,7 +287,7 @@ describe('MethodologyStatusPage', () => {
     });
   });
 
-  function renderPage(methodology: BasicMethodologyVersion) {
+  function renderPage(methodology: MethodologyVersion) {
     render(
       <MemoryRouter
         initialEntries={[

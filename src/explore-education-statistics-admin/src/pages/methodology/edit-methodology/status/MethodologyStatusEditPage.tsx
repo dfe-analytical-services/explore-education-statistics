@@ -1,5 +1,5 @@
 import methodologyService, {
-  BasicMethodologyVersion,
+  MethodologyVersion,
   MethodologyStatus,
 } from '@admin/services/methodologyService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -16,13 +16,13 @@ interface FormValues {
 }
 
 interface Props {
-  methodologySummary: BasicMethodologyVersion;
+  methodology: MethodologyVersion;
   onCancel: () => void;
   onSubmit: (values: FormValues) => void;
 }
 
 const MethodologyStatusEditPage = ({
-  methodologySummary,
+  methodology,
   onCancel,
   onSubmit,
 }: Props) => {
@@ -30,17 +30,16 @@ const MethodologyStatusEditPage = ({
     value: unpublishedReleases,
     isLoading,
   } = useAsyncHandledRetry(
-    async () =>
-      methodologyService.getUnpublishedReleases(methodologySummary.id),
-    [methodologySummary.id],
+    async () => methodologyService.getUnpublishedReleases(methodology.id),
+    [methodology.id],
   );
 
   return (
     <LoadingSpinner loading={isLoading}>
       {unpublishedReleases ? (
         <MethodologyStatusForm
-          isPublished={methodologySummary.published}
-          methodologySummary={methodologySummary}
+          isPublished={methodology.published}
+          methodology={methodology}
           unpublishedReleases={unpublishedReleases}
           onCancel={onCancel}
           onSubmit={onSubmit}
