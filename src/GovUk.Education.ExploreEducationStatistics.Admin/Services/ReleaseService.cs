@@ -360,14 +360,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             _repository.ListReleasesForUser(_userService.GetUserId(),
                                 releaseApprovalStatuses));
                 })
-                .OnSuccess(releases =>
+                .OnSuccess(async releases =>
                 {
-                    return releases.Select(release =>
-                    {
-                        var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-                        releaseViewModel.Permissions = PermissionsUtils.GetReleasePermissions(_userService, release);
-                        return releaseViewModel;
-                    }).ToList();
+                    return await releases
+                        .ToAsyncEnumerable()
+                        .SelectAwait(async release =>
+                        {
+                            var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+                            releaseViewModel.Permissions =
+                                await PermissionsUtils.GetReleasePermissions(_userService, release);
+                            return releaseViewModel;
+                        }).ToListAsync();
                 });
         }
 
@@ -384,14 +387,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             _repository.ListReleasesForUser(_userService.GetUserId(),
                                 ReleaseApprovalStatus.Approved));
                 })
-                .OnSuccess(releases =>
+                .OnSuccess(async releases =>
                 {
-                    var approvedReleases = releases.Select(release =>
-                    {
-                        var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-                        releaseViewModel.Permissions = PermissionsUtils.GetReleasePermissions(_userService, release);
-                        return releaseViewModel;
-                    }).ToList();
+                    var approvedReleases = await releases
+                        .ToAsyncEnumerable()
+                        .SelectAwait(async release =>
+                        {
+                            var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+                            releaseViewModel.Permissions =
+                                await PermissionsUtils.GetReleasePermissions(_userService, release);
+                            return releaseViewModel;
+                        }).ToListAsync();
 
                     return approvedReleases
                         .Where(release => !release.Live)

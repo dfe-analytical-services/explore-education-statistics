@@ -320,13 +320,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .Include(p => p.Releases)
                     .ThenInclude(r => r.ReleaseStatuses))
                 .OnSuccess(_userService.CheckCanViewPublication)
-                .OnSuccess(publication => publication.ListActiveReleases()
-                    .Where(release => live == null || release.Live == live)
-                    .OrderByDescending(r => r.Year)
-                    .ThenByDescending(r => r.TimePeriodCoverage)
-                    .Select(r => HydrateReleaseListItemViewModel(r, includePermissions))
-                    .ToList()
-                );
+                .OnSuccess(async publication =>
+                {
+                    var activeReleases = publication.ListActiveReleases()
+                        .Where(release => live == null || release.Live == live)
+                        .OrderByDescending(r => r.Year)
+                        .ThenByDescending(r => r.TimePeriodCoverage);
+
+                    return await activeReleases
+                        .ToAsyncEnumerable()
+                        .SelectAwait(async r => await HydrateReleaseListItemViewModel(r, includePermissions))
+                        .ToListAsync();
+                });
         }
 
         public async Task<Either<ActionResult, List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
@@ -411,10 +416,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             publicationViewModel.IsSuperseded = _publicationRepository.IsSuperseded(publication);
 
-            publicationViewModel.Releases.ForEach(releaseViewModel =>
+            await publicationViewModel.Releases
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async releaseViewModel =>
             {
                 var release = publication.Releases.Single(release => release.Id == releaseViewModel.Id);
-                releaseViewModel.Permissions = PermissionsUtils.GetReleasePermissions(_userService, release);
+                releaseViewModel.Permissions = await PermissionsUtils.GetReleasePermissions(_userService, release);
             });
 
             publicationViewModel.Methodologies = (await HydrateMethodologyVersionViewModels(publication))
@@ -424,13 +431,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return publicationViewModel;
         }
 
-        private ReleaseSummaryViewModel HydrateReleaseListItemViewModel(Release release, bool includePermissions)
+        private async Task<ReleaseSummaryViewModel> HydrateReleaseListItemViewModel(Release release, bool includePermissions)
         {
             var viewModel = _mapper.Map<ReleaseSummaryViewModel>(release);
 
             if (includePermissions)
             {
-                viewModel.Permissions = PermissionsUtils.GetReleasePermissions(_userService, release);
+                viewModel.Permissions = await PermissionsUtils.GetReleasePermissions(_userService, release);
             }
 
             return viewModel;
