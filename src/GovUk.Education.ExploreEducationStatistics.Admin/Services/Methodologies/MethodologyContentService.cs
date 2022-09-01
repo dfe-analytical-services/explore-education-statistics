@@ -434,7 +434,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             }
 
             return await _userService
-                .CheckCanUpdateMethodology(methodologyVersion)
+                .CheckCanUpdateMethodologyVersion(methodologyVersion)
                 .OnSuccess(_ => methodologyVersion.MethodologyContent);
         }
 
@@ -447,7 +447,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             }
 
             return await _userService
-                .CheckCanUpdateMethodology(tuple.Item1)
+                .CheckCanUpdateMethodologyVersion(tuple.Item1)
                 .OnSuccess(_ => new Tuple<MethodologyVersionContent, ContentSection>(tuple.Item1.MethodologyContent, tuple.Item2));
         }
 

@@ -197,7 +197,7 @@ const FormCheckboxSearchSubGroups = ({
                     onSubGroupAllChange(event, checked, optionGroup.options);
                   }
                 }}
-                visuallyHiddenText={`for ${optionGroup.legend}`}
+                hiddenText={`for ${optionGroup.legend}`}
               />
             ))}
           </>

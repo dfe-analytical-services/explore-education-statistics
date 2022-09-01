@@ -314,4 +314,22 @@ describe('Accordion', () => {
 
     expect(toggleAll).toHaveBeenCalledWith(false);
   });
+
+  test('it renders visually hidden text', () => {
+    const { container } = render(
+      <Accordion
+        id="test-sections"
+        toggleAllHiddenText="Academic Year 2016/17 sections"
+      >
+        <AccordionSection heading="Test heading">Test content</AccordionSection>
+      </Accordion>,
+    );
+
+    expect(container.querySelectorAll('.govuk-visually-hidden')).toHaveLength(
+      1,
+    );
+    expect(container.querySelector('.govuk-visually-hidden')).toHaveTextContent(
+      'Academic Year 2016/17 sections',
+    );
+  });
 });

@@ -6,7 +6,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import noop from 'lodash/noop';
-import { BasicMethodologyVersion } from 'src/services/methodologyService';
+import { MethodologyVersion } from 'src/services/methodologyService';
 
 describe('MethodologyStatusForm', () => {
   const testUnpublishedReleases: IdTitlePair[] = [
@@ -23,10 +23,10 @@ describe('MethodologyStatusForm', () => {
   test('renders the form with draft initial values', () => {
     render(
       <MethodologyStatusForm
-        methodologySummary={
+        methodology={
           {
             status: 'Draft',
-          } as BasicMethodologyVersion
+          } as MethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
@@ -60,11 +60,11 @@ describe('MethodologyStatusForm', () => {
   test('renders the form with approved status initial values', () => {
     render(
       <MethodologyStatusForm
-        methodologySummary={
+        methodology={
           {
             status: 'Approved',
-            latestInternalReleaseNote: 'The latest note',
-          } as BasicMethodologyVersion
+            internalReleaseNote: 'Test release note',
+          } as MethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
@@ -76,7 +76,7 @@ describe('MethodologyStatusForm', () => {
     expect(approvedRadio).toBeChecked();
 
     const noteField = screen.getByLabelText('Internal note');
-    expect(noteField).toHaveValue('The latest note');
+    expect(noteField).toHaveValue('Test release note');
 
     expect(
       screen.queryByRole('group', { name: 'When to publish' }),
@@ -86,15 +86,15 @@ describe('MethodologyStatusForm', () => {
   test('renders the form with publishing strategy initial values', () => {
     render(
       <MethodologyStatusForm
-        methodologySummary={
+        methodology={
           {
             status: 'Approved',
-            latestInternalReleaseNote: 'The latest note',
+            internalReleaseNote: 'Test release note',
             publishingStrategy: 'WithRelease',
             scheduledWithRelease: {
               id: 'test-release-2',
             },
-          } as BasicMethodologyVersion
+          } as MethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
@@ -137,10 +137,10 @@ describe('MethodologyStatusForm', () => {
   test('shows validation error if internal note is empty and status is approved', async () => {
     render(
       <MethodologyStatusForm
-        methodologySummary={
+        methodology={
           {
             status: 'Draft',
-          } as BasicMethodologyVersion
+          } as MethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
@@ -165,10 +165,10 @@ describe('MethodologyStatusForm', () => {
   test('shows validation error if a release is not selected when publish strategy is with release', async () => {
     render(
       <MethodologyStatusForm
-        methodologySummary={
+        methodology={
           {
             status: 'Approved',
-          } as BasicMethodologyVersion
+          } as MethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
@@ -192,11 +192,11 @@ describe('MethodologyStatusForm', () => {
 
     render(
       <MethodologyStatusForm
-        methodologySummary={
+        methodology={
           {
             status: 'Approved',
             publishingStrategy: 'WithRelease',
-          } as BasicMethodologyVersion
+          } as MethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
@@ -224,11 +224,11 @@ describe('MethodologyStatusForm', () => {
 
     render(
       <MethodologyStatusForm
-        methodologySummary={
+        methodology={
           {
             status: 'Approved',
             publishingStrategy: 'WithRelease',
-          } as BasicMethodologyVersion
+          } as MethodologyVersion
         }
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}

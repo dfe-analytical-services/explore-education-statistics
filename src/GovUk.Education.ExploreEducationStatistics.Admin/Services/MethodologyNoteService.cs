@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _persistenceHelper
                 .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
-                .OnSuccess(_userService.CheckCanUpdateMethodology)
+                .OnSuccess(_userService.CheckCanUpdateMethodologyVersion)
                 .OnSuccess(async methodologyVersion =>
                 {
                     var addedNote = await _methodologyNoteRepository.AddNote(
@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             n => n.Id == methodologyNoteId
                                  && n.MethodologyVersionId == methodologyVersionId))
                 .OnSuccessDo(methodologyNote =>
-                    _userService.CheckCanUpdateMethodology(methodologyNote.MethodologyVersion))
+                    _userService.CheckCanUpdateMethodologyVersion(methodologyNote.MethodologyVersion))
                 .OnSuccessVoid(async methodologyNote =>
                 {
                     await _methodologyNoteRepository.DeleteNote(methodologyNoteId);
@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             n => n.Id == methodologyNoteId
                                  && n.MethodologyVersionId == methodologyVersionId))
                 .OnSuccessDo(methodologyNote =>
-                    _userService.CheckCanUpdateMethodology(methodologyNote.MethodologyVersion))
+                    _userService.CheckCanUpdateMethodologyVersion(methodologyNote.MethodologyVersion))
                 .OnSuccess(async methodologyNote =>
                 {
                     var updatedNote = await _methodologyNoteRepository.UpdateNote(

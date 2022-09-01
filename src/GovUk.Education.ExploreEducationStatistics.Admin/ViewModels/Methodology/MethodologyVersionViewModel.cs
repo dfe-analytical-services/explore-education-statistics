@@ -7,17 +7,17 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology
 {
-    public class MethodologyVersionSummaryViewModel
+    public record MethodologyVersionViewModel
     {
         public Guid Id { get; set; }
 
         public Guid MethodologyId { get; set; }
 
-        public string? LatestInternalReleaseNote { get; set; }
+        public string? InternalReleaseNote { get; set; }
 
         public TitleAndIdViewModel OwningPublication { get; set; }
 
-        public List<TitleAndIdViewModel> OtherPublications { get; set; } = new List<TitleAndIdViewModel>();
+        public List<TitleAndIdViewModel> OtherPublications { get; set; } = new();
 
         public DateTime? Published { get; set; }
 

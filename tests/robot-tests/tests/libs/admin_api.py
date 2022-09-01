@@ -183,17 +183,18 @@ def user_resets_user_roles_via_api_if_required(user_emails: list) -> None:
         if user_email not in allowed_users:
             raise AssertionError(f'`User emails` must contain only allowed users: {allowed_users}')
         try:
-            user_ids = [get_user_details_via_api(user_email)['id']]
-        except IndexError:
-            BuiltIn().log(f'User with email {user_email} does not exist')
-
-        try:
-            result = [user_removes_all_release_and_publication_roles_from_user(user_id) for user_id in user_ids]
-            assert(all(result))
+            user_ids = [get_prerelease_user_details_via_api(user_email)['id']]
+            _ = [user_removes_all_release_and_publication_roles_from_user(user_id) for user_id in user_ids]
             BuiltIn().log(f'All userReleaseRoles & userPublicationRoles reset for user: {user_email}')
+        except TypeError or IndexError:
+            BuiltIn().log(f'User with email {user_email} does not exist in pre-release user list', 'WARN')
 
-        except AssertionError:
-            BuiltIn().log(f'Failed to remove roles from user {user_email}')
+            try:
+                user_ids = [get_user_details_via_api(user_email)['id']]
+                _ = [user_removes_all_release_and_publication_roles_from_user(user_id) for user_id in user_ids]
+                BuiltIn().log(f'All userReleaseRoles & userPublicationRoles reset for user: {user_email}')
+            except TypeError or IndexError:
+                BuiltIn().log(f'User with email {user_email} does not exist in user list', 'WARN')
 
 
 def user_create_test_release_via_api(
@@ -222,5 +223,13 @@ def get_user_details_via_api(
         user_email: str):
 
     users = admin_client.get('/api/user-management/users').json()
+
+    return list(filter(lambda user: user['email'] == user_email, users))[0]
+
+
+def get_prerelease_user_details_via_api(
+        user_email: str):
+
+    users = admin_client.get('/api/user-management/pre-release').json()
 
     return list(filter(lambda user: user['email'] == user_email, users))[0]

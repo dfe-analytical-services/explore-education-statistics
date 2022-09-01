@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -20,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -112,6 +112,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publicationRepository: publicationRepository.Object);
 
                 var result = await publicationService.GetMyPublicationsAndReleasesByTopic(topic.Id);
+
+                VerifyAllMocks(publicationRepository);
+
                 var publicationViewModels = result.AssertRight();
 
                 Assert.Equal(2, publicationViewModels.Count);
@@ -133,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetMyPublicationsAndReleasesByTopic_CanViewAllReleases_MethodologyOrder()
+        public async Task GetMyPublicationsAndReleasesByTopic_CanViewAllReleases_Methodologies()
         {
             var topic = new Topic
             {
@@ -188,7 +191,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Methodology = new Methodology
                         {
-                            Slug = "methodology-2-slug",
                             Versions = ListOf(methodology2Version2, methodology2Version1)
                         },
                         Owner = false
@@ -197,7 +199,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Methodology = new Methodology
                         {
-                            Slug = "methodology-3-slug",
                             Versions = ListOf(methodology3Version1)
                         },
                         Owner = false
@@ -206,7 +207,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Methodology = new Methodology
                         {
-                            Slug = "methodology-1-slug",
                             Versions = ListOf(methodology1Version1)
                         },
                         Owner = true
@@ -233,6 +233,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publicationRepository: publicationRepository.Object);
 
                 var result = await publicationService.GetMyPublicationsAndReleasesByTopic(topic.Id);
+
+                VerifyAllMocks(publicationRepository);
+
                 var publicationViewModels = result.AssertRight();
 
                 var publicationViewModel = Assert.Single(publicationViewModels);
@@ -245,14 +248,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var methodologies = publicationViewModel.Methodologies;
                 Assert.Equal(3, methodologies.Count);
 
-                Assert.Equal(methodology1Version1.AlternativeTitle, methodologies[0].Methodology.Title);
-                Assert.True(methodologies[0].Owner);
+                Assert.Equal(methodology1Version1.AlternativeTitle, methodologies[0].Title);
+                Assert.True(methodologies[0].Owned);
 
-                Assert.Equal(methodology2Version2.AlternativeTitle, methodologies[1].Methodology.Title);
-                Assert.False(methodologies[1].Owner);
+                Assert.Equal(methodology2Version2.AlternativeTitle, methodologies[1].Title);
+                Assert.False(methodologies[1].Owned);
 
-                Assert.Equal(methodology3Version1.AlternativeTitle, methodologies[2].Methodology.Title);
-                Assert.False(methodologies[2].Owner);
+                Assert.Equal(methodology3Version1.AlternativeTitle, methodologies[2].Title);
+                Assert.False(methodologies[2].Owned);
             }
         }
 
@@ -329,6 +332,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publicationRepository: publicationRepository.Object);
 
                 var result = await publicationService.GetMyPublicationsAndReleasesByTopic(topic.Id);
+
+                VerifyAllMocks(publicationRepository);
+
                 var publicationViewModels = result.AssertRight();
 
                 var publicationViewModel = Assert.Single(publicationViewModels);
@@ -352,7 +358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetMyPublicationsAndReleasesByTopic_CanViewAllReleases_ReleasePermissionsSet()
+        public async Task GetMyPublicationsAndReleasesByTopic_CanViewAllReleases_ReleasePermissions()
         {
             var topic = new Topic
             {
@@ -378,27 +384,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             var userService = new Mock<IUserService>(Strict);
-            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem))
+            userService.Setup(s => s.MatchesPolicy(CanAccessSystem))
                 .ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
+            userService.Setup(s => s.MatchesPolicy(CanViewAllReleases))
                 .ReturnsAsync(true);
             userService.Setup(s => s.GetUserId())
                 .Returns(Guid.NewGuid());
             userService
                 .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanUpdateSpecificRelease))
+                    It.IsAny<Release>(), CanUpdateSpecificRelease))
                 .ReturnsAsync(true);
             userService
                 .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanDeleteSpecificRelease))
+                    It.IsAny<Release>(), CanDeleteSpecificRelease))
                 .ReturnsAsync(true);
             userService
                 .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease))
+                    It.IsAny<Release>(), CanAssignPrereleaseContactsToSpecificRelease))
                 .ReturnsAsync(false);
             userService
                 .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanMakeAmendmentOfSpecificRelease))
+                    It.IsAny<Release>(), CanMakeAmendmentOfSpecificRelease))
                 .ReturnsAsync(false);
 
             var publicationRepository = new Mock<IPublicationRepository>(Strict);
@@ -416,6 +422,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publicationRepository: publicationRepository.Object);
 
                 var result = await publicationService.GetMyPublicationsAndReleasesByTopic(topic.Id);
+
+                VerifyAllMocks(publicationRepository, userService);
+
                 var publicationViewModels = result.AssertRight();
 
                 var publicationViewModel = Assert.Single(publicationViewModels);
@@ -502,27 +511,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             var userService = new Mock<IUserService>(Strict);
-            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem))
+            userService.Setup(s => s.MatchesPolicy(CanAccessSystem))
                 .ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
+            userService.Setup(s => s.MatchesPolicy(CanViewAllReleases))
                 .ReturnsAsync(false);
             userService.Setup(s => s.GetUserId())
                 .Returns(userId);
             userService
                 .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanUpdateSpecificRelease))
+                    It.IsAny<Release>(), CanUpdateSpecificRelease))
                 .ReturnsAsync(true);
             userService
                 .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanDeleteSpecificRelease))
+                    It.IsAny<Release>(), CanDeleteSpecificRelease))
                 .ReturnsAsync(true);
             userService
                 .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease))
+                    It.IsAny<Release>(), CanAssignPrereleaseContactsToSpecificRelease))
                 .ReturnsAsync(false);
             userService
                 .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanMakeAmendmentOfSpecificRelease))
+                    It.IsAny<Release>(), CanMakeAmendmentOfSpecificRelease))
                 .ReturnsAsync(false);
 
             var publicationRepository = new Mock<IPublicationRepository>(Strict);
@@ -548,6 +557,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publicationRepository: publicationRepository.Object);
 
                 var result = await publicationService.GetMyPublicationsAndReleasesByTopic(topic.Id);
+
+                VerifyAllMocks(publicationRepository, userService);
+
                 var publicationViewModels = result.AssertRight();
 
                 Assert.Equal(2, publicationViewModels.Count);
@@ -571,7 +583,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetMyPublicationsAndReleasesByTopic_NotViewAllReleases_MethodologyOrder()
+        public async Task GetMyPublicationsAndReleasesByTopic_NotViewAllReleases_Methodologies()
         {
             var userId = Guid.NewGuid();
 
@@ -628,7 +640,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Methodology = new Methodology
                         {
-                            Slug = "methodology-2-slug",
                             Versions = ListOf(methodology2Version2, methodology2Version1)
                         },
                         Owner = false
@@ -637,7 +648,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Methodology = new Methodology
                         {
-                            Slug = "methodology-3-slug",
                             Versions = ListOf(methodology3Version1)
                         },
                         Owner = false
@@ -646,7 +656,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Methodology = new Methodology
                         {
-                            Slug = "methodology-1-slug",
                             Versions = ListOf(methodology1Version1)
                         },
                         Owner = true
@@ -655,28 +664,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             var userService = new Mock<IUserService>(Strict);
-            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem))
+            userService.Setup(s => s.MatchesPolicy(CanAccessSystem))
                 .ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
+            userService.Setup(s => s.MatchesPolicy(CanViewAllReleases))
                 .ReturnsAsync(false);
             userService.Setup(s => s.GetUserId())
                 .Returns(userId);
-            userService
-                .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanUpdateSpecificRelease))
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<Release>(), CanUpdateSpecificRelease))
                 .ReturnsAsync(true);
-            userService
-                .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanDeleteSpecificRelease))
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<Release>(), CanDeleteSpecificRelease))
                 .ReturnsAsync(true);
-            userService
-                .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease))
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<Release>(), CanAssignPrereleaseContactsToSpecificRelease))
                 .ReturnsAsync(false);
-            userService
-                .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanMakeAmendmentOfSpecificRelease))
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<Release>(), CanMakeAmendmentOfSpecificRelease))
                 .ReturnsAsync(false);
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanDeleteSpecificMethodology))
+                .ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanUpdateSpecificMethodology))
+                .ReturnsAsync(false);
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanApproveSpecificMethodology))
+                .ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanMarkSpecificMethodologyAsDraft))
+                .ReturnsAsync(true);
+            userService.Setup(s =>
+                    s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanMakeAmendmentOfSpecificMethodology))
+                .ReturnsAsync(false);
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<PublicationMethodology>(), CanDropMethodologyLink))
+                .ReturnsAsync(true);
 
             var publicationRepository = new Mock<IPublicationRepository>(Strict);
 
@@ -695,6 +709,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publicationRepository: publicationRepository.Object);
 
                 var result = await publicationService.GetMyPublicationsAndReleasesByTopic(topic.Id);
+
+                VerifyAllMocks(publicationRepository, userService);
+
                 var publicationViewModels = result.AssertRight();
 
                 var publicationViewModel = Assert.Single(publicationViewModels);
@@ -707,14 +724,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var methodologies = publicationViewModel.Methodologies;
                 Assert.Equal(3, methodologies.Count);
 
-                Assert.Equal(methodology1Version1.AlternativeTitle, methodologies[0].Methodology.Title);
-                Assert.True(methodologies[0].Owner);
+                Assert.Equal(methodology1Version1.AlternativeTitle, methodologies[0].Title);
+                Assert.True(methodologies[0].Owned);
 
-                Assert.Equal(methodology2Version2.AlternativeTitle, methodologies[1].Methodology.Title);
-                Assert.False(methodologies[1].Owner);
+                Assert.Equal(methodology2Version2.AlternativeTitle, methodologies[1].Title);
+                Assert.False(methodologies[1].Owned);
 
-                Assert.Equal(methodology3Version1.AlternativeTitle, methodologies[2].Methodology.Title);
-                Assert.False(methodologies[2].Owner);
+                Assert.Equal(methodology3Version1.AlternativeTitle, methodologies[2].Title);
+                Assert.False(methodologies[2].Owned);
             }
         }
 
@@ -768,27 +785,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             var userService = new Mock<IUserService>(Strict);
-            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem))
+            userService.Setup(s => s.MatchesPolicy(CanAccessSystem))
                 .ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
+            userService.Setup(s => s.MatchesPolicy(CanViewAllReleases))
                 .ReturnsAsync(false);
             userService.Setup(s => s.GetUserId())
                 .Returns(userId);
             userService
                 .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanUpdateSpecificRelease))
+                    It.IsAny<Release>(), CanUpdateSpecificRelease))
                 .ReturnsAsync(true);
             userService
                 .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanDeleteSpecificRelease))
+                    It.IsAny<Release>(), CanDeleteSpecificRelease))
                 .ReturnsAsync(true);
             userService
                 .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease))
+                    It.IsAny<Release>(), CanAssignPrereleaseContactsToSpecificRelease))
                 .ReturnsAsync(false);
             userService
                 .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanMakeAmendmentOfSpecificRelease))
+                    It.IsAny<Release>(), CanMakeAmendmentOfSpecificRelease))
                 .ReturnsAsync(false);
 
             var publicationRepository = new Mock<IPublicationRepository>(Strict);
@@ -814,6 +831,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publicationRepository: publicationRepository.Object);
 
                 var result = await publicationService.GetMyPublicationsAndReleasesByTopic(topic.Id);
+
+                VerifyAllMocks(publicationRepository, userService);
+
                 var publicationViewModels = result.AssertRight();
 
                 var publicationViewModel = Assert.Single(publicationViewModels);
@@ -865,27 +885,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             var userService = new Mock<IUserService>(Strict);
-            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem))
+            userService.Setup(s => s.MatchesPolicy(CanAccessSystem))
                 .ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
+            userService.Setup(s => s.MatchesPolicy(CanViewAllReleases))
                 .ReturnsAsync(false);
             userService.Setup(s => s.GetUserId())
                 .Returns(userId);
             userService
                 .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanUpdateSpecificRelease))
+                    It.IsAny<Release>(), CanUpdateSpecificRelease))
                 .ReturnsAsync(true);
             userService
                 .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanDeleteSpecificRelease))
+                    It.IsAny<Release>(), CanDeleteSpecificRelease))
                 .ReturnsAsync(true);
             userService
                 .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease))
+                    It.IsAny<Release>(), CanAssignPrereleaseContactsToSpecificRelease))
                 .ReturnsAsync(false);
             userService
                 .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(), SecurityPolicies.CanMakeAmendmentOfSpecificRelease))
+                    It.IsAny<Release>(), CanMakeAmendmentOfSpecificRelease))
                 .ReturnsAsync(false);
 
             var publicationRepository = new Mock<IPublicationRepository>(Strict);
@@ -903,6 +923,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publicationRepository: publicationRepository.Object);
 
                 var result = await publicationService.GetMyPublicationsAndReleasesByTopic(topic.Id);
+
+                VerifyAllMocks(publicationRepository, userService);
+
                 var publicationViewModels = result.AssertRight();
 
                 var publicationViewModel = Assert.Single(publicationViewModels);
@@ -1077,11 +1100,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
                 Methodologies = new List<PublicationMethodology>
                 {
-                    new PublicationMethodology
+                    new()
                     {
                         Methodology = new Methodology
                         {
-                            Slug = "methodology-1-slug",
                             Versions = ListOf(methodologyVersion),
                         },
                         Owner = true
@@ -1136,8 +1158,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication.Contact.TeamName, viewModel.Contact.TeamName);
 
                 Assert.Single(viewModel.Methodologies);
-                Assert.Equal(methodologyVersion.Id, viewModel.Methodologies[0].Methodology.Id);
-                Assert.Equal(methodologyVersion.Title, viewModel.Methodologies[0].Methodology.Title);
+                Assert.Equal(methodologyVersion.Id, viewModel.Methodologies[0].Id);
+                Assert.Equal(methodologyVersion.Title, viewModel.Methodologies[0].Title);
 
                 Assert.Equal(3, viewModel.Releases.Count);
                 var releases = viewModel.Releases;
@@ -1195,11 +1217,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Releases = ListOf(release),
                 Methodologies = new List<PublicationMethodology>
                 {
-                    new PublicationMethodology
+                    new()
                     {
                         Methodology = new Methodology
                         {
-                            Slug = "methodology-1-slug",
                             Versions = ListOf(methodologyVersion),
                         },
                         Owner = true
@@ -1217,44 +1238,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userService = new Mock<IUserService>(Strict);
 
-            userService
-                .Setup(s => s.GetUserId())
+            userService.Setup(s => s.GetUserId())
                 .Returns(userId);
-
-            userService
-                .Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem))
+            userService.Setup(s => s.MatchesPolicy(CanAccessSystem))
                 .ReturnsAsync(true);
-
-            userService
-                .Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
+            userService.Setup(s => s.MatchesPolicy(CanViewAllReleases))
                 .ReturnsAsync(false);
-
-            userService
-                .Setup(s =>
-                    s.MatchesPolicy(
-                        It.Is<Publication>(p => p.Id == publication.Id),
-                        SecurityPolicies.CanViewSpecificPublication))
+            userService.Setup(s =>
+                    s.MatchesPolicy(It.Is<Publication>(p => p.Id == publication.Id), CanViewSpecificPublication))
                 .ReturnsAsync(true);
-
-            userService
-                .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(),
-                    SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease))
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<Release>(), CanAssignPrereleaseContactsToSpecificRelease))
                 .ReturnsAsync(true);
-            userService
-                .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(),
-                    SecurityPolicies.CanUpdateSpecificRelease))
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<Release>(), CanUpdateSpecificRelease))
                 .ReturnsAsync(true);
-            userService
-                .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(),
-                    SecurityPolicies.CanDeleteSpecificRelease))
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<Release>(), CanDeleteSpecificRelease))
                 .ReturnsAsync(true);
-            userService
-                .Setup(s => s.MatchesPolicy(
-                    It.IsAny<Release>(),
-                    SecurityPolicies.CanMakeAmendmentOfSpecificRelease))
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<Release>(), CanMakeAmendmentOfSpecificRelease))
+                .ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanDeleteSpecificMethodology))
+                .ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanUpdateSpecificMethodology))
+                .ReturnsAsync(false);
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanApproveSpecificMethodology))
+                .ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanMarkSpecificMethodologyAsDraft))
+                .ReturnsAsync(true);
+            userService.Setup(s =>
+                    s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanMakeAmendmentOfSpecificMethodology))
+                .ReturnsAsync(false);
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<PublicationMethodology>(), CanDropMethodologyLink))
                 .ReturnsAsync(true);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1264,6 +1276,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publicationRepository: publicationRepository,
                     userService: userService.Object);
                 var result = await publicationService.GetMyPublication(publication.Id);
+
+                VerifyAllMocks(userService);
+
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(publication.Id, viewModel.Id);
@@ -1283,8 +1298,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Id, viewModel.Releases[0].Id);
 
                 Assert.Single(viewModel.Methodologies);
-                Assert.Equal(methodologyVersion.Id, viewModel.Methodologies[0].Methodology.Id);
-                Assert.Equal(methodologyVersion.Title, viewModel.Methodologies[0].Methodology.Title);
+                Assert.Equal(methodologyVersion.Id, viewModel.Methodologies[0].Id);
+                Assert.Equal(methodologyVersion.Title, viewModel.Methodologies[0].Title);
             }
         }
 
@@ -1308,18 +1323,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Returns(userId);
 
             userService
-                .Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem))
+                .Setup(s => s.MatchesPolicy(CanAccessSystem))
                 .ReturnsAsync(true);
 
             userService
-                .Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
+                .Setup(s => s.MatchesPolicy(CanViewAllReleases))
                 .ReturnsAsync(false);
 
             userService
                 .Setup(s =>
                     s.MatchesPolicy(
                         It.Is<Publication>(p => p.Id == publication.Id),
-                        SecurityPolicies.CanViewSpecificPublication))
+                        CanViewSpecificPublication))
                 .ReturnsAsync(false);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1329,8 +1344,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publicationRepository: publicationRepository,
                     userService: userService.Object);
                 var result = await publicationService.GetMyPublication(publication.Id);
-                var actionResult = result.AssertLeft();
-                Assert.IsType<ForbidResult>(actionResult);
+
+                VerifyAllMocks(userService);
+
+                result.AssertForbidden();
             }
         }
 
@@ -1921,6 +1938,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
+                VerifyAllMocks(publicBlobCacheService, methodologyVersionRepository);
+
                 var viewModel = result.AssertRight();
 
                 var updatedPublication = await context.Publications.FindAsync(viewModel.Id);
@@ -2005,6 +2024,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TopicId = publication.TopicId
                     }
                 );
+
+                VerifyAllMocks(publicBlobCacheService, methodologyVersionRepository);
 
                 var viewModel = result.AssertRight();
 
@@ -2151,6 +2172,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
+                VerifyAllMocks(publicBlobCacheService);
+
                 result.AssertBadRequest(TopicDoesNotExist);
             }
         }
@@ -2200,6 +2223,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TopicId = topic.Id,
                     }
                 );
+
+                VerifyAllMocks(publicBlobCacheService);
 
                 result.AssertBadRequest(SlugNotUnique);
             }
@@ -2258,6 +2283,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     }
                 );
+
+                VerifyAllMocks(publicBlobCacheService);
 
                 var legacyReleases = result.AssertRight();
 
@@ -2320,6 +2347,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     }
                 );
+
+                VerifyAllMocks(publicBlobCacheService);
 
                 var legacyReleases = result.AssertRight();
 

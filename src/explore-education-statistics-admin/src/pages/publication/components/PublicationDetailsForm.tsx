@@ -4,7 +4,11 @@ import themeService from '@admin/services/themeService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import { FormFieldset, FormFieldSelect } from '@common/components/form';
+import {
+  FormFieldset,
+  FormFieldSelect,
+  FormFieldTextArea,
+} from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -105,10 +109,11 @@ const PublicationDetailsForm = ({
                     className="govuk-!-width-one-half"
                   />
 
-                  <FormFieldTextInput<PublicationDetailsFormValues>
+                  <FormFieldTextArea<PublicationDetailsFormValues>
                     name="summary"
                     label="Publication summary"
                     className="govuk-!-width-one-half"
+                    maxLength={160}
                   />
                   {themes && initialValues?.topicId && (
                     <FormFieldThemeTopicSelect<PublicationDetailsFormValues>

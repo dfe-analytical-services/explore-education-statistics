@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _context = context;
         }
 
-        public async Task<Either<ActionResult, MethodologyVersionSummaryViewModel>> CreateMethodologyAmendment(
+        public async Task<Either<ActionResult, MethodologyVersionViewModel>> CreateMethodologyAmendment(
             Guid originalMethodologyVersionId)
         {
             return await _persistenceHelper.CheckEntityExists<MethodologyVersion>(originalMethodologyVersionId)
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(HydrateMethodologyVersionForAmendment)
                 .OnSuccess(CreateAndSaveAmendment)
                 .OnSuccessDo(LinkOriginalMethodologyFilesToAmendment)
-                .OnSuccess(amendment => _methodologyService.GetSummary(amendment.Id));
+                .OnSuccess(amendment => _methodologyService.GetMethodology(amendment.Id));
         }
 
         private async Task<Either<ActionResult, MethodologyVersion>> CreateAndSaveAmendment(

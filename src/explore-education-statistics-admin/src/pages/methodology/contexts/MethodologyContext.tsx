@@ -1,11 +1,11 @@
-import { BasicMethodologyVersion } from '@admin/services/methodologyService';
+import { MethodologyVersion } from '@admin/services/methodologyService';
 import noop from 'lodash/noop';
 import React, { createContext, ReactNode, useContext, useMemo } from 'react';
 
 export interface MethodologyContextState {
-  methodology: BasicMethodologyVersion;
+  methodology: MethodologyVersion;
   methodologyId: string;
-  onMethodologyChange: (nextMethodology: BasicMethodologyVersion) => void;
+  onMethodologyChange: (nextMethodology: MethodologyVersion) => void;
 }
 
 const MethodologyContext = createContext<MethodologyContextState | undefined>(
@@ -14,8 +14,8 @@ const MethodologyContext = createContext<MethodologyContextState | undefined>(
 
 interface MethodologyContextProviderProps {
   children: ReactNode;
-  methodology: BasicMethodologyVersion;
-  onMethodologyChange?: (nextMethodology: BasicMethodologyVersion) => void;
+  methodology: MethodologyVersion;
+  onMethodologyChange?: (nextMethodology: MethodologyVersion) => void;
 }
 
 export const MethodologyContextProvider = ({

@@ -56,7 +56,10 @@ const PublicationSectionBlocks = ({
                     </h3>
 
                     <p>Use our table tool to explore this data.</p>
-                    <ExploreDataButton block={block} />
+                    <ExploreDataButton
+                      block={block}
+                      hiddenText={`for ${block.heading}`}
+                    />
                   </div>
                 }
               />

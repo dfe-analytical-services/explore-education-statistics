@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public async Task GetSummary()
+        public async Task GetMethodology()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFail(_methodologyVersion, CanViewSpecificMethodology)
@@ -136,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                             contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, MethodologyVersion>(
                                 _methodologyVersion.Id, _methodologyVersion).Object,
                             userService: userService.Object);
-                        return service.GetSummary(_methodologyVersion.Id);
+                        return service.GetMethodology(_methodologyVersion.Id);
                     }
                 );
         }
@@ -155,6 +155,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                                 _methodologyVersion.Id, _methodologyVersion).Object,
                             userService: userService.Object);
                         return service.GetUnpublishedReleasesUsingMethodology(_methodologyVersion.Id);
+                    }
+                );
+        }
+
+        [Fact]
+        public async Task ListMethodologies()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_publication, CanViewSpecificPublication)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupMethodologyService(
+                            contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Publication>(
+                                _publication.Id, _publication).Object,
+                            userService: userService.Object);
+                        return service.ListMethodologies(_publication.Id);
                     }
                 );
         }

@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return await _persistenceHelper
                 .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
-                .OnSuccess(async release => await _userService.CheckCanUpdateMethodology(release, forceDelete))
+                .OnSuccess(async release => await _userService.CheckCanUpdateMethodologyVersion(release, forceDelete))
                 .OnSuccess(async release =>
                     await fileIds.Select(fileId =>
                         _methodologyFileRepository.CheckFileExists(methodologyVersionId, fileId, Image)).OnSuccessAll())
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return _persistenceHelper
                 .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
-                .OnSuccess(_userService.CheckCanUpdateMethodology)
+                .OnSuccess(_userService.CheckCanUpdateMethodologyVersion)
                 .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileForUpload(formFile, Image))
                 .OnSuccess(async () => await Upload(
                     methodologyVersionId,

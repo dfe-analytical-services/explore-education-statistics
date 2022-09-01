@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
             _methodologyAmendmentService = methodologyAmendmentService;
         }
 
-        [HttpPut("publication/{publicationId}/methodology/{methodologyId}")]
+        [HttpPut("publication/{publicationId:guid}/methodology/{methodologyId}")]
         public async Task<ActionResult<Unit>> AdoptMethodology(Guid publicationId, Guid methodologyId)
         {
             return await _methodologyService
@@ -36,15 +36,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("publication/{publicationId}/methodology")]
-        public Task<ActionResult<MethodologyVersionSummaryViewModel>> CreateMethodology(Guid publicationId)
+        [HttpPost("publication/{publicationId:guid}/methodology")]
+        public Task<ActionResult<MethodologyVersionViewModel>> CreateMethodology(Guid publicationId)
         {
             return _methodologyService
                 .CreateMethodology(publicationId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("publication/{publicationId}/methodology/{methodologyId}")]
+        [HttpDelete("publication/{publicationId:guid}/methodology/{methodologyId}")]
         public async Task<ActionResult> DropMethodology(Guid publicationId, Guid methodologyId)
         {
             return await _methodologyService
@@ -52,23 +52,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrNoContent();
         }
 
-        [HttpGet("publication/{publicationId}/adoptable-methodologies")]
-        public async Task<ActionResult<List<MethodologyVersionSummaryViewModel>>> GetAdoptableMethodologies(Guid publicationId)
+        [HttpGet("publication/{publicationId:guid}/adoptable-methodologies")]
+        public async Task<ActionResult<List<MethodologyVersionViewModel>>> GetAdoptableMethodologies(Guid publicationId)
         {
             return await _methodologyService
                 .GetAdoptableMethodologies(publicationId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("methodology/{methodologyVersionId}/summary")]
-        public async Task<ActionResult<MethodologyVersionSummaryViewModel>> GetMethodologySummary(Guid methodologyVersionId)
+        [HttpGet("methodology/{methodologyVersionId:guid}")]
+        public async Task<ActionResult<MethodologyVersionViewModel>> GetMethodology(Guid methodologyVersionId)
         {
             return await _methodologyService
-                .GetSummary(methodologyVersionId)
+                .GetMethodology(methodologyVersionId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("methodology/{methodologyVersionId}/unpublished-releases")]
+        [HttpGet("methodology/{methodologyVersionId:guid}/unpublished-releases")]
         public async Task<ActionResult<List<TitleAndIdViewModel>>> GetUnpublishedReleasesUsingMethodology(
             Guid methodologyVersionId)
         {
@@ -77,8 +77,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("methodology/{methodologyVersionId}")]
-        public async Task<ActionResult<MethodologyVersionSummaryViewModel>> UpdateMethodology(
+        [HttpGet("publication/{publicationId:guid}/methodologies")]
+        public async Task<ActionResult<List<MethodologyVersionSummaryViewModel>>> ListMethodologies(Guid publicationId)
+        {
+            return await _methodologyService
+                .ListMethodologies(publicationId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPut("methodology/{methodologyVersionId:guid}")]
+        public async Task<ActionResult<MethodologyVersionViewModel>> UpdateMethodology(
             Guid methodologyVersionId,
             MethodologyUpdateRequest request)
         {
@@ -87,8 +95,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("methodology/{originalMethodologyVersionId}/amendment")]
-        public Task<ActionResult<MethodologyVersionSummaryViewModel>> CreateMethodologyAmendment(
+        [HttpPost("methodology/{originalMethodologyVersionId:guid}/amendment")]
+        public Task<ActionResult<MethodologyVersionViewModel>> CreateMethodologyAmendment(
             Guid originalMethodologyVersionId)
         {
             return _methodologyAmendmentService
@@ -96,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("methodology/{methodologyVersionId}")]
+        [HttpDelete("methodology/{methodologyVersionId:guid}")]
         public Task<ActionResult> DeleteMethodologyVersion(Guid methodologyVersionId)
         {
             return _methodologyService

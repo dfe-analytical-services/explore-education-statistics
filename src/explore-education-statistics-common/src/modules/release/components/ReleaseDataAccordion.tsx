@@ -173,7 +173,7 @@ const ReleaseDataAccordion = ({
                           <Details
                             summary="More details"
                             className="govuk-!-margin-top-2"
-                            visuallyHiddenText={` for file ${file.name}`}
+                            hiddenText={` for file ${file.name}`}
                           >
                             <div className="dfe-white-space--pre-wrap">
                               {file.summary}

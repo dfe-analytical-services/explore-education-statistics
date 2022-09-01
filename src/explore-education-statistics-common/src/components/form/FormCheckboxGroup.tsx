@@ -5,7 +5,6 @@ import naturalOrderBy, {
   OrderDirection,
   OrderKeys,
 } from '@common/utils/array/naturalOrderBy';
-import numberWithCommas from '@common/utils/number/numberWithCommas';
 import classNames from 'classnames';
 import React, {
   FocusEventHandler,
@@ -40,11 +39,8 @@ export type CheckboxGroupAllChangeEventHandler = (
 interface BaseFormCheckboxGroupProps {
   disabled?: boolean;
   id: string;
-  maxResults?: number;
   name: string;
   options: CheckboxOption[];
-  searchHelpText?: string;
-  searchOnly?: boolean;
   selectAll?: boolean;
   selectAllText?: (isAllChecked: boolean, options: CheckboxOption[]) => string;
   small?: boolean;
@@ -54,7 +50,7 @@ interface BaseFormCheckboxGroupProps {
   onAllChange?: CheckboxGroupAllChangeEventHandler;
   onBlur?: FocusEventHandler<HTMLInputElement>;
   onChange?: CheckboxChangeEventHandler;
-  visuallyHiddenText?: string;
+  hiddenText?: string;
 }
 
 const getDefaultSelectAllText = (
@@ -69,11 +65,8 @@ export const BaseFormCheckboxGroup = ({
   disabled,
   value = [],
   id,
-  maxResults = 500,
   name,
   options,
-  searchHelpText,
-  searchOnly = false,
   selectAll = false,
   selectAllText = getDefaultSelectAllText,
   small,
@@ -82,7 +75,7 @@ export const BaseFormCheckboxGroup = ({
   onBlur,
   onChange,
   onAllChange,
-  visuallyHiddenText,
+  hiddenText,
 }: BaseFormCheckboxGroupProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -111,34 +104,6 @@ export const BaseFormCheckboxGroup = ({
     [isAllChecked, onAllChange, options],
   );
 
-  const showResults = !searchOnly || options.length <= maxResults;
-
-  const getResultsMessage = () => {
-    const numResults = options.length;
-    if (!searchOnly && numResults === 0) {
-      return <p>No options available.</p>;
-    }
-    if (searchOnly) {
-      if (numResults === 0) {
-        return (
-          <p>
-            {searchHelpText ||
-              'Search above and select at least one option before continuing to the next step.'}
-          </p>
-        );
-      }
-      if (numResults > maxResults) {
-        return (
-          <p>
-            {numberWithCommas(numResults)} results found. Please refine your
-            search to view options.
-          </p>
-        );
-      }
-    }
-    return null;
-  };
-
   return (
     <div
       className={classNames('govuk-checkboxes', {
@@ -146,7 +111,7 @@ export const BaseFormCheckboxGroup = ({
       })}
       ref={ref}
     >
-      {options.length > 1 && selectAll && showResults && (
+      {options.length > 1 && selectAll && (
         <ButtonText
           id={`${id}-all`}
           onClick={handleAllChange}
@@ -154,32 +119,27 @@ export const BaseFormCheckboxGroup = ({
           underline={false}
         >
           {selectAllText(isAllChecked, options)}
-          {visuallyHiddenText && (
-            <VisuallyHidden> {visuallyHiddenText}</VisuallyHidden>
-          )}
+          {hiddenText && <VisuallyHidden> {hiddenText}</VisuallyHidden>}
         </ButtonText>
       )}
-      {showResults && (
-        <>
-          {naturalOrderBy(options, order, orderDirection).map(option => (
-            <FormCheckbox
-              disabled={disabled}
-              {...option}
-              id={
-                option.id
-                  ? `${id}-${option.id}`
-                  : `${id}-${option.value.replace(/\s/g, '-')}`
-              }
-              name={name}
-              key={option.value}
-              checked={value.includes(option.value)}
-              onBlur={onBlur}
-              onChange={onChange}
-            />
-          ))}
-        </>
-      )}
-      {getResultsMessage()}
+      <>
+        {naturalOrderBy(options, order, orderDirection).map(option => (
+          <FormCheckbox
+            disabled={disabled}
+            {...option}
+            id={
+              option.id
+                ? `${id}-${option.id}`
+                : `${id}-${option.value.replace(/\s/g, '-')}`
+            }
+            name={name}
+            key={option.value}
+            checked={value.includes(option.value)}
+            onBlur={onBlur}
+            onChange={onChange}
+          />
+        ))}
+      </>
     </div>
   );
 };
