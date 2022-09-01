@@ -117,7 +117,7 @@ const FormCheckboxSearchGroup = ({
           value={value}
           name={name}
           options={filteredOptions}
-          searchOnly
+          searchOnly={searchOnly}
           small
         />
       </div>

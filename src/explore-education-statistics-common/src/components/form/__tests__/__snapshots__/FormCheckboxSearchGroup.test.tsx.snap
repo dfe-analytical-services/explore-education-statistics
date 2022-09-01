@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`FormCheckboxSearchGroup renders list of checkboxes in correct order 1`] = `
+exports[`FormCheckboxSearchGroup without searchOnly renders list of checkboxes in correct order 1`] = `
 <div class="govuk-form-group">
   <fieldset class="govuk-fieldset"
             id="test-checkboxes"
