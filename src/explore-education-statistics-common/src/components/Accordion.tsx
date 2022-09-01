@@ -17,6 +17,7 @@ import {
   accordionSectionClasses,
   AccordionSectionProps,
 } from './AccordionSection';
+import VisuallyHidden from './VisuallyHidden';
 
 export interface AccordionProps {
   children: ReactNode;
@@ -25,6 +26,7 @@ export interface AccordionProps {
   showOpenAll?: boolean;
   onToggleAll?: (open: boolean) => void;
   onSectionOpen?: (accordionSection: { id: string; title: string }) => void;
+  toggleAllHiddenText?: string;
 }
 
 const Accordion = ({
@@ -34,6 +36,7 @@ const Accordion = ({
   showOpenAll = true,
   onToggleAll,
   onSectionOpen,
+  toggleAllHiddenText,
 }: AccordionProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -177,7 +180,11 @@ const Accordion = ({
             }}
           >
             {isAllOpen ? 'Close all ' : 'Open all '}
-            <span className="govuk-visually-hidden">sections</span>
+            <VisuallyHidden>
+              {!toggleAllHiddenText
+                ? ' sections'
+                : `${' '}${toggleAllHiddenText}`}
+            </VisuallyHidden>
           </button>
         </div>
       )}
