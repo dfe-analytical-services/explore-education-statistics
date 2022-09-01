@@ -1,16 +1,15 @@
+import { testFullTable } from '@admin/pages/release/datablocks/components/chart/__tests__/__data__/testTableData';
 import ChartAxisConfiguration from '@admin/pages/release/datablocks/components/chart/ChartAxisConfiguration';
-import { testTableData } from '@admin/pages/release/datablocks/components/chart/__tests__/__data__/testTableData';
 import {
   ChartBuilderForms,
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { verticalBarBlockDefinition } from '@common/modules/charts/components/VerticalBarBlock';
-import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { AxisConfiguration } from '@common/modules/charts/types/chart';
-import userEvent from '@testing-library/user-event';
-import React from 'react';
-import noop from 'lodash/noop';
 import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import noop from 'lodash/noop';
+import React from 'react';
 
 describe('ChartAxisConfiguration', () => {
   const testFormState: ChartBuilderForms = {
@@ -86,7 +85,7 @@ describe('ChartAxisConfiguration', () => {
     },
   };
 
-  const testTable = mapFullTable(testTableData);
+  const testTable = testFullTable;
 
   test('renders correctly with initial values', () => {
     render(

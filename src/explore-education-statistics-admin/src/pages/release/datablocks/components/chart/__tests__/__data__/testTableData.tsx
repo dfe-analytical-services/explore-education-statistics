@@ -1,6 +1,6 @@
+import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { TableDataResponse } from '@common/services/tableBuilderService';
 
-// eslint-disable-next-line import/prefer-default-export
 export const testTableData: TableDataResponse = {
   subjectMeta: {
     filters: {
@@ -246,3 +246,5 @@ export const testTableData: TableDataResponse = {
     },
   ],
 };
+
+export const testFullTable = mapFullTable(testTableData);

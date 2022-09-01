@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.Chart.ChartType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
@@ -62,6 +63,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         
         // TODO EES-3319 - make mandatory when all Map Charts are migrated to have a Boundary Level set
         public long? BoundaryLevel { get; set; }
+        
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ChartDataClassification? DataClassification { get; set; }
+        public int? DataGroups { get; set; }
     }
 
     public class InfographicChart : Chart

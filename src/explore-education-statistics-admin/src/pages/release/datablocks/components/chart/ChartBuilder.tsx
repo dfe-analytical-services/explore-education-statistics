@@ -5,6 +5,7 @@ import ChartConfiguration from '@admin/pages/release/datablocks/components/chart
 import ChartDataSetsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartDataSetsConfiguration';
 import ChartDefinitionSelector from '@admin/pages/release/datablocks/components/chart/ChartDefinitionSelector';
 import ChartLegendConfiguration from '@admin/pages/release/datablocks/components/chart/ChartLegendConfiguration';
+import ChartMapConfiguration from '@admin/pages/release/datablocks/components/chart/ChartMapConfiguration';
 import { ChartBuilderFormsContextProvider } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { useChartBuilderReducer } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
@@ -318,8 +319,6 @@ const ChartBuilder = ({
                     submitError={submitError}
                     definition={definition}
                     chartOptions={options}
-                    meta={meta}
-                    onBoundaryLevelChange={handleBoundaryLevelChange}
                     onChange={handleChartConfigurationChange}
                     onSubmit={actions.updateChartOptions}
                   />
@@ -337,6 +336,23 @@ const ChartBuilder = ({
                     meta={meta}
                     dataSets={axes.major?.dataSets}
                     onChange={actions.updateDataSets}
+                  />
+                </TabsSection>
+              )}
+
+              {forms.map && definition?.type === 'map' && options && (
+                <TabsSection
+                  title="Map configuration"
+                  headingTitle="Map configuration"
+                  id={forms.map.id}
+                >
+                  <ChartMapConfiguration
+                    buttons={deleteButton}
+                    meta={meta}
+                    options={options}
+                    onBoundaryLevelChange={handleBoundaryLevelChange}
+                    onChange={handleChartConfigurationChange}
+                    onSubmit={actions.updateChartOptions}
                   />
                 </TabsSection>
               )}

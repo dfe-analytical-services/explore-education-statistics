@@ -22,12 +22,18 @@ export interface ChartBuilderForm extends FormState {
   id: string;
 }
 
-export type ChartBuilderFormKeys = 'options' | 'dataSets' | 'legend' | AxisType;
+export type ChartBuilderFormKeys =
+  | 'options'
+  | 'dataSets'
+  | 'legend'
+  | 'map'
+  | AxisType;
 
 export interface ChartBuilderForms {
   options: ChartBuilderForm;
   dataSets?: ChartBuilderForm;
   legend?: ChartBuilderForm;
+  map?: ChartBuilderForm;
   major?: ChartBuilderForm;
   minor?: ChartBuilderForm;
 }
@@ -100,6 +106,15 @@ export const ChartBuilderFormsContextProvider = ({
           ...(prevForms.legend ?? {}),
           id: `${id}-legend`,
           title: 'Legend',
+        };
+      }
+
+      if (definition.type === 'map') {
+        nextForms.map = {
+          ...defaultFormState(),
+          ...(prevForms.map ?? {}),
+          id: `${id}-map`,
+          title: 'Map configuration',
         };
       }
 

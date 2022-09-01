@@ -1,13 +1,15 @@
-import { testTableData } from '@admin/pages/release/datablocks/components/chart/__tests__/__data__/testTableData';
+import { testFullTable } from '@admin/pages/release/datablocks/components/chart/__tests__/__data__/testTableData';
 import ChartLegendConfiguration from '@admin/pages/release/datablocks/components/chart/ChartLegendConfiguration';
 import {
   ChartBuilderForms,
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
-import { DataSetConfiguration } from '@common/modules/charts/types/dataSet';
+import {
+  DataSet,
+  DataSetConfiguration,
+} from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
-import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import {
   fireEvent,
   render,
@@ -20,7 +22,7 @@ import noop from 'lodash/noop';
 import React from 'react';
 
 describe('ChartLegendConfiguration', () => {
-  const testTable = mapFullTable(testTableData);
+  const testTable = testFullTable;
 
   const testFormState: ChartBuilderForms = {
     options: {
