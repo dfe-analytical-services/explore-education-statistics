@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(() => _methodologyVersionRepository
                     .CreateMethodologyForPublication(publicationId, _userService.GetUserId())
                 )
-                .OnSuccess(BuildMethodologySummaryViewModel);
+                .OnSuccess(BuildMethodologyVersionViewModel);
         }
 
         public async Task<Either<ActionResult, Unit>> DropMethodology(Guid publicationId, Guid methodologyId)
@@ -118,16 +118,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     var methodologies = await _methodologyRepository.GetUnrelatedToPublication(publication.Id);
                     var latestVersions = await methodologies.SelectAsync(methodology =>
                         _methodologyVersionRepository.GetLatestVersion(methodology.Id));
-                    return (await latestVersions.SelectAsync(BuildMethodologySummaryViewModel)).ToList();
+                    return (await latestVersions.SelectAsync(BuildMethodologyVersionViewModel)).ToList();
                 });
         }
 
-        public async Task<Either<ActionResult, MethodologyVersionViewModel>> GetSummary(Guid id)
+        public async Task<Either<ActionResult, MethodologyVersionViewModel>> GetMethodology(Guid id)
         {
             return await _persistenceHelper
                 .CheckEntityExists<MethodologyVersion>(id)
                 .OnSuccess(_userService.CheckCanViewMethodology)
-                .OnSuccess(BuildMethodologySummaryViewModel);
+                .OnSuccess(BuildMethodologyVersionViewModel);
         }
 
         public async Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> ListMethodologies(Guid publicationId)
@@ -206,10 +206,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     q.Include(m => m.Methodology))
                 .OnSuccess(methodology => UpdateStatus(methodology, request))
                 .OnSuccess(methodology => UpdateDetails(methodology, request))
-                .OnSuccess(_ => GetSummary(id));
+                .OnSuccess(_ => GetMethodology(id));
         }
 
-        private async Task<MethodologyVersionViewModel> BuildMethodologySummaryViewModel(
+        private async Task<MethodologyVersionViewModel> BuildMethodologyVersionViewModel(
             MethodologyVersion methodologyVersion)
         {
             var loadedMethodology = _context.AssertEntityLoaded(methodologyVersion);

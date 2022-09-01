@@ -62,9 +62,7 @@ const methodologyService = {
   },
 
   getMethodology(methodologyId: string): Promise<MethodologyVersion> {
-    return client.get<MethodologyVersion>(
-      `/methodology/${methodologyId}/summary`,
-    );
+    return client.get<MethodologyVersion>(`/methodology/${methodologyId}`);
   },
 
   getUnpublishedReleases(methodologyId: string): Promise<IdTitlePair[]> {

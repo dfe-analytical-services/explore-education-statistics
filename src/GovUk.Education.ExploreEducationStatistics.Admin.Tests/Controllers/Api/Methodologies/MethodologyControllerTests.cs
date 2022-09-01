@@ -99,17 +99,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task GetMethodologySummary_Returns_Ok()
+        public async Task GetMethodology_Returns_Ok()
         {
             var methodologyService = new Mock<IMethodologyService>(Strict);
 
             methodologyService
-                .Setup(s => s.GetSummary(_id))
+                .Setup(s => s.GetMethodology(_id))
                 .ReturnsAsync(new MethodologyVersionViewModel());
 
             var controller = SetupMethodologyController(methodologyService.Object);
 
-            var result = await controller.GetMethodologySummary(_id);
+            var result = await controller.GetMethodology(_id);
 
             VerifyAllMocks(methodologyService);
 
@@ -117,17 +117,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task GetMethodologySummary_Returns_NotFound()
+        public async Task GetMethodology_Returns_NotFound()
         {
             var methodologyService = new Mock<IMethodologyService>(Strict);
 
             methodologyService
-                .Setup(s => s.GetSummary(_id))
+                .Setup(s => s.GetMethodology(_id))
                 .ReturnsAsync(new NotFoundResult());
 
             var controller = SetupMethodologyController(methodologyService.Object);
 
-            var result = await controller.GetMethodologySummary(_id);
+            var result = await controller.GetMethodology(_id);
 
             VerifyAllMocks(methodologyService);
 

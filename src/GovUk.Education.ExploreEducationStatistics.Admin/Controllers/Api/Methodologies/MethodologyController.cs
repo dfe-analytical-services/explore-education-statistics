@@ -60,11 +60,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("methodology/{methodologyVersionId:guid}/summary")]
-        public async Task<ActionResult<MethodologyVersionViewModel>> GetMethodologySummary(Guid methodologyVersionId)
+        [HttpGet("methodology/{methodologyVersionId:guid}")]
+        public async Task<ActionResult<MethodologyVersionViewModel>> GetMethodology(Guid methodologyVersionId)
         {
             return await _methodologyService
-                .GetSummary(methodologyVersionId)
+                .GetMethodology(methodologyVersionId)
                 .HandleFailuresOrOk();
         }
 

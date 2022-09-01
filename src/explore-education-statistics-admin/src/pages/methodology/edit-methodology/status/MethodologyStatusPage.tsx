@@ -162,7 +162,7 @@ const MethodologyStatusPage = () => {
               </>
             ) : (
               <MethodologyStatusEditPage
-                methodologySummary={currentMethodology}
+                methodology={currentMethodology}
                 onCancel={toggleForm.off}
                 onSubmit={handleSubmit}
               />

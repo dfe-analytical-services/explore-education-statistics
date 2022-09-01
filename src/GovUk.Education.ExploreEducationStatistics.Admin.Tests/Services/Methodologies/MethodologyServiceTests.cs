@@ -649,7 +649,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public async Task GetSummary()
+        public async Task GetMethodology()
         {
             var methodology = new Methodology
             {
@@ -723,7 +723,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupMethodologyService(contentDbContext: context);
 
-                var viewModel = (await service.GetSummary(methodologyVersion.Id)).AssertRight();
+                var viewModel = (await service.GetMethodology(methodologyVersion.Id)).AssertRight();
 
                 Assert.Equal(methodologyVersion.Id, viewModel.Id);
                 Assert.Equal("test-publication", viewModel.Slug);

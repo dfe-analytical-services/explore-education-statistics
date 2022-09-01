@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = new MethodologyVersionViewModel();
 
                 methodologyService
-                    .Setup(s => s.GetSummary(Capture.In(amendmentIdCapture)))
+                    .Setup(s => s.GetMethodology(Capture.In(amendmentIdCapture)))
                     .ReturnsAsync(viewModel);
 
                 var result = await service.CreateMethodologyAmendment(originalVersion.Id);
@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var viewModel = new MethodologyVersionViewModel();
 
                 methodologyService
-                    .Setup(s => s.GetSummary(Capture.In(amendmentIdCapture)))
+                    .Setup(s => s.GetMethodology(Capture.In(amendmentIdCapture)))
                     .ReturnsAsync(viewModel);
 
                 var result = await service.CreateMethodologyAmendment(originalVersion.Id);

@@ -25,7 +25,7 @@ export interface FormValues {
 
 interface Props {
   isPublished?: string;
-  methodologySummary: MethodologyVersion;
+  methodology: MethodologyVersion;
   unpublishedReleases: IdTitlePair[];
   onCancel: () => void;
   onSubmit: (values: FormValues) => void;
@@ -33,7 +33,7 @@ interface Props {
 
 const MethodologyStatusForm = ({
   isPublished,
-  methodologySummary,
+  methodology,
   unpublishedReleases,
   onCancel,
   onSubmit,
@@ -41,11 +41,10 @@ const MethodologyStatusForm = ({
   return (
     <Formik<FormValues>
       initialValues={{
-        status: methodologySummary.status,
-        latestInternalReleaseNote: methodologySummary.internalReleaseNote ?? '',
-        publishingStrategy:
-          methodologySummary.publishingStrategy ?? 'Immediately',
-        withReleaseId: methodologySummary.scheduledWithRelease?.id,
+        status: methodology.status,
+        latestInternalReleaseNote: methodology.internalReleaseNote ?? '',
+        publishingStrategy: methodology.publishingStrategy ?? 'Immediately',
+        withReleaseId: methodology.scheduledWithRelease?.id,
       }}
       onSubmit={useFormSubmit<FormValues>(onSubmit)}
       validationSchema={Yup.object<FormValues>({

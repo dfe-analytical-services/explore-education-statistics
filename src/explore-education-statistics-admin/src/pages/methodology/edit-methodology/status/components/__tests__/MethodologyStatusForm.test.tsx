@@ -23,7 +23,7 @@ describe('MethodologyStatusForm', () => {
   test('renders the form with draft initial values', () => {
     render(
       <MethodologyStatusForm
-        methodologySummary={
+        methodology={
           {
             status: 'Draft',
           } as MethodologyVersion
@@ -60,7 +60,7 @@ describe('MethodologyStatusForm', () => {
   test('renders the form with approved status initial values', () => {
     render(
       <MethodologyStatusForm
-        methodologySummary={
+        methodology={
           {
             status: 'Approved',
             internalReleaseNote: 'Test release note',
@@ -86,7 +86,7 @@ describe('MethodologyStatusForm', () => {
   test('renders the form with publishing strategy initial values', () => {
     render(
       <MethodologyStatusForm
-        methodologySummary={
+        methodology={
           {
             status: 'Approved',
             internalReleaseNote: 'Test release note',
@@ -137,7 +137,7 @@ describe('MethodologyStatusForm', () => {
   test('shows validation error if internal note is empty and status is approved', async () => {
     render(
       <MethodologyStatusForm
-        methodologySummary={
+        methodology={
           {
             status: 'Draft',
           } as MethodologyVersion
@@ -165,7 +165,7 @@ describe('MethodologyStatusForm', () => {
   test('shows validation error if a release is not selected when publish strategy is with release', async () => {
     render(
       <MethodologyStatusForm
-        methodologySummary={
+        methodology={
           {
             status: 'Approved',
           } as MethodologyVersion
@@ -192,7 +192,7 @@ describe('MethodologyStatusForm', () => {
 
     render(
       <MethodologyStatusForm
-        methodologySummary={
+        methodology={
           {
             status: 'Approved',
             publishingStrategy: 'WithRelease',
@@ -224,7 +224,7 @@ describe('MethodologyStatusForm', () => {
 
     render(
       <MethodologyStatusForm
-        methodologySummary={
+        methodology={
           {
             status: 'Approved',
             publishingStrategy: 'WithRelease',
