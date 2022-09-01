@@ -2,6 +2,7 @@ import { FormFieldsetProps } from '@common/components/form/FormFieldset';
 import FormTextSearchInput from '@common/components/form/FormTextSearchInput';
 import { FormFieldset } from '@common/components/form/index';
 import useMounted from '@common/hooks/useMounted';
+import numberWithCommas from '@common/utils/number/numberWithCommas';
 import React, { useState } from 'react';
 import FormCheckboxGroup, {
   BaseFormCheckboxGroup,
@@ -10,7 +11,10 @@ import FormCheckboxGroup, {
 import styles from './FormCheckboxSearchGroup.module.scss';
 
 export interface FormCheckboxSearchGroupProps extends FormCheckboxGroupProps {
+  maxSearchResults?: number;
+  searchHelpText?: string;
   searchLabel?: string;
+  searchOnly?: boolean;
 }
 
 const FormCheckboxSearchGroup = ({
@@ -32,10 +36,12 @@ const FormCheckboxSearchGroup = ({
     legendHidden,
     legendSize,
     error,
+    maxSearchResults = 500,
     name,
     onFieldsetFocus,
     onFieldsetBlur,
     options = [],
+    searchHelpText,
     searchOnly = false,
     value = [],
     ...groupProps
@@ -77,6 +83,33 @@ const FormCheckboxSearchGroup = ({
     }
   }
 
+  const getResultsMessage = () => {
+    const numResults = filteredOptions.length;
+    if (!searchOnly && numResults === 0) {
+      return <p>No options available.</p>;
+    }
+    if (searchOnly) {
+      if (numResults === 0) {
+        return (
+          <p>
+            {searchHelpText || 'Search above and select at least one option.'}
+          </p>
+        );
+      }
+      if (numResults > maxSearchResults) {
+        return (
+          <p>
+            {numberWithCommas(numResults)} results found. Please refine your
+            search to view options.
+          </p>
+        );
+      }
+    }
+    return null;
+  };
+
+  const showResults = !searchOnly || filteredOptions.length <= maxSearchResults;
+
   return (
     <FormFieldset {...fieldsetProps} useFormId={false}>
       <FormTextSearchInput
@@ -111,15 +144,17 @@ const FormCheckboxSearchGroup = ({
             } found`}
           </span>
         )}
-        <BaseFormCheckboxGroup
-          {...groupProps}
-          id={`${id}-options`}
-          value={value}
-          name={name}
-          options={filteredOptions}
-          searchOnly={searchOnly}
-          small
-        />
+        {showResults && filteredOptions.length > 0 && (
+          <BaseFormCheckboxGroup
+            {...groupProps}
+            id={`${id}-options`}
+            value={value}
+            name={name}
+            options={filteredOptions}
+            small
+          />
+        )}
+        {getResultsMessage()}
       </div>
     </FormFieldset>
   );

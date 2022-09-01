@@ -103,13 +103,13 @@ describe('FormCheckboxSearchGroup', () => {
       expect(checkboxes[1]).toHaveAttribute('value', '2');
     });
 
-    test('renders the checkboxes when the number of options is above the maxResults', () => {
+    test('renders the checkboxes when the number of options is above the maxSearchResults', () => {
       render(
         <FormCheckboxSearchGroup
           name="testCheckboxes"
           id="test-checkboxes"
           legend="Choose options"
-          maxResults={2}
+          maxSearchResults={2}
           value={[]}
           options={[
             { label: 'Test checkbox 1', value: '1' },
@@ -127,6 +127,20 @@ describe('FormCheckboxSearchGroup', () => {
       expect(checkboxes[0]).toHaveAttribute('value', '1');
       expect(checkboxes[1]).toHaveAttribute('value', '2');
       expect(checkboxes[2]).toHaveAttribute('value', '3');
+    });
+
+    test('renders the no options message when there are no options', () => {
+      render(
+        <FormCheckboxSearchGroup
+          name="testCheckboxes"
+          id="test-checkboxes"
+          legend="Choose options"
+          value={[]}
+          options={[]}
+        />,
+      );
+
+      expect(screen.getByText('No options available.')).toBeInTheDocument();
     });
   });
 
@@ -273,13 +287,14 @@ describe('FormCheckboxSearchGroup', () => {
       expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
     });
 
-    test('does not render the checkboxes that match the search term when the number of results is over the maxResults', async () => {
+    test('renders the too many results message and no checkboxes when there are more than the maximum results', async () => {
       render(
         <FormCheckboxSearchGroup
           name="testCheckboxes"
           id="test-checkboxes"
           legend="Choose options"
-          maxResults={2}
+          maxSearchResults={2}
+          searchHelpText="This is the help text"
           searchLabel="Search options"
           searchOnly
           value={[]}
@@ -299,6 +314,24 @@ describe('FormCheckboxSearchGroup', () => {
       });
 
       expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+    });
+
+    test('renders the search help when text there are no options', () => {
+      render(
+        <FormCheckboxSearchGroup
+          name="testCheckboxes"
+          id="test-checkboxes"
+          legend="Choose options"
+          maxSearchResults={2}
+          searchHelpText="This is the help text"
+          searchLabel="Search options"
+          searchOnly
+          value={[]}
+          options={[]}
+        />,
+      );
+
+      expect(screen.getByText('This is the help text')).toBeInTheDocument();
     });
   });
 
