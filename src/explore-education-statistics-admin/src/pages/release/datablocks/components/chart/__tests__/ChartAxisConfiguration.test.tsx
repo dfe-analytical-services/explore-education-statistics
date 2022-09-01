@@ -185,6 +185,37 @@ describe('ChartAxisConfiguration', () => {
     expect(referenceLinesSection.getByLabelText('Style')).toHaveValue('none');
   });
 
+  test('calls `onChange` when form values change', () => {
+    const handleChange = jest.fn();
+
+    render(
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartAxisConfiguration
+          id="chartBuilder-major"
+          type="major"
+          configuration={testAxisConfiguration}
+          definition={verticalBarBlockDefinition}
+          data={testTable.results}
+          meta={testTable.subjectMeta}
+          onChange={handleChange}
+          onSubmit={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
+    );
+
+    const sizeInput = screen.getByLabelText('Size of axis (pixels)');
+
+    expect(handleChange).not.toHaveBeenCalled();
+
+    userEvent.clear(sizeInput);
+    userEvent.type(sizeInput, '20');
+
+    expect(handleChange).toHaveBeenCalledWith<[AxisConfiguration]>({
+      ...testAxisConfiguration,
+      size: 20,
+    });
+  });
+
   test('shows validation error if invalid custom tick spacing given', async () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>

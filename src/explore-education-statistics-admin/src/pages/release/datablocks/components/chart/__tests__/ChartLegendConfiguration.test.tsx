@@ -551,6 +551,66 @@ describe('ChartLegendConfiguration', () => {
     expect(legendItem1.queryByLabelText('Style')).not.toBeInTheDocument();
   });
 
+  test('calls `onChange` handler if form values change', async () => {
+    const handleChange = jest.fn();
+
+    const dataSet: DataSet = {
+      location: {
+        value: 'barnet',
+        level: 'localAuthority',
+      },
+      filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+      indicator: 'authorised-absence-sessions',
+    };
+
+    render(
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={lineChartBlockDefinition}
+          meta={testTable.subjectMeta}
+          data={testTable.results}
+          axisMajor={{
+            dataSets: [dataSet],
+            groupBy: 'timePeriod',
+            referenceLines: [],
+            type: 'major',
+            visible: true,
+          }}
+          legend={{
+            position: 'top',
+            items: [],
+          }}
+          onSubmit={noop}
+          onChange={handleChange}
+        />
+      </ChartBuilderFormsContextProvider>,
+    );
+
+    const legendItems = screen.getAllByRole('group');
+    expect(legendItems).toHaveLength(1);
+
+    const legendItem1 = within(legendItems[0]);
+
+    userEvent.clear(legendItem1.getByLabelText('Label'));
+    await userEvent.type(
+      legendItem1.getByLabelText('Label'),
+      'Updated legend item 1',
+    );
+
+    expect(handleChange).toHaveBeenCalledWith<[LegendConfiguration]>({
+      position: 'top',
+      items: [
+        {
+          dataSet,
+          label: 'Updated legend item 1',
+          colour: '#12436D',
+          lineStyle: 'solid',
+          symbol: 'none',
+        },
+      ],
+    });
+  });
+
   test('shows validation errors if missing legend item label', async () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
