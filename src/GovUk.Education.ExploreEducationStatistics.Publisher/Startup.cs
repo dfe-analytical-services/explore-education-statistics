@@ -10,9 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
@@ -28,6 +26,8 @@ using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
 using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
+using IContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
+using ContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.ThemeService;
 using FileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.FileStorageService;
 using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IFileStorageService;
 using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
@@ -63,10 +63,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     BlobCacheAttribute.AddService("default", publicBlobCacheService);
                     return publicBlobCacheService;
                 })
+
+                // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
+                // EES-3528 plans to send a request to the Content API to update its cached resources instead of this
+                // being done from Publisher directly, and so these DI dependencies should eventually be removed.
                 .AddScoped<IContentMethodologyService, ContentMethodologyService>()
                 .AddScoped<IMethodologyCacheService, MethodologyCacheService>()
                 .AddScoped<IThemeCacheService, ThemeCacheService>()
-                .AddScoped<IThemeService, ThemeService>()
+                .AddScoped<IContentThemeService, ContentThemeService>()
+
                 .AddScoped<IPublishingService, PublishingService>(provider =>
                     new PublishingService(
                         publicStorageConnectionString: GetConfigurationValue(provider, "PublicStorage"),
