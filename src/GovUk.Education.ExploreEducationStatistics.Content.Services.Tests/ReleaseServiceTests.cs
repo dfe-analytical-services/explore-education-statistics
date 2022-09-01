@@ -41,11 +41,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Title = "Methodology"
             };
 
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+            var publicationService = new Mock<IPublicationService>(Strict);
             var fileStorageService = new Mock<IFileStorageService>(Strict);
             var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
 
-            publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
+            publicationService.Setup(mock => mock.GetCachedPublication(publicationSlug))
                 .ReturnsAsync(
                     new PublicationViewModel
                     {
@@ -88,13 +88,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupReleaseService(
                     contentDbContext: contentDbContext,
-                    publicationCacheService: publicationCacheService.Object,
+                    publicationService: publicationService.Object,
                     methodologyCacheService: methodologyCacheService.Object,
                     fileStorageService: fileStorageService.Object);
 
                 var result = await service.GetCachedViewModel(publicationSlug, releaseSlug);
 
-                VerifyAllMocks(methodologyCacheService, publicationCacheService, fileStorageService);
+                VerifyAllMocks(methodologyCacheService, publicationService, fileStorageService);
 
                 var releaseViewModel = result.AssertRight();
 
@@ -117,16 +117,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var contentDbContextId = Guid.NewGuid().ToString();
             await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
 
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
+            var publicationService = new Mock<IPublicationService>(Strict);
+            publicationService.Setup(mock => mock.GetCachedPublication(publicationSlug))
                 .ReturnsAsync(new NotFoundResult());
 
             var service = SetupReleaseService(contentDbContext,
-                publicationCacheService: publicationCacheService.Object);
+                publicationService: publicationService.Object);
 
             var result = await service.GetCachedViewModel(publicationSlug, releaseSlug);
 
-            VerifyAllMocks(publicationCacheService);
+            VerifyAllMocks(publicationService);
 
             result.AssertNotFound();
         }
@@ -140,11 +140,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             const string publicationSlug = "publication-a";
             const string releaseSlug = "2016";
 
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+            var publicationService = new Mock<IPublicationService>(Strict);
             var fileStorageService = new Mock<IFileStorageService>(Strict);
             var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
 
-            publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
+            publicationService.Setup(mock => mock.GetCachedPublication(publicationSlug))
                 .ReturnsAsync(
                     new PublicationViewModel
                     {
@@ -178,13 +178,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupReleaseService(
                     contentDbContext: contentDbContext,
-                    publicationCacheService: publicationCacheService.Object,
+                    publicationService: publicationService.Object,
                     fileStorageService: fileStorageService.Object,
                     methodologyCacheService: methodologyCacheService.Object);
 
                 var result = await service.GetCachedViewModel(publicationSlug, releaseSlug);
 
-                VerifyAllMocks(publicationCacheService, fileStorageService, methodologyCacheService);
+                VerifyAllMocks(publicationService, fileStorageService, methodologyCacheService);
 
                 result.AssertNotFound();
             }
@@ -199,10 +199,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             const string publicationSlug = "publication-a";
             const string releaseSlug = "2016";
 
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+            var publicationService = new Mock<IPublicationService>(Strict);
             var fileStorageService = new Mock<IFileStorageService>(Strict);
 
-            publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
+            publicationService.Setup(mock => mock.GetCachedPublication(publicationSlug))
                 .ReturnsAsync(
                     new PublicationViewModel
                     {
@@ -242,13 +242,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupReleaseService(
                     contentDbContext: contentDbContext,
-                    publicationCacheService: publicationCacheService.Object,
+                    publicationService: publicationService.Object,
                     fileStorageService: fileStorageService.Object
                 );
 
                 var result = await service.GetSummary(publicationSlug, releaseSlug);
 
-                VerifyAllMocks(publicationCacheService, fileStorageService);
+                VerifyAllMocks(publicationService, fileStorageService);
 
                 var releaseSummaryViewModel = result.AssertRight();
 
@@ -269,12 +269,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var contentDbContextId = Guid.NewGuid().ToString();
             await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
 
-           var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-           publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
+           var publicationService = new Mock<IPublicationService>(Strict);
+           publicationService.Setup(mock => mock.GetCachedPublication(publicationSlug))
                .ReturnsAsync(new NotFoundResult());
 
            var service = SetupReleaseService(contentDbContext,
-               publicationCacheService: publicationCacheService.Object);
+               publicationService: publicationService.Object);
 
            var result = await service.GetSummary(publicationSlug, releaseSlug);
 
@@ -290,10 +290,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             const string publicationSlug = "publication-a";
             const string releaseSlug = "2016";
 
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+            var publicationService = new Mock<IPublicationService>(Strict);
             var fileStorageService = new Mock<IFileStorageService>(Strict);
 
-            publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
+            publicationService.Setup(mock => mock.GetCachedPublication(publicationSlug))
                 .ReturnsAsync(
                     new PublicationViewModel
                     {
@@ -324,12 +324,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupReleaseService(
                     contentDbContext: contentDbContext,
-                    publicationCacheService: publicationCacheService.Object,
+                    publicationService: publicationService.Object,
                     fileStorageService: fileStorageService.Object);
 
                 var result = await service.GetSummary(publicationSlug, releaseSlug);
 
-                VerifyAllMocks(publicationCacheService, fileStorageService);
+                VerifyAllMocks(publicationService, fileStorageService);
 
                 result.AssertNotFound();
             }
@@ -525,7 +525,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             ContentDbContext? contentDbContext = null,
             IFileStorageService? fileStorageService = null,
             IMethodologyCacheService? methodologyCacheService = null,
-            IPublicationCacheService? publicationCacheService = null,
+            IPublicationService? publicationService = null,
             IUserService? userService = null)
         {
             return new(
@@ -534,8 +534,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     : new PersistenceHelper<ContentDbContext>(contentDbContext),
                 fileStorageService ?? Mock.Of<IFileStorageService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
-                publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
-                userService ?? AlwaysTrueUserService().Object
+                userService ?? AlwaysTrueUserService().Object,
+                publicationService ?? Mock.Of<IPublicationService>(Strict)
             );
         }
     }

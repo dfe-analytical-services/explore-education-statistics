@@ -3,7 +3,7 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,17 +13,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [Produces(MediaTypeNames.Application.Json)]
     public class PublicationController : ControllerBase
     {
-        private readonly IPublicationCacheService _publicationCacheService;
+        private readonly IPublicationService _publicationService;
 
-        public PublicationController(IPublicationCacheService publicationCacheService)
+        public PublicationController(IPublicationService publicationService)
         {
-            _publicationCacheService = publicationCacheService;
+            _publicationService = publicationService;
         }
 
         [HttpGet("publications/{slug}/title")]
         public async Task<ActionResult<PublicationTitleViewModel>> GetPublicationTitle(string slug)
         {
-            return await _publicationCacheService.GetPublication(slug)
+            return await _publicationService.GetCachedPublication(slug)
                 .OnSuccess(p => new PublicationTitleViewModel
                 {
                     Id = p.Id,

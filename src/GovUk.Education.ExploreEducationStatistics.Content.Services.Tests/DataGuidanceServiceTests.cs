@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
@@ -14,6 +13,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
+using IPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
@@ -52,16 +52,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             const string releaseSlug = "2016-17";
 
             var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>(Strict);
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+            var publicationService = new Mock<IPublicationService>(Strict);
             var releaseService = new Mock<IReleaseService>(Strict);
 
             var service = SetupService(
                 dataGuidanceSubjectService: dataGuidanceSubjectService.Object,
-                publicationCacheService: publicationCacheService.Object,
+                publicationService: publicationService.Object,
                 releaseService: releaseService.Object
             );
 
-            publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
+            publicationService.Setup(mock => mock.GetCachedPublication(publicationSlug))
                 .ReturnsAsync(
                     new PublicationViewModel
                     {
@@ -91,8 +91,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var result = await service.Get(publicationSlug, releaseSlug);
 
-            publicationCacheService.Verify(
-                mock => mock.GetPublication(publicationSlug),
+            publicationService.Verify(
+                mock => mock.GetCachedPublication(publicationSlug),
                 Times.Once
             );
 
@@ -106,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Times.Once
             );
 
-            VerifyAllMocks(publicationCacheService, releaseService, dataGuidanceSubjectService);
+            VerifyAllMocks(publicationService, releaseService, dataGuidanceSubjectService);
 
             Assert.True(result.IsRight);
 
@@ -127,25 +127,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             const string publicationSlug = "incorrect-publication-slug";
             const string releaseSlug = "2016-17";
 
-            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>(Strict);
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+            var publicationService = new Mock<IPublicationService>(Strict);
 
-            var service = SetupService(
-                dataGuidanceSubjectService: dataGuidanceSubjectService.Object,
-                publicationCacheService: publicationCacheService.Object
-            );
+            var service = SetupService(publicationService: publicationService.Object);
 
-            publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
+            publicationService.Setup(mock => mock.GetCachedPublication(publicationSlug))
                 .ReturnsAsync(new NotFoundResult());
 
             var result = await service.Get( publicationSlug, releaseSlug);
 
-            publicationCacheService.Verify(
-                mock => mock.GetPublication(publicationSlug),
+            publicationService.Verify(
+                mock => mock.GetCachedPublication(publicationSlug),
                 Times.Once
             );
 
-            VerifyAllMocks(publicationCacheService);
+            VerifyAllMocks(publicationService);
 
             result.AssertNotFound();
         }
@@ -156,17 +152,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             const string publicationSlug = "test-publication";
             const string releaseSlug = "incorrect-release-slug";
 
-            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>(Strict);
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+            var publicationService = new Mock<IPublicationService>(Strict);
             var releaseService = new Mock<IReleaseService>(Strict);
 
             var service = SetupService(
-                dataGuidanceSubjectService: dataGuidanceSubjectService.Object,
-                publicationCacheService: publicationCacheService.Object,
+                publicationService: publicationService.Object,
                 releaseService: releaseService.Object
             );
 
-            publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
+            publicationService.Setup(mock => mock.GetCachedPublication(publicationSlug))
                 .ReturnsAsync(new PublicationViewModel());
 
             releaseService.Setup(mock => mock.GetCachedRelease(publicationSlug, releaseSlug))
@@ -176,8 +170,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var result = await service.Get(publicationSlug, releaseSlug);
 
-            publicationCacheService.Verify(
-                mock => mock.GetPublication(publicationSlug),
+            publicationService.Verify(
+                mock => mock.GetCachedPublication(publicationSlug),
                 Times.Once
             );
 
@@ -186,19 +180,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Times.Once
             );
 
-            VerifyAllMocks(publicationCacheService, releaseService);
+            VerifyAllMocks(publicationService, releaseService);
 
             result.AssertNotFound();
         }
 
         private static DataGuidanceService SetupService(
             IDataGuidanceSubjectService? dataGuidanceSubjectService = null,
-            IPublicationCacheService? publicationCacheService = null,
+            IPublicationService? publicationService = null,
             IReleaseService? releaseService = null)
         {
             return new DataGuidanceService(
                 dataGuidanceSubjectService ?? Mock.Of<IDataGuidanceSubjectService>(Strict),
-                publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
+                publicationService ?? Mock.Of<IPublicationService>(Strict),
                 releaseService ?? Mock.Of<IReleaseService>(Strict)
             );
         }

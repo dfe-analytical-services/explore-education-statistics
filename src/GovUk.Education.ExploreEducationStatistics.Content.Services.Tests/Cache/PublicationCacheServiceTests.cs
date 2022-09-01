@@ -30,52 +30,6 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     };
 
     [Fact]
-    public async Task GetPublication_NoCachedPublication()
-    {
-        var cacheKey = new PublicationCacheKey(PublicationSlug);
-
-        BlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(PublicationViewModel)))
-            .ReturnsAsync(null);
-
-        BlobCacheService
-            .Setup(s => s.SetItem<object>(cacheKey, _publicationViewModel))
-            .Returns(Task.CompletedTask);
-
-        var publicationService = new Mock<IPublicationService>(Strict);
-
-        publicationService
-            .Setup(s => s.Get(PublicationSlug))
-            .ReturnsAsync(_publicationViewModel);
-
-        var service = BuildService(publicationService: publicationService.Object);
-
-        var result = await service.GetPublication(PublicationSlug);
-
-        VerifyAllMocks(publicationService, BlobCacheService);
-
-        result.AssertRight(_publicationViewModel);
-    }
-
-    [Fact]
-    public async Task GetPublication_CachedPublication()
-    {
-        var cacheKey = new PublicationCacheKey(PublicationSlug);
-
-        BlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(PublicationViewModel)))
-            .ReturnsAsync(_publicationViewModel);
-
-        var service = BuildService();
-
-        var result = await service.GetPublication(PublicationSlug);
-
-        VerifyAllMocks(BlobCacheService);
-
-        result.AssertRight(_publicationViewModel);
-    }
-
-    [Fact]
     public async Task UpdatePublication()
     {
         var cacheKey = new PublicationCacheKey(PublicationSlug);

@@ -3,19 +3,78 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
-    public class PublicationServiceTests
+    [Collection(CacheServiceTests)]
+    public class PublicationServiceTests : CacheServiceTestFixture
     {
+        private const string PublicationSlug = "publication-slug";
+
+        private static readonly PublicationViewModel PublicationViewModel = new()
+        {
+            Id = Guid.NewGuid()
+        };
+
+        [Fact]
+        public async Task GetCachedPublication_PublicationIsCached()
+        {
+            BlobCacheAttribute.AddService("public", BlobCacheService.Object);
+
+            var cacheKey = new PublicationCacheKey(PublicationSlug);
+
+            BlobCacheService
+                .Setup(s => s.GetItem(cacheKey, typeof(PublicationViewModel)))
+                .ReturnsAsync(PublicationViewModel);
+
+            var service = SetupPublicationService();
+
+            var result = await service.GetCachedPublication(PublicationSlug);
+
+            VerifyAllMocks(BlobCacheService);
+
+            result.AssertRight(PublicationViewModel);
+        }
+
+        [Fact]
+        public async Task GetCachedPublication_PublicationIsNotCached()
+        {
+            BlobCacheAttribute.AddService("public", BlobCacheService.Object);
+
+            var cacheKey = new PublicationCacheKey(PublicationSlug);
+
+            BlobCacheService
+                .Setup(s => s.GetItem(cacheKey, typeof(PublicationViewModel)))
+                .ReturnsAsync(null);
+
+            // Value returned by stub of the un-cached method should be set in the cache
+            BlobCacheService
+                .Setup(s => s.SetItem<object>(cacheKey, PublicationViewModel))
+                .Returns(Task.CompletedTask);
+
+            // Setup service with a stub of the un-cached method to return a value for when it's not found in the cache
+            var service = SetupPublicationServiceStub();
+
+            var result = await service.GetCachedPublication(PublicationSlug);
+
+            VerifyAllMocks(BlobCacheService);
+
+            result.AssertRight(PublicationViewModel);
+        }
+
         [Fact]
         public async Task Get()
         {
@@ -24,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Releases = new List<Release>
                 {
-                    new ()
+                    new()
                     {
                         Published = null,
                     },
@@ -33,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publication = new Publication
             {
                 Title = "Publication Title",
-                Slug = "publication-slug",
+                Slug = PublicationSlug,
                 SupersededBy = supersedingPublication,
                 Releases = new List<Release>
                 {
@@ -171,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publication = new Publication
             {
                 Title = "Publication Title",
-                Slug = "publication-slug",
+                Slug = PublicationSlug,
                 SupersededBy = supersedingPublication,
                 Releases = new List<Release>
                 {
@@ -245,14 +304,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task Get_PublicationHasNoLiveLatestRelease()
         {
-            const string publicationSlug = "publication-slug";
-
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(new Publication
                 {
-                    Slug = publicationSlug,
+                    Slug = PublicationSlug,
                     Releases = new List<Release>
                     {
                         new () // not published
@@ -271,7 +328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupPublicationService(contentDbContext);
 
-                var result = await service.Get(publicationSlug);
+                var result = await service.Get(PublicationSlug);
 
                 result.AssertNotFound();
             }
@@ -287,6 +344,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     ? Mock.Of<IPersistenceHelper<ContentDbContext>>()
                     : new PersistenceHelper<ContentDbContext>(contentDbContext)
             );
+        }
+
+        private static PublicationService SetupPublicationServiceStub(
+            ContentDbContext? contentDbContext = null,
+            IMapper? mapper = null)
+        {
+            return new PublicationServiceStub(
+                contentDbContext ?? Mock.Of<ContentDbContext>(),
+                contentDbContext is null
+                    ? Mock.Of<IPersistenceHelper<ContentDbContext>>()
+                    : new PersistenceHelper<ContentDbContext>(contentDbContext)
+            );
+        }
+
+        private class PublicationServiceStub : PublicationService
+        {
+            public PublicationServiceStub(ContentDbContext contentDbContext,
+                IPersistenceHelper<ContentDbContext> contentPersistenceHelper) : base(
+                contentDbContext,
+                contentPersistenceHelper)
+            {
+            }
+
+            public override Task<Either<ActionResult, PublicationViewModel>> Get(string publicationSlug)
+            {
+                // Stub a response value to allow testing cached methods which use this
+                return Task.FromResult(new Either<ActionResult, PublicationViewModel>(PublicationViewModel));
+            }
         }
     }
 }

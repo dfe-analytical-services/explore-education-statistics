@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -27,7 +28,13 @@ public class PublicationService : IPublicationService
         _contentPersistenceHelper = contentPersistenceHelper;
     }
 
-    public async Task<Either<ActionResult, PublicationViewModel>> Get(string publicationSlug)
+    [BlobCache(typeof(PublicationCacheKey), ServiceName = "public")]
+    public Task<Either<ActionResult, PublicationViewModel>> GetCachedPublication(string publicationSlug)
+    {
+        return Get(publicationSlug);
+    }
+
+    public virtual async Task<Either<ActionResult, PublicationViewModel>> Get(string publicationSlug)
     {
         return await _contentPersistenceHelper
             .CheckEntityExists<Publication>(query => query
