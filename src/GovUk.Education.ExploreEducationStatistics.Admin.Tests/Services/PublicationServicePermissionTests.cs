@@ -20,6 +20,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
+using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -474,7 +475,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService? userService = null,
             IPublicationRepository? publicationRepository = null,
             IMethodologyVersionRepository? methodologyVersionRepository = null,
-            IPublicationCacheService? publicationCacheService = null,
+            IContentPublicationService? publicationService = null,
             IMethodologyCacheService? methodologyCacheService = null,
             IThemeCacheService? themeCacheService = null)
         {
@@ -485,7 +486,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? AlwaysTrueUserService().Object,
                 publicationRepository ?? Mock.Of<IPublicationRepository>(Strict),
                 methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(Strict),
-                publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
+                publicationService ?? Mock.Of<IContentPublicationService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
                 themeCacheService ?? Mock.Of<IThemeCacheService>(Strict));
         }

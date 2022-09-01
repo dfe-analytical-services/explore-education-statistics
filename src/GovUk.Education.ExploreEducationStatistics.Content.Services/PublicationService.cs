@@ -34,6 +34,12 @@ public class PublicationService : IPublicationService
         return Get(publicationSlug);
     }
 
+    [BlobCache(typeof(PublicationCacheKey), forceUpdate: true, ServiceName = "public")]
+    public Task<Either<ActionResult, PublicationViewModel>> UpdateCachedPublication(string publicationSlug)
+    {
+        return Get(publicationSlug);
+    }
+
     public virtual async Task<Either<ActionResult, PublicationViewModel>> Get(string publicationSlug)
     {
         return await _contentPersistenceHelper

@@ -3,7 +3,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -12,6 +11,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
+using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private readonly ContentDbContext _contentDbContext;
         private readonly IContentService _contentService;
         private readonly INotificationsService _notificationsService;
-        private readonly IPublicationCacheService _publicationCacheService;
+        private readonly IContentPublicationService _publicationService;
         private readonly IReleaseService _releaseService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
 
@@ -29,14 +29,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ContentDbContext contentDbContext,
             IContentService contentService,
             INotificationsService notificationsService,
-            IPublicationCacheService publicationCacheService,
+            IContentPublicationService publicationService,
             IReleaseService releaseService,
             IReleasePublishingStatusService releasePublishingStatusService)
         {
             _contentDbContext = contentDbContext;
             _contentService = contentService;
             _notificationsService = notificationsService;
-            _publicationCacheService = publicationCacheService;
+            _publicationService = publicationService;
             _releaseService = releaseService;
             _releasePublishingStatusService = releasePublishingStatusService;
         }
@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 await publicationsToUpdate
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
-                        publication => _publicationCacheService.UpdatePublication(publication.Slug));
+                        publication => _publicationService.UpdateCachedPublication(publication.Slug));
 
                 await _contentService.DeletePreviousVersionsDownloadFiles(message.ReleaseId);
                 await _contentService.DeletePreviousVersionsContent(message.ReleaseId);

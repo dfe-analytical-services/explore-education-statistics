@@ -411,7 +411,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContentPublicationService, ContentPublicationService>();
             services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
             services.AddTransient<IThemeCacheService, ThemeCacheService>();
-            services.AddTransient<IPublicationCacheService, PublicationCacheService>();
 
             services.AddTransient<IMyPublicationPermissionsResolver,
                 MyPublicationPermissionsResolver>();
@@ -463,7 +462,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     publicationRepository: provider.GetRequiredService<IPublicationRepository>(),
                     methodologyVersionRepository: provider.GetRequiredService<IMethodologyVersionRepository>(),
                     methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
-                    publicationCacheService: provider.GetRequiredService<IPublicationCacheService>(),
+                    publicationService: provider.GetRequiredService<IContentPublicationService>(),
                     themeCacheService: provider.GetRequiredService<IThemeCacheService>()
                 )
             );
@@ -475,7 +474,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     mapper: provider.GetService<IMapper>(),
                     userService: provider.GetService<IUserService>(),
                     persistenceHelper: provider.GetService<IPersistenceHelper<ContentDbContext>>(),
-                    publicationCacheService: provider.GetRequiredService<IPublicationCacheService>())
+                    publicationService: provider.GetRequiredService<IContentPublicationService>())
                 );
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IReleaseApprovalService, ReleaseApprovalService>();

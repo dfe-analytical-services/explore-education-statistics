@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
 using MethodologyVersionSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MethodologyVersionSummaryViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
@@ -36,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly IPublicationRepository _publicationRepository;
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
-        private readonly IPublicationCacheService _publicationCacheService;
+        private readonly IContentPublicationService _publicationService;
         private readonly IMethodologyCacheService _methodologyCacheService;
         private readonly IThemeCacheService _themeCacheService;
 
@@ -47,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IPublicationRepository publicationRepository,
             IMethodologyVersionRepository methodologyVersionRepository,
-            IPublicationCacheService publicationCacheService, 
+            IContentPublicationService publicationService, 
             IMethodologyCacheService methodologyCacheService, 
             IThemeCacheService themeCacheService)
         {
@@ -57,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _publicationRepository = publicationRepository;
             _methodologyVersionRepository = methodologyVersionRepository;
-            _publicationCacheService = publicationCacheService;
+            _publicationService = publicationService;
             _methodologyCacheService = methodologyCacheService;
             _themeCacheService = themeCacheService;
         }
@@ -243,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                         await _methodologyCacheService.UpdateSummariesTree();
                         await _themeCacheService.UpdatePublicationTree();
-                        await _publicationCacheService.UpdatePublication(publication.Slug);
+                        await _publicationService.UpdateCachedPublication(publication.Slug);
 
                         await UpdateCachedSupersededPublications(publication);
                     }
@@ -259,7 +260,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _context.Publications
                 .Where(p => p.SupersededById == publication.Id)
                 .ToAsyncEnumerable()
-                .ForEachAwaitAsync(p => _publicationCacheService.UpdatePublication(p.Slug));
+                .ForEachAwaitAsync(p => _publicationService.UpdateCachedPublication(p.Slug));
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateSelectedTopic(
@@ -364,7 +365,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     _context.Update(publication);
                     await _context.SaveChangesAsync();
 
-                    await _publicationCacheService.UpdatePublication(publication.Slug);
+                    await _publicationService.UpdateCachedPublication(publication.Slug);
 
                     return _mapper.Map<List<LegacyReleaseViewModel>>(
                         publication.LegacyReleases.OrderByDescending(release => release.Order)

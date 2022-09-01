@@ -64,7 +64,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IContentMethodologyService, ContentMethodologyService>()
                 .AddScoped<IMethodologyCacheService, MethodologyCacheService>()
                 .AddScoped<IContentPublicationService, ContentPublicationService>()
-                .AddScoped<IPublicationCacheService, PublicationCacheService>()
                 .AddScoped<IThemeCacheService, ThemeCacheService>()
                 .AddScoped<IContentThemeService, ContentThemeService>()
 

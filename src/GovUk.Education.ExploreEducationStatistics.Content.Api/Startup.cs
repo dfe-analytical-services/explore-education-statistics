@@ -39,6 +39,8 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Publishe
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 using IThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
+using PublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
+using ReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.ThemeService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api
@@ -140,8 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IFilterRepository, FilterRepository>();
             services.AddTransient<IIndicatorRepository, IndicatorRepository>();
             services.AddTransient<IDataGuidanceService, DataGuidanceService>();
-            services.AddTransient<IPublicationCacheService, PublicationCacheService>();
-            services.AddTransient<IPublicationService, Services.PublicationService>();
+            services.AddTransient<IPublicationService, PublicationService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IDataGuidanceSubjectService, DataGuidanceSubjectService>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();
@@ -152,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
             services.AddTransient<IThemeCacheService, ThemeCacheService>();
-            services.AddTransient<IReleaseService, Services.ReleaseService>();
+            services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
             services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();

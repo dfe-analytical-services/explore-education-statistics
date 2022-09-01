@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
@@ -15,6 +14,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Map
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
+using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -61,16 +61,16 @@ public class LegacyReleaseServicePermissionTests
     private LegacyReleaseService SetupService(
         ContentDbContext? contentDbContext = null,
         PersistenceHelper<ContentDbContext>? persistenceHelper = null,
-        IPublicationCacheService? publicationCacheService = null,
+        IContentPublicationService? publicationService = null,
         IUserService? userService = null,
         IMapper? mapper = null)
     {
         return new LegacyReleaseService(
             contentDbContext ?? new Mock<ContentDbContext>().Object,
             mapper ?? AdminMapper(),
+            publicationService ?? Mock.Of<IContentPublicationService>(Strict),
             userService ?? Mock.Of<IUserService>(Strict),
-            persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-            publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict)
+            persistenceHelper ?? DefaultPersistenceHelperMock().Object
         );
     }
 

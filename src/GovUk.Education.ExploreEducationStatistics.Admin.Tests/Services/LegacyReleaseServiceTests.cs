@@ -11,13 +11,14 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
+using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels.PublicationViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -142,16 +143,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+            var publicationService = new Mock<IContentPublicationService>(Strict);
 
-            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
+            publicationService.Setup(s => s.UpdateCachedPublication(PublicationSlug))
                 .ReturnsAsync(new PublicationViewModel());
 
             using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var legacyReleaseService = BuildLegacyReleaseService(
                     context: context,
-                    publicationCacheService: publicationCacheService.Object);
+                    publicationService: publicationService.Object);
 
                 // Service method under test
                 var result = await legacyReleaseService.CreateLegacyRelease(
@@ -162,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         PublicationId = publicationId
                     });
 
-                VerifyAllMocks(publicationCacheService);
+                VerifyAllMocks(publicationService);
 
                 Assert.Equal("Test description", result.Right.Description);
                 Assert.Equal("https://test.com", result.Right.Url);
@@ -206,16 +207,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+            var publicationService = new Mock<IContentPublicationService>(Strict);
 
-            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
+            publicationService.Setup(s => s.UpdateCachedPublication(PublicationSlug))
                 .ReturnsAsync(new PublicationViewModel());
 
             using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var legacyReleaseService = BuildLegacyReleaseService(
                     context: context,
-                    publicationCacheService: publicationCacheService.Object);
+                    publicationService: publicationService.Object);
 
                 // Service method under test
                 var result = await legacyReleaseService.CreateLegacyRelease(
@@ -226,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         PublicationId = publicationId
                     });
 
-                VerifyAllMocks(publicationCacheService);
+                VerifyAllMocks(publicationService);
 
                 var legacyRelease = context.LegacyReleases.Single(release => release.Id == result.Right.Id);
 
@@ -266,16 +267,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+            var publicationService = new Mock<IPublicationService>(Strict);
 
-            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
+            publicationService.Setup(s => s.UpdateCachedPublication(PublicationSlug))
                 .ReturnsAsync(new PublicationViewModel());
 
             using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var legacyReleaseService = BuildLegacyReleaseService(
                     context: context,
-                    publicationCacheService: publicationCacheService.Object);
+                    publicationService: publicationService.Object);
 
                 // Service method under test
                 var result = await legacyReleaseService.UpdateLegacyRelease(
@@ -288,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         PublicationId = publicationId,
                     });
 
-                VerifyAllMocks(publicationCacheService);
+                VerifyAllMocks(publicationService);
 
                 Assert.Equal("Updated test description", result.Right.Description);
                 Assert.Equal("https://updated-test.com", result.Right.Url);
@@ -344,16 +345,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+            var publicationCacheService = new Mock<IPublicationService>(Strict);
 
-            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
+            publicationCacheService.Setup(s => s.UpdateCachedPublication(PublicationSlug))
                 .ReturnsAsync(new PublicationViewModel());
 
             using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var legacyReleaseService = BuildLegacyReleaseService(
                     context: context,
-                    publicationCacheService: publicationCacheService.Object);
+                    publicationService: publicationCacheService.Object);
 
                 // Service method under test
                 await legacyReleaseService.UpdateLegacyRelease(
@@ -428,16 +429,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+            var publicationService = new Mock<IPublicationService>(Strict);
 
-            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
+            publicationService.Setup(s => s.UpdateCachedPublication(PublicationSlug))
                 .ReturnsAsync(new PublicationViewModel());
 
             using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var legacyReleaseService = BuildLegacyReleaseService(
                     context: context,
-                    publicationCacheService: publicationCacheService.Object);
+                    publicationService: publicationService.Object);
 
                 // Service method under test
                 await legacyReleaseService.UpdateLegacyRelease(
@@ -450,7 +451,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         PublicationId = publicationId,
                     });
 
-                VerifyAllMocks(publicationCacheService);
+                VerifyAllMocks(publicationService);
 
                 var legacyReleases = context.LegacyReleases
                     .AsQueryable()
@@ -497,21 +498,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+            var publicationService = new Mock<Content.Services.Interfaces.IPublicationService>(Strict);
 
-            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
+            publicationService.Setup(s => s.UpdateCachedPublication(PublicationSlug))
                 .ReturnsAsync(new PublicationViewModel());
 
             using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var legacyReleaseService = BuildLegacyReleaseService(
                     context: context,
-                    publicationCacheService: publicationCacheService.Object);
+                    publicationService: publicationService.Object);
 
                 // Service method under test
                 await legacyReleaseService.DeleteLegacyRelease(id);
 
-                VerifyAllMocks(publicationCacheService);
+                VerifyAllMocks(publicationService);
 
                 Assert.Empty(context.LegacyReleases);
                 Assert.Empty(
@@ -565,21 +566,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+            var publicationService = new Mock<Content.Services.Interfaces.IPublicationService>(Strict);
 
-            publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
+            publicationService.Setup(s => s.UpdateCachedPublication(PublicationSlug))
                 .ReturnsAsync(new PublicationViewModel());
 
             using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var legacyReleaseService = BuildLegacyReleaseService(
                     context: context,
-                    publicationCacheService: publicationCacheService.Object);
+                    publicationService: publicationService.Object);
 
                 // Service method under test
                 await legacyReleaseService.DeleteLegacyRelease(id);
 
-                VerifyAllMocks(publicationCacheService);
+                VerifyAllMocks(publicationService);
 
                 var legacyReleases = context.LegacyReleases
                     .AsQueryable()
@@ -605,15 +606,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private LegacyReleaseService BuildLegacyReleaseService(
             ContentDbContext context,
             IMapper? mapper = null,
-            IUserService? userService = null,
-            IPublicationCacheService? publicationCacheService = null)
+            IContentPublicationService? publicationService = null,
+            IUserService? userService = null)
         {
             return new LegacyReleaseService(
                 context,
                 mapper ?? AdminMapper(),
+                publicationService ?? Mock.Of<IContentPublicationService>(Strict),
                 userService ?? AlwaysTrueUserService().Object,
-                new PersistenceHelper<ContentDbContext>(context),
-                publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict)
+                new PersistenceHelper<ContentDbContext>(context)
             );
         }
     }

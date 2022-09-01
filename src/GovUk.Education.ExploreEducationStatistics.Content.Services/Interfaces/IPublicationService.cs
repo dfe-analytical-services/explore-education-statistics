@@ -11,4 +11,6 @@ public interface IPublicationService
     public Task<Either<ActionResult, PublicationViewModel>> Get(string publicationSlug);
 
     public Task<Either<ActionResult, PublicationViewModel>> GetCachedPublication(string publicationSlug);
+
+    public Task<Either<ActionResult, PublicationViewModel>> UpdateCachedPublication(string publicationSlug);
 }
