@@ -401,10 +401,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             
+            // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
+            // EES-3528 plans to send a request to the Content API to update its cached resources instead of this
+            // being done from Admin directly, and so these DI dependencies should eventually be removed.
             services.AddTransient<IContentThemeService, ContentThemeService>();
             services.AddTransient<IContentMethodologyService, ContentMethodologyService>();
             services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
             services.AddTransient<IThemeCacheService, ThemeCacheService>();
+
             services.AddTransient<IMyPublicationPermissionsResolver,
                 MyPublicationPermissionsResolver>();
             services.AddTransient<IMyPublicationMethodologyVersionPermissionsResolver,
