@@ -74,10 +74,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))
                         .OrderByDescending(r => r.Year)
                         .ThenByDescending(r => r.TimePeriodCoverage)))
-                .ForMember(dest => dest.Methodologies, m => m.MapFrom(p =>
-                    p.Methodologies
-                        .Select(methodologyLink => methodologyLink.Methodology.LatestVersion())
-                        .OrderBy(methodology => methodology.Title)))
                 .ForMember(
                     dest => dest.ThemeId,
                     m => m.MapFrom(p => p.Topic.ThemeId));
