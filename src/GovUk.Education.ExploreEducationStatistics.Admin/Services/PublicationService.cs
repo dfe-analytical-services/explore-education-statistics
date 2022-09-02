@@ -47,8 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IPublicationRepository publicationRepository,
             IMethodologyVersionRepository methodologyVersionRepository,
-            IPublicationCacheService publicationCacheService, 
-            IMethodologyCacheService methodologyCacheService, 
+            IPublicationCacheService publicationCacheService,
+            IMethodologyCacheService methodologyCacheService,
             IThemeCacheService themeCacheService)
         {
             _context = context;
@@ -62,15 +62,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _themeCacheService = themeCacheService;
         }
 
-        public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(
-            Guid topicId)
+        public async Task<Either<ActionResult, List<PublicationViewModel>>> GetPublicationsAndReleasesByTopic(
+            bool permissions,
+            Guid? topicId)
         {
+            var userId = _userService.GetUserId();
+
             return await _userService
                 .CheckCanAccessSystem()
                 .OnSuccess(_ => _userService.CheckCanViewAllReleases()
-                    .OnSuccess(() => _publicationRepository.GetAllPublicationsForTopic(topicId))
-                    .OrElse(() =>
-                        _publicationRepository.GetPublicationsForTopicRelatedToUser(topicId, _userService.GetUserId()))
+                    .OnSuccess(() =>
+                    {
+                        if (!topicId.HasValue)
+                        {
+                            throw new ArgumentException(
+                                "Users with permissions to view all releases shouldn't request all publications");
+                        }
+                        return _publicationRepository.GetPublicationsForTopic(topicId.Value);
+                    })
+                    .OrElse(() => _publicationRepository.GetPublicationListForUser(userId, topicId))
+                )
+                .OnSuccess(async publications =>
+                {
+                    return (await GeneratePublicationViewModelList(publications, permissions))
+                        .OrderBy(publicationViewModel => publicationViewModel.Title)
+                        .ToList();
+                });
+        }
+
+        public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(
+            Guid topicId)
+        {
+            var userId = _userService.GetUserId();
+
+            return await _userService
+                .CheckCanAccessSystem()
+                .OnSuccess(_ => _userService.CheckCanViewAllReleases()
+                    .OnSuccess(() => _publicationRepository.GetPublicationsForTopic(topicId))
+                    .OrElse(() => _publicationRepository.GetPublicationsForTopicRelatedToUser(topicId, userId))
                 )
                 .OnSuccess(async publicationViewModels =>
                 {
@@ -397,6 +426,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(p => p.Methodologies)
                 .ThenInclude(p => p.Methodology)
                 .ThenInclude(p => p.Versions);
+        }
+
+        private async Task<List<PublicationViewModel>> GeneratePublicationViewModelList(List<Publication> publications, bool permissions)
+        {
+            return await publications
+                .ToAsyncEnumerable()
+                .SelectAwait(async publication => await GeneratePublicationViewModel(publication, permissions))
+                .ToListAsync();
+        }
+
+        private async Task<PublicationViewModel> GeneratePublicationViewModel(Publication publication, bool permissions)
+        {
+            var publicationViewModel = _mapper.Map<PublicationViewModel>(publication);
+
+            publicationViewModel.IsSuperseded = _publicationRepository.IsSuperseded(publication);
+
+            if (permissions)
+            {
+                publicationViewModel.Permissions =
+                    await PermissionsUtils.GetPublicationPermissions(_userService, publication);
+            }
+
+            await publicationViewModel.Releases
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async releaseViewModel =>
+            {
+                var release = publication.Releases.Single(release => release.Id == releaseViewModel.Id);
+                if (permissions)
+                {
+                    releaseViewModel.Permissions = await PermissionsUtils.GetReleasePermissions(_userService, release);
+                }
+            });
+
+            return publicationViewModel;
         }
 
         private async Task<List<MyPublicationViewModel>> HydrateMyPublicationsViewModels(List<Publication> publications)

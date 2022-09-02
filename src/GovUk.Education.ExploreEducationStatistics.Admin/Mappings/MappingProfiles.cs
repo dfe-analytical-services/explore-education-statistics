@@ -71,7 +71,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<Publication, PublicationViewModel>()
                 .ForMember(dest => dest.Releases,
                     m => m.MapFrom(p => p.Releases
-                        .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))))
+                        .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))
+                        .OrderByDescending(r => r.Year)
+                        .ThenByDescending(r => r.TimePeriodCoverage)))
                 .ForMember(dest => dest.Methodologies, m => m.MapFrom(p =>
                     p.Methodologies
                         .Select(methodologyLink => methodologyLink.Methodology.LatestVersion())

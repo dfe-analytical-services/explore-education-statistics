@@ -1,3 +1,4 @@
+// @MarkFix nullable enable
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -17,11 +18,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Slug { get; set; }
 
-        public List<ReleaseViewModel> Releases { get; set; }
+        public List<ReleaseViewModel> Releases { get; set; } // @MarkFix remove
 
-        public List<IdTitleViewModel> Methodologies { get; set; }
+        public List<IdTitleViewModel> Methodologies { get; set; } // @MarkFix remove
 
-        public ExternalMethodology ExternalMethodology { get; set; }
+        public ExternalMethodology ExternalMethodology { get; set; } // @MarkFix remove
 
         public Guid TopicId { get; set; }
 
@@ -32,6 +33,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public Guid? SupersededById { get; set; }
 
         public bool IsSuperseded { get; set; }
+
+        public PublicationPermissions? Permissions { get; set; }
+
+        public record PublicationPermissions
+        {
+            public bool CanUpdatePublication { get; set; }
+            public bool CanUpdatePublicationTitle { get; set; }
+            public bool CanUpdatePublicationSupersededBy { get; set; }
+            public bool CanCreateReleases { get; set; }
+            public bool CanAdoptMethodologies { get; set; }
+            public bool CanCreateMethodologies { get; set; }
+            public bool CanManageExternalMethodology { get; set; }
+        }
     }
 
     public class PublicationSaveViewModel

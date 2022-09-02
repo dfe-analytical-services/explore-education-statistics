@@ -14,6 +14,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IPublicationService
     {
+        Task<Either<ActionResult, List<PublicationViewModel>>> GetPublicationsAndReleasesByTopic(bool permissions, Guid? topicId);
+
         Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(Guid topicId);
 
         Task<Either<ActionResult, MyPublicationViewModel>> GetMyPublication(Guid publicationId);
@@ -35,14 +37,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             int pageSize,
             bool? live = null,
             bool includePermissions = false);
-        
+
         Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListActiveReleases(
             Guid publicationId,
             bool? live = null,
             bool includePermissions = false);
 
         Task<Either<ActionResult, List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
-            Guid publicationId, 
+            Guid publicationId,
             List<LegacyReleasePartialUpdateViewModel> updatedLegacyReleases);
     }
 }

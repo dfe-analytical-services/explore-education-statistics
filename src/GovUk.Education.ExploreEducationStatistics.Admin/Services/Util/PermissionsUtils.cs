@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MethodologyVersionSummaryViewModel;
+using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 
@@ -19,6 +20,23 @@ public static class PermissionsUtils
             CanUpdateRelease = await userService.CheckCanUpdateRelease(release).IsRight(),
             CanDeleteRelease = await userService.CheckCanDeleteRelease(release).IsRight(),
             CanMakeAmendmentOfRelease = await userService.CheckCanMakeAmendmentOfRelease(release).IsRight()
+        };
+    }
+
+    public static async Task<PublicationPermissions> GetPublicationPermissions(
+        IUserService userService,
+        Publication publication)
+    {
+        return new PublicationPermissions
+        {
+            CanUpdatePublication = await userService.CheckCanUpdatePublication(publication).IsRight(),
+            CanUpdatePublicationTitle = await userService.CheckCanUpdatePublicationTitle().IsRight(),
+            CanUpdatePublicationSupersededBy = await userService.CheckCanUpdatePublicationSupersededBy().IsRight(),
+            CanCreateReleases = await userService.CheckCanCreateReleaseForPublication(publication).IsRight(),
+            CanAdoptMethodologies = await userService.CheckCanAdoptMethodologyForPublication(publication).IsRight(),
+            CanCreateMethodologies = await userService.CheckCanCreateMethodologyForPublication(publication).IsRight(),
+            CanManageExternalMethodology =
+                await userService.CheckCanManageExternalMethodologyForPublication(publication).IsRight(),
         };
     }
 

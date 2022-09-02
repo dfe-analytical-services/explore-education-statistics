@@ -62,9 +62,9 @@ export interface BasicPublicationDetails {
   summary: string;
   slug: string;
   contact: PublicationContactDetails;
-  releases?: Release[];
-  methodologies?: MethodologyVersion[];
-  externalMethodology?: ExternalMethodology;
+  releases?: Release[]; // @MarkFix remove
+  methodologies?: MethodologyVersion[]; // @MarkFix remove
+  externalMethodology?: ExternalMethodology; // @MarkFix remove
   themeId: string;
   topicId: string;
 }

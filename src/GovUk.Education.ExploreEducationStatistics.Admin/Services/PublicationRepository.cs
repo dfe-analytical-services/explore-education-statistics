@@ -25,11 +25,82 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _mapper = mapper;
         }
 
-        public async Task<List<Publication>> GetAllPublicationsForTopic(Guid topicId)
+        public async Task<List<Publication>> GetPublicationsForTopic(Guid topicId)
         {
             return await HydratePublicationForPublicationViewModel(_context.Publications)
                 .Where(publication => publication.TopicId == topicId)
                 .ToListAsync();
+        }
+
+        public async Task<List<Publication>> GetPublicationListForUser(
+            Guid userId,
+            Guid? topicId = null)
+        {
+            var publicationsGrantedByPublicationRoleQueryable = _context
+                .UserPublicationRoles
+                .AsQueryable()
+                .Where(userPublicationRole => userPublicationRole.UserId == userId &&
+                                              ListOf(PublicationRole.Owner, PublicationRole.ReleaseApprover)
+                                                  .Contains(userPublicationRole.Role));
+
+            if (topicId.HasValue)
+            {
+                publicationsGrantedByPublicationRoleQueryable =
+                    publicationsGrantedByPublicationRoleQueryable.Where(userPublicationRole =>
+                        userPublicationRole.Publication.TopicId == topicId.Value);
+            }
+
+            var publicationsGrantedByPublicationRole = await publicationsGrantedByPublicationRoleQueryable
+                .Select(userPublicationRole => userPublicationRole.Publication)
+                .ToListAsync();
+
+            var publicationIdsGrantedByPublicationRole = publicationsGrantedByPublicationRole
+                .Select(publication => publication.Id)
+                .ToList();
+
+            var releasesGrantedByReleaseRolesQueryable = _context.UserReleaseRoles
+                .Include(userReleaseRole => userReleaseRole.Release.Publication)
+                .Where(userReleaseRole => userReleaseRole.UserId == userId &&
+                                          userReleaseRole.Role != ReleaseRole.PrereleaseViewer);
+
+            if (topicId.HasValue)
+            {
+                releasesGrantedByReleaseRolesQueryable =
+                    releasesGrantedByReleaseRolesQueryable.Where(userReleaseRole =>
+                        userReleaseRole.Release.Publication.TopicId == topicId.Value);
+            }
+
+            var releasesGrantedByReleaseRoles = await releasesGrantedByReleaseRolesQueryable
+                .Select(userReleaseRole => userReleaseRole.Release)
+                .ToListAsync();
+
+            var publications = new List<Publication>();
+
+            // Add publication view models for the Publications granted directly via Publication roles
+            publications.AddRange(await publicationsGrantedByPublicationRole
+                .SelectAsync(async publication =>
+                    // Include all Releases of the Publication unconditionally
+                    await HydratePublicationForPublicationViewModel(_context.Publications)
+                        .FirstAsync(p => p.Id == publication.Id)));
+
+            // Add publication view models for the Publications granted indirectly via Release roles
+            publications.AddRange(await releasesGrantedByReleaseRoles
+                .GroupBy(release => release.Publication)
+                .Where(publicationWithReleases =>
+                {
+                    // Don't include a publication that's already been included by Publication roles
+                    var publication = publicationWithReleases.Key;
+                    return !publicationIdsGrantedByPublicationRole.Contains(publication.Id);
+                })
+                .SelectAsync(async publicationWithReleases =>
+                {
+                    var publication = publicationWithReleases.Key;
+                    // Only include Releases of the Publication that the user has access to
+                    var releaseIds = publicationWithReleases.Select(r => r.Id);
+                    return await GetPublicationWithFilteredReleases(publication.Id, releaseIds);
+                }));
+
+            return publications;
         }
 
         public async Task<List<Publication>> GetPublicationsForTopicRelatedToUser(

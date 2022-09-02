@@ -8,7 +8,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IPublicationRepository
     {
-        Task<List<Publication>> GetAllPublicationsForTopic(Guid topicId);
+        Task<List<Publication>> GetPublicationsForTopic(Guid topicId);
+
+        Task<List<Publication>> GetPublicationListForUser(Guid userId, Guid? topicId = null);
 
         Task<List<Publication>> GetPublicationsForTopicRelatedToUser(Guid topicId, Guid userId);
 

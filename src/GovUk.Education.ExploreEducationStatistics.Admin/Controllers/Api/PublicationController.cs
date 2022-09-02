@@ -27,6 +27,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _publicationService = publicationService;
         }
 
+        [HttpGet("api/publications")]
+        public async Task<ActionResult<List<PublicationViewModel>>> GetPublications(
+            [FromQuery] bool permissions,
+            [FromQuery] Guid? topicId)
+        {
+            return await _publicationService
+                .GetPublicationsAndReleasesByTopic(permissions, topicId)
+                .HandleFailuresOrOk();
+        }
+
         [HttpGet("api/me/publications")]
         public async Task<ActionResult<List<MyPublicationViewModel>>> GetMyPublications(
             [FromQuery(Name = "topicId"), Required] Guid topicId)
