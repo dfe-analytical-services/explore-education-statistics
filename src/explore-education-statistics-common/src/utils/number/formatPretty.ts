@@ -25,7 +25,7 @@ export default function formatPretty(
   if (typeof value === 'string') {
     numberValue = Number(value);
 
-    if (Number.isNaN(numberValue) || value === '') {
+    if (Number.isNaN(numberValue) || value.trim() === '') {
       return value;
     }
   } else {

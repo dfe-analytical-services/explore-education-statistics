@@ -94,6 +94,7 @@ describe('formatPretty', () => {
     expect(formatPretty('not a number')).toBe('not a number');
     expect(formatPretty('n/a')).toBe('n/a');
     expect(formatPretty('')).toBe('');
+    expect(formatPretty(' ')).toBe(' ');
   });
 
   describe('Handling units', () => {
