@@ -1,4 +1,4 @@
-import { unsafeCountDecimals } from '@common/utils/number/countDecimals';
+import countDecimalPlaces from '@common/utils/number/countDecimalPlaces';
 import clamp from 'lodash/clamp';
 
 export const defaultMaxDecimalPlaces = 2;
@@ -36,7 +36,7 @@ export default function formatPretty(
 
   if (typeof decimalPlaces === 'undefined') {
     const minDecimalPlaces = clamp(
-      unsafeCountDecimals(value.toString()),
+      countDecimalPlaces(value) ?? 0,
       0,
       defaultMaxDecimalPlaces,
     );

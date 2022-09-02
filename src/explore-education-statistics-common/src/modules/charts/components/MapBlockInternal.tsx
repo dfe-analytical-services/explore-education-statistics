@@ -22,7 +22,7 @@ import { Dictionary } from '@common/types';
 import locationLevelsMap from '@common/utils/locationLevelsMap';
 import generateHslColour from '@common/utils/colour/generateHslColour';
 import lighten from '@common/utils/colour/lighten';
-import { unsafeCountDecimals } from '@common/utils/number/countDecimals';
+import countDecimalPlaces from '@common/utils/number/countDecimalPlaces';
 import formatPretty, {
   defaultMaxDecimalPlaces,
 } from '@common/utils/number/formatPretty';
@@ -111,7 +111,7 @@ function getMinMaxDecimalPlaces(
     const value = category.dataSets[selectedDataSetKey]?.value ?? 0;
 
     if (typeof explicitDecimalPlaces !== 'number') {
-      const decimals = unsafeCountDecimals(value.toString());
+      const decimals = countDecimalPlaces(value.toString()) ?? 0;
 
       if (decimals > decimalPlaces) {
         decimalPlaces = decimals;
