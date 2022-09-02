@@ -231,6 +231,7 @@ const ReleaseDataUploadsSection = ({
       <LoadingSpinner loading={isLoading}>
         {dataFiles.length > 0 ? (
           <ReorderableAccordion
+            canUpdateRelease={canUpdateRelease}
             id="uploadedDataFiles"
             heading="Uploaded data files"
             onReorder={async (fileIds: string[]) => {
