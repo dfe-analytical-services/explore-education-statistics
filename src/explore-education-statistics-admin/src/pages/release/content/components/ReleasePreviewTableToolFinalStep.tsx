@@ -1,6 +1,6 @@
 import Link from '@admin/components/Link';
 import publicationService, {
-  BasicPublicationDetails,
+  Publication,
   ExternalMethodology,
 } from '@admin/services/publicationService';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
@@ -23,7 +23,7 @@ interface Model {
 }
 
 interface ReleasePreviewTableToolFinalStepProps {
-  publication: BasicPublicationDetails;
+  publication: Publication;
   query: ReleaseTableDataQuery;
   table: FullTable;
   tableHeaders: TableHeadersConfig;

@@ -6,7 +6,7 @@ import releasePermissionService, {
   ContributorViewModel,
 } from '@admin/services/releasePermissionService';
 import publicationService, {
-  BasicPublicationDetails,
+  Publication,
 } from '@admin/services/publicationService';
 import releaseService, { Release } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -15,7 +15,7 @@ import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 
 interface Model {
-  publication: BasicPublicationDetails;
+  publication: Publication;
   release: Release;
   publicationContributors: ContributorViewModel[];
   releaseContributors: ContributorViewModel[];

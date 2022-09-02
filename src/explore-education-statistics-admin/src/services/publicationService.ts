@@ -56,7 +56,7 @@ export interface MyPublication {
   isSuperseded?: boolean;
 }
 
-export interface BasicPublicationDetails {
+export interface Publication {
   id: string;
   title: string;
   summary: string;
@@ -110,21 +110,19 @@ const publicationService = {
 
   createPublication(
     publication: CreatePublicationRequest,
-  ): Promise<BasicPublicationDetails> {
+  ): Promise<Publication> {
     return client.post('/publications', publication);
   },
 
   updatePublication(
     publicationId: string,
     publication: UpdatePublicationRequest,
-  ): Promise<BasicPublicationDetails> {
+  ): Promise<Publication> {
     return client.put(`/publications/${publicationId}`, publication);
   },
 
-  getPublication(publicationId: string): Promise<BasicPublicationDetails> {
-    return client.get<BasicPublicationDetails>(
-      `/publications/${publicationId}`,
-    );
+  getPublication(publicationId: string): Promise<Publication> {
+    return client.get<Publication>(`/publications/${publicationId}`);
   },
 
   getMyPublication(publicationId: string): Promise<MyPublication> {

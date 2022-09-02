@@ -1,5 +1,5 @@
 import publicationService, {
-  BasicPublicationDetails,
+  Publication,
 } from '@admin/services/publicationService';
 import useAsyncHandledRetry, {
   AsyncHandledRetryState,
@@ -7,13 +7,13 @@ import useAsyncHandledRetry, {
 import React, { createContext, ReactNode, useContext } from 'react';
 
 const PublicationContext = createContext<
-  AsyncHandledRetryState<BasicPublicationDetails> | undefined
+  AsyncHandledRetryState<Publication> | undefined
 >(undefined);
 
 interface PublicationContextProviderProps {
   children:
     | ReactNode
-    | ((state: AsyncHandledRetryState<BasicPublicationDetails>) => ReactNode);
+    | ((state: AsyncHandledRetryState<Publication>) => ReactNode);
   publicationId: string;
 }
 

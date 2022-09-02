@@ -1,6 +1,6 @@
 import { testContact } from '@admin/pages/publication/__data__/testPublication';
 import { testReleaseSummaries } from '@admin/pages/publication/__data__/testReleases';
-import { BasicPublicationDetails } from '@admin/services/publicationService';
+import { Publication } from '@admin/services/publicationService';
 import userService from '@admin/services/userService';
 import PublicationInviteNewUsersForm from '@admin/pages/publication/components/PublicationInviteNewUsersForm';
 import userEvent from '@testing-library/user-event';
@@ -9,7 +9,7 @@ import React from 'react';
 
 jest.mock('@admin/services/userService');
 
-const publication: BasicPublicationDetails = {
+const publication: Publication = {
   contact: testContact,
   id: 'publication-id',
   title: 'Publication title',

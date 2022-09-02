@@ -6,7 +6,7 @@ import ReleaseSummaryForm, {
 import { releaseSummaryRoute } from '@admin/routes/releaseRoutes';
 import { dashboardRoute } from '@admin/routes/routes';
 import publicationService, {
-  BasicPublicationDetails,
+  Publication,
 } from '@admin/services/publicationService';
 import releaseService from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
@@ -38,7 +38,7 @@ interface MatchProps {
 
 interface Model {
   templateRelease: IdTitlePair;
-  publication: BasicPublicationDetails;
+  publication: Publication;
 }
 
 const ReleaseCreatePage = ({

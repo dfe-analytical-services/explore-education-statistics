@@ -7,7 +7,7 @@ import _dataBlockService, {
   ReleaseDataBlock,
 } from '@admin/services/dataBlockService';
 import _publicationService, {
-  BasicPublicationDetails,
+  Publication,
   PublicationContactDetails,
 } from '@admin/services/publicationService';
 import _tableBuilderService, {
@@ -192,7 +192,7 @@ describe('PreReleaseTableToolPage', () => {
     teamName: 'Team Smith',
   };
 
-  const testPublication: BasicPublicationDetails = {
+  const testPublication: Publication = {
     contact: testContact,
     id: 'publication-1',
     title: 'Pupil absence',
