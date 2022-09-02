@@ -423,6 +423,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(p => p.Releases)
                 .ThenInclude(r => r.ReleaseStatuses)
                 .Include(p => p.Topic)
+                .ThenInclude(topic => topic.Theme)
                 .Include(p => p.Methodologies)
                 .ThenInclude(p => p.Methodology)
                 .ThenInclude(p => p.Versions);

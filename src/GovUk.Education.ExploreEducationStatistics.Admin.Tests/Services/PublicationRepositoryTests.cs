@@ -25,7 +25,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetPublicationListForUser()
         {
             var user = new User();
-            var topic = new Topic();
+            var topic = new Topic
+            {
+                Theme = new Theme(),
+            };
 
             var userReleaseRoles = new List<UserReleaseRole>();
             var userPublicationRoles = new List<UserPublicationRole>();
@@ -158,7 +161,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Publication = new Publication
                     {
                         Title = "Unrelated publication 1",
-                        Topic = new Topic()
+                        Topic = new Topic
+                        {
+                            Theme = new Theme(),
+                        },
                     }
                 },
                 User = user,
@@ -181,7 +187,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TimePeriodCoverage = AcademicYear
                         }
                     },
-                    Topic = new Topic()
+                    Topic = new Topic
+                    {
+                        Theme = new Theme(),
+                    },
                 },
                 User = user,
                 Role = Owner
@@ -203,7 +212,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TimePeriodCoverage = AcademicYear
                         }
                     },
-                    Topic = new Topic()
+                    Topic = new Topic
+                    {
+                        Theme = new Theme(),
+                    },
                 },
                 User = user,
                 Role = ReleaseApprover
@@ -252,7 +264,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetPublicationsForTopic_MethodologiesReturned()
         {
             var user = new User();
-            var topic = new Topic();
+            var topic = new Topic
+            {
+                Theme = new Theme(),
+            };
 
             var methodology1Id = Guid.NewGuid();
             var methodology2Id = Guid.NewGuid();
@@ -504,7 +519,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetPublicationListForUser_PublicationHasNoReleases()
         {
             var user = new User();
-            var topic = new Topic();
+            var topic = new Topic
+            {
+                Theme = new Theme(),
+            };
+
 
             // Check publications granted via the owner role are still returned when they contain no releases
             // Set up publications without any releases, one for this topic and one for a different topic
@@ -528,7 +547,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Title = "Unrelated publication 1",
                         Releases = new List<Release>(),
-                        Topic = new Topic()
+                        Topic = new Topic
+                        {
+                            Theme = new Theme(),
+                        },
                     },
                     User = user,
                     Role = Owner
@@ -561,7 +583,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetPublicationListForUser_PublicationGrantedByBothPublicationAndReleaseRoles()
         {
             var user = new User();
-            var topic = new Topic();
+            var topic = new Topic
+            {
+                Theme = new Theme(),
+            };
 
             // Check a Publication granted via the owner role is only returned once where it has a Release
             // also granted with roles to the same user
@@ -636,7 +661,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetPublicationsForTopicRelatedToUser()
         {
             var user = new User();
-            var topic = new Topic();
+            var topic = new Topic
+            {
+                Theme = new Theme(),
+            };
 
             var userReleaseRoles = new List<UserReleaseRole>();
             var userPublicationRoles = new List<UserPublicationRole>();
@@ -769,7 +797,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Publication = new Publication
                     {
                         Title = "Unrelated publication 1",
-                        Topic = new Topic()
+                        Topic = new Topic
+                        {
+                            Theme = new Theme(),
+                        },
                     }
                 },
                 User = user,
@@ -792,7 +823,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TimePeriodCoverage = AcademicYear
                         }
                     },
-                    Topic = new Topic()
+                    Topic = new Topic
+                    {
+                        Theme = new Theme(),
+                    },
                 },
                 User = user,
                 Role = Owner
@@ -814,7 +848,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TimePeriodCoverage = AcademicYear
                         }
                     },
-                    Topic = new Topic()
+                    Topic = new Topic
+                    {
+                        Theme = new Theme(),
+                    },
                 },
                 User = user,
                 Role = ReleaseApprover
@@ -863,7 +900,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetPublicationsForTopicRelatedToUser_MethodologiesReturned()
         {
             var user = new User();
-            var topic = new Topic();
+            var topic = new Topic
+            {
+                Theme = new Theme(),
+            };
 
             var methodology1Id = Guid.NewGuid();
             var methodology2Id = Guid.NewGuid();
@@ -1115,7 +1155,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetPublicationsForTopicRelatedToUser_PublicationHasNoReleases()
         {
             var user = new User();
-            var topic = new Topic();
+            var topic = new Topic
+            {
+                Theme = new Theme(),
+            };
 
             // Check publications granted via the owner role are still returned when they contain no releases
             // Set up publications without any releases, one for this topic and one for a different topic
@@ -1139,7 +1182,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Title = "Unrelated publication 1",
                         Releases = new List<Release>(),
-                        Topic = new Topic()
+                        Topic = new Topic
+                        {
+                            Theme = new Theme(),
+                        },
                     },
                     User = user,
                     Role = Owner
@@ -1172,7 +1218,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetPublicationsForTopicRelatedToUser_PublicationGrantedByBothPublicationAndReleaseRoles()
         {
             var user = new User();
-            var topic = new Topic();
+            var topic = new Topic
+            {
+                Theme = new Theme(),
+            };
 
             // Check a Publication granted via the owner role is only returned once where it has a Release
             // also granted with roles to the same user
@@ -1254,6 +1303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 context.Add(new Topic
                 {
                     Id = topicId,
+                    Theme = new Theme(),
                     Publications = new List<Publication>
                     {
                         new()
@@ -1485,7 +1535,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Publication title",
                 Summary = "Publication summary",
-                Topic = new Topic(),
+                Topic = new Topic
+                {
+                    Theme = new Theme(),
+                },
                 Contact = new Contact
                 {
                     ContactName = "Contact name",
@@ -1512,7 +1565,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var otherUnseenPublication = new Publication
             {
-                Topic = new Topic(),
+                Topic = new Topic
+                {
+                    Theme = new Theme(),
+                },
                 Releases = new List<Release>
                 {
                     new Release()
@@ -1565,7 +1621,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var publication = new Publication
             {
-                Topic = new Topic(),
+                Topic = new Topic
+                {
+                    Theme = new Theme(),
+                },
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1598,7 +1657,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Test title",
                 Summary = "Test summary",
-                Topic = new Topic(),
+                Topic = new Topic
+                {
+                    Theme = new Theme(),
+                },
                 Releases = new List<Release>
                 {
                     release1,

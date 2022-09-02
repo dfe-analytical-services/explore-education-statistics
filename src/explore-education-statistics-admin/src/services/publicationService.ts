@@ -62,8 +62,8 @@ export interface Publication {
   summary: string;
   slug: string;
   contact: PublicationContactDetails;
-  themeId: string;
-  topicId: string;
+  theme: IdTitlePair;
+  topic: IdTitlePair;
 }
 
 export interface PublicationMethodologyDetails {

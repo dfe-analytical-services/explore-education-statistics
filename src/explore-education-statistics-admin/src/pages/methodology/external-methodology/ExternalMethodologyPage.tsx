@@ -42,7 +42,7 @@ const ExternalMethodologyPage = ({
       title: model.publication.title,
       summary: model.publication.summary,
       contact: model.publication.contact,
-      topicId: model.publication.topicId,
+      topicId: model.publication.topic.id,
       externalMethodology: {
         title: values.title,
         url: values.url,

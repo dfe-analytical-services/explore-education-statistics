@@ -18,9 +18,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Slug { get; set; }
 
-        public Guid TopicId { get; set; }
+        public IdTitleViewModel Topic { get; set; }
 
-        public Guid ThemeId { get; set; }
+        public IdTitleViewModel Theme { get; set; }
 
         public ContactViewModel Contact { get; set; }
 

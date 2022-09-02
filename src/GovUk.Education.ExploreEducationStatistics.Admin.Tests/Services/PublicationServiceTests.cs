@@ -987,8 +987,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication.Summary, result.Summary);
                 Assert.Equal(publication.Slug, result.Slug);
 
-                Assert.Equal(publication.Topic.Id, result.TopicId);
-                Assert.Equal(publication.Topic.ThemeId, result.ThemeId);
+                Assert.Equal(publication.Topic.Id, result.Topic.Id);
+                Assert.Equal(publication.Topic.Title, result.Topic.Title);
+
+                Assert.Equal(publication.Topic.ThemeId, result.Theme.Id);
+                Assert.Equal(publication.Topic.Theme.Title, result.Theme.Title);
 
                 Assert.Equal(publication.Contact.Id, result.Contact.Id);
                 Assert.Equal(publication.Contact.ContactName, result.Contact.ContactName);
@@ -1361,7 +1364,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var topic = new Topic
             {
-                Title = "Test topic"
+                Title = "Test topic",
+                Theme = new Theme
+                {
+                    Title = "Test theme",
+                },
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1402,7 +1409,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test team", publicationViewModel.Contact.TeamName);
                 Assert.Equal("john.smith@test.com", publicationViewModel.Contact.TeamEmail);
 
-                Assert.Equal(topic.Id, publicationViewModel.TopicId);
+                Assert.Equal(topic.Id, publicationViewModel.Topic.Id);
+                Assert.Equal(topic.Title, publicationViewModel.Topic.Title);
+
+                Assert.Equal(topic.Theme.Id, publicationViewModel.Theme.Id);
+                Assert.Equal(topic.Theme.Title, publicationViewModel.Theme.Title);
 
                 // Do an in depth check of the saved release
                 var createdPublication = await context.Publications.FindAsync(publicationViewModel.Id);
@@ -1488,7 +1499,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var topic = new Topic
             {
-                Title = "New topic"
+                Title = "New topic",
+                Theme = new Theme(),
             };
 
             var publication = new Publication
@@ -1568,7 +1580,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test team", viewModel.Contact.TeamName);
                 Assert.Equal("john.smith@test.com", viewModel.Contact.TeamEmail);
 
-                Assert.Equal(topic.Id, viewModel.TopicId);
+                Assert.Equal(topic.Id, viewModel.Topic.Id);
+                Assert.Equal(topic.Title, viewModel.Topic.Title);
 
                 Assert.Equal(newSupersededById, viewModel.SupersededById);
 
@@ -1598,7 +1611,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var topic = new Topic
             {
-                Title = "New topic"
+                Title = "New topic",
+                Theme = new Theme(),
             };
 
             var supersedingPublicationToRemove = new Publication
@@ -1711,7 +1725,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test team", viewModel.Contact.TeamName);
                 Assert.Equal("john.smith@test.com", viewModel.Contact.TeamEmail);
 
-                Assert.Equal(topic.Id, viewModel.TopicId);
+                Assert.Equal(topic.Id, viewModel.Topic.Id);
+                Assert.Equal(topic.Title, viewModel.Topic.Title);
 
                 Assert.Equal(newSupersededById, viewModel.SupersededById);
 
@@ -1744,7 +1759,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var topic = new Topic
             {
-                Title = "New topic"
+                Title = "New topic",
+                Theme = new Theme(),
             };
 
             var publication = new Publication
@@ -1823,7 +1839,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Slug = "test-slug",
                 Topic = new Topic
                 {
-                    Title = "Test topic"
+                    Title = "Test topic",
+                    Theme = new Theme(),
                 },
             };
 
@@ -1898,7 +1915,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Slug = "test-publication",
                 Topic = new Topic
                 {
-                    Title = "Test topic"
+                    Title = "Test topic",
+                    Theme = new Theme(),
                 },
                 Contact = sharedContact
             };
@@ -1973,7 +1991,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Slug = "test-slug",
                 Topic = new Topic
                 {
-                    Title = "Test topic"
+                    Title = "Test topic",
+                    Theme = new Theme(),
                 },
                 Published = DateTime.UtcNow,
             };

@@ -123,8 +123,8 @@ const PublicationEditPage = ({
 
               history.push(
                 appendQuery<ThemeTopicParams>(dashboardRoute.path, {
-                  themeId: updatedPublication.themeId,
-                  topicId: updatedPublication.topicId,
+                  themeId: updatedPublication.theme.id,
+                  topicId: updatedPublication.topic.id,
                 }),
               );
             }}
