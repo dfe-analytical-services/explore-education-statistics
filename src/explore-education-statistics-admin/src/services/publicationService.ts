@@ -63,7 +63,6 @@ export interface BasicPublicationDetails {
   slug: string;
   contact: PublicationContactDetails;
   releases?: Release[]; // @MarkFix remove
-  methodologies?: MethodologyVersion[]; // @MarkFix remove
   externalMethodology?: ExternalMethodology; // @MarkFix remove
   themeId: string;
   topicId: string;
