@@ -20,8 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public List<ReleaseViewModel> Releases { get; set; } // @MarkFix remove
 
-        public ExternalMethodology ExternalMethodology { get; set; } // @MarkFix remove
-
         public Guid TopicId { get; set; }
 
         public Guid ThemeId { get; set; }

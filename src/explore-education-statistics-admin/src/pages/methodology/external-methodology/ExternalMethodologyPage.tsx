@@ -6,10 +6,16 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import ExternalMethodologyForm from '@admin/pages/methodology/external-methodology/components/ExternalMethodologyForm';
 import publicationService, {
   ExternalMethodology,
+  Publication,
   UpdatePublicationRequest,
 } from '@admin/services/publicationService';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
+
+interface Model {
+  publication: Publication;
+  externalMethodology: ExternalMethodology | undefined;
+}
 
 const ExternalMethodologyPage = ({
   history,
@@ -17,22 +23,26 @@ const ExternalMethodologyPage = ({
 }: RouteComponentProps<{ publicationId: string }>) => {
   const { publicationId } = match.params;
 
-  const { value: publication, isLoading } = useAsyncHandledRetry(
-    async () => publicationService.getPublication(publicationId),
-    [publicationId],
-  );
+  const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
+    const [publication, externalMethodology] = await Promise.all([
+      publicationService.getPublication(publicationId),
+      publicationService.getExternalMethodology(publicationId),
+    ]);
+
+    return { publication, externalMethodology };
+  }, [publicationId]);
 
   const handleExternalMethodologySubmit = async (
     values: ExternalMethodology,
   ) => {
-    if (!publication) {
+    if (!model?.publication) {
       return;
     }
     const updatedPublication: UpdatePublicationRequest = {
-      title: publication.title,
-      summary: publication.summary,
-      contact: publication.contact,
-      topicId: publication.topicId,
+      title: model.publication.title,
+      summary: model.publication.summary,
+      contact: model.publication.contact,
+      topicId: model.publication.topicId,
       externalMethodology: {
         title: values.title,
         url: values.url,
@@ -53,7 +63,7 @@ const ExternalMethodologyPage = ({
           ? []
           : [
               {
-                name: publication?.externalMethodology
+                name: model?.externalMethodology
                   ? 'Edit external methodology link'
                   : 'Link to an externally hosted methodology',
               },
@@ -65,14 +75,14 @@ const ExternalMethodologyPage = ({
           <LoadingSpinner loading={isLoading}>
             <PageTitle
               title={
-                publication?.externalMethodology
+                model?.externalMethodology
                   ? 'Edit external methodology link'
                   : 'Link to an externally hosted methodology'
               }
-              caption={publication?.title}
+              caption={model?.publication.title}
             />
             <ExternalMethodologyForm
-              initialValues={publication?.externalMethodology}
+              initialValues={model?.externalMethodology}
               onCancel={() => history.push(dashboardRoute.path)}
               onSubmit={handleExternalMethodologySubmit}
             />

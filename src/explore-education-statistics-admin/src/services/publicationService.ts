@@ -63,7 +63,6 @@ export interface Publication {
   slug: string;
   contact: PublicationContactDetails;
   releases?: Release[]; // @MarkFix remove
-  externalMethodology?: ExternalMethodology; // @MarkFix remove
   themeId: string;
   topicId: string;
 }
