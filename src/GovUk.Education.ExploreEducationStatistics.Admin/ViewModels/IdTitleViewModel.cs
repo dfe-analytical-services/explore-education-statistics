@@ -2,17 +2,17 @@ using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class TitleAndIdViewModel
+    public class IdTitleViewModel
     {
         public Guid Id { get; set; }
 
         public string Title { get; set; }
 
-        public TitleAndIdViewModel()
+        public IdTitleViewModel()
         {
         }
 
-        public TitleAndIdViewModel(Guid id, string title)
+        public IdTitleViewModel(Guid id, string title)
         {
             Id = id;
             Title = title;

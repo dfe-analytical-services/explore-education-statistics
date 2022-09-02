@@ -15,16 +15,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
 
         public string? InternalReleaseNote { get; set; }
 
-        public TitleAndIdViewModel OwningPublication { get; set; }
+        public IdTitleViewModel OwningPublication { get; set; }
 
-        public List<TitleAndIdViewModel> OtherPublications { get; set; } = new();
+        public List<IdTitleViewModel> OtherPublications { get; set; } = new();
 
         public DateTime? Published { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public MethodologyPublishingStrategy PublishingStrategy { get; set; }
 
-        public TitleAndIdViewModel? ScheduledWithRelease { get; set; }
+        public IdTitleViewModel? ScheduledWithRelease { get; set; }
 
         public string Slug { get; set; } = string.Empty;
 

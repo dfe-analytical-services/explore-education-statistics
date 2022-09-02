@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<TitleAndIdViewModel>>> ListReleases()
+        public async Task<Either<ActionResult, List<IdTitleViewModel>>> ListReleases()
         {
             return await _userService
                 .CheckCanManageAllUsers()
@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Include(r => r.Publication)
                         .ToList()
                         .Where(r => r.Publication.IsLatestVersionOfRelease(r.Id))
-                        .Select(r => new TitleAndIdViewModel
+                        .Select(r => new IdTitleViewModel
                         {
                             Id = r.Id,
                             Title = $"{r.Publication.Title} - {r.Title}"

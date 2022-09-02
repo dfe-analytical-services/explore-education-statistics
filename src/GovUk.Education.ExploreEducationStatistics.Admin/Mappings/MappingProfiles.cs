@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.ScheduledWithRelease,
                     m => m.Ignore());
 
-            CreateMap<MethodologyVersion, TitleAndIdViewModel>();
+            CreateMap<MethodologyVersion, IdTitleViewModel>();
 
             CreateMap<Publication, PublicationViewModel>()
                 .ForMember(dest => dest.Releases,
