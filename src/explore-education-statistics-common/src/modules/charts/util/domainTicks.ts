@@ -129,7 +129,7 @@ export function getMinorAxisDomainTicks(
   }
 
   const { min = 0, max = 0 } = getMinMax(
-    chartData.flatMap(item => Object.values(omit(item, ['name'])) as number[]),
+    chartData.flatMap(item => Object.values(omit(item, ['name']))),
   );
 
   const axisMin = parseNumber(axis.min) ?? min;

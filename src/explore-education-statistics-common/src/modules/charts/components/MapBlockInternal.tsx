@@ -26,6 +26,7 @@ import { unsafeCountDecimals } from '@common/utils/number/countDecimals';
 import formatPretty, {
   defaultMaxDecimalPlaces,
 } from '@common/utils/number/formatPretty';
+import getMinMax from '@common/utils/number/getMinMax';
 import { roundDownToNearest } from '@common/utils/number/roundNearest';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import classNames from 'classnames';
@@ -104,65 +105,21 @@ function getMinMaxDecimalPlaces(
   selectedDataSetKey: string,
   explicitDecimalPlaces?: number,
 ): MinMaxDecimalPlaces {
-  const reduce = (
-    initialAcc: MinMaxDecimalPlaces,
-    callback?: (acc: MinMaxDecimalPlaces, value: number) => MinMaxDecimalPlaces,
-  ) => {
-    const { min, max, decimalPlaces } = dataSetCategories.reduce<
-      MinMaxDecimalPlaces
-    >((acc, category) => {
-      const value = category.dataSets[selectedDataSetKey]?.value;
+  let decimalPlaces = 0;
 
-      if (typeof value !== 'number') {
-        return acc;
+  const { min = 0, max = 0 } = getMinMax(dataSetCategories, category => {
+    const value = category.dataSets[selectedDataSetKey]?.value ?? 0;
+
+    if (typeof explicitDecimalPlaces !== 'number') {
+      const decimals = unsafeCountDecimals(value.toString());
+
+      if (decimals > decimalPlaces) {
+        decimalPlaces = decimals;
       }
+    }
 
-      if (value < acc.min) {
-        acc.min = value;
-      }
-
-      if (value > acc.max) {
-        acc.max = value;
-      }
-
-      if (callback) {
-        return callback(acc, value);
-      }
-
-      return acc;
-    }, initialAcc);
-
-    return {
-      min: Number.isFinite(min) ? min : 0,
-      max: Number.isFinite(max) ? max : 0,
-      decimalPlaces,
-    };
-  };
-
-  if (typeof explicitDecimalPlaces === 'number') {
-    return reduce({
-      min: Number.POSITIVE_INFINITY,
-      max: Number.NEGATIVE_INFINITY,
-      decimalPlaces: explicitDecimalPlaces,
-    });
-  }
-
-  const { min, max, decimalPlaces } = reduce(
-    {
-      min: Number.POSITIVE_INFINITY,
-      max: Number.NEGATIVE_INFINITY,
-      decimalPlaces: 0,
-    },
-    (acc, value) => {
-      const decimals = unsafeCountDecimals(value?.toString() ?? 0);
-
-      if (decimals > acc.decimalPlaces) {
-        acc.decimalPlaces = decimals;
-      }
-
-      return acc;
-    },
-  );
+    return value;
+  });
 
   return {
     min,
