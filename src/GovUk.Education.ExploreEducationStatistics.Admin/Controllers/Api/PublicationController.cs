@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [FromQuery] Guid? topicId)
         {
             return await _publicationService
-                .GetPublicationsAndReleasesByTopic(permissions, topicId)
+                .GetPublicationsByTopic(permissions, topicId)
                 .HandleFailuresOrOk();
         }
 

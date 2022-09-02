@@ -62,7 +62,6 @@ export interface Publication {
   summary: string;
   slug: string;
   contact: PublicationContactDetails;
-  releases?: Release[]; // @MarkFix remove
   themeId: string;
   topicId: string;
 }

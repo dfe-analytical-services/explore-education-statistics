@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IPublicationService
     {
-        Task<Either<ActionResult, List<PublicationViewModel>>> GetPublicationsAndReleasesByTopic(bool permissions, Guid? topicId);
+        Task<Either<ActionResult, List<PublicationViewModel>>> GetPublicationsByTopic(bool permissions, Guid? topicId);
 
         Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(Guid topicId);
 

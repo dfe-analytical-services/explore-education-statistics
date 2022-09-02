@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _themeCacheService = themeCacheService;
         }
 
-        public async Task<Either<ActionResult, List<PublicationViewModel>>> GetPublicationsAndReleasesByTopic(
+        public async Task<Either<ActionResult, List<PublicationViewModel>>> GetPublicationsByTopic(
             bool permissions,
             Guid? topicId)
         {
@@ -447,17 +447,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 publicationViewModel.Permissions =
                     await PermissionsUtils.GetPublicationPermissions(_userService, publication);
             }
-
-            await publicationViewModel.Releases
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async releaseViewModel =>
-            {
-                var release = publication.Releases.Single(release => release.Id == releaseViewModel.Id);
-                if (permissions)
-                {
-                    releaseViewModel.Permissions = await PermissionsUtils.GetReleasePermissions(_userService, release);
-                }
-            });
 
             return publicationViewModel;
         }
