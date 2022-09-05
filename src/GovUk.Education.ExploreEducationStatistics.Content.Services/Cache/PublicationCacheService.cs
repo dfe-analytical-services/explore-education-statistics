@@ -18,13 +18,13 @@ public class PublicationCacheService : IPublicationCacheService
         _publicationService = publicationService;
     }
 
-    [BlobCache(typeof(PublicationCacheKey))]
+    [BlobCache(typeof(PublicationCacheKey), ServiceName = "public")]
     public Task<Either<ActionResult, PublicationViewModel>> GetPublication(string publicationSlug)
     {
         return _publicationService.Get(publicationSlug);
     }
 
-    [BlobCache(typeof(PublicationCacheKey), forceUpdate: true)]
+    [BlobCache(typeof(PublicationCacheKey), forceUpdate: true, ServiceName = "public")]
     public Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(string publicationSlug)
     {
         return _publicationService.Get(publicationSlug);

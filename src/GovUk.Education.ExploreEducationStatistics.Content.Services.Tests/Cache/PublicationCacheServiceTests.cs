@@ -17,6 +17,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Cach
 [Collection(CacheServiceTests)]
 public class PublicationCacheServiceTests : CacheServiceTestFixture
 {
+    public PublicationCacheServiceTests()
+    {
+        BlobCacheAttribute.AddService("public", BlobCacheService.Object);
+    }
+
     private const string PublicationSlug = "publication-slug";
 
     private readonly PublicationViewModel _publicationViewModel = new()
