@@ -16,8 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
         {
             CreateMap<Link, LinkViewModel>();
 
-            CreateMap<Contact, ContactViewModel>();
-
             CreateContentBlockMap();
 
             CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
