@@ -27,13 +27,13 @@ public class ThemeCacheService : IThemeCacheService
         _logger = logger;
     }
 
-    [BlobCache(typeof(PublicationTreeCacheKey))]
+    [BlobCache(typeof(PublicationTreeCacheKey), ServiceName = "public")]
     private Task<IList<ThemeTree<PublicationTreeNode>>> GetFullPublicationTree()
     {
         return _themeService.GetPublicationTree();
     }
-    
-    [BlobCache(typeof(PublicationTreeCacheKey), forceUpdate: true)]
+
+    [BlobCache(typeof(PublicationTreeCacheKey), forceUpdate: true, ServiceName = "public")]
     public Task<IList<ThemeTree<PublicationTreeNode>>> UpdatePublicationTree()
     {
         _logger.LogInformation("Updating cached Publication Tree");

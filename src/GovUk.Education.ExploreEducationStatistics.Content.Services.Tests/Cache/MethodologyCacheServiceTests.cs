@@ -22,6 +22,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Cach
 [Collection(CacheServiceTests)]
 public class MethodologyCacheServiceTests : CacheServiceTestFixture
 {
+    public MethodologyCacheServiceTests()
+    {
+        BlobCacheAttribute.AddService("public", BlobCacheService.Object);
+    }
+
     private readonly List<AllMethodologiesThemeViewModel> _methodologyTree = ListOf(
         new AllMethodologiesThemeViewModel
         {

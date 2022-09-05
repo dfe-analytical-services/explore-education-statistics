@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
@@ -19,6 +20,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Cach
 [Collection(CacheServiceTests)]
 public class ThemeCacheServiceTests : CacheServiceTestFixture
 {
+    public ThemeCacheServiceTests()
+    {
+        BlobCacheAttribute.AddService("public", BlobCacheService.Object);
+    }
+
     [Fact]
     public async Task GetPublicationTree_NoCachedTreeExists()
     {

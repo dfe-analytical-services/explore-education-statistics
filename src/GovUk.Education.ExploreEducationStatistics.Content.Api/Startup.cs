@@ -170,8 +170,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
         {
             // Enable caching and register any caching services
             CacheAspect.Enabled = true;
-            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>()!);
-            
+            BlobCacheAttribute.AddService("public", app.ApplicationServices.GetRequiredService<IBlobCacheService>());
+
             // Register the MemoryCacheService only if the Memory Caching is enabled. 
             var memoryCacheConfig = Configuration.GetSection("MemoryCache");
             if (memoryCacheConfig.GetValue("Enabled", false))

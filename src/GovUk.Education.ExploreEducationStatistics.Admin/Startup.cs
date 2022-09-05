@@ -655,9 +655,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var provider = app.ApplicationServices;
+
             // Enable caching and register any caching services.
             CacheAspect.Enabled = true;
-            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
+            var privateBlobCacheService = GetBlobCacheService(provider, "CoreStorage");
+            var publicBlobCacheService = GetBlobCacheService(provider, "PublicStorage");
+            BlobCacheAttribute.AddService("default", privateBlobCacheService);
+            BlobCacheAttribute.AddService("public", publicBlobCacheService);
 
             UpdateDatabase(app, env);
 
@@ -794,6 +799,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     .GetService<BootstrapUsersService>()
                     .AddBootstrapUsers();
             }
+        }
+
+        private IBlobCacheService GetBlobCacheService(IServiceProvider provider, string connectionStringKey)
+        {
+            return new BlobCacheService(
+                blobStorageService: GetBlobStorageService(provider, connectionStringKey),
+                logger: provider.GetRequiredService<ILogger<BlobCacheService>>());
         }
 
         private IBlobStorageService GetBlobStorageService(IServiceProvider provider, string connectionStringKey)

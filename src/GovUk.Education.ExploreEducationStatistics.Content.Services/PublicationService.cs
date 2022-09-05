@@ -32,7 +32,7 @@ public class PublicationService : IPublicationService
         _mapper = mapper;
     }
 
-    [BlobCache(typeof(PublicationCacheKey))]
+    [BlobCache(typeof(PublicationCacheKey), ServiceName = "public")]
     public async Task<Either<ActionResult, PublicationViewModel>> Get(string publicationSlug)
     {
         return await _contentPersistenceHelper

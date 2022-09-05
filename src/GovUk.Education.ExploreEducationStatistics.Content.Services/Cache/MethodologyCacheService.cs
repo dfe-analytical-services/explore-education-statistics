@@ -26,13 +26,13 @@ public class MethodologyCacheService : IMethodologyCacheService
         _logger = logger;
     }
 
-    [BlobCache(typeof(AllMethodologiesCacheKey))]
+    [BlobCache(typeof(AllMethodologiesCacheKey), ServiceName = "public")]
     public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetSummariesTree()
     {
         return _methodologyService.GetSummariesTree();
     }
 
-    [BlobCache(typeof(AllMethodologiesCacheKey), forceUpdate: true)]
+    [BlobCache(typeof(AllMethodologiesCacheKey), forceUpdate: true, ServiceName = "public")]
     public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> UpdateSummariesTree()
     {
         _logger.LogInformation("Updating cached Methodology Tree");

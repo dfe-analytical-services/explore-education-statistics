@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 {
                     var publicBlobCacheService = GetBlobCacheService(provider, "PublicStorage");
                     CacheAspect.Enabled = true;
-                    BlobCacheAttribute.AddService("default", publicBlobCacheService);
+                    BlobCacheAttribute.AddService("public", publicBlobCacheService);
                     return publicBlobCacheService;
                 })
 
