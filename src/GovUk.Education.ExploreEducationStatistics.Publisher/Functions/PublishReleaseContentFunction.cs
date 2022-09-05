@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -19,6 +20,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class PublishReleaseContentFunction
     {
         private readonly ContentDbContext _contentDbContext;
+        // TODO EES-3648 IBlobCacheService is not used but still needed to force it's initialisation from DI
+        // where it's registered with the BlobCacheAttribute
+        private readonly IBlobCacheService _blobCacheService;
         private readonly IContentService _contentService;
         private readonly INotificationsService _notificationsService;
         private readonly IPublicationCacheService _publicationCacheService;
@@ -27,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         public PublishReleaseContentFunction(
             ContentDbContext contentDbContext,
+            IBlobCacheService blobCacheService,
             IContentService contentService,
             INotificationsService notificationsService,
             IPublicationCacheService publicationCacheService,
@@ -34,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             IReleasePublishingStatusService releasePublishingStatusService)
         {
             _contentDbContext = contentDbContext;
+            _blobCacheService = blobCacheService;
             _contentService = contentService;
             _notificationsService = notificationsService;
             _publicationCacheService = publicationCacheService;
