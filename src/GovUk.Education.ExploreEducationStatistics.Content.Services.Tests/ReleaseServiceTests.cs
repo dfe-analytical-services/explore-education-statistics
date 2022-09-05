@@ -2,10 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -13,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -529,8 +526,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             IFileStorageService? fileStorageService = null,
             IMethodologyCacheService? methodologyCacheService = null,
             IPublicationCacheService? publicationCacheService = null,
-            IUserService? userService = null,
-            IMapper? mapper = null)
+            IUserService? userService = null)
         {
             return new(
                 contentDbContext is null
@@ -539,8 +535,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 fileStorageService ?? Mock.Of<IFileStorageService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
-                userService ?? AlwaysTrueUserService().Object,
-                mapper ?? MapperUtils.MapperForProfile<MappingProfiles>()
+                userService ?? AlwaysTrueUserService().Object
             );
         }
     }

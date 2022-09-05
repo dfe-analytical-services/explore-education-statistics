@@ -1,9 +1,5 @@
 ﻿#nullable enable
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
-{
-    public class TopicViewModel
-    {
-        public ThemeViewModel Theme { get; set; } = null!;
-    }
-}
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+
+public record TopicViewModel(ThemeViewModel Theme);

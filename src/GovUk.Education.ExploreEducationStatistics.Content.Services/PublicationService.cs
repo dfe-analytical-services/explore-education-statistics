@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -19,16 +18,13 @@ public class PublicationService : IPublicationService
 {
     private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
-    private readonly IMapper _mapper;
 
     public PublicationService(
         ContentDbContext contentDbContext,
-        IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
-        IMapper mapper)
+        IPersistenceHelper<ContentDbContext> contentPersistenceHelper)
     {
         _contentDbContext = contentDbContext;
         _contentPersistenceHelper = contentPersistenceHelper;
-        _mapper = mapper;
     }
 
     public async Task<Either<ActionResult, PublicationViewModel>> Get(string publicationSlug)
@@ -42,14 +38,10 @@ public class PublicationService : IPublicationService
                 .ThenInclude(topic => topic.Theme)
                 .Where(p => p.Slug == publicationSlug))
             .OnSuccessCombineWith(GetLatestRelease)
-            .OnSuccess(tuple =>
+            .OnSuccess(async tuple =>
             {
                 var (publication, latestRelease) = tuple;
-                var publicationViewModel = _mapper.Map<PublicationViewModel>(publication);
-                publicationViewModel.LatestReleaseId = latestRelease.Id;
-                publicationViewModel.IsSuperseded = IsSuperseded(publication);
-                publicationViewModel.Releases = ListPublishedReleases(publication);
-                return publicationViewModel;
+                return await BuildPublicationViewModel(publication, latestRelease);
             });
     }
 
@@ -58,21 +50,48 @@ public class PublicationService : IPublicationService
         return publication.LatestPublishedRelease() ?? new Either<ActionResult, Release>(new NotFoundResult());
     }
 
-    private List<ReleaseTitleViewModel> ListPublishedReleases(Publication publication)
+    private async Task<PublicationViewModel> BuildPublicationViewModel(Publication publication, Release latestRelease)
     {
-        var releases = publication.GetPublishedReleases()
-            .OrderByDescending(release => release.Year)
-            .ThenByDescending(release => release.TimePeriodCoverage)
-            .ToList();
-        return _mapper.Map<List<ReleaseTitleViewModel>>(releases);
+        return new PublicationViewModel
+        {
+            Id = publication.Id,
+            Title = publication.Title,
+            Slug = publication.Slug,
+            LegacyReleases = publication.LegacyReleases
+                .OrderByDescending(legacyRelease => legacyRelease.Order)
+                .Select(legacyRelease => new LegacyReleaseViewModel(legacyRelease))
+                .ToList(),
+            Topic = new TopicViewModel(new ThemeViewModel(publication.Topic.Theme.Title)),
+            Contact = new ContactViewModel(publication.Contact),
+            ExternalMethodology = publication.ExternalMethodology != null
+                ? new ExternalMethodologyViewModel(publication.ExternalMethodology)
+                : null,
+            LatestReleaseId = latestRelease.Id,
+            IsSuperseded = await IsSuperseded(publication),
+            Releases = ListPublishedReleases(publication)
+        };
     }
 
-    private bool IsSuperseded(Publication publication)
+    private static List<ReleaseTitleViewModel> ListPublishedReleases(Publication publication)
+    {
+        return publication.GetPublishedReleases()
+            .OrderByDescending(release => release.Year)
+            .ThenByDescending(release => release.TimePeriodCoverage)
+            .Select(release => new ReleaseTitleViewModel
+            {
+                Id = release.Id,
+                Slug = release.Slug,
+                Title = release.Title
+            })
+            .ToList();
+    }
+
+    private async Task<bool> IsSuperseded(Publication publication)
     {
         return publication.SupersededById != null
                // To be superseded, superseding publication must have Live release
-               && _contentDbContext.Releases
-                   .Any(r => r.PublicationId == publication.SupersededById
-                             && r.Published.HasValue && DateTime.UtcNow >= r.Published.Value);
+               && await _contentDbContext.Releases
+                   .AnyAsync(r => r.PublicationId == publication.SupersededById
+                                  && r.Published.HasValue && DateTime.UtcNow >= r.Published.Value);
     }
 }

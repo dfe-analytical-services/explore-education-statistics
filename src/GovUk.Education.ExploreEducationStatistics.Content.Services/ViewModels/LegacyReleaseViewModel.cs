@@ -1,13 +1,16 @@
-﻿using System;
+﻿#nullable enable
+using System;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+
+public record LegacyReleaseViewModel(Guid Id, string Description, string Url)
 {
-    public class LegacyReleaseViewModel
+    public LegacyReleaseViewModel(LegacyRelease legacyRelease) : this(
+        Id: legacyRelease.Id,
+        Description: legacyRelease.Description,
+        Url: legacyRelease.Url
+    )
     {
-        public Guid Id { get; set; }
-
-        public string Description { get; set; }
-
-        public string Url { get; set; }
     }
 }

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -28,21 +27,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private readonly IMethodologyCacheService _methodologyCacheService;
         private readonly IPublicationCacheService _publicationCacheService;
         private readonly IUserService _userService;
-        private readonly IMapper _mapper;
 
         public ReleaseService(IPersistenceHelper<ContentDbContext> persistenceHelper,
             IFileStorageService fileStorageService,
             IMethodologyCacheService methodologyCacheService,
             IPublicationCacheService publicationCacheService,
-            IUserService userService,
-            IMapper mapper)
+            IUserService userService)
         {
             _persistenceHelper = persistenceHelper;
             _fileStorageService = fileStorageService;
             _methodologyCacheService = methodologyCacheService;
             _publicationCacheService = publicationCacheService;
             _userService = userService;
-            _mapper = mapper;
         }
 
         // TODO EES-3643 - move into a ReleaseCacheService?
@@ -81,8 +77,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 {
                     var (publication, release) = publicationAndRelease;
                     return new ReleaseSummaryViewModel(
-                        _mapper.Map<CachedReleaseViewModel>(release),
-                        _mapper.Map<PublicationViewModel>(publication)
+                        release!,
+                        publication
                     );
                 });
         }
