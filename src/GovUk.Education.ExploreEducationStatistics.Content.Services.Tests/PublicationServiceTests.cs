@@ -19,8 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task Get()
         {
-            BlobCacheAttribute.AddService("public", BlobCacheService.Object);
-
             var release2000Version0Id = Guid.NewGuid();
             var supersedingPublication = new Publication
             {
@@ -159,8 +157,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task Get_IsSuperseded()
         {
-            BlobCacheAttribute.AddService("public", BlobCacheService.Object);
-
             var release2000Version0Id = Guid.NewGuid();
             var supersedingPublication = new Publication
             {
@@ -234,8 +230,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task Get_NoPublication()
         {
-            BlobCacheAttribute.AddService("public", BlobCacheService.Object);
-
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -251,8 +245,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task Get_PublicationHasNoLiveLatestRelease()
         {
-            BlobCacheAttribute.AddService("public", BlobCacheService.Object);
-
             const string publicationSlug = "publication-slug";
 
             var contentDbContextId = Guid.NewGuid().ToString();
