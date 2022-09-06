@@ -420,12 +420,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return values
                 .AsSplitQuery()
                 .Include(p => p.Contact)
-                .Include(p => p.Releases)
+                .Include(p => p.Releases) // EES-3576 remove when MyPublicationViewModel is gone
                 .ThenInclude(r => r.ReleaseStatuses)
                 .Include(p => p.Topic)
                 .ThenInclude(topic => topic.Theme)
-                .Include(p => p.Methodologies)
-                .ThenInclude(p => p.Methodology)
+                .Include(p => p.Methodologies) // EES-3576 remove when MyPublicationViewModel is gone
+                .ThenInclude(p => p.Methodology) // EES-3576 remove when MyPublicationViewModel is gone
                 .ThenInclude(p => p.Versions);
         }
 

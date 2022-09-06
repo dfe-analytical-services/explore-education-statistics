@@ -17,12 +17,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class PublicationRepository : IPublicationRepository
     {
         private readonly ContentDbContext _context;
-        private readonly IMapper _mapper;
 
-        public PublicationRepository(ContentDbContext context, IMapper mapper)
+        public PublicationRepository(ContentDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         public async Task<List<Publication>> GetPublicationsForTopic(Guid topicId)

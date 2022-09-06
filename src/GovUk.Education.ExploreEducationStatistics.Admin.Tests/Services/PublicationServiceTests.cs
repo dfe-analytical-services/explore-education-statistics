@@ -1084,7 +1084,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicationRepository = new PublicationRepository(context, AdminMapper());
+                var publicationRepository = new PublicationRepository(context);
                 var publicationService = BuildPublicationService(context, publicationRepository: publicationRepository);
                 var result = await publicationService.GetMyPublication(publication.Id);
                 var viewModel = result.AssertRight();
@@ -1216,7 +1216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicationRepository = new PublicationRepository(context, AdminMapper());
+                var publicationRepository = new PublicationRepository(context);
                 var publicationService = BuildPublicationService(context,
                     publicationRepository: publicationRepository,
                     userService: userService.Object);
@@ -1285,7 +1285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicationRepository = new PublicationRepository(context, AdminMapper());
+                var publicationRepository = new PublicationRepository(context);
                 var publicationService = BuildPublicationService(context,
                     publicationRepository: publicationRepository,
                     userService: userService.Object);

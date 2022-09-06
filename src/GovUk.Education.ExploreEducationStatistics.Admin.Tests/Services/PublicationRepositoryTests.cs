@@ -235,7 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var service = SetupPublicationRepository(contentDbContext);
+                var service = new PublicationRepository(contentDbContext);
                 var result = await service.GetPublicationListForUser(user.Id, topic.Id);
 
                 // Result should contain Related publication 1, Related publication 2 and Related publication 3.
@@ -364,7 +364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var service = SetupPublicationRepository(contentDbContext);
+                var service = new PublicationRepository(contentDbContext);
                 var result = await service.GetPublicationListForUser(user.Id, topic.Id);
 
                 var publication = Assert.Single(result);
@@ -443,7 +443,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var service = SetupPublicationRepository(contentDbContext);
+                var service = new PublicationRepository(contentDbContext);
                 var result = await service.GetPublicationListForUser(user.Id, topic.Id);
 
                 Assert.Empty(result);
@@ -508,7 +508,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var service = SetupPublicationRepository(contentDbContext);
+                var service = new PublicationRepository(contentDbContext);
                 var result = await service.GetPublicationListForUser(user.Id, topic.Id);
 
                 Assert.Empty(result);
@@ -569,7 +569,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var service = SetupPublicationRepository(contentDbContext);
+                var service = new PublicationRepository(contentDbContext);
                 var result = await service.GetPublicationListForUser(user.Id, topic.Id);
 
                 // Result should contain the publication related to this topic
@@ -646,7 +646,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var service = SetupPublicationRepository(contentDbContext);
+                var service = new PublicationRepository(contentDbContext);
                 var publications = await service.GetPublicationListForUser(user.Id, topic.Id);
 
                 var resultPublication = Assert.Single(publications);
@@ -871,7 +871,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var service = SetupPublicationRepository(contentDbContext);
+                var service = new PublicationRepository(contentDbContext);
                 var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
 
                 // Result should contain Related publication 1, Related publication 2 and Related publication 3.
@@ -1000,7 +1000,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var service = SetupPublicationRepository(contentDbContext);
+                var service = new PublicationRepository(contentDbContext);
                 var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
 
                 var publication = Assert.Single(result);
@@ -1079,7 +1079,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var service = SetupPublicationRepository(contentDbContext);
+                var service = new PublicationRepository(contentDbContext);
                 var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
 
                 Assert.Empty(result);
@@ -1144,7 +1144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var service = SetupPublicationRepository(contentDbContext);
+                var service = new PublicationRepository(contentDbContext);
                 var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
 
                 Assert.Empty(result);
@@ -1204,7 +1204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var service = SetupPublicationRepository(contentDbContext);
+                var service = new PublicationRepository(contentDbContext);
                 var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
 
                 // Result should contain the publication related to this topic
@@ -1281,7 +1281,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                var service = SetupPublicationRepository(contentDbContext);
+                var service = new PublicationRepository(contentDbContext);
                 var publications = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
 
                 var resultPublication = Assert.Single(publications);
@@ -1364,7 +1364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicationService = SetupPublicationRepository(context);
+                var publicationService = new PublicationRepository(context);
                 var publications = await publicationService.GetPublicationsForTopic(topicId);
                 var releases = publications.Single().Releases;
 
@@ -1423,7 +1423,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var repository = SetupPublicationRepository(context);
+                var repository = new PublicationRepository(context);
                 var latestRelease = await repository.GetLatestReleaseForPublication(publication.Id);
                 Assert.NotNull(latestRelease);
                 Assert.Equal(expectedLatestReleaseId, latestRelease!.Id);
@@ -1480,7 +1480,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var repository = SetupPublicationRepository(context);
+                var repository = new PublicationRepository(context);
                 var latestRelease = await repository.GetLatestReleaseForPublication(publication.Id);
                 Assert.NotNull(latestRelease);
                 Assert.Equal(expectedLatestReleaseId, latestRelease!.Id);
@@ -1506,7 +1506,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var repository = SetupPublicationRepository(context);
+                var repository = new PublicationRepository(context);
                 var latestRelease = await repository.GetLatestReleaseForPublication(publication.Id);
                 Assert.Null(latestRelease);
             }
@@ -1598,7 +1598,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var repository = SetupPublicationRepository(context);
+                var repository = new PublicationRepository(context);
                 var resultPublication = await repository.GetPublicationWithAllReleases(publication.Id);
 
                 Assert.Equal(publication.Id, resultPublication.Id);
@@ -1636,7 +1636,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var repository = SetupPublicationRepository(context);
+                var repository = new PublicationRepository(context);
                 var resultPublication = await repository.GetPublicationWithAllReleases(publication.Id);
                 Assert.Equal(publication.Id, resultPublication.Id);
             }
@@ -1676,7 +1676,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var repository = SetupPublicationRepository(context);
+                var repository = new PublicationRepository(context);
                 var resultPublication = await repository.GetPublicationForUser(publication.Id, userId);
 
                 Assert.Equal(publication.Id, resultPublication.Id);
@@ -1746,7 +1746,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var service = new PublicationRepository(context, AdminMapper());
+                var service = new PublicationRepository(context);
                 var latestReleases = await service.ListActiveReleases(publication.Id);
 
                 Assert.Equal(3, latestReleases.Count);
@@ -1755,11 +1755,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release2001Latest.Id, latestReleases[1].Id);
                 Assert.Equal(release2002Latest.Id, latestReleases[2].Id);
             }
-        }
-
-        private static PublicationRepository SetupPublicationRepository(ContentDbContext contentDbContext)
-        {
-            return new(contentDbContext, AdminMapper());
         }
     }
 }
