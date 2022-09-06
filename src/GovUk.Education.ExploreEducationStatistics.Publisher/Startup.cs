@@ -2,7 +2,6 @@
 using System;
 using AutoMapper;
 using Azure.Storage.Blobs;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -47,8 +46,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            CacheAspect.Enabled = true;
-
             builder.Services
                 .AddAutoMapper(typeof(Startup).Assembly)
                 .AddMemoryCache()
@@ -60,18 +57,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("PublicStatisticsDb")))
                 .AddSingleton<IFileStorageService, FileStorageService>(provider =>
                     new FileStorageService(GetConfigurationValue(provider, "PublisherStorage")))
-
-                // TODO EES-3648 A component needs to depend on IBlobCacheService in order for the service to be be
-                // created from this factory method.
-                // If not, the factory method won't be run and the registration with BlobCacheAttribute
-                // won't happen. We should separate the DI configuration and the configuration required for caching.
-                // Remove this service and also IBlobCacheService from PublishReleaseContentFunction when this is fixed.
-                .AddScoped(provider =>
-                {
-                    var publicBlobCacheService = GetBlobCacheService(provider, "PublicStorage");
-                    BlobCacheAttribute.AddService("public", publicBlobCacheService);
-                    return publicBlobCacheService;
-                })
 
                 // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
                 // EES-3528 plans to send a request to the Content API to update its cached resources instead of this
