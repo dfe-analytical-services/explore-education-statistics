@@ -13,7 +13,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -146,6 +148,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IMethodologyRepository, MethodologyRepository>();
             services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
             services.AddTransient<IThemeService, ThemeService>();
+            services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
+            services.AddTransient<IThemeCacheService, ThemeCacheService>();
             services.AddTransient<IReleaseService, Services.ReleaseService>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
@@ -166,8 +170,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
         {
             // Enable caching and register any caching services
             CacheAspect.Enabled = true;
-            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>()!);
-            
+            BlobCacheAttribute.AddService("public", app.ApplicationServices.GetRequiredService<IBlobCacheService>());
+
             // Register the MemoryCacheService only if the Memory Caching is enabled. 
             var memoryCacheConfig = Configuration.GetSection("MemoryCache");
             if (memoryCacheConfig.GetValue("Enabled", false))

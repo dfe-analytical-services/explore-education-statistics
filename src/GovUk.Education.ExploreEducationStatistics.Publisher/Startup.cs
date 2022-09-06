@@ -2,6 +2,7 @@
 using System;
 using AutoMapper;
 using Azure.Storage.Blobs;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -9,6 +10,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -21,13 +24,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
+using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
+using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
+using IContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
+using ContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.ThemeService;
 using FileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.FileStorageService;
-using IFileStorageService =
-    GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IFileStorageService;
-using IMethodologyService =
-    GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
-using IPublicationService =
-    GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IPublicationService;
+using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IFileStorageService;
+using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
+using IPublicationService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IPublicationService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.MethodologyService;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.PublicationService;
@@ -52,7 +56,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("PublicStatisticsDb")))
                 .AddSingleton<IFileStorageService, FileStorageService>(provider =>
                     new FileStorageService(GetConfigurationValue(provider, "PublisherStorage")))
-                .AddScoped(provider => GetBlobCacheService(provider, "PublicStorage"))
+                .AddScoped(provider =>
+                {
+                    var publicBlobCacheService = GetBlobCacheService(provider, "PublicStorage");
+                    CacheAspect.Enabled = true;
+                    BlobCacheAttribute.AddService("public", publicBlobCacheService);
+                    return publicBlobCacheService;
+                })
+
+                // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
+                // EES-3528 plans to send a request to the Content API to update its cached resources instead of this
+                // being done from Publisher directly, and so these DI dependencies should eventually be removed.
+                .AddScoped<IContentMethodologyService, ContentMethodologyService>()
+                .AddScoped<IMethodologyCacheService, MethodologyCacheService>()
+                .AddScoped<IThemeCacheService, ThemeCacheService>()
+                .AddScoped<IContentThemeService, ContentThemeService>()
+
                 .AddScoped<IPublishingService, PublishingService>(provider =>
                     new PublishingService(
                         publicStorageConnectionString: GetConfigurationValue(provider, "PublicStorage"),
@@ -62,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         methodologyService: provider.GetRequiredService<IMethodologyService>(),
                         publicationService: provider.GetRequiredService<IPublicationService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
-                        contentDbContext: provider.GetService<ContentDbContext>(),
+                        contentDbContext: provider.GetRequiredService<ContentDbContext>(),
                         logger: provider.GetRequiredService<ILogger<PublishingService>>()))
                 .AddScoped<IContentService, ContentService>(provider =>
                     new ContentService(
@@ -70,15 +89,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         privateBlobCacheService: GetBlobCacheService(provider, "CoreStorage"),
                         publicBlobCacheService: GetBlobCacheService(provider, "PublicStorage"),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
-                        publicationService: provider.GetRequiredService<IPublicationService>()
-                    ))
+                        publicationService: provider.GetRequiredService<IPublicationService>(),
+                        methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
+                        themeCacheService: provider.GetRequiredService<IThemeCacheService>()))
                 .AddScoped<IReleaseService, ReleaseService>(provider =>
                     new ReleaseService(
-                        contentDbContext: provider.GetService<ContentDbContext>(),
-                        statisticsDbContext: provider.GetService<StatisticsDbContext>(),
-                        publicStatisticsDbContext: provider.GetService<PublicStatisticsDbContext>(),
-                        methodologyService: provider.GetService<IMethodologyService>(),
-                        releaseSubjectRepository: provider.GetService<IReleaseSubjectRepository>(),
+                        contentDbContext: provider.GetRequiredService<ContentDbContext>(),
+                        statisticsDbContext: provider.GetRequiredService<StatisticsDbContext>(),
+                        publicStatisticsDbContext: provider.GetRequiredService<PublicStatisticsDbContext>(),
+                        methodologyService: provider.GetRequiredService<IMethodologyService>(),
+                        releaseSubjectRepository: provider.GetRequiredService<IReleaseSubjectRepository>(),
                         mapper: provider.GetRequiredService<IMapper>()
                     ))
                 .AddScoped<ITableStorageService, TableStorageService>(provider =>
@@ -91,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IMethodologyService, MethodologyService>()
                 .AddScoped<INotificationsService, NotificationsService>(provider =>
                     new NotificationsService(
-                        context: provider.GetService<ContentDbContext>(),
+                        context: provider.GetRequiredService<ContentDbContext>(),
                         storageQueueService: new StorageQueueService(
                             GetConfigurationValue(provider,
                             "NotificationStorage"),
@@ -108,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IValidationService, ValidationService>()
                 .AddScoped<IReleaseSubjectRepository, ReleaseSubjectRepository>(provider =>
                     new ReleaseSubjectRepository(
-                        statisticsDbContext: provider.GetService<PublicStatisticsDbContext>(),
+                        statisticsDbContext: provider.GetRequiredService<PublicStatisticsDbContext>(),
                         footnoteRepository: new FootnoteRepository(provider.GetService<PublicStatisticsDbContext>())
                     ))
                 .AddScoped<IFilterRepository, FilterRepository>()

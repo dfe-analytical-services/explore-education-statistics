@@ -3,9 +3,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -31,7 +29,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             // Attempt to read blob from the storage container
             try
             {
-                return await _blobStorageService.GetDeserializedJson(cacheKey.Container, cacheKey.Key, targetType);
+                var result = await _blobStorageService.GetDeserializedJson(cacheKey.Container, cacheKey.Key, targetType);
+
+                _logger.LogDebug("Blob cache {HitOrMiss} - for key {CacheKey}", 
+                    result != null ? "hit" : "miss", key);
+
+                return result;
             }
             catch (JsonException e)
             {
@@ -59,16 +62,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             // Write result to cache as a json blob before returning
             await _blobStorageService.UploadAsJson(cacheKey.Container, cacheKey.Key, item);
+
+            _logger.LogDebug("Blob cache set - for key {CacheKey}", cacheKey.Key);
         }
         
         public async Task DeleteItem(IBlobCacheKey cacheKey)
         {
             await _blobStorageService.DeleteBlob(cacheKey.Container, cacheKey.Key);
+
+            _logger.LogDebug("Blob cache delete - for key {CacheKey}", cacheKey.Key);
         }
 
         public async Task DeleteCacheFolder(IBlobCacheKey cacheFolderKey)
         {
             await _blobStorageService.DeleteBlobs(cacheFolderKey.Container, cacheFolderKey.Key);
+
+            _logger.LogDebug("Blob cache folder delete - for key {CacheKey}", cacheFolderKey.Key);
         }
     }
 }

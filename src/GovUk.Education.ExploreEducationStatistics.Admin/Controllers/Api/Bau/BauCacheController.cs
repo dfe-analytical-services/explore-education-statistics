@@ -1,16 +1,16 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
@@ -25,13 +25,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
     {
         private readonly IBlobStorageService _privateBlobStorageService;
         private readonly IBlobStorageService _publicBlobStorageService;
+        private readonly IMethodologyCacheService _methodologyCacheService;
+        private readonly IThemeCacheService _themeCacheService;
 
         public BauCacheController(
             IBlobStorageService privateBlobStorageService,
-            IBlobStorageService publicBlobStorageService)
+            IBlobStorageService publicBlobStorageService, 
+            IMethodologyCacheService methodologyCacheService, 
+            IThemeCacheService themeCacheService)
         {
             _privateBlobStorageService = privateBlobStorageService;
             _publicBlobStorageService = publicBlobStorageService;
+            _methodologyCacheService = methodologyCacheService;
+            _themeCacheService = themeCacheService;
         }
 
         [HttpDelete("private-cache")]
@@ -56,14 +62,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
         [HttpDelete("public-cache/trees")]
         public async Task<ActionResult> ClearPublicCacheTrees(ClearPublicCacheTreePathsViewModel request)
         {
-            if (request.Paths.Any())
+            if (request.CacheEntries.Any())
             {
-                await request.Paths
+                await request.CacheEntries
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
-                        path =>
-                            _publicBlobStorageService.DeleteBlob(BlobContainers.PublicContent, path)
-                    );
+                        
+                        async entry =>
+                        {
+                            var allowedPath =
+                                EnumUtil.GetFromString<ClearPublicCacheTreePathsViewModel.CacheEntry>(entry);
+                            
+                            switch (allowedPath)
+                            {
+                                case ClearPublicCacheTreePathsViewModel.CacheEntry.MethodologyTree: 
+                                    await _methodologyCacheService.UpdateSummariesTree();
+                                    break;
+                                case ClearPublicCacheTreePathsViewModel.CacheEntry.PublicationTree:
+                                    await _themeCacheService.UpdatePublicationTree();
+                                    break;
+                                default:
+                                    throw new ArgumentException($"Unsupported cache clearing entry {entry}");
+                            }
+                        });
             }
 
             return NoContent();
@@ -90,15 +111,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
 
         public class ClearPublicCacheTreePathsViewModel
         {
-            private static readonly HashSet<string> AllowedPaths = new()
+            public enum CacheEntry
             {
-                PublicationTreeCacheKey.GetKey(),
-                AllMethodologiesCacheKey.GetKey()
+                MethodologyTree,
+                PublicationTree
+            }
+            
+            private static readonly HashSet<string> AllowedCacheEntries = new()
+            {
+                CacheEntry.MethodologyTree.ToString(),
+                CacheEntry.PublicationTree.ToString()
             };
 
             [MinLength(1)]
-            [ContainsOnly(AllowedValuesProvider = nameof(AllowedPaths))]
-            public HashSet<string> Paths { get; set; } = new();
+            [ContainsOnly(AllowedValuesProvider = nameof(AllowedCacheEntries))]
+            public HashSet<string> CacheEntries { get; set; } = new();
         }
 
         public class ClearPublicCacheReleasePathsViewModel

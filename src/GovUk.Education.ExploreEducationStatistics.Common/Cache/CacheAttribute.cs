@@ -45,11 +45,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         /// </para>
         /// </summary>
         public Type Key { get; }
+        
+        /// <summary>
+        /// Flag signifying that this caching attribute forces a cache update.
+        /// When an attribute with this flag set is invoked, it will retrieve a fresh
+        /// value rather than a cached item and then set or update it in the cache,
+        /// therefore always caching and then supplying a freshly retrieved value.
+        /// </summary>
+        public bool ForceUpdate { get; }
 
-        protected CacheAttribute(Type key)
+        protected CacheAttribute(Type key, bool forceUpdate)
         {
             Key = key;
-
+            ForceUpdate = forceUpdate;
             ValidateOptions();
         }
 

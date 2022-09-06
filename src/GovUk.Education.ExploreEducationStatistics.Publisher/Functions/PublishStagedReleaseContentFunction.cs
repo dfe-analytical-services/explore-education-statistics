@@ -89,14 +89,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                         await _releaseService.DeletePreviousVersionsStatisticalData(releaseIds);
                     }
 
-                    // Invalidate the cached trees in case any methodologies/publications
-                    // are now accessible for the first time after publishing these releases
-                    await _contentService.DeleteCachedTaxonomyBlobs();
-
                     await _contentService.DeletePreviousVersionsDownloadFiles(releaseIds);
                     await _contentService.DeletePreviousVersionsContent(releaseIds);
 
                     await _notificationsService.NotifySubscribersIfApplicable(releaseIds);
+
+                    // Update the cached trees in case any methodologies/publications
+                    // are now accessible for the first time after publishing these releases
+                    await _contentService.UpdateCachedTaxonomyBlobs();
 
                     await UpdateStage(published, Complete);
                 }

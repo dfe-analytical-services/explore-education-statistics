@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -71,22 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> 
-            GetCachedSummariesByPublication(Guid publicationId)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId)
-                .OnSuccess(_ => GetCachedSummariesTree())
-                .OnSuccess(methodologiesByTheme => 
-                    methodologiesByTheme
-                        .SelectMany(theme => theme.Topics)
-                        .SelectMany(topic => topic.Publications)
-                        .SingleOrDefault(publication => publication.Id == publicationId)
-                        ?.Methodologies ?? new List<MethodologyVersionSummaryViewModel>());
-        }
-
-        [BlobCache(typeof(AllMethodologiesCacheKey))]
-        public async Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetCachedSummariesTree()
+        public async Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetSummariesTree()
         {
             var themes = await _contentDbContext.Themes
                 .Include(theme => theme.Topics)

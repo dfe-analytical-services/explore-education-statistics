@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +32,7 @@ public class PublicationService : IPublicationService
         _mapper = mapper;
     }
 
-    [BlobCache(typeof(PublicationCacheKey))]
+    [BlobCache(typeof(PublicationCacheKey), ServiceName = "public")]
     public async Task<Either<ActionResult, PublicationViewModel>> Get(string publicationSlug)
     {
         return await _contentPersistenceHelper

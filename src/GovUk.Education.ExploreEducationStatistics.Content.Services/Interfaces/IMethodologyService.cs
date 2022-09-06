@@ -6,14 +6,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+
+public interface IMethodologyService
 {
-    public interface IMethodologyService
-    {
-        public Task<Either<ActionResult, MethodologyVersionViewModel>> GetLatestMethodologyBySlug(string slug);
+    public Task<Either<ActionResult, MethodologyVersionViewModel>> GetLatestMethodologyBySlug(string slug);
 
-        public Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetCachedSummariesByPublication(Guid publicationId);
-
-        public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetCachedSummariesTree();
-    }
+    public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetSummariesTree();
 }

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -39,7 +39,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
@@ -76,6 +78,10 @@ using Notify.Interfaces;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
+using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
+using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
+using IContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
+using ContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.ThemeService;
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
 using IDataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IDataGuidanceService;
@@ -139,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
+                options.CheckConsentNeeded = _ => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
                 options.Secure = CookieSecurePolicy.Always;
             });
@@ -239,7 +245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         return;
                     }
                     
-                    var allowRefreshTokens = clientConfig.GetValue<bool>("AllowOfflineAccess", false);
+                    var allowRefreshTokens = clientConfig.GetValue("AllowOfflineAccess", false);
 
                     if (allowRefreshTokens)
                     {
@@ -395,6 +401,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             
+            // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
+            // EES-3528 plans to send a request to the Content API to update its cached resources instead of this
+            // being done from Admin directly, and so these DI dependencies should eventually be removed.
+            services.AddTransient<IContentThemeService, ContentThemeService>();
+            services.AddTransient<IContentMethodologyService, ContentMethodologyService>();
+            services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
+            services.AddTransient<IThemeCacheService, ThemeCacheService>();
+
             services.AddTransient<IMyPublicationPermissionsResolver,
                 MyPublicationPermissionsResolver>();
 
@@ -438,15 +452,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ITopicService, TopicService>();
             services.AddTransient<IPublicationService, PublicationService>(provider =>
                 new PublicationService(
-                    context: provider.GetService<ContentDbContext>(),
-                    mapper: provider.GetService<IMapper>(),
-                    persistenceHelper: provider.GetService<IPersistenceHelper<ContentDbContext>>(),
-                    userService: provider.GetService<IUserService>(),
-                    publicationRepository: provider.GetService<IPublicationRepository>(),
-                    methodologyVersionRepository: provider.GetService<IMethodologyVersionRepository>(),
+                    context: provider.GetRequiredService<ContentDbContext>(),
+                    mapper: provider.GetRequiredService<IMapper>(),
+                    persistenceHelper: provider.GetRequiredService<IPersistenceHelper<ContentDbContext>>(),
+                    userService: provider.GetRequiredService<IUserService>(),
+                    publicationRepository: provider.GetRequiredService<IPublicationRepository>(),
+                    methodologyVersionRepository: provider.GetRequiredService<IMethodologyVersionRepository>(),
                     publicBlobCacheService: new BlobCacheService(
                         GetBlobStorageService(provider, "PublicStorage"),
-                        provider.GetRequiredService<ILogger<BlobCacheService>>())
+                        provider.GetRequiredService<ILogger<BlobCacheService>>()),
+                    methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
+                    themeCacheService: provider.GetRequiredService<IThemeCacheService>()
                 )
             );
             services.AddTransient<IPublicationRepository, PublicationRepository>();
@@ -479,17 +495,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMethodologyAmendmentService, MethodologyAmendmentService>();
             services.AddTransient<IMethodologyApprovalService, MethodologyApprovalService>(provider =>
                 new MethodologyApprovalService(
-                    context: provider.GetService<ContentDbContext>(),
-                    persistenceHelper: provider.GetService<IPersistenceHelper<ContentDbContext>>(),
+                    context: provider.GetRequiredService<ContentDbContext>(),
+                    persistenceHelper: provider.GetRequiredService<IPersistenceHelper<ContentDbContext>>(),
                     methodologyContentService: provider.GetRequiredService<IMethodologyContentService>(),
                     methodologyFileRepository: provider.GetRequiredService<IMethodologyFileRepository>(),
                     methodologyImageService: provider.GetRequiredService<IMethodologyImageService>(),
                     methodologyVersionRepository: provider.GetRequiredService<IMethodologyVersionRepository>(),
-                    publicBlobCacheService: new BlobCacheService(
-                        GetBlobStorageService(provider, "PublicStorage"),
-                        provider.GetRequiredService<ILogger<BlobCacheService>>()),
                     publishingService: provider.GetRequiredService<IPublishingService>(),
-                    userService: provider.GetRequiredService<IUserService>()));
+                    userService: provider.GetRequiredService<IUserService>(),
+                    methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>()));
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
@@ -603,7 +617,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient(
                 provider => new BauCacheController(
                     privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage"),
-                    publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage")
+                    publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
+                    methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
+                    themeCacheService: provider.GetRequiredService<IThemeCacheService>()
                 )
             );
 
@@ -639,9 +655,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var provider = app.ApplicationServices;
+
             // Enable caching and register any caching services.
             CacheAspect.Enabled = true;
-            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
+            var privateBlobCacheService = GetBlobCacheService(provider, "CoreStorage");
+            var publicBlobCacheService = GetBlobCacheService(provider, "PublicStorage");
+            BlobCacheAttribute.AddService("default", privateBlobCacheService);
+            BlobCacheAttribute.AddService("public", publicBlobCacheService);
 
             UpdateDatabase(app, env);
 
@@ -778,6 +799,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     .GetService<BootstrapUsersService>()
                     .AddBootstrapUsers();
             }
+        }
+
+        private IBlobCacheService GetBlobCacheService(IServiceProvider provider, string connectionStringKey)
+        {
+            return new BlobCacheService(
+                blobStorageService: GetBlobStorageService(provider, connectionStringKey),
+                logger: provider.GetRequiredService<ILogger<BlobCacheService>>());
         }
 
         private IBlobStorageService GetBlobStorageService(IServiceProvider provider, string connectionStringKey)
