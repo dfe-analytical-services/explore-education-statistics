@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,11 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public PublicationService(ContentDbContext contentDbContext)
         {
             _contentDbContext = contentDbContext;
-        }
-
-        public async Task<Publication> Get(Guid id)
-        {
-            return await _contentDbContext.Publications.FindAsync(id);
         }
 
         public List<Publication> GetPublicationsWithPublishedReleases()

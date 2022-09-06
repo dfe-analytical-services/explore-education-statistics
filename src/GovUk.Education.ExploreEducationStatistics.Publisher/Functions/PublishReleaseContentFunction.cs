@@ -78,8 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     await _releaseService.DeletePreviousVersionsStatisticalData(message.ReleaseId);
                 }
 
-                var release = await _contentDbContext.Releases
-                    .SingleAsync(r => r.Id == message.ReleaseId);
+                var release = await _releaseService.Get(message.ReleaseId);
 
                 // Update the cached publication and any cached superseded publications.
                 // If this is the first live release of the publication, the superseding is now enforced
