@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
-        public void GetMyPublicationsByTopic_NoAccessOfSystem()
+        public async Task GetMyPublicationsByTopic_NoAccessOfSystem()
         {
             var userService = AlwaysTrueUserService();
             var publicationRepository = new Mock<IPublicationRepository>(Strict);
@@ -63,8 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             publicationRepository.Setup(s => s.GetPublicationsForTopic(topicId)).ReturnsAsync(list);
 
-            var result = publicationService.GetPublicationsByTopic(permissions: false, topicId).Result.Left;
-            Assert.IsAssignableFrom<ForbidResult>(result);
+            var result = await publicationService.GetPublicationsByTopic(permissions: false, topicId);
+            result.AssertForbidden();
 
             userService.Verify(s => s.GetUserId());
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem)).ReturnsAsync(true);
 
-            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllPublications)).ReturnsAsync(true);
 
             var list = new List<Publication>
             {
@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userService.Verify(s => s.GetUserId());
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
-            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases));
+            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanViewAllPublications));
             userService.VerifyNoOtherCalls();
 
             publicationRepository.Verify(s => s.GetPublicationsForTopic(topicId));
@@ -120,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void GetPublicationsByTopic_CanViewRelatedPublications()
+        public async Task GetPublicationsByTopic_CanViewRelatedPublications()
         {
             var userService = AlwaysTrueUserService();
             var publicationRepository = new Mock<IPublicationRepository>(Strict);
@@ -134,9 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 publicationRepository: publicationRepository.Object);
 
             userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem)).ReturnsAsync(true);
-
-            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases)).ReturnsAsync(false);
-
+            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllPublications)).ReturnsAsync(false);
             userService.Setup(s => s.GetUserId()).Returns(userId);
 
             var list = new List<Publication>
@@ -153,14 +151,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             publicationRepository.Setup(s => s.IsSuperseded(list[0]))
                 .Returns(false);
 
-            var result = publicationService.GetPublicationsByTopic(permissions: false, topicId).Result;
+            var result = await publicationService.GetPublicationsByTopic(permissions: false, topicId);
             var publicationViewModels = result.AssertRight();
 
             Assert.Single(publicationViewModels);
             Assert.Equal(list[0].Id, publicationViewModels[0].Id);
 
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
-            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases));
+            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanViewAllPublications));
             userService.Verify(s => s.GetUserId());
             userService.VerifyNoOtherCalls();
 

@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return await _userService
                 .CheckCanAccessSystem()
-                .OnSuccess(_ => _userService.CheckCanViewAllReleases() // @MarkFix new permission for Publications?
+                .OnSuccess(_ => _userService.CheckCanViewAllPublications()
                     .OnSuccess(() =>
                     {
                         if (!topicId.HasValue)

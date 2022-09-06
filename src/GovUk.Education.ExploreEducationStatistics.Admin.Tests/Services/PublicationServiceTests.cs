@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class PublicationServiceTests
     {
         [Fact]
-        public async Task GetPublicationsByTopic_CanViewAllReleases()
+        public async Task GetPublicationsByTopic_CanViewAllPublications()
         {
             var topic = new Topic
             {
@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userService.Setup(s => s.GetUserId()).Returns(new Guid());
             userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(CanViewAllReleases)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(CanViewAllPublications)).ReturnsAsync(true);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetPublicationsByTopic_CanViewAllReleases_Order()
+        public async Task GetPublicationsByTopic_CanViewAllPublications_Order()
         {
             var topic = new Topic();
 
@@ -150,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userService.Setup(s => s.GetUserId()).Returns(new Guid());
             userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(CanViewAllReleases)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(CanViewAllPublications)).ReturnsAsync(true);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetPublicationsByTopic_CanViewAllReleases_Permissions()
+        public async Task GetPublicationsByTopic_CanViewAllPublications_Permissions()
         {
             var topic = new Topic
             {
@@ -209,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userService.Setup(s => s.GetUserId()).Returns(new Guid());
             userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(CanViewAllReleases)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(CanViewAllPublications)).ReturnsAsync(true);
 
             userService.Setup(s => s.MatchesPolicy(publication, CanUpdateSpecificPublication)).ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(CanUpdatePublicationTitles)).ReturnsAsync(true);
@@ -252,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetPublicationsByTopic_CannotViewAllReleases()
+        public async Task GetPublicationsByTopic_CannotViewAllPublications()
         {
             var userId = Guid.NewGuid();
 
@@ -294,7 +294,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userService.Setup(s => s.GetUserId()).Returns(userId);
             userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(CanViewAllReleases)).ReturnsAsync(false);
+            userService.Setup(s => s.MatchesPolicy(CanViewAllPublications)).ReturnsAsync(false);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -336,7 +336,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetPublicationsByTopic_CannotViewAllReleases_Order()
+        public async Task GetPublicationsByTopic_CannotViewAllPublications_Order()
         {
             var userId = Guid.NewGuid();
 
@@ -373,7 +373,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userService.Setup(s => s.GetUserId()).Returns(userId);
             userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(CanViewAllReleases)).ReturnsAsync(false);
+            userService.Setup(s => s.MatchesPolicy(CanViewAllPublications)).ReturnsAsync(false);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -404,7 +404,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetPublicationsByTopic_CannotViewAllReleases_Permissions()
+        public async Task GetPublicationsByTopic_CannotViewAllPublications_Permissions()
         {
             var userId = new Guid();
 
@@ -440,7 +440,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userService.Setup(s => s.GetUserId()).Returns(userId);
             userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(CanViewAllReleases)).ReturnsAsync(false);
+            userService.Setup(s => s.MatchesPolicy(CanViewAllPublications)).ReturnsAsync(false);
 
             userService.Setup(s => s.MatchesPolicy(publication, CanUpdateSpecificPublication)).ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(CanUpdatePublicationTitles)).ReturnsAsync(true);
