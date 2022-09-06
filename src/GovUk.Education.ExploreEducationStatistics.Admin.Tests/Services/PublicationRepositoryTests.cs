@@ -5,10 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
@@ -19,8 +17,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class PublicationRepositoryTests
     {
-        // @MarkFix Add GetPublicationListForUser test where no topic is supplied
-
         [Fact]
         public async Task GetPublicationListForUser()
         {
@@ -257,6 +253,197 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2, result[2].Releases.Count);
                 Assert.Equal("Academic Year 2011/12", result[2].Releases[0].Title);
                 Assert.Equal("Academic Year 2012/13", result[2].Releases[1].Title);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationListForUser_NoTopic()
+        {
+            var user = new User();
+
+            var userPublicationRoles = new List<UserPublicationRole>
+            {
+                new()
+                {
+                    Publication = new Publication
+                    {
+                        Title = "Publication Owner publication",
+                        Releases = new List<Release>
+                        {
+                            new()
+                            {
+                                ReleaseName = "2015",
+                                TimePeriodCoverage = AcademicYear,
+                            },
+                            new()
+                            {
+                                ReleaseName = "2016",
+                                TimePeriodCoverage = AcademicYear,
+                            }
+                        },
+                        Topic = new Topic { Theme = new Theme(), },
+                    },
+                    User = user,
+                    Role = Owner,
+                },
+                new()
+                {
+                    Publication = new Publication
+                    {
+                        Title = "Publication ReleaseApprover publication",
+                        Releases = new List<Release>
+                        {
+                            new()
+                            {
+                                ReleaseName = "2015",
+                                TimePeriodCoverage = AcademicYear,
+                            },
+                            new()
+                            {
+                                ReleaseName = "2016",
+                                TimePeriodCoverage = AcademicYear,
+                            }
+                        },
+                        Topic = new Topic { Theme = new Theme(), },
+                    },
+                    User = user,
+                    Role = ReleaseApprover,
+                },
+                new()
+                {
+                    Publication = new Publication
+                    {
+                        Title = "Publication Owner publication 2",
+                        Releases = new List<Release>
+                        {
+                            new()
+                            {
+                                ReleaseName = "2012",
+                                TimePeriodCoverage = AcademicYear,
+                            }
+                        },
+                        Topic = new Topic
+                        {
+                            Theme = new Theme(),
+                        },
+                    },
+                    User = user,
+                    Role = Owner,
+                },
+            };
+
+            var userReleaseRoles = new List<UserReleaseRole>
+            {
+                new()
+                {
+                    Release = new Release
+                    {
+                        ReleaseName = "2014",
+                        TimePeriodCoverage = AcademicYear,
+                        Publication = new Publication
+                        {
+                            Title = "Release Contributor publication",
+                            Topic = new Topic { Theme = new Theme(), },
+                        },
+                    },
+                    User = user,
+                    Role = Contributor,
+                },
+                new()
+                {
+                    Release = new Release
+                    {
+                        ReleaseName = "2012",
+                        TimePeriodCoverage = AcademicYear,
+                        Publication = new Publication
+                        {
+                            Title = "Release Viewer publication",
+                            Topic = new Topic { Theme = new Theme(), },
+                        },
+                    },
+                    User = user,
+                    Role = Viewer,
+                },
+                new()
+                {
+                    Release = new Release
+                    {
+                        ReleaseName = "2020",
+                        TimePeriodCoverage = AcademicYear,
+                        Publication = new Publication
+                        {
+                            Title = "Release PrereleaseViewer publication",
+                            Topic = new Topic { Theme = new Theme(), },
+                        }
+                    },
+                    User = user,
+                    Role = PrereleaseViewer,
+                },
+                new()
+                {
+                    Release = new Release
+                    {
+                        ReleaseName = "2011",
+                        TimePeriodCoverage = AcademicYear,
+                        Publication = new Publication
+                        {
+                            Title = "Release Contributor publication 2",
+                            Topic = new Topic
+                            {
+                                Theme = new Theme(),
+                            },
+                        }
+                    },
+                    User = user,
+                    Role = Contributor,
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.Users.AddAsync(user);
+                await contentDbContext.UserReleaseRoles.AddRangeAsync(userReleaseRoles);
+                await contentDbContext.UserPublicationRoles.AddRangeAsync(userPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var service = new PublicationRepository(contentDbContext);
+                var result = await service.GetPublicationListForUser(user.Id);
+
+                // Result should contain all publications except the one associated with the
+                // Release.PrereleaseViewer role
+                Assert.Equal(6, result.Count);
+
+                Assert.False(result.Exists(pub => pub.Title == "Release PrereleaseViewer publication"));
+
+                Assert.Equal("Publication Owner publication", result[0].Title);
+                Assert.Equal(2, result[0].Releases.Count);
+                Assert.Equal("Academic Year 2015/16", result[0].Releases[0].Title);
+                Assert.Equal("Academic Year 2016/17", result[0].Releases[1].Title);
+
+                Assert.Equal("Publication ReleaseApprover publication", result[1].Title);
+                Assert.Equal(2, result[1].Releases.Count);
+                Assert.Equal("Academic Year 2015/16", result[1].Releases[0].Title);
+                Assert.Equal("Academic Year 2016/17", result[1].Releases[1].Title);
+
+                Assert.Equal("Publication Owner publication 2", result[2].Title);
+                Assert.Single(result[2].Releases);
+                Assert.Equal("Academic Year 2012/13", result[2].Releases[0].Title);
+
+                Assert.Equal("Release Contributor publication", result[3].Title);
+                Assert.Single(result[3].Releases);
+                Assert.Equal("Academic Year 2014/15", result[3].Releases[0].Title);
+
+                Assert.Equal("Release Viewer publication", result[4].Title);
+                Assert.Single(result[4].Releases);
+                Assert.Equal("Academic Year 2012/13", result[4].Releases[0].Title);
+
+                Assert.Equal("Release Contributor publication 2", result[5].Title);
+                Assert.Single(result[5].Releases);
+                Assert.Equal("Academic Year 2011/12", result[5].Releases[0].Title);
             }
         }
 

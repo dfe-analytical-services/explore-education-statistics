@@ -40,6 +40,136 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
+        public void GetMyPublicationsByTopic_NoAccessOfSystem()
+        {
+            var userService = AlwaysTrueUserService();
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
+
+            var topicId = Guid.NewGuid();
+
+            var publicationService = BuildPublicationService(
+                context: Mock.Of<ContentDbContext>(Strict),
+                userService: userService.Object,
+                publicationRepository: publicationRepository.Object);
+
+            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem)).ReturnsAsync(false);
+
+            var list = new List<Publication> {
+                new()
+                {
+                    Id = Guid.NewGuid()
+                }
+            };
+
+            publicationRepository.Setup(s => s.GetPublicationsForTopic(topicId)).ReturnsAsync(list);
+
+            var result = publicationService.GetPublicationsByTopic(permissions: false, topicId).Result.Left;
+            Assert.IsAssignableFrom<ForbidResult>(result);
+
+            userService.Verify(s => s.GetUserId());
+            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
+            userService.VerifyNoOtherCalls();
+
+            publicationRepository.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public async Task GetPublicationsByTopic_CanViewAllPublications()
+        {
+            var userService = AlwaysTrueUserService();
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
+
+            var topicId = Guid.NewGuid();
+
+            var publicationService = BuildPublicationService(
+                context: Mock.Of<ContentDbContext>(Strict),
+                userService: userService.Object,
+                publicationRepository: publicationRepository.Object);
+
+            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem)).ReturnsAsync(true);
+
+            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases)).ReturnsAsync(true);
+
+            var list = new List<Publication>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid()
+                }
+            };
+
+            publicationRepository.Setup(s => s.IsSuperseded(list[0]))
+                .Returns(false);
+
+            publicationRepository.Setup(s => s.GetPublicationsForTopic(topicId)).ReturnsAsync(list);
+
+            var result = await publicationService.GetPublicationsByTopic(permissions: false, topicId);
+            var publicationViewModels = result.AssertRight();
+
+            Assert.Single(publicationViewModels);
+            Assert.Equal(list[0].Id, publicationViewModels[0].Id);
+
+            userService.Verify(s => s.GetUserId());
+            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
+            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases));
+            userService.VerifyNoOtherCalls();
+
+            publicationRepository.Verify(s => s.GetPublicationsForTopic(topicId));
+            publicationRepository.Verify(s => s.IsSuperseded(list[0]));
+            publicationRepository.VerifyNoOtherCalls();
+        }
+
+        [Fact]
+        public void GetPublicationsByTopic_CanViewRelatedPublications()
+        {
+            var userService = AlwaysTrueUserService();
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
+
+            var topicId = Guid.NewGuid();
+            var userId = Guid.NewGuid();
+
+            var publicationService = BuildPublicationService(
+                context: Mock.Of<ContentDbContext>(Strict),
+                userService: userService.Object,
+                publicationRepository: publicationRepository.Object);
+
+            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem)).ReturnsAsync(true);
+
+            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases)).ReturnsAsync(false);
+
+            userService.Setup(s => s.GetUserId()).Returns(userId);
+
+            var list = new List<Publication>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid()
+                }
+            };
+
+            publicationRepository.Setup(s => s.GetPublicationListForUser(userId, topicId))
+                .ReturnsAsync(list);
+
+            publicationRepository.Setup(s => s.IsSuperseded(list[0]))
+                .Returns(false);
+
+            var result = publicationService.GetPublicationsByTopic(permissions: false, topicId).Result;
+            var publicationViewModels = result.AssertRight();
+
+            Assert.Single(publicationViewModels);
+            Assert.Equal(list[0].Id, publicationViewModels[0].Id);
+
+            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
+            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases));
+            userService.Verify(s => s.GetUserId());
+            userService.VerifyNoOtherCalls();
+
+            publicationRepository.Verify(s => s.GetPublicationListForUser(userId, topicId));
+            publicationRepository.Verify(s => s.IsSuperseded(list[0]));
+            publicationRepository.VerifyNoOtherCalls();
+        }
+
+        [Fact]
         public void GetMyPublicationsAndReleasesByTopic_NoAccessOfSystem()
         {
             var userService = AlwaysTrueUserService();

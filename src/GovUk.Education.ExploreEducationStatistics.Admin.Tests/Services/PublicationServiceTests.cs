@@ -32,7 +32,451 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class PublicationServiceTests
     {
-        // @MarkFix Add tests for GetPublicationsByTopic
+        [Fact]
+        public async Task GetPublicationsByTopic_CanViewAllReleases()
+        {
+            var topic = new Topic
+            {
+                Title = "Topic title",
+                Theme = new Theme
+                {
+                    Title = "Theme title",
+                },
+            };
+
+            var publication = new Publication
+            {
+                Title = "Test Publication",
+                Summary = "Test summary",
+                Slug = "test-slug",
+                Topic = topic,
+                Contact = new Contact
+                {
+                    ContactName = "contact name",
+                    ContactTelNo = "1234",
+                    TeamName = "team name",
+                    TeamEmail = "team@email",
+                },
+                SupersededBy = null,
+            };
+
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
+
+            publicationRepository.Setup(s => s.GetPublicationsForTopic(topic.Id))
+                .ReturnsAsync(new List<Publication>
+                {
+                    publication,
+                });
+            publicationRepository.Setup(s => s.IsSuperseded(publication)).Returns(false);
+
+            var userService = new Mock<IUserService>(Strict);
+
+            userService.Setup(s => s.GetUserId()).Returns(new Guid());
+            userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(CanViewAllReleases)).ReturnsAsync(true);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object,
+                    publicationRepository: publicationRepository.Object);
+
+                var result = await publicationService
+                    .GetPublicationsByTopic(permissions: false, topic.Id);
+
+                VerifyAllMocks(publicationRepository);
+
+                var publicationViewModelList = result.AssertRight();
+
+                var publicationViewModel = Assert.Single(publicationViewModelList);
+
+                Assert.Equal(publication.Id, publicationViewModel.Id);
+                Assert.Equal(publication.Title, publicationViewModel.Title);
+                Assert.Equal(publication.Summary, publicationViewModel.Summary);
+                Assert.Equal(publication.Slug, publicationViewModel.Slug);
+                Assert.Equal(publication.Topic.Id, publicationViewModel.Topic.Id);
+                Assert.Equal(publication.Topic.Title, publicationViewModel.Topic.Title);
+                Assert.Equal(publication.Topic.Theme.Id, publicationViewModel.Theme.Id);
+                Assert.Equal(publication.Topic.Theme.Title, publicationViewModel.Theme.Title);
+
+                Assert.Equal(publication.Contact.Id, publicationViewModel.Contact.Id);
+                Assert.Equal(publication.Contact.ContactName, publicationViewModel.Contact.ContactName);
+                Assert.Equal(publication.Contact.ContactTelNo, publicationViewModel.Contact.ContactTelNo);
+                Assert.Equal(publication.Contact.TeamName, publicationViewModel.Contact.TeamName);
+                Assert.Equal(publication.Contact.TeamEmail, publicationViewModel.Contact.TeamEmail);
+
+                Assert.Null(publicationViewModel.SupersededById);
+                Assert.False(publicationViewModel.IsSuperseded);
+
+                Assert.Null(publicationViewModel.Permissions);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationsByTopic_CanViewAllReleases_Order()
+        {
+            var topic = new Topic();
+
+            var publication1 = new Publication
+            {
+                Title = "A",
+            };
+
+            var publication2 = new Publication
+            {
+                Title = "B",
+            };
+
+            var publication3 = new Publication
+            {
+                Title = "C",
+            };
+
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
+
+            publicationRepository.Setup(s => s.GetPublicationsForTopic(topic.Id))
+                .ReturnsAsync(new List<Publication>
+                {
+                    publication2,
+                    publication3,
+                    publication1,
+                });
+
+            publicationRepository.Setup(s => s.IsSuperseded(It.IsAny<Publication>())).Returns(false);
+
+            var userService = new Mock<IUserService>(Strict);
+
+            userService.Setup(s => s.GetUserId()).Returns(new Guid());
+            userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(CanViewAllReleases)).ReturnsAsync(true);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object,
+                    publicationRepository: publicationRepository.Object);
+
+                var result = await publicationService
+                    .GetPublicationsByTopic(permissions: false, topic.Id);
+
+                VerifyAllMocks(publicationRepository);
+
+                var publicationViewModelList = result.AssertRight();
+
+                Assert.Equal(3, publicationViewModelList.Count);
+                Assert.Equal(publication1.Id, publicationViewModelList[0].Id);
+                Assert.Equal(publication1.Title, publicationViewModelList[0].Title);
+
+                Assert.Equal(publication2.Id, publicationViewModelList[1].Id);
+                Assert.Equal(publication2.Title, publicationViewModelList[1].Title);
+
+                Assert.Equal(publication3.Id, publicationViewModelList[2].Id);
+                Assert.Equal(publication3.Title, publicationViewModelList[2].Title);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationsByTopic_CanViewAllReleases_Permissions()
+        {
+            var topic = new Topic
+            {
+                Title = "Topic title",
+                Theme = new Theme
+                {
+                    Title = "Theme title",
+                },
+            };
+
+            var publication = new Publication
+            {
+                Title = "Test Publication",
+            };
+
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
+
+            publicationRepository.Setup(s => s.GetPublicationsForTopic(topic.Id))
+                .ReturnsAsync(new List<Publication>
+                {
+                    publication,
+                });
+            publicationRepository.Setup(s => s.IsSuperseded(publication)).Returns(true);
+
+            var userService = new Mock<IUserService>(Strict);
+
+            userService.Setup(s => s.GetUserId()).Returns(new Guid());
+            userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(CanViewAllReleases)).ReturnsAsync(true);
+
+            userService.Setup(s => s.MatchesPolicy(publication, CanUpdateSpecificPublication)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(CanUpdatePublicationTitles)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(CanUpdatePublicationSupersededBy)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(publication, CanCreateReleaseForSpecificPublication)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(publication, CanAdoptMethodologyForSpecificPublication)).ReturnsAsync(false);
+            userService.Setup(s => s.MatchesPolicy(publication, CanCreateMethodologyForSpecificPublication)).ReturnsAsync(false);
+            userService.Setup(s => s.MatchesPolicy(publication, CanManageExternalMethodologyForSpecificPublication)).ReturnsAsync(false);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object,
+                    publicationRepository: publicationRepository.Object);
+
+                var result = await publicationService
+                    .GetPublicationsByTopic(permissions: true, topic.Id);
+
+                VerifyAllMocks(publicationRepository);
+
+                var publicationViewModelList = result.AssertRight();
+
+                var publicationViewModel = Assert.Single(publicationViewModelList);
+
+                Assert.Equal(publication.Id, publicationViewModel.Id);
+
+                Assert.True(publicationViewModel.IsSuperseded);
+
+                Assert.NotNull(publicationViewModel.Permissions);
+                Assert.True(publicationViewModel.Permissions!.CanUpdatePublication);
+                Assert.True(publicationViewModel.Permissions.CanUpdatePublicationTitle);
+                Assert.True(publicationViewModel.Permissions.CanUpdatePublicationSupersededBy);
+                Assert.True(publicationViewModel.Permissions.CanCreateReleases);
+                Assert.False(publicationViewModel.Permissions.CanAdoptMethodologies);
+                Assert.False(publicationViewModel.Permissions.CanCreateMethodologies);
+                Assert.False(publicationViewModel.Permissions.CanManageExternalMethodology);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationsByTopic_CannotViewAllReleases()
+        {
+            var userId = Guid.NewGuid();
+
+            var topic = new Topic
+            {
+                Title = "Topic title",
+                Theme = new Theme
+                {
+                    Title = "Theme title",
+                },
+            };
+
+            var publication = new Publication
+            {
+                Title = "Test Publication",
+                Summary = "Test summary",
+                Slug = "test-slug",
+                Topic = topic,
+                Contact = new Contact
+                {
+                    ContactName = "contact name",
+                    ContactTelNo = "1234",
+                    TeamName = "team name",
+                    TeamEmail = "team@email",
+                },
+                SupersededBy = null,
+            };
+
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
+
+            publicationRepository.Setup(s => s.GetPublicationListForUser(userId, topic.Id))
+                .ReturnsAsync(new List<Publication>
+                {
+                    publication,
+                });
+            publicationRepository.Setup(s => s.IsSuperseded(publication)).Returns(false);
+
+            var userService = new Mock<IUserService>(Strict);
+
+            userService.Setup(s => s.GetUserId()).Returns(userId);
+            userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(CanViewAllReleases)).ReturnsAsync(false);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object,
+                    publicationRepository: publicationRepository.Object);
+
+                var result = await publicationService
+                    .GetPublicationsByTopic(permissions: false, topic.Id);
+
+                VerifyAllMocks(publicationRepository);
+
+                var publicationViewModelList = result.AssertRight();
+
+                var publicationViewModel = Assert.Single(publicationViewModelList);
+
+                Assert.Equal(publication.Id, publicationViewModel.Id);
+                Assert.Equal(publication.Title, publicationViewModel.Title);
+                Assert.Equal(publication.Summary, publicationViewModel.Summary);
+                Assert.Equal(publication.Slug, publicationViewModel.Slug);
+                Assert.Equal(publication.Topic.Id, publicationViewModel.Topic.Id);
+                Assert.Equal(publication.Topic.Title, publicationViewModel.Topic.Title);
+                Assert.Equal(publication.Topic.Theme.Id, publicationViewModel.Theme.Id);
+                Assert.Equal(publication.Topic.Theme.Title, publicationViewModel.Theme.Title);
+
+                Assert.Equal(publication.Contact.Id, publicationViewModel.Contact.Id);
+                Assert.Equal(publication.Contact.ContactName, publicationViewModel.Contact.ContactName);
+                Assert.Equal(publication.Contact.ContactTelNo, publicationViewModel.Contact.ContactTelNo);
+                Assert.Equal(publication.Contact.TeamName, publicationViewModel.Contact.TeamName);
+                Assert.Equal(publication.Contact.TeamEmail, publicationViewModel.Contact.TeamEmail);
+
+                Assert.Null(publicationViewModel.SupersededById);
+                Assert.False(publicationViewModel.IsSuperseded);
+
+                Assert.Null(publicationViewModel.Permissions);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationsByTopic_CannotViewAllReleases_Order()
+        {
+            var userId = Guid.NewGuid();
+
+            var topic = new Topic();
+
+            var publication1 = new Publication
+            {
+                Title = "A",
+            };
+
+            var publication2 = new Publication
+            {
+                Title = "B",
+            };
+
+            var publication3 = new Publication
+            {
+                Title = "C",
+            };
+
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
+
+            publicationRepository.Setup(s => s.GetPublicationListForUser(userId, topic.Id))
+                .ReturnsAsync(new List<Publication>
+                {
+                    publication2,
+                    publication3,
+                    publication1,
+                });
+
+            publicationRepository.Setup(s => s.IsSuperseded(It.IsAny<Publication>())).Returns(false);
+
+            var userService = new Mock<IUserService>(Strict);
+
+            userService.Setup(s => s.GetUserId()).Returns(userId);
+            userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(CanViewAllReleases)).ReturnsAsync(false);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object,
+                    publicationRepository: publicationRepository.Object);
+
+                var result = await publicationService
+                    .GetPublicationsByTopic(permissions: false, topic.Id);
+
+                VerifyAllMocks(publicationRepository);
+
+                var publicationViewModelList = result.AssertRight();
+
+                Assert.Equal(3, publicationViewModelList.Count);
+
+                Assert.Equal(publication1.Id, publicationViewModelList[0].Id);
+                Assert.Equal(publication1.Title, publicationViewModelList[0].Title);
+
+                Assert.Equal(publication2.Id, publicationViewModelList[1].Id);
+                Assert.Equal(publication2.Title, publicationViewModelList[1].Title);
+
+                Assert.Equal(publication3.Id, publicationViewModelList[2].Id);
+                Assert.Equal(publication3.Title, publicationViewModelList[2].Title);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationsByTopic_CannotViewAllReleases_Permissions()
+        {
+            var userId = new Guid();
+
+            var topic = new Topic
+            {
+                Title = "Topic title",
+                Theme = new Theme
+                {
+                    Title = "Theme title",
+                },
+            };
+
+            var publication = new Publication
+            {
+                Title = "Test Publication",
+                Summary = "Test summary",
+                Slug = "test-slug",
+                Topic = topic,
+                Contact = new Contact(),
+                SupersededBy = null,
+            };
+
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
+
+            publicationRepository.Setup(s => s.GetPublicationListForUser(userId, topic.Id))
+                .ReturnsAsync(new List<Publication>
+                {
+                    publication,
+                });
+            publicationRepository.Setup(s => s.IsSuperseded(publication)).Returns(false);
+
+            var userService = new Mock<IUserService>(Strict);
+
+            userService.Setup(s => s.GetUserId()).Returns(userId);
+            userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(CanViewAllReleases)).ReturnsAsync(false);
+
+            userService.Setup(s => s.MatchesPolicy(publication, CanUpdateSpecificPublication)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(CanUpdatePublicationTitles)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(CanUpdatePublicationSupersededBy)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(publication, CanCreateReleaseForSpecificPublication)).ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(publication, CanAdoptMethodologyForSpecificPublication)).ReturnsAsync(false);
+            userService.Setup(s => s.MatchesPolicy(publication, CanCreateMethodologyForSpecificPublication)).ReturnsAsync(false);
+            userService.Setup(s => s.MatchesPolicy(publication, CanManageExternalMethodologyForSpecificPublication)).ReturnsAsync(false);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object,
+                    publicationRepository: publicationRepository.Object);
+
+                var result = await publicationService
+                    .GetPublicationsByTopic(permissions: true, topic.Id);
+
+                VerifyAllMocks(publicationRepository);
+
+                var publicationViewModelList = result.AssertRight();
+
+                var publicationViewModel = Assert.Single(publicationViewModelList);
+
+                Assert.NotNull(publicationViewModel.Permissions);
+                Assert.True(publicationViewModel.Permissions!.CanUpdatePublication);
+                Assert.True(publicationViewModel.Permissions.CanUpdatePublicationTitle);
+                Assert.True(publicationViewModel.Permissions.CanUpdatePublicationSupersededBy);
+                Assert.True(publicationViewModel.Permissions.CanCreateReleases);
+                Assert.False(publicationViewModel.Permissions.CanAdoptMethodologies);
+                Assert.False(publicationViewModel.Permissions.CanCreateMethodologies);
+                Assert.False(publicationViewModel.Permissions.CanManageExternalMethodology);
+            }
+        }
 
         [Fact]
         public async Task GetMyPublicationsAndReleasesByTopic_CanViewAllReleases_ReleaseOrder()
