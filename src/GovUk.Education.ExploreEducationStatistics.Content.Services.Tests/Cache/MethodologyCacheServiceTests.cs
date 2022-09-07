@@ -22,11 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Cach
 [Collection(CacheServiceTests)]
 public class MethodologyCacheServiceTests : CacheServiceTestFixture
 {
-    public MethodologyCacheServiceTests()
-    {
-        BlobCacheAttribute.AddService("public", BlobCacheService.Object);
-    }
-
     private readonly List<AllMethodologiesThemeViewModel> _methodologyTree = ListOf(
         new AllMethodologiesThemeViewModel
         {
@@ -66,7 +61,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetSummariesTree_NoCachedTreeExists()
     {
-        BlobCacheService
+        PublicBlobCacheService
             .Setup(s => s.GetItem(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
             .ReturnsAsync(null);
 
@@ -76,7 +71,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
             .Setup(s => s.GetSummariesTree())
             .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(_methodologyTree));
 
-        BlobCacheService
+        PublicBlobCacheService
             .Setup(s => s.SetItem<object>(new AllMethodologiesCacheKey(), _methodologyTree))
             .Returns(Task.CompletedTask);
 
@@ -84,7 +79,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
 
         var result = await service.GetSummariesTree();
 
-        VerifyAllMocks(methodologyService, BlobCacheService);
+        VerifyAllMocks(methodologyService, PublicBlobCacheService);
 
         result.AssertRight(_methodologyTree);
     }
@@ -92,7 +87,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetSummariesTree_CachedTreeExists()
     {
-        BlobCacheService
+        PublicBlobCacheService
             .Setup(s => s.GetItem(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
             .ReturnsAsync(_methodologyTree);
 
@@ -100,7 +95,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
 
         var result = await service.GetSummariesTree();
 
-        VerifyAllMocks(BlobCacheService);
+        VerifyAllMocks(PublicBlobCacheService);
 
         result.AssertRight(_methodologyTree);
     }
@@ -110,7 +105,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
     {
         var publicationId = _methodologyTree[1].Topics[0].Publications[0].Id;
 
-        BlobCacheService
+        PublicBlobCacheService
             .Setup(s => s.GetItem(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
             .ReturnsAsync(null);
 
@@ -120,7 +115,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
             .Setup(s => s.GetSummariesTree())
             .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(_methodologyTree));
 
-        BlobCacheService
+        PublicBlobCacheService
             .Setup(s => s.SetItem<object>(new AllMethodologiesCacheKey(), _methodologyTree))
             .Returns(Task.CompletedTask);
 
@@ -128,7 +123,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
 
         var result = await service.GetSummariesByPublication(publicationId);
 
-        VerifyAllMocks(methodologyService, BlobCacheService);
+        VerifyAllMocks(methodologyService, PublicBlobCacheService);
 
         var expectedMethodologiesByPublication =
             _methodologyTree[1].Topics[0].Publications[0].Methodologies;
@@ -147,7 +142,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
 
         // We should not see any attempt to "get" the cached tree, but rather only see a fresh fetching
         // of the latest tree and then it being cached.
-        BlobCacheService
+        PublicBlobCacheService
             .Setup(s => s.SetItem<object>(new AllMethodologiesCacheKey(), _methodologyTree))
             .Returns(Task.CompletedTask);
 
@@ -155,7 +150,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
 
         var result = await service.UpdateSummariesTree();
 
-        VerifyAllMocks(methodologyService, BlobCacheService);
+        VerifyAllMocks(methodologyService, PublicBlobCacheService);
 
         result.AssertRight(_methodologyTree);
     }
@@ -165,7 +160,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
     {
         var publicationId = _methodologyTree[1].Topics[0].Publications[0].Id;
 
-        BlobCacheService
+        PublicBlobCacheService
             .Setup(s => s.GetItem(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
             .ReturnsAsync(_methodologyTree);
 
@@ -173,7 +168,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
 
         var result = await service.GetSummariesByPublication(publicationId);
 
-        VerifyAllMocks(BlobCacheService);
+        VerifyAllMocks(PublicBlobCacheService);
 
         var expectedMethodologiesByPublication =
             _methodologyTree[1].Topics[0].Publications[0].Methodologies;
@@ -186,7 +181,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
     {
         var publicationId = Guid.NewGuid();
 
-        BlobCacheService
+        PublicBlobCacheService
             .Setup(s => s.GetItem(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
             .ReturnsAsync(_methodologyTree);
 
@@ -194,7 +189,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
 
         var result = await service.GetSummariesByPublication(publicationId);
 
-        VerifyAllMocks(BlobCacheService);
+        VerifyAllMocks(PublicBlobCacheService);
 
         result.AssertRight(new List<MethodologyVersionSummaryViewModel>());
     }

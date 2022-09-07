@@ -2,7 +2,6 @@
 using System;
 using AutoMapper;
 using Azure.Storage.Blobs;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -26,6 +25,8 @@ using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
 using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
+using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
+using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
 using IContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
 using ContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.ThemeService;
 using FileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.FileStorageService;
@@ -56,19 +57,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("PublicStatisticsDb")))
                 .AddSingleton<IFileStorageService, FileStorageService>(provider =>
                     new FileStorageService(GetConfigurationValue(provider, "PublisherStorage")))
-                .AddScoped(provider =>
-                {
-                    var publicBlobCacheService = GetBlobCacheService(provider, "PublicStorage");
-                    CacheAspect.Enabled = true;
-                    BlobCacheAttribute.AddService("public", publicBlobCacheService);
-                    return publicBlobCacheService;
-                })
 
                 // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
                 // EES-3528 plans to send a request to the Content API to update its cached resources instead of this
                 // being done from Publisher directly, and so these DI dependencies should eventually be removed.
                 .AddScoped<IContentMethodologyService, ContentMethodologyService>()
                 .AddScoped<IMethodologyCacheService, MethodologyCacheService>()
+                .AddScoped<IContentPublicationService, ContentPublicationService>()
+                .AddScoped<IPublicationCacheService, PublicationCacheService>()
                 .AddScoped<IThemeCacheService, ThemeCacheService>()
                 .AddScoped<IContentThemeService, ContentThemeService>()
 

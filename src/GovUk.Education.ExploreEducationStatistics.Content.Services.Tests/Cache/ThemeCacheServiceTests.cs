@@ -20,11 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Cach
 [Collection(CacheServiceTests)]
 public class ThemeCacheServiceTests : CacheServiceTestFixture
 {
-    public ThemeCacheServiceTests()
-    {
-        BlobCacheAttribute.AddService("public", BlobCacheService.Object);
-    }
-
     [Fact]
     public async Task GetPublicationTree_NoCachedTreeExists()
     {
@@ -46,7 +41,7 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
             }
         });
         
-        BlobCacheService
+        PublicBlobCacheService
             .Setup(s => s.GetItem(
                 new PublicationTreeCacheKey(), typeof(IList<ThemeTree<PublicationTreeNode>>)))
             .ReturnsAsync(null);
@@ -57,7 +52,7 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
             .Setup(s => s.GetPublicationTree())
             .ReturnsAsync(publicationTree);
         
-        BlobCacheService
+        PublicBlobCacheService
             .Setup(s => s.SetItem<object>(
                 new PublicationTreeCacheKey(), publicationTree))
             .Returns(Task.CompletedTask);
@@ -66,7 +61,7 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
 
         var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
 
-        VerifyAllMocks(BlobCacheService);
+        VerifyAllMocks(PublicBlobCacheService);
 
         var filteredTree = result.AssertRight();
         filteredTree.AssertDeepEqualTo(publicationTree);
@@ -93,7 +88,7 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
             }
         };
         
-        BlobCacheService
+        PublicBlobCacheService
             .Setup(s => s.GetItem(
                 new PublicationTreeCacheKey(), typeof(IList<ThemeTree<PublicationTreeNode>>)))
             .ReturnsAsync(ListOf(publicationTree));
@@ -102,7 +97,7 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
 
         var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
 
-        VerifyAllMocks(BlobCacheService);   
+        VerifyAllMocks(PublicBlobCacheService);   
 
         var filteredTree = result.AssertRight();
         filteredTree.AssertDeepEqualTo(ListOf(publicationTree));
@@ -388,7 +383,7 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
         
         // We should not see any attempt to "get" the cached tree, but rather only see a fresh fetching
         // of the latest tree and then it being cached.
-        BlobCacheService
+        PublicBlobCacheService
             .Setup(s => s.SetItem<object>(
                 new PublicationTreeCacheKey(), publicationTree))
             .Returns(Task.CompletedTask);
@@ -397,7 +392,7 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
 
         var filteredTree = await service.UpdatePublicationTree();
 
-        VerifyAllMocks(BlobCacheService);
+        VerifyAllMocks(PublicBlobCacheService);
         
         publicationTree.AssertDeepEqualTo(filteredTree);
     }
@@ -406,7 +401,7 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
         ThemeTree<PublicationTreeNode> publicationTree,
         PublicationTreeFilter filter)
     {
-        BlobCacheService
+        PublicBlobCacheService
             .Setup(s => s.GetItem(
                 new PublicationTreeCacheKey(), typeof(IList<ThemeTree<PublicationTreeNode>>)))
             .ReturnsAsync(ListOf(publicationTree));
@@ -415,7 +410,7 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
 
         var result = await service.GetPublicationTree(filter);
 
-        VerifyAllMocks(BlobCacheService);
+        VerifyAllMocks(PublicBlobCacheService);
 
         var filteredTree = result.AssertRight();
         filteredTree.AssertDeepEqualTo(ListOf(publicationTree));
@@ -425,7 +420,7 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
         ThemeTree<PublicationTreeNode> publicationTree,
         PublicationTreeFilter filter)
     {
-        BlobCacheService
+        PublicBlobCacheService
             .Setup(s => s.GetItem(
                 new PublicationTreeCacheKey(), typeof(IList<ThemeTree<PublicationTreeNode>>)))
             .ReturnsAsync(ListOf(publicationTree));
@@ -434,7 +429,7 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
 
         var result = await service.GetPublicationTree(filter);
 
-        VerifyAllMocks(BlobCacheService);
+        VerifyAllMocks(PublicBlobCacheService);
 
         var filteredTree = result.AssertRight();
         Assert.Empty(filteredTree);

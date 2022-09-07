@@ -39,11 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
 
             CreateMap<Publication, PublicationSummaryViewModel>();
 
-            CreateMap<Publication, PublicationViewModel>()
-                .ForMember(dest => dest.LegacyReleases,
-                    m => m.MapFrom(p => p.LegacyReleases.OrderByDescending(l => l.Order)))
-                .ForMember(dest => dest.Releases, m => m.Ignore());
-
             CreateMap<Release, CachedReleaseViewModel>()
                 .ForMember(dest => dest.CoverageTitle,
                     m => m.MapFrom(release => release.TimePeriodCoverage.GetEnumLabel()))
@@ -58,18 +53,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
                 .ForMember(
                     dest => dest.Content,
                     m => m.MapFrom(r => r.GenericContent.OrderBy(s => s.Order)));
-
-            CreateMap<Topic, TopicViewModel>();
-
-            CreateMap<Theme, ThemeViewModel>();
-
-            CreateMap<Contact, ContactViewModel>();
-
-            CreateMap<Release, ReleaseTitleViewModel>();
-
-            CreateMap<LegacyRelease, LegacyReleaseViewModel>();
-
-            CreateMap<ExternalMethodology, ExternalMethodologyViewModel>();
         }
 
         private void CreateContentBlockMap()

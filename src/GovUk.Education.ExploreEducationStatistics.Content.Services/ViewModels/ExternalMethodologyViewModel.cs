@@ -1,8 +1,17 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
+﻿#nullable enable
+
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+
+public record ExternalMethodologyViewModel(
+    string Title,
+    string Url)
 {
-    public class ExternalMethodologyViewModel
+    public ExternalMethodologyViewModel(ExternalMethodology externalMethodology) : this(
+        Title: externalMethodology.Title,
+        Url: externalMethodology.Url
+    )
     {
-        public string Title { get; set; }
-        public string Url { get; set; }
     }
 }

@@ -3,11 +3,11 @@ using System;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
@@ -61,7 +61,7 @@ public class LegacyReleaseServicePermissionTests
     private LegacyReleaseService SetupService(
         ContentDbContext? contentDbContext = null,
         PersistenceHelper<ContentDbContext>? persistenceHelper = null,
-        IBlobCacheService? publicBlobCacheService = null,
+        IPublicationCacheService? publicationCacheService = null,
         IUserService? userService = null,
         IMapper? mapper = null)
     {
@@ -70,7 +70,7 @@ public class LegacyReleaseServicePermissionTests
             mapper ?? AdminMapper(),
             userService ?? Mock.Of<IUserService>(Strict),
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-            publicBlobCacheService ?? Mock.Of<IBlobCacheService>(Strict)
+            publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict)
         );
     }
 

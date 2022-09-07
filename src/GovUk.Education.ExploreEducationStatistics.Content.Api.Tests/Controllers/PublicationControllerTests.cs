@@ -1,13 +1,15 @@
 ﻿#nullable enable
 using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
@@ -18,50 +20,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var publicationId = Guid.NewGuid();
 
-            var publicationService = new Mock<IPublicationService>(MockBehavior.Strict);
+            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-            publicationService.Setup(mock => mock.Get("publication-a"))
+            publicationCacheService.Setup(mock => mock.GetPublication("publication-a"))
                 .ReturnsAsync(new PublicationViewModel
                 {
                     Id = publicationId,
                     Title = "Test title",
                 });
 
-            var controller = BuildPublicationController(publicationService.Object);
+            var controller = BuildPublicationController(publicationCacheService.Object);
 
-            var publicationTitleViewModel = (await controller.GetPublicationTitle("publication-a")).Value;
+            var result = await controller.GetPublicationTitle("publication-a");
 
-            Assert.NotNull(publicationTitleViewModel);
-            Assert.IsType<PublicationTitleViewModel>(publicationTitleViewModel);
-            Assert.Equal(publicationId, publicationTitleViewModel!.Id);
+            VerifyAllMocks(publicationCacheService);
+
+            var publicationTitleViewModel = result.AssertOkResult();
+
+            Assert.Equal(publicationId, publicationTitleViewModel.Id);
             Assert.Equal("Test title", publicationTitleViewModel.Title);
-
-            MockUtils.VerifyAllMocks(publicationService);
         }
 
         [Fact]
         public async Task GetPublicationTitle_NotFound()
         {
-            var publicationService = new Mock<IPublicationService>(MockBehavior.Strict);
+            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-            publicationService.Setup(mock => mock.Get("missing-publication"))
+            publicationCacheService.Setup(mock => mock.GetPublication("missing-publication"))
                 .ReturnsAsync(new NotFoundResult());
 
-            var controller = BuildPublicationController(publicationService.Object);
+            var controller = BuildPublicationController(publicationCacheService.Object);
 
             var result = await controller.GetPublicationTitle("missing-publication");
 
-            Assert.IsType<NotFoundResult>(result.Result);
+            VerifyAllMocks(publicationCacheService);
 
-            MockUtils.VerifyAllMocks(publicationService);
+            result.AssertNotFoundResult();
         }
 
         private static PublicationController BuildPublicationController(
-            IPublicationService? publicationService = null
+            IPublicationCacheService? publicationCacheService = null
         )
         {
             return new PublicationController(
-                publicationService ?? Mock.Of<IPublicationService>()
+                publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict)
             );
         }
     }

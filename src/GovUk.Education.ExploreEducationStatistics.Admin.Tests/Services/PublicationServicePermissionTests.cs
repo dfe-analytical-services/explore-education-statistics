@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -15,7 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -40,37 +38,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
-        public void GetMyPublicationsAndReleasesByTopic_NoAccessOfSystem()
+        public async Task GetMyPublicationsAndReleasesByTopic_NoAccessOfSystem()
         {
-            var userService = AlwaysTrueUserService();
-            var publicationRepository = new Mock<IPublicationRepository>(Strict);
-
-            var topicId = Guid.NewGuid();
-
-            var publicationService = BuildPublicationService(
-                context: Mock.Of<ContentDbContext>(Strict),
-                userService: userService.Object,
-                publicationRepository: publicationRepository.Object);
-
-            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem)).ReturnsAsync(false);
-
-            var list = new List<Publication> {
-                new()
+            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectCheckToFail(SecurityPolicies.CanAccessSystem)
+                .AssertForbidden(async userService =>
                 {
-                    Id = Guid.NewGuid()
-                }
-            };
-
-            publicationRepository.Setup(s => s.GetAllPublicationsForTopic(topicId)).ReturnsAsync(list);
-
-            var result = publicationService.GetMyPublicationsAndReleasesByTopic(topicId).Result.Left;
-            Assert.IsAssignableFrom<ForbidResult>(result);
-
-            userService.Verify(s => s.GetUserId());
-            userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
-            userService.VerifyNoOtherCalls();
-
-            publicationRepository.VerifyNoOtherCalls();
+                    var service = BuildPublicationService(
+                        context: Mock.Of<ContentDbContext>(Strict),
+                        userService: userService.Object);
+                    return await service.GetMyPublicationsAndReleasesByTopic(Guid.NewGuid());
+                });
         }
 
         [Fact]
@@ -109,7 +87,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Single(publicationViewModels);
             Assert.Equal(list[0].Id, publicationViewModels[0].Id);
 
-            userService.Verify(s => s.GetUserId());
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem));
             userService.Verify(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases));
             userService.VerifyNoOtherCalls();
@@ -337,11 +314,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
-
                 var publicationService = BuildPublicationService(context,
-                    userService: userService.Object,
-                    publicBlobCacheService: publicBlobCacheService.Object);
+                    userService: userService.Object);
 
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
@@ -351,8 +325,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                var actionResult = result.AssertLeft();
-                Assert.IsType<ForbidResult>(actionResult);
+                VerifyAllMocks(userService);
+
+                result.AssertForbidden();
             }
         }
 
@@ -388,11 +363,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
-
                 var publicationService = BuildPublicationService(context,
-                    userService: userService.Object,
-                    publicBlobCacheService: publicBlobCacheService.Object);
+                    userService: userService.Object);
 
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
@@ -404,8 +376,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                var actionResult = result.AssertLeft();
-                Assert.IsType<ForbidResult>(actionResult);
+                VerifyAllMocks(userService);
+
+                result.AssertForbidden();
             }
         }
 
@@ -448,11 +421,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
-
                 var publicationService = BuildPublicationService(context,
-                    userService: userService.Object,
-                    publicBlobCacheService: publicBlobCacheService.Object);
+                    userService: userService.Object);
 
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
@@ -463,8 +433,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                var actionResult = result.AssertLeft();
-                Assert.IsType<ForbidResult>(actionResult);
+                result.AssertForbidden();
             }
         }
 
@@ -505,7 +474,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService? userService = null,
             IPublicationRepository? publicationRepository = null,
             IMethodologyVersionRepository? methodologyVersionRepository = null,
-            IBlobCacheService? publicBlobCacheService = null,
+            IPublicationCacheService? publicationCacheService = null,
             IMethodologyCacheService? methodologyCacheService = null,
             IThemeCacheService? themeCacheService = null)
         {
@@ -516,7 +485,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? AlwaysTrueUserService().Object,
                 publicationRepository ?? Mock.Of<IPublicationRepository>(Strict),
                 methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(Strict),
-                publicBlobCacheService ?? Mock.Of<IBlobCacheService>(Strict),
+                publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
                 themeCacheService ?? Mock.Of<IThemeCacheService>(Strict));
         }
