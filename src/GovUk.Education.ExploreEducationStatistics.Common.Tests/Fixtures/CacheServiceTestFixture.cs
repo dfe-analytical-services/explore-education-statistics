@@ -15,12 +15,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures
         protected const string CacheServiceTests = "Cache service tests";
 
         protected static readonly Mock<IBlobCacheService> BlobCacheService = new(MockBehavior.Strict);
+        protected static readonly Mock<IBlobCacheService> PublicBlobCacheService = new(MockBehavior.Strict);
         protected static readonly Mock<IMemoryCacheService> MemoryCacheService = new(MockBehavior.Strict);
 
         protected CacheServiceTestFixture()
         {
             CacheAspect.Enabled = true;
             BlobCacheAttribute.AddService("default", BlobCacheService.Object);
+            BlobCacheAttribute.AddService("public", PublicBlobCacheService.Object);
             MemoryCacheAttribute.AddService("default", MemoryCacheService.Object);
         }
 
@@ -30,6 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures
 
             BlobCacheAttribute.ClearServices();
             BlobCacheService.Reset();
+            PublicBlobCacheService.Reset();
 
             MemoryCacheAttribute.ClearServices();
             MemoryCacheService.Reset();

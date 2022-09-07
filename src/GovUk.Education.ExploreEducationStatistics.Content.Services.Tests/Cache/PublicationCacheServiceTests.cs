@@ -17,11 +17,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Cach
 [Collection(CacheServiceTests)]
 public class PublicationCacheServiceTests : CacheServiceTestFixture
 {
-    public PublicationCacheServiceTests()
-    {
-        BlobCacheAttribute.AddService("public", BlobCacheService.Object);
-    }
-
     private const string PublicationSlug = "publication-slug";
 
     private readonly PublicationViewModel _publicationViewModel = new()
@@ -34,11 +29,11 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     {
         var cacheKey = new PublicationCacheKey(PublicationSlug);
 
-        BlobCacheService
+        PublicBlobCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(PublicationViewModel)))
             .ReturnsAsync(null);
 
-        BlobCacheService
+        PublicBlobCacheService
             .Setup(s => s.SetItem<object>(cacheKey, _publicationViewModel))
             .Returns(Task.CompletedTask);
 
@@ -52,7 +47,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
         var result = await service.GetPublication(PublicationSlug);
 
-        VerifyAllMocks(publicationService, BlobCacheService);
+        VerifyAllMocks(publicationService, PublicBlobCacheService);
 
         result.AssertRight(_publicationViewModel);
     }
@@ -62,7 +57,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     {
         var cacheKey = new PublicationCacheKey(PublicationSlug);
 
-        BlobCacheService
+        PublicBlobCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(PublicationViewModel)))
             .ReturnsAsync(_publicationViewModel);
 
@@ -70,7 +65,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
         var result = await service.GetPublication(PublicationSlug);
 
-        VerifyAllMocks(BlobCacheService);
+        VerifyAllMocks(PublicBlobCacheService);
 
         result.AssertRight(_publicationViewModel);
     }
@@ -86,7 +81,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
             .Setup(s => s.Get(PublicationSlug))
             .ReturnsAsync(_publicationViewModel);
 
-        BlobCacheService
+        PublicBlobCacheService
             .Setup(s => s.SetItem<object>(cacheKey, _publicationViewModel))
             .Returns(Task.CompletedTask);
 
@@ -96,7 +91,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
         // There should be no attempt on the cache service to get the cached resource
 
-        VerifyAllMocks(publicationService, BlobCacheService);
+        VerifyAllMocks(publicationService, PublicBlobCacheService);
 
         result.AssertRight(_publicationViewModel);
     }
