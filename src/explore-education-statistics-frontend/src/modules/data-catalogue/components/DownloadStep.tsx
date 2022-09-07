@@ -98,7 +98,11 @@ const DownloadStep = ({
           label: `${subject.name} (${subject.file.extension}, ${subject.file.size})`,
           value: subject.file.id,
           hint: hasDetails ? (
-            <Details summary="More details" className="govuk-!-margin-bottom-2">
+            <Details
+              summary="More details"
+              className="govuk-!-margin-bottom-2"
+              hiddenText={`for ${subject.name}`}
+            >
               <h4>This subject includes the following data:</h4>
               <SummaryList>
                 {geographicLevels && (

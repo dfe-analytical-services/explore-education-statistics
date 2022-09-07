@@ -66,8 +66,12 @@ const SubjectForm = ({
         return {
           label: option.name,
           value: option.id,
-          hint: hasDetails ? (
-            <Details summary="More details" className="govuk-!-margin-bottom-2">
+          hint: hasDetails && (
+            <Details
+              summary="More details"
+              className="govuk-!-margin-bottom-2"
+              hiddenText={`for ${option.name}`}
+            >
               <h4>This subject includes the following data:</h4>
               <SummaryList>
                 {geographicLevels && (
@@ -89,7 +93,7 @@ const SubjectForm = ({
                 )}
               </SummaryList>
             </Details>
-          ) : null,
+          ),
         };
       }),
     [options],

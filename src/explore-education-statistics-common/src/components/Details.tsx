@@ -141,7 +141,7 @@ const Details = ({
           data-testid={formatTestId(`Expand Details Section ${summary}`)}
         >
           {summary}
-          {hiddenText && <VisuallyHidden> {hiddenText}</VisuallyHidden>}
+          {hiddenText && <VisuallyHidden>{` ${hiddenText}`}</VisuallyHidden>}
         </span>
         {summaryAfter}
       </summary>
