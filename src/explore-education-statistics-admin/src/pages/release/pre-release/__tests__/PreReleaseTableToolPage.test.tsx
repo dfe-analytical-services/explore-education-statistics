@@ -198,8 +198,8 @@ describe('PreReleaseTableToolPage', () => {
     title: 'Pupil absence',
     summary: 'Pupil absence summary',
     slug: 'pupil-absence',
-    themeId: 'theme-1',
-    topicId: 'topic-1',
+    theme: { id: 'theme-1', title: 'Test theme' },
+    topic: { id: 'topic-1', title: 'Test topic' },
   };
 
   const testFeaturedTables: FeaturedTable[] = [

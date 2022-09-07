@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -14,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IPublicationService
     {
-        Task<Either<ActionResult, List<PublicationViewModel>>> GetPublicationsByTopic(bool permissions, Guid? topicId);
+        Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(bool permissions, Guid? topicId);
 
         Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(Guid topicId);
 
@@ -23,11 +24,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, List<PublicationSummaryViewModel>>> ListPublicationSummaries();
 
         Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
-            PublicationSaveViewModel publication);
+            PublicationSaveRequest publication);
 
         Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(
             Guid publicationId,
-            PublicationSaveViewModel updatedPublication);
+            PublicationSaveRequest updatedPublication);
 
         Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId);
 

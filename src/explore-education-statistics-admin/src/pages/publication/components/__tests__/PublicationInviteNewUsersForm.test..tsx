@@ -15,8 +15,8 @@ const publication: Publication = {
   title: 'Publication title',
   summary: 'Publication summary',
   slug: 'publication-slug',
-  themeId: 'theme-id',
-  topicId: 'topic-id',
+  theme: { id: 'theme-id', title: 'Test theme title' },
+  topic: { id: 'topic-id', title: 'Test topic title' },
 };
 
 const currentReleaseId = 'release-1-id';

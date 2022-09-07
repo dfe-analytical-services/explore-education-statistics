@@ -14,7 +14,7 @@ import { RouteComponentProps } from 'react-router';
 
 interface Model {
   publication: Publication;
-  externalMethodology: ExternalMethodology | undefined;
+  externalMethodology?: ExternalMethodology;
 }
 
 const ExternalMethodologyPage = ({

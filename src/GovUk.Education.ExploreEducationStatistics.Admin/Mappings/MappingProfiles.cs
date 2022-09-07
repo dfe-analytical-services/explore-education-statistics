@@ -68,23 +68,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<MethodologyVersion, IdTitleViewModel>();
 
+            CreateMap<Theme, IdTitleViewModel>();
+            CreateMap<Topic, IdTitleViewModel>();
             CreateMap<Publication, PublicationViewModel>()
                 .ForMember(
                     dest => dest.Theme,
-                    m => m.MapFrom(p =>
-                        new IdTitleViewModel
-                        {
-                            Id = p.Topic.Theme.Id,
-                            Title = p.Topic.Theme.Title
-                        } ))
-                .ForMember(
-                    dest => dest.Topic,
-                    m => m.MapFrom(p =>
-                        new IdTitleViewModel
-                        {
-                            Id = p.Topic.Id,
-                            Title = p.Topic.Title
-                        } ));
+                    m => m.MapFrom(p => p.Topic.Theme));
 
             CreateMap<Publication, MyPublicationViewModel>()
                 .ForMember(

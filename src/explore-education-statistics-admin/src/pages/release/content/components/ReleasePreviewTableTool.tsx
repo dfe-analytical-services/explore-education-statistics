@@ -11,13 +11,13 @@ import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHead
 import tableBuilderService from '@common/services/tableBuilderService';
 import ButtonText from '@common/components/ButtonText';
 import ReleasePreviewTableToolFinalStep from '@admin/pages/release/content/components/ReleasePreviewTableToolFinalStep';
-import { Publication as PublicationAdmin } from '@admin/services/publicationService';
-import { Publication } from '@common/services/publicationService';
+import { Publication } from '@admin/services/publicationService';
+import { Publication as ContentPublication } from '@common/services/publicationService';
 import React, { useState } from 'react';
 
 interface Props {
   releaseId: string;
-  publication: PublicationAdmin | Publication;
+  publication: Publication | ContentPublication;
 }
 const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
   const [featuredTableId, setHighlightId] = useState<string>();
@@ -112,7 +112,7 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
 
                     {query && table && tableHeaders && (
                       <ReleasePreviewTableToolFinalStep
-                        publication={publication as PublicationAdmin}
+                        publication={publication as Publication}
                         query={query}
                         table={table}
                         tableHeaders={tableHeaders}
