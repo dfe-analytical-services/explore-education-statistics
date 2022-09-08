@@ -84,12 +84,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 // If this is the first live release of the publication, the superseding is now enforced
                 var publicationsToUpdate = await _contentDbContext.Publications
                     .Where(p => p.Id == release.PublicationId || p.SupersededById == release.PublicationId)
+                    .Select(p => p.Slug)
                     .ToListAsync();
 
                 await publicationsToUpdate
                     .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(
-                        publication => _publicationCacheService.UpdatePublication(publication.Slug));
+                    .ForEachAwaitAsync(_publicationCacheService.UpdatePublication);
 
                 await _contentService.DeletePreviousVersionsDownloadFiles(message.ReleaseId);
                 await _contentService.DeletePreviousVersionsContent(message.ReleaseId);
