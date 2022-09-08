@@ -39,7 +39,7 @@ const TableHeadersGroupControls = ({
     <div className={styles.buttonsContainer}>
       {activeGroup === id ? (
         <Button
-          onClick={e => {
+          onClick={() => {
             setActiveGroup(undefined);
             toggleGroupDraggingEnabled(true);
           }}
@@ -76,7 +76,7 @@ const TableHeadersGroupControls = ({
           )}
           <Button
             disabled={!!disableControls}
-            onClick={e => {
+            onClick={() => {
               setActiveGroup(id);
               toggleGroupDraggingEnabled(false);
             }}

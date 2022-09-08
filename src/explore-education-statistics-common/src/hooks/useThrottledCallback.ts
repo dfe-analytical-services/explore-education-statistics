@@ -36,6 +36,7 @@ export default function useThrottledCallback<Args extends unknown[] = []>(
         }
       }, timeout);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [timeout],
   );
 

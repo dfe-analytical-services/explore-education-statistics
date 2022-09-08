@@ -2,8 +2,6 @@ import DataBlockDetailsForm, {
   DataBlockDetailsFormValues,
 } from '@admin/pages/release/datablocks/components/DataBlockDetailsForm';
 import { ReleaseDataBlock } from '@admin/services/dataBlockService';
-import Button from '@common/components/Button';
-import useToggle from '@common/hooks/useToggle';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TableToolWizard, {
   InitialTableToolState,

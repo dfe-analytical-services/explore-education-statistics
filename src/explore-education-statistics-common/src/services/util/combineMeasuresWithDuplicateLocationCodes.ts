@@ -59,6 +59,7 @@ export default function combineMeasuresWithDuplicateLocationCodes(
   const [deduplicatedLocationsResults, unaffectedResults] = partition(
     results,
     result => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const { code } = result.location![result.geographicLevel];
       return deduplicatedLocations.find(
         dedupedLocations =>
@@ -80,6 +81,7 @@ export default function combineMeasuresWithDuplicateLocationCodes(
     result =>
       JSON.stringify({
         level: result.geographicLevel,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         code: result.location![result.geographicLevel].code,
       }),
   );
@@ -89,6 +91,7 @@ export default function combineMeasuresWithDuplicateLocationCodes(
       const { level, code }: LocationGroupingKey = JSON.parse(key);
       const resultsGroupedByLocationName = groupBy(
         resultsForLocation,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         r => r.location![level].name,
       );
 

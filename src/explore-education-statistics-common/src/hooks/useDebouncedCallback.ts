@@ -40,6 +40,7 @@ export default function useDebouncedCallback<Args extends unknown[] = []>(
         }, timeout);
       });
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [timeout],
   );
 
