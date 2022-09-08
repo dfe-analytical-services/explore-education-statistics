@@ -16,6 +16,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
+using static Newtonsoft.Json.JsonConvert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Cache;
 
@@ -192,6 +193,44 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
         VerifyAllMocks(PublicBlobCacheService);
 
         result.AssertRight(new List<MethodologyVersionSummaryViewModel>());
+    }
+
+    [Fact]
+    public void AllMethodologiesThemeViewModel_SerializeAndDeserialize()
+    {
+        var viewModel = new AllMethodologiesThemeViewModel
+        {
+            Id = Guid.NewGuid(),
+            Title = "Publication title",
+            Topics = new List<AllMethodologiesTopicViewModel>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Topic title",
+                    Publications = new List<AllMethodologiesPublicationViewModel>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Title = "Publication title",
+                            Methodologies = new List<MethodologyVersionSummaryViewModel>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Slug = "methodology-slug",
+                                    Title = "Methodology title",
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        var converted = DeserializeObject<AllMethodologiesThemeViewModel>(SerializeObject(viewModel));
+        converted.AssertDeepEqualTo(viewModel);
     }
 
     private static MethodologyCacheService SetupService(

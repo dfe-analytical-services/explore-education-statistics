@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
@@ -14,9 +13,10 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
+using static Newtonsoft.Json.JsonConvert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Cache;
- 
+
 [Collection(CacheServiceTests)]
 public class ThemeCacheServiceTests : CacheServiceTestFixture
 {
@@ -395,6 +395,27 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
         VerifyAllMocks(PublicBlobCacheService);
         
         publicationTree.AssertDeepEqualTo(filteredTree);
+    }
+
+    [Fact]
+    public void ThemeTree_SerializeAndDeserialize()
+    {
+        var themeTree = new ThemeTree<PublicationTreeNode>
+        {
+            Topics = new List<TopicTree<PublicationTreeNode>>
+            {
+                new()
+                {
+                    Publications = new List<PublicationTreeNode>
+                    {
+                        new()
+                    }
+                }
+            }
+        };
+
+        var converted = DeserializeObject<ThemeTree<PublicationTreeNode>>(SerializeObject(themeTree));
+        converted.AssertDeepEqualTo(themeTree);
     }
 
     private static async Task AssertPublicationTreeUnfiltered(

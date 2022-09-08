@@ -12,7 +12,6 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
-using static Newtonsoft.Json.JsonConvert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
@@ -108,20 +107,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             VerifyAllMocks(methodologyCacheService);
 
             result.AssertOkResult(MethodologyThemes);
-        }
-
-        [Fact]
-        public void ThemeTree_SerialiseAndDeserialize()
-        {
-            var converted = DeserializeObject<ThemeTree<PublicationTreeNode>>(SerializeObject(Themes[0]));
-            converted.AssertDeepEqualTo(Themes[0]);
-        }
-
-        [Fact]
-        public void AllMethodologiesThemeViewModel_SerialiseAndDeserialize()
-        {
-            var converted = DeserializeObject<AllMethodologiesThemeViewModel>(SerializeObject(MethodologyThemes[0]));
-            converted.AssertDeepEqualTo(MethodologyThemes[0]);
         }
 
         private static ThemeController BuildController(
