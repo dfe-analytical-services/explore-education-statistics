@@ -1,5 +1,4 @@
 import TableToolFinalStep from '@frontend/modules/table-tool/components/TableToolFinalStep';
-import { within } from '@testing-library/dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import _publicationService from '@common/services/publicationService';
 import {

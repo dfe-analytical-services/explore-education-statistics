@@ -76,9 +76,6 @@ const testMethodology2: MethodologyVersionSummary = {
 const testDraftMethodology = produce(testMethodology, draft => {
   draft.status = 'Draft';
 });
-const testAmendmentMethodology = produce(testMethodology, draft => {
-  draft.amendment = true;
-});
 const testMethodologyCanAmend = produce(testMethodology, draft => {
   draft.permissions.canMakeAmendmentOfMethodology = true;
 });

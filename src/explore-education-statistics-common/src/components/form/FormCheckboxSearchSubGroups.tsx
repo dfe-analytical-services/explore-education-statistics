@@ -17,7 +17,6 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import VisuallyHidden from '../VisuallyHidden';
 import styles from './FormCheckboxSearchSubGroups.module.scss';
 import FormTextSearchInput from './FormTextSearchInput';
 
