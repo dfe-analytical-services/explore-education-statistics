@@ -12,6 +12,7 @@ import generateLegendDataGroups, {
 import {
   AxisConfiguration,
   ChartProps,
+  DataClassification,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
@@ -58,6 +59,8 @@ export interface MapBlockProps extends ChartProps {
     major: AxisConfiguration;
   };
   boundaryLevel?: number;
+  dataGroups?: number;
+  dataClassification?: DataClassification;
   id: string;
   legend: LegendConfiguration;
   maxBounds?: LatLngBounds;
@@ -67,6 +70,8 @@ export interface MapBlockProps extends ChartProps {
 export default function MapBlockInternal({
   id,
   data,
+  dataGroups = 5,
+  dataClassification = 'EqualIntervals',
   meta,
   legend,
   position = { lat: 53.00986, lng: -3.2524038 },
@@ -218,15 +223,19 @@ export default function MapBlockInternal({
       const {
         features: newFeatures,
         dataGroups: newDataGroups,
-      } = generateMapFeaturesAndDataGroups(
+      } = generateFeaturesAndDataGroups({
         selectedDataSetConfig,
         dataSetCategories,
-      );
+        dataGroups,
+        classification: dataClassification,
+      });
 
       setFeatures(newFeatures);
       setLegendDataGroups(newDataGroups);
     }
   }, [
+    dataGroups,
+    dataClassification,
     dataSetCategories,
     dataSetCategoryConfigs,
     meta,
@@ -496,22 +505,26 @@ export default function MapBlockInternal({
   );
 }
 
-function generateMapFeaturesAndDataGroups(
-  selectedDataSetConfiguration: DataSetCategoryConfig,
-  dataSetCategories: MapDataSetCategory[],
-): {
+function generateFeaturesAndDataGroups({
+  classification,
+  dataSetCategories,
+  dataGroups: groups,
+  selectedDataSetConfig,
+}: {
+  classification: DataClassification;
+  dataSetCategories: MapDataSetCategory[];
+  dataGroups: number;
+  selectedDataSetConfig: DataSetCategoryConfig;
+}): {
   features: MapFeatureCollection;
   dataGroups: LegendDataGroup[];
 } {
-  const selectedDataSetKey = selectedDataSetConfiguration.dataKey;
-  const {
-    unit,
-    decimalPlaces: dataSetDecimalPlaces,
-  } = selectedDataSetConfiguration.dataSet.indicator;
+  const selectedDataSetKey = selectedDataSetConfig.dataKey;
+  const { unit, decimalPlaces } = selectedDataSetConfig.dataSet.indicator;
 
   const colour =
-    selectedDataSetConfiguration.config.colour ??
-    generateHslColour(selectedDataSetConfiguration.dataKey);
+    selectedDataSetConfig.config.colour ??
+    generateHslColour(selectedDataSetConfig.dataKey);
 
   // Extract only the numeric values out of relevant data sets
   const values = dataSetCategories.reduce<number[]>((acc, category) => {
@@ -526,8 +539,9 @@ function generateMapFeaturesAndDataGroups(
 
   const dataGroups = generateLegendDataGroups({
     colour,
-    decimalPlaces: dataSetDecimalPlaces,
-    groups: 5,
+    classification,
+    decimalPlaces,
+    groups,
     values,
     unit,
   });

@@ -83,7 +83,7 @@ describe('MapBlockInternal', () => {
     expect(legendColours[4].style.backgroundColor).toBe('rgb(71, 99, 165)');
   });
 
-  test('renders legends correctly with custom decimal places', async () => {
+  test('renders legend groups correctly with custom 1 d.p decimal places', async () => {
     const fullTable = mapFullTable(
       produce(testMapTableData, draft => {
         draft.results[0].measures['authorised-absence-rate'] = '3.5123';
@@ -110,6 +110,36 @@ describe('MapBlockInternal', () => {
       expect(legendItems[2]).toHaveTextContent('3.4% to 3.5%');
       expect(legendItems[3]).toHaveTextContent('3.6% to 3.7%');
       expect(legendItems[4]).toHaveTextContent('3.8% to 4.0%');
+    });
+  });
+
+  test('renders legend groups correctly with custom 3 d.p decimal places', async () => {
+    const fullTable = mapFullTable(
+      produce(testMapTableData, draft => {
+        draft.results[0].measures['authorised-absence-rate'] = '3.5123';
+        draft.results[1].measures['authorised-absence-rate'] = '3.012';
+        draft.results[2].measures['authorised-absence-rate'] = '4.009';
+        draft.subjectMeta.indicators[0].decimalPlaces = 3;
+      }),
+    );
+
+    render(
+      <MapBlockInternal
+        {...testBlockProps}
+        meta={fullTable.subjectMeta}
+        data={fullTable.results}
+      />,
+    );
+
+    await waitFor(() => {
+      const legendItems = screen.getAllByTestId('mapBlock-legend-item');
+
+      expect(legendItems).toHaveLength(5);
+      expect(legendItems[0]).toHaveTextContent('3.012% to 3.211%');
+      expect(legendItems[1]).toHaveTextContent('3.212% to 3.411%');
+      expect(legendItems[2]).toHaveTextContent('3.412% to 3.611%');
+      expect(legendItems[3]).toHaveTextContent('3.612% to 3.811%');
+      expect(legendItems[4]).toHaveTextContent('3.812% to 4.009%');
     });
   });
 
