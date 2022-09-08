@@ -120,8 +120,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             // Services
             //
 
-            var storageSupportsBatchDeletes =
-                Configuration.GetValue<bool>("StorageSupportsBatchDeletes", defaultValue: true);
             var publicStorageConnectionString = Configuration.GetValue<string>("PublicStorage");
 
             services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
@@ -140,11 +138,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 new BlobStorageService(
                         publicStorageConnectionString,
                         new BlobServiceClient(publicStorageConnectionString),
-                        provider.GetRequiredService<ILogger<BlobStorageService>>()),
-                        new StorageInstanceCreationUtil()
-            );
+                        provider.GetRequiredService<ILogger<BlobStorageService>>(),
+                        new StorageInstanceCreationUtil()));
             services.AddTransient<IFilterItemRepository, FilterItemRepository>();
-            ser            services.AddTransient<IFilterRepository, FilterRepository>();
+            services.AddTransient<IFilterRepository, FilterRepository>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();
             services.AddTransient<IGeoJsonRepository, GeoJsonRepository>();
             services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
@@ -158,10 +155,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IDataGuidanceSubjectService, DataGuidanceSubjectService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IPermalinkService, PermalinkService>();
-            services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoungeService>(_ =>
-                new TableStorageService(publicStorageConnectionString, storageSupportsBatchDeletes));
- publicStorageConnectionStringce>(_ =>
-                new TableStorageService(Configuration.GetValue<string>("PublicStorage")));
+            services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
+            services.AddTransient<ITableStorageService, TableStorageService>(s =>
+                new TableStorageService(
+                    publicStorageConnectionString,
+                    new StorageInstanceCreationUtil()));
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<ICacheKeyService, CacheKeyService>();
 
@@ -198,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
         {
             // Enable caching and register any caching services.
             CacheAspect.Enabled = true;
-            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>()!);
+            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetRequiredService<IBlobCacheService>());
             // Enable cancellation aspects and register request timeout configuration.
             CancellationTokenTimeoutAspect.Enabled = true;
             CancellationTokenTimeoutAttribute.SetTimeoutConfiguration(Configuration.GetSection("RequestTimeouts"));

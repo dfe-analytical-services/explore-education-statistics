@@ -22,7 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         public PublishReleaseFilesFunction(
             IPublishingService publishingService,
             IQueueService queueService,
-            IReleasePublishingStatusService releasePublishingStatusService, IPublishingCompletionService publishingCompletionService)
+            IReleasePublishingStatusService releasePublishingStatusService, 
+            IPublishingCompletionService publishingCompletionService)
         {
             _publishingService = publishingService;
             _queueService = queueService;

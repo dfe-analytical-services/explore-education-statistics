@@ -19,19 +19,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly StatisticsDbContext _statisticsDbContext;
-        private readonly PublicStatisticsDbContext _publicStatisticsDbContext;
         private readonly IMethodologyService _methodologyService;
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
 
         public ReleaseService(ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
-            PublicStatisticsDbContext publicStatisticsDbContext,
             IMethodologyService methodologyService,
             IReleaseSubjectRepository releaseSubjectRepository)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
-            _publicStatisticsDbContext = publicStatisticsDbContext;
             _methodologyService = methodologyService;
             _releaseSubjectRepository = releaseSubjectRepository;
         }
@@ -82,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Include(release => release.Publication)
                 .SingleOrDefaultAsync(r => r.Id == id);
 
-            var statisticsRelease = await _publicStatisticsDbContext.Release
+            var statisticsRelease = await _statisticsDbContext.Release
                 .AsQueryable()
                 .SingleOrDefaultAsync(r => r.Id == id);
 
@@ -121,9 +118,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             // The Release in the statistics database can be absent if no data files were ever created
             if (statisticsRelease != null)
             {
-                _publicStatisticsDbContext.Release.Update(statisticsRelease);
+                _statisticsDbContext.Release.Update(statisticsRelease);
                 statisticsRelease.Published ??= published;
-                await _publicStatisticsDbContext.SaveChangesAsync();
+                await _statisticsDbContext.SaveChangesAsync();
             }
         }
 

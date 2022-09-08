@@ -403,8 +403,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              * Services
              */
 
-            var storageSupportsBatchDeletes =
-                Configuration.GetValue<bool>("StorageSupportsBatchDeletes", defaultValue: true);
             var coreStorageConnectionString = Configuration.GetValue<string>("CoreStorage");
             var publisherStorageConnectionString = Configuration.GetValue<string>("PublisherStorage");
 
@@ -453,8 +451,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     s.GetService<IPersistenceHelper<ContentDbContext>>(),
                     new TableStorageService(
                         publisherStorageConnectionString,
-                        new StorageInstanceCreationUtil());
-            services.AddTransient<IReleasePublishingStatusRepository, ReleasePublishingStatusRepository>(s =>
+                        new StorageInstanceCreationUtil())));
+            services.AddTransient<IReleasePublishingStatusRepository, ReleasePublishingStatusRepository>(_ =>
                 new ReleasePublishingStatusRepository(
                     new TableStorageService(
                         publisherStorageConnectionString,
@@ -480,10 +478,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<ILegacyReleaseService, LegacyReleaseService>(provider =>
                 new LegacyReleaseService(
-                    context: provider.GetService<ContentDbContext>(),
-                    mapper: provider.GetService<IMapper>(),
-                    userService: provider.GetService<IUserService>(),
-                    persistenceHelper: provider.GetService<IPersistenceHelper<ContentDbContext>>(),
+                    context: provider.GetRequiredService<ContentDbContext>(),
+                    mapper: provider.GetRequiredService<IMapper>(),
+                    userService: provider.GetRequiredService<IUserService>(),
+                    persistenceHelper: provider.GetRequiredService<IPersistenceHelper<ContentDbContext>>(),
                     publicationCacheService: provider.GetRequiredService<IPublicationCacheService>())
                 );
             services.AddTransient<IReleaseService, ReleaseService>();
@@ -584,11 +582,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserInviteRepository, UserInviteRepository>();
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
             services.AddTransient(provider => GetBlobStorageService(provider, "CoreStorage"));
-            services.AddTransient<ITableStorageService, TableStorageService>(s =>
+            services.AddTransient<ITableStorageService, TableStorageService>(_ =>
                 new TableStorageService(
                     coreStorageConnectionString,
                     new StorageInstanceCreationUtil()));
-            services.AddTransient<IStorageQueueService, StorageQueueService>(s =>
+            services.AddTransient<IStorageQueueService, StorageQueueService>(_ =>
                 new StorageQueueService(
                     coreStorageConnectionString,
                     new StorageInstanceCreationUtil()));
@@ -805,7 +803,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     .CreateScope();
 
                 serviceScope.ServiceProvider
-                    .GetService<BootstrapUsersService>()
+                    .GetRequiredService<BootstrapUsersService>()
                     .AddBootstrapUsers();
             }
         }
