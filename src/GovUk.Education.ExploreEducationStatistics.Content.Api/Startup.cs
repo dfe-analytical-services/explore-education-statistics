@@ -156,6 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
             services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
+            services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
             services.AddTransient<IGlossaryService, GlossaryService>();
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);

@@ -1,13 +1,11 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -16,9 +14,8 @@ using static Newtonsoft.Json.JsonConvert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
-    [Collection(CacheServiceTests)]
-    public class GlossaryControllerTests : CacheServiceTestFixture {
-
+    public class GlossaryControllerTests
+    {
         [Fact]
         public async Task GetAllGlossaryEntries()
         {
@@ -40,25 +37,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             };
 
             var (controller, mocks) = BuildControllerAndDependencies();
-            
-            mocks.cacheService
-                .Setup(s => s.GetItem(
-                  It.IsAny<GlossaryCacheKey>(), typeof(List<GlossaryCategoryViewModel>)))
-                .ReturnsAsync(null);
 
-            mocks.glossaryService
-                .Setup(s => s.GetAllGlossaryEntries())
+            mocks.glossaryCacheService
+                .Setup(s => s.GetGlossary())
                 .ReturnsAsync(glossaryEntries);
-            
-            mocks.cacheService
-                .Setup(s => s.SetItem<object>(
-                    It.IsAny<GlossaryCacheKey>(), 
-                    glossaryEntries))
-                .Returns(Task.CompletedTask);
 
             var result = await controller.GetAllGlossaryEntries();
             VerifyAllMocks(mocks);
-            
+
             Assert.Equal(glossaryEntries, result);
         }
 
@@ -72,21 +58,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 Title = "A title"
             };
 
-            var (controller, mocks) = 
+            var (controller, mocks) =
                 BuildControllerAndDependencies();
-            
+
             mocks.glossaryService
                 .Setup(s => s.GetGlossaryEntry(glossaryEntry.Slug))
                 .ReturnsAsync(glossaryEntry);
-            
+
             var result = await controller.GetGlossaryEntry(glossaryEntry.Slug);
             VerifyAllMocks(mocks);
-            
+
             result.AssertOkResult(glossaryEntry);
         }
 
         [Fact]
-        public void GlossaryCategoryViewModel_SerialiseAndDeserialise()
+        public void GlossaryCategoryViewModel_SerialiseAndDeserialize()
         {
             var original = new GlossaryCategoryViewModel
             {
@@ -107,15 +93,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         }
 
         private static (
-            GlossaryController controller, 
+            GlossaryController controller,
             (
-                Mock<IGlossaryService> glossaryService,
-                Mock<IBlobCacheService> cacheService) mocks) 
+            Mock<IGlossaryCacheService> glossaryCacheService,
+            Mock<IGlossaryService> glossaryService) mocks
+            )
             BuildControllerAndDependencies()
         {
+            var glossaryCacheService = new Mock<IGlossaryCacheService>(Strict);
             var glossaryService = new Mock<IGlossaryService>(Strict);
-            var controller = new GlossaryController(glossaryService.Object);
-            return (controller, (glossaryService, BlobCacheService));
+
+            var controller = new GlossaryController(
+                glossaryCacheService.Object,
+                glossaryService.Object);
+            return (controller, (glossaryCacheService, glossaryService));
         }
     }
 }
