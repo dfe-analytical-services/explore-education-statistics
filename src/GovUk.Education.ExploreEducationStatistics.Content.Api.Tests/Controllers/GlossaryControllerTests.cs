@@ -10,7 +10,6 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
-using static Newtonsoft.Json.JsonConvert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
@@ -69,27 +68,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             VerifyAllMocks(mocks);
 
             result.AssertOkResult(glossaryEntry);
-        }
-
-        [Fact]
-        public void GlossaryCategoryViewModel_SerialiseAndDeserialize()
-        {
-            var original = new GlossaryCategoryViewModel
-            {
-                Heading = "Glossary Category 1",
-                Entries = new List<GlossaryEntryViewModel>
-                {
-                    new()
-                    {
-                        Body = "A body",
-                        Slug = "A slug",
-                        Title = "A title"
-                    }
-                }
-            };
-
-            var converted = DeserializeObject<GlossaryCategoryViewModel>(SerializeObject(original));
-            converted.AssertDeepEqualTo(original);
         }
 
         private static (
