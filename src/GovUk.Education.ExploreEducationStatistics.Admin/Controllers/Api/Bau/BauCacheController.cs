@@ -69,8 +69,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             return NoContent();
         }
 
-        [HttpDelete("public-cache/trees")]
-        public async Task<ActionResult> ClearPublicCacheTrees(ClearPublicCacheTreePathsViewModel request)
+        [HttpPut("public-cache/trees")]
+        public async Task<ActionResult> UpdatePublicCacheTrees(UpdatePublicCacheTreePathsViewModel request)
         {
             if (request.CacheEntries.Any())
             {
@@ -81,18 +81,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                         async entry =>
                         {
                             var allowedPath =
-                                EnumUtil.GetFromString<ClearPublicCacheTreePathsViewModel.CacheEntry>(entry);
+                                EnumUtil.GetFromString<UpdatePublicCacheTreePathsViewModel.CacheEntry>(entry);
                             
                             switch (allowedPath)
                             {
-                                case ClearPublicCacheTreePathsViewModel.CacheEntry.MethodologyTree: 
+                                case UpdatePublicCacheTreePathsViewModel.CacheEntry.MethodologyTree: 
                                     await _methodologyCacheService.UpdateSummariesTree();
                                     break;
-                                case ClearPublicCacheTreePathsViewModel.CacheEntry.PublicationTree:
+                                case UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree:
                                     await _themeCacheService.UpdatePublicationTree();
                                     break;
                                 default:
-                                    throw new ArgumentException($"Unsupported cache clearing entry {entry}");
+                                    throw new ArgumentException($"Unsupported cache entry {entry}");
                             }
                         });
             }
@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             return NoContent();
         }
 
-        public class ClearPublicCacheTreePathsViewModel
+        public class UpdatePublicCacheTreePathsViewModel
         {
             public enum CacheEntry
             {

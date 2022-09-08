@@ -222,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task ClearPublicCacheTrees_SingleValidCacheEntry()
+        public async Task UpdatePublicCacheTrees_SingleValidCacheEntry()
         {
             var themeCacheService = new Mock<IThemeCacheService>(Strict);
 
@@ -232,10 +232,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(themeCacheService: themeCacheService.Object);
 
-            var publicationTreeOption = ClearPublicCacheTreePathsViewModel.CacheEntry.PublicationTree.ToString();
+            var publicationTreeOption = UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree.ToString();
 
-            var result = await controller.ClearPublicCacheTrees(
-                new ClearPublicCacheTreePathsViewModel
+            var result = await controller.UpdatePublicCacheTrees(
+                new UpdatePublicCacheTreePathsViewModel
                 {
                     CacheEntries = SetOf(publicationTreeOption)
                 }
@@ -247,7 +247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task ClearPublicCacheTrees_AllValidCacheEntries()
+        public async Task UpdatePublicCacheTrees_AllValidCacheEntries()
         {
             var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
             var themeCacheService = new Mock<IThemeCacheService>(Strict);
@@ -265,11 +265,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 methodologyCacheService: methodologyCacheService.Object,
                 themeCacheService: themeCacheService.Object);
 
-            var publicationTreeOption = ClearPublicCacheTreePathsViewModel.CacheEntry.PublicationTree.ToString();
-            var methodologyTreeOption = ClearPublicCacheTreePathsViewModel.CacheEntry.MethodologyTree.ToString();
+            var publicationTreeOption = UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree.ToString();
+            var methodologyTreeOption = UpdatePublicCacheTreePathsViewModel.CacheEntry.MethodologyTree.ToString();
 
-            var result = await controller.ClearPublicCacheTrees(
-                new ClearPublicCacheTreePathsViewModel
+            var result = await controller.UpdatePublicCacheTrees(
+                new UpdatePublicCacheTreePathsViewModel
                 {
                     CacheEntries = new HashSet<string>
                     {
@@ -285,13 +285,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task ClearPublicCacheTrees_Empty()
+        public async Task UpdatePublicCacheTrees_Empty()
         {
             var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
 
             var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
-            var result = await controller.ClearPublicCacheTrees(new ClearPublicCacheTreePathsViewModel());
+            var result = await controller.UpdatePublicCacheTrees(new UpdatePublicCacheTreePathsViewModel());
 
             VerifyAllMocks(publicBlobStorageService);
 
