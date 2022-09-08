@@ -320,7 +320,7 @@ export default function MapBlockInternal({
       }
 
       featureLayer.bindTooltip(() => {
-        if (feature.properties) {
+        if (feature.properties.dataSets[selectedDataSetKey]) {
           const dataSetValue = formatPretty(
             feature.properties.dataSets[selectedDataSetKey].value,
             selectedDataSetConfig.dataSet.indicator.unit,
