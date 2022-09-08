@@ -169,7 +169,7 @@ empty `content` database by running the
 [Admin app Content database permissions script](useful-scripts/sql/database-users/assign-adminapp-permissions-for-content-db.sql)
 against the `content` database.
 4. Assign permissions for the `adminapp` user to allow the database migrations to run against the
-   empty `statistics` database by running the
+empty `statistics` database by running the
 [Admin app Statistics database permissions script](useful-scripts/sql/database-users/assign-adminapp-permissions-for-statistics-db.sql)
 against the `statistics` database.
 5. Start up the Admin API alone, to allow database migrations to run and schema to be updated to the

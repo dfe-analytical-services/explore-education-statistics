@@ -84,10 +84,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                                 await _queueService.QueueGenerateStagedReleaseContentMessageAsync(
                                     ListOf((message.ReleaseId, releaseStatus.Id)));
                             }
-                            
-                            // TODO DW - EES-3369 - remove needing to mark this stage complete
-                            await _releasePublishingStatusService.UpdateDataStageAsync(message.ReleaseId,
-                                message.ReleaseStatusId, ReleasePublishingStatusDataStage.Complete);
                         })
                         .OnFailureDo(async logMessages =>
                         {

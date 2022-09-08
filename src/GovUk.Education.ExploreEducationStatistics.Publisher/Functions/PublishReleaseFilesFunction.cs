@@ -54,15 +54,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName,
                 message);
 
-            var published = new List<(Guid ReleaseId, Guid ReleaseStatusId)>();
             foreach (var (releaseId, releaseStatusId) in message.Releases)
             {
-                await UpdateStage(releaseId, releaseStatusId, Started);
                 try
                 {
+                    await UpdateStage(releaseId, releaseStatusId, Started);
+
                     await _publishingService.PublishMethodologyFilesIfApplicableForRelease(releaseId);
                     await _publishingService.PublishReleaseFiles(releaseId);
-                    published.Add((releaseId, releaseStatusId));
+                    
+                    await UpdateStage(releaseId, releaseStatusId, Complete);
+                    
+                    await _publishingCompletionService.CompletePublishingIfAllStagesComplete(
+                        releaseId, 
+                        releaseStatusId,
+                        DateTime.UtcNow);
                 }
                 catch (Exception e)
                 {
@@ -75,23 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 }
             }
 
-            try
-            {
-                foreach (var (releaseId, releaseStatusId) in published)
-                {
-                    await UpdateStage(releaseId, releaseStatusId, Complete);
-                    await _publishingCompletionService.CompletePublishingIfAllStagesComplete(releaseId, releaseStatusId);
-                }
-            }
-            catch (Exception e)
-            {
-                logger.LogError(e, "Exception occured while executing {FunctionName}",
-                    executionContext.FunctionName);
-                logger.LogError("{StackTrace}", e.StackTrace);
-            }
-
-            logger.LogInformation("{FunctionName} completed",
-                executionContext.FunctionName);
+            logger.LogInformation("{FunctionName} completed", executionContext.FunctionName);
         }
 
         private async Task UpdateStage(Guid releaseId, Guid releaseStatusId, ReleasePublishingStatusFilesStage stage,

@@ -113,7 +113,10 @@ const ReleaseStatusPage = () => {
         </SummaryListItem>
         {release.approvalStatus === 'Approved' && (
           <SummaryListItem term="Release process status">
-            <ReleaseServiceStatus releaseId={releaseId} refreshPeriod={500} />
+            <ReleasePublishingStatus
+              releaseId={releaseId}
+              refreshPeriod={500}
+            />
           </SummaryListItem>
         )}
         <SummaryListItem term="Scheduled release">

@@ -16,7 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task<IEnumerable<ReleasePublishingStatus>> GetWherePublishingDueTodayWithStages(
             ReleasePublishingStatusContentStage? content = null,
-            ReleasePublishingStatusDataStage? data = null,
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null);
@@ -24,6 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
         Task<IEnumerable<ReleasePublishingStatus>> GetAllByOverallStage(
             Guid releaseId, 
             params ReleasePublishingStatusOverallStage[] overallStages);
+
+        Task<ReleasePublishingStatus> GetAsync(Guid releaseId, Guid releaseStatusId);
 
         Task<ReleasePublishingStatus> GetLatestAsync(Guid releaseId);
 
@@ -35,7 +36,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
             Guid releaseId, 
             Guid releaseStatusId, 
             ReleasePublishingStatusContentStage? content = null,
-            ReleasePublishingStatusDataStage? data = null, 
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null, 
             ReleasePublishingStatusOverallStage? overall = null, 
@@ -45,12 +45,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
             Guid releaseId, 
             Guid releaseStatusId, 
             ReleasePublishingStatusContentStage stage,
-            ReleasePublishingStatusLogMessage logMessage = null);
-
-        Task UpdateDataStageAsync(
-            Guid releaseId, 
-            Guid releaseStatusId, 
-            ReleasePublishingStatusDataStage stage,
             ReleasePublishingStatusLogMessage logMessage = null);
 
         Task UpdateFilesStageAsync(

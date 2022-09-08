@@ -57,7 +57,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             try
             {
                 await _contentService.UpdateContent(context, message.ReleaseId);
-                await _publishingCompletionService.CompletePublishingIfAllStagesComplete(message.ReleaseId, message.ReleaseStatusId);
+                await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Complete);
+                await _publishingCompletionService.CompletePublishingIfAllStagesComplete(
+                    message.ReleaseId, 
+                    message.ReleaseStatusId,
+                    context.Published);
             }
             catch (Exception e)
             {

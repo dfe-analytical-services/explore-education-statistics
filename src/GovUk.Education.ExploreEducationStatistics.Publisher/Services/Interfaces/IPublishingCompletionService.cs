@@ -5,5 +5,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
 public interface IPublishingCompletionService
 {
-    Task CompletePublishingIfAllStagesComplete(Guid releaseId, Guid releaseStatusId);
+    Task CompletePublishingIfAllStagesComplete(Guid releaseId, Guid releaseStatusId, DateTime publishedDate);
 }

@@ -16,6 +16,7 @@ public class PublishingCompletionService : IPublishingCompletionService
     private readonly INotificationsService _notificationsService;
     private readonly IReleasePublishingStatusService _releasePublishingStatusService;
     private readonly IPublicationCacheService _publicationCacheService;
+    private readonly IReleaseService _releaseService;
     private readonly ILogger<PublishingCompletionService> _logger;
 
     public PublishingCompletionService(
@@ -24,6 +25,7 @@ public class PublishingCompletionService : IPublishingCompletionService
         INotificationsService notificationsService,
         IReleasePublishingStatusService releasePublishingStatusService, 
         IPublicationCacheService publicationCacheService,
+        IReleaseService releaseService,
         ILogger<PublishingCompletionService> logger)
     {
         _contentDbContext = contentDbContext;
@@ -31,18 +33,21 @@ public class PublishingCompletionService : IPublishingCompletionService
         _notificationsService = notificationsService;
         _releasePublishingStatusService = releasePublishingStatusService;
         _publicationCacheService = publicationCacheService;
+        _releaseService = releaseService;
         _logger = logger;
     }
 
-    public async Task CompletePublishingIfAllStagesComplete(Guid releaseId, Guid releaseStatusId)
+    public async Task CompletePublishingIfAllStagesComplete(Guid releaseId, Guid releaseStatusId, DateTime publishedDate)
     {
-        var releaseStatus = await _releasePublishingStatusService.GetLatestAsync(releaseId);
+        var releaseStatus = await _releasePublishingStatusService.GetAsync(releaseId, releaseStatusId);
 
         if (releaseStatus.AllStagesPriorToPublishingComplete())
         {
             var release = await _contentDbContext.Releases
                 .SingleAsync(r => r.Id == releaseId);
 
+            await _releaseService.SetPublishedDates(releaseId, publishedDate);
+            
             // Update the cached publication and any cached superseded publications.
             // If this is the first live release of the publication, the superseding is now enforced
             var publicationsToUpdate = await _contentDbContext.Publications
