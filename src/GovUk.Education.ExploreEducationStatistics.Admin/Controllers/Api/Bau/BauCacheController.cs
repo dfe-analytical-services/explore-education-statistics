@@ -25,17 +25,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
     {
         private readonly IBlobStorageService _privateBlobStorageService;
         private readonly IBlobStorageService _publicBlobStorageService;
+        private readonly IGlossaryCacheService _glossaryCacheService;
         private readonly IMethodologyCacheService _methodologyCacheService;
         private readonly IThemeCacheService _themeCacheService;
 
         public BauCacheController(
             IBlobStorageService privateBlobStorageService,
-            IBlobStorageService publicBlobStorageService, 
+            IBlobStorageService publicBlobStorageService,
+            IGlossaryCacheService glossaryCacheService,
             IMethodologyCacheService methodologyCacheService, 
             IThemeCacheService themeCacheService)
         {
             _privateBlobStorageService = privateBlobStorageService;
             _publicBlobStorageService = publicBlobStorageService;
+            _glossaryCacheService = glossaryCacheService;
             _methodologyCacheService = methodologyCacheService;
             _themeCacheService = themeCacheService;
         }
@@ -56,6 +59,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                 );
             }
 
+            return NoContent();
+        }
+
+        [HttpPut("public-cache/glossary")]
+        public async Task<ActionResult> UpdatePublicCacheGlossary()
+        {
+            await _glossaryCacheService.UpdateGlossary();
             return NoContent();
         }
 

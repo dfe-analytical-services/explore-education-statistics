@@ -78,6 +78,8 @@ using Notify.Interfaces;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
+using IContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IGlossaryService;
+using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
 using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
 using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
 using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
@@ -406,9 +408,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
             // EES-3528 plans to send a request to the Content API to update its cached resources instead of this
             // being done from Admin directly, and so these DI dependencies should eventually be removed.
+            services.AddTransient<IContentGlossaryService, ContentGlossaryService>();
             services.AddTransient<IContentThemeService, ContentThemeService>();
             services.AddTransient<IContentMethodologyService, ContentMethodologyService>();
             services.AddTransient<IContentPublicationService, ContentPublicationService>();
+            services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
             services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
             services.AddTransient<IThemeCacheService, ThemeCacheService>();
             services.AddTransient<IPublicationCacheService, PublicationCacheService>();
@@ -617,6 +621,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 provider => new BauCacheController(
                     privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage"),
                     publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
+                    glossaryCacheService: provider.GetRequiredService<IGlossaryCacheService>(),
                     methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
                     themeCacheService: provider.GetRequiredService<IThemeCacheService>()
                 )
