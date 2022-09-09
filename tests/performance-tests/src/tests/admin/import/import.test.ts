@@ -14,11 +14,11 @@ export const options: Options = {
   stages: [
     {
       duration: '1s',
-      target: 2,
+      target: 10,
     },
     {
       duration: '119m',
-      target: 2,
+      target: 10,
     },
     {
       duration: '30s',
@@ -117,7 +117,7 @@ export function setup(): SetupData {
     topicId,
     publicationId,
     publicationTitle,
-    releaseName: '2022',
+    year: 2022,
     timePeriodCoverage: 'AY',
   });
 

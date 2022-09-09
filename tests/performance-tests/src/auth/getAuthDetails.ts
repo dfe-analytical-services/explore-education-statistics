@@ -110,7 +110,7 @@ const getAuthTokensAzure = async (
 
   await page.waitForXPath("//*[.='Dashboard']", {
     visible: true,
-    timeout: 5000,
+    timeout: 10000,
   });
 };
 

@@ -8,6 +8,15 @@ const applicationJsonHeaders = {
   'Content-Type': 'application/json',
 };
 
+type OverallStage =
+  | 'Validating'
+  | 'Complete'
+  | 'Failed'
+  | 'Invalid'
+  | 'Scheduled'
+  | 'Started'
+  | 'Superseded';
+
 export interface SubjectMeta {
   filters: {
     [filter: string]: {
@@ -56,7 +65,7 @@ interface ThemeAndTopics {
 
 interface Release {
   id: string;
-  releaseName: string;
+  year: number;
 }
 
 interface PublicationAndReleases {
@@ -197,6 +206,7 @@ class DataService {
           teamEmail: 'team@example.com',
           teamName: 'Team',
         },
+        summary: `${title} summary`,
       }),
       applicationJsonHeaders,
     );
@@ -218,35 +228,33 @@ class DataService {
   getRelease({
     topicId,
     publicationTitle,
-    releaseName,
+    year,
   }: {
     topicId: string;
     publicationTitle: string;
-    releaseName: string;
+    year: number;
   }): Release | undefined {
     const publication = this.getPublication({
       topicId,
       title: publicationTitle,
     });
-    return publication?.releases.find(
-      release => release.releaseName === releaseName,
-    );
+    return publication?.releases.find(release => release.year === year);
   }
 
   createRelease({
     publicationId,
-    releaseName,
+    year,
     timePeriodCoverage,
   }: {
     publicationId: string;
-    releaseName: string;
+    year: number;
     timePeriodCoverage: 'AY' | 'FY';
   }) {
     const { response, json } = this.client.post<{ id: string }>(
       `/api/publications/${publicationId}/releases`,
       JSON.stringify({
         publicationId,
-        releaseName,
+        year,
         timePeriodCoverage: {
           value: timePeriodCoverage,
         },
@@ -255,7 +263,7 @@ class DataService {
       applicationJsonHeaders,
     );
 
-    console.log(`Created Release ${releaseName}`);
+    console.log(`Created Release ${year}`);
 
     return {
       id: json.id,
@@ -267,20 +275,19 @@ class DataService {
     topicId,
     publicationId,
     publicationTitle,
-    releaseName,
+    year,
     timePeriodCoverage,
   }: {
     topicId: string;
     publicationId: string;
     publicationTitle: string;
-    releaseName: string;
+    year: number;
     timePeriodCoverage: 'AY' | 'FY';
   }) {
     return {
       id:
-        this.getRelease({ topicId, publicationTitle, releaseName })?.id ??
-        this.createRelease({ publicationId, releaseName, timePeriodCoverage })
-          ?.id,
+        this.getRelease({ topicId, publicationTitle, year })?.id ??
+        this.createRelease({ publicationId, year, timePeriodCoverage })?.id,
     };
   }
 
@@ -502,6 +509,122 @@ class DataService {
       results: json.results,
       response,
     };
+  }
+
+  addDataGuidance({
+    releaseId,
+    content = '<p>Test Content</p>',
+    subjects,
+  }: {
+    releaseId: string;
+    content?: string;
+    subjects: {
+      id: string;
+      content: string;
+    }[];
+  }) {
+    const { response } = this.client.post(
+      `/api/release/${releaseId}/data-guidance`,
+      JSON.stringify({
+        content,
+        subjects,
+      }),
+      applicationJsonHeaders,
+    );
+    return {
+      response,
+    };
+  }
+
+  approveRelease({
+    releaseId,
+    notifySubscribers = false,
+    latestInternalReleaseNote = 'Appproved',
+  }: {
+    releaseId: string;
+    notifySubscribers?: boolean;
+    latestInternalReleaseNote?: string;
+  }) {
+    const { response } = this.client.post(
+      `/api/release/${releaseId}/status`,
+      JSON.stringify({
+        notifySubscribers,
+        latestInternalReleaseNote,
+        approvalStatus: 'Approved',
+        publishMethod: 'Immediate',
+      }),
+      applicationJsonHeaders,
+    );
+    return {
+      response,
+    };
+  }
+
+  getReleaseApprovalStatus({ releaseId }: { releaseId: string }) {
+    const { response, json } = this.client.get<{ overallStage: OverallStage }>(
+      `/api/release/${releaseId}/stage-status`,
+      applicationJsonHeaders,
+    );
+    return {
+      status: json.overallStage,
+      response,
+    };
+  }
+
+  waitForReleaseToBePublished({
+    releaseId,
+    pollingDelaySeconds = 5,
+    onStatusCheckFailed,
+    onStatusReceived,
+    onPublishingFailed,
+    onPublishingCompleted,
+    onPublishingExceededTimeout,
+  }: {
+    releaseId: string;
+    pollingDelaySeconds?: number;
+    onStatusCheckFailed?: (statusResponse: RefinedResponse<'text'>) => void;
+    onStatusReceived?: (status: string) => void;
+    onPublishingFailed?: (status: string) => void;
+    onPublishingCompleted?: () => void;
+    onPublishingExceededTimeout?: () => void;
+  }) {
+    const publishingStartTime = Date.now();
+    const publishingExpireTime =
+      publishingStartTime + TestData.maxPublishingWaitTimeMillis;
+
+    while (Date.now() < publishingExpireTime) {
+      const { status, response } = this.getReleaseApprovalStatus({ releaseId });
+
+      if (response.status !== 200 && onStatusCheckFailed) {
+        onStatusCheckFailed(response);
+      } else {
+        if (onStatusReceived) {
+          onStatusReceived(status);
+        }
+
+        const failureStates: OverallStage[] = ['Failed', 'Invalid'];
+
+        if (failureStates.includes(status)) {
+          if (onPublishingFailed) {
+            onPublishingFailed(status);
+          }
+          return;
+        }
+
+        if ('Complete'.includes(status)) {
+          if (onPublishingCompleted) {
+            onPublishingCompleted();
+          }
+          return;
+        }
+      }
+
+      sleep(pollingDelaySeconds);
+    }
+
+    if (onPublishingExceededTimeout) {
+      onPublishingExceededTimeout();
+    }
   }
 }
 

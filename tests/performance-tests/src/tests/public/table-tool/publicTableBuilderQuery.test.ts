@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-globals */
 /* eslint-disable no-console */
 import { check } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
@@ -9,10 +8,10 @@ import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
 
 const PUBLICATION =
-  'UI test publication - Performance tests - adminTableBuilderQuery.test.ts';
-const RELEASE = '2022';
+  'UI test publication - Performance tests - publicTableBuilderQuery.test.ts';
+const RELEASE = 2022;
 const SUBJECT =
-  'UI test subject - Performance tests - adminTableBuilderQuery.test.ts';
+  'UI test subject - Performance tests - publicTableBuilderQuery.test.ts';
 
 const alwaysCreateNewDataPerTest = false;
 
@@ -50,8 +49,10 @@ export const tableQueryFailureCount = new Counter(
   'ees_table_query_failure_count',
 );
 
+/* eslint-disable no-restricted-globals */
 const subjectFile = open('admin/import/assets/dates.csv', 'b');
 const subjectMetaFile = open('admin/import/assets/dates.meta.csv', 'b');
+/* eslint-enable no-restricted-globals */
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT as string,
@@ -93,7 +94,7 @@ function getOrCreateReleaseWithSubject() {
     publicationId,
     publicationTitle,
     topicId,
-    releaseName: RELEASE,
+    year: RELEASE,
     timePeriodCoverage: 'AY',
   });
 
@@ -114,6 +115,20 @@ function getOrCreateReleaseWithSubject() {
 
   const { subjects } = dataService.getSubjects({ releaseId });
   const subjectId = subjects[0].id;
+
+  dataService.addDataGuidance({
+    releaseId,
+    subjects: [
+      {
+        id: subjectId,
+        content: '<p>Test</p>',
+      },
+    ],
+  });
+
+  dataService.approveRelease({ releaseId });
+
+  dataService.waitForReleaseToBePublished({ releaseId });
 
   return {
     themeId,
