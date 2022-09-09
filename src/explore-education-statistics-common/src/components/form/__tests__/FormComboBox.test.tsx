@@ -1,804 +1,812 @@
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import noop from 'lodash/noop';
+import renderer from 'react-test-renderer';
+import userEvent from '@testing-library/user-event';
 import FormComboBox from '../FormComboBox';
 
 describe('FormComboBox', () => {
   test('renders with no options by default', () => {
-    const { container } = render(
+    render(
       <FormComboBox
         id="test-combobox"
         inputLabel="Choose option"
-        onInputChange={() => {}}
-        onSelect={() => {}}
+        onInputChange={noop}
+        onSelect={noop}
         options={['Option 1', 'Option 2', 'Option 3']}
       />,
     );
 
-    const options = container.querySelectorAll('[role="option"]');
+    const options = screen.queryAllByRole('option');
 
     expect(options).toHaveLength(0);
-    expect(container.innerHTML).toMatchSnapshot();
+
+    const tree = renderer
+      .create(
+        <FormComboBox
+          id="test-combobox"
+          inputLabel="Choose option"
+          onInputChange={noop}
+          onSelect={noop}
+          options={['Option 1', 'Option 2', 'Option 3']}
+        />,
+      )
+      .toJSON();
+
+    expect(tree).toMatchSnapshot();
   });
 
-  test('renders with options in correct order when input changes', () => {
-    const { container, getByLabelText } = render(
+  test('renders with options in correct order when input changes', async () => {
+    render(
       <FormComboBox
         id="test-combobox"
         inputLabel="Choose option"
-        onInputChange={() => {}}
-        onSelect={() => {}}
+        onInputChange={noop}
+        onSelect={noop}
         options={['Option 1', 'Option 2', 'Option 3']}
       />,
     );
 
-    const input = getByLabelText('Choose option') as HTMLInputElement;
+    await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
-    fireEvent.change(input, {
-      target: {
-        value: 'Test',
-      },
-    });
-
-    const options = container.querySelectorAll('[role="option"]');
+    const options = screen.queryAllByRole('option');
 
     expect(options).toHaveLength(3);
     expect(options[0]).toHaveTextContent('Option 1');
     expect(options[1]).toHaveTextContent('Option 2');
     expect(options[2]).toHaveTextContent('Option 3');
 
-    expect(container.innerHTML).toMatchSnapshot();
+    const tree = renderer
+      .create(
+        <FormComboBox
+          id="test-combobox"
+          inputLabel="Choose option"
+          onInputChange={noop}
+          onSelect={noop}
+          options={['Option 1', 'Option 2', 'Option 3']}
+        />,
+      )
+      .toJSON();
+
+    expect(tree).toMatchSnapshot();
   });
 
   describe('input field', () => {
-    test('pressing ArrowDown focuses the list box', () => {
-      const { container, getByLabelText } = render(
+    test('pressing ArrowDown focuses the first option', async () => {
+      render(
         <FormComboBox
           id="test-combobox"
           inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
+          onInputChange={noop}
+          onSelect={noop}
           options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
 
-      const input = getByLabelText('Choose option') as HTMLInputElement;
+      const input = screen.getByLabelText('Choose option') as HTMLInputElement;
 
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
+      await userEvent.type(input, 'Test');
+
+      const option1 = screen.getByText('Option 1');
+      const option2 = screen.getByText('Option 2');
+      const option3 = screen.getByText('Option 3');
+
+      expect(option1).toHaveAttribute('aria-selected', 'false');
+      expect(option1).not.toHaveFocus();
+
+      expect(option2).toHaveAttribute('aria-selected', 'false');
+      expect(option2).not.toHaveFocus();
+
+      expect(option3).toHaveAttribute('aria-selected', 'false');
+      expect(option3).not.toHaveFocus();
+
+      fireEvent.keyDown(input, {
+        key: 'ArrowDown',
       });
 
-      const listBox = container.querySelector('[role="listbox"]');
+      await waitFor(() => {
+        expect(option1).toHaveAttribute('aria-selected', 'true');
+        expect(option1).toHaveFocus();
+
+        expect(option2).toHaveAttribute('aria-selected', 'false');
+        expect(option2).not.toHaveFocus();
+
+        expect(option3).toHaveAttribute('aria-selected', 'false');
+        expect(option3).not.toHaveFocus();
+      });
+    });
+
+    test('pressing ArrowDown selects the first list item', async () => {
+      render(
+        <FormComboBox
+          id="test-combobox"
+          inputLabel="Choose option"
+          onInputChange={noop}
+          onSelect={noop}
+          options={['Option 1', 'Option 2', 'Option 3']}
+        />,
+      );
+
+      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+
+      const option1 = screen.getByText('Option 1');
+      const option2 = screen.getByText('Option 2');
+      const option3 = screen.getByText('Option 3');
+
+      expect(option1).toHaveAttribute('aria-selected', 'false');
+      expect(option1).not.toHaveFocus();
+
+      expect(option2).toHaveAttribute('aria-selected', 'false');
+      expect(option2).not.toHaveFocus();
+
+      expect(option3).toHaveAttribute('aria-selected', 'false');
+      expect(option3).not.toHaveFocus();
+
+      fireEvent.keyDown(screen.getByLabelText('Choose option'), {
+        key: 'ArrowDown',
+      });
+
+      await waitFor(() => {
+        expect(option1).toHaveAttribute('aria-selected', 'true');
+        expect(option1).toHaveFocus();
+
+        expect(option2).toHaveAttribute('aria-selected', 'false');
+        expect(option2).not.toHaveFocus();
+
+        expect(option3).toHaveAttribute('aria-selected', 'false');
+        expect(option3).not.toHaveFocus();
+      });
+    });
+
+    test('pressing ArrowUp focuses the list box', async () => {
+      render(
+        <FormComboBox
+          id="test-combobox"
+          inputLabel="Choose option"
+          onInputChange={noop}
+          onSelect={noop}
+          options={['Option 1', 'Option 2', 'Option 3']}
+        />,
+      );
+
+      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+
+      const listBox = screen.getByRole('listbox');
 
       expect(listBox).not.toHaveFocus();
 
-      fireEvent.keyDown(getByLabelText('Choose option'), { key: 'ArrowDown' });
+      fireEvent.keyDown(screen.getByLabelText('Choose option'), {
+        key: 'ArrowUp',
+      });
 
-      expect(listBox).toHaveFocus();
+      const option = screen.getByText('Option 3');
+      expect(option).toHaveFocus();
     });
 
-    test('pressing ArrowDown selects the first list item', () => {
-      const { getByLabelText, getByText } = render(
+    test('pressing ArrowUp selects the last list item', async () => {
+      render(
         <FormComboBox
           id="test-combobox"
           inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
+          onInputChange={noop}
+          onSelect={noop}
           options={['Option 1', 'Option 2', 'Option 3']}
         />,
       );
+      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
-      const input = getByLabelText('Choose option') as HTMLInputElement;
-
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
-      });
-
-      const option1 = getByText('Option 1');
-      const option2 = getByText('Option 2');
-      const option3 = getByText('Option 3');
+      const option1 = screen.getByText('Option 1');
+      const option2 = screen.getByText('Option 2');
+      const option3 = screen.getByText('Option 3');
 
       expect(option1).toHaveAttribute('aria-selected', 'false');
+      expect(option1).not.toHaveFocus();
+
       expect(option2).toHaveAttribute('aria-selected', 'false');
+      expect(option2).not.toHaveFocus();
+
       expect(option3).toHaveAttribute('aria-selected', 'false');
+      expect(option3).not.toHaveFocus();
 
-      fireEvent.keyDown(getByLabelText('Choose option'), { key: 'ArrowDown' });
-
-      expect(option1).toHaveAttribute('aria-selected', 'true');
-      expect(option2).toHaveAttribute('aria-selected', 'false');
-      expect(option3).toHaveAttribute('aria-selected', 'false');
-    });
-
-    test('pressing ArrowUp focuses the list box', () => {
-      const { container, getByLabelText } = render(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      );
-
-      const input = getByLabelText('Choose option') as HTMLInputElement;
-
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
+      fireEvent.keyDown(screen.getByLabelText('Choose option'), {
+        key: 'ArrowUp',
       });
 
-      const listBox = container.querySelector('[role="listbox"]');
+      await waitFor(() => {
+        expect(option1).toHaveAttribute('aria-selected', 'false');
+        expect(option1).not.toHaveFocus();
 
-      expect(listBox).not.toHaveFocus();
+        expect(option2).toHaveAttribute('aria-selected', 'false');
+        expect(option2).not.toHaveFocus();
 
-      fireEvent.keyDown(getByLabelText('Choose option'), { key: 'ArrowUp' });
-
-      expect(listBox).toHaveFocus();
+        expect(option3).toHaveAttribute('aria-selected', 'true');
+        expect(option3).toHaveFocus();
+      });
     });
+    describe('list box', () => {
+      test('pressing ArrowUp will cycle the selected item through the entire list', async () => {
+        render(
+          <FormComboBox
+            id="test-combobox"
+            inputLabel="Choose option"
+            onInputChange={() => {}}
+            onSelect={() => {}}
+            options={['Option 1', 'Option 2', 'Option 3']}
+          />,
+        );
 
-    test('pressing ArrowUp selects the last list item', () => {
-      const { getByLabelText, getByText } = render(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      );
+        await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
-      const input = getByLabelText('Choose option') as HTMLInputElement;
+        const listBox = screen.queryByRole('listbox') as HTMLElement;
 
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
+        const option1 = screen.getByText('Option 1');
+        const option2 = screen.getByText('Option 2');
+        const option3 = screen.getByText('Option 3');
+
+        expect(option1).toHaveAttribute('aria-selected', 'false');
+        expect(option1).not.toHaveFocus();
+
+        expect(option2).toHaveAttribute('aria-selected', 'false');
+        expect(option2).not.toHaveFocus();
+
+        expect(option3).toHaveAttribute('aria-selected', 'false');
+        expect(option3).not.toHaveFocus();
+
+        fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+
+        await waitFor(() => {
+          expect(option1).toHaveAttribute('aria-selected', 'false');
+          expect(option1).not.toHaveFocus();
+
+          expect(option2).toHaveAttribute('aria-selected', 'false');
+          expect(option2).not.toHaveFocus();
+
+          expect(option3).toHaveAttribute('aria-selected', 'true');
+          expect(option3).toHaveFocus();
+        });
+
+        fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+
+        expect(option1).toHaveAttribute('aria-selected', 'false');
+        expect(option1).not.toHaveFocus();
+
+        expect(option2).toHaveAttribute('aria-selected', 'true');
+        expect(option2).toHaveFocus();
+
+        expect(option3).toHaveAttribute('aria-selected', 'false');
+        expect(option3).not.toHaveFocus();
+
+        fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+
+        await waitFor(() => {
+          expect(option1).toHaveAttribute('aria-selected', 'true');
+          expect(option1).toHaveFocus();
+
+          expect(option2).toHaveAttribute('aria-selected', 'false');
+          expect(option2).not.toHaveFocus();
+
+          expect(option3).toHaveAttribute('aria-selected', 'false');
+          expect(option3).not.toHaveFocus();
+        });
+
+        fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+
+        await waitFor(() => {
+          expect(option1).toHaveAttribute('aria-selected', 'false');
+          expect(option1).not.toHaveFocus();
+
+          expect(option2).toHaveAttribute('aria-selected', 'false');
+          expect(option2).not.toHaveFocus();
+
+          expect(option3).toHaveAttribute('aria-selected', 'true');
+          expect(option3).toHaveFocus();
+        });
       });
 
-      const option1 = getByText('Option 1');
-      const option2 = getByText('Option 2');
-      const option3 = getByText('Option 3');
+      test('pressing ArrowUp adjusts scroll correctly', async () => {
+        render(
+          <FormComboBox
+            id="test-combobox"
+            inputLabel="Choose option"
+            onInputChange={noop}
+            onSelect={noop}
+            options={['Option 1', 'Option 2', 'Option 3']}
+          />,
+        );
 
-      expect(option1).toHaveAttribute('aria-selected', 'false');
-      expect(option2).toHaveAttribute('aria-selected', 'false');
-      expect(option3).toHaveAttribute('aria-selected', 'false');
+        await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
-      fireEvent.keyDown(getByLabelText('Choose option'), { key: 'ArrowUp' });
+        const listBox = screen.getByRole('listbox');
 
-      expect(option1).toHaveAttribute('aria-selected', 'false');
-      expect(option2).toHaveAttribute('aria-selected', 'false');
-      expect(option3).toHaveAttribute('aria-selected', 'true');
-    });
-  });
+        expect(listBox.scrollTop).toBe(0);
 
-  describe('list box', () => {
-    test('pressing ArrowUp will cycle the selected item through the entire list', () => {
-      const { container, getByText, getByLabelText } = render(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      );
+        fireEvent.keyDown(listBox, { key: 'ArrowUp' });
 
-      const input = getByLabelText('Choose option') as HTMLInputElement;
+        expect(listBox.scrollTop).toBe(listBox.scrollHeight);
 
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
+        fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+
+        expect(listBox.scrollTop).toBe(
+          listBox.scrollHeight - screen.getByText('Option 3').scrollHeight,
+        );
+
+        fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+
+        expect(listBox.scrollTop).toBe(
+          listBox.scrollHeight - screen.getByText('Option 2').scrollHeight,
+        );
+
+        fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+        expect(listBox.scrollTop).toBe(0);
       });
 
-      const listBox = container.querySelector(
-        '[role="listbox"]',
-      ) as HTMLElement;
+      test('pressing ArrowDown will cycle the selected item through the entire list', async () => {
+        render(
+          <FormComboBox
+            id="test-combobox"
+            inputLabel="Choose option"
+            onInputChange={noop}
+            onSelect={noop}
+            options={['Option 1', 'Option 2', 'Option 3']}
+          />,
+        );
 
-      const option1 = getByText('Option 1');
-      const option2 = getByText('Option 2');
-      const option3 = getByText('Option 3');
+        await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
-      expect(option1).toHaveAttribute('aria-selected', 'false');
-      expect(option2).toHaveAttribute('aria-selected', 'false');
-      expect(option3).toHaveAttribute('aria-selected', 'false');
+        const listBox = screen.getByRole('combobox');
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+        const option1 = screen.getByText('Option 1');
+        const option2 = screen.getByText('Option 2');
+        const option3 = screen.getByText('Option 3');
 
-      expect(option1).toHaveAttribute('aria-selected', 'false');
-      expect(option2).toHaveAttribute('aria-selected', 'false');
-      expect(option3).toHaveAttribute('aria-selected', 'true');
+        expect(option1).toHaveAttribute('aria-selected', 'false');
+        expect(option1).not.toHaveFocus();
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+        expect(option2).toHaveAttribute('aria-selected', 'false');
+        expect(option2).not.toHaveFocus();
 
-      expect(option1).toHaveAttribute('aria-selected', 'false');
-      expect(option2).toHaveAttribute('aria-selected', 'true');
-      expect(option3).toHaveAttribute('aria-selected', 'false');
+        expect(option3).toHaveAttribute('aria-selected', 'false');
+        expect(option3).not.toHaveFocus();
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+        fireEvent.keyDown(listBox, { key: 'ArrowDown' });
 
-      expect(option1).toHaveAttribute('aria-selected', 'true');
-      expect(option2).toHaveAttribute('aria-selected', 'false');
-      expect(option3).toHaveAttribute('aria-selected', 'false');
+        await waitFor(() => {
+          expect(option1).toHaveAttribute('aria-selected', 'true');
+          expect(option1).toHaveFocus();
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+          expect(option2).toHaveAttribute('aria-selected', 'false');
+          expect(option2).not.toHaveFocus();
 
-      expect(option1).toHaveAttribute('aria-selected', 'false');
-      expect(option2).toHaveAttribute('aria-selected', 'false');
-      expect(option3).toHaveAttribute('aria-selected', 'true');
-    });
+          expect(option3).toHaveAttribute('aria-selected', 'false');
+          expect(option3).not.toHaveFocus();
+        });
 
-    test('pressing ArrowUp adjusts scroll correctly', () => {
-      const { container, getByText, getByLabelText } = render(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      );
+        fireEvent.keyDown(listBox, { key: 'ArrowDown' });
 
-      const input = getByLabelText('Choose option') as HTMLInputElement;
+        await waitFor(() => {
+          expect(option1).toHaveAttribute('aria-selected', 'false');
+          expect(option1).not.toHaveFocus();
 
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
+          expect(option2).toHaveAttribute('aria-selected', 'true');
+          expect(option2).toHaveFocus();
+
+          expect(option3).toHaveAttribute('aria-selected', 'false');
+          expect(option3).not.toHaveFocus();
+        });
+
+        fireEvent.keyDown(listBox, { key: 'ArrowDown' });
+
+        await waitFor(() => {
+          expect(option1).toHaveAttribute('aria-selected', 'false');
+          expect(option1).not.toHaveFocus();
+
+          expect(option2).toHaveAttribute('aria-selected', 'false');
+          expect(option2).not.toHaveFocus();
+
+          expect(option3).toHaveAttribute('aria-selected', 'true');
+          expect(option3).toHaveFocus();
+        });
+
+        fireEvent.keyDown(listBox, { key: 'ArrowDown' });
+
+        await waitFor(() => {
+          expect(option1).toHaveAttribute('aria-selected', 'true');
+          expect(option1).toHaveFocus();
+
+          expect(option2).toHaveAttribute('aria-selected', 'false');
+          expect(option2).not.toHaveFocus();
+
+          expect(option3).toHaveAttribute('aria-selected', 'false');
+          expect(option3).not.toHaveFocus();
+        });
       });
 
-      const listBox = container.querySelector(
-        '[role="listbox"]',
-      ) as HTMLElement;
+      test('pressing ArrowDown adjusts scroll correctly', async () => {
+        render(
+          <FormComboBox
+            id="test-combobox"
+            inputLabel="Choose option"
+            onInputChange={noop}
+            onSelect={noop}
+            options={['Option 1', 'Option 2', 'Option 3']}
+          />,
+        );
 
-      expect(listBox.scrollTop).toBe(0);
+        await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
-      expect(listBox.scrollTop).toBe(listBox.scrollHeight);
+        const comboBox = screen.getByRole('combobox');
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
-      expect(listBox.scrollTop).toBe(
-        listBox.scrollHeight - getByText('Option 3').scrollHeight,
-      );
+        expect(comboBox.scrollTop).toBe(0);
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
-      expect(listBox.scrollTop).toBe(
-        listBox.scrollHeight - getByText('Option 2').scrollHeight,
-      );
+        fireEvent.keyDown(comboBox, { key: 'ArrowDown' });
+        expect(comboBox.scrollTop).toBe(0);
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
-      expect(listBox.scrollTop).toBe(0);
-    });
+        fireEvent.keyDown(comboBox, { key: 'ArrowDown' });
+        expect(comboBox.scrollTop).toBe(
+          screen.getByText('Option 1').scrollHeight,
+        );
 
-    test('pressing ArrowDown will cycle the selected item through the entire list', () => {
-      const { container, getByText, getByLabelText } = render(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      );
+        fireEvent.keyDown(comboBox, { key: 'ArrowDown' });
+        expect(comboBox.scrollTop).toBe(
+          comboBox.scrollHeight + screen.getByText('Option 2').scrollHeight,
+        );
 
-      const input = getByLabelText('Choose option') as HTMLInputElement;
-
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
+        fireEvent.keyDown(comboBox, { key: 'ArrowDown' });
+        expect(comboBox.scrollTop).toBe(comboBox.scrollHeight);
       });
 
-      const listBox = container.querySelector(
-        '[role="listbox"]',
-      ) as HTMLElement;
+      test('pressing ArrowLeft focuses back to input field', async () => {
+        render(
+          <FormComboBox
+            id="test-combobox"
+            inputLabel="Choose option"
+            onInputChange={noop}
+            onSelect={noop}
+            options={['Option 1', 'Option 2', 'Option 3']}
+          />,
+        );
 
-      const option1 = getByText('Option 1');
-      const option2 = getByText('Option 2');
-      const option3 = getByText('Option 3');
+        await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
-      expect(option1).toHaveAttribute('aria-selected', 'false');
-      expect(option2).toHaveAttribute('aria-selected', 'false');
-      expect(option3).toHaveAttribute('aria-selected', 'false');
+        const input = screen.getByLabelText('Choose option');
 
-      fireEvent.keyDown(listBox, { key: 'ArrowDown' });
+        fireEvent.keyDown(input, { key: 'ArrowDown' });
+        expect(screen.getByLabelText('Choose option')).not.toHaveFocus();
 
-      expect(option1).toHaveAttribute('aria-selected', 'true');
-      expect(option2).toHaveAttribute('aria-selected', 'false');
-      expect(option3).toHaveAttribute('aria-selected', 'false');
+        const listBox = screen.getByRole('listbox');
 
-      fireEvent.keyDown(listBox, { key: 'ArrowDown' });
+        fireEvent.keyDown(listBox, { key: 'ArrowLeft' });
 
-      expect(option1).toHaveAttribute('aria-selected', 'false');
-      expect(option2).toHaveAttribute('aria-selected', 'true');
-      expect(option3).toHaveAttribute('aria-selected', 'false');
-
-      fireEvent.keyDown(listBox, { key: 'ArrowDown' });
-
-      expect(option1).toHaveAttribute('aria-selected', 'false');
-      expect(option2).toHaveAttribute('aria-selected', 'false');
-      expect(option3).toHaveAttribute('aria-selected', 'true');
-
-      fireEvent.keyDown(listBox, { key: 'ArrowDown' });
-
-      expect(option1).toHaveAttribute('aria-selected', 'true');
-      expect(option2).toHaveAttribute('aria-selected', 'false');
-      expect(option3).toHaveAttribute('aria-selected', 'false');
-    });
-
-    test('pressing ArrowDown adjusts scroll correctly', () => {
-      const { container, getByText, getByLabelText } = render(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      );
-
-      const input = getByLabelText('Choose option') as HTMLInputElement;
-
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
+        expect(screen.getByLabelText('Choose option')).toHaveFocus();
       });
 
-      const listBox = container.querySelector(
-        '[role="listbox"]',
-      ) as HTMLElement;
+      test('pressing ArrowLeft moves input field selection one character to the left', async () => {
+        render(
+          <FormComboBox
+            id="test-combobox"
+            inputLabel="Choose option"
+            onInputChange={noop}
+            onSelect={noop}
+            options={['Option 1', 'Option 2', 'Option 3']}
+          />,
+        );
 
-      expect(listBox.scrollTop).toBe(0);
+        const input = screen.getByLabelText(
+          'Choose option',
+        ) as HTMLInputElement;
 
-      fireEvent.keyDown(listBox, { key: 'ArrowDown' });
-      expect(listBox.scrollTop).toBe(0);
+        await userEvent.type(input, 'Test');
 
-      fireEvent.keyDown(listBox, { key: 'ArrowDown' });
-      expect(listBox.scrollTop).toBe(
-        listBox.scrollHeight + getByText('Option 1').scrollHeight,
-      );
+        input.selectionStart = 2;
+        input.selectionEnd = 2;
 
-      fireEvent.keyDown(listBox, { key: 'ArrowDown' });
-      expect(listBox.scrollTop).toBe(
-        listBox.scrollHeight + getByText('Option 2').scrollHeight,
-      );
+        const listBox = screen.getByRole('listbox');
 
-      fireEvent.keyDown(listBox, { key: 'ArrowDown' });
-      expect(listBox.scrollTop).toBe(listBox.scrollHeight);
-    });
+        fireEvent.keyDown(listBox, { key: 'ArrowLeft' });
 
-    test('pressing ArrowLeft focuses back to input field', () => {
-      const { container, getByLabelText } = render(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      );
-
-      const input = getByLabelText('Choose option') as HTMLInputElement;
-
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
+        expect(input.selectionStart).toBe(1);
+        expect(input.selectionEnd).toBe(1);
       });
 
-      expect(getByLabelText('Choose option')).not.toHaveFocus();
+      test('pressing ArrowRight focuses back to input field', async () => {
+        render(
+          <FormComboBox
+            id="test-combobox"
+            inputLabel="Choose option"
+            onInputChange={noop}
+            onSelect={noop}
+            options={['Option 1', 'Option 2', 'Option 3']}
+          />,
+        );
 
-      const listBox = container.querySelector(
-        '[role="listbox"]',
-      ) as HTMLElement;
+        await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
-      fireEvent.keyDown(listBox, { key: 'ArrowLeft' });
+        const listBox = screen.getByRole('listbox');
 
-      expect(getByLabelText('Choose option')).toHaveFocus();
-    });
+        fireEvent.keyDown(listBox, { key: 'ArrowRight' });
 
-    test('pressing ArrowLeft moves input field selection one character to the left', () => {
-      const { container, getByLabelText } = render(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      );
-
-      const input = getByLabelText('Choose option') as HTMLInputElement;
-
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
+        expect(screen.getByLabelText('Choose option')).toHaveFocus();
       });
 
-      input.selectionStart = 2;
-      input.selectionEnd = 2;
+      test('pressing ArrowRight moves input field selection one character to the left', async () => {
+        render(
+          <FormComboBox
+            id="test-combobox"
+            inputLabel="Choose option"
+            onInputChange={noop}
+            onSelect={noop}
+            options={['Option 1', 'Option 2', 'Option 3']}
+          />,
+        );
 
-      const listBox = container.querySelector(
-        '[role="listbox"]',
-      ) as HTMLElement;
+        const input = screen.getByLabelText(
+          'Choose option',
+        ) as HTMLInputElement;
 
-      fireEvent.keyDown(listBox, { key: 'ArrowLeft' });
+        await userEvent.type(input, 'Test');
 
-      expect(input.selectionStart).toBe(1);
-      expect(input.selectionEnd).toBe(1);
-    });
+        input.selectionStart = 2;
+        input.selectionEnd = 2;
 
-    test('pressing ArrowRight focuses back to input field', () => {
-      const { container, getByLabelText } = render(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      );
+        const listBox = screen.getByRole('listbox');
 
-      const input = getByLabelText('Choose option') as HTMLInputElement;
+        fireEvent.keyDown(listBox, { key: 'ArrowRight' });
 
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
+        expect(input.selectionStart).toBe(3);
+        expect(input.selectionEnd).toBe(3);
       });
 
-      expect(input).not.toHaveFocus();
+      test('pressing Home focuses input field and moves selection back to start', async () => {
+        render(
+          <FormComboBox
+            id="test-combobox"
+            inputLabel="Choose option"
+            onInputChange={noop}
+            onSelect={noop}
+            options={['Option 1', 'Option 2', 'Option 3']}
+          />,
+        );
 
-      const listBox = container.querySelector(
-        '[role="listbox"]',
-      ) as HTMLElement;
+        const input = screen.getByLabelText(
+          'Choose option',
+        ) as HTMLInputElement;
 
-      fireEvent.keyDown(listBox, { key: 'ArrowRight' });
+        await userEvent.type(input, 'Test');
 
-      expect(getByLabelText('Choose option')).toHaveFocus();
-    });
+        input.value = 'Test';
+        input.selectionStart = 2;
+        input.selectionEnd = 2;
 
-    test('pressing ArrowRight moves input field selection one character to the left', () => {
-      const { container, getByLabelText } = render(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      );
+        const listBox = screen.getByRole('listbox');
 
-      const input = getByLabelText('Choose option') as HTMLInputElement;
+        fireEvent.keyDown(listBox, { key: 'Home' });
 
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
+        expect(input).toHaveFocus();
+        expect(input.selectionStart).toBe(0);
+        expect(input.selectionEnd).toBe(0);
       });
 
-      input.selectionStart = 2;
-      input.selectionEnd = 2;
+      test('pressing End focuses input field and moves selection back to start', async () => {
+        render(
+          <FormComboBox
+            id="test-combobox"
+            inputLabel="Choose option"
+            onInputChange={noop}
+            onSelect={noop}
+            options={['Option 1', 'Option 2', 'Option 3']}
+          />,
+        );
 
-      const listBox = container.querySelector(
-        '[role="listbox"]',
-      ) as HTMLElement;
+        const input = screen.getByLabelText(
+          'Choose option',
+        ) as HTMLInputElement;
 
-      fireEvent.keyDown(listBox, { key: 'ArrowRight' });
+        await userEvent.type(input, 'Test');
+        input.selectionStart = 2;
+        input.selectionEnd = 2;
 
-      expect(input.selectionStart).toBe(3);
-      expect(input.selectionEnd).toBe(3);
-    });
+        const listBox = screen.getByRole('listbox');
 
-    test('pressing Home focuses input field and moves selection back to start', () => {
-      const { container, getByLabelText } = render(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      );
+        fireEvent.keyDown(listBox, { key: 'End' });
 
-      const input = getByLabelText('Choose option') as HTMLInputElement;
-
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
+        expect(input).toHaveFocus();
+        expect(input.selectionStart).toBe(4);
+        expect(input.selectionEnd).toBe(4);
       });
 
-      input.value = 'Test';
-      input.selectionStart = 2;
-      input.selectionEnd = 2;
+      test('pressing Enter calls `onSelect` handler with selected item index', async () => {
+        const onSelect = jest.fn();
 
-      const listBox = container.querySelector(
-        '[role="listbox"]',
-      ) as HTMLElement;
+        render(
+          <FormComboBox
+            id="test-combobox"
+            inputLabel="Choose option"
+            onInputChange={noop}
+            onSelect={onSelect}
+            options={['Option 1', 'Option 2', 'Option 3']}
+          />,
+        );
 
-      fireEvent.keyDown(listBox, { key: 'Home' });
+        await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
-      expect(input).toHaveFocus();
-      expect(input.selectionStart).toBe(0);
-      expect(input.selectionEnd).toBe(0);
-    });
+        expect(onSelect).not.toHaveBeenCalled();
 
-    test('pressing End focuses input field and moves selection back to start', () => {
-      const { container, getByLabelText } = render(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      );
+        const listBox = screen.getByRole('listbox');
 
-      const input = getByLabelText('Choose option') as HTMLInputElement;
+        fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+        fireEvent.keyDown(listBox, { key: 'Enter' });
 
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
+        expect(onSelect).toHaveBeenCalledWith(2);
       });
 
-      input.selectionStart = 2;
-      input.selectionEnd = 2;
+      test('clicking option hides all options', async () => {
+        render(
+          <FormComboBox
+            id="test-combobox"
+            inputLabel="Choose option"
+            onInputChange={noop}
+            onSelect={noop}
+            options={['Option 1', 'Option 2', 'Option 3']}
+          />,
+        );
 
-      const listBox = container.querySelector(
-        '[role="listbox"]',
-      ) as HTMLElement;
+        await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
-      fireEvent.keyDown(listBox, { key: 'End' });
+        const listBox = screen.getByRole('listbox');
 
-      expect(input).toHaveFocus();
-      expect(input.selectionStart).toBe(4);
-      expect(input.selectionEnd).toBe(4);
-    });
+        fireEvent.keyDown(listBox, { key: 'ArrowUp' });
+        fireEvent.keyDown(listBox, { key: 'Enter' });
 
-    test('pressing Enter calls `onSelect` handler with selected item index', () => {
-      const onSelect = jest.fn();
-
-      const { container, getByLabelText } = render(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={onSelect}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      );
-
-      const input = getByLabelText('Choose option') as HTMLInputElement;
-
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
+        expect(screen.queryAllByRole('option')).toHaveLength(0);
       });
 
-      expect(onSelect).not.toHaveBeenCalled();
+      test('pressing Escape on list box options clears them and focuses input field', async () => {
+        render(
+          <FormComboBox
+            id="test-combobox"
+            inputLabel="Choose option"
+            onInputChange={noop}
+            onSelect={noop}
+            options={['Option 1', 'Option 2', 'Option 3']}
+          />,
+        );
 
-      const listBox = container.querySelector(
-        '[role="listbox"]',
-      ) as HTMLElement;
+        const input = screen.getByLabelText(
+          'Choose option',
+        ) as HTMLInputElement;
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
-      fireEvent.keyDown(listBox, { key: 'Enter' });
+        await userEvent.type(input, 'Test');
 
-      expect(onSelect).toHaveBeenCalledWith(2);
-    });
+        const listBox = screen.getByRole('listbox');
 
-    test('clicking option hides all options', () => {
-      const { container, getByLabelText } = render(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      );
+        expect(input).toHaveAttribute('value', 'Test');
+        expect(input).toHaveFocus();
+        expect(screen.queryAllByRole('option')).toHaveLength(3);
 
-      const input = getByLabelText('Choose option') as HTMLInputElement;
+        fireEvent.keyDown(listBox, { key: 'Escape' });
 
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
+        expect(input).toHaveAttribute('value', '');
+        expect(input).toHaveFocus();
+        expect(screen.queryAllByRole('option')).toHaveLength(0);
+
+        fireEvent.keyDown(listBox, { key: 'Escape' });
+
+        expect(input).toHaveFocus();
       });
 
-      const listBox = container.querySelector(
-        '[role="listbox"]',
-      ) as HTMLElement;
+      test('pressing Escape on input field clears it and clears the list box options', async () => {
+        render(
+          <FormComboBox
+            id="test-combobox"
+            inputLabel="Choose option"
+            onInputChange={noop}
+            onSelect={noop}
+            options={['Option 1', 'Option 2', 'Option 3']}
+          />,
+        );
 
-      fireEvent.keyDown(listBox, { key: 'ArrowUp' });
-      fireEvent.keyDown(listBox, { key: 'Enter' });
+        const input = screen.getByLabelText(
+          'Choose option',
+        ) as HTMLInputElement;
 
-      expect(container.querySelectorAll('[role="option"]')).toHaveLength(0);
-    });
+        await userEvent.type(input, 'Test');
 
-    test('pressing Escape on list box options clears them and focuses input field', () => {
-      const { container, getByLabelText } = render(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      );
+        expect(input).toHaveAttribute('value', 'Test');
+        expect(screen.queryAllByRole('option')).toHaveLength(3);
 
-      const input = getByLabelText('Choose option') as HTMLInputElement;
+        fireEvent.keyDown(input, { key: 'Escape' });
 
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
+        expect(input).toHaveAttribute('value', '');
+        expect(screen.queryAllByRole('option')).toHaveLength(0);
       });
 
-      const listBox = container.querySelector(
-        '[role="listbox"]',
-      ) as HTMLElement;
+      test('clicking option calls `onSelect` handler', async () => {
+        const onSelect = jest.fn();
 
-      expect(input).toHaveAttribute('value', 'Test');
-      expect(input).not.toHaveFocus();
-      expect(container.querySelectorAll('[role="option"]')).toHaveLength(3);
+        render(
+          <FormComboBox
+            id="test-combobox"
+            inputLabel="Choose option"
+            onInputChange={noop}
+            onSelect={onSelect}
+            options={['Option 1', 'Option 2', 'Option 3']}
+          />,
+        );
 
-      fireEvent.keyDown(listBox, { key: 'Escape' });
+        await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
-      expect(input).toHaveAttribute('value', '');
-      expect(input).toHaveFocus();
-      expect(container.querySelectorAll('[role="option"]')).toHaveLength(0);
-    });
+        expect(onSelect).not.toHaveBeenCalled();
 
-    test('pressing Escape on input field clears it and clears the list box options', () => {
-      const { container, getByLabelText } = render(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      );
+        fireEvent.click(screen.getByText('Option 2'));
 
-      const input = getByLabelText('Choose option') as HTMLInputElement;
-
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
+        expect(onSelect).toHaveBeenCalledWith(1);
       });
 
-      expect(input).toHaveAttribute('value', 'Test');
-      expect(container.querySelectorAll('[role="option"]')).toHaveLength(3);
+      test('clicking option hides all options', async () => {
+        render(
+          <FormComboBox
+            id="test-combobox"
+            inputLabel="Choose option"
+            onInputChange={noop}
+            onSelect={noop}
+            options={['Option 1', 'Option 2', 'Option 3']}
+          />,
+        );
 
-      fireEvent.keyDown(input, { key: 'Escape' });
+        await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
-      expect(input).toHaveAttribute('value', '');
-      expect(container.querySelectorAll('[role="option"]')).toHaveLength(0);
-    });
+        fireEvent.click(screen.getByText('Option 2'));
 
-    test('clicking option calls `onSelect` handler', () => {
-      const onSelect = jest.fn();
-
-      const { getByText, getByLabelText } = render(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={onSelect}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      );
-
-      const input = getByLabelText('Choose option') as HTMLInputElement;
-
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
+        expect(screen.queryAllByRole('option')).toHaveLength(0);
       });
 
-      expect(onSelect).not.toHaveBeenCalled();
+      test('clicking outside of combobox hides options', async () => {
+        render(
+          <div>
+            <p id="outside">Target</p>
 
-      fireEvent.click(getByText('Option 2'));
+            <FormComboBox
+              id="test-combobox"
+              inputLabel="Choose option"
+              onInputChange={noop}
+              onSelect={noop}
+              options={['Option 1', 'Option 2', 'Option 3']}
+            />
+          </div>,
+        );
 
-      expect(onSelect).toHaveBeenCalledWith(1);
+        await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+
+        expect(screen.queryAllByRole('option')).toHaveLength(3);
+
+        fireEvent.click(screen.getByText('Target'));
+
+        expect(screen.queryAllByRole('option')).toHaveLength(0);
+      });
     });
-
-    test('clicking option hides all options', () => {
-      const { container, getByText, getByLabelText } = render(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
+    test('re-clicking combobox re-renders options', async () => {
+      render(
+        <div>
+          <p id="outside">Target</p>
+          <FormComboBox
+            id="test-combobox"
+            inputLabel="Choose option"
+            onInputChange={noop}
+            onSelect={noop}
+            options={['Option 1', 'Option 2', 'Option 3']}
+          />
+        </div>,
       );
 
-      const input = getByLabelText('Choose option') as HTMLInputElement;
+      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
-      fireEvent.change(input, {
-        target: {
-          value: 'Test',
-        },
-      });
+      fireEvent.click(screen.getByText('Target'));
 
-      fireEvent.click(getByText('Option 2'));
+      expect(screen.queryAllByRole('option')).toHaveLength(0);
 
-      expect(container.querySelectorAll('[role="option"]')).toHaveLength(0);
+      fireEvent.click(screen.getByLabelText('Choose option'));
+
+      expect(screen.queryAllByRole('option')).toHaveLength(3);
     });
-  });
-
-  test('clicking outside of combobox hides options', () => {
-    const { container, getByText, getByLabelText } = render(
-      <div>
-        <p id="outside">Target</p>
-
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />
-      </div>,
-    );
-
-    const input = getByLabelText('Choose option') as HTMLInputElement;
-
-    fireEvent.change(input, {
-      target: {
-        value: 'Test',
-      },
-    });
-
-    expect(container.querySelectorAll('[role="option"]')).toHaveLength(3);
-
-    fireEvent.click(getByText('Target'));
-
-    expect(container.querySelectorAll('[role="option"]')).toHaveLength(0);
-  });
-
-  test('re-clicking combobox re-renders options', () => {
-    const { container, getByText, getByLabelText } = render(
-      <div>
-        <p id="outside">Target</p>
-
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={() => {}}
-          onSelect={() => {}}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />
-      </div>,
-    );
-
-    const input = getByLabelText('Choose option') as HTMLInputElement;
-
-    fireEvent.change(input, {
-      target: {
-        value: 'Test',
-      },
-    });
-
-    fireEvent.click(getByText('Target'));
-
-    expect(container.querySelectorAll('[role="option"]')).toHaveLength(0);
-
-    fireEvent.click(getByLabelText('Choose option'));
-
-    expect(container.querySelectorAll('[role="option"]')).toHaveLength(3);
   });
 });

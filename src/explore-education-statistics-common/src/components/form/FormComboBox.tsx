@@ -7,9 +7,11 @@ import React, {
   InputHTMLAttributes,
   KeyboardEvent,
   ReactNode,
+  useEffect,
   useRef,
   useState,
 } from 'react';
+import inputStyles from '@common/components/form/FormTextSearchInput.module.scss';
 import styles from './FormComboBox.module.scss';
 
 interface ComboBoxRenderProps {
@@ -51,11 +53,11 @@ const FormComboBox = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const optionRefs = useRef<Dictionary<HTMLLIElement>>({});
 
-  const [value, setValue] = useState('');
-  const [selectedOption, setSelectedOption] = useState(initialOption);
+  const [value, setValue] = useState<string>('');
+  const [selectedOption, setSelectedOption] = useState<number>(initialOption);
   const [showOptions, toggleShowOptions] = useToggle(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setValue(inputValue);
   }, [inputValue]);
 
@@ -156,158 +158,160 @@ const FormComboBox = ({
       onKeyDown={handleContainerInteraction}
       ref={containerRef}
     >
-      <div
-        // eslint-disable-next-line jsx-a11y/role-has-required-aria-props
-        role="combobox"
-        aria-expanded={renderedOptions ? renderedOptions.length > 0 : false}
-        aria-owns={`${id}-options`}
-        aria-haspopup="listbox"
-        className="govuk-form-group"
+      <label
+        className={classNames('govuk-label', classes.inputLabel)}
+        htmlFor={`${id}-input`}
       >
-        <label
-          className={classNames('govuk-label', classes.inputLabel)}
-          htmlFor={`${id}-input`}
-        >
-          {inputLabel}
-        </label>
+        {inputLabel}
+      </label>
 
-        <input
-          type="text"
-          // eslint-disable-next-line react/jsx-props-no-spreading
-          {...inputProps}
-          aria-autocomplete="list"
-          aria-activedescendant={
-            selectedOption > -1 ? `${id}-option-${selectedOption}` : undefined
+      <input
+        type="text"
+        // eslint-disable-next-line react/jsx-props-no-spreading
+        {...inputProps}
+        role="combobox"
+        className={classNames(inputStyles.searchInput, 'govuk-input')}
+        id={`${id}-input`}
+        value={value}
+        ref={inputRef}
+        aria-autocomplete="list"
+        aria-haspopup="listbox"
+        aria-controls={`${id}-options`}
+        aria-expanded={renderedOptions ? renderedOptions.length > 0 : false}
+        aria-activedescendant={
+          selectedOption > -1 ? `${id}-option-${selectedOption}` : undefined
+        }
+        onChange={event => {
+          event.persist();
+
+          setValue(event.target.value);
+          optionRefs.current = {};
+
+          onInputChange(event);
+          toggleShowOptions(true);
+        }}
+        onKeyDown={event => {
+          if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+            selectNextOption(event);
           }
-          aria-controls={`${id}-options`}
-          className="govuk-input"
-          id={`${id}-input`}
-          value={value}
-          ref={inputRef}
-          onChange={event => {
-            event.persist();
 
-            setValue(event.target.value);
-            optionRefs.current = {};
+          if (event.key === 'Escape') {
+            setValue('');
+            toggleShowOptions(false);
+          }
+        }}
+      />
 
-            onInputChange(event);
-            toggleShowOptions(true);
-          }}
-          onKeyDown={event => {
-            if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      {typeof afterInput === 'function'
+        ? afterInput({ selectedOption, value })
+        : afterInput}
+
+      {showOptions && renderedOptions && (
+        <div className={styles.optionsContainer} role="alert">
+          {typeof listBoxLabel === 'function'
+            ? listBoxLabel({ selectedOption, value })
+            : listBoxLabel}
+          <ul
+            aria-labelledby={listBoxLabelId}
+            className={classNames(styles.options, {
+              [styles.optionsNoFocus]: renderedOptions.length === 0,
+            })}
+            id={`${id}-options`}
+            ref={listBoxRef}
+            role="listbox"
+            onKeyDown={event => {
               selectNextOption(event);
+              const inputEl = inputRef.current;
 
-              if (listBoxRef.current) {
-                listBoxRef.current.focus();
-              }
-            }
+              if (inputEl) {
+                switch (event.key) {
+                  case 'ArrowLeft':
+                  case 'ArrowRight': {
+                    const directionChange = event.key === 'ArrowLeft' ? -1 : 1;
 
-            if (event.key === 'Escape') {
-              setValue('');
-              toggleShowOptions(false);
-            }
-          }}
-        />
-
-        {typeof afterInput === 'function'
-          ? afterInput({ selectedOption, value })
-          : afterInput}
-
-        {showOptions && renderedOptions && (
-          <div role="alert" className={styles.optionsContainer}>
-            {typeof listBoxLabel === 'function'
-              ? listBoxLabel({ selectedOption, value })
-              : listBoxLabel}
-            <ul
-              aria-labelledby={listBoxLabelId}
-              className={classNames(styles.options, {
-                [styles.optionsNoFocus]: renderedOptions.length === 0,
-              })}
-              id={`${id}-options`}
-              ref={listBoxRef}
-              role="listbox"
-              tabIndex={-1}
-              onKeyDown={event => {
-                selectNextOption(event);
-
-                const inputEl = inputRef.current;
-
-                if (inputEl) {
-                  switch (event.key) {
-                    case 'ArrowLeft':
-                    case 'ArrowRight': {
-                      const directionChange =
-                        event.key === 'ArrowLeft' ? -1 : 1;
-
-                      inputEl.selectionStart = inputEl.selectionStart
-                        ? inputEl.selectionStart + directionChange
-                        : 0;
-                      inputEl.selectionEnd = inputEl.selectionStart;
-                      inputEl.focus();
-                      break;
-                    }
-
-                    case 'Enter':
-                      onSelect(selectedOption);
-                      toggleShowOptions(false);
-                      break;
-
-                    case 'Home':
-                      inputEl.selectionStart = 0;
-                      inputEl.selectionEnd = 0;
-                      inputEl.focus();
-                      break;
-
-                    case 'End':
-                      inputEl.selectionStart = inputEl.value.length;
-                      inputEl.selectionEnd = inputEl.selectionStart;
-                      inputEl.focus();
-                      break;
-
-                    case 'Escape':
-                      setValue('');
-                      toggleShowOptions(false);
-                      inputEl.focus();
-                      break;
-
-                    default:
+                    inputEl.selectionStart = inputEl.selectionStart
+                      ? inputEl.selectionStart + directionChange
+                      : 0;
+                    inputEl.selectionEnd = inputEl.selectionStart;
+                    inputEl.focus();
+                    break;
                   }
-                }
-              }}
-            >
-              {renderedOptions &&
-                renderedOptions.length > 0 &&
-                renderedOptions.map((item, index) => {
-                  const key = index;
 
-                  return (
-                    // eslint-disable-next-line jsx-a11y/click-events-have-key-events
-                    <li
-                      aria-selected={selectedOption === index}
-                      key={key}
-                      id={`${id}-option-${index}`}
-                      className={
-                        selectedOption === index ? styles.selected : undefined
-                      }
-                      role="option"
-                      ref={el => {
-                        if (el) {
-                          optionRefs.current[key] = el;
+                  case 'Enter':
+                    onSelect(selectedOption);
+                    toggleShowOptions(false);
+                    break;
+
+                  case 'Home':
+                    inputEl.selectionStart = 0;
+                    inputEl.selectionEnd = 0;
+                    inputEl.focus();
+                    break;
+
+                  case 'End':
+                    inputEl.selectionStart = inputEl.value.length;
+                    inputEl.selectionEnd = inputEl.selectionStart;
+                    inputEl.focus();
+                    break;
+
+                  case 'Escape':
+                    setValue('');
+                    toggleShowOptions(false);
+                    inputEl.focus();
+                    break;
+
+                  case 'Tab':
+                    setValue('');
+                    toggleShowOptions(false);
+                    break;
+
+                  default:
+                }
+              }
+            }}
+          >
+            {renderedOptions &&
+              renderedOptions.length > 0 &&
+              renderedOptions.map((item, index) => {
+                const key = index;
+
+                const isSelected = selectedOption === index;
+
+                return (
+                  // eslint-disable-next-line jsx-a11y/click-events-have-key-events
+                  <li
+                    aria-posinset={index + 1}
+                    aria-selected={isSelected}
+                    aria-setsize={renderedOptions.length}
+                    key={key}
+                    id={`${id}-option-${index}`}
+                    className={isSelected ? styles.selected : undefined}
+                    role="option"
+                    tabIndex={-1}
+                    ref={el => {
+                      if (el) {
+                        optionRefs.current[index] = el;
+
+                        if (isSelected) {
+                          // this is a bit hacky but it seems to be the only way to focus
+                          // without two list items being selected at the same time
+                          // (and the focus being on the input instead of the list item)
+                          el.focus();
                         }
-                      }}
-                      onClick={() => {
-                        onSelect(index);
-                        toggleShowOptions(false);
-                      }}
-                    >
-                      {item}
-                    </li>
-                  );
-                })}
-            </ul>
-          </div>
-        )}
-      </div>
+                      }
+                    }}
+                    onClick={() => {
+                      onSelect(index);
+                      toggleShowOptions(false);
+                    }}
+                  >
+                    {item}
+                  </li>
+                );
+              })}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

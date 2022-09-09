@@ -1,81 +1,59 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`FormComboBox renders with no options by default 1`] = `
-<div class="container"
-     role="none"
+<div
+  className="container"
+  onClick={[Function]}
+  onKeyDown={[Function]}
+  role="none"
 >
-  <div role="combobox"
-       aria-expanded="true"
-       aria-owns="test-combobox-options"
-       aria-haspopup="listbox"
-       class="govuk-form-group"
+  <label
+    className="govuk-label"
+    htmlFor="test-combobox-input"
   >
-    <label class="govuk-label"
-           for="test-combobox-input"
-    >
-      Choose option
-    </label>
-    <input type="text"
-           aria-autocomplete="list"
-           aria-controls="test-combobox-options"
-           class="govuk-input"
-           id="test-combobox-input"
-           value
-    >
-  </div>
+    Choose option
+  </label>
+  <input
+    aria-autocomplete="list"
+    aria-controls="test-combobox-options"
+    aria-expanded={true}
+    aria-haspopup="listbox"
+    className="searchInput govuk-input"
+    id="test-combobox-input"
+    onChange={[Function]}
+    onKeyDown={[Function]}
+    role="combobox"
+    type="text"
+    value=""
+  />
 </div>
 `;
 
 exports[`FormComboBox renders with options in correct order when input changes 1`] = `
-<div class="container"
-     role="none"
+<div
+  className="container"
+  onClick={[Function]}
+  onKeyDown={[Function]}
+  role="none"
 >
-  <div role="combobox"
-       aria-expanded="true"
-       aria-owns="test-combobox-options"
-       aria-haspopup="listbox"
-       class="govuk-form-group"
+  <label
+    className="govuk-label"
+    htmlFor="test-combobox-input"
   >
-    <label class="govuk-label"
-           for="test-combobox-input"
-    >
-      Choose option
-    </label>
-    <input type="text"
-           aria-autocomplete="list"
-           aria-controls="test-combobox-options"
-           class="govuk-input"
-           id="test-combobox-input"
-           value="Test"
-    >
-    <div role="alert"
-         class="optionsContainer"
-    >
-      <ul class="options"
-          id="test-combobox-options"
-          role="listbox"
-          tabindex="-1"
-      >
-        <li aria-selected="false"
-            id="test-combobox-option-0"
-            role="option"
-        >
-          Option 1
-        </li>
-        <li aria-selected="false"
-            id="test-combobox-option-1"
-            role="option"
-        >
-          Option 2
-        </li>
-        <li aria-selected="false"
-            id="test-combobox-option-2"
-            role="option"
-        >
-          Option 3
-        </li>
-      </ul>
-    </div>
-  </div>
+    Choose option
+  </label>
+  <input
+    aria-autocomplete="list"
+    aria-controls="test-combobox-options"
+    aria-expanded={true}
+    aria-haspopup="listbox"
+    className="searchInput govuk-input"
+    id="test-combobox-input"
+    onChange={[Function]}
+    onKeyDown={[Function]}
+    role="combobox"
+    type="text"
+    value=""
+  />
 </div>
 `;
