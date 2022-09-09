@@ -25,17 +25,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
     {
         private readonly IBlobStorageService _privateBlobStorageService;
         private readonly IBlobStorageService _publicBlobStorageService;
+        private readonly IGlossaryCacheService _glossaryCacheService;
         private readonly IMethodologyCacheService _methodologyCacheService;
         private readonly IThemeCacheService _themeCacheService;
 
         public BauCacheController(
             IBlobStorageService privateBlobStorageService,
-            IBlobStorageService publicBlobStorageService, 
+            IBlobStorageService publicBlobStorageService,
+            IGlossaryCacheService glossaryCacheService,
             IMethodologyCacheService methodologyCacheService, 
             IThemeCacheService themeCacheService)
         {
             _privateBlobStorageService = privateBlobStorageService;
             _publicBlobStorageService = publicBlobStorageService;
+            _glossaryCacheService = glossaryCacheService;
             _methodologyCacheService = methodologyCacheService;
             _themeCacheService = themeCacheService;
         }
@@ -59,8 +62,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             return NoContent();
         }
 
-        [HttpDelete("public-cache/trees")]
-        public async Task<ActionResult> ClearPublicCacheTrees(ClearPublicCacheTreePathsViewModel request)
+        [HttpPut("public-cache/glossary")]
+        public async Task<ActionResult> UpdatePublicCacheGlossary()
+        {
+            await _glossaryCacheService.UpdateGlossary();
+            return NoContent();
+        }
+
+        [HttpPut("public-cache/trees")]
+        public async Task<ActionResult> UpdatePublicCacheTrees(UpdatePublicCacheTreePathsViewModel request)
         {
             if (request.CacheEntries.Any())
             {
@@ -71,18 +81,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                         async entry =>
                         {
                             var allowedPath =
-                                EnumUtil.GetFromString<ClearPublicCacheTreePathsViewModel.CacheEntry>(entry);
+                                EnumUtil.GetFromString<UpdatePublicCacheTreePathsViewModel.CacheEntry>(entry);
                             
                             switch (allowedPath)
                             {
-                                case ClearPublicCacheTreePathsViewModel.CacheEntry.MethodologyTree: 
+                                case UpdatePublicCacheTreePathsViewModel.CacheEntry.MethodologyTree: 
                                     await _methodologyCacheService.UpdateSummariesTree();
                                     break;
-                                case ClearPublicCacheTreePathsViewModel.CacheEntry.PublicationTree:
+                                case UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree:
                                     await _themeCacheService.UpdatePublicationTree();
                                     break;
                                 default:
-                                    throw new ArgumentException($"Unsupported cache clearing entry {entry}");
+                                    throw new ArgumentException($"Unsupported cache entry {entry}");
                             }
                         });
             }
@@ -109,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             return NoContent();
         }
 
-        public class ClearPublicCacheTreePathsViewModel
+        public class UpdatePublicCacheTreePathsViewModel
         {
             public enum CacheEntry
             {
