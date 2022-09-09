@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -11,6 +12,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
+using static Newtonsoft.Json.JsonConvert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Cache;
 
@@ -21,7 +23,27 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
     private readonly PublicationViewModel _publicationViewModel = new()
     {
-        Id = Guid.NewGuid()
+        Id = Guid.NewGuid(),
+        Slug = "",
+        Title = "",
+        IsSuperseded = false,
+        Contact = new ContactViewModel
+        {
+            ContactName = "",
+            TeamEmail = "",
+            TeamName = "",
+            ContactTelNo = ""
+        },
+        ExternalMethodology = new ExternalMethodologyViewModel
+        {
+            Title = "",
+            Url = ""
+        },
+        LatestReleaseId = Guid.NewGuid(),
+        Methodologies = new List<MethodologyVersionSummaryViewModel>(),
+        LegacyReleases = new List<LegacyReleaseViewModel>(),
+        Releases = new List<ReleaseTitleViewModel>(),
+        Topic = new TopicViewModel(new ThemeViewModel(""))
     };
 
     [Fact]
@@ -94,6 +116,13 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         VerifyAllMocks(publicationService, PublicBlobCacheService);
 
         result.AssertRight(_publicationViewModel);
+    }
+
+    [Fact]
+    public void PublicationViewModel_SerializeAndDeserialize()
+    {
+        var converted = DeserializeObject<PublicationViewModel>(SerializeObject(_publicationViewModel));
+        converted.AssertDeepEqualTo(_publicationViewModel);
     }
 
     private static PublicationCacheService BuildService(
