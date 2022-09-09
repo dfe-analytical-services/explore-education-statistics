@@ -73,11 +73,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         publicStorageConnectionString: GetConfigurationValue(provider, "PublicStorage"),
                         privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage"),
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
-                        publicBlobCacheService: GetBlobCacheService(provider, "PublicStorage"),
                         methodologyService: provider.GetRequiredService<IMethodologyService>(),
                         publicationService: provider.GetRequiredService<IPublicationService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
-                        contentDbContext: provider.GetRequiredService<ContentDbContext>(),
                         logger: provider.GetRequiredService<ILogger<PublishingService>>()))
                 .AddScoped<IContentService, ContentService>(provider =>
                     new ContentService(

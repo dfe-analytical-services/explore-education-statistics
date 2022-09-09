@@ -8,8 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IPublicationService
     {
-        Task<Publication> Get(Guid id);
-
         List<Publication> GetPublicationsWithPublishedReleases();
 
         Task<bool> IsPublicationPublished(Guid publicationId);

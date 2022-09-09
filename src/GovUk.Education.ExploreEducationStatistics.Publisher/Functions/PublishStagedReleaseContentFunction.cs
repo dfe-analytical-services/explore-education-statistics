@@ -3,10 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Utils;
 using Microsoft.Azure.WebJobs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusPublishingStage;
 
@@ -15,21 +18,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     // ReSharper disable once UnusedType.Global
     public class PublishStagedReleaseContentFunction
     {
+        private readonly ContentDbContext _contentDbContext;
         private readonly IContentService _contentService;
         private readonly INotificationsService _notificationsService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
+        private readonly IPublicationCacheService _publicationCacheService;
         private readonly IPublishingService _publishingService;
         private readonly IReleaseService _releaseService;
 
-        public PublishStagedReleaseContentFunction(IContentService contentService,
+        public PublishStagedReleaseContentFunction(
+            ContentDbContext contentDbContext,
+            IContentService contentService,
             INotificationsService notificationsService,
             IReleasePublishingStatusService releasePublishingStatusService,
+            IPublicationCacheService publicationCacheService,
             IPublishingService publishingService,
             IReleaseService releaseService)
         {
+            _contentDbContext = contentDbContext;
             _contentService = contentService;
             _notificationsService = notificationsService;
             _releasePublishingStatusService = releasePublishingStatusService;
+            _publicationCacheService = publicationCacheService;
             _publishingService = publishingService;
             _releaseService = releaseService;
         }
@@ -58,18 +68,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             var scheduled = (await QueryScheduledReleases()).ToList();
             if (scheduled.Any())
             {
-                var published = new List<ReleasePublishingStatus>();
+                var publishedReleases = new List<ReleasePublishingStatus>();
                 foreach (var releaseStatus in scheduled)
                 {
-                    logger.LogInformation("Moving content for release: {0}",
-                        releaseStatus.ReleaseId);
                     await UpdateStage(releaseStatus, Started);
                     try
                     {
-                        await _publishingService.PublishStagedReleaseContent(releaseStatus.ReleaseId,
-                            releaseStatus.PublicationSlug);
-
-                        published.Add(releaseStatus);
+                        await _releaseService.SetPublishedDates(releaseStatus.ReleaseId, DateTime.UtcNow);
+                        publishedReleases.Add(releaseStatus);
                     }
                     catch (Exception e)
                     {
@@ -80,10 +86,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     }
                 }
 
-                var releaseIds = published.Select(status => status.ReleaseId).ToArray();
-
                 try
                 {
+                    // Move all cached releases in the staging directory of the public content container to the root
+                    await _publishingService.PublishStagedReleaseContent();
+
+                    // Determine the distinct set of publications for the published releases
+                    var publishedPublications = publishedReleases.Select(status => status.PublicationSlug)
+                        .Distinct()
+                        .ToList();
+
+                    // Update the cached publications and any cached superseded publications.
+                    // If any publications have a live release for the first time, the superseding is now enforced
+                    var supersededPublications = await _contentDbContext.Publications
+                        .Join(_contentDbContext.Publications,
+                            publication => publication.Id,
+                            supersededPublication => supersededPublication.SupersededById,
+                            (publication, supersededPublication) => new { publication, supersededPublication })
+                        .Where(tuple => publishedPublications.Contains(tuple.publication.Slug))
+                        .Select(tuple => tuple.supersededPublication.Slug)
+                        .ToListAsync();
+
+                    var publicationsToUpdate = publishedPublications.Concat(supersededPublications);
+
+                    await publicationsToUpdate
+                        .ToAsyncEnumerable()
+                        .ForEachAwaitAsync(_publicationCacheService.UpdatePublication);
+
+                    var releaseIds = publishedReleases.Select(status => status.ReleaseId).ToArray();
+
                     if (!EnvironmentUtils.IsLocalEnvironment())
                     {
                         await _releaseService.DeletePreviousVersionsStatisticalData(releaseIds);
@@ -98,13 +129,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     // are now accessible for the first time after publishing these releases
                     await _contentService.UpdateCachedTaxonomyBlobs();
 
-                    await UpdateStage(published, Complete);
+                    await UpdateStage(publishedReleases, Complete);
                 }
                 catch (Exception e)
                 {
                     logger.LogError(e, "Exception occured while executing {0}",
                         executionContext.FunctionName);
-                    await UpdateStage(published, Failed,
+                    await UpdateStage(publishedReleases, Failed,
                         new ReleasePublishingStatusLogMessage($"Exception in publishing stage: {e.Message}"));
                 }
             }
