@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -70,6 +71,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _publicationService
                 .GetPublication(publicationId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("api/publication/{publicationId:guid}/external-methodology")]
+        public async Task<ActionResult<ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId)
+        {
+            return await _publicationService.GetExternalMethodology(publicationId)
                 .HandleFailuresOrOk();
         }
 

@@ -2953,6 +2953,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task GetExternalMethodology()
+        {
+            var publication = new Publication
+            {
+                ExternalMethodology = new ExternalMethodology
+                {
+                    Title = "Test external methodology",
+                    Url = "http://test.external.methodology",
+                }
+            };
+
+            var contentDbContext = InMemoryApplicationDbContext();
+            await contentDbContext.Publications.AddAsync(publication);
+            await contentDbContext.SaveChangesAsync();
+
+            var service = BuildPublicationService(context: contentDbContext);
+
+            var result = await service.GetExternalMethodology(publication.Id);
+            var externalMethodology = result.AssertRight();
+
+            Assert.Equal(publication.ExternalMethodology.Title, externalMethodology.Title);
+            Assert.Equal(publication.ExternalMethodology.Url, externalMethodology.Url);
+        }
+
+        [Fact]
+        public async Task GetExternalMethodology_NoPublication()
+        {
+            var contentDbContext = InMemoryApplicationDbContext();
+
+            var service = BuildPublicationService(context: contentDbContext);
+
+            var result = await service.GetExternalMethodology(Guid.NewGuid());
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task GetExternalMethodology_NoExternalMethodology()
+        {
+            var publication = new Publication
+            {
+                ExternalMethodology = null,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildPublicationService(context: contentDbContext);
+
+                var result = await service.GetExternalMethodology(publication.Id);
+                result.AssertNotFound();
+            }
+        }
+
+        [Fact]
         public async Task ListActiveReleases()
         {
             var release1Original = new Release

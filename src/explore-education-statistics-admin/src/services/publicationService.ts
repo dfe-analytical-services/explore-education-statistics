@@ -127,13 +127,10 @@ const publicationService = {
     return client.get<MyPublication>(`/me/publication/${publicationId}`);
   },
 
-  getExternalMethodology(
-    publicationId: string,
-  ): Promise<ExternalMethodology | undefined> {
-    // TODO EES-3666 Replace with external methodology request
-    return client
-      .get<MyPublication>(`/me/publication/${publicationId}`)
-      .then(response => response.externalMethodology);
+  getExternalMethodology(publicationId: string): Promise<ExternalMethodology> {
+    return client.get<ExternalMethodology>(
+      `/publication/${publicationId}/external-methodology`,
+    );
   },
 
   listReleases<TReleaseSummary extends ReleaseSummary = ReleaseSummary>(

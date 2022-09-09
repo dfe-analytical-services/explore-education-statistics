@@ -31,7 +31,12 @@ const PreReleaseMethodologiesPage = ({
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [externalMethodology, methodologyVersions] = await Promise.all([
-      publicationService.getExternalMethodology(publicationId),
+      publicationService.getExternalMethodology(publicationId).catch(err => {
+        if (err.response.status !== 404) {
+          throw err;
+        }
+        return undefined;
+      }),
       methodologyService.listMethodologyVersions(publicationId),
     ]);
 

@@ -41,7 +41,12 @@ const ReleasePreviewTableToolFinalStep = ({
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [methodologies, externalMethodology] = await Promise.all([
       methodologyService.listMethodologyVersions(publication.id),
-      publicationService.getExternalMethodology(publication.id),
+      publicationService.getExternalMethodology(publication.id).catch(err => {
+        if (err.response.status !== 404) {
+          throw err;
+        }
+        return undefined;
+      }),
     ]);
 
     return { methodologies, externalMethodology };

@@ -375,7 +375,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void GetLatestReleaseVersions()
+        public async Task GetExternalMethodology()
+        {
+            var publication = new Publication
+            {
+                ExternalMethodology = new ExternalMethodology
+                {
+                    Title = "Test external methodology",
+                    Url = "http://test.external.methodology",
+                }
+            };
+
+            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(publication, SecurityPolicies.CanViewSpecificPublication)
+                .AssertForbidden(async userService =>
+                {
+                    var contentDbContext = InMemoryApplicationDbContext();
+                    await contentDbContext.Publications.AddAsync(publication);
+                    await contentDbContext.SaveChangesAsync();
+
+                    var service = BuildPublicationService(
+                        context: contentDbContext,
+                        userService: userService.Object);
+                    return await service.GetExternalMethodology(publication.Id);
+                });
+        }
+
+        [Fact]
+        public void ListActiveReleases()
         {
             var userService = AlwaysTrueUserService();
             var publicationService = BuildPublicationService(
