@@ -263,7 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             {
                 return methodologyVersionToUpdate;
             }
-            
+
             return await _methodologyApprovalService
                 .UpdateApprovalStatus(methodologyVersionToUpdate.Id, request)
                 .OnSuccess(_ => _context
@@ -333,8 +333,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     var methodologyVersionIdsInDeleteOrder = VersionedEntityDeletionOrderUtil
                         .Sort(methodologyVersionIds)
                         .Select(ids => Guid.Parse(ids.Id));
-                        
-                    return await methodologyVersionIdsInDeleteOrder    
+
+                    return await methodologyVersionIdsInDeleteOrder
                         .Select(methodologyVersionId => methodology.Versions.Single(version => version.Id == methodologyVersionId))
                         .Select(methodologyVersion => DeleteVersion(methodologyVersion, forceDelete))
                         .OnSuccessAll()

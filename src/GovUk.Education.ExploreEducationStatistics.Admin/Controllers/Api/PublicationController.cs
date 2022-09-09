@@ -81,6 +81,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        [HttpPut("api/publication/{publicationId:guid}/external-methodology")]
+        public async Task<ActionResult<ExternalMethodologyViewModel>> UpdateExternalMethodology(
+            Guid publicationId, ExternalMethodology updatedExternalMethodology)
+        {
+            return await _publicationService.UpdateExternalMethodology(publicationId, updatedExternalMethodology)
+                .HandleFailuresOrOk();
+        }
+
         [HttpGet("api/publication/{publicationId}/releases")]
         public async Task<ActionResult<PaginatedListViewModel<ReleaseSummaryViewModel>>> ListActiveReleases(
             [Required] Guid publicationId,

@@ -133,6 +133,16 @@ const publicationService = {
     );
   },
 
+  updateExternalMethodology(
+    publicationId: string,
+    updatedExternalMethodology: ExternalMethodology,
+  ): Promise<ExternalMethodology> {
+    return client.put<ExternalMethodology>(
+      `publication/${publicationId}/external-methodology`,
+      updatedExternalMethodology,
+    );
+  },
+
   listReleases<TReleaseSummary extends ReleaseSummary = ReleaseSummary>(
     publicationId: string,
     params?: ListReleasesParams,

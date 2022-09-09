@@ -335,6 +335,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     : NotFound<ExternalMethodologyViewModel>());
         }
 
+        public async Task<Either<ActionResult, ExternalMethodologyViewModel>> UpdateExternalMethodology(
+            Guid publicationId, ExternalMethodology updatedExternalMethodology)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId)
+                .OnSuccessDo(_userService.CheckCanUpdatePublication)
+                .OnSuccess(publication =>
+                {
+                    _context.Update(publication);
+                    publication.ExternalMethodology = updatedExternalMethodology;
+                    _context.SaveChangesAsync();
+
+                    return _mapper.Map<ExternalMethodologyViewModel>(updatedExternalMethodology);
+                });
+        }
+
         public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>>
             ListActiveReleasesPaginated(
                 Guid publicationId,

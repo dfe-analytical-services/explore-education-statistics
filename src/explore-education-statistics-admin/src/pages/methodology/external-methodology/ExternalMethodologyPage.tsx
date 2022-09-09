@@ -7,7 +7,6 @@ import ExternalMethodologyForm from '@admin/pages/methodology/external-methodolo
 import publicationService, {
   ExternalMethodology,
   Publication,
-  UpdatePublicationRequest,
 } from '@admin/services/publicationService';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
@@ -38,20 +37,14 @@ const ExternalMethodologyPage = ({
     if (!model?.publication) {
       return;
     }
-    const updatedPublication: UpdatePublicationRequest = {
-      title: model.publication.title,
-      summary: model.publication.summary,
-      contact: model.publication.contact,
-      topicId: model.publication.topic.id,
-      externalMethodology: {
-        title: values.title,
-        url: values.url,
-      },
+    const updatedExternalMethodology: ExternalMethodology = {
+      title: values.title,
+      url: values.url,
     };
 
-    await publicationService.updatePublication(
+    await publicationService.updateExternalMethodology(
       publicationId,
-      updatedPublication,
+      updatedExternalMethodology,
     );
     history.push(dashboardRoute.path);
   };
