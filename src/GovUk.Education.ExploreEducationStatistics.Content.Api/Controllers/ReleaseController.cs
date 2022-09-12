@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,10 +18,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     {
         private const string HalfHourlyExpirySchedule = "*/30 * * * *";
 
+        private readonly IReleaseCacheService _releaseCacheService;
         private readonly IReleaseService _releaseService;
 
-        public ReleaseController(IReleaseService releaseService)
+        public ReleaseController(IReleaseCacheService releaseCacheService,
+            IReleaseService releaseService)
         {
+            _releaseCacheService = releaseCacheService;
             _releaseService = releaseService;
         }
 
@@ -35,14 +39,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [HttpGet("publications/{publicationSlug}/releases/latest")]
         public async Task<ActionResult<ReleaseViewModel>> GetLatestRelease(string publicationSlug)
         {
-            return await _releaseService.GetCachedViewModel(publicationSlug)
+            return await _releaseCacheService.GetReleaseAndPublication(publicationSlug)
                 .HandleFailuresOrOk();
         }
 
         [HttpGet("publications/{publicationSlug}/releases/latest/summary")]
         public async Task<ActionResult<ReleaseSummaryViewModel>> GetLatestReleaseSummary(string publicationSlug)
         {
-            return await _releaseService.GetSummary(publicationSlug)
+            return await _releaseCacheService.GetReleaseSummary(publicationSlug)
                 .HandleFailuresOrOk();
         }
 
@@ -50,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}")]
         public async Task<ActionResult<ReleaseViewModel>> GetRelease(string publicationSlug, string releaseSlug)
         {
-            return await _releaseService.GetCachedViewModel(
+            return await _releaseCacheService.GetReleaseAndPublication(
                     publicationSlug,
                     releaseSlug)
                 .HandleFailuresOrOk();
@@ -60,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         public async Task<ActionResult<ReleaseSummaryViewModel>> GetReleaseSummary(string publicationSlug,
             string releaseSlug)
         {
-            return await _releaseService.GetSummary(
+            return await _releaseCacheService.GetReleaseSummary(
                     publicationSlug,
                     releaseSlug)
                 .HandleFailuresOrOk();

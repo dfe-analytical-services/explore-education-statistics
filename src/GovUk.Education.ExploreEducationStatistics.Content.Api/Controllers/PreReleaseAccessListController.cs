@@ -3,7 +3,6 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -14,16 +13,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     public class PreReleaseAccessListController : ControllerBase
     {
         private readonly IPublicationCacheService _publicationCacheService;
-        private readonly IPublicationService _publicationService;
-        private readonly IReleaseService _releaseService;
+        private readonly IReleaseCacheService _releaseCacheService;
 
         public PreReleaseAccessListController(IPublicationCacheService publicationCacheService,
-            IPublicationService publicationService,
-            IReleaseService releaseService)
+            IReleaseCacheService releaseCacheService)
         {
             _publicationCacheService = publicationCacheService;
-            _publicationService = publicationService;
-            _releaseService = releaseService;
+            _releaseCacheService = releaseCacheService;
         }
 
         [HttpGet("publications/{publicationSlug}/releases/latest/prerelease-access-list")]
@@ -50,11 +46,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             string? releaseSlug = null)
         {
             return await _publicationCacheService.GetPublication(publicationSlug)
-                .OnSuccessCombineWith(_ => _releaseService.GetCachedRelease(publicationSlug, releaseSlug))
+                .OnSuccessCombineWith(_ => _releaseCacheService.GetRelease(publicationSlug, releaseSlug))
                 .OnSuccess(publicationAndRelease =>
                 {
                     var (publication, release) = publicationAndRelease;
-                    return new PreReleaseAccessListViewModel(release!, publication);
+                    return new PreReleaseAccessListViewModel(release, publication);
                 })
                 .HandleFailuresOrOk();
         }

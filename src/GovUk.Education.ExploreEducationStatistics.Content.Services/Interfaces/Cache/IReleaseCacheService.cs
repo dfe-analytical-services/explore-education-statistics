@@ -1,0 +1,20 @@
+﻿#nullable enable
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+
+public interface IReleaseCacheService
+{
+    Task<Either<ActionResult, CachedReleaseViewModel>> GetRelease(string publicationSlug,
+        string? releaseSlug = null);
+
+    Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummary(string publicationSlug,
+        string? releaseSlug = null);
+
+    Task<Either<ActionResult, ReleaseViewModel>> GetReleaseAndPublication(string publicationSlug,
+        string? releaseSlug = null);
+}

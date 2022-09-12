@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -9,332 +8,16 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
-using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
     public class ReleaseServiceTests
     {
-        [Fact]
-        public async Task GetCachedViewModel()
-        {
-            var publicationId = Guid.NewGuid();
-            var releaseId = Guid.NewGuid();
-
-            const string publicationSlug = "publication-a";
-            const string releaseSlug = "2016";
-
-            var methodology = new MethodologyVersionSummaryViewModel
-            {
-                Id = Guid.NewGuid(),
-                Slug = "methodology-slug",
-                Title = "Methodology"
-            };
-
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            var fileStorageService = new Mock<IFileStorageService>(Strict);
-            var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
-
-            publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
-                .ReturnsAsync(
-                    new PublicationViewModel
-                    {
-                        Id = publicationId,
-                        Releases = new List<ReleaseTitleViewModel>
-                        {
-                            new() { Id = releaseId }
-                        }
-                    }
-                );
-
-            methodologyCacheService.Setup(mock => mock.GetSummariesByPublication(publicationId))
-                .ReturnsAsync(ListOf(methodology));
-
-            fileStorageService
-                .Setup(mock =>
-                    mock.GetDeserialized<CachedReleaseViewModel>("publications/publication-a/releases/2016.json"))
-                .ReturnsAsync(
-                    new CachedReleaseViewModel(releaseId)
-                    {
-                        Type = new ReleaseTypeViewModel
-                        {
-                            Title = "National Statistics"
-                        }
-                    }
-                );
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(new Publication
-                {
-                    Id = publicationId,
-                    Slug = publicationSlug,
-                });
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupReleaseService(
-                    contentDbContext: contentDbContext,
-                    publicationCacheService: publicationCacheService.Object,
-                    methodologyCacheService: methodologyCacheService.Object,
-                    fileStorageService: fileStorageService.Object);
-
-                var result = await service.GetCachedViewModel(publicationSlug, releaseSlug);
-
-                VerifyAllMocks(methodologyCacheService, publicationCacheService, fileStorageService);
-
-                var releaseViewModel = result.AssertRight();
-
-                Assert.Equal(ReleaseType.NationalStatistics, releaseViewModel.Type);
-
-                var publication = releaseViewModel.Publication;
-                Assert.Equal(publicationId, publication.Id);
-
-                Assert.Single(publication.Methodologies);
-                Assert.Equal(methodology, publication.Methodologies[0]);
-            }
-        }
-
-        [Fact]
-        public async Task GetCachedViewModel_PublicationNotFound()
-        {
-            const string publicationSlug = "publication-a";
-            const string releaseSlug = "2016";
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
-
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
-                .ReturnsAsync(new NotFoundResult());
-
-            var service = SetupReleaseService(contentDbContext,
-                publicationCacheService: publicationCacheService.Object);
-
-            var result = await service.GetCachedViewModel(publicationSlug, releaseSlug);
-
-            VerifyAllMocks(publicationCacheService);
-
-            result.AssertNotFound();
-        }
-
-        [Fact]
-        public async Task GetCachedViewModel_ReleaseNotFound()
-        {
-            var publicationId = Guid.NewGuid();
-            var releaseId = Guid.NewGuid();
-
-            const string publicationSlug = "publication-a";
-            const string releaseSlug = "2016";
-
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            var fileStorageService = new Mock<IFileStorageService>(Strict);
-            var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
-
-            publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
-                .ReturnsAsync(
-                    new PublicationViewModel
-                    {
-                        Id = publicationId,
-                        Releases = new List<ReleaseTitleViewModel>
-                        {
-                            new() { Id = releaseId }
-                        }
-                    }
-                );
-
-            methodologyCacheService.Setup(mock => mock.GetSummariesByPublication(publicationId))
-                .ReturnsAsync(ListOf(new MethodologyVersionSummaryViewModel()));
-
-            fileStorageService
-                .Setup(s => s.GetDeserialized<CachedReleaseViewModel>(It.IsAny<string>()))
-                .ReturnsAsync(new NotFoundResult());
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(new Publication
-                {
-                    Id = publicationId,
-                    Slug = publicationSlug,
-                });
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupReleaseService(
-                    contentDbContext: contentDbContext,
-                    publicationCacheService: publicationCacheService.Object,
-                    fileStorageService: fileStorageService.Object,
-                    methodologyCacheService: methodologyCacheService.Object);
-
-                var result = await service.GetCachedViewModel(publicationSlug, releaseSlug);
-
-                VerifyAllMocks(publicationCacheService, fileStorageService, methodologyCacheService);
-
-                result.AssertNotFound();
-            }
-        }
-
-        [Fact]
-        public async Task GetSummary()
-        {
-            var publicationId = Guid.NewGuid();
-            var releaseId = Guid.NewGuid();
-
-            const string publicationSlug = "publication-a";
-            const string releaseSlug = "2016";
-
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            var fileStorageService = new Mock<IFileStorageService>(Strict);
-
-            publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
-                .ReturnsAsync(
-                    new PublicationViewModel
-                    {
-                        Id = publicationId,
-                        Releases = new List<ReleaseTitleViewModel>
-                        {
-                            new() { Id = releaseId }
-                        }
-                    }
-                );
-
-            fileStorageService
-                .Setup(mock =>
-                    mock.GetDeserialized<CachedReleaseViewModel>("publications/publication-a/releases/2016.json"))
-                .ReturnsAsync(
-                    new CachedReleaseViewModel(releaseId)
-                    {
-                        Type = new ReleaseTypeViewModel
-                        {
-                            Title = "National Statistics"
-                        }
-                    }
-                );
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(new Publication
-                {
-                    Id = publicationId,
-                    Slug = publicationSlug,
-                });
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupReleaseService(
-                    contentDbContext: contentDbContext,
-                    publicationCacheService: publicationCacheService.Object,
-                    fileStorageService: fileStorageService.Object
-                );
-
-                var result = await service.GetSummary(publicationSlug, releaseSlug);
-
-                VerifyAllMocks(publicationCacheService, fileStorageService);
-
-                var releaseSummaryViewModel = result.AssertRight();
-
-                Assert.Equal(ReleaseType.NationalStatistics, releaseSummaryViewModel.Type);
-
-                var publication = releaseSummaryViewModel.Publication;
-                Assert.NotNull(publication);
-                Assert.Equal(publicationId, publication!.Id);
-            }
-        }
-
-        [Fact]
-        public async Task GetSummary_PublicationNotFound()
-        {
-            const string publicationSlug = "publication-a";
-            const string releaseSlug = "2016";
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
-
-           var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-           publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
-               .ReturnsAsync(new NotFoundResult());
-
-           var service = SetupReleaseService(contentDbContext,
-               publicationCacheService: publicationCacheService.Object);
-
-           var result = await service.GetSummary(publicationSlug, releaseSlug);
-
-           result.AssertNotFound();
-        }
-
-        [Fact]
-        public async Task GetSummary_ReleaseNotFound()
-        {
-            var publicationId = Guid.NewGuid();
-            var releaseId = Guid.NewGuid();
-
-            const string publicationSlug = "publication-a";
-            const string releaseSlug = "2016";
-
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            var fileStorageService = new Mock<IFileStorageService>(Strict);
-
-            publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
-                .ReturnsAsync(
-                    new PublicationViewModel
-                    {
-                        Id = publicationId,
-                        Releases = new List<ReleaseTitleViewModel>
-                        {
-                            new() { Id = releaseId }
-                        }
-                    }
-                );
-
-            fileStorageService
-                .Setup(s => s.GetDeserialized<CachedReleaseViewModel>(It.IsAny<string>()))
-                .ReturnsAsync(new NotFoundResult());
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(new Publication
-                {
-                    Id = publicationId,
-                    Slug = publicationSlug,
-                });
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupReleaseService(
-                    contentDbContext: contentDbContext,
-                    publicationCacheService: publicationCacheService.Object,
-                    fileStorageService: fileStorageService.Object);
-
-                var result = await service.GetSummary(publicationSlug, releaseSlug);
-
-                VerifyAllMocks(publicationCacheService, fileStorageService);
-
-                result.AssertNotFound();
-            }
-        }
-
         [Fact]
         public async Task List()
         {
@@ -523,18 +206,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
         private static ReleaseService SetupReleaseService(
             ContentDbContext? contentDbContext = null,
-            IFileStorageService? fileStorageService = null,
-            IMethodologyCacheService? methodologyCacheService = null,
-            IPublicationCacheService? publicationCacheService = null,
             IUserService? userService = null)
         {
             return new(
                 contentDbContext is null
                     ? Mock.Of<IPersistenceHelper<ContentDbContext>>()
                     : new PersistenceHelper<ContentDbContext>(contentDbContext),
-                fileStorageService ?? Mock.Of<IFileStorageService>(Strict),
-                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
-                publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
                 userService ?? AlwaysTrueUserService().Object
             );
         }
