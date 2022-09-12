@@ -6,27 +6,6 @@
   }
 }
 
-.searchButton {
-  background: $govuk-link-colour url('/assets/images/search-button.png') 1px -17px;
-  border: 2px solid $govuk-input-border-colour;
-  box-sizing: content-box;
-  cursor: pointer;
-  height: 36px;
-  padding: 0;
-  position: absolute;
-  right: 0;
-  text-indent: -5000px;
-  width: 36px;
-}
-
-.searchButton:focus,
-.searchButton:hover {
-  background: $govuk-link-hover-colour url('/assets/images/search-button.png')
-    1px -17px;
-  border: 2px solid $govuk-focus-colour;
-  outline: 0;
-}
-
 .resultsLabel {
   background-color: govuk-colour('light-grey');
   font-size: 1rem;
