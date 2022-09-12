@@ -25,8 +25,6 @@ module.exports = {
   },
   target: 'node',
   externals: /^(k6|https?:\/\/)(\/.*)?/,
-  // Generate map files for compiled scripts
-  devtool: 'source-map',
   stats: {
     colors: true,
   },
