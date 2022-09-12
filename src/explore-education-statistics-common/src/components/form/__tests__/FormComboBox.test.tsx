@@ -1,13 +1,12 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import noop from 'lodash/noop';
-import renderer from 'react-test-renderer';
 import userEvent from '@testing-library/user-event';
 import FormComboBox from '../FormComboBox';
 
 describe('FormComboBox', () => {
   test('renders with no options by default', () => {
-    render(
+    const { container } = render(
       <FormComboBox
         id="test-combobox"
         inputLabel="Choose option"
@@ -21,23 +20,11 @@ describe('FormComboBox', () => {
 
     expect(options).toHaveLength(0);
 
-    const tree = renderer
-      .create(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={noop}
-          onSelect={noop}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      )
-      .toJSON();
-
-    expect(tree).toMatchSnapshot();
+    expect(container.innerHTML).toMatchSnapshot();
   });
 
   test('renders with options in correct order when input changes', async () => {
-    render(
+    const { container } = render(
       <FormComboBox
         id="test-combobox"
         inputLabel="Choose option"
@@ -56,19 +43,7 @@ describe('FormComboBox', () => {
     expect(options[1]).toHaveTextContent('Option 2');
     expect(options[2]).toHaveTextContent('Option 3');
 
-    const tree = renderer
-      .create(
-        <FormComboBox
-          id="test-combobox"
-          inputLabel="Choose option"
-          onInputChange={noop}
-          onSelect={noop}
-          options={['Option 1', 'Option 2', 'Option 3']}
-        />,
-      )
-      .toJSON();
-
-    expect(tree).toMatchSnapshot();
+    expect(container.innerHTML).toMatchSnapshot();
   });
 
   describe('input field', () => {
@@ -104,16 +79,14 @@ describe('FormComboBox', () => {
         key: 'ArrowDown',
       });
 
-      await waitFor(() => {
-        expect(option1).toHaveAttribute('aria-selected', 'true');
-        expect(option1).toHaveFocus();
+      expect(option1).toHaveAttribute('aria-selected', 'true');
+      expect(option1).toHaveFocus();
 
-        expect(option2).toHaveAttribute('aria-selected', 'false');
-        expect(option2).not.toHaveFocus();
+      expect(option2).toHaveAttribute('aria-selected', 'false');
+      expect(option2).not.toHaveFocus();
 
-        expect(option3).toHaveAttribute('aria-selected', 'false');
-        expect(option3).not.toHaveFocus();
-      });
+      expect(option3).toHaveAttribute('aria-selected', 'false');
+      expect(option3).not.toHaveFocus();
     });
 
     test('pressing ArrowDown selects the first list item', async () => {
@@ -146,16 +119,14 @@ describe('FormComboBox', () => {
         key: 'ArrowDown',
       });
 
-      await waitFor(() => {
-        expect(option1).toHaveAttribute('aria-selected', 'true');
-        expect(option1).toHaveFocus();
+      expect(option1).toHaveAttribute('aria-selected', 'true');
+      expect(option1).toHaveFocus();
 
-        expect(option2).toHaveAttribute('aria-selected', 'false');
-        expect(option2).not.toHaveFocus();
+      expect(option2).toHaveAttribute('aria-selected', 'false');
+      expect(option2).not.toHaveFocus();
 
-        expect(option3).toHaveAttribute('aria-selected', 'false');
-        expect(option3).not.toHaveFocus();
-      });
+      expect(option3).toHaveAttribute('aria-selected', 'false');
+      expect(option3).not.toHaveFocus();
     });
 
     test('pressing ArrowUp focuses the list box', async () => {
@@ -212,16 +183,14 @@ describe('FormComboBox', () => {
         key: 'ArrowUp',
       });
 
-      await waitFor(() => {
-        expect(option1).toHaveAttribute('aria-selected', 'false');
-        expect(option1).not.toHaveFocus();
+      expect(option1).toHaveAttribute('aria-selected', 'false');
+      expect(option1).not.toHaveFocus();
 
-        expect(option2).toHaveAttribute('aria-selected', 'false');
-        expect(option2).not.toHaveFocus();
+      expect(option2).toHaveAttribute('aria-selected', 'false');
+      expect(option2).not.toHaveFocus();
 
-        expect(option3).toHaveAttribute('aria-selected', 'true');
-        expect(option3).toHaveFocus();
-      });
+      expect(option3).toHaveAttribute('aria-selected', 'true');
+      expect(option3).toHaveFocus();
     });
     describe('list box', () => {
       test('pressing ArrowUp will cycle the selected item through the entire list', async () => {
@@ -229,8 +198,8 @@ describe('FormComboBox', () => {
           <FormComboBox
             id="test-combobox"
             inputLabel="Choose option"
-            onInputChange={() => {}}
-            onSelect={() => {}}
+            onInputChange={noop}
+            onSelect={noop}
             options={['Option 1', 'Option 2', 'Option 3']}
           />,
         );
@@ -254,16 +223,14 @@ describe('FormComboBox', () => {
 
         fireEvent.keyDown(listBox, { key: 'ArrowUp' });
 
-        await waitFor(() => {
-          expect(option1).toHaveAttribute('aria-selected', 'false');
-          expect(option1).not.toHaveFocus();
+        expect(option1).toHaveAttribute('aria-selected', 'false');
+        expect(option1).not.toHaveFocus();
 
-          expect(option2).toHaveAttribute('aria-selected', 'false');
-          expect(option2).not.toHaveFocus();
+        expect(option2).toHaveAttribute('aria-selected', 'false');
+        expect(option2).not.toHaveFocus();
 
-          expect(option3).toHaveAttribute('aria-selected', 'true');
-          expect(option3).toHaveFocus();
-        });
+        expect(option3).toHaveAttribute('aria-selected', 'true');
+        expect(option3).toHaveFocus();
 
         fireEvent.keyDown(listBox, { key: 'ArrowUp' });
 
@@ -278,29 +245,25 @@ describe('FormComboBox', () => {
 
         fireEvent.keyDown(listBox, { key: 'ArrowUp' });
 
-        await waitFor(() => {
-          expect(option1).toHaveAttribute('aria-selected', 'true');
-          expect(option1).toHaveFocus();
+        expect(option1).toHaveAttribute('aria-selected', 'true');
+        expect(option1).toHaveFocus();
 
-          expect(option2).toHaveAttribute('aria-selected', 'false');
-          expect(option2).not.toHaveFocus();
+        expect(option2).toHaveAttribute('aria-selected', 'false');
+        expect(option2).not.toHaveFocus();
 
-          expect(option3).toHaveAttribute('aria-selected', 'false');
-          expect(option3).not.toHaveFocus();
-        });
+        expect(option3).toHaveAttribute('aria-selected', 'false');
+        expect(option3).not.toHaveFocus();
 
         fireEvent.keyDown(listBox, { key: 'ArrowUp' });
 
-        await waitFor(() => {
-          expect(option1).toHaveAttribute('aria-selected', 'false');
-          expect(option1).not.toHaveFocus();
+        expect(option1).toHaveAttribute('aria-selected', 'false');
+        expect(option1).not.toHaveFocus();
 
-          expect(option2).toHaveAttribute('aria-selected', 'false');
-          expect(option2).not.toHaveFocus();
+        expect(option2).toHaveAttribute('aria-selected', 'false');
+        expect(option2).not.toHaveFocus();
 
-          expect(option3).toHaveAttribute('aria-selected', 'true');
-          expect(option3).toHaveFocus();
-        });
+        expect(option3).toHaveAttribute('aria-selected', 'true');
+        expect(option3).toHaveFocus();
       });
 
       test('pressing ArrowUp adjusts scroll correctly', async () => {
@@ -370,55 +333,47 @@ describe('FormComboBox', () => {
 
         fireEvent.keyDown(listBox, { key: 'ArrowDown' });
 
-        await waitFor(() => {
-          expect(option1).toHaveAttribute('aria-selected', 'true');
-          expect(option1).toHaveFocus();
+        expect(option1).toHaveAttribute('aria-selected', 'true');
+        expect(option1).toHaveFocus();
 
-          expect(option2).toHaveAttribute('aria-selected', 'false');
-          expect(option2).not.toHaveFocus();
+        expect(option2).toHaveAttribute('aria-selected', 'false');
+        expect(option2).not.toHaveFocus();
 
-          expect(option3).toHaveAttribute('aria-selected', 'false');
-          expect(option3).not.toHaveFocus();
-        });
+        expect(option3).toHaveAttribute('aria-selected', 'false');
+        expect(option3).not.toHaveFocus();
 
         fireEvent.keyDown(listBox, { key: 'ArrowDown' });
 
-        await waitFor(() => {
-          expect(option1).toHaveAttribute('aria-selected', 'false');
-          expect(option1).not.toHaveFocus();
+        expect(option1).toHaveAttribute('aria-selected', 'false');
+        expect(option1).not.toHaveFocus();
 
-          expect(option2).toHaveAttribute('aria-selected', 'true');
-          expect(option2).toHaveFocus();
+        expect(option2).toHaveAttribute('aria-selected', 'true');
+        expect(option2).toHaveFocus();
 
-          expect(option3).toHaveAttribute('aria-selected', 'false');
-          expect(option3).not.toHaveFocus();
-        });
+        expect(option3).toHaveAttribute('aria-selected', 'false');
+        expect(option3).not.toHaveFocus();
 
         fireEvent.keyDown(listBox, { key: 'ArrowDown' });
 
-        await waitFor(() => {
-          expect(option1).toHaveAttribute('aria-selected', 'false');
-          expect(option1).not.toHaveFocus();
+        expect(option1).toHaveAttribute('aria-selected', 'false');
+        expect(option1).not.toHaveFocus();
 
-          expect(option2).toHaveAttribute('aria-selected', 'false');
-          expect(option2).not.toHaveFocus();
+        expect(option2).toHaveAttribute('aria-selected', 'false');
+        expect(option2).not.toHaveFocus();
 
-          expect(option3).toHaveAttribute('aria-selected', 'true');
-          expect(option3).toHaveFocus();
-        });
+        expect(option3).toHaveAttribute('aria-selected', 'true');
+        expect(option3).toHaveFocus();
 
         fireEvent.keyDown(listBox, { key: 'ArrowDown' });
 
-        await waitFor(() => {
-          expect(option1).toHaveAttribute('aria-selected', 'true');
-          expect(option1).toHaveFocus();
+        expect(option1).toHaveAttribute('aria-selected', 'true');
+        expect(option1).toHaveFocus();
 
-          expect(option2).toHaveAttribute('aria-selected', 'false');
-          expect(option2).not.toHaveFocus();
+        expect(option2).toHaveAttribute('aria-selected', 'false');
+        expect(option2).not.toHaveFocus();
 
-          expect(option3).toHaveAttribute('aria-selected', 'false');
-          expect(option3).not.toHaveFocus();
-        });
+        expect(option3).toHaveAttribute('aria-selected', 'false');
+        expect(option3).not.toHaveFocus();
       });
 
       test('pressing ArrowDown adjusts scroll correctly', async () => {
@@ -737,7 +692,7 @@ describe('FormComboBox', () => {
 
         expect(onSelect).not.toHaveBeenCalled();
 
-        fireEvent.click(screen.getByText('Option 2'));
+        userEvent.click(screen.getByText('Option 2'));
 
         expect(onSelect).toHaveBeenCalledWith(1);
       });
@@ -755,7 +710,7 @@ describe('FormComboBox', () => {
 
         await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
-        fireEvent.click(screen.getByText('Option 2'));
+        userEvent.click(screen.getByText('Option 2'));
 
         expect(screen.queryAllByRole('option')).toHaveLength(0);
       });
@@ -779,7 +734,7 @@ describe('FormComboBox', () => {
 
         expect(screen.queryAllByRole('option')).toHaveLength(3);
 
-        fireEvent.click(screen.getByText('Target'));
+        userEvent.click(screen.getByText('Target'));
 
         expect(screen.queryAllByRole('option')).toHaveLength(0);
       });
@@ -800,11 +755,11 @@ describe('FormComboBox', () => {
 
       await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
-      fireEvent.click(screen.getByText('Target'));
+      userEvent.click(screen.getByText('Target'));
 
       expect(screen.queryAllByRole('option')).toHaveLength(0);
 
-      fireEvent.click(screen.getByLabelText('Choose option'));
+      userEvent.click(screen.getByLabelText('Choose option'));
 
       expect(screen.queryAllByRole('option')).toHaveLength(3);
     });
