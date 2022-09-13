@@ -21,17 +21,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
     public class PermissionsController : ControllerBase
     {
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IReleaseFileRepository _releaseFileRepository;
+        private readonly IReleaseFileService _releaseFileService;
         private readonly IUserService _userService;
         private readonly IPreReleaseService _preReleaseService;
 
         public PermissionsController(IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IReleaseFileRepository releaseFileRepository,
+            IReleaseFileService releaseFileService,
             IUserService userService,
             IPreReleaseService preReleaseService)
         {
             _persistenceHelper = persistenceHelper;
-            _releaseFileRepository = releaseFileRepository;
+            _releaseFileService = releaseFileService;
             _userService = userService;
             _preReleaseService = preReleaseService;
         }
@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         [HttpGet("release/{releaseId}/data/{fileId}")]
         public async Task<ActionResult<DataFilePermissions>> GetDataFilePermissions(Guid releaseId, Guid fileId)
         {
-            return await _releaseFileRepository
+            return await _releaseFileService
                 .CheckFileExists(releaseId, fileId, FileType.Data)
                 .OnSuccess(_userService.GetDataFilePermissions)
                 .HandleFailuresOrOk();

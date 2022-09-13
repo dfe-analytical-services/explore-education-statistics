@@ -14,6 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseFileService
     {
+        public Task<Either<ActionResult, Content.Model.File>> CheckFileExists(Guid releaseId,
+            Guid id,
+            params FileType[] allowedFileTypes);
+
         Task<Either<ActionResult, Unit>> Delete(
             Guid releaseId,
             Guid id,

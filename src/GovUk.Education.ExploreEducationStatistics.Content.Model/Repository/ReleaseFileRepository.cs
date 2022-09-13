@@ -3,17 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 {
     public class ReleaseFileRepository : IReleaseFileRepository
     {
@@ -29,25 +26,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public ReleaseFileRepository(ContentDbContext contentDbContext)
         {
             _contentDbContext = contentDbContext;
-        }
-
-        public async Task<Either<ActionResult, File>> CheckFileExists(Guid releaseId, Guid id,
-            params FileType[] allowedFileTypes)
-        {
-            // Ensure file is linked to the Release by getting the ReleaseFile first
-            var releaseFile = await Find(releaseId, id);
-
-            if (releaseFile == null)
-            {
-                return new NotFoundResult();
-            }
-
-            if (allowedFileTypes.Any() && !allowedFileTypes.Contains(releaseFile.File.Type))
-            {
-                return ValidationUtils.ValidationActionResult(FileTypeInvalid);
-            }
-
-            return releaseFile.File;
         }
 
         public async Task<ReleaseFile> Create(

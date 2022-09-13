@@ -17,14 +17,18 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 using IReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseFileService;
+using ValidationUtils = GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -72,6 +76,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
         }
 
+        public async Task<Either<ActionResult, File>> CheckFileExists(Guid releaseId,
+            Guid id,
+            params FileType[] allowedFileTypes)
+        {
+            // Ensure file is linked to the Release by getting the ReleaseFile first
+            var releaseFile = await _releaseFileRepository.Find(releaseId, id);
+
+            if (releaseFile == null)
+            {
+                return new NotFoundResult();
+            }
+
+            if (allowedFileTypes.Any() && !allowedFileTypes.Contains(releaseFile.File.Type))
+            {
+                return ValidationUtils.ValidationResult(FileTypeInvalid);
+            }
+
+            return releaseFile.File;
+        }
+
         public async Task<Either<ActionResult, Unit>> Delete(Guid releaseId,
             Guid id,
             bool forceDelete = false)
@@ -89,9 +113,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(async release => await _userService.CheckCanUpdateRelease(release, ignoreCheck: forceDelete))
-                .OnSuccess(async release =>
-                    await ids.Select(id =>
-                        _releaseFileRepository.CheckFileExists(releaseId, id, DeletableFileTypes)).OnSuccessAll())
+                .OnSuccess(async _ =>
+                    await ids.Select(id => CheckFileExists(releaseId, id, DeletableFileTypes)).OnSuccessAll())
                 .OnSuccessVoid(async files =>
                 {
                     foreach (var file in files)
@@ -150,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(release => _releaseFileRepository.CheckFileExists(releaseId, id))
+                .OnSuccess(_ => CheckFileExists(releaseId, id))
                 .OnSuccessCombineWith(file =>
                     _blobStorageService.DownloadToStream(PrivateReleaseFiles, file.Path(), new MemoryStream()))
                 .OnSuccess(fileAndStream =>

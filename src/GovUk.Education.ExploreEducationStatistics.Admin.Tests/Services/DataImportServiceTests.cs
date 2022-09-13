@@ -7,13 +7,13 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -53,8 +53,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var userService = new Mock<IUserService>(Strict);
             var queueService = new Mock<IStorageQueueService>(Strict);
+
+            releaseFileService.Setup(s => s.CheckFileExists(release.Id,
+                    file.Id,
+                    FileType.Data))
+                .ReturnsAsync(file);
 
             userService
                 .Setup(s => s.MatchesPolicy(It.Is<File>(f => f.Id == file.Id),
@@ -69,14 +75,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = BuildDataImportService(contentDbContext: contentDbContext,
+                    releaseFileService: releaseFileService.Object,
                     queueService: queueService.Object,
                     userService: userService.Object);
 
                 var result = await service.CancelImport(release.Id, file.Id);
-                Assert.True(result.IsRight);
-            }
+                
+                MockUtils.VerifyAllMocks(releaseFileService, userService, queueService);
 
-            MockUtils.VerifyAllMocks(userService, queueService);
+                result.AssertRight();
+            }
         }
 
         [Fact]
@@ -107,8 +115,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var userService = new Mock<IUserService>(Strict);
             var queueService = new Mock<IStorageQueueService>(Strict);
+
+            releaseFileService.Setup(s => s.CheckFileExists(release.Id,
+                    file.Id,
+                    FileType.Data))
+                .ReturnsAsync(file);
 
             userService
                 .Setup(s => s.MatchesPolicy(It.Is<File>(f => f.Id == file.Id),
@@ -118,15 +132,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = BuildDataImportService(contentDbContext: contentDbContext,
+                    releaseFileService: releaseFileService.Object,
                     queueService: queueService.Object,
                     userService: userService.Object);
 
                 var result = await service.CancelImport(release.Id, file.Id);
-                Assert.True(result.IsLeft);
-                Assert.IsType<ForbidResult>(result.Left);
+                
+                MockUtils.VerifyAllMocks(releaseFileService, userService, queueService);
+                
+                result.AssertForbidden();
             }
-
-            MockUtils.VerifyAllMocks(userService, queueService);
         }
 
         [Fact]
@@ -351,14 +366,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static DataImportService BuildDataImportService(
             ContentDbContext contentDbContext,
             IDataImportRepository? dataImportRepository = null,
-            IReleaseFileRepository? releaseFileRepository = null,
+            IReleaseFileService? releaseFileService = null,
             IStorageQueueService? queueService = null,
             IUserService? userService = null)
         {
             return new DataImportService(
                 contentDbContext,
                 dataImportRepository ?? new DataImportRepository(contentDbContext),
-                releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
+                releaseFileService ?? new Mock<IReleaseFileService>(Strict).Object,
                 queueService ?? new Mock<IStorageQueueService>(Strict).Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object);
         }
