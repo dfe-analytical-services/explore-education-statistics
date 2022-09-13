@@ -24,7 +24,6 @@
         "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
       }
     },
-
     "skuPublic": {
       "type": "string",
       "defaultValue": "B1 Basic",
@@ -241,7 +240,6 @@
       "type": "bool",
       "defaultValue": true
     },
-
     "publicAppBasicAuth": {
       "type": "string",
       "defaultValue": "true",
@@ -279,7 +277,6 @@
         "description": "Hotjar ID for the public app. Leave as empty string to disable Hotjar"
       }
     },
-
     "verificationEmailTemplateId": {
       "type": "securestring",
       "defaultValue": "",
@@ -411,11 +408,9 @@
         "description": "Tag Value - Enter the name of the main script (not the parameters file) used to deploy the component. If the component is deployed manually, the value should be N/A"
       }
     },
-
     "adminUri": {
       "type": "string"
     },
-
     "minTlsVersion": {
       "type": "string",
       "defaultValue": "1.2",
@@ -433,7 +428,6 @@
       "type": "bool",
       "defaultValue": true
     },
-
     "publishReleasesCronSchedule": {
       "type": "string",
       "defaultValue": "0 0 0 * * *",
@@ -441,7 +435,6 @@
         "description": "Cron string that is used to control the schedule of the Publish Releases Function in the Publisher App"
       }
     },
-
     "publishReleaseContentCronSchedule": {
       "type": "string",
       "defaultValue": "0 30 9 * * *",
@@ -449,7 +442,6 @@
         "description": "Cron string that is used to control the schedule of the Publish Release Content Function in the Publisher App"
       }
     },
-
     "preReleaseMinutesBeforeStart": {
       "type": "int",
       "defaultValue": 870,
@@ -464,14 +456,12 @@
         "description": "Prerelease end time as number of minutes before a release is scheduled to be published"
       }
     },
-
     "publisherClientId": {
       "type": "string",
       "metadata": {
         "description": "Publisher Active Directory Application Client Id used for authentication requests"
       }
     },
-
     "publisherClientSecret": {
       "type": "string",
       "metadata": {
@@ -525,7 +515,10 @@
     "openIdConnectSpaClientRefreshTokenUsage": {
       "type": "string",
       "defaultValue": "OneTimeOnly",
-      "allowedValues": ["ReUse", "OneTimeOnly"],
+      "allowedValues": [
+        "ReUse",
+        "OneTimeOnly"
+      ],
       "metadata": {
         "description": "Whether or not this environment's Admin API supports reusable or one-time refresh tokens"
       }
@@ -533,7 +526,10 @@
     "openIdConnectSpaClientRefreshTokenExpiration": {
       "type": "string",
       "defaultValue": "Absolute",
-      "allowedValues": ["Absolute", "Sliding"],
+      "allowedValues": [
+        "Absolute",
+        "Sliding"
+      ],
       "metadata": {
         "description": "Whether or not this environment's Admin API has refresh tokens expiring at a fixed date or in a within a sliding window that extends with each use of a refresh token"
       }
@@ -645,6 +641,7 @@
         "description": "Slack webhook URI for alerts"
       }
     }
+  },
   "variables": {
     "dataAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-data')]",
     "dataPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-data')]",
@@ -717,50 +714,6 @@
         "timeAggregation": "Total",
         "criterionType": "StaticThresholdCriterion"
       },
-      //{
-      //  "name": "[concat(parameters('subscription'),'AdminAppInsightsExceptions')]",
-      //  "description": "Admin AppInsights - Exceptions",
-      //  "resourceId": "[resourceId('Microsoft.Insights/components', variables('adminAppInsights'))]",
-      //  "resourceType": "Microsoft.Insights/components",
-      //  "metricName": "exceptions/count",
-      //  "threshold": 10,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Count",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
-      //{
-      //  "name": "[concat(parameters('subscription'),'DataAppInsightsExceptions')]",
-      //  "description": "Data AppInsights - Exceptions",
-      //  "resourceId": "[resourceId('Microsoft.Insights/components', variables('dataAppInsights'))]",
-      //  "resourceType": "Microsoft.Insights/components",
-      //  "metricName": "exceptions/count",
-      //  "threshold": 5,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Count",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
-      //{
-      //  "name": "[concat(parameters('subscription'),'ContentAppInsightsExceptions')]",
-      //  "description": "Content AppInsights - Exceptions",
-      //  "resourceId": "[resourceId('Microsoft.Insights/components', variables('contentAppInsights'))]",
-      //  "resourceType": "Microsoft.Insights/components",
-      //  "metricName": "exceptions/count",
-      //  "threshold": 4,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Count",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
-      //{
-      //  "name": "[concat(parameters('subscription'),'PublicAppInsightsExceptions')]",
-      //  "description": "Content AppInsights - Exceptions",
-      //  "resourceId": "[resourceId('Microsoft.Insights/components', variables('publicAppInsights'))]",
-      //  "resourceType": "Microsoft.Insights/components",
-      //  "metricName": "exceptions/count",
-      //  "threshold": 15,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Count",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
       {
         "name": "[concat(parameters('subscription'),'ImporterAppInsightsExceptions')]",
         "description": "Importer AppInsights - Exceptions",
@@ -794,39 +747,6 @@
         "timeAggregation": "Count",
         "criterionType": "StaticThresholdCriterion"
       },
-      //{
-      //  "name": "[concat(parameters('subscription'),'AdminAppServiceResponseTime')]",
-      //  "description": "Admin App Service - Response Time",
-      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
-      //  "resourceType": "Microsoft.Web/sites",
-      //  "metricName": "HttpResponseTime",
-      //  "threshold": 10,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Average",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
-      //{
-      //  "name": "[concat(parameters('subscription'),'DataAppServiceResponseTime')]",
-      //  "description": "Data App Service - Response Time",
-      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
-      //  "resourceType": "Microsoft.Web/sites",
-      //  "metricName": "HttpResponseTime",
-      //  "threshold": 10,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Average",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
-      //{
-      //  "name": "[concat(parameters('subscription'),'ContentAppServiceResponseTime')]",
-      //  "description": "Content App Service - Response Time",
-      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
-      //  "resourceType": "Microsoft.Web/sites",
-      //  "metricName": "HttpResponseTime",
-      //  "threshold": 100,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Average",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
       {
         "name": "[concat(parameters('subscription'),'PublicAppServiceResponseTime')]",
         "description": "Public App Service - Response Time",
