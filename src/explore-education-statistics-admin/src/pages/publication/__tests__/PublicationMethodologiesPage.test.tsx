@@ -8,7 +8,6 @@ import _methodologyService, {
 import _publicationService, {
   ExternalMethodology,
   MyPublication,
-  UpdatePublicationRequest,
 } from '@admin/services/publicationService';
 import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';

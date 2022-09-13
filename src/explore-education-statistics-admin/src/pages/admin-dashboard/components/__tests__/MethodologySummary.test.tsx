@@ -7,7 +7,6 @@ import _publicationService, {
   ExternalMethodology,
   MyPublication,
   PublicationContactDetails,
-  UpdatePublicationRequest,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';

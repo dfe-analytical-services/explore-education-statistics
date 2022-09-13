@@ -71,12 +71,10 @@ export interface PublicationMethodologyDetails {
   externalMethodology?: ExternalMethodology;
 }
 
-export interface SavePublicationRequest {
+export interface PublicationSaveRequest {
   title: string;
   summary: string;
   contact: SavePublicationContact;
-  selectedMethodologyId?: string;
-  externalMethodology?: ExternalMethodology;
   supersededById?: string;
   topicId: string;
 }
@@ -87,9 +85,6 @@ export interface ListReleasesParams {
   pageSize?: number;
   permissions?: boolean;
 }
-
-export type CreatePublicationRequest = SavePublicationRequest;
-export type UpdatePublicationRequest = SavePublicationRequest;
 
 export type UpdatePublicationLegacyRelease = Partial<
   OmitStrict<UpdateLegacyRelease, 'publicationId'>
@@ -106,15 +101,13 @@ const publicationService = {
     return client.get('/publication-summaries');
   },
 
-  createPublication(
-    publication: CreatePublicationRequest,
-  ): Promise<Publication> {
+  createPublication(publication: PublicationSaveRequest): Promise<Publication> {
     return client.post('/publications', publication);
   },
 
   updatePublication(
     publicationId: string,
-    publication: UpdatePublicationRequest,
+    publication: PublicationSaveRequest,
   ): Promise<Publication> {
     return client.put(`/publications/${publicationId}`, publication);
   },

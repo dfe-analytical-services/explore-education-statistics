@@ -15,8 +15,6 @@ public record PublicationSaveRequest
 
         [Required] public Guid TopicId { get; set; }
 
-        public ExternalMethodology? ExternalMethodology { get; set; } = null;
-
         [Required] public ContactSaveViewModel Contact { get; set; } = null!;
 
         private string _slug = Empty;

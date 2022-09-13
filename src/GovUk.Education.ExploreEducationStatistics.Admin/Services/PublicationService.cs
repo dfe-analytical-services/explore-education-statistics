@@ -179,7 +179,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Summary = publication.Summary,
                         TopicId = publication.TopicId,
                         Slug = publication.Slug,
-                        ExternalMethodology = publication.ExternalMethodology
                     });
 
                     await _context.SaveChangesAsync();
@@ -240,10 +239,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         publication.Slug = updatedPublication.Slug;
                     }
 
+                    // ExternalMethodology is absent as it's updated by a different endpoint
                     publication.Title = updatedPublication.Title;
                     publication.Summary = updatedPublication.Summary;
                     publication.TopicId = updatedPublication.TopicId;
-                    publication.ExternalMethodology = updatedPublication.ExternalMethodology;
                     publication.Updated = DateTime.UtcNow;
                     publication.SupersededById = updatedPublication.SupersededById;
 
