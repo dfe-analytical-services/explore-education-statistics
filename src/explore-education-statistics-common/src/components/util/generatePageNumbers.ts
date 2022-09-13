@@ -1,52 +1,46 @@
 import last from 'lodash/last';
 import range from 'lodash/range';
 
+type WindowSizes = 's' | 'm';
+
 interface Options {
+  /**
+   * The default size, 'm', fits in 'govuk-grid-column-two-thirds' on desktop,
+   * 's' fits on mobile.
+   */
+  windowSize?: WindowSizes;
   currentPage: number;
-  maxItems?: number;
   totalPages: number;
 }
 
 /**
  * Generates pages for pagination.
- * Always returns the first and last page. Returns pages around the current page and
+ * Always returns the first and last page.
+ * On desktop (size 'm') it returns pages around the current page and
  * null spacers in gaps between consecutive numbers.
+ * On mobile (size 's') it returns the current page and spacers
  */
 export default function generatePageNumbers({
+  windowSize = 'm',
   currentPage: initialCurrentPage,
-  /**
-   * maxItems - the maximum number of items (pages and spacers) to return.
-   * Depending on the total pages and current page fewer than this may be returned.
-   * Can be used to customise the length based on the space available,
-   * the default, 7, fits in 'govuk-grid-column-two-thirds'.
-   */
-  maxItems: initialMaxItems = 7,
   totalPages,
 }: Options): (number | null)[] {
-  // Minimum items of 5, to allow [first, spacer, current, spacer, last]
-  const minItems = 5;
-  const maxItems = initialMaxItems < minItems ? minItems : initialMaxItems;
-
   // Return an empty array if 0 or 1 pages
   if (totalPages <= 1) {
     return [];
   }
 
-  // Return all pages if the total is less than maxItems
-  if (totalPages <= maxItems) {
-    return range(1, totalPages + 1);
-  }
   // Make sure the current page is valid
   const currentPage =
     initialCurrentPage <= 0 ? 1 : Math.min(initialCurrentPage, totalPages);
 
-  const { rangeStart, rangeEnd } = getPagesRange({
+  const pagesRange = getPagesRange({
+    windowSize,
     currentPage,
-    maxItems,
     totalPages,
   });
 
-  const pageNumbers = [1, ...range(rangeStart, rangeEnd + 1), totalPages];
+  const pageNumbers = [1, ...pagesRange, totalPages];
 
   return pageNumbers.reduce<(number | null)[]>((acc, current) => {
     const prev = last(acc);
@@ -59,17 +53,28 @@ export default function generatePageNumbers({
 }
 
 function getPagesRange({
+  windowSize,
   currentPage,
-  maxItems,
   totalPages,
 }: {
+  windowSize: WindowSizes;
   currentPage: number;
-  maxItems: number;
   totalPages: number;
 }) {
-  // The first and the last numbers are added later to ensure they are always shown
+  // For small windows we only return the current page
+  // or an empty array if it's the first or last page.
+  if (windowSize === 's') {
+    return currentPage === 1 || currentPage === totalPages ? [] : [currentPage];
+  }
+
+  // The first and the last numbers are added later to ensure they are always shown.
   const startNumber = 2;
   const endNumber = totalPages - 1;
+  const maxItems = 7;
+  // Return all pages if the total is less than maxItems
+  if (totalPages <= maxItems) {
+    return range(startNumber, totalPages);
+  }
 
   // Number of items (pages and spacers) to show around the current page,
   // based on what fits up to the maxItems.
@@ -84,23 +89,13 @@ function getPagesRange({
     currentPage - startNumber < midPoint &&
     currentPage <= startNumber + offsetItems
   ) {
-    return {
-      rangeStart: startNumber,
-      rangeEnd: startNumber + (itemsAroundCurrent - 1),
-    };
+    return range(startNumber, startNumber + itemsAroundCurrent);
   }
 
   // currentPage is near the end
   if (endNumber - currentPage < midPoint) {
-    return {
-      rangeStart: endNumber - (itemsAroundCurrent - 1),
-      rangeEnd: endNumber,
-    };
+    return range(endNumber - (itemsAroundCurrent - 1), endNumber + 1);
   }
 
-  // currentPage is in the middle
-  return {
-    rangeStart: currentPage - offsetItems + 1,
-    rangeEnd: currentPage + offsetItems - 1,
-  };
+  return range(currentPage - offsetItems + 1, currentPage + offsetItems);
 }

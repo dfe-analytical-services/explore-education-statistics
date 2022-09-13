@@ -1,6 +1,7 @@
 import { ArrowLeft, ArrowRight } from '@common/components/ArrowIcons';
-import appendQuery from '@common/utils/url/appendQuery';
 import generatePageNumbers from '@common/components/util/generatePageNumbers';
+import { useMobileMedia } from '@common/hooks/useMedia';
+import appendQuery from '@common/utils/url/appendQuery';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 
@@ -37,9 +38,12 @@ const Pagination = ({
   renderLink,
   totalPages,
 }: PaginationProps) => {
+  const { isMedia: isMobileMedia } = useMobileMedia();
+
   const pageNumbers = generatePageNumbers({
     currentPage,
     totalPages,
+    windowSize: isMobileMedia ? 's' : 'm',
   });
 
   if (!pageNumbers.length) {

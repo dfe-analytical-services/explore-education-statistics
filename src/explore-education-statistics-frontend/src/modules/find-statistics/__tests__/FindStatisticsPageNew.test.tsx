@@ -4,6 +4,14 @@ import { testPublications } from '@frontend/modules/find-statistics/__tests__/__
 import { render, screen, within } from '@testing-library/react';
 import React from 'react';
 
+jest.mock('@common/hooks/useMedia', () => ({
+  useMobileMedia: () => {
+    return {
+      isMedia: false,
+    };
+  },
+}));
+
 describe('FindStatisticsPageNew', () => {
   const testPaging: Paging = {
     page: 1,
