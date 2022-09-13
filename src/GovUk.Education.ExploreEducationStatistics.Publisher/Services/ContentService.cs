@@ -18,6 +18,7 @@ using Newtonsoft.Json.Serialization;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.IBlobStorageService;
+using IContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -26,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IBlobCacheService _privateBlobCacheService;
         private readonly IBlobCacheService _publicBlobCacheService;
         private readonly IBlobStorageService _publicBlobStorageService;
+        private readonly IContentReleaseService _contentReleaseService;
         private readonly IReleaseService _releaseService;
         private readonly IPublicationService _publicationService;
         private readonly IMethodologyCacheService _methodologyCacheService;
@@ -38,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             IBlobCacheService privateBlobCacheService,
             IBlobCacheService publicBlobCacheService,
             IBlobStorageService publicBlobStorageService,
+            IContentReleaseService contentReleaseService,
             IReleaseService releaseService,
             IPublicationService publicationService,
             IMethodologyCacheService methodologyCacheService,
@@ -46,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _privateBlobCacheService = privateBlobCacheService;
             _publicBlobCacheService = publicBlobCacheService;
             _publicBlobStorageService = publicBlobStorageService;
+            _contentReleaseService = contentReleaseService;
             _releaseService = releaseService;
             _publicationService = publicationService;
             _methodologyCacheService = methodologyCacheService;
@@ -154,13 +158,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task CacheLatestRelease(Publication publication, PublishContext context, params Guid[] includedReleaseIds)
         {
-            var viewModel = await _releaseService.GetLatestReleaseViewModel(publication.Id, includedReleaseIds, context);
+            var latestRelease = await _releaseService.GetLatestRelease(publication.Id, includedReleaseIds);
+            var viewModel = (await _contentReleaseService.GetRelease(latestRelease.Id, context.Published)).Right;
             await Upload(prefix => PublicContentLatestReleasePath(publication.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
         }
 
         private async Task CacheRelease(Release release, PublishContext context)
         {
-            var viewModel = await _releaseService.GetReleaseViewModel(release.Id, context);
+            var viewModel = (await _contentReleaseService.GetRelease(release.Id, context.Published)).Right;
             await Upload(prefix => PublicContentReleasePath(release.Publication.Slug, release.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
         }
 

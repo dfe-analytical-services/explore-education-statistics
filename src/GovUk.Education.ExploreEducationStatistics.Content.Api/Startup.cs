@@ -153,6 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IThemeCacheService, ThemeCacheService>();
             services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
             services.AddTransient<IReleaseService, Services.ReleaseService>();
+            services.AddTransient<IReleaseFileRepository, ReleaseFileRepository>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
             services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
