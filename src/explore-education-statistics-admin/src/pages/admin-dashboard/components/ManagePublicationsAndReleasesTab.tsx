@@ -10,7 +10,7 @@ import permissionService from '@admin/services/permissionService';
 import publicationService from '@admin/services/publicationService';
 import themeService, { Theme } from '@admin/services/themeService';
 import { Topic } from '@admin/services/topicService';
-import appendQuery from '@admin/utils/url/appendQuery';
+import appendQuery from '@common/utils/url/appendQuery';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import InsetText from '@common/components/InsetText';

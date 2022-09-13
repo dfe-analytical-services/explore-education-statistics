@@ -8,7 +8,7 @@ import {
 } from '@admin/routes/routes';
 import themeService from '@admin/services/themeService';
 import topicService from '@admin/services/topicService';
-import appendQuery from '@admin/utils/url/appendQuery';
+import appendQuery from '@common/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';

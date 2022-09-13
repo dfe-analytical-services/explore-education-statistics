@@ -3,7 +3,7 @@ import Page from '@admin/components/Page';
 import ThemeForm from '@admin/pages/themes/components/ThemeForm';
 import { ThemeParams, themesRoute } from '@admin/routes/routes';
 import themeService from '@admin/services/themeService';
-import appendQuery from '@admin/utils/url/appendQuery';
+import appendQuery from '@common/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';

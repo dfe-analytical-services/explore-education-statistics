@@ -12,6 +12,7 @@ import TemporaryNotice from './TemporaryNotice';
 
 type Props = {
   title: string;
+  metaTitle?: string;
   caption?: string;
   description?: string;
   breadcrumbLabel?: string;
@@ -24,6 +25,7 @@ type Props = {
 
 const Page = ({
   title,
+  metaTitle,
   caption = '',
   description,
   breadcrumbLabel = '',
@@ -40,7 +42,7 @@ const Page = ({
     <>
       <CookieBanner wide={wide} />
       <PageMeta
-        title={`${title}${caption && `, ${caption}`}`}
+        title={metaTitle ?? `${title}${caption && `, ${caption}`}`}
         description={description}
         {...pageMeta}
       />
