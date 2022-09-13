@@ -18,10 +18,10 @@ Click fast track link for 'Pupil absence rates' data block
     user opens accordion section    Pupil absence rates    id:content
     user scrolls to accordion section content    Pupil absence rates    id:content
     user waits until h3 is visible    Explore and edit this data online
-    user clicks link    Explore data
+    user clicks link by visible text    Explore data    testid:Data block - Generic data block - National
 
 Validate Publication selected step option
-    user waits until h1 is visible    Create your own tables
+    user waits until h1 is visible    Create your own tables    %{WAIT_SMALL}
     user waits until page contains element    css:table
     user checks previous table tool step contains    1    Publication    Pupil absence in schools in England
 

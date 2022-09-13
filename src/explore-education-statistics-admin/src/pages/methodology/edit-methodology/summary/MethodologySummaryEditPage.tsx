@@ -27,7 +27,7 @@ const MethodologySummaryEditPage = ({
     const nextMethodology = await methodologyService.updateMethodology(
       methodologyId,
       {
-        latestInternalReleaseNote: methodology.latestInternalReleaseNote,
+        latestInternalReleaseNote: methodology.internalReleaseNote,
         publishingStrategy: methodology.publishingStrategy,
         status: methodology.status,
         title,

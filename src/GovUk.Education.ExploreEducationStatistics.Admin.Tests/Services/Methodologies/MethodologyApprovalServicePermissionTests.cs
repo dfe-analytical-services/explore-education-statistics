@@ -6,12 +6,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
@@ -73,24 +73,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         private MethodologyApprovalService SetupService(
             ContentDbContext? contentDbContext = null,
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
-            IBlobCacheService? publicBlobCacheService = null,
             IMethodologyContentService? methodologyContentService = null,
             IMethodologyFileRepository? methodologyFileRepository = null,
             IMethodologyVersionRepository? methodologyVersionRepository = null,
             IMethodologyImageService? methodologyImageService = null,
             IPublishingService? publishingService = null,
-            IUserService? userService = null)
+            IUserService? userService = null,
+            IMethodologyCacheService? methodologyCacheService = null)
         {
             return new(
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
-                publicBlobCacheService ?? Mock.Of<IBlobCacheService>(Strict),
                 methodologyContentService ?? Mock.Of<IMethodologyContentService>(Strict),
                 methodologyFileRepository ?? new MethodologyFileRepository(contentDbContext),
                 methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(Strict),
                 methodologyImageService ?? Mock.Of<IMethodologyImageService>(Strict),
                 publishingService ?? Mock.Of<IPublishingService>(Strict),
-                userService ?? Mock.Of<IUserService>());
+                userService ?? Mock.Of<IUserService>(),
+                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict));
         }
         
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()

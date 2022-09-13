@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau.BauCacheController;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.IBlobStorageService;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 using Capture = Moq.Capture;
 
@@ -42,9 +47,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 }
             );
 
-            result.AssertNoContent();
+            VerifyAllMocks(privateBlobStorageService);
 
-            MockUtils.VerifyAllMocks(privateBlobStorageService);
+            result.AssertNoContent();
 
             var regex = Assert.IsType<Regex>(options.IncludeRegex);
             Assert.Matches(regex, "releases/release-1/subject-meta/something");
@@ -81,9 +86,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 }
             );
 
-            result.AssertNoContent();
+            VerifyAllMocks(privateBlobStorageService);
 
-            MockUtils.VerifyAllMocks(privateBlobStorageService);
+            result.AssertNoContent();
 
             var regex = Assert.IsType<Regex>(options.IncludeRegex);
             Assert.Matches(regex, "releases/release-1/data-blocks/something");
@@ -103,9 +108,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var result = await controller.ClearPrivateCache(new ClearPrivateCachePathsViewModel());
 
-            result.AssertNoContent();
+            VerifyAllMocks(privateBlobStorageService);
 
-            MockUtils.VerifyAllMocks(privateBlobStorageService);
+            result.AssertNoContent();
+        }
+
+        [Fact]
+        public async Task UpdatePublicCacheGlossary()
+        {
+            var glossaryCacheService = new Mock<IGlossaryCacheService>(Strict);
+
+            glossaryCacheService.Setup(s => s.UpdateGlossary())
+                .ReturnsAsync(new List<GlossaryCategoryViewModel>());
+
+            var controller = BuildController(glossaryCacheService: glossaryCacheService.Object);
+
+            var result = await controller.UpdatePublicCacheGlossary();
+
+            VerifyAllMocks(glossaryCacheService);
+
+            result.AssertNoContent();
         }
 
         [Fact]
@@ -131,9 +153,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 }
             );
 
-            result.AssertNoContent();
+            VerifyAllMocks(publicBlobStorageService);
 
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
+            result.AssertNoContent();
 
             var regex = Assert.IsType<Regex>(options.IncludeRegex);
             Assert.Matches(regex, "publications/publication-1/releases/release-1/subject-meta/something");
@@ -171,9 +193,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 }
             );
 
-            result.AssertNoContent();
+            VerifyAllMocks(publicBlobStorageService);
 
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
+            result.AssertNoContent();
 
             var regex = Assert.IsType<Regex>(options.IncludeRegex);
             Assert.Matches(regex, "publications/publication-1/releases/release-1/data-blocks/something");
@@ -194,93 +216,101 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var result = await controller.ClearPublicCacheReleases(new ClearPublicCacheReleasePathsViewModel());
 
-            result.AssertNoContent();
+            VerifyAllMocks(publicBlobStorageService);
 
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
+            result.AssertNoContent();
         }
 
         [Fact]
-        public async Task ClearPublicCacheTrees_SingleValidPath()
+        public async Task UpdatePublicCacheTrees_SingleValidCacheEntry()
         {
-            var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
+            var themeCacheService = new Mock<IThemeCacheService>(Strict);
 
-            var paths = new List<string>();
+            themeCacheService
+                .Setup(s => s.UpdatePublicationTree())
+                .ReturnsAsync(new List<ThemeTree<PublicationTreeNode>>());
 
-            publicBlobStorageService
-                .Setup(s => s.DeleteBlob(PublicContent, Capture.In(paths)))
-                .Returns(Task.CompletedTask);
+            var controller = BuildController(themeCacheService: themeCacheService.Object);
 
-            var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
+            var publicationTreeOption = UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree.ToString();
 
-            var result = await controller.ClearPublicCacheTrees(
-                new ClearPublicCacheTreePathsViewModel
+            var result = await controller.UpdatePublicCacheTrees(
+                new UpdatePublicCacheTreePathsViewModel
                 {
-                    Paths = SetOf("publication-tree.json")
+                    CacheEntries = SetOf(publicationTreeOption)
                 }
             );
 
+            VerifyAllMocks(themeCacheService);
+
             result.AssertNoContent();
-
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
-
-            Assert.Single(paths);
-            Assert.Equal("publication-tree.json", paths[0]);
         }
 
         [Fact]
-        public async Task ClearPublicCacheTrees_AllValidPaths()
+        public async Task UpdatePublicCacheTrees_AllValidCacheEntries()
         {
-            var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
+            var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
+            var themeCacheService = new Mock<IThemeCacheService>(Strict);
 
-            var paths = new List<string>();
+            themeCacheService
+                .Setup(s => s.UpdatePublicationTree())
+                .ReturnsAsync(new List<ThemeTree<PublicationTreeNode>>());
 
-            publicBlobStorageService
-                .Setup(s => s.DeleteBlob(PublicContent, Capture.In(paths)))
-                .Returns(Task.CompletedTask);
+            methodologyCacheService
+                .Setup(s => s.UpdateSummariesTree())
+                .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
+                    new List<AllMethodologiesThemeViewModel>()));
 
-            var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
+            var controller = BuildController(
+                methodologyCacheService: methodologyCacheService.Object,
+                themeCacheService: themeCacheService.Object);
 
-            var result = await controller.ClearPublicCacheTrees(
-                new ClearPublicCacheTreePathsViewModel
+            var publicationTreeOption = UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree.ToString();
+            var methodologyTreeOption = UpdatePublicCacheTreePathsViewModel.CacheEntry.MethodologyTree.ToString();
+
+            var result = await controller.UpdatePublicCacheTrees(
+                new UpdatePublicCacheTreePathsViewModel
                 {
-                    Paths = new HashSet<string>
+                    CacheEntries = new HashSet<string>
                     {
-                        "publication-tree.json",
-                        "methodology-tree.json"
+                        publicationTreeOption,
+                        methodologyTreeOption
                     }
                 }
             );
 
+            VerifyAllMocks(themeCacheService, methodologyCacheService);
+
             result.AssertNoContent();
-
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
-
-            Assert.Equal(2, paths.Count);
-            Assert.Equal("publication-tree.json", paths[0]);
-            Assert.Equal("methodology-tree.json", paths[1]);
         }
 
         [Fact]
-        public async Task ClearPublicCacheTrees_Empty()
+        public async Task UpdatePublicCacheTrees_Empty()
         {
             var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
 
             var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
-            var result = await controller.ClearPublicCacheTrees(new ClearPublicCacheTreePathsViewModel());
+            var result = await controller.UpdatePublicCacheTrees(new UpdatePublicCacheTreePathsViewModel());
+
+            VerifyAllMocks(publicBlobStorageService);
 
             result.AssertNoContent();
-
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
         }
 
         private static BauCacheController BuildController(
             IBlobStorageService? privateBlobStorageService = null,
-            IBlobStorageService? publicBlobStorageService = null)
+            IBlobStorageService? publicBlobStorageService = null,
+            IGlossaryCacheService? glossaryCacheService = null,
+            IMethodologyCacheService? methodologyCacheService = null,
+            IThemeCacheService? themeCacheService = null)
         {
             return new BauCacheController(
                 privateBlobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
-                publicBlobStorageService ?? Mock.Of<IBlobStorageService>(Strict)
+                publicBlobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
+                glossaryCacheService ?? Mock.Of<IGlossaryCacheService>(Strict),
+                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
+                themeCacheService ?? Mock.Of<IThemeCacheService>(Strict)
             );
         }
     }

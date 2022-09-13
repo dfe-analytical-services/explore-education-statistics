@@ -126,19 +126,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         [HttpGet("methodology/{methodologyId}/update")]
         public Task<ActionResult<bool>> CanUpdateMethodology(Guid methodologyId)
         {
-            return CheckPolicyAgainstEntity<MethodologyVersion>(methodologyId, _userService.CheckCanUpdateMethodology);
+            return CheckPolicyAgainstEntity<MethodologyVersion>(methodologyId,
+                _userService.CheckCanUpdateMethodologyVersion);
         }
 
         [HttpGet("methodology/{methodologyId}/status/draft")]
         public Task<ActionResult<bool>> CanMarkMethodologyAsDraft(Guid methodologyId)
         {
-            return CheckPolicyAgainstEntity<MethodologyVersion>(methodologyId, _userService.CheckCanMarkMethodologyAsDraft);
+            return CheckPolicyAgainstEntity<MethodologyVersion>(methodologyId,
+                _userService.CheckCanMarkMethodologyVersionAsDraft);
         }
 
         [HttpGet("methodology/{methodologyId}/status/approve")]
         public Task<ActionResult<bool>> CanApproveMethodology(Guid methodologyId)
         {
-            return CheckPolicyAgainstEntity<MethodologyVersion>(methodologyId, _userService.CheckCanApproveMethodology);
+            return CheckPolicyAgainstEntity<MethodologyVersion>(methodologyId,
+                _userService.CheckCanApproveMethodologyVersion);
         }
 
         private async Task<ActionResult<bool>> CheckPolicyAgainstEntity<TEntity>(

@@ -1,16 +1,16 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
@@ -25,13 +25,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
     {
         private readonly IBlobStorageService _privateBlobStorageService;
         private readonly IBlobStorageService _publicBlobStorageService;
+        private readonly IGlossaryCacheService _glossaryCacheService;
+        private readonly IMethodologyCacheService _methodologyCacheService;
+        private readonly IThemeCacheService _themeCacheService;
 
         public BauCacheController(
             IBlobStorageService privateBlobStorageService,
-            IBlobStorageService publicBlobStorageService)
+            IBlobStorageService publicBlobStorageService,
+            IGlossaryCacheService glossaryCacheService,
+            IMethodologyCacheService methodologyCacheService, 
+            IThemeCacheService themeCacheService)
         {
             _privateBlobStorageService = privateBlobStorageService;
             _publicBlobStorageService = publicBlobStorageService;
+            _glossaryCacheService = glossaryCacheService;
+            _methodologyCacheService = methodologyCacheService;
+            _themeCacheService = themeCacheService;
         }
 
         [HttpDelete("private-cache")]
@@ -53,17 +62,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             return NoContent();
         }
 
-        [HttpDelete("public-cache/trees")]
-        public async Task<ActionResult> ClearPublicCacheTrees(ClearPublicCacheTreePathsViewModel request)
+        [HttpPut("public-cache/glossary")]
+        public async Task<ActionResult> UpdatePublicCacheGlossary()
         {
-            if (request.Paths.Any())
+            await _glossaryCacheService.UpdateGlossary();
+            return NoContent();
+        }
+
+        [HttpPut("public-cache/trees")]
+        public async Task<ActionResult> UpdatePublicCacheTrees(UpdatePublicCacheTreePathsViewModel request)
+        {
+            if (request.CacheEntries.Any())
             {
-                await request.Paths
+                await request.CacheEntries
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
-                        path =>
-                            _publicBlobStorageService.DeleteBlob(BlobContainers.PublicContent, path)
-                    );
+                        
+                        async entry =>
+                        {
+                            var allowedPath =
+                                EnumUtil.GetFromString<UpdatePublicCacheTreePathsViewModel.CacheEntry>(entry);
+                            
+                            switch (allowedPath)
+                            {
+                                case UpdatePublicCacheTreePathsViewModel.CacheEntry.MethodologyTree: 
+                                    await _methodologyCacheService.UpdateSummariesTree();
+                                    break;
+                                case UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree:
+                                    await _themeCacheService.UpdatePublicationTree();
+                                    break;
+                                default:
+                                    throw new ArgumentException($"Unsupported cache entry {entry}");
+                            }
+                        });
             }
 
             return NoContent();
@@ -88,17 +119,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             return NoContent();
         }
 
-        public class ClearPublicCacheTreePathsViewModel
+        public class UpdatePublicCacheTreePathsViewModel
         {
-            private static readonly HashSet<string> AllowedPaths = new()
+            public enum CacheEntry
             {
-                PublicationTreeCacheKey.GetKey(),
-                AllMethodologiesCacheKey.GetKey()
+                MethodologyTree,
+                PublicationTree
+            }
+            
+            private static readonly HashSet<string> AllowedCacheEntries = new()
+            {
+                CacheEntry.MethodologyTree.ToString(),
+                CacheEntry.PublicationTree.ToString()
             };
 
             [MinLength(1)]
-            [ContainsOnly(AllowedValuesProvider = nameof(AllowedPaths))]
-            public HashSet<string> Paths { get; set; } = new();
+            [ContainsOnly(AllowedValuesProvider = nameof(AllowedCacheEntries))]
+            public HashSet<string> CacheEntries { get; set; } = new();
         }
 
         public class ClearPublicCacheReleasePathsViewModel

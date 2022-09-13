@@ -1,13 +1,27 @@
-﻿namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
+﻿#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+
+public record ContactViewModel
 {
-    public class ContactViewModel
+    public string TeamName { get; init; } = string.Empty;
+
+    public string TeamEmail { get; init; } = string.Empty;
+
+    public string ContactName { get; init; } = string.Empty;
+
+    public string ContactTelNo { get; init; } = string.Empty;
+
+    public ContactViewModel()
     {
-        public string TeamName { get; set; }
+    }
 
-        public string TeamEmail { get; set; }
-
-        public string ContactName { get; set; }
-
-        public string ContactTelNo { get; set; }
+    public ContactViewModel(Contact contact)
+    {
+        TeamName = contact.TeamName;
+        TeamEmail = contact.TeamEmail;
+        ContactName = contact.ContactName;
+        ContactTelNo = contact.ContactTelNo;
     }
 }

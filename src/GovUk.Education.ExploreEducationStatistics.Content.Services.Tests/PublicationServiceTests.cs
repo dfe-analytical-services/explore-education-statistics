@@ -3,40 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
-    [Collection(CacheServiceTests)]
-    public class PublicationServiceTests : CacheServiceTestFixture
+    public class PublicationServiceTests
     {
-        public PublicationServiceTests()
-        {
-            BlobCacheService
-                .Setup(s => s.GetItem(
-                    It.IsAny<PublicationCacheKey>(), typeof(PublicationViewModel)))
-                .ReturnsAsync(null);
-
-            BlobCacheService
-                .Setup(s => s.SetItem<object>(
-                    It.IsAny<PublicationCacheKey>(), It.IsAny<PublicationViewModel>()))
-                .Returns(Task.CompletedTask);
-        }
-        
         [Fact]
         public async Task Get()
         {
@@ -216,6 +195,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Slug = "test-theme",
                     }
                 },
+                Contact = new Contact
+                {
+                    TeamName = "Team name",
+                    TeamEmail = "team@email.com",
+                    ContactName = "Contact name",
+                    ContactTelNo = "1234",
+                },
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -299,8 +285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
                 contentDbContext is null
                     ? Mock.Of<IPersistenceHelper<ContentDbContext>>()
-                    : new PersistenceHelper<ContentDbContext>(contentDbContext),
-                mapper ?? MapperUtils.MapperForProfile<MappingProfiles>()
+                    : new PersistenceHelper<ContentDbContext>(contentDbContext)
             );
         }
     }

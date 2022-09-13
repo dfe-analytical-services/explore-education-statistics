@@ -2,13 +2,10 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -22,60 +19,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly string _publicStorageConnectionString;
         private readonly IBlobStorageService _privateBlobStorageService;
         private readonly IBlobStorageService _publicBlobStorageService;
-        private readonly IBlobCacheService _publicBlobCacheService;
         private readonly IMethodologyService _methodologyService;
         private readonly IPublicationService _publicationService;
         private readonly IReleaseService _releaseService;
-        private readonly ContentDbContext _contentDbContext;
         private readonly ILogger<PublishingService> _logger;
 
         public PublishingService(
             string publicStorageConnectionString,
             IBlobStorageService privateBlobStorageService,
             IBlobStorageService publicBlobStorageService,
-            IBlobCacheService publicBlobCacheService,
             IMethodologyService methodologyService,
             IPublicationService publicationService,
             IReleaseService releaseService,
-            ContentDbContext contentDbContext,
             ILogger<PublishingService> logger)
         {
             _publicStorageConnectionString = publicStorageConnectionString;
             _privateBlobStorageService = privateBlobStorageService;
             _publicBlobStorageService = publicBlobStorageService;
-            _publicBlobCacheService = publicBlobCacheService;
             _methodologyService = methodologyService;
             _publicationService = publicationService;
             _releaseService = releaseService;
-            _contentDbContext = contentDbContext;
             _logger = logger;
         }
 
-        public async Task PublishStagedReleaseContent(Guid releaseId, string publicationSlug)
+        public async Task PublishStagedReleaseContent()
         {
+            _logger.LogInformation("Moving staged release content");
             await _publicBlobStorageService.MoveDirectory(
                 sourceContainerName: PublicContent,
                 sourceDirectoryPath: PublicContentStagingPath(),
                 destinationContainerName: PublicContent,
                 destinationDirectoryPath: string.Empty
             );
-
-            await _releaseService.SetPublishedDates(releaseId, DateTime.UtcNow);
-
-            await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(publicationSlug));
-
-            // Invalidate publication cache for superseded publications, as potentially affected. If newly
-            // published release is first Live release for the publication, the superseding is now enforced
-            var supersededPublications = await _contentDbContext.Publications
-                .Where(p =>
-                    p.SupersededById == _contentDbContext.Publications
-                        .Single(publication => publication.Slug == publicationSlug)
-                        .Id)
-                .ToListAsync();
-            foreach (var p in supersededPublications)
-            {
-                await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(p.Slug));
-            }
         }
 
         public async Task PublishMethodologyFiles(Guid methodologyId)

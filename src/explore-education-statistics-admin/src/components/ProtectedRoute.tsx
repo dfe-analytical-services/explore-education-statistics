@@ -1,7 +1,7 @@
 import { QueryParameterNames } from '@admin/components/api-authorization/ApiAuthorizationConstants';
 import { useAuthContext, User } from '@admin/contexts/AuthContext';
 import signInService from '@admin/services/loginService';
-import appendQuery from '@admin/utils/url/appendQuery';
+import appendQuery from '@common/utils/url/appendQuery';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import React from 'react';
 import { Redirect, Route, RouteProps } from 'react-router';

@@ -6,14 +6,13 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -28,34 +27,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
     {
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly ContentDbContext _context;
-        private readonly IBlobCacheService _publicBlobCacheService;
         private readonly IMethodologyContentService _methodologyContentService;
         private readonly IMethodologyFileRepository _methodologyFileRepository;
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IMethodologyImageService _methodologyImageService;
         private readonly IPublishingService _publishingService;
         private readonly IUserService _userService;
+        private readonly IMethodologyCacheService _methodologyCacheService;
 
         public MethodologyApprovalService(
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             ContentDbContext context,
-            IBlobCacheService publicBlobCacheService,
             IMethodologyContentService methodologyContentService,
             IMethodologyFileRepository methodologyFileRepository,
             IMethodologyVersionRepository methodologyVersionRepository,
             IMethodologyImageService methodologyImageService,
             IPublishingService publishingService,
-            IUserService userService)
+            IUserService userService, 
+            IMethodologyCacheService methodologyCacheService)
         {
             _persistenceHelper = persistenceHelper;
             _context = context;
-            _publicBlobCacheService = publicBlobCacheService;
             _methodologyContentService = methodologyContentService;
             _methodologyFileRepository = methodologyFileRepository;
             _methodologyVersionRepository = methodologyVersionRepository;
             _methodologyImageService = methodologyImageService;
             _publishingService = publishingService;
             _userService = userService;
+            _methodologyCacheService = methodologyCacheService;
         }
 
         public async Task<Either<ActionResult, MethodologyVersion>> UpdateApprovalStatus(
@@ -97,18 +96,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     _context.MethodologyVersions.Update(methodology);
 
-                    if (await _methodologyVersionRepository.IsPubliclyAccessible(methodology.Id))
+                    var isPubliclyAccessible = await _methodologyVersionRepository.IsPubliclyAccessible(methodology.Id);
+                    
+                    if (isPubliclyAccessible)
                     {
                         methodology.Published = DateTime.UtcNow;
 
                         await _publishingService.PublishMethodologyFiles(methodology.Id);
-
-                        // Invalidate the 'All Methodologies' cache item
-                        await _publicBlobCacheService.DeleteItem(new AllMethodologiesCacheKey());
                     }
 
                     _context.MethodologyVersions.Update(methodology);
                     await _context.SaveChangesAsync();
+
+                    if (isPubliclyAccessible)
+                    {
+                        // Update the 'All Methodologies' cache item
+                        await _methodologyCacheService.UpdateSummariesTree();
+                    }
+
                     return methodology;
                 });
         }
@@ -164,8 +169,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             return requestedStatus switch
             {
-                Draft => _userService.CheckCanMarkMethodologyAsDraft(methodologyVersion),
-                Approved => _userService.CheckCanApproveMethodology(methodologyVersion),
+                Draft => _userService.CheckCanMarkMethodologyVersionAsDraft(methodologyVersion),
+                Approved => _userService.CheckCanApproveMethodologyVersion(methodologyVersion),
                 _ => throw new ArgumentOutOfRangeException(nameof(requestedStatus), "Unexpected status")
             };
         }

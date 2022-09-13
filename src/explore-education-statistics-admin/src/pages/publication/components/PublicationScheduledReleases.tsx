@@ -4,17 +4,19 @@ import {
   ScheduledStagesGuidanceModal,
   ScheduledStatusGuidanceModal,
 } from '@admin/pages/publication/components/PublicationGuidance';
-import { Release } from '@admin/services/releaseService';
+import { ReleaseSummaryWithPermissions } from '@admin/services/releaseService';
 import ButtonText from '@common/components/ButtonText';
 import InfoIcon from '@common/components/InfoIcon';
+import InsetText from '@common/components/InsetText';
 import useToggle from '@common/hooks/useToggle';
 import React from 'react';
 
 interface Props {
-  releases: Release[];
+  publicationId: string;
+  releases: ReleaseSummaryWithPermissions[];
 }
 
-const PublicationScheduledReleases = ({ releases }: Props) => {
+const PublicationScheduledReleases = ({ publicationId, releases }: Props) => {
   const [
     showScheduledStatusGuidance,
     toggleScheduledStatusGuidance,
@@ -24,15 +26,13 @@ const PublicationScheduledReleases = ({ releases }: Props) => {
     toggleScheduledStagesGuidance,
   ] = useToggle(false);
 
+  if (releases.length === 0) {
+    return <InsetText>There are no scheduled releases.</InsetText>;
+  }
+
   return (
     <>
-      <table
-        className="govuk-!-margin-bottom-9"
-        data-testid="publication-scheduled-releases"
-      >
-        <caption className="govuk-table__caption--m">
-          Scheduled releases
-        </caption>
+      <table data-testid="publication-scheduled-releases">
         <thead>
           <tr>
             <th className="govuk-!-width-one-third">Release period</th>
@@ -53,9 +53,13 @@ const PublicationScheduledReleases = ({ releases }: Props) => {
           </tr>
         </thead>
         <tbody>
-          {releases.map(release => {
-            return <ScheduledReleaseRow key={release.id} release={release} />;
-          })}
+          {releases.map(release => (
+            <ScheduledReleaseRow
+              key={release.id}
+              publicationId={publicationId}
+              release={release}
+            />
+          ))}
         </tbody>
       </table>
 

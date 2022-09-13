@@ -81,17 +81,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = BuildService(context, methodologyService: methodologyService.Object);
 
                 var amendmentIdCapture = new List<Guid>();
-                var summaryViewModel = new MethodologyVersionSummaryViewModel();
+                var viewModel = new MethodologyVersionViewModel();
 
                 methodologyService
-                    .Setup(s => s.GetSummary(Capture.In(amendmentIdCapture)))
-                    .ReturnsAsync(summaryViewModel);
+                    .Setup(s => s.GetMethodology(Capture.In(amendmentIdCapture)))
+                    .ReturnsAsync(viewModel);
 
                 var result = await service.CreateMethodologyAmendment(originalVersion.Id);
                 VerifyAllMocks(methodologyService);
 
-                var resultingViewModel = result.AssertRight();
-                Assert.Same(summaryViewModel, resultingViewModel);
+                result.AssertRight(viewModel);
                 amendmentId = Assert.Single(amendmentIdCapture);
             }
 
@@ -180,17 +179,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = BuildService(context, methodologyService: methodologyService.Object);
 
                 var amendmentIdCapture = new List<Guid>();
-                var summaryViewModel = new MethodologyVersionSummaryViewModel();
+                var viewModel = new MethodologyVersionViewModel();
 
                 methodologyService
-                    .Setup(s => s.GetSummary(Capture.In(amendmentIdCapture)))
-                    .ReturnsAsync(summaryViewModel);
+                    .Setup(s => s.GetMethodology(Capture.In(amendmentIdCapture)))
+                    .ReturnsAsync(viewModel);
 
                 var result = await service.CreateMethodologyAmendment(originalVersion.Id);
                 VerifyAllMocks(methodologyService);
 
-                var resultingViewModel = result.AssertRight();
-                Assert.Same(summaryViewModel, resultingViewModel);
+                result.AssertRight(viewModel);
                 amendmentId = Assert.Single(amendmentIdCapture);
             }
 

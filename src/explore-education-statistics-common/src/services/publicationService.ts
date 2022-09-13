@@ -42,6 +42,23 @@ export interface PublicationSummary {
   title: string;
 }
 
+// TODO EES-3517 a guess at the new type for the find stats page.
+export interface PublicationSummaryWithRelease {
+  id: string;
+  legacyPublicationUrl?: string;
+  latestRelease?: {
+    id: string;
+    published: string;
+    type: ReleaseType;
+  };
+  slug: string;
+  summary?: string;
+  theme: {
+    title: string;
+  };
+  title: string;
+}
+
 export interface BasicPublicationContact {
   id?: string;
   contactName: string;

@@ -29,6 +29,11 @@ export function useRouter() {
     pathname: '',
     query: '',
     asPath: '',
+    events: {
+      on: jest.fn(),
+      off: jest.fn(),
+      emit: jest.fn(),
+    },
   };
 }
 

@@ -16,8 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
         {
             CreateMap<Link, LinkViewModel>();
 
-            CreateMap<Contact, ContactViewModel>();
-
             CreateContentBlockMap();
 
             CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
@@ -39,6 +37,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     m => m.MapFrom(r => r.GenericContent.OrderBy(s => s.Order)));
 
             CreateMap<Update, ReleaseNoteViewModel>();
+
+            CreateMap<MethodologyVersion, MethodologyVersionSummaryViewModel>();
         }
 
         private void CreateContentBlockMap()

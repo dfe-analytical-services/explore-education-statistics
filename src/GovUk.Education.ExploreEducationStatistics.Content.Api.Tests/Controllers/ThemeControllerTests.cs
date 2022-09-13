@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Moq;
@@ -12,7 +12,6 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
-using static Newtonsoft.Json.JsonConvert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
@@ -34,8 +33,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 }
             }
         };
-        
-        private static readonly List<AllMethodologiesThemeViewModel> MethodologyThemes = new() {
+
+        private static readonly List<AllMethodologiesThemeViewModel> MethodologyThemes = new()
+        {
             new AllMethodologiesThemeViewModel
             {
                 Id = Guid.NewGuid(),
@@ -64,68 +64,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 )
             }
         };
-        
+
         [Fact]
         public async Task GetPublicationTree()
         {
-            var (controller, mocks) = BuildControllerAndDependencies();
+            var themeCacheService = new Mock<IThemeCacheService>(Strict);
 
-            mocks.themeService
+            var controller = BuildController(themeCacheService: themeCacheService.Object);
+
+            themeCacheService
                 .Setup(s => s.GetPublicationTree(PublicationTreeFilter.FindStatistics))
                 .ReturnsAsync(Themes);
 
             var result = await controller.GetPublicationTree(PublicationTreeFilter.FindStatistics);
-            var publicationTree = result.Value;
-            VerifyAllMocks(mocks);
 
-            var theme = Assert.Single(publicationTree!);
+            VerifyAllMocks(themeCacheService);
+
+            var publicationTree = result.AssertOkResult();
+
+            var theme = Assert.Single(publicationTree);
 
             Assert.IsType<ThemeTree<PublicationTreeNode>>(theme);
 
-            var topic = Assert.Single(theme!.Topics);
+            var topic = Assert.Single(theme.Topics);
 
-            Assert.Single(topic!.Publications);
+            Assert.Single(topic.Publications);
         }
 
         [Fact]
         public async Task GetMethodologyThemes()
         {
-            var (controller, mocks) = BuildControllerAndDependencies();
+            var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
 
-            mocks.methodologyService
-                .Setup(mock => mock.GetCachedSummariesTree())
+            var controller = BuildController(methodologyCacheService.Object);
+
+            methodologyCacheService
+                .Setup(mock => mock.GetSummariesTree())
                 .ReturnsAsync(MethodologyThemes);
 
             var result = await controller.GetMethodologyThemes();
 
-            VerifyAllMocks(mocks);
+            VerifyAllMocks(methodologyCacheService);
 
             result.AssertOkResult(MethodologyThemes);
         }
 
-        [Fact]
-        public void ThemeTree_SerialiseAndDeserialise()
+        private static ThemeController BuildController(
+            IMethodologyCacheService? methodologyCacheService = null,
+            IThemeCacheService? themeCacheService = null)
         {
-            var converted = DeserializeObject<ThemeTree<PublicationTreeNode>>(SerializeObject(Themes[0]));
-            converted.AssertDeepEqualTo(Themes[0]);
-        }
-        
-        [Fact]
-        public void AllMethodologiesThemeViewModel_SerialiseAndDeserialise()
-        {
-            var converted = DeserializeObject<AllMethodologiesThemeViewModel>(SerializeObject(MethodologyThemes[0]));
-            converted.AssertDeepEqualTo(MethodologyThemes[0]);
-        }
-
-        private static (ThemeController controller, (
-                Mock<IThemeService> themeService, 
-                Mock<IMethodologyService> methodologyService) mocks) 
-                BuildControllerAndDependencies()
-        {
-            var themeService = new Mock<IThemeService>(Strict);
-            var methodologyService = new Mock<IMethodologyService>(Strict);
-            var controller = new ThemeController(themeService.Object, methodologyService.Object);
-            return (controller, (themeService, methodologyService));
+            return new ThemeController(
+                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
+                themeCacheService ?? Mock.Of<IThemeCacheService>(Strict));
         }
     }
 }

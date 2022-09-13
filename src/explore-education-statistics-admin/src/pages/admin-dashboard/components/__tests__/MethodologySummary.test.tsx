@@ -1,7 +1,7 @@
 import MethodologySummary from '@admin/pages/admin-dashboard/components/MethodologySummary';
 import _methodologyService, {
-  BasicMethodologyVersion,
-  MyMethodologyVersion,
+  MethodologyVersion,
+  MethodologyVersionSummary,
 } from '@admin/services/methodologyService';
 import _publicationService, {
   ExternalMethodology,
@@ -35,55 +35,46 @@ const testContact: PublicationContactDetails = {
   teamName: 'Team Smith',
 };
 
-const testMethodology: MyMethodologyVersion = {
+const testMethodology: MethodologyVersionSummary = {
   amendment: false,
   id: 'methodology-v1',
-  latestInternalReleaseNote: 'this is the release note',
+  internalReleaseNote: 'this is the release note',
   methodologyId: 'methodology-1',
   previousVersionId: 'methodology-previous-version-1',
+  owned: true,
   published: '2021-06-08T09:04:17',
-  slug: 'methodology-slug-1',
   status: 'Approved',
   title: 'I am a methodology',
-  owningPublication: {
-    id: 'owning-publication-1',
-    title: 'Owning publication title',
-  },
   permissions: {
     canApproveMethodology: false,
     canUpdateMethodology: false,
     canDeleteMethodology: false,
     canMakeAmendmentOfMethodology: false,
     canMarkMethodologyAsDraft: false,
+    canRemoveMethodologyLink: false,
   },
 };
-const testMethodology2: MyMethodologyVersion = {
+const testMethodology2: MethodologyVersionSummary = {
   amendment: false,
   id: 'methodology-v2',
-  latestInternalReleaseNote: 'this is another release note',
+  internalReleaseNote: 'this is another release note',
   methodologyId: 'methodology-2',
   previousVersionId: 'methodology-previous-version-2',
+  owned: true,
   published: '2021-06-10T09:04:17',
-  slug: 'meth-2',
   status: 'Approved',
   title: 'I am a methodology 2',
-  owningPublication: {
-    id: 'owning-publication-2',
-    title: 'Owning publication title 2',
-  },
   permissions: {
     canApproveMethodology: false,
     canUpdateMethodology: false,
     canDeleteMethodology: false,
     canMakeAmendmentOfMethodology: false,
     canMarkMethodologyAsDraft: false,
+    canRemoveMethodologyLink: false,
   },
 };
 const testDraftMethodology = produce(testMethodology, draft => {
   draft.status = 'Draft';
-});
-const testAmendmentMethodology = produce(testMethodology, draft => {
-  draft.amendment = true;
 });
 const testMethodologyCanAmend = produce(testMethodology, draft => {
   draft.permissions.canMakeAmendmentOfMethodology = true;
@@ -95,6 +86,13 @@ const testMethodologyCanRemove = produce(testMethodology, draft => {
 const testMethodologyCanRemoveAmendment = produce(testMethodology, draft => {
   draft.amendment = true;
   draft.permissions.canDeleteMethodology = true;
+});
+const testAdoptedMethodology = produce(testMethodology, draft => {
+  draft.owned = false;
+  draft.permissions.canRemoveMethodologyLink = true;
+});
+const testAdoptedMethodology2 = produce(testMethodology2, draft => {
+  draft.owned = false;
 });
 
 const externalMethodology: ExternalMethodology = {
@@ -124,54 +122,25 @@ const testPublicationNoMethodology: MyPublication = {
 const testPublicationWithMethodology = produce(
   testPublicationNoMethodology,
   draft => {
-    draft.methodologies = [
-      {
-        owner: true,
-        permissions: { canDropMethodology: false },
-        methodology: testMethodology,
-      },
-    ];
+    draft.methodologies = [testMethodology];
   },
 );
 const testPublicationWithDraftMethodology = produce(
   testPublicationNoMethodology,
   draft => {
-    draft.methodologies = [
-      {
-        owner: true,
-        permissions: { canDropMethodology: false },
-        methodology: testDraftMethodology,
-      },
-    ];
+    draft.methodologies = [testDraftMethodology];
   },
 );
 const testPublicationWithAmendmentMethodology = produce(
   testPublicationNoMethodology,
   draft => {
-    draft.methodologies = [
-      {
-        owner: true,
-        permissions: { canDropMethodology: false },
-        methodology: testAmendmentMethodology,
-      },
-    ];
+    draft.methodologies = [testMethodologyCanRemoveAmendment];
   },
 );
 const testPublicationWithAdoptedMethodologies = produce(
   testPublicationNoMethodology,
   draft => {
-    draft.methodologies = [
-      {
-        owner: false,
-        permissions: { canDropMethodology: true },
-        methodology: testMethodology,
-      },
-      {
-        owner: false,
-        permissions: { canDropMethodology: false },
-        methodology: testMethodology2,
-      },
-    ];
+    draft.methodologies = [testAdoptedMethodology, testAdoptedMethodology2];
   },
 );
 const testPublicationWithExternalMethodology = produce(
@@ -183,37 +152,19 @@ const testPublicationWithExternalMethodology = produce(
 const testPublicationWithMethodologyCanAmend = produce(
   testPublicationWithMethodology,
   draft => {
-    draft.methodologies = [
-      {
-        owner: true,
-        permissions: { canDropMethodology: false },
-        methodology: testMethodologyCanAmend,
-      },
-    ];
+    draft.methodologies = [testMethodologyCanAmend];
   },
 );
 const testPublicationWithMethodologyCanCancelAmend = produce(
   testPublicationWithMethodology,
   draft => {
-    draft.methodologies = [
-      {
-        owner: true,
-        permissions: { canDropMethodology: false },
-        methodology: testMethodologyCanRemoveAmendment,
-      },
-    ];
+    draft.methodologies = [testMethodologyCanRemoveAmendment];
   },
 );
 const testPublicationWithMethodologyCanRemove = produce(
   testPublicationWithMethodology,
   draft => {
-    draft.methodologies = [
-      {
-        owner: true,
-        permissions: { canDropMethodology: false },
-        methodology: testMethodologyCanRemove,
-      },
-    ];
+    draft.methodologies = [testMethodologyCanRemove];
   },
 );
 
@@ -222,7 +173,21 @@ const testTopicId = 'topic-id';
 describe('MethodologySummary', () => {
   describe('Create Methodology', () => {
     test('clicking Create Methodology creates the Methodology and takes the user to the Methodology summary', async () => {
-      methodologyService.createMethodology.mockResolvedValue(testMethodology);
+      const createdMethodology: MethodologyVersion = {
+        id: 'methodology-v1',
+        amendment: false,
+        methodologyId: 'methodology-1',
+        title: 'Methodology 1',
+        slug: 'methodology-slug-1',
+        owningPublication: {
+          id: 'p1',
+          title: 'Publication title',
+        },
+        status: 'Draft',
+      };
+      methodologyService.createMethodology.mockResolvedValue(
+        createdMethodology,
+      );
 
       const history = createMemoryHistory();
 
@@ -245,7 +210,7 @@ describe('MethodologySummary', () => {
           testPublicationNoMethodology.id,
         );
         expect(history.location.pathname).toBe(
-          `/methodology/${testMethodology.id}/summary`,
+          `/methodology/${createdMethodology.id}/summary`,
         );
       });
     });
@@ -432,16 +397,10 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  methodology: {
-                    ...testMethodology,
-                    permissions: {
-                      ...testMethodology.permissions,
-                      canApproveMethodology: true,
-                    },
-                  },
-                  owner: true,
+                  ...testMethodology,
                   permissions: {
-                    canDropMethodology: false,
+                    ...testMethodology.permissions,
+                    canApproveMethodology: true,
                   },
                 },
               ],
@@ -473,16 +432,10 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  methodology: {
-                    ...testMethodology,
-                    permissions: {
-                      ...testMethodology.permissions,
-                      canMarkMethodologyAsDraft: true,
-                    },
-                  },
-                  owner: true,
+                  ...testMethodology,
                   permissions: {
-                    canDropMethodology: false,
+                    ...testMethodology.permissions,
+                    canMarkMethodologyAsDraft: true,
                   },
                 },
               ],
@@ -514,16 +467,10 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  methodology: {
-                    ...testMethodology,
-                    permissions: {
-                      ...testMethodology.permissions,
-                      canUpdateMethodology: true,
-                    },
-                  },
-                  owner: true,
+                  ...testMethodology,
                   permissions: {
-                    canDropMethodology: false,
+                    ...testMethodology.permissions,
+                    canUpdateMethodology: true,
                   },
                 },
               ],
@@ -605,17 +552,11 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  methodology: {
-                    ...testMethodology,
-                    amendment: true,
-                    permissions: {
-                      ...testMethodology.permissions,
-                      canApproveMethodology: true,
-                    },
-                  },
-                  owner: true,
+                  ...testMethodology,
+                  amendment: true,
                   permissions: {
-                    canDropMethodology: false,
+                    ...testMethodology.permissions,
+                    canApproveMethodology: true,
                   },
                 },
               ],
@@ -647,17 +588,11 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  methodology: {
-                    ...testMethodology,
-                    amendment: true,
-                    permissions: {
-                      ...testMethodology.permissions,
-                      canMarkMethodologyAsDraft: true,
-                    },
-                  },
-                  owner: true,
+                  ...testMethodology,
+                  amendment: true,
                   permissions: {
-                    canDropMethodology: false,
+                    ...testMethodology.permissions,
+                    canMarkMethodologyAsDraft: true,
                   },
                 },
               ],
@@ -689,17 +624,11 @@ describe('MethodologySummary', () => {
               ...testPublicationNoMethodology,
               methodologies: [
                 {
-                  methodology: {
-                    ...testMethodology,
-                    amendment: true,
-                    permissions: {
-                      ...testMethodology.permissions,
-                      canUpdateMethodology: true,
-                    },
-                  },
-                  owner: true,
+                  ...testMethodology,
+                  amendment: true,
                   permissions: {
-                    canDropMethodology: false,
+                    ...testMethodology.permissions,
+                    canUpdateMethodology: true,
                   },
                 },
               ],
@@ -726,8 +655,6 @@ describe('MethodologySummary', () => {
 
   describe('External methodologies', () => {
     test('clicking the link to external methodology button takes the user to the page', async () => {
-      methodologyService.createMethodology.mockResolvedValue(testMethodology);
-
       const history = createMemoryHistory();
 
       render(
@@ -1010,8 +937,7 @@ describe('MethodologySummary', () => {
 
       await waitFor(() => {
         expect(methodologyService.deleteMethodology).toHaveBeenCalledWith(
-          testPublicationWithMethodologyCanAmend.methodologies[0].methodology
-            .id,
+          testPublicationWithMethodologyCanRemove.methodologies[0].id,
         );
       });
     });
@@ -1086,10 +1012,10 @@ describe('MethodologySummary', () => {
     test('calls the service to amend the methodology when the confirm button is clicked', async () => {
       const history = createMemoryHistory();
 
-      const mockMethodology: BasicMethodologyVersion = {
+      const mockMethodology: MethodologyVersion = {
         amendment: true,
         id: 'methodology-v1',
-        latestInternalReleaseNote: 'this is the release note',
+        internalReleaseNote: 'Test internal release note',
         methodologyId: 'methodology-1',
         previousVersionId: 'methodology-previous-version-1',
         owningPublication: {
@@ -1135,8 +1061,7 @@ describe('MethodologySummary', () => {
         expect(
           methodologyService.createMethodologyAmendment,
         ).toHaveBeenCalledWith(
-          testPublicationWithMethodologyCanAmend.methodologies[0].methodology
-            .id,
+          testPublicationWithMethodologyCanAmend.methodologies[0].id,
         );
         expect(history.location.pathname).toBe(
           `/methodology/${mockMethodology.id}/summary`,
@@ -1234,8 +1159,7 @@ describe('MethodologySummary', () => {
 
       await waitFor(() => {
         expect(methodologyService.deleteMethodology).toHaveBeenCalledWith(
-          testPublicationWithMethodologyCanAmend.methodologies[0].methodology
-            .id,
+          testPublicationWithMethodologyCanCancelAmend.methodologies[0].id,
         );
       });
     });
@@ -1371,7 +1295,7 @@ describe('MethodologySummary', () => {
       await waitFor(() => {
         expect(publicationService.dropMethodology).toHaveBeenCalledWith(
           testPublicationWithAdoptedMethodologies.id,
-          testPublicationWithAdoptedMethodologies.methodologies[0].methodology
+          testPublicationWithAdoptedMethodologies.methodologies[0]
             .methodologyId,
         );
       });

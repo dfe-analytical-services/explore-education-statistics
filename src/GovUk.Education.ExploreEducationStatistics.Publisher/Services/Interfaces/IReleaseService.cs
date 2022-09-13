@@ -11,8 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface IReleaseService
     {
-        Task<Release?> Find(Guid id);
-
         Task<Release> Get(Guid id);
 
         Task<IEnumerable<Release>> List(IEnumerable<Guid> ids);

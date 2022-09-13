@@ -48,24 +48,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _mapper = mapper;
         }
 
-        public async Task<Release?> Find(Guid id)
-        {
-            return await _contentDbContext.Releases
-                .Include(release => release.Publication)
-                .Include(r => r.PreviousVersion)
-                .SingleOrDefaultAsync(release => release.Id == id);
-        }
-
         public async Task<Release> Get(Guid id)
         {
-            var release = await Find(id);
-
-            if (release == null)
-            {
-                throw new ArgumentException($"Could not find release: {id}");
-            }
-
-            return release;
+            return await _contentDbContext.Releases
+                .SingleAsync(release => release.Id == id);
         }
 
         public async Task<IEnumerable<Release>> List(IEnumerable<Guid> ids)
@@ -207,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             contentRelease.Published ??= published;
             contentRelease.DataLastPublished = DateTime.UtcNow;
 
-            // Update the Publication published date since we always generate the Publication when generating Release Content
+            // Update the publication published date
             contentRelease.Publication.Published = published;
 
             // Set the published date on any methodologies used by this publication that are now publicly accessible

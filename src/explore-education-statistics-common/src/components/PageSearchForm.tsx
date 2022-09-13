@@ -193,19 +193,14 @@ const PageSearchForm = ({
           placeholder: 'Search this page',
         }}
         inputLabel={inputLabel}
-        afterInput={({ value }) => (
-          <button
-            type="submit"
-            className={styles.searchButton}
-            value="Search"
-            onClick={() => search(value)}
-          >
-            <span className="govuk-visually-hidden">Search</span>
-          </button>
-        )}
         listBoxLabelId={`${id}-resultsLabel`}
         listBoxLabel={() => (
-          <div id={`${id}-resultsLabel`} className={styles.resultsLabel}>
+          <div
+            id={`${id}-resultsLabel`}
+            className={styles.resultsLabel}
+            aria-live="polite"
+            aria-atomic
+          >
             Found <strong>{searchResults.length}</strong>
             {` ${searchResults.length === 1 ? 'result' : 'results'}`}
           </div>

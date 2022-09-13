@@ -4,7 +4,7 @@ import TopicPublications from '@admin/pages/admin-dashboard/components/TopicPubl
 import { ThemeTopicParams, dashboardRoute } from '@admin/routes/routes';
 import themeService, { Theme } from '@admin/services/themeService';
 import { Topic } from '@admin/services/topicService';
-import appendQuery from '@admin/utils/url/appendQuery';
+import appendQuery from '@common/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useStorageItem from '@common/hooks/useStorageItem';

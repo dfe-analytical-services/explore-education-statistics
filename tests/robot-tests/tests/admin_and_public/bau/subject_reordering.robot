@@ -182,6 +182,17 @@ Add data guidance for all subjects
 Publish release
     user approves original release for immediate publication
 
+Check subjects can no longer be re-ordered after release has been published
+    user clicks link    Data and files
+    user waits until page contains element    id:uploadedDataFiles
+
+    user checks accordion is in position    One    1    id:uploadedDataFiles
+    user checks accordion is in position    Two    2    id:uploadedDataFiles
+    user checks accordion is in position    Three    3    id:uploadedDataFiles
+    user checks accordion is in position    Four    4    id:uploadedDataFiles
+
+    user checks element is not visible    testid:reorder-files    %{WAIT_SMALL}
+
 Check subject order in data tables
     user navigates to data tables page on public frontend
 

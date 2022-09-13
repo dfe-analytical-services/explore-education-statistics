@@ -6,12 +6,14 @@ exports[`PageSearchForm renders results found in custom selectors 1`] = `
   class="options"
   id="pageSearchForm-options"
   role="listbox"
-  tabindex="-1"
 >
   <li
+    aria-posinset="1"
     aria-selected="false"
+    aria-setsize="2"
     id="pageSearchForm-option-0"
     role="option"
+    tabindex="-1"
   >
     <div
       class="resultHeader"
@@ -32,9 +34,12 @@ exports[`PageSearchForm renders results found in custom selectors 1`] = `
     
   </li>
   <li
+    aria-posinset="2"
     aria-selected="false"
+    aria-setsize="2"
     id="pageSearchForm-option-1"
     role="option"
+    tabindex="-1"
   >
     <div
       class="resultHeader"
@@ -67,12 +72,14 @@ exports[`PageSearchForm renders results found in default elements 1`] = `
   class="options"
   id="pageSearchForm-options"
   role="listbox"
-  tabindex="-1"
 >
   <li
+    aria-posinset="1"
     aria-selected="false"
+    aria-setsize="5"
     id="pageSearchForm-option-0"
     role="option"
+    tabindex="-1"
   >
     <div
       class="resultHeader"
@@ -93,9 +100,12 @@ exports[`PageSearchForm renders results found in default elements 1`] = `
     
   </li>
   <li
+    aria-posinset="2"
     aria-selected="false"
+    aria-setsize="5"
     id="pageSearchForm-option-1"
     role="option"
+    tabindex="-1"
   >
     <div
       class="resultHeader"
@@ -116,9 +126,12 @@ exports[`PageSearchForm renders results found in default elements 1`] = `
     
   </li>
   <li
+    aria-posinset="3"
     aria-selected="false"
+    aria-setsize="5"
     id="pageSearchForm-option-2"
     role="option"
+    tabindex="-1"
   >
     <div
       class="resultHeader"
@@ -139,9 +152,12 @@ exports[`PageSearchForm renders results found in default elements 1`] = `
     
   </li>
   <li
+    aria-posinset="4"
     aria-selected="false"
+    aria-setsize="5"
     id="pageSearchForm-option-3"
     role="option"
+    tabindex="-1"
   >
     <div
       class="resultHeader"
@@ -162,9 +178,12 @@ exports[`PageSearchForm renders results found in default elements 1`] = `
     
   </li>
   <li
+    aria-posinset="5"
     aria-selected="false"
+    aria-setsize="5"
     id="pageSearchForm-option-4"
     role="option"
+    tabindex="-1"
   >
     <div
       class="resultHeader"
@@ -193,12 +212,14 @@ exports[`PageSearchForm result locations include accordion sections 1`] = `
   class="options"
   id="pageSearchForm-options"
   role="listbox"
-  tabindex="-1"
 >
   <li
+    aria-posinset="1"
     aria-selected="false"
+    aria-setsize="2"
     id="pageSearchForm-option-0"
     role="option"
+    tabindex="-1"
   >
     <div
       class="resultHeader"
@@ -223,9 +244,12 @@ exports[`PageSearchForm result locations include accordion sections 1`] = `
     </div>
   </li>
   <li
+    aria-posinset="2"
     aria-selected="false"
+    aria-setsize="2"
     id="pageSearchForm-option-1"
     role="option"
+    tabindex="-1"
   >
     <div
       class="resultHeader"
@@ -258,12 +282,14 @@ exports[`PageSearchForm result locations include heading hierarchy 1`] = `
   class="options"
   id="pageSearchForm-options"
   role="listbox"
-  tabindex="-1"
 >
   <li
+    aria-posinset="1"
     aria-selected="false"
+    aria-setsize="1"
     id="pageSearchForm-option-0"
     role="option"
+    tabindex="-1"
   >
     <div
       class="resultHeader"
@@ -296,12 +322,14 @@ exports[`PageSearchForm result locations uses nearest heading 1`] = `
   class="options"
   id="pageSearchForm-options"
   role="listbox"
-  tabindex="-1"
 >
   <li
+    aria-posinset="1"
     aria-selected="false"
+    aria-setsize="2"
     id="pageSearchForm-option-0"
     role="option"
+    tabindex="-1"
   >
     <div
       class="resultHeader"
@@ -326,9 +354,12 @@ exports[`PageSearchForm result locations uses nearest heading 1`] = `
     </div>
   </li>
   <li
+    aria-posinset="2"
     aria-selected="false"
+    aria-setsize="2"
     id="pageSearchForm-option-1"
     role="option"
+    tabindex="-1"
   >
     <div
       class="resultHeader"

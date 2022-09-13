@@ -73,7 +73,7 @@ const KeyStat = ({
               <Details
                 summary={summary?.dataDefinitionTitle[0] || 'Help'}
                 className={styles.definition}
-                visuallyHiddenText={
+                hiddenText={
                   !summary?.dataDefinitionTitle[0]
                     ? `for ${keyStat.title}`
                     : undefined

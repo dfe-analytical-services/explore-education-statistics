@@ -6,19 +6,25 @@ import {
 } from '@admin/pages/publication/components/PublicationGuidance';
 import releaseService, {
   DeleteReleasePlan,
-  Release,
+  ReleaseSummaryWithPermissions,
 } from '@admin/services/releaseService';
 import ButtonText from '@common/components/ButtonText';
 import InfoIcon from '@common/components/InfoIcon';
+import InsetText from '@common/components/InsetText';
 import useToggle from '@common/hooks/useToggle';
 import React, { useState } from 'react';
 
 interface Props {
-  releases: Release[];
-  onChange: () => void;
+  publicationId: string;
+  releases: ReleaseSummaryWithPermissions[];
+  onAmendmentDelete?: () => void;
 }
 
-const PublicationDraftReleases = ({ releases, onChange }: Props) => {
+const PublicationDraftReleases = ({
+  publicationId,
+  releases,
+  onAmendmentDelete,
+}: Props) => {
   const [deleteReleasePlan, setDeleteReleasePlan] = useState<
     DeleteReleasePlan & {
       releaseId: string;
@@ -28,13 +34,16 @@ const PublicationDraftReleases = ({ releases, onChange }: Props) => {
   const [showDraftStatusGuidance, toggleDraftStatusGuidance] = useToggle(false);
   const [showIssuesGuidance, toggleIssuesGuidance] = useToggle(false);
 
+  if (releases.length === 0) {
+    return <InsetText>There are no draft releases.</InsetText>;
+  }
+
   return (
     <>
       <table
-        className="dfe-hide-empty-cells govuk-!-margin-bottom-9"
+        className="dfe-hide-empty-cells"
         data-testid="publication-draft-releases"
       >
-        <caption className="govuk-table__caption--m">Draft releases</caption>
         <thead>
           <tr>
             <th className="govuk-!-width-one-third">Release period</th>
@@ -63,6 +72,7 @@ const PublicationDraftReleases = ({ releases, onChange }: Props) => {
           {releases.map(release => (
             <DraftReleaseRow
               key={release.id}
+              publicationId={publicationId}
               release={release}
               onDelete={async () => {
                 setDeleteReleasePlan({
@@ -81,7 +91,7 @@ const PublicationDraftReleases = ({ releases, onChange }: Props) => {
           onConfirm={async () => {
             await releaseService.deleteRelease(deleteReleasePlan.releaseId);
             setDeleteReleasePlan(undefined);
-            onChange();
+            onAmendmentDelete?.();
           }}
           onCancel={() => setDeleteReleasePlan(undefined)}
         />

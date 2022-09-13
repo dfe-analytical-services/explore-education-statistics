@@ -17,7 +17,6 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import VisuallyHidden from '../VisuallyHidden';
 import styles from './FormCheckboxSearchSubGroups.module.scss';
 import FormTextSearchInput from './FormTextSearchInput';
 
@@ -197,7 +196,7 @@ const FormCheckboxSearchSubGroups = ({
                     onSubGroupAllChange(event, checked, optionGroup.options);
                   }
                 }}
-                visuallyHiddenText={`for ${optionGroup.legend}`}
+                hiddenText={`for ${optionGroup.legend}`}
               />
             ))}
           </>

@@ -113,6 +113,9 @@ const MethodologyStatusPage = () => {
                   </SummaryListItem>
                   {currentMethodology.status === 'Approved' && (
                     <>
+                      <SummaryListItem term="Internal note">
+                        {currentMethodology.internalReleaseNote}
+                      </SummaryListItem>
                       <SummaryListItem term="When to publish">
                         {currentMethodology.publishingStrategy === 'WithRelease'
                           ? 'With a specific release'
@@ -159,7 +162,7 @@ const MethodologyStatusPage = () => {
               </>
             ) : (
               <MethodologyStatusEditPage
-                methodologySummary={currentMethodology}
+                methodology={currentMethodology}
                 onCancel={toggleForm.off}
                 onSubmit={handleSubmit}
               />
