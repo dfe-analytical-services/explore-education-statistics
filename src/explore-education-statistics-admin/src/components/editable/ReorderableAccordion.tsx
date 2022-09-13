@@ -1,5 +1,6 @@
 import Accordion, { AccordionProps } from '@common/components/Accordion';
 import Button from '@common/components/Button';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
 import { OmitStrict } from '@common/types';
 import reorder from '@common/utils/reorder';
@@ -24,10 +25,19 @@ export interface ReorderableAccordionProps
   extends OmitStrict<AccordionProps, 'openAll'> {
   heading?: string;
   onReorder: (sectionIds: string[]) => void;
+  canReorder: boolean;
+  reorderHiddenText?: string;
 }
 
 const ReorderableAccordion = (props: ReorderableAccordionProps) => {
-  const { children, id, heading, onReorder } = props;
+  const {
+    children,
+    id,
+    heading,
+    onReorder,
+    canReorder,
+    reorderHiddenText = 'sections',
+  } = props;
 
   const [isReordering, toggleReordering] = useToggle(false);
 
@@ -82,13 +92,16 @@ const ReorderableAccordion = (props: ReorderableAccordionProps) => {
         <h2 className="govuk-heading-l govuk-!-margin-bottom-0">{heading}</h2>
 
         {sections.length > 1 &&
+          canReorder &&
           (!isReordering ? (
             <Button
               variant="secondary"
               className="govuk-!-font-size-16 govuk-!-margin-bottom-0"
               onClick={toggleReordering.on}
+              data-testid="reorder-files"
             >
-              Reorder<span className="govuk-visually-hidden"> data files</span>
+              Reorder
+              <VisuallyHidden> {reorderHiddenText}</VisuallyHidden>
             </Button>
           ) : (
             <Button
