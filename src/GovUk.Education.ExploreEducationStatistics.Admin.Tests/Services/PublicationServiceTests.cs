@@ -131,18 +131,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "A",
                 Topic = topic,
+                Contact = new Contact(),
             };
 
             var publication2 = new Publication
             {
                 Title = "B",
                 Topic = topic,
+                Contact = new Contact(),
             };
 
             var publication3 = new Publication
             {
                 Title = "C",
                 Topic = topic,
+                Contact = new Contact(),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -188,18 +191,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "publication1",
                 Topic = new Topic { Theme = new Theme(), },
+                Contact = new Contact(),
             };
 
             var publication2 = new Publication
             {
                 Title = "publication2",
                 Topic = new Topic { Theme = new Theme(), },
+                Contact = new Contact(),
             };
 
             var publication3 = new Publication
             {
                 Title = "publication3",
                 Topic = new Topic { Theme = new Theme(), },
+                Contact = new Contact(),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -257,6 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Test Publication",
                 Topic = topic,
+                Contact = new Contact(),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -437,18 +444,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "A",
                 Topic = topic,
+                Contact = new Contact(),
             };
 
             var publication2 = new Publication
             {
                 Title = "B",
                 Topic = topic,
+                Contact = new Contact(),
             };
 
             var publication3 = new Publication
             {
                 Title = "C",
                 Topic = topic,
+                Contact = new Contact(),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -516,24 +526,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "publication1",
                 Topic = new Topic { Theme = new Theme(), },
+                Contact = new Contact(),
             };
 
             var publication2 = new Publication
             {
                 Title = "publication2",
                 Topic = new Topic { Theme = new Theme(), },
+                Contact = new Contact(),
             };
 
             var publication3 = new Publication
             {
                 Title = "publication3",
                 Topic = new Topic { Theme = new Theme(), },
+                Contact = new Contact(),
             };
 
             var publication4 = new Publication
             {
                 Title = "publication4",
                 Topic = new Topic { Theme = new Theme(), },
+                Contact = new Contact(),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -724,6 +738,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "publication1",
                 Topic = topic,
+                Contact = new Contact(),
                 Releases = new List<Release>
                 {
                     publication1Release1,
@@ -749,6 +764,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "publication2",
                 Topic = topic,
+                Contact = new Contact(),
                 Releases = ListOf(publication2Release1, publication2Release2),
             };
 
@@ -840,6 +856,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "publication1",
                 Topic = topic,
+                Contact = new Contact(),
                 Releases = ListOf(release),
                 Methodologies = ListOf(
                     new PublicationMethodology
@@ -953,6 +970,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publication1Release3,
                     publication1Release4,
                     publication1Release1),
+                Contact = new Contact(),
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1015,6 +1033,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "publication1",
                 Topic = topic,
+                Contact = new Contact(),
                 Releases = ListOf(publication1Release1, publication1Release2),
             };
 
@@ -1119,6 +1138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "publication1",
                 Topic = topic,
+                Contact = new Contact(),
                 Releases = ListOf(
                     publication1Release2,
                     publication1Release3,
@@ -1142,6 +1162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "publication2",
                 Topic = topic,
+                Contact = new Contact(),
                 Releases = ListOf(publication2Release2, publication2Release1),
             };
 
@@ -1278,6 +1299,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "publication1",
                 Topic = topic,
+                Contact = new Contact(),
                 Releases = ListOf(release),
                 Methodologies = ListOf(
                     new PublicationMethodology
@@ -2650,6 +2672,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Theme = new Theme(),
                 },
                 Published = DateTime.UtcNow,
+                Contact = new Contact(),
             };
 
             var supersededPublication1 = new Publication
@@ -2657,6 +2680,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Superseded title 1",
                 Slug = "superseded-slug-1",
                 SupersededBy = publication,
+                Contact = new Contact(),
             };
 
             var supersededPublication2 = new Publication
@@ -2664,6 +2688,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Superseded title 2",
                 Slug = "superseded-slug-2",
                 SupersededBy = publication,
+                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -2745,7 +2770,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Topic = new Topic
                 {
                     Title = "Test topic"
-                }
+                },
+                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -2785,13 +2811,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Test publication",
                 Slug = "test-publication",
-                Topic = topic
+                Topic = topic,
+                Contact = new Contact(),
             };
             var otherPublication = new Publication
             {
                 Title = "Duplicated title",
                 Slug = "duplicated-title",
-                Topic = topic
+                Topic = topic,
+                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
