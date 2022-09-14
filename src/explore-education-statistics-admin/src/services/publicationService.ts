@@ -76,6 +76,8 @@ export interface PublicationMethodologyDetails {
   externalMethodology?: ExternalMethodology;
 }
 
+// @MarkFix copy to create PublicationCreateRequest
+// and remove contact from PublicationSaveRequest
 export interface PublicationSaveRequest {
   title: string;
   summary: string;
@@ -156,6 +158,13 @@ const publicationService = {
 
   getContact(publicationId: string): Promise<Contact> {
     return client.get(`publication/${publicationId}/contact`);
+  },
+
+  updateContact(
+    publicationId: string,
+    updatedContact: SavePublicationContact,
+  ): Promise<Contact> {
+    return client.put(`publication/${publicationId}/contact`, updatedContact);
   },
 
   listReleases<TReleaseSummary extends ReleaseSummary = ReleaseSummary>(

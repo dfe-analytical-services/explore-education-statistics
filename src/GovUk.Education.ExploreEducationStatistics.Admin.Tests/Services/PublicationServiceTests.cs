@@ -17,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
@@ -2296,6 +2297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Slug = "superseded-slug",
                 SupersededBy = publication,
+                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -2494,6 +2496,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Title = "Test topic",
                     Theme = new Theme(),
                 },
+                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -3168,6 +3171,148 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var service = BuildPublicationService(context: contentDbContext);
 
             var result = await service.GetContact(Guid.NewGuid());
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task UpdateContact()
+        {
+            var publication = new Publication
+            {
+                Contact = new Contact
+                {
+                    ContactName = "contact name",
+                    ContactTelNo = "12345",
+                    TeamName = "team name",
+                    TeamEmail = "team@email.com",
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+                publicationCacheService.Setup(s => s.UpdatePublication(publication.Slug))
+                    .ReturnsAsync(new PublicationCacheViewModel());
+
+                var service = BuildPublicationService(context: contentDbContext,
+                    publicationCacheService: publicationCacheService.Object);
+
+                var updatedContact = new Contact
+                {
+                    ContactName = "new contact name",
+                    ContactTelNo = "12345 6789",
+                    TeamName = "new team name",
+                    TeamEmail = "new_team@email.com",
+                };
+
+                var result = await service.UpdateContact(publication.Id, updatedContact);
+                var contact = result.AssertRight();
+
+                Assert.Equal(updatedContact.ContactName, contact.ContactName);
+                Assert.Equal(updatedContact.ContactTelNo, contact.ContactTelNo);
+                Assert.Equal(updatedContact.TeamName, contact.TeamName);
+                Assert.Equal(updatedContact.TeamEmail, contact.TeamEmail);
+
+                var dbPublication = await contentDbContext.Publications
+                    .Include(p => p.Contact)
+                    .SingleAsync(p => p.Id == publication.Id);
+
+                Assert.Equal(updatedContact.ContactName, dbPublication.Contact.ContactName);
+                Assert.Equal(updatedContact.ContactTelNo, dbPublication.Contact.ContactTelNo);
+                Assert.Equal(updatedContact.TeamName, dbPublication.Contact.TeamName);
+                Assert.Equal(updatedContact.TeamEmail, dbPublication.Contact.TeamEmail);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateContact_SharedContact()
+        {
+            var sharedContact = new Contact
+            {
+                ContactName = "contact name",
+                ContactTelNo = "12345",
+                TeamName = "team name",
+                TeamEmail = "team@email.com",
+            };
+
+            var publication1 = new Publication
+            {
+                Contact = sharedContact,
+            };
+
+            var publication2 = new Publication
+            {
+                Contact = sharedContact,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddRangeAsync(publication1, publication2);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+                publicationCacheService.Setup(s => s.UpdatePublication(publication1.Slug))
+                    .ReturnsAsync(new PublicationCacheViewModel());
+
+                var service = BuildPublicationService(context: contentDbContext,
+                    publicationCacheService: publicationCacheService.Object);
+
+                var updatedContact = new Contact
+                {
+                    ContactName = "new contact name",
+                    ContactTelNo = "12345 6789",
+                    TeamName = "new team name",
+                    TeamEmail = "new_team@email.com",
+                };
+
+                var result = await service.UpdateContact(publication1.Id, updatedContact);
+                var contact = result.AssertRight();
+
+                Assert.Equal(updatedContact.ContactName, contact.ContactName);
+                Assert.Equal(updatedContact.ContactTelNo, contact.ContactTelNo);
+                Assert.Equal(updatedContact.TeamName, contact.TeamName);
+                Assert.Equal(updatedContact.TeamEmail, contact.TeamEmail);
+
+                var dbPublication1 = contentDbContext.Publications
+                    .Include(p => p.Contact)
+                    .Single(p => p.Id == publication1.Id);
+
+                Assert.Equal(updatedContact.ContactName, dbPublication1.Contact.ContactName);
+                Assert.Equal(updatedContact.ContactTelNo, dbPublication1.Contact.ContactTelNo);
+                Assert.Equal(updatedContact.TeamName, dbPublication1.Contact.TeamName);
+                Assert.Equal(updatedContact.TeamEmail, dbPublication1.Contact.TeamEmail);
+
+                var dbPublication2 = contentDbContext.Publications
+                    .Include(p => p.Contact)
+                    .Single(p => p.Id == publication2.Id);
+
+                Assert.Equal(sharedContact.ContactName, dbPublication2.Contact.ContactName);
+                Assert.Equal(sharedContact.ContactTelNo, dbPublication2.Contact.ContactTelNo);
+                Assert.Equal(sharedContact.TeamName, dbPublication2.Contact.TeamName);
+                Assert.Equal(sharedContact.TeamEmail, dbPublication2.Contact.TeamEmail);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateContact_NoPublication()
+        {
+            var contentDbContext = InMemoryApplicationDbContext();
+
+            var service = BuildPublicationService(context: contentDbContext);
+
+            var result = await service.UpdateContact(
+                Guid.NewGuid(), new Contact());
             result.AssertNotFound();
         }
 

@@ -485,6 +485,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task UpdateContact()
+        {
+            var publication = new Publication
+            {
+                Contact = new Contact
+                {
+                    ContactName = "test",
+                    ContactTelNo = "1234",
+                    TeamEmail = "test@test.com",
+                    TeamName = "test",
+                },
+            };
+
+            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(publication, SecurityPolicies.CanUpdateSpecificPublication)
+                .AssertForbidden(async userService =>
+                {
+                    var contentDbContext = InMemoryApplicationDbContext();
+                    await contentDbContext.Publications.AddAsync(publication);
+                    await contentDbContext.SaveChangesAsync();
+
+                    var service = BuildPublicationService(
+                        context: contentDbContext,
+                        userService: userService.Object);
+                    return await service.UpdateContact(publication.Id, new Contact());
+                });
+        }
+
+        [Fact]
         public void ListActiveReleases()
         {
             var userService = AlwaysTrueUserService();

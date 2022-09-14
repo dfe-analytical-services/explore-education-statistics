@@ -187,7 +187,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             PublicationSaveRequest updatedPublication)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId)
+                .CheckEntityExists<Publication>(publicationId, query =>
+                    query.Include(p => p.Contact))
                 .OnSuccess(_userService.CheckCanUpdatePublication)
                 .OnSuccessDo(async publication =>
                 {
@@ -234,18 +235,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         publication.Slug = updatedPublication.Slug;
                     }
 
-                    // ExternalMethodology is absent as it's updated by a different endpoint
                     publication.Title = updatedPublication.Title;
                     publication.Summary = updatedPublication.Summary;
                     publication.TopicId = updatedPublication.TopicId;
                     publication.Updated = DateTime.UtcNow;
                     publication.SupersededById = updatedPublication.SupersededById;
 
-                    // Add new contact if it doesn't exist, otherwise replace existing
-                    // contact that is shared with another publication with a new
+                    // Replace existing contact that is shared with another publication with a new
                     // contact, as we want each publication to have its own contact.
-                    if (publication.Contact == null ||
-                        _context.Publications
+                    if (_context.Publications
                             .Any(p => p.ContactId == publication.ContactId && p.Id != publication.Id))
                     {
                         publication.Contact = new Contact();
@@ -375,6 +373,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Publication>(publicationId)
                 .OnSuccessDo(_userService.CheckCanViewPublication)
                 .OnSuccess(publication => _mapper.Map<ContactViewModel>(publication.Contact));
+        }
+
+        public async Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId, Contact updatedContact)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId, query =>
+                    query.Include(p => p.Contact))
+                .OnSuccessDo(_userService.CheckCanUpdatePublication)
+                .OnSuccess(async publication =>
+                {
+                    // Replace existing contact that is shared with another publication with a new
+                    // contact, as we want each publication to have its own contact.
+                    if (_context.Publications
+                            .Any(p => p.ContactId == publication.ContactId && p.Id != publication.Id))
+                    {
+                        publication.Contact = new Contact();
+                    }
+
+                    publication.Contact.ContactName = updatedContact.ContactName;
+                    publication.Contact.ContactTelNo = updatedContact.ContactTelNo;
+                    publication.Contact.TeamName = updatedContact.TeamName;
+                    publication.Contact.TeamEmail = updatedContact.TeamEmail;
+                    await _context.SaveChangesAsync();
+
+                    // Clear cache because Contact is in Content.Services.ViewModels.PublicationViewModel
+                    await _publicationCacheService.UpdatePublication(publication.Slug);
+
+                    return _mapper.Map<ContactViewModel>(updatedContact);
+                });
         }
 
         public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>>

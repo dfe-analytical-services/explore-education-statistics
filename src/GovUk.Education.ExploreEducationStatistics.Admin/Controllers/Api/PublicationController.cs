@@ -101,6 +101,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        [HttpPut("api/publication/{publicationId:guid}/contact")]
+        public async Task<ActionResult<ContactViewModel>> UpdateContact(
+            Guid publicationId, Contact updatedContact)
+        {
+            return await _publicationService.UpdateContact(publicationId, updatedContact)
+                .HandleFailuresOrOk();
+        }
 
         [HttpGet("api/publication/{publicationId}/releases")]
         public async Task<ActionResult<PaginatedListViewModel<ReleaseSummaryViewModel>>> ListActiveReleases(
