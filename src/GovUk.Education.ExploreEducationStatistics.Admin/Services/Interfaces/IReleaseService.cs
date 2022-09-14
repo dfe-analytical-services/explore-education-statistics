@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(Guid releaseId, ReleaseUpdateRequest request);
 
-        Task<Either<ActionResult, TitleAndIdViewModel?>> GetLatestPublishedRelease(Guid publicationId);
+        Task<Either<ActionResult, IdTitleViewModel?>> GetLatestPublishedRelease(Guid publicationId);
 
         Task<Either<ActionResult, List<ReleaseViewModel>>> ListReleasesWithStatuses(
             params ReleaseApprovalStatus[] releaseApprovalStatues);

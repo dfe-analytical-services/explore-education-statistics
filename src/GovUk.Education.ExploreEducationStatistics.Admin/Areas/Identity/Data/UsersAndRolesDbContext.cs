@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
             if (updateTimestamps)
             {
                 ChangeTracker.StateChanged += DbContextUtils.UpdateTimestamps;
-                ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;   
+                ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;
             }
         }
 
@@ -298,6 +298,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                         Id = -40,
                         RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.AdoptAnyMethodology.ToString(),
+                        ClaimValue = "",
+                    },
+                    new IdentityRoleClaim<string>
+                    {
+                        Id = -41,
+                        RoleId = bauRoleId,
+                        ClaimType = SecurityClaimTypes.AccessAllPublications.ToString(),
                         ClaimValue = "",
                     }
                 );

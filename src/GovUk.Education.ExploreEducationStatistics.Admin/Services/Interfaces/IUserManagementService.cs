@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<UserViewModel>>> ListAllUsers();
 
-        Task<Either<ActionResult, List<TitleAndIdViewModel>>> ListReleases();
+        Task<Either<ActionResult, List<IdTitleViewModel>>> ListReleases();
 
         Task<List<UserViewModel>> ListPreReleaseUsersAsync();
 

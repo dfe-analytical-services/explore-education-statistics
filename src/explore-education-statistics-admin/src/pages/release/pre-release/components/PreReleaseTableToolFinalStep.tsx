@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import { preReleaseContentRoute } from '@admin/routes/preReleaseRoutes';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
-import { BasicPublicationDetails } from '@admin/services/publicationService';
+import { Publication } from '@admin/services/publicationService';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
@@ -13,7 +13,7 @@ import React, { memo, useRef } from 'react';
 import { generatePath } from 'react-router-dom';
 
 interface TableToolFinalStepProps {
-  publication?: BasicPublicationDetails;
+  publication?: Publication;
   query: ReleaseTableDataQuery;
   releaseId: string;
   table: FullTable;

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
@@ -47,8 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IPublicationRepository publicationRepository,
             IMethodologyVersionRepository methodologyVersionRepository,
-            IPublicationCacheService publicationCacheService, 
-            IMethodologyCacheService methodologyCacheService, 
+            IPublicationCacheService publicationCacheService,
+            IMethodologyCacheService methodologyCacheService,
             IThemeCacheService themeCacheService)
         {
             _context = context;
@@ -62,15 +63,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _themeCacheService = themeCacheService;
         }
 
+        public async Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(
+            bool permissions = false,
+            Guid? topicId = null)
+        {
+            return await _userService
+                .CheckCanAccessSystem()
+                .OnSuccess(_ => _userService.CheckCanViewAllPublications()
+                    .OnSuccess(async () =>
+                    {
+                        var hydratedPublication = HydratePublication(
+                            _publicationRepository.QueryPublicationsForTopic(topicId));
+                        return await hydratedPublication.ToListAsync();
+                    })
+                    .OrElse(() =>
+                    {
+                        var userId = _userService.GetUserId();
+                        return _publicationRepository.ListPublicationsForUser(userId, topicId);
+                    })
+                )
+                .OnSuccess(async publications =>
+                {
+                    return await publications
+                        .ToAsyncEnumerable()
+                        .SelectAwait(async publication => await GeneratePublicationViewModel(publication, permissions))
+                        .OrderBy(publicationViewModel => publicationViewModel.Title)
+                        .ToListAsync();
+                });
+        }
+
         public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(
             Guid topicId)
         {
             return await _userService
                 .CheckCanAccessSystem()
                 .OnSuccess(_ => _userService.CheckCanViewAllReleases()
-                    .OnSuccess(() => _publicationRepository.GetAllPublicationsForTopic(topicId))
+                    .OnSuccess(async () =>
+                    {
+                        var hydratedPublication = HydratePublication(
+                            _publicationRepository.QueryPublicationsForTopic(topicId));
+                        return await hydratedPublication.ToListAsync();
+                    })
                     .OrElse(() =>
-                        _publicationRepository.GetPublicationsForTopicRelatedToUser(topicId, _userService.GetUserId()))
+                    {
+                        var userId = _userService.GetUserId();
+                        return _publicationRepository.ListPublicationsForUser(userId, topicId);
+                    })
                 )
                 .OnSuccess(async publicationViewModels =>
                 {
@@ -116,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
-            PublicationSaveViewModel publication)
+            PublicationSaveRequest publication)
         {
             return await ValidateSelectedTopic(publication.TopicId)
                 .OnSuccess(async _ =>
@@ -152,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(
             Guid publicationId,
-            PublicationSaveViewModel updatedPublication)
+            PublicationSaveRequest updatedPublication)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
@@ -282,7 +320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId, HydratePublicationForPublicationViewModel)
+                .CheckEntityExists<Publication>(publicationId, HydratePublication)
                 .OnSuccess(_userService.CheckCanViewPublication)
                 .OnSuccess(publication => _mapper.Map<PublicationViewModel>(publication));
         }
@@ -386,17 +424,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        public static IQueryable<Publication> HydratePublicationForPublicationViewModel(IQueryable<Publication> values)
+        public static IQueryable<Publication> HydratePublication(IQueryable<Publication> values)
         {
             return values
                 .AsSplitQuery()
                 .Include(p => p.Contact)
-                .Include(p => p.Releases)
+                .Include(p => p.Releases) // EES-3576 remove when MyPublicationViewModel is gone
                 .ThenInclude(r => r.ReleaseStatuses)
                 .Include(p => p.Topic)
-                .Include(p => p.Methodologies)
-                .ThenInclude(p => p.Methodology)
+                .ThenInclude(topic => topic.Theme)
+                .Include(p => p.Methodologies) // EES-3576 remove when MyPublicationViewModel is gone
+                .ThenInclude(p => p.Methodology) // EES-3576 remove when MyPublicationViewModel is gone
                 .ThenInclude(p => p.Versions);
+        }
+
+        private async Task<PublicationViewModel> GeneratePublicationViewModel(Publication publication, bool permissions)
+        {
+            var publicationViewModel = _mapper.Map<PublicationViewModel>(publication);
+
+            publicationViewModel.IsSuperseded = _publicationRepository.IsSuperseded(publication);
+
+            if (permissions)
+            {
+                publicationViewModel.Permissions =
+                    await PermissionsUtils.GetPublicationPermissions(_userService, publication);
+            }
+
+            return publicationViewModel;
         }
 
         private async Task<List<MyPublicationViewModel>> HydrateMyPublicationsViewModels(List<Publication> publications)

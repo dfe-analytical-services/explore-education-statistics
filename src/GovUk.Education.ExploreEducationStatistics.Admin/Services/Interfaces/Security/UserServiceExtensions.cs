@@ -113,6 +113,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(SecurityPolicies.CanViewAllReleases);
         }
 
+        public static Task<Either<ActionResult, Unit>> CheckCanViewAllPublications(this IUserService userService)
+        {
+            return userService.CheckPolicy(SecurityPolicies.CanViewAllPublications);
+        }
+
         public static Task<Either<ActionResult, Unit>> CheckCanManageAllTaxonomy(this IUserService userService)
         {
             return userService.CheckPolicy(SecurityPolicies.CanManageAllTaxonomy);

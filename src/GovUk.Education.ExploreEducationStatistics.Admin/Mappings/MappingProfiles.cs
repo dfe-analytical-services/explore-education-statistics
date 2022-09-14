@@ -66,19 +66,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.ScheduledWithRelease,
                     m => m.Ignore());
 
-            CreateMap<MethodologyVersion, TitleAndIdViewModel>();
+            CreateMap<MethodologyVersion, IdTitleViewModel>();
 
+            CreateMap<Theme, IdTitleViewModel>();
+            CreateMap<Topic, IdTitleViewModel>();
             CreateMap<Publication, PublicationViewModel>()
-                .ForMember(dest => dest.Releases,
-                    m => m.MapFrom(p => p.Releases
-                        .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))))
-                .ForMember(dest => dest.Methodologies, m => m.MapFrom(p =>
-                    p.Methodologies
-                        .Select(methodologyLink => methodologyLink.Methodology.LatestVersion())
-                        .OrderBy(methodology => methodology.Title)))
                 .ForMember(
-                    dest => dest.ThemeId,
-                    m => m.MapFrom(p => p.Topic.ThemeId));
+                    dest => dest.Theme,
+                    m => m.MapFrom(p => p.Topic.Theme));
 
             CreateMap<Publication, MyPublicationViewModel>()
                 .ForMember(

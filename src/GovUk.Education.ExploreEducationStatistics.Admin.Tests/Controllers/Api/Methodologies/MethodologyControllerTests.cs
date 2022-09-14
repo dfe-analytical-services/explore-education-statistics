@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             methodologyService
                 .Setup(s => s.GetUnpublishedReleasesUsingMethodology(_id))
-                .ReturnsAsync(ListOf(new TitleAndIdViewModel()));
+                .ReturnsAsync(ListOf(new IdTitleViewModel()));
 
             var controller = SetupMethodologyController(methodologyService.Object);
 

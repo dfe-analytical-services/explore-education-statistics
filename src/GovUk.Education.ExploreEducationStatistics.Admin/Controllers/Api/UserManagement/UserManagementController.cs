@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         /// <returns>Id and Title of the releases</returns>
         [HttpGet("releases")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<List<TitleAndIdViewModel>>> GetReleases()
+        public async Task<ActionResult<List<IdTitleViewModel>>> GetReleases()
         {
             return await _userManagementService
                 .ListReleases()

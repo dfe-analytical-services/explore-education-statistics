@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         }
 
         [HttpGet("methodology/{methodologyVersionId:guid}/unpublished-releases")]
-        public async Task<ActionResult<List<TitleAndIdViewModel>>> GetUnpublishedReleasesUsingMethodology(
+        public async Task<ActionResult<List<IdTitleViewModel>>> GetUnpublishedReleasesUsingMethodology(
             Guid methodologyVersionId)
         {
             return await _methodologyService

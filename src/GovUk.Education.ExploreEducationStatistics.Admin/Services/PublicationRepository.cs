@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -17,32 +16,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class PublicationRepository : IPublicationRepository
     {
         private readonly ContentDbContext _context;
-        private readonly IMapper _mapper;
 
-        public PublicationRepository(ContentDbContext context, IMapper mapper)
+        public PublicationRepository(ContentDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
-        public async Task<List<Publication>> GetAllPublicationsForTopic(Guid topicId)
+        public IQueryable<Publication> QueryPublicationsForTopic(Guid? topicId = null)
         {
-            return await HydratePublicationForPublicationViewModel(_context.Publications)
-                .Where(publication => publication.TopicId == topicId)
-                .ToListAsync();
+            return _context.Publications
+                .Where(publication => topicId == null || publication.TopicId == topicId);
         }
 
-        public async Task<List<Publication>> GetPublicationsForTopicRelatedToUser(
-            Guid topicId,
-            Guid userId)
+        public async Task<List<Publication>> ListPublicationsForUser(
+            Guid userId,
+            Guid? topicId = null)
         {
-            var publicationsGrantedByPublicationRole = await _context
+            // EES-3576 Move hydration to PublicationService, and change to return an IQueryable
+            var publicationsGrantedByPublicationRoleQueryable = _context
                 .UserPublicationRoles
                 .AsQueryable()
                 .Where(userPublicationRole => userPublicationRole.UserId == userId &&
-                                              userPublicationRole.Publication.TopicId == topicId &&
                                               ListOf(PublicationRole.Owner, PublicationRole.ReleaseApprover)
-                                                  .Contains(userPublicationRole.Role))
+                                                  .Contains(userPublicationRole.Role));
+
+            if (topicId.HasValue)
+            {
+                publicationsGrantedByPublicationRoleQueryable =
+                    publicationsGrantedByPublicationRoleQueryable.Where(userPublicationRole =>
+                        userPublicationRole.Publication.TopicId == topicId.Value);
+            }
+
+            var publicationsGrantedByPublicationRole = await publicationsGrantedByPublicationRoleQueryable
                 .Select(userPublicationRole => userPublicationRole.Publication)
                 .ToListAsync();
 
@@ -50,11 +55,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(publication => publication.Id)
                 .ToList();
 
-            var releasesGrantedByReleaseRoles = await _context.UserReleaseRoles
+            var releasesGrantedByReleaseRolesQueryable = _context.UserReleaseRoles
                 .Include(userReleaseRole => userReleaseRole.Release.Publication)
                 .Where(userReleaseRole => userReleaseRole.UserId == userId &&
-                                          userReleaseRole.Release.Publication.TopicId == topicId &&
-                                          userReleaseRole.Role != ReleaseRole.PrereleaseViewer)
+                                          userReleaseRole.Role != ReleaseRole.PrereleaseViewer);
+
+            if (topicId.HasValue)
+            {
+                releasesGrantedByReleaseRolesQueryable =
+                    releasesGrantedByReleaseRolesQueryable.Where(userReleaseRole =>
+                        userReleaseRole.Release.Publication.TopicId == topicId.Value);
+            }
+
+            var releasesGrantedByReleaseRoles = await releasesGrantedByReleaseRolesQueryable
                 .Select(userReleaseRole => userReleaseRole.Release)
                 .ToListAsync();
 
@@ -64,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             publications.AddRange(await publicationsGrantedByPublicationRole
                 .SelectAsync(async publication =>
                     // Include all Releases of the Publication unconditionally
-                    await HydratePublicationForPublicationViewModel(_context.Publications)
+                    await HydratePublication(_context.Publications)
                         .FirstAsync(p => p.Id == publication.Id)));
 
             // Add publication view models for the Publications granted indirectly via Release roles
@@ -104,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Publication> GetPublicationWithAllReleases(Guid publicationId)
         {
-            return await HydratePublicationForPublicationViewModel(_context.Publications)
+            return await HydratePublication(_context.Publications)
                 .FirstAsync(p => p.Id == publicationId);
         }
 
@@ -128,6 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return publication.LatestRelease();
         }
 
+        // NOTE: Should be removed as part of EES-3576
         private async Task<Publication> GetPublicationWithFilteredReleases(Guid publicationId,
             IEnumerable<Guid> releaseIds)
         {
@@ -137,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             //   be tracked otherwise it will affect any other code retrieving Publication from the context that's
             //   expecting an unfiltered list of Releases. Entities tracked by the context can be returned immediately
             //   without making a request to the database, e.g. when using DbContext.Find/FindAsync.
-            var hydratedPublication = await HydratePublicationForPublicationViewModel(_context.Publications)
+            var hydratedPublication = await HydratePublication(_context.Publications)
                 .AsNoTracking()
                 .FirstAsync(p => p.Id == publicationId);
 

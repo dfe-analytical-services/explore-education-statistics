@@ -189,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("publications/{publicationId}/releases/template")]
-        public async Task<ActionResult<TitleAndIdViewModel>> GetTemplateRelease(
+        public async Task<ActionResult<IdTitleViewModel>> GetTemplateRelease(
             [Required] Guid publicationId)
         {
             return await _releaseService

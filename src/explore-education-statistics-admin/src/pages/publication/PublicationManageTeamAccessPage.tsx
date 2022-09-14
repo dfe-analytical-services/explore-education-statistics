@@ -9,7 +9,7 @@ import {
   PublicationRouteParams,
 } from '@admin/routes/routes';
 import publicationService, {
-  BasicPublicationDetails,
+  Publication,
 } from '@admin/services/publicationService';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -24,7 +24,7 @@ import { generatePath, useHistory } from 'react-router-dom';
 
 interface Model {
   releases: ReleaseSummary[];
-  publication: BasicPublicationDetails;
+  publication: Publication;
 }
 
 const PublicationManageTeamAccessPage = ({

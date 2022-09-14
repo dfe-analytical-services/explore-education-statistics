@@ -4,7 +4,7 @@ import {
   releaseTableToolRoute,
 } from '@admin/routes/releaseRoutes';
 import _publicationService, {
-  BasicPublicationDetails,
+  Publication,
   PublicationContactDetails,
 } from '@admin/services/publicationService';
 import _tableBuilderService from '@common/services/tableBuilderService';
@@ -32,14 +32,14 @@ const testContact: PublicationContactDetails = {
   teamName: 'Team Smith',
 };
 
-const testPublication: BasicPublicationDetails = {
+const testPublication: Publication = {
   contact: testContact,
   id: 'publication-1',
   title: 'Pupil absence',
   summary: 'Pupil absence summary',
   slug: 'pupil-absence',
-  themeId: 'theme-1',
-  topicId: 'topic-1',
+  theme: { id: 'theme-1', title: 'Test theme' },
+  topic: { id: 'topic-1', title: 'Test topic' },
 };
 
 describe('ReleaseTableToolPage', () => {
