@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 /* eslint-disable camelcase */
 import puppeteer, { Page } from 'puppeteer';
 import getChromePath from './getChromePath';
@@ -88,6 +87,7 @@ const getAuthTokensAzure = async (
   await emailInput[0].type(email);
 
   const btn = await page.$x("//*[@type='submit']");
+
   await btn[0].click();
 
   await page.waitForXPath("//*[.='Enter password']", {

@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 import fs from 'fs';
 import dotenvJson from 'dotenv-json-complex';
 import { EnvironmentAndUsers } from '../utils/environmentAndUsers';
@@ -24,7 +23,6 @@ const getEnvironmentAndUsers = async (
   environmentName: string,
   userNames: string[],
 ): Promise<EnvironmentAndUsers> => {
-  /* eslint-disable-next-line @typescript-eslint/no-var-requires */
   dotenvJson({ environment: environmentName });
 
   const environment = JSON.parse(

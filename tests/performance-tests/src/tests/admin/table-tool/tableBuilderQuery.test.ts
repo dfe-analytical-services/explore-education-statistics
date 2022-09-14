@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 /* eslint-disable no-console */
 import { check } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
@@ -49,10 +50,8 @@ export const tableQueryFailureCount = new Counter(
   'ees_table_query_failure_count',
 );
 
-/* eslint-disable no-restricted-globals */
 const subjectFile = open('admin/import/assets/dates.csv', 'b');
 const subjectMetaFile = open('admin/import/assets/dates.meta.csv', 'b');
-/* eslint-enable no-restricted-globals */
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT as string,

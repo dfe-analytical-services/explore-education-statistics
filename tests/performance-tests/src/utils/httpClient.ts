@@ -5,11 +5,11 @@ interface HttpHeaders {
 }
 
 export default class HttpClient {
-  private readonly baseUrl: string;
+  private baseUrl: string;
 
-  private readonly accessToken: string;
+  private accessToken: string;
 
-  private readonly checkResponseStatus;
+  private checkResponseStatus: boolean;
 
   constructor({
     baseUrl,
