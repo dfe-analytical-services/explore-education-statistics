@@ -39,9 +39,33 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
             Url = ""
         },
         LatestReleaseId = Guid.NewGuid(),
-        Methodologies = new List<MethodologyVersionSummaryViewModel>(),
-        LegacyReleases = new List<LegacyReleaseViewModel>(),
-        Releases = new List<ReleaseTitleViewModel>(),
+        Methodologies = new List<MethodologyVersionSummaryViewModel>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Slug = "",
+                Title = ""
+            }
+        },
+        LegacyReleases = new List<LegacyReleaseViewModel>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Description = "",
+                Url = ""
+            }
+        },
+        Releases = new List<ReleaseTitleViewModel>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Slug = "",
+                Title = ""
+            }
+        },
         Topic = new TopicViewModel(new ThemeViewModel(""))
     };
 
