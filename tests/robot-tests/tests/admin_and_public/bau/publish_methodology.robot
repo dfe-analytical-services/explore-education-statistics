@@ -118,13 +118,11 @@ Verify that the methodology is visible on the public methodologies page with the
     user checks page contains methodology link
     ...    %{TEST_TOPIC_NAME}
     ...    ${PUBLICATION_NAME}
-    ...    ${PUBLICATION_NAME}
     ...    ${PUBLIC_METHODOLOGY_URL_ENDING}
 
 Verify that the methodology is publicly accessible
     user clicks methodology link
     ...    %{TEST_TOPIC_NAME}
-    ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}
     user waits until page contains title caption    Methodology
@@ -325,7 +323,6 @@ Verify that the amended methodology is visible on the public methodologies page
     user scrolls down    400
     user checks page contains methodology link
     ...    %{TEST_TOPIC_NAME}
-    ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - Amended methodology
     ...    ${PUBLIC_METHODOLOGY_URL_ENDING}
 

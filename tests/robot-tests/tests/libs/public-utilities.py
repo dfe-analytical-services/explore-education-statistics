@@ -61,38 +61,30 @@ def user_checks_other_release_is_shown_in_position(release_name, position):
 
 
 # Methodology
-def user_checks_page_contains_methodology_link(topic, publication, methodology, link_url_ending):
-    link = get_methodology_link(topic, publication, methodology)
+def user_checks_page_contains_methodology_link(topic, methodology, link_url_ending):
+    link = get_methodology_link(topic, methodology)
 
     if not link.get_attribute('href').endswith(link_url_ending):
         raise_assertion_error(
-            f'Methodology link with title "{methodology}" should be linking to "{link_url}", but is '
+            f'Methodology link with title "{methodology}" should be linking to "{link_url_ending}", but is '
             f'linking to "{link.get_attribute("href")}" instead!')
 
 
-def user_clicks_methodology_link(topic, publication, methodology):
-    get_methodology_link(topic, publication, methodology).click()
+def user_clicks_methodology_link(topic, methodology):
+    get_methodology_link(topic, methodology).click()
 
 
-def get_methodology_link(topic, publication, methodology):
+def get_methodology_link(topic, methodology):
     try:
         sl.driver.find_element(By.XPATH, f'//summary/span[text()="{topic}"]')
     except BaseException:
         raise_assertion_error(f'Cannot find theme "{topic}" on page')
 
     try:
-        sl.driver.find_element(By.XPATH,
-                               f'//summary/span[text()="{topic}"]/../..//h3[text()="{publication}"]')
-    except BaseException:
-        raise_assertion_error(f'Topic "{topic}" doesn\'t contain publication "{publication}"!')
-
-    try:
-        return sl.driver.find_element(By.XPATH,
-                                      f'//h3[text()="{publication}"]/..//a[text()="{methodology}"]')
+        return sl.driver.find_element(By.XPATH, f'//*[@data-testid="methodology-list"]//li//a[text()="{methodology}"]')
     except BaseException:
         raise_assertion_error(
             f'Could not find methodology link with title "{methodology}""!')
-
 
 # Table tool
 def user_checks_generated_permalink_is_valid():

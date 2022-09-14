@@ -17,12 +17,10 @@ Navigate to Pupil absence in schools in England methodology page
 Go to Pupil absence methodology page
     user checks page contains methodology link
     ...    Pupil absence
-    ...    Pupil absence in schools in England
     ...    Pupil absence statistics: methodology
     ...    %{PUBLIC_URL}/methodology/pupil-absence-in-schools-in-england
     user clicks methodology link
     ...    Pupil absence
-    ...    Pupil absence in schools in England
     ...    Pupil absence statistics: methodology
     user waits until h1 is visible    Pupil absence statistics: methodology
     user waits until page contains title caption    Methodology

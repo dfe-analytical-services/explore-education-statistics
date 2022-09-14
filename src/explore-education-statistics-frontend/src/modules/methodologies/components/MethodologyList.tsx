@@ -16,26 +16,17 @@ function MethodologyList({ publications }: Props) {
   }
 
   return (
-    <ul>
+    <ul data-testid="methodology-list">
       {filteredPublications.map(publication => (
-        <li className="govuk-!-margin-bottom-2" key={publication.id}>
-          <h3
-            className="govuk-heading-s govuk-!-margin-bottom-0"
-            id={`methodology-heading-${publication.id}`}
-          >
-            {publication.title}
-          </h3>
-
-          <ul>
-            {publication.methodologies.map(methodology => (
-              <li key={methodology.id}>
-                <Link to={`/methodology/${methodology.slug}`}>
-                  {methodology.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </li>
+        <>
+          {publication.methodologies.map(methodology => (
+            <li key={methodology.id} className="govuk-!-margin-bottom-2">
+              <Link to={`/methodology/${methodology.slug}`}>
+                {methodology.title}
+              </Link>
+            </li>
+          ))}
+        </>
       ))}
     </ul>
   );

@@ -1,6 +1,6 @@
 """
 This utility class is responsible for allowing us to control the fail-fast behaviour of Robot Test Suites if one of
-their Tests fails.  If the "fail tests suites fast" option is enabled, this file's methods are called from Robot
+their Tests fails. If the "fail tests suites fast" option is enabled, this file's methods are called from Robot
 scripts, firstly to record that a test suite is failing, and then again on subsequent Tests starting to see if they
 should continue to run or if they should fail immediately and therefore fail the test suite immediately.
 """
