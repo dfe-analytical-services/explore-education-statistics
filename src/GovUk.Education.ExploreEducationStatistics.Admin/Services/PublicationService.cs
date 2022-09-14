@@ -351,6 +351,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, Unit>> RemoveExternalMethodology(
+            Guid publicationId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId)
+                .OnSuccessDo(_userService.CheckCanUpdatePublication)
+                .OnSuccess(publication =>
+                {
+                    _context.Update(publication);
+                    publication.ExternalMethodology = null;
+                    _context.SaveChangesAsync();
+
+                    return Unit.Instance;
+                });
+        }
+
         public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>>
             ListActiveReleasesPaginated(
                 Guid publicationId,

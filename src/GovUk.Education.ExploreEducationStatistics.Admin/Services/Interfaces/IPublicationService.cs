@@ -38,6 +38,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, ExternalMethodologyViewModel>> UpdateExternalMethodology(
             Guid publicationId, ExternalMethodology updatedExternalMethodology);
 
+        Task<Either<ActionResult, Unit>> RemoveExternalMethodology(
+            Guid publicationId);
+
         Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>> ListActiveReleasesPaginated(
             Guid publicationId,
             int page,

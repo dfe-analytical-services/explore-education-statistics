@@ -195,7 +195,6 @@ describe('MethodologySummary', () => {
         <Router history={history}>
           <MethodologySummary
             publication={testPublicationNoMethodology}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </Router>,
@@ -226,7 +225,6 @@ describe('MethodologySummary', () => {
                 canCreateMethodologies: false,
               },
             }}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -250,7 +248,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationNoMethodology}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -264,7 +261,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationNoMethodology}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -300,7 +296,6 @@ describe('MethodologySummary', () => {
                 canAdoptMethodologies: false,
               },
             }}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -330,7 +325,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithMethodology}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -362,7 +356,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithMethodology}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -378,7 +371,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithDraftMethodology}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -405,7 +397,6 @@ describe('MethodologySummary', () => {
                 },
               ],
             }}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -440,7 +431,6 @@ describe('MethodologySummary', () => {
                 },
               ],
             }}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -475,7 +465,6 @@ describe('MethodologySummary', () => {
                 },
               ],
             }}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -501,7 +490,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithAmendmentMethodology}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -533,7 +521,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithAmendmentMethodology}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -561,7 +548,6 @@ describe('MethodologySummary', () => {
                 },
               ],
             }}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -597,7 +583,6 @@ describe('MethodologySummary', () => {
                 },
               ],
             }}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -633,7 +618,6 @@ describe('MethodologySummary', () => {
                 },
               ],
             }}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -661,7 +645,6 @@ describe('MethodologySummary', () => {
         <Router history={history}>
           <MethodologySummary
             publication={testPublicationNoMethodology}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </Router>,
@@ -687,7 +670,6 @@ describe('MethodologySummary', () => {
           <MemoryRouter>
             <MethodologySummary
               publication={testPublicationWithExternalMethodology}
-              topicId={testTopicId}
               onChangePublication={noop}
             />
           </MemoryRouter>,
@@ -729,7 +711,6 @@ describe('MethodologySummary', () => {
                   canManageExternalMethodology: false,
                 },
               }}
-              topicId={testTopicId}
               onChangePublication={noop}
             />
           </MemoryRouter>,
@@ -764,7 +745,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithExternalMethodology}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -806,7 +786,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithExternalMethodology}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -830,17 +809,12 @@ describe('MethodologySummary', () => {
 
       userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
-      const updatedPublication: UpdatePublicationRequest = {
-        title: testPublicationWithExternalMethodology.title,
-        summary: testPublicationWithExternalMethodology.summary,
-        contact: testContact,
-        topicId: testTopicId,
-      };
-
       await waitFor(() => {
-        expect(publicationService.updatePublication).toHaveBeenCalledWith<
-          Parameters<typeof publicationService.updatePublication>
-        >(testPublicationWithExternalMethodology.id, updatedPublication);
+        expect(
+          publicationService.removeExternalMethodology,
+        ).toHaveBeenCalledWith<
+          Parameters<typeof publicationService.removeExternalMethodology>
+        >(testPublicationWithExternalMethodology.id);
       });
     });
   });
@@ -851,7 +825,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithMethodologyCanRemove}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -879,7 +852,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithMethodologyCanRemove}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -913,7 +885,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithMethodologyCanRemove}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -949,7 +920,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithMethodologyCanAmend}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -969,7 +939,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithMethodology}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -985,7 +954,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithMethodologyCanAmend}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -1034,7 +1002,6 @@ describe('MethodologySummary', () => {
         <Router history={history}>
           <MethodologySummary
             publication={testPublicationWithMethodologyCanAmend}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </Router>,
@@ -1076,7 +1043,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithMethodologyCanCancelAmend}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -1100,7 +1066,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithMethodologyCanCancelAmend}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -1135,7 +1100,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithMethodologyCanCancelAmend}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -1171,7 +1135,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithAdoptedMethodologies}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -1207,7 +1170,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithAdoptedMethodologies}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -1234,7 +1196,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithAdoptedMethodologies}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,
@@ -1270,7 +1231,6 @@ describe('MethodologySummary', () => {
         <MemoryRouter>
           <MethodologySummary
             publication={testPublicationWithAdoptedMethodologies}
-            topicId={testTopicId}
             onChangePublication={noop}
           />
         </MemoryRouter>,

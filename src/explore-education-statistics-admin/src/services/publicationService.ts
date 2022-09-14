@@ -143,6 +143,10 @@ const publicationService = {
     );
   },
 
+  removeExternalMethodology(publicationId: string): Promise<boolean> {
+    return client.delete(`publication/${publicationId}/external-methodology`);
+  },
+
   listReleases<TReleaseSummary extends ReleaseSummary = ReleaseSummary>(
     publicationId: string,
     params?: ListReleasesParams,

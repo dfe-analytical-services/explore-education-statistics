@@ -3075,6 +3075,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task RemoveExternalMethodology()
+        {
+            var publication = new Publication
+            {
+                ExternalMethodology = new ExternalMethodology
+                {
+                    Title = "Original external methodology",
+                    Url = "http://test.external.methodology/original",
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildPublicationService(context: contentDbContext);
+
+                var result = await service.RemoveExternalMethodology(publication.Id);
+                result.AssertRight();
+
+                var dbPublication = contentDbContext.Publications
+                    .Single(p => p.Id == publication.Id);
+
+                Assert.Null(dbPublication.ExternalMethodology);
+            }
+        }
+
+        [Fact]
+        public async Task RemoveExternalMethodology_NoPublication()
+        {
+            var contentDbContext = InMemoryApplicationDbContext();
+            var service = BuildPublicationService(context: contentDbContext);
+
+            var result = await service.RemoveExternalMethodology(publicationId: Guid.NewGuid());
+
+            result.AssertNotFound();
+        }
+
+        [Fact]
         public async Task ListActiveReleases()
         {
             var release1Original = new Release

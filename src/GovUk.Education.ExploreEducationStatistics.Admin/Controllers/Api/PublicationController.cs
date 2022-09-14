@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
@@ -88,6 +89,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             return await _publicationService.UpdateExternalMethodology(publicationId, updatedExternalMethodology)
                 .HandleFailuresOrOk();
         }
+
+        [HttpDelete("api/publication/{publicationId:guid}/external-methodology")]
+        public async Task<ActionResult<Unit>> RemoveExternalMethodology(
+            Guid publicationId)
+        {
+            return await _publicationService.RemoveExternalMethodology(publicationId)
+                .HandleFailuresOrOk();
+        }
+
 
         [HttpGet("api/publication/{publicationId}/releases")]
         public async Task<ActionResult<PaginatedListViewModel<ReleaseSummaryViewModel>>> ListActiveReleases(

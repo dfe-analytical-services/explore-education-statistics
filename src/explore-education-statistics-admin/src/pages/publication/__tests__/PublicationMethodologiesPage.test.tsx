@@ -1492,15 +1492,12 @@ describe('PublicationMethodologiesPage', () => {
 
         userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
-        const updatedPublication: UpdatePublicationRequest = {
-          ...testPublication,
-          externalMethodology: undefined,
-        };
-
         await waitFor(() => {
-          expect(publicationService.updatePublication).toHaveBeenCalledWith<
-            Parameters<typeof publicationService.updatePublication>
-          >(testPublication.id, updatedPublication);
+          expect(
+            publicationService.removeExternalMethodology,
+          ).toHaveBeenCalledWith<
+            Parameters<typeof publicationService.removeExternalMethodology>
+          >(testPublication.id);
         });
       });
     });
