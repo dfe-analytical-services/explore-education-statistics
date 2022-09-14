@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
@@ -15,5 +16,11 @@ public interface IReleaseCacheService
         string? releaseSlug = null);
 
     Task<Either<ActionResult, ReleaseViewModel>> GetReleaseAndPublication(string publicationSlug,
+        string? releaseSlug = null);
+
+    Task<Either<ActionResult, CachedReleaseViewModel>> UpdateRelease(bool staging,
+        DateTime expectedPublishDate,
+        Guid releaseId,
+        string publicationSlug,
         string? releaseSlug = null);
 }

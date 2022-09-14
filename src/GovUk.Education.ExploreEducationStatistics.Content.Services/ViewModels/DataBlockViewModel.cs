@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using JsonKnownTypes;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
+    [JsonKnownThisType("DataBlock")]
     public class DataBlockViewModel : IContentBlockViewModel
     {
         public Guid Id { get; set; }
@@ -43,7 +45,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
         public DataBlockSummaryViewModel Summary { get; set; }
 
         public TableBuilderConfiguration Table { get; set; }
-
-        public string Type => "DataBlock";
     }
 }

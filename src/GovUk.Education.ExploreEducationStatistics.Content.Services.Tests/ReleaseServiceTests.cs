@@ -323,8 +323,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupReleaseService(contentDbContext: contentDbContext);
 
-                var published = DateTime.Today.Add(new TimeSpan(9, 30, 0));
-                var result = await service.GetRelease(Release1V1.Id, published);
+                var result = await service.GetRelease(Release1V1.Id);
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(Release1V1.Id, viewModel.Id);
@@ -505,9 +504,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupReleaseService(contentDbContext: contentDbContext);
 
-                // TODO EES-3650 this is the future publishing time
-                var published = DateTime.Today.Add(new TimeSpan(9, 30, 0));
-                var result = await service.GetRelease(release.Id, published);
+                var result = await service.GetRelease(release.Id);
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(release.Id, viewModel.Id);
@@ -567,15 +564,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupReleaseService(contentDbContext: contentDbContext);
 
-                // TODO EES-3650 this is the future publishing time, comment few lines below needs altering
-                var published = DateTime.Today.Add(new TimeSpan(9, 30, 0));
-                var result = await service.GetRelease(release.Id, published);
+                var expectedPublishDate = DateTime.Today.Add(new TimeSpan(9, 30, 0));
+                var result = await service.GetRelease(release.Id, expectedPublishDate);
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(release.Id, viewModel.Id);
                 Assert.Equal("Calendar Year 2022", viewModel.Title);
-                // Published date in the view model should match the date set up in the publishing context
-                Assert.Equal(published, viewModel.Published);
+                // Published date in the view model should match the expected publish date
+                Assert.Equal(expectedPublishDate, viewModel.Published);
 
                 Assert.Null(viewModel.KeyStatisticsSection);
                 Assert.Null(viewModel.SummarySection);
@@ -583,6 +579,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Empty(viewModel.Content);
                 Assert.Empty(viewModel.DownloadFiles);
                 Assert.Empty(viewModel.RelatedInformation);
+            }
+        }
+
+        [Fact]
+        public async Task GetRelease_NotYetPublished_ExpectedPublishDateIsNull()
+        {
+            var release = new Release
+            {
+                ReleaseName = "2022",
+                TimePeriodCoverage = CalendarYear,
+                ApprovalStatus = Approved,
+                Published = null
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseService(contentDbContext: contentDbContext);
+
+                DateTime? expectedPublishDate = null;
+                var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
+                    service.GetRelease(release.Id, expectedPublishDate));
+
+                Assert.Equal(
+                    "Expected published date must be specified for a non-live release (Parameter 'expectedPublishDate')",
+                    exception.Message
+                );
             }
         }
 
@@ -601,9 +631,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupReleaseService(contentDbContext: contentDbContext);
 
-                // TODO EES-3650 this is the future publishing time, but ignored. Maybe it should be optional?
-                var published = DateTime.Today.Add(new TimeSpan(9, 30, 0));
-                var result = await service.GetRelease(Release1V3NotPublished.Id, published);
+                // The expected publish date for this release should be ignored
+                var expectedPublishDate = DateTime.Today.Add(new TimeSpan(9, 30, 0));
+
+                var result = await service.GetRelease(Release1V3NotPublished.Id, expectedPublishDate);
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(Release1V3NotPublished.Id, viewModel.Id);
@@ -638,9 +669,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupReleaseService(contentDbContext: contentDbContext);
 
-                // TODO EES-3650 this is the future publishing time, but ignored. Maybe it should be optional?
-                var published = DateTime.Today.Add(new TimeSpan(9, 30, 0));
-                var result = await service.GetRelease(Release1V3NotPublished.Id, published);
+                var result = await service.GetRelease(Release1V3NotPublished.Id, DateTime.UtcNow);
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(Release1V3NotPublished.Id, viewModel.Id);

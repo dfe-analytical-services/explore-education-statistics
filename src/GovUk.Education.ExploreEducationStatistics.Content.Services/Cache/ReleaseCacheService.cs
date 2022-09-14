@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -18,14 +20,17 @@ public class ReleaseCacheService : IReleaseCacheService
     private readonly IBlobStorageService _blobStorageService;
     private readonly IMethodologyCacheService _methodologyCacheService;
     private readonly IPublicationCacheService _publicationCacheService;
+    private readonly IReleaseService _releaseService;
 
     public ReleaseCacheService(IBlobStorageService blobStorageService,
         IMethodologyCacheService methodologyCacheService,
-        IPublicationCacheService publicationCacheService)
+        IPublicationCacheService publicationCacheService,
+        IReleaseService releaseService)
     {
         _blobStorageService = blobStorageService;
         _methodologyCacheService = methodologyCacheService;
         _publicationCacheService = publicationCacheService;
+        _releaseService = releaseService;
     }
 
     public async Task<Either<ActionResult, CachedReleaseViewModel>> GetRelease(string publicationSlug,
@@ -82,5 +87,16 @@ public class ReleaseCacheService : IReleaseCacheService
                         }
                     ));
             });
+    }
+
+    [BlobCache(typeof(ReleaseCacheKey), forceUpdate: true, ServiceName = "public")]
+    public Task<Either<ActionResult, CachedReleaseViewModel>> UpdateRelease(
+        bool staging,
+        DateTime expectedPublishDate,
+        Guid releaseId,
+        string publicationSlug,
+        string? releaseSlug = null)
+    {
+        return _releaseService.GetRelease(releaseId, expectedPublishDate);
     }
 }

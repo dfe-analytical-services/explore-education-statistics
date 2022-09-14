@@ -46,14 +46,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             _mapper = mapper;
         }
 
-        public async Task<Either<ActionResult, CachedReleaseViewModel>> GetRelease(Guid releaseId, DateTime published)
+        public async Task<Either<ActionResult, CachedReleaseViewModel>> GetRelease(Guid releaseId,
+            DateTime? expectedPublishDate = null)
         {
+            // Note this method can deliberately return an unpublished Release so that Publisher can use it
+            // to cache a release in advance of it going live.
+
             var release = _contentDbContext.Releases
                 .Include(r => r.Content)
                 .ThenInclude(releaseContentSection => releaseContentSection.ContentSection)
                 .ThenInclude(section => section.Content)
                 .Include(r => r.Updates)
                 .Single(r => r.Id == releaseId);
+
+            // TODO EES-3650 Could this be !Live instead or use the scheduled published date?
+            if (!release.Published.HasValue && !expectedPublishDate.HasValue)
+            {
+                throw new ArgumentException("Expected published date must be specified for a non-live release",
+                    nameof(expectedPublishDate));
+            }
 
             var releaseViewModel = _mapper.Map<CachedReleaseViewModel>(release);
 
@@ -87,9 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 }
                 else
                 {
-                    // Otherwise it's either the time now or the next scheduled publishing time
-                    // This date is set up by the calling function when execution begins
-                    releaseViewModel.Published = published;
+                    releaseViewModel.Published = expectedPublishDate;
                 }
             }
 
