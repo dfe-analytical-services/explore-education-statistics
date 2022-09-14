@@ -68,6 +68,8 @@ export type AxesConfiguration = {
   [key in AxisType]?: AxisConfiguration;
 };
 
+export type DataClassification = 'EqualIntervals' | 'Quantiles';
+
 export interface ChartProps {
   data: TableDataResult[];
   meta: FullTableMeta;
@@ -108,6 +110,10 @@ export interface ChartDefinitionOptions {
   titleType: 'default' | 'alternative';
   alt: string;
   includeNonNumericData?: boolean;
+  // Map options
+  boundaryLevel?: number;
+  dataClassification?: DataClassification;
+  dataGroups?: number;
 }
 
 export interface ChartDefinition {

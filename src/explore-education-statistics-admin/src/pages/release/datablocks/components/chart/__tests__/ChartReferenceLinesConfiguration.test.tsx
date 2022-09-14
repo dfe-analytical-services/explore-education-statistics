@@ -1,4 +1,4 @@
-import { testTableData } from '@admin/pages/release/datablocks/components/chart/__tests__/__data__/testTableData';
+import { testFullTable } from '@admin/pages/release/datablocks/components/chart/__tests__/__data__/testTableData';
 import ChartReferenceLinesConfiguration, {
   ChartReferenceLinesConfigurationProps,
 } from '@admin/pages/release/datablocks/components/chart/ChartReferenceLinesConfiguration';
@@ -8,7 +8,6 @@ import {
   AxisConfiguration,
   ChartDefinitionAxis,
 } from '@common/modules/charts/types/chart';
-import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -67,7 +66,7 @@ describe('ChartReferenceLinesConfiguration', () => {
     },
   };
 
-  const testTable = mapFullTable(testTableData);
+  const testTable = testFullTable;
   const testTimePeriodDataSetCategories = createDataSetCategories(
     {
       ...testAxisConfiguration,

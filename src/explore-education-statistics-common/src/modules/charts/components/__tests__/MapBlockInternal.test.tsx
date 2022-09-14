@@ -8,7 +8,7 @@ import {
   testsMixedLocationsTableDataWithLADs,
 } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
 import { MapBlockProps } from '@common/modules/charts/components/MapBlock';
-import { MapBlockInternal } from '@common/modules/charts/components/MapBlockInternal';
+import MapBlockInternal from '@common/modules/charts/components/MapBlockInternal';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { within } from '@testing-library/dom';
@@ -59,31 +59,31 @@ describe('MapBlockInternal', () => {
       // UK polygon
       expect(paths[0]).toHaveAttribute('fill', '#3388ff');
       // Location polygons
-      expect(paths[1]).toHaveAttribute('fill', '#5c80d6');
-      expect(paths[2]).toHaveAttribute('fill', '#86bcff');
-      expect(paths[3]).toHaveAttribute('fill', '#314573');
+      expect(paths[1]).toHaveAttribute('fill', 'rgba(145, 161, 201, 1)');
+      expect(paths[2]).toHaveAttribute('fill', 'rgba(218, 224, 237, 1)');
+      expect(paths[3]).toHaveAttribute('fill', 'rgba(71, 99, 165, 1)');
     });
 
     const legendItems = screen.getAllByTestId('mapBlock-legend-item');
 
     expect(legendItems).toHaveLength(5);
-    expect(legendItems[0]).toHaveTextContent('3.0% to 3.2%');
-    expect(legendItems[1]).toHaveTextContent('3.3% to 3.4%');
-    expect(legendItems[2]).toHaveTextContent('3.5% to 3.6%');
-    expect(legendItems[3]).toHaveTextContent('3.7% to 3.8%');
-    expect(legendItems[4]).toHaveTextContent('3.9% to 4.0%');
+    expect(legendItems[0]).toHaveTextContent('3.0% to 3.1%');
+    expect(legendItems[1]).toHaveTextContent('3.2% to 3.3%');
+    expect(legendItems[2]).toHaveTextContent('3.4% to 3.5%');
+    expect(legendItems[3]).toHaveTextContent('3.6% to 3.7%');
+    expect(legendItems[4]).toHaveTextContent('3.8% to 4.0%');
 
     const legendColours = screen.getAllByTestId('mapBlock-legend-colour');
 
     expect(legendColours).toHaveLength(5);
-    expect(legendColours[0].style.backgroundColor).toBe('rgb(134, 188, 255)');
-    expect(legendColours[1].style.backgroundColor).toBe('rgb(113, 158, 255)');
-    expect(legendColours[2].style.backgroundColor).toBe('rgb(92, 128, 214)');
-    expect(legendColours[3].style.backgroundColor).toBe('rgb(71, 99, 165)');
-    expect(legendColours[4].style.backgroundColor).toBe('rgb(49, 69, 115)');
+    expect(legendColours[0].style.backgroundColor).toBe('rgb(218, 224, 237)');
+    expect(legendColours[1].style.backgroundColor).toBe('rgb(181, 193, 219)');
+    expect(legendColours[2].style.backgroundColor).toBe('rgb(145, 161, 201)');
+    expect(legendColours[3].style.backgroundColor).toBe('rgb(108, 130, 183)');
+    expect(legendColours[4].style.backgroundColor).toBe('rgb(71, 99, 165)');
   });
 
-  test('renders legends correctly with custom decimal places', async () => {
+  test('renders legend groups correctly with custom 1 d.p decimal places', async () => {
     const fullTable = mapFullTable(
       produce(testMapTableData, draft => {
         draft.results[0].measures['authorised-absence-rate'] = '3.5123';
@@ -105,11 +105,41 @@ describe('MapBlockInternal', () => {
       const legendItems = screen.getAllByTestId('mapBlock-legend-item');
 
       expect(legendItems).toHaveLength(5);
-      expect(legendItems[0]).toHaveTextContent('3.0% to 3.2%');
-      expect(legendItems[1]).toHaveTextContent('3.3% to 3.4%');
-      expect(legendItems[2]).toHaveTextContent('3.5% to 3.6%');
-      expect(legendItems[3]).toHaveTextContent('3.7% to 3.8%');
-      expect(legendItems[4]).toHaveTextContent('3.9% to 4.0%');
+      expect(legendItems[0]).toHaveTextContent('3.0% to 3.1%');
+      expect(legendItems[1]).toHaveTextContent('3.2% to 3.3%');
+      expect(legendItems[2]).toHaveTextContent('3.4% to 3.5%');
+      expect(legendItems[3]).toHaveTextContent('3.6% to 3.7%');
+      expect(legendItems[4]).toHaveTextContent('3.8% to 4.0%');
+    });
+  });
+
+  test('renders legend groups correctly with custom 3 d.p decimal places', async () => {
+    const fullTable = mapFullTable(
+      produce(testMapTableData, draft => {
+        draft.results[0].measures['authorised-absence-rate'] = '3.5123';
+        draft.results[1].measures['authorised-absence-rate'] = '3.012';
+        draft.results[2].measures['authorised-absence-rate'] = '4.009';
+        draft.subjectMeta.indicators[0].decimalPlaces = 3;
+      }),
+    );
+
+    render(
+      <MapBlockInternal
+        {...testBlockProps}
+        meta={fullTable.subjectMeta}
+        data={fullTable.results}
+      />,
+    );
+
+    await waitFor(() => {
+      const legendItems = screen.getAllByTestId('mapBlock-legend-item');
+
+      expect(legendItems).toHaveLength(5);
+      expect(legendItems[0]).toHaveTextContent('3.012% to 3.211%');
+      expect(legendItems[1]).toHaveTextContent('3.212% to 3.411%');
+      expect(legendItems[2]).toHaveTextContent('3.412% to 3.611%');
+      expect(legendItems[3]).toHaveTextContent('3.612% to 3.811%');
+      expect(legendItems[4]).toHaveTextContent('3.812% to 4.009%');
     });
   });
 
@@ -151,26 +181,26 @@ describe('MapBlockInternal', () => {
       // UK polygon
       expect(paths[0]).toHaveAttribute('fill', '#3388ff');
       // Location polygon
-      expect(paths[1]).toHaveAttribute('fill', '#ffff80');
-      expect(paths[2]).toHaveAttribute('fill', '#ffff98');
-      expect(paths[3]).toHaveAttribute('fill', '#ab7238');
+      expect(paths[1]).toHaveAttribute('fill', 'rgba(251, 219, 185, 1)');
+      expect(paths[2]).toHaveAttribute('fill', 'rgba(253, 237, 220, 1)');
+      expect(paths[3]).toHaveAttribute('fill', 'rgba(245, 164, 80, 1)');
     });
 
     const legendItems = screen.getAllByTestId('mapBlock-legend-item');
 
-    expect(legendItems[0]).toHaveTextContent('4.70% to 4.78%');
-    expect(legendItems[1]).toHaveTextContent('4.79% to 4.86%');
-    expect(legendItems[2]).toHaveTextContent('4.87% to 4.94%');
-    expect(legendItems[3]).toHaveTextContent('4.95% to 5.02%');
-    expect(legendItems[4]).toHaveTextContent('5.03% to 5.10%');
+    expect(legendItems[0]).toHaveTextContent('4.70% to 4.77%');
+    expect(legendItems[1]).toHaveTextContent('4.78% to 4.85%');
+    expect(legendItems[2]).toHaveTextContent('4.86% to 4.93%');
+    expect(legendItems[3]).toHaveTextContent('4.94% to 5.01%');
+    expect(legendItems[4]).toHaveTextContent('5.02% to 5.10%');
 
     const legendColours = screen.getAllByTestId('mapBlock-legend-colour');
 
-    expect(legendColours[0].style.backgroundColor).toBe('rgb(255, 255, 152)');
-    expect(legendColours[1].style.backgroundColor).toBe('rgb(255, 255, 128)');
-    expect(legendColours[2].style.backgroundColor).toBe('rgb(255, 213, 104)');
-    expect(legendColours[3].style.backgroundColor).toBe('rgb(245, 164, 80)');
-    expect(legendColours[4].style.backgroundColor).toBe('rgb(171, 114, 56)');
+    expect(legendColours[0].style.backgroundColor).toBe('rgb(253, 237, 220)');
+    expect(legendColours[1].style.backgroundColor).toBe('rgb(251, 219, 185)');
+    expect(legendColours[2].style.backgroundColor).toBe('rgb(249, 200, 150)');
+    expect(legendColours[3].style.backgroundColor).toBe('rgb(247, 182, 115)');
+    expect(legendColours[4].style.backgroundColor).toBe('rgb(245, 164, 80)');
   });
 
   test('changing selected location focuses the correct polygon', async () => {

@@ -14,7 +14,7 @@
 export default function parseNumber(value: unknown): number | undefined {
   let parsed: unknown;
 
-  if (typeof value === 'string' && value !== '') {
+  if (typeof value === 'string' && value.trim() !== '') {
     parsed = Number(value);
   } else {
     parsed = value;

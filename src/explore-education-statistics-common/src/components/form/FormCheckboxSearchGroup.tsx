@@ -2,7 +2,7 @@ import { FormFieldsetProps } from '@common/components/form/FormFieldset';
 import FormTextSearchInput from '@common/components/form/FormTextSearchInput';
 import { FormFieldset } from '@common/components/form/index';
 import useMounted from '@common/hooks/useMounted';
-import numberWithCommas from '@common/utils/number/numberWithCommas';
+import formatPretty from '@common/utils/number/formatPretty';
 import React, { useState } from 'react';
 import FormCheckboxGroup, {
   BaseFormCheckboxGroup,
@@ -99,8 +99,8 @@ const FormCheckboxSearchGroup = ({
       if (numResults > maxSearchResults) {
         return (
           <p>
-            {numberWithCommas(numResults)} results found. Please refine your
-            search to view options.
+            {formatPretty(numResults)} results found. Please refine your search
+            to view options.
           </p>
         );
       }
