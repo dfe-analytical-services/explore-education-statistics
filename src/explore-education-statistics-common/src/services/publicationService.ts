@@ -99,12 +99,12 @@ export interface ContentSection<BlockType> {
   content: BlockType[];
 }
 
-export type PublicationSortOptions = 'newest' | 'oldest' | 'alphabetical';
+export type PublicationSortOption = 'newest' | 'oldest' | 'alphabetical';
 
 // TODO EES-3517 expand to include filters and search
 export interface GetPublicationsRequest {
   page?: number;
-  sortBy?: PublicationSortOptions;
+  sortBy?: PublicationSortOption;
 }
 
 export interface Release<

@@ -1,7 +1,7 @@
 import themeService, { Theme } from '@common/services/themeService';
 import {
   PublicationSummaryWithRelease,
-  PublicationSortOptions,
+  PublicationSortOption,
 } from '@common/services/publicationService';
 import { Paging } from '@common/services/types/pagination';
 import { testPublications } from '@frontend/modules/find-statistics/__tests__/__data__/testPublications';
@@ -14,7 +14,7 @@ interface Props {
   newDesign?: boolean; // TODO EES-3517 flag
   paging?: Paging | null; // TODO EES-3517 won't be optional or null
   publications?: PublicationSummaryWithRelease[]; // TODO EES-3517 won't be optional
-  sortBy?: PublicationSortOptions;
+  sortBy?: PublicationSortOption;
   themes: Theme[];
 }
 
@@ -43,7 +43,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
 }) => {
   const { newDesign, page, sortBy } = query;
   const currentPage = typeof page === 'string' ? parseInt(page, 10) : 1;
-  const currentSortBy = sortBy as PublicationSortOptions;
+  const currentSortBy = sortBy as PublicationSortOption;
 
   // TODO EES-3517 - fetch publications here, using pagination and filters from query.
   // const publicationsResponse = newDesign ? await publicationService.getPublications({

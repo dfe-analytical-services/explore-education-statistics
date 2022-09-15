@@ -3,28 +3,25 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useMobileMedia } from '@common/hooks/useMedia';
-import useToggle from '@common/hooks/useToggle';
 import {
   PublicationSummaryWithRelease,
-  PublicationSortOptions,
+  PublicationSortOption,
 } from '@common/services/publicationService';
 import { Paging } from '@common/services/types/pagination';
 import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
 import useRouterLoading from '@frontend/hooks/useRouterLoading';
-import styles from '@frontend/modules/find-statistics/FindStatisticsPage.module.scss';
 import PublicationSummary from '@frontend/modules/find-statistics/components/PublicationSummary';
 import SortControls from '@frontend/modules/find-statistics/components/SortControls';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import classNames from 'classnames';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 interface Props {
   paging: Paging;
   publications: PublicationSummaryWithRelease[];
-  sortBy?: PublicationSortOptions;
+  sortBy?: PublicationSortOption;
 }
 
 const FindStatisticsPageNew: NextPage<Props> = ({
@@ -34,25 +31,10 @@ const FindStatisticsPageNew: NextPage<Props> = ({
 }) => {
   const { page, totalPages, totalResults } = paging;
   const router = useRouter();
-  const isRouterLoading = useRouterLoading();
+  const isLoading = useRouterLoading();
   const { isMedia: isMobileMedia } = useMobileMedia();
-  const [currentPage, setCurrentPage] = useState<number>(page);
-  const [currentPublications, setCurrentPublications] = useState<
-    PublicationSummaryWithRelease[]
-  >(publications);
-  const [currentSortBy, setCurrentSortBy] = useState<
-    PublicationSortOptions | undefined
-  >(sortBy ?? undefined);
-  const [isLoadingPublications, toggleIsLoadingPublications] = useToggle(false);
 
-  useEffect(() => {
-    setCurrentPage(page);
-    setCurrentPublications(publications);
-  }, [page, publications]);
-
-  const sortPublications = async (nextSortBy: PublicationSortOptions) => {
-    toggleIsLoadingPublications.on();
-
+  const handleSortPublications = async (nextSortBy: PublicationSortOption) => {
     router.push(
       {
         pathname: '/find-statistics',
@@ -62,26 +44,14 @@ const FindStatisticsPageNew: NextPage<Props> = ({
         },
       },
       undefined,
-      { shallow: true },
+      { shallow: false },
     );
-
-    // TODO EES-3517 - Fetch sorted publications here,
-    // will need to take filters and search into account
-    // const nextPublications = await publicationService.getPublications({
-    //   sortBy: nextSortBy,
-    // });
-    // setCurrentPublications(nextPublications);
-
-    setCurrentPage(1);
-    setCurrentSortBy(nextSortBy);
 
     logEvent({
       category: 'Find statistics and data',
       action: 'Publications sorted',
       label: nextSortBy,
     });
-
-    toggleIsLoadingPublications.off();
   };
 
   return (
@@ -89,7 +59,7 @@ const FindStatisticsPageNew: NextPage<Props> = ({
       <Page
         metaTitle={
           totalPages > 1
-            ? `Find statistics and data (page ${currentPage} of ${totalPages})`
+            ? `Find statistics and data (page ${page} of ${totalPages})`
             : undefined
         }
         title="Find statistics and data"
@@ -155,47 +125,34 @@ const FindStatisticsPageNew: NextPage<Props> = ({
               </h2>
 
               <p className="govuk-!-margin-top-1">
-                {`Page ${currentPage} of ${paging.totalPages}, showing all publications`}
-                <VisuallyHidden>
-                  {` Sorted by ${currentSortBy} publications`}
-                </VisuallyHidden>
+                {`Page ${page} of ${paging.totalPages}, showing all publications`}
+                <VisuallyHidden>{` sorted by ${sortBy}`}</VisuallyHidden>
               </p>
             </div>
 
-            <a href="#searchResults" className="govuk-skip-link ">
+            <a href="#searchResults" className="govuk-skip-link">
               Skip to search results
             </a>
 
-            <div className={styles.sortControlsContainer}>
-              {isMobileMedia && (
-                <Button
-                  className={classNames(
-                    styles.mobileFilterButton,
-                    'govuk-!-margin-bottom-0',
-                  )}
-                  variant="secondary"
-                >
-                  Filter results
-                </Button>
-              )}
-              <SortControls
-                initialValues={{ sortBy: currentSortBy ?? 'newest' }}
-                onChange={sortPublications}
-              />
-            </div>
+            {isMobileMedia && <Button>Filter results</Button>}
+
+            <SortControls
+              sortBy={sortBy ?? 'newest'}
+              onChange={handleSortPublications}
+            />
 
             <LoadingSpinner
-              loading={isLoadingPublications || isRouterLoading}
+              loading={isLoading}
               className="govuk-!-margin-top-4"
             >
               {/* TODO EES-3517 show different message if search / filter returns no results  */}
-              {currentPublications.length === 0 ? (
+              {publications.length === 0 ? (
                 <div className="govuk-inset-text" id="searchResults">
                   No data currently published.
                 </div>
               ) : (
                 <ul className="govuk-list" id="searchResults">
-                  {currentPublications.map(publication => (
+                  {publications.map(publication => (
                     <PublicationSummary
                       key={publication.id}
                       publication={publication}
@@ -204,10 +161,7 @@ const FindStatisticsPageNew: NextPage<Props> = ({
                 </ul>
               )}
 
-              <Pagination
-                currentPage={currentPage ?? 1}
-                totalPages={totalPages}
-              />
+              <Pagination currentPage={page ?? 1} totalPages={totalPages} />
             </LoadingSpinner>
           </div>
         </div>

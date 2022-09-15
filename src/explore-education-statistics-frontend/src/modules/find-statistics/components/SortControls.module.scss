@@ -1,6 +1,6 @@
 @import '~govuk-frontend/govuk/base';
 
-.sortControlsContainer {
+.container {
   border-bottom: 1px solid govuk-colour('mid-grey');
   border-top: 1px solid govuk-colour('mid-grey');
   display: flex;
@@ -14,9 +14,4 @@
   :global(.govuk-form-group) {
     margin-bottom: 0;
   }
-}
-
-.mobileFilterButton {
-  font-weight: bold;
-  width: 150px;
 }
