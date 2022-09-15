@@ -13,6 +13,7 @@ import {
   logOutboundLink,
 } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 
 export interface PublicationSectionBlocksProps {
   release: Release;
@@ -53,6 +54,7 @@ const PublicationSectionBlocks = ({
                   <div className="dfe-print-hidden">
                     <h3 className="govuk-heading-m">
                       Explore and edit this data online
+                      <VisuallyHidden>{` for ${block.heading}`}</VisuallyHidden>
                     </h3>
 
                     <p>Use our table tool to explore this data.</p>

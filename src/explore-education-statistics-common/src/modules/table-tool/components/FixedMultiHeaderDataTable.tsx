@@ -14,11 +14,18 @@ interface Props extends OmitStrict<MultiHeaderTableProps, 'ariaLabelledBy'> {
   innerRef?: Ref<HTMLElement>;
   footnotes?: FullTableMeta['footnotes'];
   source?: string;
+  footnotesHeadingHiddenText?: string;
 }
 
 const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
   (props, ref) => {
-    const { caption, captionId, footnotes = [], source } = props;
+    const {
+      caption,
+      captionId,
+      footnotes = [],
+      source,
+      footnotesHeadingHiddenText,
+    } = props;
 
     const containerRef = useRef<HTMLDivElement>(null);
     const mainTableRef = useRef<HTMLTableElement>(null);
@@ -126,7 +133,10 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
           />
         </div>
 
-        <FigureFootnotes footnotes={footnotes} />
+        <FigureFootnotes
+          footnotes={footnotes}
+          headingHiddenText={footnotesHeadingHiddenText}
+        />
 
         {source && <p className="govuk-body-s">Source: {source}</p>}
       </figure>
