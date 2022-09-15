@@ -1,4 +1,4 @@
-import { MyPublication } from '@admin/services/publicationService';
+import { MyPublication } from '@admin/services/publicationService'; // @MarkFix switch to Publication
 import React, { createContext, ReactNode, useContext, useMemo } from 'react';
 
 export interface PublicationContextState {

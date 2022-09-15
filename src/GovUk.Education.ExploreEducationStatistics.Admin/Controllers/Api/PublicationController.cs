@@ -64,10 +64,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpGet("api/publications/{publicationId}")]
         public async Task<ActionResult<PublicationViewModel>> GetPublication(
-            [Required] Guid publicationId)
+            [Required] Guid publicationId, [FromQuery] bool permissions = false)
         {
             return await _publicationService
-                .GetPublication(publicationId)
+                .GetPublication(publicationId, permissions)
                 .HandleFailuresOrOk();
         }
 

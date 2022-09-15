@@ -52,17 +52,19 @@ export interface MyPublication {
   topicId: string;
   themeId: string;
   contact: Contact;
-  permissions: {
-    canAdoptMethodologies: boolean;
-    canCreateReleases: boolean;
-    canUpdatePublication: boolean;
-    canUpdatePublicationTitle: boolean;
-    canUpdatePublicationSupersededBy: boolean;
-    canCreateMethodologies: boolean;
-    canManageExternalMethodology: boolean;
-  };
+  permissions: PublicationPermissions;
   supersededById?: string;
   isSuperseded?: boolean;
+}
+
+export interface PublicationPermissions {
+  canAdoptMethodologies: boolean;
+  canCreateReleases: boolean;
+  canUpdatePublication: boolean;
+  canUpdatePublicationTitle: boolean;
+  canUpdatePublicationSupersededBy: boolean;
+  canCreateMethodologies: boolean;
+  canManageExternalMethodology: boolean;
 }
 
 export interface Publication {
@@ -70,9 +72,12 @@ export interface Publication {
   title: string;
   summary: string;
   slug: string;
-  contact: Contact;
+  contact: Contact; // @MarkFix remove this
   theme: IdTitlePair;
   topic: IdTitlePair;
+  supersededById?: string;
+  isSuperseded?: boolean;
+  permissions?: PublicationPermissions;
 }
 
 export interface PublicationMethodologyDetails {
@@ -130,8 +135,13 @@ const publicationService = {
     return client.put(`/publications/${publicationId}`, publication);
   },
 
-  getPublication(publicationId: string): Promise<Publication> {
-    return client.get<Publication>(`/publications/${publicationId}`);
+  getPublication(
+    publicationId: string,
+    permissions = false,
+  ): Promise<Publication> {
+    return client.get<Publication>(`/publications/${publicationId}`, {
+      params: { permissions },
+    });
   },
 
   getMyPublication(publicationId: string): Promise<MyPublication> {

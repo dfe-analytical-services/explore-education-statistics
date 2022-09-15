@@ -1670,6 +1670,172 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication.Contact.ContactTelNo, result.Contact.ContactTelNo);
                 Assert.Equal(publication.Contact.TeamEmail, result.Contact.TeamEmail);
                 Assert.Equal(publication.Contact.TeamName, result.Contact.TeamName);
+
+                Assert.Null(result.SupersededById);
+                Assert.False(result.IsSuperseded);
+
+                Assert.Null(result.Permissions);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublication_Permissions()
+        {
+            var publication = new Publication
+            {
+                Topic = new Topic
+                {
+                    Theme = new Theme(),
+                },
+                Contact = new Contact(),
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var userService = new Mock<IUserService>(Strict);
+
+                userService.Setup(s => s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        CanViewSpecificPublication))
+                    .ReturnsAsync(true);
+                userService.Setup(s => s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        CanUpdateSpecificPublication))
+                    .ReturnsAsync(true);
+                userService.Setup(s => s.MatchesPolicy(CanUpdatePublicationTitles))
+                    .ReturnsAsync(true);
+                userService.Setup(s => s.MatchesPolicy(CanUpdatePublicationSupersededBy))
+                    .ReturnsAsync(true);
+                userService.Setup(s => s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        CanCreateReleaseForSpecificPublication))
+                    .ReturnsAsync(false);
+                userService.Setup(s => s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        CanAdoptMethodologyForSpecificPublication))
+                    .ReturnsAsync(false);
+                userService.Setup(s => s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        CanCreateMethodologyForSpecificPublication))
+                    .ReturnsAsync(false);
+                userService.Setup(s => s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        CanManageExternalMethodologyForSpecificPublication))
+                    .ReturnsAsync(false);
+
+                var publicationService = BuildPublicationService(context,
+                    userService: userService.Object);
+
+                var result = (await publicationService.GetPublication(publication.Id, permissions: true)).AssertRight();
+
+                Assert.Equal(publication.Id, result.Id);
+
+                Assert.NotNull(result.Permissions);
+                Assert.True(result.Permissions!.CanUpdatePublication);
+                Assert.True(result.Permissions.CanUpdatePublicationTitle);
+                Assert.True(result.Permissions.CanUpdatePublicationSupersededBy);
+                Assert.False(result.Permissions.CanCreateReleases);
+                Assert.False(result.Permissions.CanAdoptMethodologies);
+                Assert.False(result.Permissions.CanCreateMethodologies);
+                Assert.False(result.Permissions.CanManageExternalMethodology);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublication_IsSuperseded()
+        {
+            var supersedingPublication = new Publication
+            {
+                Title = "Superseding publication",
+                Releases = ListOf(
+                    new Release
+                    {
+                        Published = DateTime.UtcNow,
+                    }),
+            };
+
+            var publication = new Publication
+            {
+                Title = "Test publication",
+                Topic = new Topic
+                {
+                    Theme = new Theme(),
+                },
+                Contact = new Contact(),
+                SupersededBy = supersedingPublication,
+            };
+
+        var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddRangeAsync(supersedingPublication, publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationService = BuildPublicationService(context);
+
+                var result = (await publicationService.GetPublication(publication.Id, permissions: true)).AssertRight();
+
+                Assert.Equal(publication.Id, result.Id);
+
+                Assert.Equal(supersedingPublication.Id, result.SupersededById);
+                Assert.True(result.IsSuperseded);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublication_IsSuperseded_False()
+        {
+            var supersedingPublication = new Publication
+            {
+                Title = "Superseding publication",
+                Releases = ListOf(
+                    new Release
+                    {
+                        Published = DateTime.UtcNow.AddDays(1),
+                    }),
+            };
+
+            var publication = new Publication
+            {
+                Title = "Test publication",
+                Topic = new Topic
+                {
+                    Theme = new Theme(),
+                },
+                Contact = new Contact(),
+                SupersededBy = supersedingPublication,
+            };
+
+        var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddRangeAsync(supersedingPublication, publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationService = BuildPublicationService(context);
+
+                var result = (await publicationService.GetPublication(publication.Id, permissions: true)).AssertRight();
+
+                Assert.Equal(publication.Id, result.Id);
+
+                Assert.Equal(supersedingPublication.Id, result.SupersededById);
+                Assert.False(result.IsSuperseded);
             }
         }
 

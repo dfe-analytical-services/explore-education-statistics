@@ -296,12 +296,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => Unit.Instance);
         }
 
-        public async Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId)
+        public async Task<Either<ActionResult, PublicationViewModel>> GetPublication(
+            Guid publicationId, bool permissions = false)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, HydratePublication)
                 .OnSuccess(_userService.CheckCanViewPublication)
-                .OnSuccess(publication => _mapper.Map<PublicationViewModel>(publication));
+                .OnSuccess(publication => GeneratePublicationViewModel(publication, permissions));
         }
 
         public async Task<Either<ActionResult, ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId)

@@ -54,8 +54,8 @@ const PublicationPageContainer = ({
     setState: setPublication,
     isLoading: loadingPublication,
     retry: reloadPublication,
-  } = useAsyncHandledRetry(() =>
-    publicationService.getMyPublication(publicationId),
+  } = useAsyncHandledRetry(
+    () => publicationService.getMyPublication(publicationId), // @MarkFix switch to getPublication
   );
 
   return (

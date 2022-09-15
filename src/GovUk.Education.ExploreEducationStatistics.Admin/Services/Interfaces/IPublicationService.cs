@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid publicationId,
             PublicationSaveRequest updatedPublication);
 
-        Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId);
+        Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId, bool permissions);
 
         Task<Either<ActionResult, ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId);
 
