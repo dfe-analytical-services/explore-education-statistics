@@ -14,14 +14,13 @@ import { PublicationSummary } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
 
 export interface Contact {
-  id: string; // @MarkFix remove?
   contactName: string;
   contactTelNo: string;
   teamEmail: string;
   teamName: string;
 }
 
-export interface SavePublicationContact {
+export interface ContactSave {
   contactName: string;
   contactTelNo: string;
   teamEmail: string;
@@ -76,12 +75,17 @@ export interface PublicationMethodologyDetails {
   externalMethodology?: ExternalMethodology;
 }
 
-// @MarkFix copy to create PublicationCreateRequest
-// and remove contact from PublicationSaveRequest
 export interface PublicationSaveRequest {
   title: string;
   summary: string;
-  contact: SavePublicationContact;
+  supersededById?: string;
+  topicId: string;
+}
+
+export interface PublicationCreateRequest {
+  title: string;
+  summary: string;
+  contact: ContactSave;
   supersededById?: string;
   topicId: string;
 }
@@ -108,7 +112,9 @@ const publicationService = {
     return client.get('/publication-summaries');
   },
 
-  createPublication(publication: PublicationSaveRequest): Promise<Publication> {
+  createPublication(
+    publication: PublicationCreateRequest,
+  ): Promise<Publication> {
     return client.post('/publications', publication);
   },
 
@@ -162,7 +168,7 @@ const publicationService = {
 
   updateContact(
     publicationId: string,
-    updatedContact: SavePublicationContact,
+    updatedContact: ContactSave,
   ): Promise<Contact> {
     return client.put(`publication/${publicationId}/contact`, updatedContact);
   },

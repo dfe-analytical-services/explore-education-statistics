@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
                 async service =>
-                    await service.CreatePublication(new PublicationSaveRequest
+                    await service.CreatePublication(new PublicationCreateRequest
                     {
                         TopicId = _topic.Id,
                     }),
@@ -124,13 +124,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         TopicId = _topic.Id,
                         Title = "Updated publication",
-                        Contact = new ContactSaveViewModel
-                        {
-                            TeamName = "Test team",
-                            TeamEmail = "team@test.com",
-                            ContactName = "John Smith",
-                            ContactTelNo = "0123456789"
-                        }
                     }),
                 _publication,
                 userService,
@@ -157,13 +150,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         TopicId = _topic.Id,
                         Title = "Updated publication",
-                        Contact = new ContactSaveViewModel
-                        {
-                            TeamName = "Test team",
-                            TeamEmail = "team@test.com",
-                            ContactName = "John Smith",
-                            ContactTelNo = "0123456789"
-                        }
                     }),
                 _publication,
                 userService,
@@ -190,13 +176,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         TopicId = _topic.Id,
                         Title = "Updated publication",
-                        Contact = new ContactSaveViewModel
-                        {
-                            TeamName = "Test team",
-                            TeamEmail = "team@test.com",
-                            ContactName = "John Smith",
-                            ContactTelNo = "0123456789"
-                        }
                     }),
                 _topic,
                 userService,

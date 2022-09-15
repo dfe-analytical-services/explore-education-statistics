@@ -4,7 +4,7 @@ import PublicationContactForm, {
 } from '@admin/pages/publication/components/PublicationContactForm';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
 import publicationService from '@admin/services/publicationService';
-import Button from '@common/components/Button';
+// import Button from '@common/components/Button'; // @MarkFix
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -23,41 +23,26 @@ const PublicationContactPage = () => {
   const lastLocation = useLastLocation();
   const [readOnly, toggleReadOnly] = useToggle(true);
 
-  const { value: publication } = useAsyncHandledRetry(
+  const { value: contact } = useAsyncHandledRetry(
     async () =>
       lastLocation && lastLocation !== location
-        ? publicationService.getMyPublication(publicationId)
-        : contextPublication,
+        ? publicationService.getContact(publicationId)
+        : contextPublication.contact,
     [publicationId],
   );
 
-  const handleSubmit = async ({
-    teamName,
-    teamEmail,
-    contactName,
-    contactTelNo,
-  }: PublicationContactFormValues) => {
-    if (!publication) {
+  const handleSubmit = async (updatedContact: PublicationContactFormValues) => {
+    if (!contact) {
       return;
     }
-    await publicationService.updatePublication(publicationId, {
-      ...publication,
-      contact: {
-        teamName,
-        teamEmail,
-        contactName,
-        contactTelNo,
-      },
-    });
+    await publicationService.updateContact(publicationId, updatedContact);
 
     onReload();
   };
 
-  if (!publication) {
+  if (!contact) {
     return <LoadingSpinner />;
   }
-
-  const { contact } = publication;
 
   return (
     <>
@@ -88,11 +73,11 @@ const PublicationContactPage = () => {
               {contact.contactTelNo}
             </SummaryListItem>
           </SummaryList>
-          {publication.permissions.canUpdatePublication && (
+          {/* {publication.permissions.canUpdatePublication && ( // @MarkFix add permissions to ContactViewModel
             <Button variant="secondary" onClick={toggleReadOnly.off}>
               Edit contact details
             </Button>
-          )}
+          )} */}
         </>
       ) : (
         <PublicationContactForm

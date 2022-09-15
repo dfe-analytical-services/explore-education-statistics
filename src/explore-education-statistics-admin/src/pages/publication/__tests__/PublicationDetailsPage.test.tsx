@@ -400,7 +400,6 @@ describe('PublicationDetailsPage', () => {
         expect(publicationService.updatePublication).toHaveBeenCalledWith<
           Parameters<typeof publicationService.updatePublication>
         >(testPublication.id, {
-          contact: testContact,
           supersededById: 'publication-2',
           title: 'Publication 1 updated',
           summary: 'Publication 1 summary',

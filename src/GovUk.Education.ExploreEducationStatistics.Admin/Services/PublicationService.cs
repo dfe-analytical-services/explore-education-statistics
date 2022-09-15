@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
-            PublicationSaveRequest publication)
+            PublicationCreateRequest publication)
         {
             return await ValidateSelectedTopic(publication.TopicId)
                 .OnSuccess(async _ =>
@@ -240,19 +240,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     publication.TopicId = updatedPublication.TopicId;
                     publication.Updated = DateTime.UtcNow;
                     publication.SupersededById = updatedPublication.SupersededById;
-
-                    // Replace existing contact that is shared with another publication with a new
-                    // contact, as we want each publication to have its own contact.
-                    if (_context.Publications
-                            .Any(p => p.ContactId == publication.ContactId && p.Id != publication.Id))
-                    {
-                        publication.Contact = new Contact();
-                    }
-
-                    publication.Contact.ContactName = updatedPublication.Contact.ContactName;
-                    publication.Contact.ContactTelNo = updatedPublication.Contact.ContactTelNo;
-                    publication.Contact.TeamName = updatedPublication.Contact.TeamName;
-                    publication.Contact.TeamEmail = updatedPublication.Contact.TeamEmail;
 
                     _context.Publications.Update(publication);
 

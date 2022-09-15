@@ -15,7 +15,6 @@ import React from 'react';
 const PublicationDetailsPage = () => {
   const { publication, onReload } = usePublicationContext();
   const {
-    contact,
     id,
     permissions,
     supersededById,
@@ -47,7 +46,6 @@ const PublicationDetailsPage = () => {
   const handleSubmit = async (values: PublicationDetailsFormValues) => {
     await publicationService.updatePublication(publication.id, {
       ...values,
-      contact,
     });
     onReload();
   };

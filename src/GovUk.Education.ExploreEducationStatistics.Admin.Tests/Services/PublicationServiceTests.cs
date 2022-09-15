@@ -106,7 +106,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication1.Topic.Theme.Id, publicationViewModel.Theme.Id);
                 Assert.Equal(publication1.Topic.Theme.Title, publicationViewModel.Theme.Title);
 
-                Assert.Equal(publication1.Contact.Id, publicationViewModel.Contact.Id);
                 Assert.Equal(publication1.Contact.ContactName, publicationViewModel.Contact.ContactName);
                 Assert.Equal(publication1.Contact.ContactTelNo, publicationViewModel.Contact.ContactTelNo);
                 Assert.Equal(publication1.Contact.TeamName, publicationViewModel.Contact.TeamName);
@@ -420,7 +419,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication1.Topic.Theme.Id, publicationViewModel.Theme.Id);
                 Assert.Equal(publication1.Topic.Theme.Title, publicationViewModel.Theme.Title);
 
-                Assert.Equal(publication1.Contact.Id, publicationViewModel.Contact.Id);
                 Assert.Equal(publication1.Contact.ContactName, publicationViewModel.Contact.ContactName);
                 Assert.Equal(publication1.Contact.ContactTelNo, publicationViewModel.Contact.ContactTelNo);
                 Assert.Equal(publication1.Contact.TeamName, publicationViewModel.Contact.TeamName);
@@ -1668,7 +1666,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication.Topic.ThemeId, result.Theme.Id);
                 Assert.Equal(publication.Topic.Theme.Title, result.Theme.Title);
 
-                Assert.Equal(publication.Contact.Id, result.Contact.Id);
                 Assert.Equal(publication.Contact.ContactName, result.Contact.ContactName);
                 Assert.Equal(publication.Contact.ContactTelNo, result.Contact.ContactTelNo);
                 Assert.Equal(publication.Contact.TeamEmail, result.Contact.TeamEmail);
@@ -2060,7 +2057,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Service method under test
                 var result = await publicationService.CreatePublication(
-                    new PublicationSaveRequest
+                    new PublicationCreateRequest
                     {
                         Title = "Test publication",
                         Summary = "Test summary",
@@ -2119,7 +2116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             // Service method under test
             var result = await publicationService.CreatePublication(
-                new PublicationSaveRequest
+                new PublicationCreateRequest
                 {
                     Title = "Test publication",
                     TopicId = Guid.NewGuid()
@@ -2158,7 +2155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Service method under test
                 var result = await publicationService.CreatePublication(
-                    new PublicationSaveRequest
+                    new PublicationCreateRequest
                     {
                         Title = "Test publication",
                         TopicId = topic.Id
@@ -2231,13 +2228,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Title = "New title",
                         Summary = "New summary",
-                        Contact = new ContactSaveViewModel
-                        {
-                            ContactName = "John Smith",
-                            ContactTelNo = "0123456789",
-                            TeamName = "Test team",
-                            TeamEmail = "john.smith@test.com",
-                        },
                         TopicId = topic.Id,
                         SupersededById = newSupersededById,
                     }
@@ -2250,10 +2240,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("New title", viewModel.Title);
                 Assert.Equal("New summary", viewModel.Summary);
 
-                Assert.Equal("John Smith", viewModel.Contact.ContactName);
-                Assert.Equal("0123456789", viewModel.Contact.ContactTelNo);
-                Assert.Equal("Test team", viewModel.Contact.TeamName);
-                Assert.Equal("john.smith@test.com", viewModel.Contact.TeamEmail);
+                Assert.Equal("Old name", viewModel.Contact.ContactName);
+                Assert.Equal("0987654321", viewModel.Contact.ContactTelNo);
+                Assert.Equal("Old team", viewModel.Contact.TeamName);
+                Assert.Equal("old.smith@test.com", viewModel.Contact.TeamEmail);
 
                 Assert.Equal(topic.Id, viewModel.Topic.Id);
                 Assert.Equal(topic.Title, viewModel.Topic.Title);
@@ -2271,10 +2261,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("New title", updatedPublication.Title);
                 Assert.Equal(newSupersededById, updatedPublication.SupersededById);
 
-                Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
-                Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
-                Assert.Equal("Test team", updatedPublication.Contact.TeamName);
-                Assert.Equal("john.smith@test.com", updatedPublication.Contact.TeamEmail);
+                Assert.Equal("Old name", updatedPublication.Contact.ContactName);
+                Assert.Equal("0987654321", updatedPublication.Contact.ContactTelNo);
+                Assert.Equal("Old team", updatedPublication.Contact.TeamName);
+                Assert.Equal("old.smith@test.com", updatedPublication.Contact.TeamEmail);
+
 
                 Assert.Equal(topic.Id, updatedPublication.TopicId);
                 Assert.Equal("New topic", updatedPublication.Topic.Title);
@@ -2323,7 +2314,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             var contextId = Guid.NewGuid().ToString();
-
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.AddRange(topic, publication, supersedingPublicationToRemove, supersededPublication);
@@ -2374,13 +2364,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Title = "New title",
                         Summary = "New summary",
-                        Contact = new ContactSaveViewModel
-                        {
-                            ContactName = "John Smith",
-                            ContactTelNo = "0123456789",
-                            TeamName = "Test team",
-                            TeamEmail = "john.smith@test.com",
-                        },
                         TopicId = topic.Id,
                         SupersededById = newSupersededById,
                     }
@@ -2396,10 +2379,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("New title", viewModel.Title);
                 Assert.Equal("New summary", viewModel.Summary);
 
-                Assert.Equal("John Smith", viewModel.Contact.ContactName);
-                Assert.Equal("0123456789", viewModel.Contact.ContactTelNo);
-                Assert.Equal("Test team", viewModel.Contact.TeamName);
-                Assert.Equal("john.smith@test.com", viewModel.Contact.TeamEmail);
+                Assert.Equal("Old name", viewModel.Contact.ContactName);
+                Assert.Equal("0987654321", viewModel.Contact.ContactTelNo);
+                Assert.Equal("Old team", viewModel.Contact.TeamName);
+                Assert.Equal("old.smith@test.com", viewModel.Contact.TeamEmail);
 
                 Assert.Equal(topic.Id, viewModel.Topic.Id);
                 Assert.Equal(topic.Title, viewModel.Topic.Title);
@@ -2418,10 +2401,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("New title", updatedPublication.Title);
                 Assert.Equal("New summary", updatedPublication.Summary);
 
-                Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
-                Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
-                Assert.Equal("Test team", updatedPublication.Contact.TeamName);
-                Assert.Equal("john.smith@test.com", updatedPublication.Contact.TeamEmail);
+                Assert.Equal("Old name", updatedPublication.Contact.ContactName);
+                Assert.Equal("0987654321", updatedPublication.Contact.ContactTelNo);
+                Assert.Equal("Old team", updatedPublication.Contact.TeamName);
+                Assert.Equal("old.smith@test.com", updatedPublication.Contact.TeamEmail);
 
                 Assert.Equal(topic.Id, updatedPublication.TopicId);
                 Assert.Equal("New topic", updatedPublication.Topic.Title);
@@ -2483,13 +2466,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Title = "Old title",
                         Summary = "New summary",
-                        Contact = new ContactSaveViewModel
-                        {
-                            ContactName = "John Smith",
-                            ContactTelNo = "0123456789",
-                            TeamName = "Test team",
-                            TeamEmail = "john.smith@test.com",
-                        },
                         TopicId = topic.Id,
                         SupersededById = publication.SupersededById,
                     }
@@ -2501,161 +2477,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("Old title", viewModel.Title);
                 Assert.Equal("New summary", viewModel.Summary);
-                Assert.Equal("John Smith", viewModel.Contact.ContactName);
+                Assert.Equal("Old name", viewModel.Contact.ContactName);
                 Assert.Equal(publication.SupersededById, viewModel.SupersededById);
-            }
-        }
-
-        [Fact]
-        public async Task UpdatePublication_SavesNewContact()
-        {
-            var publication = new Publication
-            {
-                Title = "Test title",
-                Slug = "test-slug",
-                Topic = new Topic
-                {
-                    Title = "Test topic",
-                    Theme = new Theme(),
-                },
-                Contact = new Contact(),
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.Add(publication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-
-                methodologyVersionRepository.Setup(mock =>
-                        mock.PublicationTitleChanged(
-                            publication.Id,
-                            publication.Slug,
-                            "New title",
-                            "new-slug"))
-                    .Returns(Task.CompletedTask);
-
-                var publicationService = BuildPublicationService(context,
-                    methodologyVersionRepository: methodologyVersionRepository.Object);
-
-                // Service method under test
-                var result = await publicationService.UpdatePublication(
-                    publication.Id,
-                    new PublicationSaveRequest
-                    {
-                        Title = "New title",
-                        Slug = "new-slug",
-                        Contact = new ContactSaveViewModel
-                        {
-                            ContactName = "John Smith",
-                            ContactTelNo = "0123456789",
-                            TeamName = "Test team",
-                            TeamEmail = "john.smith@test.com",
-                        },
-                        TopicId = publication.TopicId
-                    }
-                );
-
-                VerifyAllMocks(methodologyVersionRepository);
-
-                var viewModel = result.AssertRight();
-
-                var updatedPublication = await context.Publications.FindAsync(viewModel.Id);
-
-                Assert.NotNull(updatedPublication);
-                Assert.Equal("John Smith", updatedPublication!.Contact.ContactName);
-                Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
-                Assert.Equal("Test team", updatedPublication.Contact.TeamName);
-                Assert.Equal("john.smith@test.com", updatedPublication.Contact.TeamEmail);
-            }
-        }
-
-        [Fact]
-        public async Task UpdatePublication_SavesNewContactWhenSharedWithOtherPublication()
-        {
-            var sharedContact = new Contact
-            {
-                Id = Guid.NewGuid(),
-                ContactName = "Old name",
-                ContactTelNo = "0987654321",
-                TeamName = "Old team",
-                TeamEmail = "old.smith@test.com",
-            };
-            var publication = new Publication
-            {
-                Title = "Test publication",
-                Slug = "test-publication",
-                Topic = new Topic
-                {
-                    Title = "Test topic",
-                    Theme = new Theme(),
-                },
-                Contact = sharedContact
-            };
-            var otherPublication = new Publication
-            {
-                Title = "Other publication",
-                Summary = "Other publication summary",
-                Contact = sharedContact
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.AddRangeAsync(publication, otherPublication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-
-                methodologyVersionRepository.Setup(mock =>
-                        mock.PublicationTitleChanged(
-                            publication.Id,
-                            publication.Slug,
-                            "New title",
-                            "new-title"))
-                    .Returns(Task.CompletedTask);
-
-                var publicationService = BuildPublicationService(context,
-                    methodologyVersionRepository: methodologyVersionRepository.Object);
-
-                // Service method under test
-                var result = await publicationService.UpdatePublication(
-                    publication.Id,
-                    new PublicationSaveRequest
-                    {
-                        Title = "New title",
-                        Contact = new ContactSaveViewModel
-                        {
-                            ContactName = "John Smith",
-                            ContactTelNo = "0123456789",
-                            TeamName = "Test team",
-                            TeamEmail = "john.smith@test.com",
-                        },
-                        TopicId = publication.TopicId
-                    }
-                );
-
-                VerifyAllMocks(methodologyVersionRepository);
-
-                var viewModel = result.AssertRight();
-
-                var updatedPublication = await context.Publications.FindAsync(viewModel.Id);
-
-                Assert.NotNull(updatedPublication);
-                Assert.NotEqual(sharedContact.Id, updatedPublication!.Contact.Id);
-                Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
-                Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
-                Assert.Equal("Test team", updatedPublication.Contact.TeamName);
-                Assert.Equal("john.smith@test.com", updatedPublication.Contact.TeamEmail);
             }
         }
 
@@ -2738,13 +2561,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Title = "Test title",
                         Slug = "test-slug",
-                        Contact = new ContactSaveViewModel
-                        {
-                            ContactName = "John Smith",
-                            ContactTelNo = "0123456789",
-                            TeamName = "Test team",
-                            TeamEmail = "john.smith@test.com",
-                        },
                         TopicId = publication.TopicId,
                     }
                 );

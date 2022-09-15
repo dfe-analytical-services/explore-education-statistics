@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, List<PublicationSummaryViewModel>>> ListPublicationSummaries();
 
         Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
-            PublicationSaveRequest publication);
+            PublicationCreateRequest publication);
 
         Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(
             Guid publicationId,

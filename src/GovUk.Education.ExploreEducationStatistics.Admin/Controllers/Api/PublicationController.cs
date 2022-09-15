@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpPost("api/publications")]
         public async Task<ActionResult<PublicationViewModel>> CreatePublication(
-            PublicationSaveRequest publication)
+            PublicationCreateRequest publication)
         {
             return await _publicationService
                 .CreatePublication(publication)
