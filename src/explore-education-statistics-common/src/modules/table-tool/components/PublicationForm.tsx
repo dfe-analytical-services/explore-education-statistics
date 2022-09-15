@@ -142,7 +142,7 @@ const PublicationForm = ({
                   {searchTerm && publications.length > 0 && (
                     <p>
                       <a
-                        href={`${formId}-publications`}
+                        href={`#${formId}-publications`}
                         className="govuk-!-margin-top-3 govuk-!-font-size-14"
                       >
                         Skip to search results
@@ -176,7 +176,7 @@ const PublicationForm = ({
 
                   <div className={styles.publicationsList}>
                     <FormFieldRadioGroup
-                      id={`${formId}-publications`}
+                      id="publications"
                       legend={
                         <>
                           Select a publication
