@@ -212,7 +212,7 @@ const PageSearchForm = ({
                   <>
                     <div className={styles.resultHeader}>{result.text}</div>
                     {result.location && (
-                      <div className={styles.resultLocation}>
+                      <div className={styles.resultLocation} aria-hidden>
                         {result.location}
                       </div>
                     )}

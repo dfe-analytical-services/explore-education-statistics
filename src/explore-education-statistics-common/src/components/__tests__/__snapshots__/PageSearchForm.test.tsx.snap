@@ -58,6 +58,7 @@ exports[`PageSearchForm renders results found in custom selectors 1`] = `
       </span>
     </div>
     <div
+      aria-hidden="true"
       class="resultLocation"
     >
       Section 1
@@ -238,6 +239,7 @@ exports[`PageSearchForm result locations include accordion sections 1`] = `
       </span>
     </div>
     <div
+      aria-hidden="true"
       class="resultLocation"
     >
       Section 1 &gt; Section 2 &gt; Accordion section 1 &gt; Section 3
@@ -268,6 +270,7 @@ exports[`PageSearchForm result locations include accordion sections 1`] = `
       </span>
     </div>
     <div
+      aria-hidden="true"
       class="resultLocation"
     >
       Section 1 &gt; Section 2 &gt; Accordion section 2
@@ -308,6 +311,7 @@ exports[`PageSearchForm result locations include heading hierarchy 1`] = `
       </span>
     </div>
     <div
+      aria-hidden="true"
       class="resultLocation"
     >
       Section 1 &gt; Section 2 &gt; Section 3
@@ -348,6 +352,7 @@ exports[`PageSearchForm result locations uses nearest heading 1`] = `
       </span>
     </div>
     <div
+      aria-hidden="true"
       class="resultLocation"
     >
       Section 1
@@ -378,6 +383,7 @@ exports[`PageSearchForm result locations uses nearest heading 1`] = `
       </span>
     </div>
     <div
+      aria-hidden="true"
       class="resultLocation"
     >
       Section 2
