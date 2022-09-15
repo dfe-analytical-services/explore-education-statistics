@@ -169,13 +169,13 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               </Link>
             </SummaryListItem>
           </SummaryList>
-          <VisuallyHidden>
+          <VisuallyHidden as="h2">
             {/** 
               Visually hidden h2 as currently the release intro editor only starts from h3
               meaning that this breaks sequential heading order.
               @see {@link https://dfedigital.atlassian.net/browse/EES-3541}
               */}
-            <h2>Introduction</h2>
+            Introduction
           </VisuallyHidden>
           {release.summarySection.content.map(block => (
             <ContentBlockRenderer
