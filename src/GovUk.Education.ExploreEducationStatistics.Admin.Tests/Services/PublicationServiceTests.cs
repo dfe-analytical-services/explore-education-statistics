@@ -2998,13 +2998,71 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var service = BuildPublicationService(context: contentDbContext);
 
-            var result = await service.GetContact(publication.Id);
+            var result = await service.GetContact(publication.Id, false);
             var contact = result.AssertRight();
 
             Assert.Equal(publication.Contact.ContactName, contact.ContactName);
             Assert.Equal(publication.Contact.ContactTelNo, contact.ContactTelNo);
             Assert.Equal(publication.Contact.TeamName, contact.TeamName);
             Assert.Equal(publication.Contact.TeamEmail, contact.TeamEmail);
+            Assert.Null(contact.Permissions);
+        }
+
+        [Fact]
+        public async Task GetContact_NoContact()
+        {
+            var publication = new Publication();
+
+            var contentDbContext = InMemoryApplicationDbContext();
+            await contentDbContext.Publications.AddAsync(publication);
+            await contentDbContext.SaveChangesAsync();
+
+            var service = BuildPublicationService(context: contentDbContext);
+
+            var result = await service.GetContact(publication.Id, false);
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task GetContact_Permissions()
+        {
+            var publication = new Publication
+            {
+                Contact = new Contact
+                {
+                    ContactName = "contact name",
+                    ContactTelNo = "12345",
+                    TeamName = "team name",
+                    TeamEmail = "team@email.com",
+                },
+            };
+
+            var contentDbContext = InMemoryApplicationDbContext();
+            await contentDbContext.Publications.AddAsync(publication);
+            await contentDbContext.SaveChangesAsync();
+
+            var userService = new Mock<IUserService>(Strict);
+
+            userService.Setup(s =>
+                    s.MatchesPolicy(It.Is<Publication>(p => p.Id == publication.Id), CanViewSpecificPublication))
+                .ReturnsAsync(true);
+            userService.Setup(s =>
+                    s.MatchesPolicy(It.Is<Publication>(p => p.Id == publication.Id), CanUpdateSpecificPublication))
+                .ReturnsAsync(false);
+
+            var service = BuildPublicationService(context: contentDbContext,
+                userService: userService.Object);
+
+            var result = await service.GetContact(publication.Id, true);
+            var contact = result.AssertRight();
+
+            Assert.Equal(publication.Contact.ContactName, contact.ContactName);
+            Assert.Equal(publication.Contact.ContactTelNo, contact.ContactTelNo);
+            Assert.Equal(publication.Contact.TeamName, contact.TeamName);
+            Assert.Equal(publication.Contact.TeamEmail, contact.TeamEmail);
+
+            Assert.NotNull(contact.Permissions);
+            Assert.False(contact.Permissions!.CanUpdatePublication);
         }
 
         [Fact]
@@ -3014,7 +3072,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var service = BuildPublicationService(context: contentDbContext);
 
-            var result = await service.GetContact(Guid.NewGuid());
+            var result = await service.GetContact(Guid.NewGuid(), false);
             result.AssertNotFound();
         }
 

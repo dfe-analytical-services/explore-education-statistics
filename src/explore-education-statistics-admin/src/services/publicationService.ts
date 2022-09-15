@@ -13,11 +13,16 @@ import { OmitStrict } from '@common/types';
 import { PublicationSummary } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
 
+export interface ContactPermissions {
+  canUpdatePublication: boolean;
+}
+
 export interface Contact {
   contactName: string;
   contactTelNo: string;
   teamEmail: string;
   teamName: string;
+  permissions?: ContactPermissions;
 }
 
 export interface ContactSave {
@@ -162,8 +167,10 @@ const publicationService = {
     return client.delete(`/publication/${publicationId}/external-methodology`);
   },
 
-  getContact(publicationId: string): Promise<Contact> {
-    return client.get(`publication/${publicationId}/contact`);
+  getContact(publicationId: string, permissions: boolean): Promise<Contact> {
+    return client.get(`publication/${publicationId}/contact`, {
+      params: { permissions },
+    });
   },
 
   updateContact(

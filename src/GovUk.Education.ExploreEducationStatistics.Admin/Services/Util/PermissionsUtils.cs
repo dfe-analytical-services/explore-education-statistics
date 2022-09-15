@@ -61,4 +61,15 @@ public static class PermissionsUtils
                 await userService.CheckCanDropMethodologyLink(publicationMethodology).IsRight()
         };
     }
+
+    public static async Task<ContactViewModel.ContactPermissions> GetContactPermissions(
+        IUserService userService,
+        Publication publication
+    )
+    {
+        return new ContactViewModel.ContactPermissions
+        {
+            CanUpdatePublication = await userService.CheckCanUpdatePublication(publication).IsRight(),
+        };
+    }
 }

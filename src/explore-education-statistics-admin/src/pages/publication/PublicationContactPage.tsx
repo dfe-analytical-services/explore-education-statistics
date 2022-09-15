@@ -1,33 +1,22 @@
-import { useLastLocation } from '@admin/contexts/LastLocationContext';
 import PublicationContactForm, {
   PublicationContactFormValues,
 } from '@admin/pages/publication/components/PublicationContactForm';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
 import publicationService from '@admin/services/publicationService';
-// import Button from '@common/components/Button'; // @MarkFix
+import Button from '@common/components/Button';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import React from 'react';
-import { useLocation } from 'react-router';
 
 const PublicationContactPage = () => {
-  const {
-    publicationId,
-    publication: contextPublication,
-    onReload,
-  } = usePublicationContext();
-  const location = useLocation();
-  const lastLocation = useLastLocation();
+  const { publicationId, onReload } = usePublicationContext();
   const [readOnly, toggleReadOnly] = useToggle(true);
 
   const { value: contact } = useAsyncHandledRetry(
-    async () =>
-      lastLocation && lastLocation !== location
-        ? publicationService.getContact(publicationId)
-        : contextPublication.contact,
+    async () => publicationService.getContact(publicationId, true),
     [publicationId],
   );
 
@@ -73,11 +62,11 @@ const PublicationContactPage = () => {
               {contact.contactTelNo}
             </SummaryListItem>
           </SummaryList>
-          {/* {publication.permissions.canUpdatePublication && ( // @MarkFix add permissions to ContactViewModel
+          {contact.permissions?.canUpdatePublication && (
             <Button variant="secondary" onClick={toggleReadOnly.off}>
               Edit contact details
             </Button>
-          )} */}
+          )}
         </>
       ) : (
         <PublicationContactForm

@@ -5,6 +5,9 @@ export const testContact: Contact = {
   contactTelNo: '0777777777',
   teamEmail: 'john.smith@test.com',
   teamName: 'Team Smith',
+  permissions: {
+    canUpdatePublication: true,
+  },
 };
 
 export const testPublication: MyPublication = {

@@ -22,6 +22,9 @@ export const testRelease: Release = {
     teamEmail: 'test@test.com',
     contactName: 'Test contact name',
     contactTelNo: '1111 1111 1111',
+    permissions: {
+      canUpdatePublication: true,
+    },
   },
   previousVersionId: '',
   preReleaseAccessList: '',

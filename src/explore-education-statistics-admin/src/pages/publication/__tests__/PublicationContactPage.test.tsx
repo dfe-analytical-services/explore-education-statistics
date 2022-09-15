@@ -17,6 +17,13 @@ const publicationService = _publicationService as jest.Mocked<
 
 describe('PublicationContactPage', () => {
   test('renders the contact page correctly', async () => {
+    publicationService.getContact.mockResolvedValue({
+      ...testPublication.contact,
+      permissions: {
+        canUpdatePublication: true,
+      },
+    });
+
     renderPage(testPublication);
 
     await waitFor(() => {
@@ -39,13 +46,14 @@ describe('PublicationContactPage', () => {
   });
 
   test('does not show the edit button if do not have permission', async () => {
-    renderPage({
-      ...testPublication,
+    publicationService.getContact.mockResolvedValue({
+      ...testPublication.contact,
       permissions: {
-        ...testPublication.permissions,
         canUpdatePublication: false,
       },
     });
+
+    renderPage(testPublication);
 
     await waitFor(() => {
       expect(
@@ -59,6 +67,13 @@ describe('PublicationContactPage', () => {
   });
 
   test('clicking the edit button shows the edit form', async () => {
+    publicationService.getContact.mockResolvedValue({
+      ...testPublication.contact,
+      permissions: {
+        canUpdatePublication: true,
+      },
+    });
+
     renderPage(testPublication);
 
     await waitFor(() => {
@@ -86,6 +101,13 @@ describe('PublicationContactPage', () => {
   });
 
   test('clicking the cancel button switches back to readOnly view', async () => {
+    publicationService.getContact.mockResolvedValue({
+      ...testPublication.contact,
+      permissions: {
+        canUpdatePublication: true,
+      },
+    });
+
     renderPage(testPublication);
 
     await waitFor(() => {
@@ -119,6 +141,13 @@ describe('PublicationContactPage', () => {
   });
 
   test('shows validation errors when there are no contact details', async () => {
+    publicationService.getContact.mockResolvedValue({
+      ...testPublication.contact,
+      permissions: {
+        canUpdatePublication: true,
+      },
+    });
+
     renderPage(testPublication);
 
     await waitFor(() => {
@@ -171,6 +200,13 @@ describe('PublicationContactPage', () => {
   });
 
   test('show validation error when contact email is not valid', async () => {
+    publicationService.getContact.mockResolvedValue({
+      ...testPublication.contact,
+      permissions: {
+        canUpdatePublication: true,
+      },
+    });
+
     renderPage(testPublication);
 
     await waitFor(() => {
@@ -199,6 +235,13 @@ describe('PublicationContactPage', () => {
   });
 
   test('shows a confirmation modal on submit', async () => {
+    publicationService.getContact.mockResolvedValue({
+      ...testPublication.contact,
+      permissions: {
+        canUpdatePublication: true,
+      },
+    });
+
     renderPage(testPublication);
 
     await waitFor(() => {
@@ -225,6 +268,13 @@ describe('PublicationContactPage', () => {
   });
 
   test('clicking confirm calls the publication service', async () => {
+    publicationService.getContact.mockResolvedValue({
+      ...testPublication.contact,
+      permissions: {
+        canUpdatePublication: true,
+      },
+    });
+
     renderPage(testPublication);
 
     await waitFor(() => {
@@ -244,17 +294,9 @@ describe('PublicationContactPage', () => {
     userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
-      expect(publicationService.updatePublication).toHaveBeenCalledWith(
+      expect(publicationService.updateContact).toHaveBeenCalledWith(
         testPublication.id,
-        {
-          ...testPublication,
-          contact: {
-            contactName: 'John Smith',
-            contactTelNo: '0777777777',
-            teamEmail: 'john.smith@test.com',
-            teamName: 'Team Smith',
-          },
-        },
+        testPublication.contact,
       );
     });
   });

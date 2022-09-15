@@ -72,7 +72,6 @@ describe('PublicationsTab', () => {
   ];
 
   const testContact: Contact = {
-    id: 'contact-1',
     contactName: 'John Smith',
     contactTelNo: '0777777777',
     teamEmail: 'john.smith@test.com',

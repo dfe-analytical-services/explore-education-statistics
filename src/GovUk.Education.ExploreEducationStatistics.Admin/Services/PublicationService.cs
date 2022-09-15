@@ -354,12 +354,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId)
+        public async Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId, bool permissions)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId)
+                .CheckEntityExists<Publication>(publicationId, query =>
+                    query.Include(p => p.Contact))
                 .OnSuccessDo(_userService.CheckCanViewPublication)
-                .OnSuccess(publication => _mapper.Map<ContactViewModel>(publication.Contact));
+                .OnSuccess(async publication =>
+                {
+                    var contact = _mapper.Map<ContactViewModel>(publication.Contact);
+
+                    if (permissions)
+                    {
+                        contact.Permissions = await PermissionsUtils.GetContactPermissions(_userService, publication);
+                    }
+
+                    return contact;
+                });
         }
 
         public async Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId, Contact updatedContact)
