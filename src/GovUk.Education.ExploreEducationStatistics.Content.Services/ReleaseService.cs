@@ -46,10 +46,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             _mapper = mapper;
         }
 
+        public async Task<Either<ActionResult, CachedReleaseViewModel>> GetRelease(string publicationSlug,
+            string? releaseSlug = null)
+        {
+            return await _persistenceHelper.CheckEntityExists<Publication>(q =>
+                    q.Include(p => p.Releases)
+                        .Where(p => p.Slug == publicationSlug)
+                )
+                .OnSuccess(publication =>
+                {
+                    // If no release is requested get the latest published version of the latest published release.
+                    // Otherwise get the latest published version of the requested release.
+                    return releaseSlug == null
+                        ? publication.LatestPublishedRelease()
+                        : publication.Releases
+                            .SingleOrDefault(r => r.Slug == releaseSlug && r.IsLatestPublishedVersionOfRelease());
+                }).OnSuccess(async release =>
+                {
+                    if (release == null)
+                    {
+                        return new NotFoundResult();
+                    }
+                    // Build the view model for the published release
+                    return await GetRelease(release.Id);
+                });
+        }
+
         public async Task<Either<ActionResult, CachedReleaseViewModel>> GetRelease(Guid releaseId,
             DateTime? expectedPublishDate = null)
         {
-            // Note this method can deliberately return an unpublished Release so that Publisher can use it
+            // Note this method is allowed to return an unpublished Release so that Publisher can use it
             // to cache a release in advance of it going live.
 
             var release = _contentDbContext.Releases

@@ -10,6 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 {
     public interface IReleaseService
     {
+        Task<Either<ActionResult, CachedReleaseViewModel>> GetRelease(string publicationSlug,
+            string? releaseSlug);
+
         Task<Either<ActionResult, CachedReleaseViewModel>> GetRelease(Guid releaseId, DateTime? expectedPublishDate);
 
         Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> List(string publicationSlug);

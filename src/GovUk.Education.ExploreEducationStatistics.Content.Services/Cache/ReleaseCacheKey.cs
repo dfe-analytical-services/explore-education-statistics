@@ -13,6 +13,12 @@ public record ReleaseCacheKey : IBlobCacheKey
 
     private string? ReleaseSlug { get; }
 
+    public ReleaseCacheKey(string publicationSlug, string? releaseSlug = null)
+    {
+        PublicationSlug = publicationSlug;
+        ReleaseSlug = releaseSlug;
+    }
+
     public ReleaseCacheKey(bool staging, string publicationSlug, string? releaseSlug = null)
     {
         Staging = staging;

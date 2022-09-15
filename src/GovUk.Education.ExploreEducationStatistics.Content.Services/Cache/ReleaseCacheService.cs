@@ -1,55 +1,37 @@
 ﻿#nullable enable
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 
 public class ReleaseCacheService : IReleaseCacheService
 {
-    private readonly IBlobStorageService _blobStorageService;
     private readonly IMethodologyCacheService _methodologyCacheService;
     private readonly IPublicationCacheService _publicationCacheService;
     private readonly IReleaseService _releaseService;
 
-    public ReleaseCacheService(IBlobStorageService blobStorageService,
+    public ReleaseCacheService(
         IMethodologyCacheService methodologyCacheService,
         IPublicationCacheService publicationCacheService,
         IReleaseService releaseService)
     {
-        _blobStorageService = blobStorageService;
         _methodologyCacheService = methodologyCacheService;
         _publicationCacheService = publicationCacheService;
         _releaseService = releaseService;
     }
 
-    public async Task<Either<ActionResult, CachedReleaseViewModel>> GetRelease(string publicationSlug,
+    [BlobCache(typeof(ReleaseCacheKey), ServiceName = "public")]
+    public Task<Either<ActionResult, CachedReleaseViewModel>> GetRelease(string publicationSlug,
         string? releaseSlug = null)
     {
-        var releasePath = releaseSlug != null
-            ? PublicContentReleasePath(publicationSlug, releaseSlug)
-            : PublicContentLatestReleasePath(publicationSlug);
-        try
-        {
-            return await _blobStorageService.GetDeserializedJson<CachedReleaseViewModel>(
-                BlobContainers.PublicContent,
-                releasePath
-            ) ?? new Either<ActionResult, CachedReleaseViewModel>(new NotFoundResult());
-        }
-        catch (FileNotFoundException)
-        {
-            return new NotFoundResult();
-        }
+        return _releaseService.GetRelease(publicationSlug, releaseSlug);
     }
 
     public Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummary(string publicationSlug,

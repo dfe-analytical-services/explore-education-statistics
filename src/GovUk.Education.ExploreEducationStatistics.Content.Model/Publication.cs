@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public List<Release> GetPublishedReleases()
         {
             return Releases
-                .Where(r => IsLatestPublishedVersionOfRelease(r))
+                .Where(IsLatestPublishedVersionOfRelease)
                 .ToList();
         }
 
