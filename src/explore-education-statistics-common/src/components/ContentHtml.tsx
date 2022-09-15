@@ -1,14 +1,11 @@
-import sanitizeHtml, { SanitizeHtmlOptions } from '@common/utils/sanitizeHtml';
-import parseHtmlString, { DOMNode, domToReact } from 'html-react-parser';
-import { Element } from 'domhandler/lib/node';
-import classNames from 'classnames';
-import React, { createRef, useEffect, useMemo, useState } from 'react';
-import { GlossaryEntry } from '@common/services/types/glossary';
-import Modal from '@common/components/Modal';
-import InfoIcon from '@common/components/InfoIcon';
+import GlossaryEntryButton from '@common/components/GlossaryEntryButton';
 import useMounted from '@common/hooks/useMounted';
-import ButtonText from '@common/components/ButtonText';
-import Button from '@common/components/Button';
+import { GlossaryEntry } from '@common/services/types/glossary';
+import sanitizeHtml, { SanitizeHtmlOptions } from '@common/utils/sanitizeHtml';
+import classNames from 'classnames';
+import { Element } from 'domhandler/lib/node';
+import parseHtmlString, { DOMNode, domToReact } from 'html-react-parser';
+import React, { useEffect, useMemo, useRef } from 'react';
 
 export interface ContentHtmlProps {
   className?: string;
@@ -30,31 +27,26 @@ const ContentHtml = ({
   trackGlossaryLinks,
 }: ContentHtmlProps) => {
   const { isMounted } = useMounted();
-  const contentAreaRef = createRef<HTMLDivElement>();
+  const contentAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const currentRef = contentAreaRef.current;
+
     const handleClick = (event: MouseEvent) => {
       const element = event.target as HTMLAnchorElement;
-      if (
-        trackContentLinks &&
-        element.tagName.toLowerCase() === 'a' &&
-        element.href
-      ) {
+
+      if (trackContentLinks && element.tagName === 'A' && element.href) {
         event.preventDefault();
         trackContentLinks(element.href, element.target === '_blank');
       }
     };
 
     currentRef?.addEventListener('click', handleClick);
+
     return () => {
       currentRef?.removeEventListener('click', handleClick);
     };
   }, [contentAreaRef, trackContentLinks]);
-
-  const [glossaryEntry, setGlossaryEntry] = useState<GlossaryEntry | undefined>(
-    undefined,
-  );
 
   const cleanHtml = useMemo(() => {
     return sanitizeHtml(html, sanitizeOptions);
@@ -62,65 +54,38 @@ const ContentHtml = ({
 
   const parsedContent = parseHtmlString(cleanHtml, {
     replace: (node: DOMNode) => {
+      if (!(node instanceof Element)) {
+        return undefined;
+      }
+
       if (
         getGlossaryEntry &&
-        node instanceof Element &&
         node.name === 'a' &&
-        node.attribs &&
-        Object.keys(node.attribs).includes('data-glossary')
+        typeof node.attribs['data-glossary'] !== 'undefined'
       ) {
-        const linkText = domToReact(node.children);
-        const glossaryEntrySlug = node.attribs.href.split('#')[1];
         return isMounted ? (
-          <>
-            <ButtonText
-              onClick={async () => {
-                const newGlossaryEntry = await getGlossaryEntry(
-                  glossaryEntrySlug,
-                );
-                setGlossaryEntry(newGlossaryEntry);
-                if (trackGlossaryLinks) {
-                  trackGlossaryLinks(glossaryEntrySlug);
-                }
-              }}
-            >
-              {linkText}{' '}
-              <InfoIcon description="(show glossary term definition)" />
-            </ButtonText>
-          </>
-        ) : (
-          <a href={node.attribs.href}>{linkText}</a>
-        );
+          <GlossaryEntryButton
+            href={node.attribs.href}
+            getEntry={getGlossaryEntry}
+            onToggle={trackGlossaryLinks}
+          >
+            {domToReact(node.children)}
+          </GlossaryEntryButton>
+        ) : undefined;
       }
+
       return undefined;
     },
   });
 
   return (
-    <>
-      <div
-        className={classNames('dfe-content', className)}
-        data-testid={testId}
-        ref={contentAreaRef}
-      >
-        {parsedContent}
-      </div>
-      {glossaryEntry && (
-        <Modal
-          title={glossaryEntry.title}
-          onExit={() => setGlossaryEntry(undefined)}
-        >
-          {parseHtmlString(sanitizeHtml(glossaryEntry.body, sanitizeOptions))}
-          <Button
-            onClick={() => {
-              setGlossaryEntry(undefined);
-            }}
-          >
-            Close
-          </Button>
-        </Modal>
-      )}
-    </>
+    <div
+      className={classNames('dfe-content', className)}
+      data-testid={testId}
+      ref={contentAreaRef}
+    >
+      {parsedContent}
+    </div>
   );
 };
 
