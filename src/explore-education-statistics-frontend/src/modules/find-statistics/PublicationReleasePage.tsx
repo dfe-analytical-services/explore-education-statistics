@@ -33,6 +33,7 @@ import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 
@@ -168,7 +169,14 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               </Link>
             </SummaryListItem>
           </SummaryList>
-
+          <VisuallyHidden as="h2">
+            {/** 
+              Visually hidden h2 as currently the release intro editor only starts from h3
+              meaning that this breaks sequential heading order.
+              @see {@link https://dfedigital.atlassian.net/browse/EES-3541}
+              */}
+            Introduction
+          </VisuallyHidden>
           {release.summarySection.content.map(block => (
             <ContentBlockRenderer
               key={block.id}
