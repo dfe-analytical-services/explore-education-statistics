@@ -191,6 +191,7 @@ const PageSearchForm = ({
         id={id}
         inputProps={{
           placeholder: 'Search this page',
+          type: 'search',
         }}
         inputLabel={inputLabel}
         listBoxLabelId={`${id}-resultsLabel`}
