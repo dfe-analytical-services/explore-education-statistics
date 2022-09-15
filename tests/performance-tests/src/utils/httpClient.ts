@@ -5,11 +5,11 @@ interface HttpHeaders {
 }
 
 export default class HttpClient {
-  private baseUrl: string;
+  private readonly baseUrl: string;
 
-  private accessToken: string;
+  private readonly accessToken?: string;
 
-  private checkResponseStatus: boolean;
+  private readonly checkResponseStatus: boolean;
 
   constructor({
     baseUrl,
@@ -17,7 +17,7 @@ export default class HttpClient {
     checkResponseStatus = true,
   }: {
     baseUrl: string;
-    accessToken: string;
+    accessToken?: string;
     checkResponseStatus?: boolean;
   }) {
     this.baseUrl = baseUrl;
@@ -136,11 +136,15 @@ export default class HttpClient {
     return response;
   }
 
-  private static getDefaultParams(accessToken: string): RefinedParams<'text'> {
+  private static getDefaultParams(accessToken?: string): RefinedParams<'text'> {
     return {
       timeout: '300s',
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        ...(accessToken
+          ? {
+              Authorization: `Bearer ${accessToken}`,
+            }
+          : {}),
       },
     };
   }

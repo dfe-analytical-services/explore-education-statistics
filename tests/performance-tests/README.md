@@ -89,10 +89,10 @@ run the following commands:
 
 ```bash
 sudo ufw allow from 172.30.0.0/24 to any port 3000 # Public site
-sudo ufw allow from 172.30.0.0/24 to any port 3050 # Keycloak
 sudo ufw allow from 172.30.0.0/24 to any port 5000 # Data API
 sudo ufw allow from 172.30.0.0/24 to any port 5010 # Content API
 sudo ufw allow from 172.30.0.0/24 to any port 5021 # Admin site / Admin API
+sudo ufw allow from 172.30.0.0/24 to any port 5030 # Keycloak
 ```
 
 #### Obtain auth tokens for Admin testing

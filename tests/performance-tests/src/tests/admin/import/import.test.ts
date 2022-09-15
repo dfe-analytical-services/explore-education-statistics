@@ -2,7 +2,7 @@
 import { check, fail } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
-import createDataService from '../../../utils/dataService';
+import createAdminService from '../../../utils/adminService';
 import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
 
@@ -91,29 +91,29 @@ const { authTokens, userName } = environmentAndUsers.users.find(
 )!;
 
 export function setup(): SetupData {
-  const dataService = createDataService(adminUrl, authTokens.accessToken);
+  const adminService = createAdminService(adminUrl, authTokens.accessToken);
 
   const suffix = alwaysCreateNewDataPerTest
     ? `-${Date.now()}-${Math.random()}`
     : '';
 
-  const { id: themeId } = dataService.getOrCreateTheme({
+  const { id: themeId } = adminService.getOrCreateTheme({
     title: `UI test theme - Performance tests - "import.test.ts" - ${suffix}`,
   });
 
-  const { id: topicId } = dataService.getOrCreateTopic({
+  const { id: topicId } = adminService.getOrCreateTopic({
     themeId,
     title: `UI test topic - Performance tests - "import.test.ts" - ${suffix}`,
   });
 
   const publicationTitle = `UI test publication - Performance tests - "import.test.ts" - ${suffix}`;
 
-  const { id: publicationId } = dataService.getOrCreatePublication({
+  const { id: publicationId } = adminService.getOrCreatePublication({
     topicId,
     title: publicationTitle,
   });
 
-  const { id: releaseId } = dataService.getOrCreateRelease({
+  const { id: releaseId } = adminService.getOrCreateRelease({
     topicId,
     publicationId,
     publicationTitle,
@@ -143,11 +143,11 @@ const performTest = ({ releaseId }: SetupData) => {
   const uniqueId = Date.now();
   const subjectName = `dates-${uniqueId}`;
 
-  const dataService = createDataService(adminUrl, accessToken, false);
+  const adminService = createAdminService(adminUrl, accessToken, false);
 
   console.log(`Uploading subject ${subjectName}`);
 
-  const { response: uploadResponse, id: fileId } = dataService.uploadDataFile({
+  const { response: uploadResponse, id: fileId } = adminService.uploadDataFile({
     title: subjectName,
     releaseId,
     dataFile: {
@@ -184,7 +184,7 @@ const performTest = ({ releaseId }: SetupData) => {
 
   const importStartTime = Date.now();
 
-  dataService.waitForDataFileToImport({
+  adminService.waitForDataFileToImport({
     releaseId,
     fileId,
     pollingDelaySeconds: IMPORT_STATUS_POLLING_DELAY_SECONDS,
@@ -246,10 +246,10 @@ export const teardown = ({ themeId, topicId }: SetupData) => {
       authTokens,
     );
 
-    const dataService = createDataService(adminUrl, accessToken);
+    const adminService = createAdminService(adminUrl, accessToken);
 
-    dataService.deleteTopic({ topicId });
-    dataService.deleteTheme({ themeId });
+    adminService.deleteTopic({ topicId });
+    adminService.deleteTheme({ themeId });
 
     console.log(`Deleted Theme ${themeId}, Topic ${topicId}`);
   }
