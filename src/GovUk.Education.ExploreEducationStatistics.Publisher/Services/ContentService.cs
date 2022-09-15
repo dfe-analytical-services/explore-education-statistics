@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
@@ -9,13 +8,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.IBlobStorageService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -101,28 +98,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        /**
-         * Intended to be used as a Development / BAU Function to perform a full content refresh
-         */
-        public async Task UpdateAllContentAsync()
-        {
-            var context = new PublishContext(DateTime.UtcNow, false);
-
-            await DeleteAllContentExcludingStaging();
-
-            var publications = _publicationService.GetPublicationsWithPublishedReleases();
-
-            foreach (var publication in publications)
-            {
-                var releases = publication.Releases.Where(release => release.IsLatestPublishedVersionOfRelease());
-                await CacheLatestRelease(publication, context);
-                foreach (var release in releases)
-                {
-                    await CacheRelease(release, context);
-                }
-            }
-        }
-
         public async Task UpdateContent(PublishContext context, params Guid[] releaseIds)
         {
             var releases = (await _releaseService
@@ -166,17 +141,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 release.Id,
                 release.Publication.Slug,
                 release.Slug);
-        }
-
-        private async Task DeleteAllContentExcludingStaging()
-        {
-            await _publicBlobStorageService.DeleteBlobs(
-                containerName: PublicContent,
-                options: new DeleteBlobsOptions
-                {
-                    ExcludeRegex = new Regex($"^{PublicContentStagingPath()}/.+$", RegexOptions.IgnoreCase | RegexOptions.Compiled)
-                }
-            );
         }
 
         private record ReleaseDataBlockResultsFolderCacheKey : IBlobCacheKey

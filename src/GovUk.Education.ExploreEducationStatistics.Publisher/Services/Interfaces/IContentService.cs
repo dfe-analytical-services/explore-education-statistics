@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
@@ -9,8 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
         Task DeletePreviousVersionsDownloadFiles(params Guid[] releaseIds);
 
         Task DeletePreviousVersionsContent(params Guid[] releaseIds);
-
-        Task UpdateAllContentAsync();
 
         Task UpdateContent(PublishContext context, params Guid[] releaseIds);
 
