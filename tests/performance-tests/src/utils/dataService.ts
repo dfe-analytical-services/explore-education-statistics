@@ -523,7 +523,7 @@ class DataService {
       content: string;
     }[];
   }) {
-    const { response } = this.client.post(
+    const { response } = this.client.patch(
       `/api/release/${releaseId}/data-guidance`,
       JSON.stringify({
         content,
@@ -539,14 +539,14 @@ class DataService {
   approveRelease({
     releaseId,
     notifySubscribers = false,
-    latestInternalReleaseNote = 'Appproved',
+    latestInternalReleaseNote = 'Approved',
   }: {
     releaseId: string;
     notifySubscribers?: boolean;
     latestInternalReleaseNote?: string;
   }) {
     const { response } = this.client.post(
-      `/api/release/${releaseId}/status`,
+      `/api/releases/${releaseId}/status`,
       JSON.stringify({
         notifySubscribers,
         latestInternalReleaseNote,
@@ -562,8 +562,9 @@ class DataService {
 
   getReleaseApprovalStatus({ releaseId }: { releaseId: string }) {
     const { response, json } = this.client.get<{ overallStage: OverallStage }>(
-      `/api/release/${releaseId}/stage-status`,
+      `/api/releases/${releaseId}/stage-status`,
       applicationJsonHeaders,
+      [204],
     );
     return {
       status: json.overallStage,
@@ -595,6 +596,13 @@ class DataService {
     while (Date.now() < publishingExpireTime) {
       const { status, response } = this.getReleaseApprovalStatus({ releaseId });
 
+      if (response.status === 204) {
+        sleep(pollingDelaySeconds);
+        return;
+      }
+
+      console.log(`.... ${status}`);
+
       if (response.status !== 200 && onStatusCheckFailed) {
         onStatusCheckFailed(response);
       } else {
@@ -611,7 +619,7 @@ class DataService {
           return;
         }
 
-        if ('Complete'.includes(status)) {
+        if (status === 'Complete') {
           if (onPublishingCompleted) {
             onPublishingCompleted();
           }

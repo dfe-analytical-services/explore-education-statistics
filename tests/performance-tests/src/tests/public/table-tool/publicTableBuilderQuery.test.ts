@@ -22,14 +22,14 @@ export const options: Options = {
       rate: 1,
       timeUnit: '5s',
       duration: '120m',
-      preAllocatedVUs: 3,
-      maxVUs: 10,
+      preAllocatedVUs: 1,
+      maxVUs: 1,
     },
   },
   noConnectionReuse: true,
   insecureSkipTLSVerify: true,
   linger: true,
-  setupTimeout: '5m',
+  setupTimeout: '10m',
 };
 
 interface SetupData {

@@ -28,6 +28,7 @@ export default class HttpClient {
   get<TJson>(
     url: string,
     headers?: HttpHeaders,
+    additionalAllowedHttpCodes?: number[],
   ): {
     json: TJson;
     response: RefinedResponse<'text'>;
@@ -41,12 +42,18 @@ export default class HttpClient {
       },
     });
 
-    if (this.checkResponseStatus && response.status !== 200) {
-      throw new Error(`Error with GET to url ${url}: ${response.body}`);
+    const successCodes = [200, ...(additionalAllowedHttpCodes ?? [])];
+
+    if (this.checkResponseStatus && !successCodes.includes(response.status)) {
+      throw new Error(
+        `${response.status} error with GET to url ${url}: ${response.body}`,
+      );
     }
 
     return {
-      json: (response.json() as unknown) as TJson,
+      json: (response.status === 200
+        ? response.json()
+        : ({} as unknown)) as TJson,
       response,
     };
   }
@@ -69,7 +76,38 @@ export default class HttpClient {
     });
 
     if (this.checkResponseStatus && response.status !== 200) {
-      throw new Error(`Error with POST to url ${url}: ${response.body}`);
+      throw new Error(
+        `${response.status} error with POST to url ${url} with request body\n\n${data}: ${response.body}`,
+      );
+    }
+
+    return {
+      json: (response.json() as unknown) as TJson,
+      response,
+    };
+  }
+
+  patch<TJson>(
+    url: string,
+    data: RequestBody | string,
+    headers?: HttpHeaders,
+  ): {
+    json: TJson;
+    response: RefinedResponse<'text'>;
+  } {
+    const params = HttpClient.getDefaultParams(this.accessToken);
+    const response = http.patch(`${this.baseUrl}${url}`, data, {
+      ...params,
+      headers: {
+        ...params.headers,
+        ...headers,
+      },
+    });
+
+    if (this.checkResponseStatus && response.status !== 200) {
+      throw new Error(
+        `${response.status} error with PATCH to url ${url} with request body\n\n${data}: ${response.body}`,
+      );
     }
 
     return {
