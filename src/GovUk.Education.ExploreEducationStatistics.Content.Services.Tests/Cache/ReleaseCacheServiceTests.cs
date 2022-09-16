@@ -300,13 +300,12 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         Assert.Equal(ReleaseId, releaseViewModel.Id);
         Assert.Equal(ReleaseType.NationalStatistics, releaseViewModel.Type);
 
-        var expectedPublicationViewModel = _publicationViewModel with
+        var expectedPublicationViewModel = new PublicationViewModel(_publicationViewModel with
         {
-            Methodologies = _methodologies,
             Releases = _publicationViewModel.Releases
                 .Where(vm => vm.Id != ReleaseId)
                 .ToList()
-        };
+        }, _methodologies);
 
         releaseViewModel.Publication.AssertDeepEqualTo(expectedPublicationViewModel);
     }
@@ -344,13 +343,12 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         Assert.Equal(ReleaseId, releaseViewModel.Id);
         Assert.Equal(ReleaseType.NationalStatistics, releaseViewModel.Type);
 
-        var expectedPublicationViewModel = _publicationViewModel with
+        var expectedPublicationViewModel = new PublicationViewModel(_publicationViewModel with
         {
-            Methodologies = _methodologies,
             Releases = _publicationViewModel.Releases
                 .Where(vm => vm.Id != ReleaseId)
                 .ToList()
-        };
+        }, _methodologies);
 
         releaseViewModel.Publication.AssertDeepEqualTo(expectedPublicationViewModel);
     }
@@ -451,13 +449,12 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         Assert.Equal(ReleaseId, releaseViewModel.Id);
         Assert.Equal(ReleaseType.NationalStatistics, releaseViewModel.Type);
 
-        var expectedPublicationViewModel = _publicationViewModel with
+        var expectedPublicationViewModel = new PublicationViewModel(_publicationViewModel with
         {
-            Methodologies = _methodologies,
             Releases = _publicationViewModel.Releases
                 .Where(vm => vm.Id != ReleaseId)
                 .ToList()
-        };
+        }, _methodologies);
 
         releaseViewModel.Publication.AssertDeepEqualTo(expectedPublicationViewModel);
     }
@@ -495,13 +492,12 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         Assert.Equal(ReleaseId, releaseViewModel.Id);
         Assert.Equal(ReleaseType.NationalStatistics, releaseViewModel.Type);
 
-        var expectedPublicationViewModel = _publicationViewModel with
+        var expectedPublicationViewModel = new PublicationViewModel(_publicationViewModel with
         {
-            Methodologies = _methodologies,
             Releases = _publicationViewModel.Releases
                 .Where(vm => vm.Id != ReleaseId)
                 .ToList()
-        };
+        }, _methodologies);
 
         releaseViewModel.Publication.AssertDeepEqualTo(expectedPublicationViewModel);
     }

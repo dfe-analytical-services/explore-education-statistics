@@ -25,7 +25,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
         public ContactViewModel Contact { get; init; } = null!;
 
         public ExternalMethodologyViewModel? ExternalMethodology { get; init; }
-
-        public List<MethodologyVersionSummaryViewModel> Methodologies { get; init; } = new();
     }
 }

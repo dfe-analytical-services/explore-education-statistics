@@ -185,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                         Title = "National Statistics"
                     }
                 },
-                new PublicationCacheViewModel
+                new PublicationViewModel
                 {
                     Releases = ListOf(new ReleaseTitleViewModel
                     {

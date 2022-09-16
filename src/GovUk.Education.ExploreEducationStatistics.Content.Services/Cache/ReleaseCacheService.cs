@@ -60,14 +60,12 @@ public class ReleaseCacheService : IReleaseCacheService
                 return await GetRelease(publicationSlug, releaseSlug)
                     .OnSuccess(release => new ReleaseViewModel(
                         release,
-                        publication with
+                        new PublicationViewModel(publication with
                         {
                             Releases = publication.Releases
                                 .Where(releaseTitleViewModel => releaseTitleViewModel.Id != release.Id)
-                                .ToList(),
-                            Methodologies = methodologies
-                        }
-                    ));
+                                .ToList()
+                        }, methodologies)));
             });
     }
 

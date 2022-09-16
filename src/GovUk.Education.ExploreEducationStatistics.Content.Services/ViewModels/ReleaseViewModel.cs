@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public ReleaseViewModel(
             ReleaseCacheViewModel release,
-            PublicationCacheViewModel publication)
+            PublicationViewModel publication)
         {
             Id = release.Id;
             Title = release.Title;
@@ -90,6 +90,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public bool LatestRelease => Id == Publication.LatestReleaseId;
 
-        public PublicationCacheViewModel Publication { get; }
+        public PublicationViewModel Publication { get; }
     }
 }
