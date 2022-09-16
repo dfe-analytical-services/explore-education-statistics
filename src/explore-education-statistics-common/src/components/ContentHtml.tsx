@@ -4,8 +4,13 @@ import { GlossaryEntry } from '@common/services/types/glossary';
 import sanitizeHtml, { SanitizeHtmlOptions } from '@common/utils/sanitizeHtml';
 import classNames from 'classnames';
 import { Element } from 'domhandler/lib/node';
-import parseHtmlString, { DOMNode, domToReact } from 'html-react-parser';
-import React, { useEffect, useMemo, useRef } from 'react';
+import parseHtmlString, {
+  DOMNode,
+  domToReact,
+  attributesToProps,
+} from 'html-react-parser';
+import React, { ReactElement, useEffect, useMemo, useRef } from 'react';
+import styles from './ContentHtml.module.scss';
 
 export interface ContentHtmlProps {
   className?: string;
@@ -17,7 +22,7 @@ export interface ContentHtmlProps {
   trackGlossaryLinks?: (glossaryEntrySlug: string) => void;
 }
 
-const ContentHtml = ({
+export default function ContentHtml({
   className,
   html,
   sanitizeOptions,
@@ -25,7 +30,7 @@ const ContentHtml = ({
   getGlossaryEntry,
   trackContentLinks,
   trackGlossaryLinks,
-}: ContentHtmlProps) => {
+}: ContentHtmlProps) {
   const { isMounted } = useMounted();
   const contentAreaRef = useRef<HTMLDivElement>(null);
 
@@ -74,6 +79,10 @@ const ContentHtml = ({
         ) : undefined;
       }
 
+      if (node.name === 'figure' && node.attribs.class === 'table') {
+        return renderTable(node);
+      }
+
       return undefined;
     },
   });
@@ -87,6 +96,37 @@ const ContentHtml = ({
       {parsedContent}
     </div>
   );
-};
+}
 
-export default ContentHtml;
+/**
+ * Fixes accessibility issues with table markup from CKEditor by
+ * replacing the figure/figcaption implementation (which does not
+ * get read out correctly) with a standard table/caption.
+ */
+function renderTable(element: Element): ReactElement | undefined {
+  const { children } = element;
+
+  const table = children.find(
+    child => child instanceof Element && child.name === 'table',
+  ) as Element | undefined;
+
+  const figcaption = children.find(
+    child => child instanceof Element && child.name === 'figcaption',
+  ) as Element | undefined;
+
+  if (!table || !figcaption) {
+    return undefined;
+  }
+
+  return (
+    <div className={styles.tableContainer}>
+      <table
+        // eslint-disable-next-line react/jsx-props-no-spreading
+        {...attributesToProps(table.attribs)}
+      >
+        <caption>{domToReact(figcaption.children)}</caption>
+        {domToReact(table.children, { trim: true })}
+      </table>
+    </div>
+  );
+}
