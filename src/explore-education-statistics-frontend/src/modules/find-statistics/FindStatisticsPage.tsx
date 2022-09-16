@@ -2,8 +2,11 @@ import themeService, { Theme } from '@common/services/themeService';
 import {
   PublicationSummaryWithRelease,
   PublicationSortOption,
+  publicationSortOptions,
 } from '@common/services/publicationService';
 import { Paging } from '@common/services/types/pagination';
+import parseNumber from '@common/utils/number/parseNumber';
+import isOneOf from '@common/utils/type-guards/isOneOf';
 import { testPublications } from '@frontend/modules/find-statistics/__tests__/__data__/testPublications';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
@@ -41,27 +44,30 @@ const FindStatisticsPage: NextPage<Props> = ({
 export const getServerSideProps: GetServerSideProps<Props> = async ({
   query,
 }) => {
-  const { newDesign, page, sortBy } = query;
-  const currentPage = typeof page === 'string' ? parseInt(page, 10) : 1;
-  const currentSortBy = sortBy as PublicationSortOption;
+  const { newDesign } = query;
+  const page = parseNumber(query.page) ?? 1;
+  const sortBy = isOneOf(query.sortBy, publicationSortOptions)
+    ? query.sortBy
+    : 'newest';
 
   // TODO EES-3517 - fetch publications here, using pagination and filters from query.
   // const publicationsResponse = newDesign ? await publicationService.getPublications({
-  //   page: currentPage ?? 1,
+  //   page,
   //   pageSize: 10,
-  //   sortBy: currentSortBy ?? 'newest'
+  //   sortBy
   // }) : []
+
   // Will need to handle if the requested page doesn't exist.
   // Fake response for now
-  const publicationsResponse = {
-    paging: {
-      page: currentPage ?? 1,
-      pageSize: 10,
-      totalResults: 100,
-      totalPages: 10,
-    },
-    results: currentPage === 1 ? testPublications : [testPublications[1]], // faking different page to test pagination
+  const paging: Paging = {
+    page,
+    pageSize: 10,
+    totalResults: 100,
+    totalPages: 10,
   };
+
+  const publications: PublicationSummaryWithRelease[] =
+    page === 1 ? testPublications : [testPublications[1]]; // faking different page to test pagination
 
   // TODO EES-3517 - remove themes
   const themes = newDesign
@@ -73,9 +79,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   return {
     props: {
       newDesign: !!newDesign,
-      paging: newDesign ? publicationsResponse.paging : null,
-      publications: newDesign ? publicationsResponse.results : [],
-      sortBy: currentSortBy ?? null,
+      paging: newDesign ? paging : null,
+      publications: newDesign ? publications : [],
+      sortBy,
       themes,
     },
   };
