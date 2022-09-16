@@ -88,7 +88,10 @@ function ChartRenderer({
 
         {chart}
 
-        <FigureFootnotes footnotes={footnotes} />
+        <FigureFootnotes
+          footnotes={footnotes}
+          headingHiddenText={`for ${title}`}
+        />
 
         {source && <p className="govuk-body-s">Source: {source}</p>}
       </figure>

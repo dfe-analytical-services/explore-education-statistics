@@ -408,6 +408,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
             ref={dataTableRef}
             footnotes={subjectMeta.footnotes}
             source={source}
+            footnotesHeadingHiddenText={`for ${captionTitle}`}
           />
         </>
       );
