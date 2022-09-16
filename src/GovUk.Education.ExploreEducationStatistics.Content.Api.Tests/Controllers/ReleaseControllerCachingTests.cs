@@ -145,7 +145,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
     private static ReleaseViewModel BuildReleaseViewModel()
     {
         return new ReleaseViewModel(
-            new CachedReleaseViewModel(Guid.NewGuid())
+            new ReleaseCacheViewModel(Guid.NewGuid())
             {
                 Type = new()
                 {

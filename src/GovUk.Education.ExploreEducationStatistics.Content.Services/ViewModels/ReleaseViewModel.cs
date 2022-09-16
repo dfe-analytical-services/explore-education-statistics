@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
         public DateTime? DataLastPublished { get; }
 
         public ReleaseViewModel(
-            CachedReleaseViewModel release,
+            ReleaseCacheViewModel release,
             PublicationViewModel publication)
         {
             Id = release.Id;

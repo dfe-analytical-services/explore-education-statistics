@@ -178,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         private static ReleaseViewModel BuildReleaseViewModel()
         {
             return new ReleaseViewModel(
-                new CachedReleaseViewModel(Guid.NewGuid())
+                new ReleaseCacheViewModel(Guid.NewGuid())
                 {
                     Type = new ReleaseTypeViewModel
                     {
@@ -199,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var releaseId = Guid.NewGuid();
 
             return new ReleaseSummaryViewModel(
-                new CachedReleaseViewModel(releaseId)
+                new ReleaseCacheViewModel(releaseId)
                 {
                     Type = new ReleaseTypeViewModel
                     {

@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
         public List<DataGuidanceSubjectViewModel> Subjects { get; }
 
         public DataGuidanceViewModel(
-            CachedReleaseViewModel release,
+            ReleaseCacheViewModel release,
             PublicationViewModel publication,
             List<DataGuidanceSubjectViewModel> subjects) : base(release, publication)
         {

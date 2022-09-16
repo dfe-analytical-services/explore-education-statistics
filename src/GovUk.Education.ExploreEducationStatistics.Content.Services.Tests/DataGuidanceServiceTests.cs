@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             releaseCacheService.Setup(mock => mock.GetRelease(publicationSlug, releaseSlug))
                 .ReturnsAsync(
-                    new CachedReleaseViewModel(releaseId)
+                    new ReleaseCacheViewModel(releaseId)
                     {
                         Title = "2016-17",
                         Slug = "2016-17",

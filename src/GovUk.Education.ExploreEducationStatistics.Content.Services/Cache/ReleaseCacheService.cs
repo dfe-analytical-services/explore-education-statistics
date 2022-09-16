@@ -28,7 +28,7 @@ public class ReleaseCacheService : IReleaseCacheService
     }
 
     [BlobCache(typeof(ReleaseCacheKey), ServiceName = "public")]
-    public Task<Either<ActionResult, CachedReleaseViewModel>> GetRelease(string publicationSlug,
+    public Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(string publicationSlug,
         string? releaseSlug = null)
     {
         return _releaseService.GetRelease(publicationSlug, releaseSlug);
@@ -72,7 +72,7 @@ public class ReleaseCacheService : IReleaseCacheService
     }
 
     [BlobCache(typeof(ReleaseCacheKey), forceUpdate: true, ServiceName = "public")]
-    public Task<Either<ActionResult, CachedReleaseViewModel>> UpdateRelease(
+    public Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateRelease(
         bool staging,
         DateTime expectedPublishDate,
         Guid releaseId,

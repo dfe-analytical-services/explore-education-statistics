@@ -56,7 +56,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         }
     };
 
-    private readonly CachedReleaseViewModel _releaseViewModel = new(ReleaseId)
+    private readonly ReleaseCacheViewModel _releaseViewModel = new(ReleaseId)
     {
         NextReleaseDate = new PartialDate(),
         Published = DateTime.UtcNow,
@@ -127,7 +127,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new ReleaseCacheKey(PublicationSlug, ReleaseSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(CachedReleaseViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(null);
 
         PublicBlobCacheService
@@ -154,7 +154,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new ReleaseCacheKey(PublicationSlug, ReleaseSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(CachedReleaseViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(_releaseViewModel);
 
         var service = BuildService();
@@ -172,7 +172,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new ReleaseCacheKey(PublicationSlug, ReleaseSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(CachedReleaseViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(null);
 
         var releaseService = new Mock<IReleaseService>(Strict);
@@ -195,7 +195,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new ReleaseCacheKey(PublicationSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(CachedReleaseViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(null);
 
         PublicBlobCacheService
@@ -222,7 +222,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new ReleaseCacheKey(PublicationSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(CachedReleaseViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(_releaseViewModel);
 
         var service = BuildService();
@@ -240,7 +240,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new ReleaseCacheKey(PublicationSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(CachedReleaseViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(null);
 
         var releaseService = new Mock<IReleaseService>(Strict);
@@ -263,7 +263,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new ReleaseCacheKey(PublicationSlug, ReleaseSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(CachedReleaseViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(null);
 
         PublicBlobCacheService
@@ -317,7 +317,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new ReleaseCacheKey(PublicationSlug, ReleaseSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(CachedReleaseViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(_releaseViewModel);
 
         var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
@@ -361,7 +361,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new ReleaseCacheKey(PublicationSlug, ReleaseSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(CachedReleaseViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(null);
 
         var releaseService = new Mock<IReleaseService>(Strict);
@@ -414,7 +414,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new ReleaseCacheKey(PublicationSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(CachedReleaseViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(null);
 
         PublicBlobCacheService
@@ -468,7 +468,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new ReleaseCacheKey(PublicationSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(CachedReleaseViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(_releaseViewModel);
 
         var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
@@ -512,7 +512,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new ReleaseCacheKey(PublicationSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(CachedReleaseViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(null);
 
         var releaseService = new Mock<IReleaseService>(Strict);
@@ -565,7 +565,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new ReleaseCacheKey(PublicationSlug, ReleaseSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(CachedReleaseViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(null);
 
         PublicBlobCacheService
@@ -610,7 +610,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new ReleaseCacheKey(PublicationSlug, ReleaseSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(CachedReleaseViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(_releaseViewModel);
 
         var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
@@ -644,7 +644,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new ReleaseCacheKey(PublicationSlug, ReleaseSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(CachedReleaseViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(null);
 
         var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
@@ -691,7 +691,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new ReleaseCacheKey(PublicationSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(CachedReleaseViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(null);
 
         PublicBlobCacheService
@@ -736,7 +736,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new ReleaseCacheKey(PublicationSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(CachedReleaseViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(_releaseViewModel);
 
         var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
@@ -770,7 +770,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new ReleaseCacheKey(PublicationSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(CachedReleaseViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(ReleaseCacheViewModel)))
             .ReturnsAsync(null);
 
         var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
@@ -875,9 +875,9 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
     }
 
     [Fact]
-    public void ReleaseViewModel_SerializeAndDeserialize()
+    public void ReleaseCacheViewModel_SerializeAndDeserialize()
     {
-        var converted = DeserializeObject<CachedReleaseViewModel>(SerializeObject(_releaseViewModel));
+        var converted = DeserializeObject<ReleaseCacheViewModel>(SerializeObject(_releaseViewModel));
         converted.AssertDeepEqualTo(_releaseViewModel);
     }
 
