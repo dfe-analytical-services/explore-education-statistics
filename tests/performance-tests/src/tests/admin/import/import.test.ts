@@ -76,8 +76,8 @@ const processingStages: {
 
 // TODO - use SharedArray instead of `open` here
 /* eslint-disable no-restricted-globals */
-const subjectFile = open('admin/import/assets/dates.csv', 'b');
-const subjectMetaFile = open('admin/import/assets/dates.meta.csv', 'b');
+const subjectFile = open('admin/import/assets/big-file.csv', 'b');
+const subjectMetaFile = open('admin/import/assets/big-file.meta.csv', 'b');
 /* eslint-enable no-restricted-globals */
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(

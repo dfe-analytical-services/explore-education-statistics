@@ -7,6 +7,7 @@ import testData from '../../testData';
 import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
 import createDataService from '../../../utils/dataService';
+import constants from '../../../utils/constants';
 
 const PUBLICATION =
   'UI test publication - Performance tests - publicTableBuilderQuery.test.ts';
@@ -106,20 +107,33 @@ function getOrCreateReleaseWithSubject() {
     timePeriodCoverage: 'AY',
   });
 
-  const { id: fileId } = adminService.getOrImportDataFile({
-    title: `${SUBJECT}${suffix}`,
+  const { subjects: existingSubjects } = adminService.getSubjects({
     releaseId,
-    dataFile: {
-      file: subjectFile,
-      filename: `subject.csv`,
-    },
-    metaFile: {
-      file: subjectMetaFile,
-      filename: `subject.meta.csv`,
-    },
   });
 
-  adminService.waitForDataFileToImport({ releaseId, fileId });
+  if (!existingSubjects.length) {
+    console.log('Importing data file');
+
+    const { id: fileId } = adminService.getOrImportDataFile({
+      title: `${SUBJECT}${suffix}`,
+      releaseId,
+      dataFile: {
+        file: subjectFile,
+        filename: `subject.csv`,
+      },
+      metaFile: {
+        file: subjectMetaFile,
+        filename: `subject.meta.csv`,
+      },
+    });
+
+    console.log('Waiting for data file to import');
+
+    adminService.waitForDataFileToImport({
+      releaseId,
+      fileId,
+    });
+  }
 
   const { subjects } = adminService.getSubjects({ releaseId });
   const subjectId = subjects[0].id;
@@ -161,6 +175,13 @@ export function setup(): SetupData {
   } = getOrCreateReleaseWithSubject();
 
   const { subjectMeta } = adminService.getSubjectMeta({ releaseId, subjectId });
+
+  console.log(
+    `\n\nEES performance results available at: ${constants.grafanaEesDashboardUrl}`,
+  );
+  console.log(
+    `generic performance results available at: ${constants.grafanaGenericDashboardUrl}\n\n`,
+  );
 
   return {
     themeId,

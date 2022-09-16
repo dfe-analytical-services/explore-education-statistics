@@ -392,8 +392,11 @@ class AdminService {
         if (['FAILED', 'CANCELLED'].includes(importStatus)) {
           if (onImportFailed) {
             onImportFailed(importStatus);
+            return;
           }
-          return;
+          throw new Error(
+            `Import of file ${fileId} for Release ${releaseId} failed`,
+          );
         }
 
         if (['COMPLETE'].includes(importStatus)) {
@@ -614,8 +617,6 @@ class AdminService {
         sleep(pollingDelaySeconds);
         return;
       }
-
-      console.log(`.... ${status}`);
 
       if (response.status !== 200 && onStatusCheckFailed) {
         onStatusCheckFailed(response);
