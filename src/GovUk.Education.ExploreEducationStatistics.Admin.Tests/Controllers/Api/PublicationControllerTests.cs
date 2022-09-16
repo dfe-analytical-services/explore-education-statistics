@@ -24,8 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             publicationService
                 .Setup(s => s.CreatePublication(It.IsAny<PublicationCreateRequest>()))
                 .Returns<PublicationCreateRequest>(p =>
-                    Task.FromResult(new Either<ActionResult, PublicationViewModel>(
-                        new PublicationViewModel
+                    Task.FromResult(new Either<ActionResult, PublicationCreateViewModel>(
+                        new PublicationCreateViewModel
                         {
                             Topic = new IdTitleViewModel
                             {
@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 TopicId = topicId
             });
 
-            Assert.IsType<PublicationViewModel>(result.Value);
+            Assert.IsType<PublicationCreateViewModel>(result.Value);
             Assert.Equal(topicId, result.Value.Topic.Id);
         }
 
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var publicationService = new Mock<IPublicationService>();
 
             var validationResponse =
-                new Either<ActionResult, PublicationViewModel>(
+                new Either<ActionResult, PublicationCreateViewModel>(
                     ValidationUtils.ValidationActionResult(SlugNotUnique));
 
             publicationService

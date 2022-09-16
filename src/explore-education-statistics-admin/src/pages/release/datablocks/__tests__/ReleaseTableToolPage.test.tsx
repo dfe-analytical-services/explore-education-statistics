@@ -32,7 +32,6 @@ const testContact: Contact = {
 };
 
 const testPublication: Publication = {
-  contact: testContact,
   id: 'publication-1',
   title: 'Pupil absence',
   summary: 'Pupil absence summary',

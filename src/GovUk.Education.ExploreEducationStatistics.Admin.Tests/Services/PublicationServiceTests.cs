@@ -106,11 +106,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication1.Topic.Theme.Id, publicationViewModel.Theme.Id);
                 Assert.Equal(publication1.Topic.Theme.Title, publicationViewModel.Theme.Title);
 
-                Assert.Equal(publication1.Contact.ContactName, publicationViewModel.Contact.ContactName);
-                Assert.Equal(publication1.Contact.ContactTelNo, publicationViewModel.Contact.ContactTelNo);
-                Assert.Equal(publication1.Contact.TeamName, publicationViewModel.Contact.TeamName);
-                Assert.Equal(publication1.Contact.TeamEmail, publicationViewModel.Contact.TeamEmail);
-
                 Assert.Null(publicationViewModel.SupersededById);
                 Assert.False(publicationViewModel.IsSuperseded);
 
@@ -345,24 +340,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Summary = "Test summary",
                 Slug = "test-slug",
                 Topic = topic,
-                Contact = new Contact
-                {
-                    ContactName = "contact name",
-                    ContactTelNo = "1234",
-                    TeamName = "team name",
-                    TeamEmail = "team@email",
-                },
                 SupersededBy = null,
+                Contact = new Contact(), // EES-3576 should be removable
             };
 
             var publication2 = new Publication
             {
                 Topic = new Topic(),
+                Contact = new Contact(), // EES-3576 should be removable
             };
 
             var publication3 = new Publication
             {
                 Topic = new Topic(),
+                Contact = new Contact(), // EES-3576 should be removable
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -419,11 +410,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication1.Topic.Theme.Id, publicationViewModel.Theme.Id);
                 Assert.Equal(publication1.Topic.Theme.Title, publicationViewModel.Theme.Title);
 
-                Assert.Equal(publication1.Contact.ContactName, publicationViewModel.Contact.ContactName);
-                Assert.Equal(publication1.Contact.ContactTelNo, publicationViewModel.Contact.ContactTelNo);
-                Assert.Equal(publication1.Contact.TeamName, publicationViewModel.Contact.TeamName);
-                Assert.Equal(publication1.Contact.TeamEmail, publicationViewModel.Contact.TeamEmail);
-
                 Assert.Null(publicationViewModel.SupersededById);
                 Assert.False(publicationViewModel.IsSuperseded);
 
@@ -442,21 +428,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "A",
                 Topic = topic,
-                Contact = new Contact(),
+                Contact = new Contact(), // EES-3576 should be removable
             };
 
             var publication2 = new Publication
             {
                 Title = "B",
                 Topic = topic,
-                Contact = new Contact(),
+                Contact = new Contact(), // EES-3576 should be removable
             };
 
             var publication3 = new Publication
             {
                 Title = "C",
                 Topic = topic,
-                Contact = new Contact(),
+                Contact = new Contact(), // EES-3576 should be removable
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -524,21 +510,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "publication1",
                 Topic = new Topic { Theme = new Theme(), },
-                Contact = new Contact(),
+                Contact = new Contact(), // EES-3576 should be removable
             };
 
             var publication2 = new Publication
             {
                 Title = "publication2",
                 Topic = new Topic { Theme = new Theme(), },
-                Contact = new Contact(),
+                Contact = new Contact(), // EES-3576 should be removable
             };
 
             var publication3 = new Publication
             {
                 Title = "publication3",
                 Topic = new Topic { Theme = new Theme(), },
-                Contact = new Contact(),
+                Contact = new Contact(), // EES-3576 should be removable
             };
 
             var publication4 = new Publication
@@ -1632,7 +1618,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Title = "Test theme"
                     }
                 },
-                Contact = new Contact
+                Contact = new Contact // EES-3576 should be removable
                 {
                     ContactName = "Test contact",
                     ContactTelNo = "0123456789",
@@ -1665,11 +1651,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(publication.Topic.ThemeId, result.Theme.Id);
                 Assert.Equal(publication.Topic.Theme.Title, result.Theme.Title);
-
-                Assert.Equal(publication.Contact.ContactName, result.Contact.ContactName);
-                Assert.Equal(publication.Contact.ContactTelNo, result.Contact.ContactTelNo);
-                Assert.Equal(publication.Contact.TeamEmail, result.Contact.TeamEmail);
-                Assert.Equal(publication.Contact.TeamName, result.Contact.TeamName);
 
                 Assert.Null(result.SupersededById);
                 Assert.False(result.IsSuperseded);
@@ -2406,11 +2387,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("New title", viewModel.Title);
                 Assert.Equal("New summary", viewModel.Summary);
 
-                Assert.Equal("Old name", viewModel.Contact.ContactName);
-                Assert.Equal("0987654321", viewModel.Contact.ContactTelNo);
-                Assert.Equal("Old team", viewModel.Contact.TeamName);
-                Assert.Equal("old.smith@test.com", viewModel.Contact.TeamEmail);
-
                 Assert.Equal(topic.Id, viewModel.Topic.Id);
                 Assert.Equal(topic.Title, viewModel.Topic.Title);
 
@@ -2545,11 +2521,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("New title", viewModel.Title);
                 Assert.Equal("New summary", viewModel.Summary);
 
-                Assert.Equal("Old name", viewModel.Contact.ContactName);
-                Assert.Equal("0987654321", viewModel.Contact.ContactTelNo);
-                Assert.Equal("Old team", viewModel.Contact.TeamName);
-                Assert.Equal("old.smith@test.com", viewModel.Contact.TeamEmail);
-
                 Assert.Equal(topic.Id, viewModel.Topic.Id);
                 Assert.Equal(topic.Title, viewModel.Topic.Title);
 
@@ -2643,7 +2614,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("Old title", viewModel.Title);
                 Assert.Equal("New summary", viewModel.Summary);
-                Assert.Equal("Old name", viewModel.Contact.ContactName);
                 Assert.Equal(publication.SupersededById, viewModel.SupersededById);
             }
         }

@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<PublicationSummaryViewModel>>> ListPublicationSummaries();
 
-        Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
+        Task<Either<ActionResult, PublicationCreateViewModel>> CreatePublication(
             PublicationCreateRequest publication);
 
         Task<Either<ActionResult, PublicationViewModel>> UpdatePublication(

@@ -72,7 +72,6 @@ export interface Publication {
   title: string;
   summary: string;
   slug: string;
-  contact: Contact; // @MarkFix remove this
   theme: IdTitlePair;
   topic: IdTitlePair;
   supersededById?: string;
@@ -177,7 +176,7 @@ const publicationService = {
     return client.delete(`/publication/${publicationId}/external-methodology`);
   },
 
-  getContact(publicationId: string, permissions: boolean): Promise<Contact> {
+  getContact(publicationId: string, permissions = false): Promise<Contact> {
     return client.get(`publication/${publicationId}/contact`, {
       params: { permissions },
     });

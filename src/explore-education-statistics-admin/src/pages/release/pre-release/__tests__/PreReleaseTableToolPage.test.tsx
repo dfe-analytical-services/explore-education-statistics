@@ -184,15 +184,7 @@ describe('PreReleaseTableToolPage', () => {
     ],
   };
 
-  const testContact: Contact = {
-    contactName: 'John Smith',
-    contactTelNo: '0777777777',
-    teamEmail: 'john.smith@test.com',
-    teamName: 'Team Smith',
-  };
-
   const testPublication: Publication = {
-    contact: testContact,
     id: 'publication-1',
     title: 'Pupil absence',
     summary: 'Pupil absence summary',

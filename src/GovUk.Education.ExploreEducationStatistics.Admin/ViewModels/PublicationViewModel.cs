@@ -18,8 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public IdTitleViewModel Theme { get; set; } = null!;
 
-        public ContactViewModel Contact { get; set; } = null!; // @MarkFix remove this
-
         public Guid? SupersededById { get; set; }
 
         public bool IsSuperseded { get; set; }

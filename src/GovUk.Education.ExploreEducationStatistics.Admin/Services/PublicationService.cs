@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
+        public async Task<Either<ActionResult, PublicationCreateViewModel>> CreatePublication(
             PublicationCreateRequest publication)
         {
             return await ValidateSelectedTopic(publication.TopicId)
@@ -178,7 +178,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.SaveChangesAsync();
 
-                    return await GetPublication(saved.Entity.Id);
+                    return await _persistenceHelper
+                        .CheckEntityExists<Publication>(saved.Entity.Id, HydratePublication)
+                        .OnSuccess(GeneratePublicationCreateViewModel);
                 });
         }
 
@@ -506,7 +508,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return values
                 .AsSplitQuery()
-                .Include(p => p.Contact)
+                .Include(p => p.Contact) // EES-3576 remove when MyPublicationViewModel is gone
                 .Include(p => p.Releases) // EES-3576 remove when MyPublicationViewModel is gone
                 .ThenInclude(r => r.ReleaseStatuses)
                 .Include(p => p.Topic)
@@ -529,6 +531,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return publicationViewModel;
+        }
+
+        private PublicationCreateViewModel GeneratePublicationCreateViewModel(Publication publication)
+        {
+            var publicationCreateViewModel = _mapper.Map<PublicationCreateViewModel>(publication);
+
+            publicationCreateViewModel.IsSuperseded = _publicationRepository.IsSuperseded(publication);
+
+            return publicationCreateViewModel;
         }
 
         private async Task<List<MyPublicationViewModel>> HydrateMyPublicationsViewModels(List<Publication> publications)
