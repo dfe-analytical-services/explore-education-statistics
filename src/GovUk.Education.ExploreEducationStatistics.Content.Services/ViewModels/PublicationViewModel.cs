@@ -6,26 +6,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
     public record PublicationViewModel
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; init; }
 
-        public string Title { get; set; } = string.Empty;
+        public string Title { get; init; } = string.Empty;
 
-        public string Slug { get; set; } = string.Empty;
+        public string Slug { get; init; } = string.Empty;
 
-        public Guid LatestReleaseId { get; set; }
+        public Guid LatestReleaseId { get; init; }
 
-        public bool IsSuperseded { get; set; }
+        public bool IsSuperseded { get; init; }
 
-        public List<ReleaseTitleViewModel> Releases { get; set; } = new();
+        public List<ReleaseTitleViewModel> Releases { get; init; } = new();
 
-        public List<LegacyReleaseViewModel> LegacyReleases { get; set; } = new();
+        public List<LegacyReleaseViewModel> LegacyReleases { get; init; } = new();
 
-        public TopicViewModel Topic { get; set; }
+        public TopicViewModel Topic { get; init; } = null!;
 
-        public ContactViewModel Contact { get; set; }
+        public ContactViewModel Contact { get; init; } = null!;
 
-        public ExternalMethodologyViewModel ExternalMethodology { get; set; }
+        public ExternalMethodologyViewModel? ExternalMethodology { get; init; }
 
-        public List<MethodologyVersionSummaryViewModel> Methodologies { get; set; } = new();
+        public List<MethodologyVersionSummaryViewModel> Methodologies { get; init; } = new();
     }
 }
