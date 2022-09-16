@@ -3,20 +3,8 @@
 // Styles related to dynamic HTML content (from CKEditor)
 
 .dfe-content {
-  .table {
-    display: table;
-    margin: 0;
-    overflow: auto;
-    padding: govuk-spacing(4) govuk-spacing(4);
-    width: 100%;
-  }
-
   figcaption {
-    caption-side: top;
-    display: table-caption;
-    font-size: 1.18rem;
-    font-weight: $govuk-font-weight-bold;
-    padding: govuk-spacing(2) govuk-spacing(4);
+    font-size: 1rem;
   }
 
   .image {
