@@ -19,7 +19,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 
 interface Model {
   methodologies: MethodologyVersionSummary[];
-  externalMethodology?: ExternalMethodology;
+  externalMethodology?: ExternalMethodology | undefined;
 }
 
 interface ReleasePreviewTableToolFinalStepProps {
@@ -41,12 +41,7 @@ const ReleasePreviewTableToolFinalStep = ({
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [methodologies, externalMethodology] = await Promise.all([
       methodologyService.listMethodologyVersions(publication.id),
-      publicationService.getExternalMethodology(publication.id).catch(err => {
-        if (err.response.status !== 404) {
-          throw err;
-        }
-        return undefined;
-      }),
+      publicationService.getExternalMethodology(publication.id),
     ]);
 
     return { methodologies, externalMethodology };

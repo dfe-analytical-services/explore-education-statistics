@@ -424,7 +424,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var service = BuildPublicationService(
                         context: contentDbContext,
                         userService: userService.Object);
-                    return await service.UpdateExternalMethodology(publication.Id, new ExternalMethodology());
+                    return await service.UpdateExternalMethodology(publication.Id, new ExternalMethodologySaveRequest());
                 });
         }
 

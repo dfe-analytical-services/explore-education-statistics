@@ -38,9 +38,7 @@ describe('PreReleaseMethodologiesPage', () => {
 
   test('renders correctly with no methodologies', async () => {
     methodologyService.listMethodologyVersions.mockResolvedValue([]);
-    publicationService.getExternalMethodology.mockRejectedValue({
-      response: { status: 404 },
-    });
+    publicationService.getExternalMethodology.mockResolvedValue(undefined);
     renderPage();
 
     expect(screen.getByRole('heading', { name: 'Methodologies' }));
@@ -121,9 +119,7 @@ describe('PreReleaseMethodologiesPage', () => {
         status: 'Approved',
       },
     ]);
-    publicationService.getExternalMethodology.mockRejectedValue({
-      response: { status: 404 },
-    });
+    publicationService.getExternalMethodology.mockResolvedValue(undefined);
     renderPage();
 
     await waitFor(() => {
@@ -155,9 +151,7 @@ describe('PreReleaseMethodologiesPage', () => {
         status: 'Draft',
       },
     ]);
-    publicationService.getExternalMethodology.mockRejectedValue({
-      response: { status: 404 },
-    });
+    publicationService.getExternalMethodology.mockResolvedValue(undefined);
     renderPage();
 
     await waitFor(() => {
@@ -183,9 +177,7 @@ describe('PreReleaseMethodologiesPage', () => {
         previousVersionId: 'methodology-1-previous-id',
       },
     ]);
-    publicationService.getExternalMethodology.mockRejectedValue({
-      response: { status: 404 },
-    });
+    publicationService.getExternalMethodology.mockResolvedValue(undefined);
     renderPage();
 
     await waitFor(() => {
@@ -229,9 +221,7 @@ describe('PreReleaseMethodologiesPage', () => {
         previousVersionId: 'methodology-2-previous-id',
       },
     ]);
-    publicationService.getExternalMethodology.mockRejectedValue({
-      response: { status: 404 },
-    });
+    publicationService.getExternalMethodology.mockResolvedValue(undefined);
     renderPage();
 
     await waitFor(() => {

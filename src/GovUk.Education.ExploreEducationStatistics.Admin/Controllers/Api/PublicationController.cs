@@ -9,12 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
-using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -84,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpPut("api/publication/{publicationId:guid}/external-methodology")]
         public async Task<ActionResult<ExternalMethodologyViewModel>> UpdateExternalMethodology(
-            Guid publicationId, ExternalMethodology updatedExternalMethodology)
+            Guid publicationId, ExternalMethodologySaveRequest updatedExternalMethodology)
         {
             return await _publicationService.UpdateExternalMethodology(publicationId, updatedExternalMethodology)
                 .HandleFailuresOrOk();
@@ -95,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             Guid publicationId)
         {
             return await _publicationService.RemoveExternalMethodology(publicationId)
-                .HandleFailuresOrOk();
+                .HandleFailuresOrNoContent();
         }
 
 

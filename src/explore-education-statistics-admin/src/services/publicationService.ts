@@ -33,6 +33,11 @@ export interface ExternalMethodology {
   url: string;
 }
 
+export interface ExternalMethodologySaveRequest {
+  title: string;
+  url: string;
+}
+
 export interface MyPublication {
   id: string;
   title: string;
@@ -120,24 +125,33 @@ const publicationService = {
     return client.get<MyPublication>(`/me/publication/${publicationId}`);
   },
 
-  getExternalMethodology(publicationId: string): Promise<ExternalMethodology> {
-    return client.get<ExternalMethodology>(
-      `/publication/${publicationId}/external-methodology`,
-    );
+  getExternalMethodology(
+    publicationId: string,
+  ): Promise<ExternalMethodology | undefined> {
+    return client
+      .get<ExternalMethodology>(
+        `/publication/${publicationId}/external-methodology`,
+      )
+      .catch(err => {
+        if (err.response.status !== 404) {
+          throw err;
+        }
+        return undefined;
+      });
   },
 
   updateExternalMethodology(
     publicationId: string,
-    updatedExternalMethodology: ExternalMethodology,
+    updatedExternalMethodology: ExternalMethodologySaveRequest,
   ): Promise<ExternalMethodology> {
     return client.put<ExternalMethodology>(
-      `publication/${publicationId}/external-methodology`,
+      `/publication/${publicationId}/external-methodology`,
       updatedExternalMethodology,
     );
   },
 
   removeExternalMethodology(publicationId: string): Promise<boolean> {
-    return client.delete(`publication/${publicationId}/external-methodology`);
+    return client.delete(`/publication/${publicationId}/external-methodology`);
   },
 
   listReleases<TReleaseSummary extends ReleaseSummary = ReleaseSummary>(

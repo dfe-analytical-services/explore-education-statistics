@@ -95,9 +95,7 @@ describe('PublicationMethodologiesPage', () => {
       testMethodology1,
       testMethodology2,
     ]);
-    publicationService.getExternalMethodology.mockRejectedValue({
-      response: { status: 404 },
-    });
+    publicationService.getExternalMethodology.mockResolvedValue(undefined);
     renderPage();
 
     await waitFor(() =>
@@ -130,9 +128,7 @@ describe('PublicationMethodologiesPage', () => {
 
   test('renders the methodologies page correctly with no methodologies', async () => {
     methodologyService.listMethodologyVersions.mockResolvedValue([]);
-    publicationService.getExternalMethodology.mockRejectedValue({
-      response: { status: 404 },
-    });
+    publicationService.getExternalMethodology.mockResolvedValue(undefined);
     renderPage();
 
     await waitFor(() =>
@@ -160,9 +156,7 @@ describe('PublicationMethodologiesPage', () => {
       };
 
       methodologyService.listMethodologyVersions.mockResolvedValue([]);
-      publicationService.getExternalMethodology.mockRejectedValue({
-        response: { status: 404 },
-      });
+      publicationService.getExternalMethodology.mockResolvedValue(undefined);
       methodologyService.createMethodology.mockResolvedValue(
         createdMethodology,
       );
@@ -201,9 +195,7 @@ describe('PublicationMethodologiesPage', () => {
 
     test('does not render the Create Methodology button if the user does not have permission to create one', async () => {
       methodologyService.listMethodologyVersions.mockResolvedValue([]);
-      publicationService.getExternalMethodology.mockRejectedValue({
-        response: { status: 404 },
-      });
+      publicationService.getExternalMethodology.mockResolvedValue(undefined);
       renderPage(
         produce(testPublication, draft => {
           draft.permissions.canCreateMethodologies = false;
@@ -226,9 +218,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology1Draft,
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -254,9 +244,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions = noMethodologyPermissions;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -287,9 +275,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canApproveMethodology = true;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -319,9 +305,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canApproveMethodology = false;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -351,9 +335,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canApproveMethodology = false;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -379,9 +361,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology1Draft,
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -404,9 +384,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canDeleteMethodology = false;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -429,9 +407,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology1Draft,
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -469,9 +445,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology1Draft,
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -504,9 +478,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology1,
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -532,9 +504,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology1,
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -556,9 +526,7 @@ describe('PublicationMethodologiesPage', () => {
             delete draft.published;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -580,9 +548,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canMakeAmendmentOfMethodology = true;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -604,9 +570,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology1,
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -630,9 +594,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology1Amendment,
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -666,9 +628,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canDeleteMethodology = true;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -691,9 +651,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canDeleteMethodology = false;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -719,9 +677,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canMakeAmendmentOfMethodology = true;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -769,9 +725,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canMakeAmendmentOfMethodology = true;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         render(
           <Router history={history}>
             <PublicationContextProvider
@@ -812,9 +766,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canDeleteMethodology = true;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -851,9 +803,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canDeleteMethodology = true;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -889,9 +839,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology2Draft,
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -923,9 +871,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions = noMethodologyPermissions;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -956,9 +902,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canApproveMethodology = true;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -988,9 +932,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canApproveMethodology = false;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -1020,9 +962,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canApproveMethodology = false;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -1050,9 +990,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canRemoveMethodologyLink = true;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -1075,9 +1013,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canRemoveMethodologyLink = false;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -1101,9 +1037,7 @@ describe('PublicationMethodologiesPage', () => {
           testMethodology1,
           testMethodology2,
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -1142,9 +1076,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canRemoveMethodologyLink = true;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -1168,9 +1100,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canRemoveMethodologyLink = false;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -1193,9 +1123,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology2Amendment,
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -1237,9 +1165,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canRemoveMethodologyLink = true;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -1272,9 +1198,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canRemoveMethodologyLink = true;
           }),
         ]);
-        publicationService.getExternalMethodology.mockRejectedValue({
-          response: { status: 404 },
-        });
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>

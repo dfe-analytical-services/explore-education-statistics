@@ -3034,15 +3034,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = BuildPublicationService(context: contentDbContext);
+                var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+                publicationCacheService.Setup(s => s.UpdatePublication(publication.Slug))
+                    .ReturnsAsync(new PublicationViewModel());
+
+                var service = BuildPublicationService(context: contentDbContext,
+                    publicationCacheService: publicationCacheService.Object);
 
                 var result = await service.UpdateExternalMethodology(
                     publication.Id,
-                    new ExternalMethodology
+                    new ExternalMethodologySaveRequest
                     {
                         Title = "New external methodology",
                         Url = "http://test.external.methodology/new",
                     });
+
+                VerifyAllMocks(publicationCacheService);
+
                 var externalMethodology = result.AssertRight();
 
                 Assert.Equal("New external methodology", externalMethodology.Title);
@@ -3065,7 +3073,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var result = await service.UpdateExternalMethodology(
                 publicationId: Guid.NewGuid(),
-                new ExternalMethodology
+                new ExternalMethodologySaveRequest
                 {
                     Title = "New external methodology",
                     Url = "http://test.external.methodology/new",
@@ -3095,9 +3103,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = BuildPublicationService(context: contentDbContext);
+                var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+                publicationCacheService.Setup(s => s.UpdatePublication(publication.Slug))
+                    .ReturnsAsync(new PublicationViewModel());
+                var service = BuildPublicationService(context: contentDbContext,
+                    publicationCacheService: publicationCacheService.Object);
 
                 var result = await service.RemoveExternalMethodology(publication.Id);
+
+                VerifyAllMocks(publicationCacheService);
+
                 result.AssertRight();
 
                 var dbPublication = contentDbContext.Publications

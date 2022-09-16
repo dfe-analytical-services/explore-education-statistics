@@ -17,15 +17,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
-using MethodologyVersionSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MethodologyVersionSummaryViewModel;
-using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -330,23 +325,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Publication>(publicationId)
                 .OnSuccessDo(_userService.CheckCanViewPublication)
                 .OnSuccess(publication => publication.ExternalMethodology != null
-                    ? _mapper.Map<ExternalMethodologyViewModel>(publication.ExternalMethodology)
+                    ? new ExternalMethodologyViewModel(publication.ExternalMethodology)
                     : NotFound<ExternalMethodologyViewModel>());
         }
 
         public async Task<Either<ActionResult, ExternalMethodologyViewModel>> UpdateExternalMethodology(
-            Guid publicationId, ExternalMethodology updatedExternalMethodology)
+            Guid publicationId, ExternalMethodologySaveRequest updatedExternalMethodology)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
                 .OnSuccessDo(_userService.CheckCanUpdatePublication)
-                .OnSuccess(publication =>
+                .OnSuccess(async publication =>
                 {
                     _context.Update(publication);
-                    publication.ExternalMethodology = updatedExternalMethodology;
-                    _context.SaveChangesAsync();
+                    publication.ExternalMethodology ??= new ExternalMethodology();
+                    publication.ExternalMethodology.Title = updatedExternalMethodology.Title;
+                    publication.ExternalMethodology.Url = updatedExternalMethodology.Url;
+                    await _context.SaveChangesAsync();
 
-                    return _mapper.Map<ExternalMethodologyViewModel>(updatedExternalMethodology);
+                    // Update publication cache because ExternalMethodology is in Content.Services.ViewModels.PublicationViewModel
+                    await _publicationCacheService.UpdatePublication(publication.Slug);
+
+                    return new ExternalMethodologyViewModel(publication.ExternalMethodology);
                 });
         }
 
@@ -356,11 +356,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
                 .OnSuccessDo(_userService.CheckCanUpdatePublication)
-                .OnSuccess(publication =>
+                .OnSuccess(async publication =>
                 {
                     _context.Update(publication);
                     publication.ExternalMethodology = null;
-                    _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync();
+
+                    // Clear cache because ExternalMethodology is in Content.Services.ViewModels.PublicationViewModel
+                    await _publicationCacheService.UpdatePublication(publication.Slug);
 
                     return Unit.Instance;
                 });
