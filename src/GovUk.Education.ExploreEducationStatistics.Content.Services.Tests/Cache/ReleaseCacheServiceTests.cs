@@ -30,7 +30,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
     private static readonly Guid ReleaseId = Guid.NewGuid();
     private static readonly Guid PublicationId = Guid.NewGuid();
 
-    private readonly PublicationViewModel _publicationViewModel = new()
+    private readonly PublicationCacheViewModel _publicationViewModel = new()
     {
         Id = PublicationId,
         Title = "Test publication",

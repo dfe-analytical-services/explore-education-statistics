@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
-    public record PublicationViewModel
+    public record PublicationCacheViewModel
     {
         public Guid Id { get; init; }
 

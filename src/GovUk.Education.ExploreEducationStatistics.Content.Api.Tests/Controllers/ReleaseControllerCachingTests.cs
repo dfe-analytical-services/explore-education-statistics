@@ -152,7 +152,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
                     Title = "National Statistics"
                 }
             },
-            new PublicationViewModel());
+            new PublicationCacheViewModel());
     }
 
     private static ReleaseController BuildReleaseController(

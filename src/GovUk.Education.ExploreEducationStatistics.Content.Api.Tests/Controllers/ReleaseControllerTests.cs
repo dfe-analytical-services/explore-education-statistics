@@ -185,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                         Title = "National Statistics"
                     }
                 },
-                new PublicationViewModel
+                new PublicationCacheViewModel
                 {
                     Releases = ListOf(new ReleaseTitleViewModel
                     {
@@ -206,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                         Title = "National Statistics"
                     }
                 },
-                new PublicationViewModel());
+                new PublicationCacheViewModel());
         }
 
         private static ReleaseController BuildReleaseController(
