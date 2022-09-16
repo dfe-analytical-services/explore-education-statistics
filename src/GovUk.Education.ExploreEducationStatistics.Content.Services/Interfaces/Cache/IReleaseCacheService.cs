@@ -12,12 +12,6 @@ public interface IReleaseCacheService
     Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(string publicationSlug,
         string? releaseSlug = null);
 
-    Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummary(string publicationSlug,
-        string? releaseSlug = null);
-
-    Task<Either<ActionResult, ReleaseViewModel>> GetReleaseAndPublication(string publicationSlug,
-        string? releaseSlug = null);
-
     Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateRelease(bool staging,
         DateTime expectedPublishDate,
         Guid releaseId,

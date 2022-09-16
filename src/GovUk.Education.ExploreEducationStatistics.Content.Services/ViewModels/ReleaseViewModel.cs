@@ -56,6 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public DateTime? DataLastPublished { get; }
 
+        public PublicationViewModel Publication { get; }
+
         public ReleaseViewModel(
             ReleaseCacheViewModel release,
             PublicationViewModel publication)
@@ -89,7 +91,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             .ToDictionary(v => v.GetTitle(), v => v);
 
         public bool LatestRelease => Id == Publication.LatestReleaseId;
-
-        public PublicationViewModel Publication { get; }
     }
 }
