@@ -99,10 +99,16 @@ export interface ContentSection<BlockType> {
   content: BlockType[];
 }
 
-export type PublicationSortOption = 'newest' | 'oldest' | 'alphabetical';
+export const publicationSortOptions = [
+  'newest',
+  'oldest',
+  'alphabetical',
+] as const;
+
+export type PublicationSortOption = typeof publicationSortOptions[number];
 
 // TODO EES-3517 expand to include filters and search
-export interface GetPublicationsRequest {
+export interface ListPublicationsRequest {
   page?: number;
   sortBy?: PublicationSortOption;
 }
