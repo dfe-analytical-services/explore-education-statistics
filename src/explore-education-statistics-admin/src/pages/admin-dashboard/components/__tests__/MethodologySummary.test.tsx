@@ -6,7 +6,7 @@ import _methodologyService, {
 import _publicationService, {
   ExternalMethodology,
   MyPublication,
-  PublicationContactDetails,
+  Contact,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
@@ -26,7 +26,7 @@ const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
 
-const testContact: PublicationContactDetails = {
+const testContact: Contact = {
   id: 'contact-1',
   contactName: 'John Smith',
   contactTelNo: '0777777777',

@@ -94,6 +94,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrNoContent();
         }
 
+        [HttpGet("api/publication/{publicationId:guid}/contact")]
+        public async Task<ActionResult<ContactViewModel>> GetContact(Guid publicationId)
+        {
+            return await _publicationService.GetContact(publicationId)
+                .HandleFailuresOrOk();
+        }
+
 
         [HttpGet("api/publication/{publicationId}/releases")]
         public async Task<ActionResult<PaginatedListViewModel<ReleaseSummaryViewModel>>> ListActiveReleases(

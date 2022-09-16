@@ -2,10 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import React from 'react';
 import { noop } from 'lodash';
 import PublicationSummary from '@admin/pages/admin-dashboard/components/PublicationSummary';
-import {
-  MyPublication,
-  PublicationContactDetails,
-} from '@admin/services/publicationService';
+import { MyPublication, Contact } from '@admin/services/publicationService';
 import _releaseService, {
   Release,
   ReleaseStageStatuses,
@@ -19,7 +16,7 @@ const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 describe('PublicationSummary', () => {
   const testTopicId = 'test-topic';
 
-  const testContact: PublicationContactDetails = {
+  const testContact: Contact = {
     id: 'contact-1',
     contactName: 'John Smith',
     contactTelNo: '0777777777',

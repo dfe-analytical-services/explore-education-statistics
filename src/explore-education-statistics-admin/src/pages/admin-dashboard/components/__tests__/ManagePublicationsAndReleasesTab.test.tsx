@@ -2,7 +2,7 @@ import ManagePublicationsAndReleasesTab from '@admin/pages/admin-dashboard/compo
 import _permissionService from '@admin/services/permissionService';
 import _publicationService, {
   MyPublication,
-  PublicationContactDetails,
+  Contact,
 } from '@admin/services/publicationService';
 import _themeService, { Theme } from '@admin/services/themeService';
 import _storageService from '@common/services/storageService';
@@ -71,7 +71,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
     },
   ];
 
-  const testContact: PublicationContactDetails = {
+  const testContact: Contact = {
     id: 'contact-1',
     contactName: 'John Smith',
     contactTelNo: '0777777777',

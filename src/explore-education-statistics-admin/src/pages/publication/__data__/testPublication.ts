@@ -1,9 +1,6 @@
-import {
-  MyPublication,
-  PublicationContactDetails,
-} from '@admin/services/publicationService';
+import { MyPublication, Contact } from '@admin/services/publicationService';
 
-export const testContact: PublicationContactDetails = {
+export const testContact: Contact = {
   contactName: 'John Smith',
   contactTelNo: '0777777777',
   id: 'contact-id-1',

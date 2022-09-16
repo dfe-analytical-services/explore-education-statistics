@@ -3132,6 +3132,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task GetContact()
+        {
+            var publication = new Publication
+            {
+                Contact = new Contact
+                {
+                    ContactName = "contact name",
+                    ContactTelNo = "12345",
+                    TeamName = "team name",
+                    TeamEmail = "team@email.com",
+                },
+            };
+
+            var contentDbContext = InMemoryApplicationDbContext();
+            await contentDbContext.Publications.AddAsync(publication);
+            await contentDbContext.SaveChangesAsync();
+
+            var service = BuildPublicationService(context: contentDbContext);
+
+            var result = await service.GetContact(publication.Id);
+            var contact = result.AssertRight();
+
+            Assert.Equal(publication.Contact.ContactName, contact.ContactName);
+            Assert.Equal(publication.Contact.ContactTelNo, contact.ContactTelNo);
+            Assert.Equal(publication.Contact.TeamName, contact.TeamName);
+            Assert.Equal(publication.Contact.TeamEmail, contact.TeamEmail);
+        }
+
+        [Fact]
+        public async Task GetContact_NoPublication()
+        {
+            var contentDbContext = InMemoryApplicationDbContext();
+
+            var service = BuildPublicationService(context: contentDbContext);
+
+            var result = await service.GetContact(Guid.NewGuid());
+            result.AssertNotFound();
+        }
+
+        [Fact]
         public async Task ListActiveReleases()
         {
             var release1Original = new Release

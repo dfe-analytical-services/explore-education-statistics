@@ -8,7 +8,7 @@ import _dataBlockService, {
 } from '@admin/services/dataBlockService';
 import _publicationService, {
   Publication,
-  PublicationContactDetails,
+  Contact,
 } from '@admin/services/publicationService';
 import _tableBuilderService, {
   SubjectMeta,
@@ -184,7 +184,7 @@ describe('PreReleaseTableToolPage', () => {
     ],
   };
 
-  const testContact: PublicationContactDetails = {
+  const testContact: Contact = {
     id: 'contact-1',
     contactName: 'John Smith',
     contactTelNo: '0777777777',

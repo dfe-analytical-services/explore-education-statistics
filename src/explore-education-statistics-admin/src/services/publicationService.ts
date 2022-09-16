@@ -13,8 +13,8 @@ import { OmitStrict } from '@common/types';
 import { PublicationSummary } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
 
-export interface PublicationContactDetails {
-  id: string;
+export interface Contact {
+  id: string; // @MarkFix remove?
   contactName: string;
   contactTelNo: string;
   teamEmail: string;
@@ -47,7 +47,7 @@ export interface MyPublication {
   externalMethodology?: ExternalMethodology;
   topicId: string;
   themeId: string;
-  contact: PublicationContactDetails;
+  contact: Contact;
   permissions: {
     canAdoptMethodologies: boolean;
     canCreateReleases: boolean;
@@ -66,7 +66,7 @@ export interface Publication {
   title: string;
   summary: string;
   slug: string;
-  contact: PublicationContactDetails;
+  contact: Contact;
   theme: IdTitlePair;
   topic: IdTitlePair;
 }
@@ -152,6 +152,10 @@ const publicationService = {
 
   removeExternalMethodology(publicationId: string): Promise<boolean> {
     return client.delete(`/publication/${publicationId}/external-methodology`);
+  },
+
+  getContact(publicationId: string): Promise<Contact> {
+    return client.get(`publication/${publicationId}/contact`);
   },
 
   listReleases<TReleaseSummary extends ReleaseSummary = ReleaseSummary>(

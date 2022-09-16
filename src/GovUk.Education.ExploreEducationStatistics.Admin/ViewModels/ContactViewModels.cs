@@ -5,6 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
     public class ContactViewModel
     {
+        // @MarkFix remove Id
         public Guid Id { get; set; }
 
         public string TeamName { get; set; }

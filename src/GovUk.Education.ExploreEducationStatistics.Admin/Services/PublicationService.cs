@@ -369,6 +369,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId)
+                .OnSuccessDo(_userService.CheckCanViewPublication)
+                .OnSuccess(publication => _mapper.Map<ContactViewModel>(publication.Contact));
+        }
+
         public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>>
             ListActiveReleasesPaginated(
                 Guid publicationId,
