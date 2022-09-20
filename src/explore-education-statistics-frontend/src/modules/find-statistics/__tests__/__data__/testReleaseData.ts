@@ -4,7 +4,11 @@ export const testPublication: Publication = {
   id: 'publication-1',
   title: 'Pupil absence in schools in England',
   slug: 'pupil-absence-in-schools-in-england',
-  releases: [{ id: 'release-id', slug: 'release-slug', title: 'Test release' }],
+  releases: [
+    { id: 'release-3', slug: '2018-19', title: 'Academic Year 2018/19' },
+    { id: 'release-2', slug: '2017-18', title: 'Academic Year 2017/18' },
+    { id: 'release-1', slug: '2016-17', title: 'Academic Year 2016/17' },
+  ],
   legacyReleases: [
     {
       id: 'legacy-release-3',
@@ -50,7 +54,7 @@ export const testPublication: Publication = {
 export const testRelease: Release = {
   latestRelease: true,
   publication: testPublication,
-  id: '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5',
+  id: 'release-1',
   title: 'Academic Year 2016/17',
   yearTitle: '2016/17',
   coverageTitle: 'Academic Year',
