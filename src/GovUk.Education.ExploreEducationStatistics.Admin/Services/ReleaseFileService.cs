@@ -77,11 +77,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, File>> CheckFileExists(Guid releaseId,
-            Guid id,
+            Guid fileId,
             params FileType[] allowedFileTypes)
         {
             // Ensure file is linked to the Release by getting the ReleaseFile first
-            var releaseFile = await _releaseFileRepository.Find(releaseId, id);
+            var releaseFile = await _releaseFileRepository.Find(releaseId, fileId);
 
             if (releaseFile == null)
             {
@@ -97,24 +97,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, Unit>> Delete(Guid releaseId,
-            Guid id,
+            Guid fileId,
             bool forceDelete = false)
         {
             return await Delete(releaseId, new List<Guid>
             {
-                id
+                fileId
             }, forceDelete: forceDelete);
         }
 
         public async Task<Either<ActionResult, Unit>> Delete(Guid releaseId,
-            IEnumerable<Guid> ids,
+            IEnumerable<Guid> fileIds,
             bool forceDelete = false)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(async release => await _userService.CheckCanUpdateRelease(release, ignoreCheck: forceDelete))
                 .OnSuccess(async _ =>
-                    await ids.Select(id => CheckFileExists(releaseId, id, DeletableFileTypes)).OnSuccessAll())
+                    await fileIds.Select(fileId => CheckFileExists(releaseId, fileId, DeletableFileTypes)).OnSuccessAll())
                 .OnSuccessVoid(async files =>
                 {
                     foreach (var file in files)
@@ -168,12 +168,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(releaseFile => releaseFile.ToFileInfo());
         }
 
-        public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid id)
+        public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid fileId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(_ => CheckFileExists(releaseId, id))
+                .OnSuccess(_ => CheckFileExists(releaseId, fileId))
                 .OnSuccessCombineWith(file =>
                     _blobStorageService.DownloadToStream(PrivateReleaseFiles, file.Path(), new MemoryStream()))
                 .OnSuccess(fileAndStream =>

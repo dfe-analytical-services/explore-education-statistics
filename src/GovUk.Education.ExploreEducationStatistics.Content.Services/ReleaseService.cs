@@ -29,8 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
-        private static readonly Regex
-            FilterRegex = new(ContentFilterUtils.CommentsFilterPattern, RegexOptions.Compiled);
+        private static readonly Regex CommentsRegex =
+            new(ContentFilterUtils.CommentsFilterPattern, RegexOptions.Compiled);
 
         public ReleaseService(
             ContentDbContext contentDbContext,
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
             var releaseViewModel = _mapper.Map<CachedReleaseViewModel>(release);
 
-            // Filter content blocks to remove any unnecessary information
+            // Filter content blocks to remove any non-public or unnecessary information
             releaseViewModel.HeadlinesSection?.Content.ForEach(FilterContentBlock);
             releaseViewModel.SummarySection?.Content.ForEach(FilterContentBlock);
             releaseViewModel.KeyStatisticsSection?.Content.ForEach(FilterContentBlock);
@@ -153,11 +153,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             switch (block)
             {
                 case HtmlBlockViewModel htmlBlock:
-                    htmlBlock.Body = FilterRegex.Replace(htmlBlock.Body, string.Empty);
+                    htmlBlock.Body = CommentsRegex.Replace(htmlBlock.Body, string.Empty);
                     break;
 
                 case MarkDownBlockViewModel markdownBlock:
-                    markdownBlock.Body = FilterRegex.Replace(markdownBlock.Body, string.Empty);
+                    markdownBlock.Body = CommentsRegex.Replace(markdownBlock.Body, string.Empty);
                     break;
             }
         }

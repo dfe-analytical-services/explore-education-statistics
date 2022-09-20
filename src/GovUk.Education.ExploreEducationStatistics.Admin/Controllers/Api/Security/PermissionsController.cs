@@ -102,7 +102,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         public async Task<ActionResult<DataFilePermissions>> GetDataFilePermissions(Guid releaseId, Guid fileId)
         {
             return await _releaseFileService
-                .CheckFileExists(releaseId, fileId, FileType.Data)
+                .CheckFileExists(
+                    releaseId: releaseId,
+                    fileId: fileId,
+                    FileType.Data)
                 .OnSuccess(_userService.GetDataFilePermissions)
                 .HandleFailuresOrOk();
         }
