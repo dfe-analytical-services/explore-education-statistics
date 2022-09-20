@@ -1,8 +1,11 @@
 import PublicationContactPage from '@admin/pages/publication/PublicationContactPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
-import { testPublication } from '@admin/pages/publication/__data__/testPublication';
+import {
+  testContact,
+  testPublication,
+} from '@admin/pages/publication/__data__/testPublication';
 import _publicationService, {
-  MyPublication,
+  Publication,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
@@ -17,12 +20,7 @@ const publicationService = _publicationService as jest.Mocked<
 
 describe('PublicationContactPage', () => {
   test('renders the contact page correctly', async () => {
-    publicationService.getContact.mockResolvedValue({
-      ...testPublication.contact,
-      permissions: {
-        canUpdatePublication: true,
-      },
-    });
+    publicationService.getContact.mockResolvedValue(testContact);
 
     renderPage(testPublication);
 
@@ -47,10 +45,8 @@ describe('PublicationContactPage', () => {
 
   test('does not show the edit button if do not have permission', async () => {
     publicationService.getContact.mockResolvedValue({
-      ...testPublication.contact,
-      permissions: {
-        canUpdatePublication: false,
-      },
+      ...testContact,
+      permissions: { canUpdatePublication: false },
     });
 
     renderPage(testPublication);
@@ -67,12 +63,7 @@ describe('PublicationContactPage', () => {
   });
 
   test('clicking the edit button shows the edit form', async () => {
-    publicationService.getContact.mockResolvedValue({
-      ...testPublication.contact,
-      permissions: {
-        canUpdatePublication: true,
-      },
-    });
+    publicationService.getContact.mockResolvedValue(testContact);
 
     renderPage(testPublication);
 
@@ -101,12 +92,7 @@ describe('PublicationContactPage', () => {
   });
 
   test('clicking the cancel button switches back to readOnly view', async () => {
-    publicationService.getContact.mockResolvedValue({
-      ...testPublication.contact,
-      permissions: {
-        canUpdatePublication: true,
-      },
-    });
+    publicationService.getContact.mockResolvedValue(testContact);
 
     renderPage(testPublication);
 
@@ -141,12 +127,7 @@ describe('PublicationContactPage', () => {
   });
 
   test('shows validation errors when there are no contact details', async () => {
-    publicationService.getContact.mockResolvedValue({
-      ...testPublication.contact,
-      permissions: {
-        canUpdatePublication: true,
-      },
-    });
+    publicationService.getContact.mockResolvedValue(testContact);
 
     renderPage(testPublication);
 
@@ -200,12 +181,7 @@ describe('PublicationContactPage', () => {
   });
 
   test('show validation error when contact email is not valid', async () => {
-    publicationService.getContact.mockResolvedValue({
-      ...testPublication.contact,
-      permissions: {
-        canUpdatePublication: true,
-      },
-    });
+    publicationService.getContact.mockResolvedValue(testContact);
 
     renderPage(testPublication);
 
@@ -235,12 +211,7 @@ describe('PublicationContactPage', () => {
   });
 
   test('shows a confirmation modal on submit', async () => {
-    publicationService.getContact.mockResolvedValue({
-      ...testPublication.contact,
-      permissions: {
-        canUpdatePublication: true,
-      },
-    });
+    publicationService.getContact.mockResolvedValue(testContact);
 
     renderPage(testPublication);
 
@@ -268,12 +239,7 @@ describe('PublicationContactPage', () => {
   });
 
   test('clicking confirm calls the publication service', async () => {
-    publicationService.getContact.mockResolvedValue({
-      ...testPublication.contact,
-      permissions: {
-        canUpdatePublication: true,
-      },
-    });
+    publicationService.getContact.mockResolvedValue(testContact);
 
     renderPage(testPublication);
 
@@ -296,13 +262,13 @@ describe('PublicationContactPage', () => {
     await waitFor(() => {
       expect(publicationService.updateContact).toHaveBeenCalledWith(
         testPublication.id,
-        testPublication.contact,
+        testContact,
       );
     });
   });
 });
 
-function renderPage(publication: MyPublication) {
+function renderPage(publication: Publication) {
   render(
     <MemoryRouter>
       <PublicationContextProvider

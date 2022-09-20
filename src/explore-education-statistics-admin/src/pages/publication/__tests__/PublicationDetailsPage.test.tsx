@@ -1,12 +1,8 @@
 import PublicationDetailsPage from '@admin/pages/publication/PublicationDetailsPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
-import {
-  testContact,
-  testPublication,
-} from '@admin/pages/publication/__data__/testPublication';
+import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import _publicationService, {
   Publication,
-  MyPublication,
 } from '@admin/services/publicationService';
 import _themeService, { Theme } from '@admin/services/themeService';
 import { PublicationSummary } from '@common/services/publicationService';
@@ -410,7 +406,7 @@ describe('PublicationDetailsPage', () => {
   });
 });
 
-function renderPage(publication: MyPublication) {
+function renderPage(publication: Publication) {
   render(
     <MemoryRouter>
       <PublicationContextProvider

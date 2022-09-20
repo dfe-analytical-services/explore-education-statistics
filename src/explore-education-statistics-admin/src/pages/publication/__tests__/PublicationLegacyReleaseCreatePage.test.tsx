@@ -2,7 +2,7 @@ import PublicationLegacyReleaseCreatePage from '@admin/pages/publication/Publica
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import _legacyReleaseService from '@admin/services/legacyReleaseService';
-import { MyPublication } from '@admin/services/publicationService';
+import { Publication } from '@admin/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -51,7 +51,7 @@ describe('PublicationLegacyReleaseCreatePage', () => {
   });
 });
 
-function renderPage(publication: MyPublication) {
+function renderPage(publication: Publication) {
   render(
     <MemoryRouter>
       <PublicationContextProvider

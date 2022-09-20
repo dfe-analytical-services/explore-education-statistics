@@ -3,7 +3,7 @@ import { PublicationContextProvider } from '@admin/pages/publication/contexts/Pu
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import { MethodologyVersion } from '@admin/services/methodologyService';
 import _publicationService, {
-  MyPublication,
+  Publication,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -197,7 +197,7 @@ describe('PublicationAdoptMethodologyPage', () => {
   });
 });
 
-function renderPage(publication: MyPublication) {
+function renderPage(publication: Publication) {
   render(
     <MemoryRouter>
       <PublicationContextProvider

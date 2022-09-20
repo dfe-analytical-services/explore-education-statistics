@@ -67,6 +67,10 @@ export interface PublicationPermissions {
   canManageExternalMethodology: boolean;
 }
 
+export interface PublicationWithPermissions extends Publication {
+  permissions: PublicationPermissions;
+}
+
 export interface Publication {
   id: string;
   title: string;
