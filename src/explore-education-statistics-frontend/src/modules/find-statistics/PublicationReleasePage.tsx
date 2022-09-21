@@ -125,6 +125,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 <Details
                   id="releaseLastUpdates"
                   summary={`See all updates (${updates.length})`}
+                  hiddenText={`for ${release.title}`}
                   onToggle={open => {
                     if (open) {
                       logEvent({
@@ -297,6 +298,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 </p>
                 <Details
                   summary={`See other releases (${releaseCount})`}
+                  hiddenText={`for ${release.publication.title}`}
                   onToggle={open =>
                     open &&
                     logEvent({
