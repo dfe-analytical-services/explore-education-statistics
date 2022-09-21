@@ -2,6 +2,7 @@
 import { check, fail } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
+import exec from 'k6/execution';
 import createAdminService from '../../../utils/adminService';
 import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
@@ -9,6 +10,7 @@ import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
 const IMPORT_STATUS_POLLING_DELAY_SECONDS = 5;
 
 const alwaysCreateNewDataPerTest = false;
+const bigFile = true;
 
 export const options: Options = {
   stages: [
@@ -35,7 +37,8 @@ export const options: Options = {
 interface SetupData {
   themeId: string;
   topicId: string;
-  releaseId: string;
+  publicationId: string;
+  publicationTitle: string;
 }
 
 export const errorRate = new Rate('ees_errors');
@@ -76,8 +79,13 @@ const processingStages: {
 
 // TODO - use SharedArray instead of `open` here
 /* eslint-disable no-restricted-globals */
-const subjectFile = open('admin/import/assets/big-file.csv', 'b');
-const subjectMetaFile = open('admin/import/assets/big-file.meta.csv', 'b');
+const zipFile = bigFile ? open('admin/import/assets/big-file1.zip', 'b') : null;
+const subjectFile = !bigFile
+  ? open('admin/import/assets/big-file.csv', 'b')
+  : null;
+const subjectMetaFile = !bigFile
+  ? open('admin/import/assets/big-file.meta.csv', 'b')
+  : null;
 /* eslint-enable no-restricted-globals */
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
@@ -113,26 +121,23 @@ export function setup(): SetupData {
     title: publicationTitle,
   });
 
-  const { id: releaseId } = adminService.getOrCreateRelease({
-    topicId,
-    publicationId,
-    publicationTitle,
-    year: 2022,
-    timePeriodCoverage: 'AY',
-  });
-
   console.log(
-    `Created Theme ${themeId}, Topic ${topicId}, Publication ${publicationId}, Release ${releaseId}`,
+    `Created Theme ${themeId}, Topic ${topicId}, Publication ${publicationId}`,
   );
 
   return {
     themeId,
     topicId,
-    releaseId,
+    publicationId,
+    publicationTitle,
   };
 }
 
-const performTest = ({ releaseId }: SetupData) => {
+const performTest = ({
+  topicId,
+  publicationId,
+  publicationTitle,
+}: SetupData) => {
   const accessToken = getOrRefreshAccessTokens(
     supportsRefreshTokens,
     userName,
@@ -141,24 +146,45 @@ const performTest = ({ releaseId }: SetupData) => {
   );
 
   const uniqueId = Date.now();
-  const subjectName = `dates-${uniqueId}`;
+  const subjectName = `subject-${uniqueId}`;
 
   const adminService = createAdminService(adminUrl, accessToken, false);
 
+  const year = 2000 + exec.scenario.iterationInTest;
+
+  console.log(`Creating Release ${year} for file import to be uploaded to`);
+
+  const { id: releaseId } = adminService.getOrCreateRelease({
+    topicId,
+    publicationId,
+    publicationTitle,
+    year,
+    timePeriodCoverage: 'AY',
+  });
+
   console.log(`Uploading subject ${subjectName}`);
 
-  const { response: uploadResponse, id: fileId } = adminService.uploadDataFile({
-    title: subjectName,
-    releaseId,
-    dataFile: {
-      file: subjectFile,
-      filename: `${subjectName}.csv`,
-    },
-    metaFile: {
-      file: subjectMetaFile,
-      filename: `${subjectName}.meta.csv`,
-    },
-  });
+  const { response: uploadResponse, id: fileId } = bigFile
+    ? adminService.uploadDataZipFile({
+        title: subjectName,
+        releaseId,
+        zipFile: {
+          file: zipFile!,
+          filename: `${subjectName}.zip`,
+        },
+      })
+    : adminService.uploadDataFile({
+        title: subjectName,
+        releaseId,
+        dataFile: {
+          file: subjectFile!,
+          filename: `${subjectName}.csv`,
+        },
+        metaFile: {
+          file: subjectMetaFile!,
+          filename: `${subjectName}.meta.csv`,
+        },
+      });
 
   console.log(`Subject ${subjectName} finished uploading`);
 

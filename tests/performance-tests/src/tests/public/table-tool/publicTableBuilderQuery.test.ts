@@ -16,6 +16,7 @@ const SUBJECT =
   'UI test subject - Performance tests - publicTableBuilderQuery.test.ts';
 
 const alwaysCreateNewDataPerTest = false;
+const bigFile = true;
 
 export const options: Options = {
   scenarios: {
@@ -31,7 +32,7 @@ export const options: Options = {
   noConnectionReuse: true,
   insecureSkipTLSVerify: true,
   linger: true,
-  setupTimeout: '10m',
+  setupTimeout: bigFile ? '30m' : '10m',
 };
 
 interface SetupData {
@@ -55,8 +56,13 @@ export const tableQueryFailureCount = new Counter(
 );
 
 /* eslint-disable no-restricted-globals */
-const subjectFile = open('admin/import/assets/dates.csv', 'b');
-const subjectMetaFile = open('admin/import/assets/dates.meta.csv', 'b');
+const zipFile = bigFile ? open('admin/import/assets/big-file1.zip', 'b') : null;
+const subjectFile = !bigFile
+  ? open('admin/import/assets/dates.csv', 'b')
+  : null;
+const subjectMetaFile = !bigFile
+  ? open('admin/import/assets/dates.meta.csv', 'b')
+  : null;
 /* eslint-enable no-restricted-globals */
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
@@ -114,18 +120,27 @@ function getOrCreateReleaseWithSubject() {
   if (!existingSubjects.length) {
     console.log('Importing data file');
 
-    const { id: fileId } = adminService.getOrImportDataFile({
-      title: `${SUBJECT}${suffix}`,
-      releaseId,
-      dataFile: {
-        file: subjectFile,
-        filename: `subject.csv`,
-      },
-      metaFile: {
-        file: subjectMetaFile,
-        filename: `subject.meta.csv`,
-      },
-    });
+    const { id: fileId } = bigFile
+      ? adminService.getOrImportDataZipFile({
+          title: `${SUBJECT}${suffix}`,
+          releaseId,
+          zipFile: {
+            file: zipFile!,
+            filename: `subject.zip`,
+          },
+        })
+      : adminService.getOrImportDataFile({
+          title: `${SUBJECT}${suffix}`,
+          releaseId,
+          dataFile: {
+            file: subjectFile!,
+            filename: `subject.csv`,
+          },
+          metaFile: {
+            file: subjectMetaFile!,
+            filename: `subject.meta.csv`,
+          },
+        });
 
     console.log('Waiting for data file to import');
 
@@ -149,9 +164,15 @@ function getOrCreateReleaseWithSubject() {
       ],
     });
 
+    console.log(`Approving Release ${RELEASE}`);
+
     adminService.approveRelease({ releaseId });
 
+    console.log(`Waiting for Release ${RELEASE} to be published`);
+
     adminService.waitForReleaseToBePublished({ releaseId });
+
+    console.log(`Release ${RELEASE} published successfully`);
   }
 
   return {
@@ -237,10 +258,14 @@ const performTest = ({ publicationId, subjectId, subjectMeta }: SetupData) => {
       'response should contain table builder results': _ => results.length > 0,
     })
   ) {
+    const tableQuerySpeed = Date.now() - startTimeMillis;
     tableQueryCompleteCount.add(1);
-    tableQuerySpeedTrend.add(Date.now() - startTimeMillis);
+    tableQuerySpeedTrend.add(tableQuerySpeed);
+
+    console.log(`Table query completed in ${tableQuerySpeed / 1000} seconds`);
   } else {
     tableQueryFailureCount.add(1);
+    console.log(`Table query failed`);
   }
 };
 

@@ -27,6 +27,8 @@ export const getAuthTokens = async (
   refresh_token: string;
   expires_at: Date;
 }> => {
+  console.log(`Getting authentication details for user ${email}`);
+
   const browser = await puppeteer.launch({
     headless: true,
     ignoreHTTPSErrors: true,

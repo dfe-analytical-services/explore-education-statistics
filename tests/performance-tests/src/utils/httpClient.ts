@@ -46,7 +46,7 @@ export default class HttpClient {
 
     if (this.checkResponseStatus && !successCodes.includes(response.status)) {
       throw new Error(
-        `${response.status} error with GET to url ${url}: ${response.body}`,
+        `${response.status} error with GET to url ${this.baseUrl}${url}: ${response.body}`,
       );
     }
 
@@ -77,7 +77,7 @@ export default class HttpClient {
 
     if (this.checkResponseStatus && response.status !== 200) {
       throw new Error(
-        `${response.status} error with POST to url ${url} with request body\n\n${data}: ${response.body}`,
+        `${response.status} error with POST to url ${this.baseUrl}${url} with request body\n\n${data}: ${response.body}`,
       );
     }
 
@@ -106,7 +106,7 @@ export default class HttpClient {
 
     if (this.checkResponseStatus && response.status !== 200) {
       throw new Error(
-        `${response.status} error with PATCH to url ${url} with request body\n\n${data}: ${response.body}`,
+        `${response.status} error with PATCH to url ${this.baseUrl}${url} with request body\n\n${data}: ${response.body}`,
       );
     }
 
@@ -131,7 +131,9 @@ export default class HttpClient {
     });
 
     if (this.checkResponseStatus && response.status !== 204) {
-      throw new Error(`Error with DELETE to url ${url}: ${response.body}`);
+      throw new Error(
+        `Error with DELETE to url ${this.baseUrl}${url}: ${response.body}`,
+      );
     }
     return response;
   }

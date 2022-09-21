@@ -318,6 +318,25 @@ class AdminService {
     return releaseFiles.find(file => file.fileName === dataFileName);
   }
 
+  uploadDataZipFile({
+    title,
+    releaseId,
+    zipFile,
+  }: {
+    title: string;
+    releaseId: string;
+    zipFile: {
+      file: ArrayBuffer;
+      filename: string;
+    };
+  }) {
+    return this.uploadDataFile({
+      title,
+      releaseId,
+      dataFile: zipFile,
+    });
+  }
+
   uploadDataFile({
     title,
     releaseId,
@@ -330,19 +349,32 @@ class AdminService {
       file: ArrayBuffer;
       filename: string;
     };
-    metaFile: {
+    metaFile?: {
       file: ArrayBuffer;
       filename: string;
     };
   }) {
+    const zipUpload = dataFile.filename.endsWith('.zip');
+
+    if (!zipUpload && !metaFile) {
+      throw new Error(
+        `Data file ${dataFile.filename} must have a corresponding metafile if it is not a ZIP`,
+      );
+    }
+
     const uploadBody = {
       title,
-      file: http.file(dataFile.file, dataFile.filename),
-      metaFile: http.file(metaFile.file, metaFile.filename),
+      [zipUpload ? 'zipFile' : 'file']: http.file(
+        dataFile.file,
+        dataFile.filename,
+      ),
+      metaFile: !zipUpload ? http.file(metaFile!.file, metaFile!.filename) : '',
     };
 
     const { response, json } = this.client.post<{ id: string }>(
-      `/api/release/${releaseId}/data?title=${encodeURI(title)}`,
+      `/api/release/${releaseId}/${
+        zipUpload ? 'zip-data' : 'data'
+      }?title=${encodeURI(title)}`,
       uploadBody,
     );
 
@@ -427,7 +459,7 @@ class AdminService {
       file: ArrayBuffer;
       filename: string;
     };
-    metaFile: {
+    metaFile?: {
       file: ArrayBuffer;
       filename: string;
     };
@@ -436,6 +468,25 @@ class AdminService {
       id:
         this.getDataFile({ releaseId, dataFileName: dataFile.filename })?.id ??
         this.uploadDataFile({ title, releaseId, dataFile, metaFile })?.id,
+    };
+  }
+
+  getOrImportDataZipFile({
+    title,
+    releaseId,
+    zipFile,
+  }: {
+    title: string;
+    releaseId: string;
+    zipFile: {
+      file: ArrayBuffer;
+      filename: string;
+    };
+  }) {
+    return {
+      id:
+        this.getDataFile({ releaseId, dataFileName: zipFile.filename })?.id ??
+        this.uploadDataFile({ title, releaseId, dataFile: zipFile })?.id,
     };
   }
 
@@ -613,36 +664,44 @@ class AdminService {
     while (Date.now() < publishingExpireTime) {
       const { status, response } = this.getReleaseApprovalStatus({ releaseId });
 
-      if (response.status === 204) {
-        sleep(pollingDelaySeconds);
-        return;
-      }
-
-      if (response.status !== 200 && onStatusCheckFailed) {
-        onStatusCheckFailed(response);
-      } else {
-        if (onStatusReceived) {
-          onStatusReceived(status);
+      switch (response.status) {
+        case 204: {
+          sleep(pollingDelaySeconds);
+          break;
         }
-
-        const failureStates: OverallStage[] = ['Failed', 'Invalid'];
-
-        if (failureStates.includes(status)) {
-          if (onPublishingFailed) {
-            onPublishingFailed(status);
+        case 200: {
+          if (onStatusReceived) {
+            onStatusReceived(status);
           }
-          return;
-        }
 
-        if (status === 'Complete') {
-          if (onPublishingCompleted) {
-            onPublishingCompleted();
+          const failureStates: OverallStage[] = ['Failed', 'Invalid'];
+
+          if (failureStates.includes(status)) {
+            if (onPublishingFailed) {
+              onPublishingFailed(status);
+              return;
+            }
+            throw new Error(`Publishing failed for Release ${releaseId}`);
           }
-          return;
+
+          if (status === 'Complete') {
+            if (onPublishingCompleted) {
+              onPublishingCompleted();
+            }
+            return;
+          }
+
+          sleep(pollingDelaySeconds);
+          break;
+        }
+        default: {
+          if (onStatusCheckFailed) {
+            onStatusCheckFailed(response);
+          }
+
+          sleep(pollingDelaySeconds);
         }
       }
-
-      sleep(pollingDelaySeconds);
     }
 
     if (onPublishingExceededTimeout) {
