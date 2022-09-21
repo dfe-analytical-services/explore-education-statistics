@@ -9,18 +9,18 @@ import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
 
 const IMPORT_STATUS_POLLING_DELAY_SECONDS = 5;
 
-const alwaysCreateNewDataPerTest = false;
+const alwaysCreateNewDataPerTest = true;
 const bigFile = true;
 
 export const options: Options = {
   stages: [
     {
       duration: '1s',
-      target: 10,
+      target: 3,
     },
     {
       duration: '119m',
-      target: 10,
+      target: 3,
     },
     {
       duration: '30s',

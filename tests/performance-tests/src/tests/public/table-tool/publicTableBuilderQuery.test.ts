@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import { check } from 'k6';
+import exec from 'k6/execution';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import createAdminService, { SubjectMeta } from '../../../utils/adminService';
@@ -216,11 +217,37 @@ export function setup(): SetupData {
 const performTest = ({ publicationId, subjectId, subjectMeta }: SetupData) => {
   const dataService = createDataService(dataApiUrl);
 
-  const allFilterIds = Object.values(subjectMeta.filters).flatMap(filter =>
-    Object.values(filter.options).flatMap(filterGroup =>
-      filterGroup.options.flatMap(filterItem => filterItem.value),
-    ),
+  const oneFilterItemIdFromEachFilter = Object.values(
+    subjectMeta.filters,
+  ).flatMap(filter =>
+    Object.values(filter.options)
+      .flatMap(filterGroup =>
+        filterGroup.options.flatMap(filterItem => filterItem.value),
+      )
+      .slice(0, 1),
   );
+
+  const allOtherFilterItemIds = Object.values(subjectMeta.filters).flatMap(
+    filter =>
+      Object.values(filter.options)
+        .flatMap(filterGroup =>
+          filterGroup.options.flatMap(filterItem => filterItem.value),
+        )
+        .slice(1),
+  );
+
+  const maxSelectedFilterItemIds = 35;
+
+  const someFilterItemIds = [
+    ...oneFilterItemIdFromEachFilter,
+    ...allOtherFilterItemIds.slice(
+      0,
+      Math.min(
+        allOtherFilterItemIds.length,
+        maxSelectedFilterItemIds - oneFilterItemIdFromEachFilter.length,
+      ),
+    ),
+  ];
 
   const allIndicationIds = Object.values(
     subjectMeta.indicators,
@@ -243,10 +270,12 @@ const performTest = ({ publicationId, subjectId, subjectMeta }: SetupData) => {
 
   const startTimeMillis = Date.now();
 
+  console.log(`Starting table query ${exec.scenario.iterationInTest}`);
+
   const { response, results } = dataService.tableQuery({
     publicationId,
     subjectId,
-    filterIds: allFilterIds,
+    filterIds: someFilterItemIds,
     indicatorIds: allIndicationIds,
     locationIds: allLocationIds,
     ...someTimePeriods,
@@ -262,10 +291,14 @@ const performTest = ({ publicationId, subjectId, subjectMeta }: SetupData) => {
     tableQueryCompleteCount.add(1);
     tableQuerySpeedTrend.add(tableQuerySpeed);
 
-    console.log(`Table query completed in ${tableQuerySpeed / 1000} seconds`);
+    console.log(
+      `Table query ${exec.scenario.iterationInTest} completed in ${
+        tableQuerySpeed / 1000
+      } seconds`,
+    );
   } else {
     tableQueryFailureCount.add(1);
-    console.log(`Table query failed`);
+    console.log(`Table query ${exec.scenario.iterationInTest} failed`);
   }
 };
 
