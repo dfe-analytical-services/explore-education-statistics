@@ -21,7 +21,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +34,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 using IThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
@@ -136,7 +134,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                     }),
                     provider.GetRequiredService<ILogger<MemoryCacheService>>());
             });
-            services.AddTransient<IFileStorageService, FileStorageService>();
             services.AddTransient<IFilterRepository, FilterRepository>();
             services.AddTransient<IIndicatorRepository, IndicatorRepository>();
             services.AddTransient<IDataGuidanceService, DataGuidanceService>();
@@ -152,7 +149,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
             services.AddTransient<IThemeCacheService, ThemeCacheService>();
+            services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
             services.AddTransient<IReleaseService, Services.ReleaseService>();
+            services.AddTransient<IReleaseFileRepository, ReleaseFileRepository>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
             services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
@@ -186,8 +185,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-
-                PublishAllContent(logger);
             }
             else
             {
@@ -222,31 +219,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             app.UseHealthChecks("/api/health");
 
             app.UseResponseCompression();
-        }
-
-        /**
-         * Add a message to the queue to publish all content.
-         * This should only be used in development!
-         */
-        private void PublishAllContent(ILogger logger)
-        {
-            const string queueName = PublishAllContentQueue;
-            try
-            {
-                var publisherConnectionString = Configuration.GetValue<string>("PublisherStorage");
-                var storageQueueService = new StorageQueueService(
-                    publisherConnectionString,
-                    new StorageInstanceCreationUtil());
-                storageQueueService.AddMessage(queueName, new PublishAllContentMessage());
-
-                logger.LogInformation($"Message added to {queueName} queue");
-                logger.LogInformation("Please ensure the Publisher function is running");
-            }
-            catch
-            {
-                logger.LogError($"Unable add message to {queueName} queue");
-                throw;
-            }
         }
     }
 }

@@ -196,6 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IFileRepository? fileRepository = null,
             IReleaseRepository? releaseRepository = null,
             IReleaseFileRepository? releaseFileRepository = null,
+            IReleaseFileService? releaseFileService = null,
             IReleaseDataFileRepository? releaseDataFileRepository = null,
             IDataImportService? dataImportService = null,
             IUserService? userService = null)
@@ -205,17 +206,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new ReleaseDataFileService(
                 contentDbContext,
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                blobStorageService ?? new Mock<IBlobStorageService>().Object,
-                dataArchiveValidationService ?? new Mock<IDataArchiveValidationService>().Object,
-                fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>().Object,
+                blobStorageService ?? new Mock<IBlobStorageService>(MockBehavior.Strict).Object,
+                dataArchiveValidationService ?? new Mock<IDataArchiveValidationService>(MockBehavior.Strict).Object,
+                fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>(MockBehavior.Strict).Object,
                 fileRepository ?? new FileRepository(contentDbContext),
                 releaseRepository ?? new ReleaseRepository(
                     contentDbContext, 
                     statisticsDbContext ?? new Mock<StatisticsDbContext>().Object, 
                     Common.Services.MapperUtils.MapperForProfile<MappingProfiles>()),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
+                releaseFileService ?? new Mock<IReleaseFileService>(MockBehavior.Strict).Object,
                 releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext),
-                dataImportService ?? new Mock<IDataImportService>().Object,
+                dataImportService ?? new Mock<IDataImportService>(MockBehavior.Strict).Object,
                 userService ?? new Mock<IUserService>().Object
             );
         }

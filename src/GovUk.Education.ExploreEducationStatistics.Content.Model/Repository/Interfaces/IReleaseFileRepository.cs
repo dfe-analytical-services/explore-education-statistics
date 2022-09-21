@@ -3,17 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces
 {
     public interface IReleaseFileRepository
     {
-        public Task<Either<ActionResult, File>> CheckFileExists(Guid releaseId,
-            Guid id,
-            params FileType[] allowedFileTypes);
-
         public Task<ReleaseFile> Create(
             Guid releaseId,
             string filename,

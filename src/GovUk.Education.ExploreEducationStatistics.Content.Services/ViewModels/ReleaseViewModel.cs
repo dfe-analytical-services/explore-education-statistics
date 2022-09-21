@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -81,24 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             HasPreReleaseAccessList = !release.PreReleaseAccessList.IsNullOrEmpty();
             RelatedInformation = release.RelatedInformation;
             DataLastPublished = release.DataLastPublished;
-
-            var otherReleases = publication.Releases
-                .Where(model => Id != model.Id)
-                .ToList();
-
-            Publication = new PublicationViewModel
-            {
-                Id = publication.Id,
-                Title = publication.Title,
-                Slug = publication.Slug,
-                LatestReleaseId = publication.LatestReleaseId,
-                Releases = otherReleases,
-                LegacyReleases = publication.LegacyReleases,
-                Topic = publication.Topic,
-                Contact = publication.Contact,
-                ExternalMethodology = publication.ExternalMethodology,
-                IsSuperseded = publication.IsSuperseded,
-            };
+            Publication = publication;
         }
 
         /// TODO EES-3127 Remove the backwards compatibility of CachedReleaseViewModel.Type.

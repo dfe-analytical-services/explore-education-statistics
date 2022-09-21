@@ -37,6 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IFileRepository _fileRepository;
         private readonly IReleaseRepository _releaseRepository;
         private readonly IReleaseFileRepository _releaseFileRepository;
+        private readonly IReleaseFileService _releaseFileService;
         private readonly IReleaseDataFileRepository _releaseDataFileRepository;
         private readonly IDataImportService _dataImportService;
         private readonly IUserService _userService;
@@ -50,6 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFileRepository fileRepository,
             IReleaseRepository releaseRepository,
             IReleaseFileRepository releaseFileRepository,
+            IReleaseFileService releaseFileService,
             IReleaseDataFileRepository releaseDataFileRepository,
             IDataImportService dataImportService,
             IUserService userService)
@@ -62,6 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _fileRepository = fileRepository;
             _releaseRepository = releaseRepository;
             _releaseFileRepository = releaseFileRepository;
+            _releaseFileService = releaseFileService;
             _releaseDataFileRepository = releaseDataFileRepository;
             _dataImportService = dataImportService;
             _userService = userService;
@@ -85,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(async release => await _userService.CheckCanUpdateRelease(release, ignoreCheck: forceDelete))
                 .OnSuccess(async _ =>
-                    await ids.Select(id => _releaseFileRepository.CheckFileExists(releaseId, id, FileType.Data))
+                    await ids.Select(id => _releaseFileService.CheckFileExists(releaseId, id, FileType.Data))
                         .OnSuccessAll())
                 .OnSuccessVoid(async files =>
                 {

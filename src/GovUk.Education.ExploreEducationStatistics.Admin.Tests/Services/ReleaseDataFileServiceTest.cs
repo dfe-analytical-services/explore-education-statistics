@@ -133,6 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
             dataImportService.Setup(mock => mock.DeleteImport(releaseDataFile.File.Id))
                 .Returns(Task.CompletedTask);
@@ -152,12 +153,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     null))
                 .Returns(Task.CompletedTask);
 
+            releaseFileService.Setup(mock => mock.CheckFileExists(release.Id,
+                    releaseDataFile.File.Id,
+                    FileType.Data))
+                .ReturnsAsync(releaseDataFile.File);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object,
-                    dataImportService: dataImportService.Object);
+                    dataImportService: dataImportService.Object,
+                    releaseFileService: releaseFileService.Object);
 
                 var result = await service.Delete(release.Id, releaseDataFile.File.Id);
 
@@ -172,7 +179,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 dataImportService.Verify(mock => mock.DeleteImport(releaseDataFile.File.Id), Times.Once());
 
-                MockUtils.VerifyAllMocks(blobStorageService, dataImportService);
+                MockUtils.VerifyAllMocks(blobStorageService,
+                    dataImportService,
+                    releaseFileService);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -305,6 +314,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
             dataImportService.Setup(mock => mock.DeleteImport(replacementDataFile.Id))
                 .Returns(Task.CompletedTask);
@@ -320,12 +330,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     null))
                 .Returns(Task.CompletedTask);
 
+            releaseFileService.Setup(mock => mock.CheckFileExists(release.Id,
+                    replacementDataFile.Id,
+                    FileType.Data))
+                .ReturnsAsync(replacementDataFile);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object,
-                    dataImportService: dataImportService.Object);
+                    dataImportService: dataImportService.Object,
+                    releaseFileService: releaseFileService.Object);
 
                 var result = await service.Delete(release.Id, replacementDataFile.Id);
 
@@ -341,7 +357,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 dataImportService.Verify(mock => mock.DeleteImport(replacementDataFile.Id), Times.Once());
 
-                MockUtils.VerifyAllMocks(blobStorageService, dataImportService);
+                MockUtils.VerifyAllMocks(blobStorageService,
+                    dataImportService,
+                    releaseFileService);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -448,6 +466,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
             blobStorageService
                 .Setup(mock => mock.DeleteBlobs(
@@ -456,18 +475,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     null))
                 .Returns(Task.CompletedTask);
 
+            releaseFileService.Setup(mock => mock.CheckFileExists(amendmentRelease.Id,
+                    dataFile.Id,
+                    FileType.Data))
+                .ReturnsAsync(dataFile);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object,
-                    dataImportService: dataImportService.Object);
+                    dataImportService: dataImportService.Object,
+                    releaseFileService: releaseFileService.Object);
 
                 var result = await service.Delete(amendmentRelease.Id, dataFile.Id);
 
                 Assert.True(result.IsRight);
 
-                MockUtils.VerifyAllMocks(blobStorageService, dataImportService);
+                MockUtils.VerifyAllMocks(blobStorageService,
+                    dataImportService,
+                    releaseFileService);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -562,6 +589,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
             dataImportService.Setup(mock => mock.DeleteImport(dataReleaseFile.File.Id))
                 .Returns(Task.CompletedTask);
@@ -577,12 +605,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     null))
                 .Returns(Task.CompletedTask);
 
+            releaseFileService.Setup(mock => mock.CheckFileExists(release.Id,
+                    dataReleaseFile.File.Id,
+                    FileType.Data))
+                .ReturnsAsync(dataReleaseFile.File);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object,
-                    dataImportService: dataImportService.Object);
+                    dataImportService: dataImportService.Object,
+                    releaseFileService: releaseFileService.Object);
 
                 var result = await service.DeleteAll(release.Id);
 
@@ -597,7 +631,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 dataImportService.Verify(mock => mock.DeleteImport(dataReleaseFile.File.Id), Times.Once());
 
-                MockUtils.VerifyAllMocks(blobStorageService, dataImportService);
+                MockUtils.VerifyAllMocks(blobStorageService,
+                    dataImportService,
+                    releaseFileService);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -701,6 +737,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
             blobStorageService.Setup(mock => mock.DeleteBlobs(
                     PrivateReleaseFiles,
@@ -708,18 +745,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     null))
                 .Returns(Task.CompletedTask);
 
+            releaseFileService.Setup(mock => mock.CheckFileExists(amendmentRelease.Id,
+                    dataFile.Id,
+                    FileType.Data))
+                .ReturnsAsync(dataFile);
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object,
-                    dataImportService: dataImportService.Object);
+                    dataImportService: dataImportService.Object,
+                    releaseFileService: releaseFileService.Object);
 
                 var result = await service.DeleteAll(amendmentRelease.Id);
 
                 Assert.True(result.IsRight);
 
-                MockUtils.VerifyAllMocks(blobStorageService, dataImportService);
+                MockUtils.VerifyAllMocks(blobStorageService,
+                    dataImportService,
+                    releaseFileService);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2644,6 +2689,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IFileRepository? fileRepository = null,
             IReleaseRepository? releaseRepository = null,
             IReleaseFileRepository? releaseFileRepository = null,
+            IReleaseFileService? releaseFileService = null,
             IReleaseDataFileRepository? releaseDataFileRepository = null,
             IDataImportService? dataImportService = null,
             IUserService? userService = null)
@@ -2663,6 +2709,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     statisticsDbContext ?? Mock.Of<StatisticsDbContext>(Strict),
                     Common.Services.MapperUtils.MapperForProfile<MappingProfiles>()),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
+                releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
                 releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext),
                 dataImportService ?? Mock.Of<IDataImportService>(Strict),
                 userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object

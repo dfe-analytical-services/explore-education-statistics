@@ -14,14 +14,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseFileService
     {
+        public Task<Either<ActionResult, Content.Model.File>> CheckFileExists(Guid releaseId,
+            Guid fileId,
+            params FileType[] allowedFileTypes);
+
         Task<Either<ActionResult, Unit>> Delete(
             Guid releaseId,
-            Guid id,
+            Guid fileId,
             bool forceDelete = false);
 
         Task<Either<ActionResult, Unit>> Delete(
             Guid releaseId,
-            IEnumerable<Guid> ids,
+            IEnumerable<Guid> fileIds,
             bool forceDelete = false);
 
         Task<Either<ActionResult, Unit>> DeleteAll(Guid releaseId, bool forceDelete = false);
@@ -30,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, FileInfo>> GetFile(Guid releaseId, Guid fileId);
 
-        Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid id);
+        Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid fileId);
 
         Task<Either<ActionResult, Unit>> ZipFilesToStream(
             Guid releaseId,

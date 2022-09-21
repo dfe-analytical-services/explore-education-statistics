@@ -7,12 +7,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Moq;
 using NCrontab;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 
@@ -22,41 +21,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 public class ReleaseControllerCachingTests : CacheServiceTestFixture
 {
     private const string HalfHourlyExpirySchedule = "*/30 * * * *";
-    
+
     [Fact]
     public async Task GetLatestRelease_NoCachedEntryExists()
     {
-        var publicationSlug = "publication-a";
-        
-        var releaseService = new Mock<IReleaseService>(Strict);
-        
+        const string publicationSlug = "publication-a";
+
+        var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
+
         MemoryCacheService
             .Setup(s => s.GetItem(
-                new GetLatestReleaseCacheKey(publicationSlug), 
+                new GetLatestReleaseCacheKey(publicationSlug),
                 typeof(ReleaseViewModel)))
             .ReturnsAsync(null);
 
         var release = BuildReleaseViewModel();
 
-        releaseService
-            .Setup(mock => mock.GetCachedViewModel(publicationSlug, null))
+        releaseCacheService
+            .Setup(mock => mock.GetReleaseAndPublication(publicationSlug, null))
             .ReturnsAsync(release);
 
         var expectedCacheConfiguration = new MemoryCacheConfiguration(
             10, CrontabSchedule.Parse(HalfHourlyExpirySchedule));
-        
+
         MemoryCacheService
             .Setup(s => s.SetItem<object>(
-                new GetLatestReleaseCacheKey(publicationSlug), 
-                release, 
-                ItIs.DeepEqualTo(expectedCacheConfiguration), 
+                new GetLatestReleaseCacheKey(publicationSlug),
+                release,
+                ItIs.DeepEqualTo(expectedCacheConfiguration),
                 null))
             .Returns(Task.CompletedTask);
-        
-        var controller = BuildReleaseController(releaseService.Object);
+
+        var controller = BuildReleaseController(releaseCacheService: releaseCacheService.Object);
 
         var result = await controller.GetLatestRelease(publicationSlug);
-        VerifyAllMocks(releaseService, MemoryCacheService);
+        VerifyAllMocks(releaseCacheService, MemoryCacheService);
 
         result.AssertOkResult(release);
     }
@@ -64,16 +63,16 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
     [Fact]
     public async Task GetLatestRelease_CachedEntryExists()
     {
-        var publicationSlug = "publication-a";
-        
+        const string publicationSlug = "publication-a";
+
         var release = BuildReleaseViewModel();
-        
+
         MemoryCacheService
             .Setup(s => s.GetItem(
-                new GetLatestReleaseCacheKey(publicationSlug), 
+                new GetLatestReleaseCacheKey(publicationSlug),
                 typeof(ReleaseViewModel)))
             .ReturnsAsync(release);
-        
+
         var controller = BuildReleaseController();
 
         var result = await controller.GetLatestRelease(publicationSlug);
@@ -81,57 +80,57 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
 
         result.AssertOkResult(release);
     }
-    
+
     [Fact]
     public async Task GetRelease_NoCachedEntryExists()
     {
-        var publicationSlug = "publication-a";
-        var releaseSlug = "release-a";
+        const string publicationSlug = "publication-a";
+        const string releaseSlug = "release-a";
 
-        var releaseService = new Mock<IReleaseService>(Strict);
-        
+        var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
+
         MemoryCacheService
             .Setup(s => s.GetItem(
-                new GetReleaseCacheKey(publicationSlug, releaseSlug), 
+                new GetReleaseCacheKey(publicationSlug, releaseSlug),
                 typeof(ReleaseViewModel)))
             .ReturnsAsync(null);
 
         var release = BuildReleaseViewModel();
 
-        releaseService
-            .Setup(mock => mock.GetCachedViewModel(publicationSlug, releaseSlug))
+        releaseCacheService
+            .Setup(mock => mock.GetReleaseAndPublication(publicationSlug, releaseSlug))
             .ReturnsAsync(release);
 
         var expectedCacheConfiguration = new MemoryCacheConfiguration(
             15, CrontabSchedule.Parse(HalfHourlyExpirySchedule));
-        
+
         MemoryCacheService
             .Setup(s => s.SetItem<object>(
-                new GetReleaseCacheKey(publicationSlug, releaseSlug), 
-                release, 
-                ItIs.DeepEqualTo(expectedCacheConfiguration), 
+                new GetReleaseCacheKey(publicationSlug, releaseSlug),
+                release,
+                ItIs.DeepEqualTo(expectedCacheConfiguration),
                 null))
             .Returns(Task.CompletedTask);
-        
-        var controller = BuildReleaseController(releaseService.Object);
+
+        var controller = BuildReleaseController(releaseCacheService: releaseCacheService.Object);
 
         var result = await controller.GetRelease(publicationSlug, releaseSlug);
-        VerifyAllMocks(releaseService, MemoryCacheService);
+        VerifyAllMocks(releaseCacheService, MemoryCacheService);
 
         result.AssertOkResult(release);
     }
-    
+
     [Fact]
     public async Task GetRelease_CachedEntryExists()
     {
-        var publicationSlug = "publication-a";
-        var releaseSlug = "release-a";
+        const string publicationSlug = "publication-a";
+        const string releaseSlug = "release-a";
 
         var release = BuildReleaseViewModel();
-        
+
         MemoryCacheService
             .Setup(s => s.GetItem(
-                new GetReleaseCacheKey(publicationSlug, releaseSlug), 
+                new GetReleaseCacheKey(publicationSlug, releaseSlug),
                 typeof(ReleaseViewModel)))
             .ReturnsAsync(release);
 
@@ -145,30 +144,24 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
 
     private static ReleaseViewModel BuildReleaseViewModel()
     {
-        var releaseId = Guid.NewGuid();
-
         return new ReleaseViewModel(
-            new CachedReleaseViewModel(releaseId)
+            new CachedReleaseViewModel(Guid.NewGuid())
             {
                 Type = new()
                 {
                     Title = "National Statistics"
                 }
             },
-            new PublicationViewModel
-            {
-                Releases = AsList(new ReleaseTitleViewModel
-                {
-                    Id = releaseId
-                })
-            });
+            new PublicationViewModel());
     }
 
     private static ReleaseController BuildReleaseController(
+        IReleaseCacheService? releaseCacheService = null,
         IReleaseService? releaseService = null
     )
     {
         return new(
+            releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
             releaseService ?? Mock.Of<IReleaseService>(Strict)
         );
     }

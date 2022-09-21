@@ -12,41 +12,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public const string ReleasesDirectory = "releases";
         public const string SubjectMetaDirectory = "subject-meta";
 
-        public static string PublicContentStagingPath()
+        public static string PublicContentStagingPath() => "staging";
+
+        private static string PublicContentPublicationParentPath(string slug, bool staging = false)
         {
-            return "staging";
+            return $"{AppendPathSeparator(staging ? PublicContentStagingPath() : null)}publications/{slug}";
         }
 
-        private static string PublicContentPublicationsPath(string? prefix = null)
+        private static string PublicContentReleaseParentPath(string publicationSlug, string releaseSlug)
         {
-            return $"{AppendPathSeparator(prefix)}publications";
+            return $"{PublicContentPublicationParentPath(publicationSlug)}/{ReleasesDirectory}/{releaseSlug}";
         }
 
-        private static string PublicContentPublicationParentPath(string slug, string? prefix = null)
+        public static string PublicContentPublicationPath(string slug)
         {
-            return $"{PublicContentPublicationsPath(prefix)}/{slug}";
+            return $"{PublicContentPublicationParentPath(slug)}/publication.json";
         }
 
-        private static string PublicContentReleaseParentPath(string publicationSlug,
-            string releaseSlug,
-            string? prefix = null)
+        public static string PublicContentLatestReleasePath(string publicationSlug, bool staging = false)
         {
-            return $"{PublicContentPublicationParentPath(publicationSlug, prefix)}/{ReleasesDirectory}/{releaseSlug}";
+            return $"{PublicContentPublicationParentPath(publicationSlug, staging)}/latest-release.json";
         }
 
-        public static string PublicContentPublicationPath(string slug, string? prefix = null)
+        public static string PublicContentReleasePath(string publicationSlug, string releaseSlug, bool staging = false)
         {
-            return $"{PublicContentPublicationParentPath(slug, prefix)}/publication.json";
-        }
-
-        public static string PublicContentLatestReleasePath(string slug, string? prefix = null)
-        {
-            return $"{PublicContentPublicationParentPath(slug, prefix)}/latest-release.json";
-        }
-
-        public static string PublicContentReleasePath(string publicationSlug, string releaseSlug, string? prefix = null)
-        {
-            return $"{PublicContentPublicationParentPath(publicationSlug, prefix)}/{ReleasesDirectory}/{releaseSlug}.json";
+            return $"{PublicContentPublicationParentPath(publicationSlug, staging)}/{ReleasesDirectory}/{releaseSlug}.json";
         }
 
         public static string PublicContentDataBlockParentPath(string publicationSlug, string releaseSlug)

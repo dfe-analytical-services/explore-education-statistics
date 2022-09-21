@@ -131,6 +131,71 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
+        public async Task ClearPublicCachePublication()
+        {
+            var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
+
+            DeleteBlobsOptions options = null!;
+            var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
+
+            publicBlobStorageService
+                .Setup(
+                    s =>
+                        s.DeleteBlobs(PublicContent, null, Capture.With(match)))
+                .Returns(Task.CompletedTask);
+
+            var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
+
+            var result = await controller.ClearPublicCachePublication("publication-1");
+
+            VerifyAllMocks(publicBlobStorageService);
+
+            result.AssertNoContent();
+
+            var regex = Assert.IsType<Regex>(options.IncludeRegex);
+            Assert.Matches(regex, "publications/publication-1/something");
+            Assert.Matches(regex, "publications/publication-1/releases/something");
+            Assert.Matches(regex, "publications/publication-1/releases/release-1/something");
+            Assert.DoesNotMatch(regex, "publications/publication-2/something");
+            Assert.DoesNotMatch(regex, "publications/publication-2/releases/something");
+            Assert.DoesNotMatch(regex, "publications/publication-2/releases/release-1/something");
+            Assert.DoesNotMatch(regex, "staging/publications/publication-1/something");
+            Assert.DoesNotMatch(regex, "staging/publications/publication-1/releases/something");
+            Assert.DoesNotMatch(regex, "staging/publications/publication-1/releases/release-1/something");
+        }
+
+        [Fact]
+        public async Task ClearPublicCachePublications()
+        {
+            var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
+
+            DeleteBlobsOptions options = null!;
+            var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
+
+            publicBlobStorageService
+                .Setup(
+                    s =>
+                        s.DeleteBlobs(PublicContent, null, Capture.With(match)))
+                .Returns(Task.CompletedTask);
+
+            var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
+
+            var result = await controller.ClearPublicCachePublications();
+
+            VerifyAllMocks(publicBlobStorageService);
+
+            result.AssertNoContent();
+
+            var regex = Assert.IsType<Regex>(options.IncludeRegex);
+            Assert.Matches(regex, "publications/publication-1/something");
+            Assert.Matches(regex, "publications/publication-1/releases/something");
+            Assert.Matches(regex, "publications/publication-1/releases/release-1/something");
+            Assert.DoesNotMatch(regex, "staging/publications/publication-1/something");
+            Assert.DoesNotMatch(regex, "staging/publications/publication-1/releases/something");
+            Assert.DoesNotMatch(regex, "staging/publications/publication-1/releases/release-1/something");
+        }
+
+        [Fact]
         public async Task ClearPublicCacheReleases_SingleValidPath()
         {
             var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);

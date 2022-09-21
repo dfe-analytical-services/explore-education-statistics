@@ -4,7 +4,6 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
 {
@@ -53,6 +52,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
                 .ForMember(
                     dest => dest.Content,
                     m => m.MapFrom(r => r.GenericContent.OrderBy(s => s.Order)));
+
+            CreateMap<Link, LinkViewModel>();
+
+            CreateMap<Update, ReleaseNoteViewModel>();
         }
 
         private void CreateContentBlockMap()
@@ -60,7 +63,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
             CreateMap<ContentBlock, IContentBlockViewModel>()
                 .IncludeAllDerived();
 
+            CreateDataBlockMap();
+
             CreateMap<HtmlBlock, HtmlBlockViewModel>();
+
+            CreateMap<MarkDownBlock, MarkDownBlockViewModel>();
+        }
+
+        private void CreateDataBlockMap()
+        {
+            CreateMap<DataBlock, DataBlockViewModel>();
+
+            CreateMap<DataBlockSummary, DataBlockSummaryViewModel>();
         }
     }
 }

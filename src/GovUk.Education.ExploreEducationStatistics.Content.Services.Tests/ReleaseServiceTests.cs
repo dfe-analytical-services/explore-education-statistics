@@ -2,336 +2,685 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
-using Microsoft.AspNetCore.Mvc;
-using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
-using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
     public class ReleaseServiceTests
     {
-        [Fact]
-        public async Task GetCachedViewModel()
+        private static readonly Release Release1V1 = new()
         {
-            var publicationId = Guid.NewGuid();
-            var releaseId = Guid.NewGuid();
-
-            const string publicationSlug = "publication-a";
-            const string releaseSlug = "2016";
-
-            var methodology = new MethodologyVersionSummaryViewModel
+            Id = Guid.NewGuid(),
+            ReleaseName = "2018",
+            TimePeriodCoverage = AcademicYearQ1,
+            DataGuidance = "Release 1 v1 Guidance",
+            RelatedInformation = new List<Link>
             {
-                Id = Guid.NewGuid(),
-                Slug = "methodology-slug",
-                Title = "Methodology"
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Description = "Related Information",
+                    Url = "https://example.com"
+                }
+            },
+            Slug = "2018-19-q1",
+            ApprovalStatus = Approved,
+            Published = new DateTime(2019, 2, 1),
+            Updates = new List<Update>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    On = new DateTime(2020, 1, 1),
+                    Reason = "First update"
+                }
+            },
+            Version = 0,
+            PreviousVersionId = null
+        };
+
+        private static readonly Release Release1V2Deleted = new()
+        {
+            Id = Guid.NewGuid(),
+            ReleaseName = "2018",
+            TimePeriodCoverage = AcademicYearQ1,
+            DataGuidance = "Release 1 v2 Guidance",
+            RelatedInformation = new List<Link>(),
+            Slug = "2018-19-q1",
+            ApprovalStatus = Approved,
+            Published = null,
+            Version = 1,
+            PreviousVersionId = Release1V1.Id,
+            SoftDeleted = true
+        };
+
+        private static readonly Release Release1V3NotPublished = new()
+        {
+            Id = Guid.NewGuid(),
+            ReleaseName = "2018",
+            TimePeriodCoverage = AcademicYearQ1,
+            DataGuidance = "Release 1 v3 Guidance",
+            RelatedInformation = new List<Link>(),
+            Slug = "2018-19-q1",
+            ApprovalStatus = Approved,
+            Published = null,
+            Updates = new List<Update>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    On = new DateTime(2020, 1, 1),
+                    Reason = "First update"
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    On = new DateTime(2020, 2, 1),
+                    Reason = "Second update"
+                }
+            },
+            Version = 2,
+            PreviousVersionId = Release1V1.Id
+        };
+
+        private static readonly List<Release> Releases = new()
+        {
+            Release1V1,
+            Release1V2Deleted,
+            Release1V3NotPublished
+        };
+
+        private static readonly ContentBlock Release1SummarySectionHtmlContentBlock1 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 1 summary 1 order 2</p>",
+            Order = 2,
+        };
+
+        private static readonly ContentBlock Release1SummarySectionHtmlContentBlock2 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 1 summary 2 order 0</p>",
+            Order = 0,
+        };
+
+        private static readonly ContentBlock Release1SummarySectionHtmlContentBlock3 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 1 summary 3 order 1</p>",
+            Order = 1,
+        };
+
+        private static readonly ContentBlock Release1Section1HtmlContentBlock1 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 1 section 1 order 2</p>",
+            Order = 2,
+        };
+
+        private static readonly ContentBlock Release1Section1HtmlContentBlock2 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 1 section 1 order 0</p>",
+            Order = 0,
+        };
+
+        private static readonly ContentBlock Release1Section1HtmlContentBlock3 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 1 section 1 order 1</p>",
+            Order = 1,
+        };
+
+        private static readonly ContentBlock Release1KeyStatsDataBlock = new DataBlock
+        {
+            Id = Guid.NewGuid(),
+        };
+
+        private static readonly ContentSection Release1SummarySection = new()
+        {
+            Id = Guid.NewGuid(),
+            Order = 1,
+            Heading = "Release 1 summary section",
+            Caption = "",
+            Type = ContentSectionType.ReleaseSummary,
+            Content = new List<ContentBlock>
+            {
+                Release1SummarySectionHtmlContentBlock1,
+                Release1SummarySectionHtmlContentBlock2,
+                Release1SummarySectionHtmlContentBlock3,
+            }
+        };
+
+        private static readonly ContentSection Release1RelatedDashboardsSection = new()
+        {
+            Id = Guid.NewGuid(),
+            Order = 0,
+            Heading = "Release 1 related dashboards section",
+            Caption = "",
+            Type = ContentSectionType.RelatedDashboards,
+            Content = new List<ContentBlock>(),
+        };
+
+
+        private static readonly ContentSection Release1Section1 = new()
+        {
+            Id = Guid.NewGuid(),
+            Order = 2,
+            Heading = "Release 1 section 1 order 2",
+            Caption = "",
+            Type = ContentSectionType.Generic,
+            Content = new List<ContentBlock>
+            {
+                Release1Section1HtmlContentBlock1,
+                Release1Section1HtmlContentBlock2,
+                Release1Section1HtmlContentBlock3,
+            }
+        };
+
+        private static readonly ContentSection Release1Section2 = new()
+        {
+            Id = Guid.NewGuid(),
+            Order = 0,
+            Heading = "Release 1 section 2 order 0",
+            Caption = "",
+            Type = ContentSectionType.Generic
+        };
+
+        private static readonly ContentSection Release1Section3 = new()
+        {
+            Id = Guid.NewGuid(),
+            Order = 1,
+            Heading = "Release 1 section 3 order 1",
+            Caption = "",
+            Type = ContentSectionType.Generic
+        };
+
+        private static readonly ContentSection Release1KeyStatsSection = new()
+        {
+            Id = Guid.NewGuid(),
+            Order = 2,
+            Heading = "Release 1 key stats section",
+            Caption = "",
+            Type = ContentSectionType.KeyStatistics,
+            Content = new List<ContentBlock>
+            {
+                Release1KeyStatsDataBlock
+            }
+        };
+
+        private static readonly List<ReleaseContentSection> ReleaseContentSections = new()
+        {
+            new ReleaseContentSection
+            {
+                Release = Release1V1,
+                ContentSection = Release1SummarySection
+            },
+            new ReleaseContentSection
+            {
+                Release = Release1V1,
+                ContentSection = Release1RelatedDashboardsSection
+            },
+            new ReleaseContentSection
+            {
+                Release = Release1V1,
+                ContentSection = Release1Section1
+            },
+            new ReleaseContentSection
+            {
+                Release = Release1V1,
+                ContentSection = Release1Section2
+            },
+            new ReleaseContentSection
+            {
+                Release = Release1V1,
+                ContentSection = Release1Section3
+            },
+            new ReleaseContentSection
+            {
+                Release = Release1V1,
+                ContentSection = Release1KeyStatsSection
+            },
+        };
+
+        [Fact]
+        public async Task GetRelease()
+        {
+            var releaseFiles = new List<ReleaseFile>
+            {
+                new()
+                {
+                    Release = Release1V1,
+                    Name = "Ancillary Test File",
+                    File = new File
+                    {
+                        Filename = "ancillary.pdf",
+                        ContentLength = 10240,
+                        Type = Ancillary
+                    }
+                },
+                new()
+                {
+                    Release = Release1V1,
+                    Name = "Data Test File",
+                    File = new File
+                    {
+                        Filename = "data.csv",
+                        ContentLength = 20480,
+                        Type = FileType.Data
+                    }
+                },
+                new()
+                {
+                    Release = Release1V1,
+                    File = new File
+                    {
+                        Filename = "chart.png",
+                        Type = Chart
+                    }
+                },
+                new()
+                {
+                    Release = Release1V1,
+                    File = new File
+                    {
+                        Filename = "data.meta.csv",
+                        Type = Metadata
+                    }
+                }
             };
 
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            var fileStorageService = new Mock<IFileStorageService>(Strict);
-            var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
-
-            publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
-                .ReturnsAsync(
-                    new PublicationViewModel
-                    {
-                        Id = publicationId,
-                        Releases = new List<ReleaseTitleViewModel>
-                        {
-                            new() { Id = releaseId }
-                        }
-                    }
-                );
-
-            methodologyCacheService.Setup(mock => mock.GetSummariesByPublication(publicationId))
-                .ReturnsAsync(ListOf(methodology));
-
-            fileStorageService
-                .Setup(mock =>
-                    mock.GetDeserialized<CachedReleaseViewModel>("publications/publication-a/releases/2016.json"))
-                .ReturnsAsync(
-                    new CachedReleaseViewModel(releaseId)
-                    {
-                        Type = new ReleaseTypeViewModel
-                        {
-                            Title = "National Statistics"
-                        }
-                    }
-                );
-
             var contentDbContextId = Guid.NewGuid().ToString();
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(new Publication
-                {
-                    Id = publicationId,
-                    Slug = publicationSlug,
-                });
+                await contentDbContext.AddRangeAsync(Releases);
+                await contentDbContext.AddRangeAsync(releaseFiles);
+                await contentDbContext.AddRangeAsync(ReleaseContentSections);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupReleaseService(
-                    contentDbContext: contentDbContext,
-                    publicationCacheService: publicationCacheService.Object,
-                    methodologyCacheService: methodologyCacheService.Object,
-                    fileStorageService: fileStorageService.Object);
+                var service = SetupReleaseService(contentDbContext: contentDbContext);
 
-                var result = await service.GetCachedViewModel(publicationSlug, releaseSlug);
+                var result = await service.GetRelease(Release1V1.Id);
+                var viewModel = result.AssertRight();
 
-                VerifyAllMocks(methodologyCacheService, publicationCacheService, fileStorageService);
+                Assert.Equal(Release1V1.Id, viewModel.Id);
+                Assert.Equal("Academic Year Q1 2018/19", viewModel.Title);
+                Assert.Equal(Release1V1.Published, viewModel.Published);
 
-                var releaseViewModel = result.AssertRight();
+                var keyStatisticsSection = viewModel.KeyStatisticsSection;
+                Assert.NotNull(keyStatisticsSection);
+                Assert.Equal(Release1KeyStatsSection.Id, keyStatisticsSection.Id);
+                var keyStatisticsSectionContent = keyStatisticsSection.Content;
+                Assert.Single(keyStatisticsSectionContent);
+                Assert.Equal(Release1KeyStatsDataBlock.Id, keyStatisticsSectionContent[0].Id);
 
-                Assert.Equal(ReleaseType.NationalStatistics, releaseViewModel.Type);
+                var summarySection = viewModel.SummarySection;
+                Assert.NotNull(summarySection);
+                Assert.Equal(Release1SummarySection.Id, summarySection.Id);
+                var summarySectionContent = summarySection.Content;
+                Assert.NotNull(summarySectionContent);
+                Assert.Equal(3, summarySectionContent.Count);
+                Assert.Equal(Release1SummarySectionHtmlContentBlock2.Id, summarySectionContent[0].Id);
+                Assert.Equal("<p>Release 1 summary 2 order 0</p>",
+                    (summarySectionContent[0] as HtmlBlockViewModel)?.Body);
+                Assert.Equal(Release1SummarySectionHtmlContentBlock3.Id, summarySectionContent[1].Id);
+                Assert.Equal("<p>Release 1 summary 3 order 1</p>",
+                    (summarySectionContent[1] as HtmlBlockViewModel)?.Body);
+                Assert.Equal(Release1SummarySectionHtmlContentBlock1.Id, summarySectionContent[2].Id);
+                Assert.Equal("<p>Release 1 summary 1 order 2</p>",
+                    (summarySectionContent[2] as HtmlBlockViewModel)?.Body);
 
-                var publication = releaseViewModel.Publication;
-                Assert.Equal(publicationId, publication.Id);
+                var relatedDashboardsSection = viewModel.RelatedDashboardsSection;
+                Assert.NotNull(relatedDashboardsSection);
+                Assert.Equal(Release1RelatedDashboardsSection.Id, relatedDashboardsSection!.Id);
+                Assert.Empty(relatedDashboardsSection.Content);
 
-                Assert.Single(publication.Methodologies);
-                Assert.Equal(methodology, publication.Methodologies[0]);
+                var content = viewModel.Content;
+                Assert.NotNull(content);
+                Assert.Equal(3, content.Count);
+
+                Assert.Equal(Release1Section2.Id, content[0].Id);
+                Assert.Equal("Release 1 section 2 order 0", content[0].Heading);
+                Assert.Empty(content[0].Content);
+
+                Assert.Equal(Release1Section3.Id, content[1].Id);
+                Assert.Equal("Release 1 section 3 order 1", content[1].Heading);
+                Assert.Empty(content[1].Content);
+
+                Assert.Equal(Release1Section1.Id, content[2].Id);
+                Assert.Equal("Release 1 section 1 order 2", content[2].Heading);
+                Assert.Equal(3, content[2].Content.Count);
+                Assert.Equal(Release1Section1HtmlContentBlock2.Id, content[2].Content[0].Id);
+                Assert.Equal("<p>Release 1 section 1 order 0</p>", (content[2].Content[0] as HtmlBlockViewModel)?.Body);
+                Assert.Equal(Release1Section1HtmlContentBlock3.Id, content[2].Content[1].Id);
+                Assert.Equal("<p>Release 1 section 1 order 1</p>", (content[2].Content[1] as HtmlBlockViewModel)?.Body);
+                Assert.Equal(Release1Section1HtmlContentBlock1.Id, content[2].Content[2].Id);
+                Assert.Equal("<p>Release 1 section 1 order 2</p>", (content[2].Content[2] as HtmlBlockViewModel)?.Body);
+
+                Assert.Single(viewModel.Updates);
+                Assert.Equal(new DateTime(2020, 1, 1), viewModel.Updates[0].On);
+                Assert.Equal("First update", viewModel.Updates[0].Reason);
+
+                Assert.Equal(2, viewModel.DownloadFiles.Count);
+                Assert.Equal(releaseFiles[0].File.Id, viewModel.DownloadFiles[0].Id);
+                Assert.Equal("pdf", viewModel.DownloadFiles[0].Extension);
+                Assert.Equal("ancillary.pdf", viewModel.DownloadFiles[0].FileName);
+                Assert.Equal("Ancillary Test File", viewModel.DownloadFiles[0].Name);
+                Assert.Equal("10 Kb", viewModel.DownloadFiles[0].Size);
+                Assert.Equal(Ancillary, viewModel.DownloadFiles[0].Type);
+                Assert.Equal(releaseFiles[1].File.Id, viewModel.DownloadFiles[1].Id);
+                Assert.Equal("csv", viewModel.DownloadFiles[1].Extension);
+                Assert.Equal("data.csv", viewModel.DownloadFiles[1].FileName);
+                Assert.Equal("Data Test File", viewModel.DownloadFiles[1].Name);
+                Assert.Equal("20 Kb", viewModel.DownloadFiles[1].Size);
+                Assert.Equal(FileType.Data, viewModel.DownloadFiles[1].Type);
+
+                Assert.Equal("Release 1 v1 Guidance", viewModel.DataGuidance);
+
+                Assert.Single(viewModel.RelatedInformation);
+                Assert.Equal(Release1V1.RelatedInformation[0].Id, viewModel.RelatedInformation[0].Id);
             }
         }
 
         [Fact]
-        public async Task GetCachedViewModel_PublicationNotFound()
+        public async Task GetRelease_FiltersContent()
         {
-            const string publicationSlug = "publication-a";
-            const string releaseSlug = "2016";
+            var release = new Release
+            {
+                Publication = new Publication(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = CalendarYear,
+                ApprovalStatus = Approved,
+                Published = DateTime.UtcNow
+            };
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
+            var originalContent = @"
+                <p>
+                    Content 1 <comment-start name=""comment-1""></comment-start>goes here<comment-end name=""comment-1""></comment-end>
+                </p>
+                <ul>
+                    <li><comment-start name=""comment-2""/>Content 2<comment-end name=""comment-2""/></li>
+                    <li><commentplaceholder-start name=""comment-3""/>Content 3<commentplaceholder-end name=""comment-3""/></li>
+                    <li><resolvedcomment-start name=""comment-4""/>Content 4<resolvedcomment-end name=""comment-4""/></li>
+                </ul>".TrimIndent();
 
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
-                .ReturnsAsync(new NotFoundResult());
-
-            var service = SetupReleaseService(contentDbContext,
-                publicationCacheService: publicationCacheService.Object);
-
-            var result = await service.GetCachedViewModel(publicationSlug, releaseSlug);
-
-            VerifyAllMocks(publicationCacheService);
-
-            result.AssertNotFound();
-        }
-
-        [Fact]
-        public async Task GetCachedViewModel_ReleaseNotFound()
-        {
-            var publicationId = Guid.NewGuid();
-            var releaseId = Guid.NewGuid();
-
-            const string publicationSlug = "publication-a";
-            const string releaseSlug = "2016";
-
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            var fileStorageService = new Mock<IFileStorageService>(Strict);
-            var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
-
-            publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
-                .ReturnsAsync(
-                    new PublicationViewModel
+            var releaseContentSections = new List<ReleaseContentSection>
+            {
+                new()
+                {
+                    Release = release,
+                    ContentSection = new ContentSection
                     {
-                        Id = publicationId,
-                        Releases = new List<ReleaseTitleViewModel>
+                        Type = ContentSectionType.ReleaseSummary,
+                        Content = new List<ContentBlock>
                         {
-                            new() { Id = releaseId }
+                            new HtmlBlock
+                            {
+                                Body = originalContent
+                            }
                         }
                     }
-                );
-
-            methodologyCacheService.Setup(mock => mock.GetSummariesByPublication(publicationId))
-                .ReturnsAsync(ListOf(new MethodologyVersionSummaryViewModel()));
-
-            fileStorageService
-                .Setup(s => s.GetDeserialized<CachedReleaseViewModel>(It.IsAny<string>()))
-                .ReturnsAsync(new NotFoundResult());
+                },
+                new()
+                {
+                    Release = release,
+                    ContentSection = new ContentSection
+                    {
+                        Type = ContentSectionType.RelatedDashboards,
+                        Content = new List<ContentBlock>
+                        {
+                            new HtmlBlock
+                            {
+                                Body = originalContent
+                            }
+                        }
+                    }
+                },
+                new()
+                {
+                    Release = release,
+                    ContentSection = new ContentSection
+                    {
+                        Type = ContentSectionType.Headlines,
+                        Content = new List<ContentBlock>
+                        {
+                            new HtmlBlock
+                            {
+                                Body = originalContent
+                            }
+                        }
+                    }
+                },
+                new()
+                {
+                    Release = release,
+                    ContentSection = new ContentSection
+                    {
+                        Type = ContentSectionType.Generic,
+                        Content = new List<ContentBlock>
+                        {
+                            new HtmlBlock
+                            {
+                                Body = originalContent
+                            }
+                        }
+                    }
+                }
+            };
 
             var contentDbContextId = Guid.NewGuid().ToString();
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(new Publication
-                {
-                    Id = publicationId,
-                    Slug = publicationSlug,
-                });
+                await contentDbContext.AddRangeAsync(release);
+                await contentDbContext.AddRangeAsync(releaseContentSections);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupReleaseService(
-                    contentDbContext: contentDbContext,
-                    publicationCacheService: publicationCacheService.Object,
-                    fileStorageService: fileStorageService.Object,
-                    methodologyCacheService: methodologyCacheService.Object);
+                var service = SetupReleaseService(contentDbContext: contentDbContext);
 
-                var result = await service.GetCachedViewModel(publicationSlug, releaseSlug);
+                var result = await service.GetRelease(release.Id);
+                var viewModel = result.AssertRight();
 
-                VerifyAllMocks(publicationCacheService, fileStorageService, methodologyCacheService);
+                Assert.Equal(release.Id, viewModel.Id);
 
-                result.AssertNotFound();
+                var expectedContent = @"
+                    <p>
+                        Content 1 goes here
+                    </p>
+                    <ul>
+                        <li>Content 2</li>
+                        <li>Content 3</li>
+                        <li>Content 4</li>
+                    </ul>".TrimIndent();
+
+                var summarySection = viewModel.SummarySection;
+                Assert.Single(summarySection.Content);
+
+                Assert.Equal(expectedContent, (summarySection.Content[0] as HtmlBlockViewModel)?.Body);
+
+                var headlines = viewModel.HeadlinesSection;
+                Assert.Single(headlines.Content);
+                Assert.Equal(expectedContent, (headlines.Content[0] as HtmlBlockViewModel)?.Body);
+
+                var relatedDashboardsSection = viewModel.RelatedDashboardsSection;
+                Assert.NotNull(relatedDashboardsSection);
+                Assert.Single(relatedDashboardsSection!.Content);
+                Assert.Equal(expectedContent, (relatedDashboardsSection.Content[0] as HtmlBlockViewModel)?.Body);
+
+                var content = viewModel.Content;
+                Assert.Single(content);
+                Assert.Single(content[0].Content);
+
+                Assert.Equal(expectedContent, (content[0].Content[0] as HtmlBlockViewModel)?.Body);
             }
         }
 
         [Fact]
-        public async Task GetSummary()
+        public async Task GetRelease_NotYetPublished()
         {
-            var publicationId = Guid.NewGuid();
-            var releaseId = Guid.NewGuid();
-
-            const string publicationSlug = "publication-a";
-            const string releaseSlug = "2016";
-
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            var fileStorageService = new Mock<IFileStorageService>(Strict);
-
-            publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
-                .ReturnsAsync(
-                    new PublicationViewModel
-                    {
-                        Id = publicationId,
-                        Releases = new List<ReleaseTitleViewModel>
-                        {
-                            new() { Id = releaseId }
-                        }
-                    }
-                );
-
-            fileStorageService
-                .Setup(mock =>
-                    mock.GetDeserialized<CachedReleaseViewModel>("publications/publication-a/releases/2016.json"))
-                .ReturnsAsync(
-                    new CachedReleaseViewModel(releaseId)
-                    {
-                        Type = new ReleaseTypeViewModel
-                        {
-                            Title = "National Statistics"
-                        }
-                    }
-                );
+            var release = new Release
+            {
+                ReleaseName = "2022",
+                TimePeriodCoverage = CalendarYear,
+                ApprovalStatus = Approved,
+                Published = null
+            };
 
             var contentDbContextId = Guid.NewGuid().ToString();
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(new Publication
-                {
-                    Id = publicationId,
-                    Slug = publicationSlug,
-                });
+                await contentDbContext.AddRangeAsync(release);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupReleaseService(
-                    contentDbContext: contentDbContext,
-                    publicationCacheService: publicationCacheService.Object,
-                    fileStorageService: fileStorageService.Object
-                );
+                var service = SetupReleaseService(contentDbContext: contentDbContext);
 
-                var result = await service.GetSummary(publicationSlug, releaseSlug);
+                var expectedPublishDate = DateTime.Today.Add(new TimeSpan(9, 30, 0));
+                var result = await service.GetRelease(release.Id, expectedPublishDate);
+                var viewModel = result.AssertRight();
 
-                VerifyAllMocks(publicationCacheService, fileStorageService);
+                Assert.Equal(release.Id, viewModel.Id);
+                Assert.Equal("Calendar Year 2022", viewModel.Title);
+                // Published date in the view model should match the expected publish date
+                Assert.Equal(expectedPublishDate, viewModel.Published);
 
-                var releaseSummaryViewModel = result.AssertRight();
-
-                Assert.Equal(ReleaseType.NationalStatistics, releaseSummaryViewModel.Type);
-
-                var publication = releaseSummaryViewModel.Publication;
-                Assert.NotNull(publication);
-                Assert.Equal(publicationId, publication!.Id);
+                Assert.Null(viewModel.KeyStatisticsSection);
+                Assert.Null(viewModel.SummarySection);
+                Assert.Null(viewModel.RelatedDashboardsSection);
+                Assert.Empty(viewModel.Content);
+                Assert.Empty(viewModel.DownloadFiles);
+                Assert.Empty(viewModel.RelatedInformation);
             }
         }
 
         [Fact]
-        public async Task GetSummary_PublicationNotFound()
+        public async Task GetRelease_NotYetPublished_ExpectedPublishDateIsNull()
         {
-            const string publicationSlug = "publication-a";
-            const string releaseSlug = "2016";
+            var release = new Release
+            {
+                ReleaseName = "2022",
+                TimePeriodCoverage = CalendarYear,
+                ApprovalStatus = Approved,
+                Published = null
+            };
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
 
-           var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-           publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
-               .ReturnsAsync(new NotFoundResult());
-
-           var service = SetupReleaseService(contentDbContext,
-               publicationCacheService: publicationCacheService.Object);
-
-           var result = await service.GetSummary(publicationSlug, releaseSlug);
-
-           result.AssertNotFound();
-        }
-
-        [Fact]
-        public async Task GetSummary_ReleaseNotFound()
-        {
-            var publicationId = Guid.NewGuid();
-            var releaseId = Guid.NewGuid();
-
-            const string publicationSlug = "publication-a";
-            const string releaseSlug = "2016";
-
-            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-            var fileStorageService = new Mock<IFileStorageService>(Strict);
-
-            publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
-                .ReturnsAsync(
-                    new PublicationViewModel
-                    {
-                        Id = publicationId,
-                        Releases = new List<ReleaseTitleViewModel>
-                        {
-                            new() { Id = releaseId }
-                        }
-                    }
-                );
-
-            fileStorageService
-                .Setup(s => s.GetDeserialized<CachedReleaseViewModel>(It.IsAny<string>()))
-                .ReturnsAsync(new NotFoundResult());
-
-            var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(new Publication
-                {
-                    Id = publicationId,
-                    Slug = publicationSlug,
-                });
+                await contentDbContext.AddRangeAsync(release);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupReleaseService(
-                    contentDbContext: contentDbContext,
-                    publicationCacheService: publicationCacheService.Object,
-                    fileStorageService: fileStorageService.Object);
+                var service = SetupReleaseService(contentDbContext: contentDbContext);
 
-                var result = await service.GetSummary(publicationSlug, releaseSlug);
+                DateTime? expectedPublishDate = null;
+                var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
+                    service.GetRelease(release.Id, expectedPublishDate));
 
-                VerifyAllMocks(publicationCacheService, fileStorageService);
+                Assert.Equal(
+                    "Expected published date must be specified for a non-live release (Parameter 'expectedPublishDate')",
+                    exception.Message
+                );
+            }
+        }
 
-                result.AssertNotFound();
+        [Fact]
+        public async Task GetRelease_AmendedReleaseNotYetPublishedHasPublishedDateOfPreviousVersion()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(Releases);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseService(contentDbContext: contentDbContext);
+
+                // The expected publish date for this release should be ignored
+                var expectedPublishDate = DateTime.Today.Add(new TimeSpan(9, 30, 0));
+
+                var result = await service.GetRelease(Release1V3NotPublished.Id, expectedPublishDate);
+                var viewModel = result.AssertRight();
+
+                Assert.Equal(Release1V3NotPublished.Id, viewModel.Id);
+                Assert.Equal("Academic Year Q1 2018/19", viewModel.Title);
+                // Published date in the view model should match the published date of the previous version
+                Assert.Equal(Release1V1.Published, viewModel.Published);
+                Assert.Null(viewModel.KeyStatisticsSection);
+                Assert.Null(viewModel.SummarySection);
+                Assert.Null(viewModel.RelatedDashboardsSection);
+                Assert.Empty(viewModel.Content);
+
+                Assert.Empty(viewModel.DownloadFiles);
+
+                Assert.Equal("Release 1 v3 Guidance", viewModel.DataGuidance);
+
+                Assert.Empty(viewModel.RelatedInformation);
+            }
+        }
+
+        [Fact]
+        public async Task GetRelease_AmendedReleaseNotYetPublishedHasUpdatesInDescendingOrder()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(Releases);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseService(contentDbContext: contentDbContext);
+
+                var result = await service.GetRelease(Release1V3NotPublished.Id, DateTime.UtcNow);
+                var viewModel = result.AssertRight();
+
+                Assert.Equal(Release1V3NotPublished.Id, viewModel.Id);
+                Assert.Equal("Academic Year Q1 2018/19", viewModel.Title);
+
+                Assert.Equal(2, viewModel.Updates.Count);
+                Assert.Equal(new DateTime(2020, 2, 1), viewModel.Updates[0].On);
+                Assert.Equal("Second update", viewModel.Updates[0].Reason);
+
+                Assert.Equal(new DateTime(2020, 1, 1), viewModel.Updates[1].On);
+                Assert.Equal("First update", viewModel.Updates[1].Reason);
             }
         }
 
@@ -341,7 +690,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var release1 = new Release
             {
                 Slug = "release-1",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                TimePeriodCoverage = CalendarYear,
                 ReleaseName = "2020",
                 Published = new DateTime(2020, 1, 1),
                 DataLastPublished = new DateTime(2020, 1, 1),
@@ -351,7 +700,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var release2 = new Release
             {
                 Slug = "release-2",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                TimePeriodCoverage = CalendarYear,
                 ReleaseName = "2021",
                 Published = new DateTime(2021, 1, 1),
                 DataLastPublished = new DateTime(2021, 1, 1),
@@ -415,14 +764,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             var originalRelease = new Release
             {
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                TimePeriodCoverage = CalendarYear,
                 ReleaseName = "2020",
                 Published = new DateTime(2020, 1, 1),
                 Type = ReleaseType.NationalStatistics,
             };
             var amendedRelease = new Release
             {
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                TimePeriodCoverage = CalendarYear,
                 ReleaseName = "2021",
                 Published = new DateTime(2020, 2, 1),
                 Type = ReleaseType.NationalStatistics,
@@ -462,14 +811,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             // Draft
             var release1 = new Release
             {
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                TimePeriodCoverage = CalendarYear,
                 ReleaseName = "2020",
                 Type = ReleaseType.NationalStatistics
             };
             // Published
             var release2 = new Release
             {
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                TimePeriodCoverage = CalendarYear,
                 ReleaseName = "2021",
                 Published = new DateTime(2021, 1, 1),
                 Type = ReleaseType.NationalStatistics
@@ -477,7 +826,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             // Amendment is draft
             var release2Amendment = new Release
             {
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                TimePeriodCoverage = CalendarYear,
                 ReleaseName = "2021",
                 Type = ReleaseType.NationalStatistics,
                 PreviousVersion = release2
@@ -522,20 +871,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         private static ReleaseService SetupReleaseService(
-            ContentDbContext? contentDbContext = null,
-            IFileStorageService? fileStorageService = null,
-            IMethodologyCacheService? methodologyCacheService = null,
-            IPublicationCacheService? publicationCacheService = null,
-            IUserService? userService = null)
+            ContentDbContext contentDbContext,
+            IReleaseFileRepository? releaseFileRepository = null,
+            IUserService? userService = null,
+            IMapper? mapper = null)
         {
             return new(
-                contentDbContext is null
-                    ? Mock.Of<IPersistenceHelper<ContentDbContext>>()
-                    : new PersistenceHelper<ContentDbContext>(contentDbContext),
-                fileStorageService ?? Mock.Of<IFileStorageService>(Strict),
-                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
-                publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
-                userService ?? AlwaysTrueUserService().Object
+                contentDbContext,
+                new PersistenceHelper<ContentDbContext>(contentDbContext),
+                releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
+                userService ?? AlwaysTrueUserService().Object,
+                mapper ?? MapperUtils.MapperForProfile<MappingProfiles>()
             );
         }
     }
