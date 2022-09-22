@@ -243,7 +243,9 @@ describe('PublicationReleasePage', () => {
     );
 
     userEvent.click(
-      screen.getByRole('button', { name: 'See all updates (2)' }),
+      screen.getByRole('button', {
+        name: `See all updates (2) for Academic Year 2016/17`,
+      }),
     );
 
     const updates = within(screen.getByTestId('all-updates')).getAllByRole(
