@@ -365,13 +365,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
         private static ReleaseCacheViewModel BuildReleaseCacheViewModel()
         {
-            return new ReleaseCacheViewModel(Guid.NewGuid())
-            {
-                Type = new ReleaseTypeViewModel
-                {
-                    Title = "National Statistics"
-                }
-            };
+            return new ReleaseCacheViewModel(Guid.NewGuid());
         }
 
         private static ReleaseController BuildReleaseController(

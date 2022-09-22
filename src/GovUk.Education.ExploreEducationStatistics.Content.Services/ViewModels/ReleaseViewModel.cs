@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             NextReleaseDate = release.NextReleaseDate;
             Published = release.Published;
             Slug = release.Slug;
-            Type = ReleaseTypeTitleMap[release.Type.Title];
+            Type = release.Type;
             Updates = release.Updates;
             Content = release.Content;
             SummarySection = release.SummarySection;
@@ -84,11 +84,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             DataLastPublished = release.DataLastPublished;
             Publication = publication;
         }
-
-        /// TODO EES-3127 Remove the backwards compatibility of CachedReleaseViewModel.Type.
-        public static readonly Dictionary<string, ReleaseType> ReleaseTypeTitleMap = 
-            EnumUtil.GetEnumValues<ReleaseType>()
-            .ToDictionary(v => v.GetTitle(), v => v);
 
         public bool LatestRelease => Id == Publication.LatestReleaseId;
     }
