@@ -75,7 +75,7 @@ interface PublicationAndReleases {
   releases: Release[];
 }
 
-class AdminService {
+export class AdminService {
   private readonly client: HttpClient;
 
   constructor(

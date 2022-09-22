@@ -9,31 +9,30 @@ import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
 import createDataService from '../../../utils/dataService';
 import constants from '../../../utils/constants';
+import utils from '../../../utils/utils';
 
-const PUBLICATION =
-  'UI test publication - Performance tests - publicTableBuilderQuery.test.ts';
-const RELEASE = 2022;
-const SUBJECT =
-  'UI test subject - Performance tests - publicTableBuilderQuery.test.ts';
-
-const alwaysCreateNewDataPerTest = false;
-const bigFile = true;
+const tearDownData = false;
+const publicationTitle =
+  __ENV.PUBLICATION_TITLE ?? 'publicTableBuilderQuery.test.ts';
+const dataFile = __ENV.DATA_FILE ?? 'small-file.csv';
+const uploadFileStrategy = utils.getDataFileUploadStrategy({
+  filename: dataFile,
+});
 
 export const options: Options = {
   scenarios: {
     constant_request_rate: {
       executor: 'constant-arrival-rate',
-      rate: 1,
+      rate: 10,
       timeUnit: '5s',
       duration: '120m',
-      preAllocatedVUs: 1,
-      maxVUs: 1,
+      preAllocatedVUs: 10,
+      maxVUs: 10,
     },
   },
   noConnectionReuse: true,
   insecureSkipTLSVerify: true,
-  linger: true,
-  setupTimeout: bigFile ? '30m' : '10m',
+  setupTimeout: uploadFileStrategy.isZip ? '30m' : '10m',
 };
 
 interface SetupData {
@@ -56,16 +55,6 @@ export const tableQueryFailureCount = new Counter(
   'ees_public_table_query_failure_count',
 );
 
-/* eslint-disable no-restricted-globals */
-const zipFile = bigFile ? open('admin/import/assets/big-file1.zip', 'b') : null;
-const subjectFile = !bigFile
-  ? open('admin/import/assets/dates.csv', 'b')
-  : null;
-const subjectMetaFile = !bigFile
-  ? open('admin/import/assets/dates.meta.csv', 'b')
-  : null;
-/* eslint-enable no-restricted-globals */
-
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT as string,
 );
@@ -86,20 +75,14 @@ function getOrCreateReleaseWithSubject() {
     authTokens?.accessToken as string,
   );
 
-  const suffix = alwaysCreateNewDataPerTest
-    ? `-${Date.now()}-${Math.random()}`
-    : '';
-
   const { id: themeId } = adminService.getOrCreateTheme({
-    title: `${testData.themeName}${suffix}`,
+    title: testData.themeName,
   });
 
   const { id: topicId } = adminService.getOrCreateTopic({
     themeId,
-    title: `${testData.topicName}${suffix}`,
+    title: testData.topicName,
   });
-
-  const publicationTitle = `${PUBLICATION}${suffix}`;
 
   const { id: publicationId } = adminService.getOrCreatePublication({
     topicId,
@@ -110,7 +93,7 @@ function getOrCreateReleaseWithSubject() {
     publicationId,
     publicationTitle,
     topicId,
-    year: RELEASE,
+    year: 2000,
     timePeriodCoverage: 'AY',
   });
 
@@ -121,27 +104,10 @@ function getOrCreateReleaseWithSubject() {
   if (!existingSubjects.length) {
     console.log('Importing data file');
 
-    const { id: fileId } = bigFile
-      ? adminService.getOrImportDataZipFile({
-          title: `${SUBJECT}${suffix}`,
-          releaseId,
-          zipFile: {
-            file: zipFile!,
-            filename: `subject.zip`,
-          },
-        })
-      : adminService.getOrImportDataFile({
-          title: `${SUBJECT}${suffix}`,
-          releaseId,
-          dataFile: {
-            file: subjectFile!,
-            filename: `subject.csv`,
-          },
-          metaFile: {
-            file: subjectMetaFile!,
-            filename: `subject.meta.csv`,
-          },
-        });
+    const { id: fileId } = uploadFileStrategy.getOrImportSubject(
+      adminService,
+      releaseId,
+    );
 
     console.log('Waiting for data file to import');
 
@@ -149,6 +115,8 @@ function getOrCreateReleaseWithSubject() {
       releaseId,
       fileId,
     });
+
+    console.log('Data file imported successfully');
   }
 
   const { subjects } = adminService.getSubjects({ releaseId });
@@ -165,15 +133,15 @@ function getOrCreateReleaseWithSubject() {
       ],
     });
 
-    console.log(`Approving Release ${RELEASE}`);
+    console.log('Approving Release');
 
     adminService.approveRelease({ releaseId });
 
-    console.log(`Waiting for Release ${RELEASE} to be published`);
+    console.log(`Waiting for Release to be published`);
 
     adminService.waitForReleaseToBePublished({ releaseId });
 
-    console.log(`Release ${RELEASE} published successfully`);
+    console.log(`Release published successfully`);
   }
 
   return {
@@ -303,7 +271,7 @@ const performTest = ({ publicationId, subjectId, subjectMeta }: SetupData) => {
 };
 
 export const teardown = ({ themeId, topicId }: SetupData) => {
-  if (alwaysCreateNewDataPerTest) {
+  if (tearDownData) {
     const accessToken = getOrRefreshAccessTokens(
       supportsRefreshTokens,
       userName,

@@ -6,39 +6,42 @@ import exec from 'k6/execution';
 import createAdminService from '../../../utils/adminService';
 import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
+import testData from '../../testData';
+import utils from '../../../utils/utils';
 
 const IMPORT_STATUS_POLLING_DELAY_SECONDS = 5;
 
-const alwaysCreateNewDataPerTest = true;
-const bigFile = true;
+const tearDownData = false;
+const publicationTitle = __ENV.PUBLICATION_TITLE ?? 'import.test.ts';
+const dataFile = __ENV.DATA_FILE ?? 'small-file.csv';
+const uploadFileStrategy = utils.getDataFileUploadStrategy({
+  filename: dataFile,
+});
 
 export const options: Options = {
   stages: [
     {
       duration: '1s',
-      target: 3,
+      target: 10,
     },
     {
       duration: '119m',
-      target: 3,
+      target: 10,
     },
     {
       duration: '30s',
-      target: 0,
+      target: 10,
     },
   ],
   noConnectionReuse: true,
   insecureSkipTLSVerify: true,
   linger: true,
-  // vus: 5,
-  // duration: '120m',
 };
 
 interface SetupData {
   themeId: string;
   topicId: string;
   publicationId: string;
-  publicationTitle: string;
 }
 
 export const errorRate = new Rate('ees_errors');
@@ -77,17 +80,6 @@ const processingStages: {
   {},
 );
 
-// TODO - use SharedArray instead of `open` here
-/* eslint-disable no-restricted-globals */
-const zipFile = bigFile ? open('admin/import/assets/big-file1.zip', 'b') : null;
-const subjectFile = !bigFile
-  ? open('admin/import/assets/big-file.csv', 'b')
-  : null;
-const subjectMetaFile = !bigFile
-  ? open('admin/import/assets/big-file.meta.csv', 'b')
-  : null;
-/* eslint-enable no-restricted-globals */
-
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT as string,
 );
@@ -101,20 +93,14 @@ const { authTokens, userName } = environmentAndUsers.users.find(
 export function setup(): SetupData {
   const adminService = createAdminService(adminUrl, authTokens.accessToken);
 
-  const suffix = alwaysCreateNewDataPerTest
-    ? `-${Date.now()}-${Math.random()}`
-    : '';
-
   const { id: themeId } = adminService.getOrCreateTheme({
-    title: `UI test theme - Performance tests - "import.test.ts" - ${suffix}`,
+    title: testData.themeName,
   });
 
   const { id: topicId } = adminService.getOrCreateTopic({
     themeId,
-    title: `UI test topic - Performance tests - "import.test.ts" - ${suffix}`,
+    title: testData.topicName,
   });
-
-  const publicationTitle = `UI test publication - Performance tests - "import.test.ts" - ${suffix}`;
 
   const { id: publicationId } = adminService.getOrCreatePublication({
     topicId,
@@ -129,15 +115,10 @@ export function setup(): SetupData {
     themeId,
     topicId,
     publicationId,
-    publicationTitle,
   };
 }
 
-const performTest = ({
-  topicId,
-  publicationId,
-  publicationTitle,
-}: SetupData) => {
+const performTest = ({ topicId, publicationId }: SetupData) => {
   const accessToken = getOrRefreshAccessTokens(
     supportsRefreshTokens,
     userName,
@@ -164,27 +145,10 @@ const performTest = ({
 
   console.log(`Uploading subject ${subjectName}`);
 
-  const { response: uploadResponse, id: fileId } = bigFile
-    ? adminService.uploadDataZipFile({
-        title: subjectName,
-        releaseId,
-        zipFile: {
-          file: zipFile!,
-          filename: `${subjectName}.zip`,
-        },
-      })
-    : adminService.uploadDataFile({
-        title: subjectName,
-        releaseId,
-        dataFile: {
-          file: subjectFile!,
-          filename: `${subjectName}.csv`,
-        },
-        metaFile: {
-          file: subjectMetaFile!,
-          filename: `${subjectName}.meta.csv`,
-        },
-      });
+  const {
+    response: uploadResponse,
+    id: fileId,
+  } = uploadFileStrategy.getOrImportSubject(adminService, releaseId);
 
   console.log(`Subject ${subjectName} finished uploading`);
 
@@ -264,7 +228,7 @@ const performTest = ({
 };
 
 export const teardown = ({ themeId, topicId }: SetupData) => {
-  if (alwaysCreateNewDataPerTest) {
+  if (tearDownData) {
     const accessToken = getOrRefreshAccessTokens(
       supportsRefreshTokens,
       userName,
