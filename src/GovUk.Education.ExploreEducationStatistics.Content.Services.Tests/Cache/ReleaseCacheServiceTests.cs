@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
@@ -77,10 +78,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
             }
         },
         DataLastPublished = DateTime.UtcNow,
-        Type = new ReleaseTypeViewModel
-        {
-            Title = "National Statistics"
-        },
+        Type = ReleaseType.NationalStatistics,
         RelatedInformation = new List<LinkViewModel>
         {
             new()

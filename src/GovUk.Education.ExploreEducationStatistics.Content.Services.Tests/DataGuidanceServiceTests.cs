@@ -75,11 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     {
                         Title = "2016-17",
                         Slug = "2016-17",
-                        DataGuidance = "Release Guidance",
-                        Type = new ReleaseTypeViewModel
-                        {
-                            Title = "National Statistics"
-                        }
+                        DataGuidance = "Release Guidance"
                     }
                 );
 

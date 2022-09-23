@@ -178,13 +178,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
 
     private static ReleaseCacheViewModel BuildReleaseCacheViewModel()
     {
-        return new ReleaseCacheViewModel(Guid.NewGuid())
-        {
-            Type = new()
-            {
-                Title = "National Statistics"
-            }
-        };
+        return new ReleaseCacheViewModel(Guid.NewGuid());
     }
 
     private static ReleaseController BuildReleaseController(

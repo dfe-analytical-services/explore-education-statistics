@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             Published = release.Published;
             ReleaseName = release.ReleaseName;
             NextReleaseDate = release.NextReleaseDate;
-            Type = ReleaseViewModel.ReleaseTypeTitleMap[release.Type.Title];
+            Type = release.Type;
             LatestRelease = Id == publication.LatestReleaseId;
             DataLastPublished = release.DataLastPublished;
             Publication = new PublicationSummaryViewModel(publication);
