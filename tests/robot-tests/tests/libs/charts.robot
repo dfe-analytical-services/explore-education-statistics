@@ -189,7 +189,9 @@ user configures basic chart
     user enters text into element    id:chartConfigurationForm-width    ${CHART_WIDTH}
 
     IF    "${CHART_TYPE}" == "Geographic"
-        user chooses select option at index    id:chartConfigurationForm-chartConfigurationForm-boundaryLevel    1
+        user clicks link    Map configuration
+        user waits until h3 is visible    Map configuration    %{WAIT_MEDIUM}
+        user chooses select option at index    name:boundaryLevel    1
     END
 
     # Prevent intermittent failure when trying to switch to other chart tab

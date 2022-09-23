@@ -22,20 +22,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IDataImportRepository _dataImportRepository;
-        private readonly IReleaseFileRepository _releaseFileRepository;
+        private readonly IReleaseFileService _releaseFileService;
         private readonly IStorageQueueService _queueService;
         private readonly IUserService _userService;
 
         public DataImportService(
             ContentDbContext contentDbContext,
             IDataImportRepository dataImportRepository,
-            IReleaseFileRepository releaseFileRepository,
+            IReleaseFileService releaseFileService,
             IStorageQueueService queueService,
             IUserService userService)
         {
             _contentDbContext = contentDbContext;
             _dataImportRepository = dataImportRepository;
-            _releaseFileRepository = releaseFileRepository;
+            _releaseFileService = releaseFileService;
             _queueService = queueService;
             _userService = userService;
         }
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, Unit>> CancelImport(Guid releaseId, Guid fileId)
         {
-            return await _releaseFileRepository.CheckFileExists(releaseId, fileId, FileType.Data)
+            return await _releaseFileService.CheckFileExists(releaseId, fileId, FileType.Data)
                 .OnSuccess(_userService.CheckCanCancelFileImport)
                 .OnSuccessVoid(async file =>
                 {

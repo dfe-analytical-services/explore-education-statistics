@@ -46,6 +46,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 /**
                  * Publication management
                  */
+                options.AddPolicy(SecurityPolicies.CanViewAllPublications.ToString(), policy =>
+                    policy.RequireClaim(SecurityClaimTypes.AccessAllPublications.ToString()));
+
                 // does this user have permission to view a specific Publication?
                 options.AddPolicy(SecurityPolicies.CanViewSpecificPublication.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificPublicationRequirement()));

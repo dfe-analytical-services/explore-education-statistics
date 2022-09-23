@@ -12,6 +12,9 @@ exports[`FormFieldset renders correctly with error 1`] = `
     <span class="govuk-error-message"
           id="test-fieldset-error"
     >
+      <span class="govuk-visually-hidden">
+        Error:
+      </span>
       There was an error
     </span>
     <input type="text"

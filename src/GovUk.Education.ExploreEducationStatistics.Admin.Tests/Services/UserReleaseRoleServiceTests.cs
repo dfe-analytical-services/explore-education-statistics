@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             return new(
                 contentDbContext,
-                new PublicationRepository(contentDbContext, AdminMapper()));
+                new PublicationRepository(contentDbContext));
         }
     }
 }

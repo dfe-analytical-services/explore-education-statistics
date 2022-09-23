@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -113,6 +114,30 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         VerifyAllMocks(PublicBlobCacheService);
 
         result.AssertRight(_publicationViewModel);
+    }
+
+    [Fact]
+    public async Task GetPublication_PublicationNotFound()
+    {
+        var cacheKey = new PublicationCacheKey(PublicationSlug);
+
+        PublicBlobCacheService
+            .Setup(s => s.GetItem(cacheKey, typeof(PublicationViewModel)))
+            .ReturnsAsync(null);
+
+        var publicationService = new Mock<IPublicationService>(Strict);
+
+        publicationService
+            .Setup(s => s.Get(PublicationSlug))
+            .ReturnsAsync(new NotFoundResult());
+
+        var service = BuildService(publicationService: publicationService.Object);
+
+        var result = await service.GetPublication(PublicationSlug);
+
+        VerifyAllMocks(publicationService, PublicBlobCacheService);
+
+        result.AssertNotFound();
     }
 
     [Fact]

@@ -5,7 +5,7 @@ import {
   testPublication,
 } from '@admin/pages/publication/__data__/testPublication';
 import _publicationService, {
-  BasicPublicationDetails,
+  Publication,
   MyPublication,
 } from '@admin/services/publicationService';
 import _themeService, { Theme } from '@admin/services/themeService';
@@ -90,7 +90,7 @@ describe('PublicationDetailsPage', () => {
     themeService.getTheme.mockResolvedValue(testThemes[0]);
     themeService.getThemes.mockResolvedValue(testThemes);
     publicationService.getPublication.mockResolvedValue(
-      testPublicationSummaries[1] as BasicPublicationDetails,
+      testPublicationSummaries[1] as Publication,
     );
     publicationService.getPublicationSummaries.mockResolvedValue(
       testPublicationSummaries,

@@ -4,7 +4,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
     public static class PublisherQueues
     {
         public const string GenerateReleaseContentQueue = "generate-release-content";
-        public const string PublishAllContentQueue = "publish-all-content";
         public const string PublishMethodologyFilesQueue = "publish-methodology-files";
         public const string PublishReleaseContentQueue = "publish-release-content";
         public const string PublishReleaseDataQueue = "publish-release-data";

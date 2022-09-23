@@ -1,16 +1,15 @@
+import { testFullTable } from '@admin/pages/release/datablocks/components/chart/__tests__/__data__/testTableData';
 import ChartAxisConfiguration from '@admin/pages/release/datablocks/components/chart/ChartAxisConfiguration';
-import { testTableData } from '@admin/pages/release/datablocks/components/chart/__tests__/__data__/testTableData';
 import {
   ChartBuilderForms,
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { verticalBarBlockDefinition } from '@common/modules/charts/components/VerticalBarBlock';
-import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { AxisConfiguration } from '@common/modules/charts/types/chart';
-import userEvent from '@testing-library/user-event';
-import React from 'react';
-import noop from 'lodash/noop';
 import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import noop from 'lodash/noop';
+import React from 'react';
 
 describe('ChartAxisConfiguration', () => {
   const testFormState: ChartBuilderForms = {
@@ -86,7 +85,7 @@ describe('ChartAxisConfiguration', () => {
     },
   };
 
-  const testTable = mapFullTable(testTableData);
+  const testTable = testFullTable;
 
   test('renders correctly with initial values', () => {
     render(
@@ -184,6 +183,37 @@ describe('ChartAxisConfiguration', () => {
     expect(referenceLinesSection.getByLabelText('Position')).toHaveValue('');
     expect(referenceLinesSection.getByLabelText('Label')).toHaveValue('');
     expect(referenceLinesSection.getByLabelText('Style')).toHaveValue('none');
+  });
+
+  test('calls `onChange` when form values change', () => {
+    const handleChange = jest.fn();
+
+    render(
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartAxisConfiguration
+          id="chartBuilder-major"
+          type="major"
+          configuration={testAxisConfiguration}
+          definition={verticalBarBlockDefinition}
+          data={testTable.results}
+          meta={testTable.subjectMeta}
+          onChange={handleChange}
+          onSubmit={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
+    );
+
+    const sizeInput = screen.getByLabelText('Size of axis (pixels)');
+
+    expect(handleChange).not.toHaveBeenCalled();
+
+    userEvent.clear(sizeInput);
+    userEvent.type(sizeInput, '20');
+
+    expect(handleChange).toHaveBeenCalledWith<[AxisConfiguration]>({
+      ...testAxisConfiguration,
+      size: 20,
+    });
   });
 
   test('shows validation error if invalid custom tick spacing given', async () => {

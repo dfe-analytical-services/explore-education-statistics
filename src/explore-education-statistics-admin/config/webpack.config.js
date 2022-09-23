@@ -456,6 +456,11 @@ module.exports = webpackEnv => {
                 /explore-education-statistics-ckeditor/,
               ],
               loader: require.resolve('babel-loader'),
+              // EES - Prevents ES modules using cjs/mjs throwing Webpack
+              // errors e.g. color2k is using this.
+              resolve: {
+                fullySpecified: false,
+              },
               options: {
                 compact: false,
                 presets: [

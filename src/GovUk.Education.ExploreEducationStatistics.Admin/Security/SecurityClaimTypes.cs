@@ -16,6 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         /**
          * Publication management
          */
+        AccessAllPublications,
         CreateAnyPublication,
         UpdateAllPublications,
         AdoptAnyMethodology,
@@ -33,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         PublishAllReleases,
         DeleteAllReleaseAmendments,
         CancelAllFileImports,
-        
+
         /**
          * Pre Release management
          */

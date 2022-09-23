@@ -11,12 +11,13 @@ describe('parseNumber', () => {
     expect(parseNumber(123.44)).toBe(123.44);
   });
 
-  test('changes NaNs to undefined', () => {
+  test('returns undefined if value is NaN', () => {
     expect(parseNumber(NaN)).toBeUndefined();
   });
 
-  test('changes invalid string values to undefined by default', () => {
+  test('returns undefined if invalid string values', () => {
     expect(parseNumber('')).toBeUndefined();
+    expect(parseNumber('   ')).toBeUndefined();
     expect(parseNumber('not a number')).toBeUndefined();
   });
 });

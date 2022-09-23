@@ -9,6 +9,9 @@ exports[`FormTextArea renders correctly with error 1`] = `
 <span class="govuk-error-message"
       id="test-input-error"
 >
+  <span class="govuk-visually-hidden">
+    Error:
+  </span>
   Field is required
 </span>
 <textarea data-testid="comment-textarea"

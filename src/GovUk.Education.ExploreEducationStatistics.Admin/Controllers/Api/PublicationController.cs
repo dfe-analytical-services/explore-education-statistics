@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -25,6 +26,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public PublicationController(IPublicationService publicationService)
         {
             _publicationService = publicationService;
+        }
+
+        [HttpGet("api/publications")]
+        public async Task<ActionResult<List<PublicationViewModel>>> ListPublications(
+            [FromQuery] bool permissions,
+            [FromQuery] Guid? topicId)
+        {
+            return await _publicationService
+                .ListPublications(permissions, topicId)
+                .HandleFailuresOrOk();
         }
 
         [HttpGet("api/me/publications")]
@@ -77,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpPost("api/publications")]
         public async Task<ActionResult<PublicationViewModel>> CreatePublication(
-            PublicationSaveViewModel publication)
+            PublicationSaveRequest publication)
         {
             return await _publicationService
                 .CreatePublication(publication)
@@ -87,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPut("api/publications/{publicationId}")]
         public async Task<ActionResult<PublicationViewModel>> UpdatePublication(
             Guid publicationId,
-            PublicationSaveViewModel updatedPublication)
+            PublicationSaveRequest updatedPublication)
         {
             return await _publicationService
                 .UpdatePublication(publicationId, updatedPublication)

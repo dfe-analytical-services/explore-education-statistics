@@ -191,13 +191,20 @@ const FormComboBox = ({
           toggleShowOptions(true);
         }}
         onKeyDown={event => {
-          if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-            selectNextOption(event);
-          }
-
-          if (event.key === 'Escape') {
-            setValue('');
-            toggleShowOptions(false);
+          switch (event.key) {
+            case 'ArrowUp':
+            case 'ArrowDown':
+              selectNextOption(event);
+              break;
+            case 'Escape':
+              setValue('');
+              toggleShowOptions(false);
+              break;
+            case 'Tab':
+              toggleShowOptions(false);
+              break;
+            default:
+              break;
           }
         }}
       />
@@ -261,7 +268,6 @@ const FormComboBox = ({
                     break;
 
                   case 'Tab':
-                    setValue('');
                     toggleShowOptions(false);
                     break;
 

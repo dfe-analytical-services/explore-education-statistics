@@ -3,7 +3,6 @@ using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 

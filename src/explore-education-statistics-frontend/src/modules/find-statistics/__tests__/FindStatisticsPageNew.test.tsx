@@ -46,6 +46,18 @@ describe('FindStatisticsPageNew', () => {
       screen.getByText('Page 1 of 3, showing all publications'),
     ).toBeInTheDocument();
 
+    const sortGroup = within(
+      screen.getByRole('group', { name: 'Sort results' }),
+    );
+    const sortOptions = sortGroup.getAllByRole('radio');
+    expect(sortOptions).toHaveLength(3);
+    expect(sortOptions[0]).toEqual(sortGroup.getByLabelText('Newest'));
+    expect(sortOptions[0]).toBeChecked();
+    expect(sortOptions[1]).toEqual(sortGroup.getByLabelText('Oldest'));
+    expect(sortOptions[1]).not.toBeChecked();
+    expect(sortOptions[2]).toEqual(sortGroup.getByLabelText('A to Z'));
+    expect(sortOptions[2]).not.toBeChecked();
+
     expect(
       screen.getByRole('heading', { name: 'Publication 1' }),
     ).toBeInTheDocument();

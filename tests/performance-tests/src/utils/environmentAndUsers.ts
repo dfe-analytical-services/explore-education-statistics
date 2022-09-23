@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import { AuthDetails } from '../auth/getAuthDetails';
 import { Environment } from '../auth/storeEnvironmentDetails';
 
@@ -10,6 +11,5 @@ export default function getEnvironmentAndUsersFromFile(
   environmentName: string,
 ): EnvironmentAndUsers {
   const environmentAndUsersFilePath = `.environment-details.${environmentName}.json`;
-  /* eslint-disable-next-line no-restricted-globals */
   return JSON.parse(open(environmentAndUsersFilePath)) as EnvironmentAndUsers;
 }

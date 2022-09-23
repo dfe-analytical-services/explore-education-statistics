@@ -401,11 +401,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             return JsonConvert.DeserializeObject(
                 text,
-                type,
-                new JsonSerializerSettings
-                {
-                    TypeNameHandling = TypeNameHandling.Auto
-                }
+                type
             );
         }
 

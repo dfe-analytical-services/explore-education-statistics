@@ -191,6 +191,7 @@ const PageSearchForm = ({
         id={id}
         inputProps={{
           placeholder: 'Search this page',
+          type: 'search',
         }}
         inputLabel={inputLabel}
         listBoxLabelId={`${id}-resultsLabel`}
@@ -212,7 +213,7 @@ const PageSearchForm = ({
                   <>
                     <div className={styles.resultHeader}>{result.text}</div>
                     {result.location && (
-                      <div className={styles.resultLocation}>
+                      <div className={styles.resultLocation} aria-hidden>
                         {result.location}
                       </div>
                     )}

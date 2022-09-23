@@ -2,50 +2,38 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Utils;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Extensions.PublisherExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
     public class ReleaseService : IReleaseService
     {
-        private static readonly Regex FilterRegex = new(ContentFilterUtils.CommentsFilterPattern, RegexOptions.Compiled);
-
         private readonly ContentDbContext _contentDbContext;
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly PublicStatisticsDbContext _publicStatisticsDbContext;
         private readonly IMethodologyService _methodologyService;
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
-        private readonly IMapper _mapper;
 
         public ReleaseService(ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
             PublicStatisticsDbContext publicStatisticsDbContext,
             IMethodologyService methodologyService,
-            IReleaseSubjectRepository releaseSubjectRepository,
-            IMapper mapper)
+            IReleaseSubjectRepository releaseSubjectRepository)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
             _publicStatisticsDbContext = publicStatisticsDbContext;
             _methodologyService = methodologyService;
             _releaseSubjectRepository = releaseSubjectRepository;
-            _mapper = mapper;
         }
 
         public async Task<Release> Get(Guid id)
@@ -74,71 +62,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToListAsync();
         }
 
-        public async Task<CachedReleaseViewModel> GetReleaseViewModel(Guid id, PublishContext context)
-        {
-            var release = _contentDbContext.Releases
-                .Include(r => r.Content)
-                .ThenInclude(releaseContentSection => releaseContentSection.ContentSection)
-                .ThenInclude(section => section.Content)
-                .Include(r => r.Publication)
-                .Include(r => r.Updates)
-                .Single(r => r.Id == id);
-
-            var releaseViewModel = _mapper.Map<CachedReleaseViewModel>(release);
-
-            // Filter content blocks to remove any unnecessary information
-            releaseViewModel.HeadlinesSection?.Content.ForEach(FilterContentBlock);
-            releaseViewModel.SummarySection?.Content.ForEach(FilterContentBlock);
-            releaseViewModel.KeyStatisticsSection?.Content.ForEach(FilterContentBlock);
-            releaseViewModel.KeyStatisticsSecondarySection?.Content.ForEach(FilterContentBlock);
-            releaseViewModel.RelatedDashboardsSection?.Content.ForEach(FilterContentBlock);
-            releaseViewModel.Content.ForEach(section => section.Content.ForEach(FilterContentBlock));
-
-            releaseViewModel.DownloadFiles = await GetDownloadFiles(release);
-
-            // If the release has no published date yet because it's not live, set the published date in the view model.
-            // This is based on what we expect it to eventually be set as in the database when publishing completes
-            if (!releaseViewModel.Published.HasValue)
-            {
-                if (release.Amendment)
-                {
-                    // For amendments this will be the published date of the previous release
-                    var previousVersion = await _contentDbContext.Releases
-                        .FindAsync(release.PreviousVersionId);
-
-                    if (!previousVersion.Published.HasValue)
-                    {
-                        throw new ArgumentException(
-                            $"Expected Release {previousVersion.Id} to have a Published date as the previous version of Release {release.Id}");
-                    }
-
-                    releaseViewModel.Published = previousVersion.Published;
-                }
-                else
-                {
-                    // Otherwise it's either the time now or the next scheduled publishing time
-                    // This date is set up by the calling function when execution begins
-                    releaseViewModel.Published = context.Published;
-                }
-            }
-
-            return releaseViewModel;
-        }
-
-        private static void FilterContentBlock(IContentBlockViewModel block)
-        {
-            switch (block)
-            {
-                case HtmlBlockViewModel htmlBlock:
-                    htmlBlock.Body = FilterRegex.Replace(htmlBlock.Body, string.Empty);
-                    break;
-
-                case MarkDownBlockViewModel markdownBlock:
-                    markdownBlock.Body = FilterRegex.Replace(markdownBlock.Body, string.Empty);
-                    break;
-            }
-        }
-
         public async Task<Release> GetLatestRelease(Guid publicationId, IEnumerable<Guid> includedReleaseIds)
         {
             var releases = await _contentDbContext.Releases
@@ -151,13 +74,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .OrderBy(release => release.Year)
                 .ThenBy(release => release.TimePeriodCoverage)
                 .Last();
-        }
-
-        public async Task<CachedReleaseViewModel> GetLatestReleaseViewModel(Guid publicationId,
-            IEnumerable<Guid> includedReleaseIds, PublishContext context)
-        {
-            var latestRelease = await GetLatestRelease(publicationId, includedReleaseIds);
-            return await GetReleaseViewModel(latestRelease.Id, context);
         }
 
         public async Task SetPublishedDates(Guid id, DateTime published)
@@ -222,16 +138,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToListAsync();
         }
 
-        public async Task<List<FileInfo>> GetDownloadFiles(Release release)
-        {
-            var files = await GetFiles(release.Id, Ancillary, FileType.Data);
-
-            return await files.ToAsyncEnumerable()
-                .SelectAwait(async file => await GetPublicFileInfo(release, file))
-                .OrderBy(file => file.Name)
-                .ToListAsync();
-        }
-
         public async Task CreatePublicStatisticsRelease(Guid releaseId)
         {
             if (!EnvironmentUtils.IsLocalEnvironment())
@@ -280,17 +186,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await RemoveStatisticalReleases(previousVersions);
 
             await _publicStatisticsDbContext.SaveChangesAsync();
-        }
-
-        private async Task<FileInfo> GetPublicFileInfo(Release release, File file)
-        {
-            var releaseFile = await _contentDbContext.ReleaseFiles
-                .Include(rf => rf.File)
-                .FirstAsync(rf =>
-                    rf.ReleaseId == release.Id
-                    && rf.FileId == file.Id);
-
-            return releaseFile.ToPublicFileInfo();
         }
 
         private async Task RemoveStatisticalReleases(IEnumerable<Guid> releaseIds)

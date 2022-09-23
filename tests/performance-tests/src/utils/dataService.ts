@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { sleep } from 'k6';
 import http, { RefinedResponse } from 'k6/http';
 import HttpClient from './httpClient';
@@ -103,7 +104,6 @@ class DataService {
       applicationJsonHeaders,
     );
 
-    /* eslint-disable-next-line no-console */
     console.log(`Created Theme ${title}`);
 
     return {
@@ -144,7 +144,6 @@ class DataService {
       applicationJsonHeaders,
     );
 
-    /* eslint-disable-next-line no-console */
     console.log(`Created Topic ${title}`);
 
     return {
@@ -202,7 +201,6 @@ class DataService {
       applicationJsonHeaders,
     );
 
-    /* eslint-disable-next-line no-console */
     console.log(`Created Publication ${title}`);
 
     return {
@@ -257,7 +255,6 @@ class DataService {
       applicationJsonHeaders,
     );
 
-    /* eslint-disable-next-line no-console */
     console.log(`Created Release ${releaseName}`);
 
     return {

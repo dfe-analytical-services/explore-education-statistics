@@ -168,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public async Task<Either<ActionResult, List<TitleAndIdViewModel>>> GetUnpublishedReleasesUsingMethodology(
+        public async Task<Either<ActionResult, List<IdTitleViewModel>>> GetUnpublishedReleasesUsingMethodology(
             Guid methodologyVersionId)
         {
             return await _persistenceHelper.CheckEntityExists<MethodologyVersion>(methodologyVersionId, queryable =>
@@ -193,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         .OrderBy(r => r.Publication.Title)
                         .ThenByDescending(r => r.Year)
                         .ThenByDescending(r => r.TimePeriodCoverage)
-                        .Select(r => new TitleAndIdViewModel(r.Id, $"{r.Publication.Title} - {r.Title}"))
+                        .Select(r => new IdTitleViewModel(r.Id, $"{r.Publication.Title} - {r.Title}"))
                         .ToList();
                 });
         }
@@ -246,7 +246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     var title =
                         $"{loadedMethodology.ScheduledWithRelease.Publication.Title} - {loadedMethodology.ScheduledWithRelease.Title}";
-                    viewModel.ScheduledWithRelease = new TitleAndIdViewModel(
+                    viewModel.ScheduledWithRelease = new IdTitleViewModel(
                         loadedMethodology.ScheduledWithRelease.Id,
                         title);
                 }
@@ -383,10 +383,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             }
         }
 
-        private static TitleAndIdViewModel BuildPublicationViewModel(PublicationMethodology publicationMethodology)
+        private static IdTitleViewModel BuildPublicationViewModel(PublicationMethodology publicationMethodology)
         {
             var publication = publicationMethodology.Publication;
-            return new TitleAndIdViewModel(publication.Id, publication.Title);
+            return new IdTitleViewModel(publication.Id, publication.Title);
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUniqueForUpdate(

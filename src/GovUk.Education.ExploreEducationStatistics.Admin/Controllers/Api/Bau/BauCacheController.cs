@@ -119,6 +119,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             return NoContent();
         }
 
+        [HttpDelete("public-cache/publication/{publicationSlug}")]
+        public async Task<ActionResult> ClearPublicCachePublication(string publicationSlug)
+        {
+            await _publicBlobStorageService.DeleteBlobs(
+                containerName: BlobContainers.PublicContent,
+                options: new DeleteBlobsOptions
+                {
+                    IncludeRegex = new Regex($"^publications/{publicationSlug}/.+$")
+                }
+            );
+
+            return NoContent();
+        }
+
+        [HttpDelete("public-cache/publications")]
+        public async Task<ActionResult> ClearPublicCachePublications()
+        {
+            await _publicBlobStorageService.DeleteBlobs(
+                containerName: BlobContainers.PublicContent,
+                options: new DeleteBlobsOptions
+                {
+                    IncludeRegex = new Regex("^publications/.+$")
+                }
+            );
+
+            return NoContent();
+        }
+
         public class UpdatePublicCacheTreePathsViewModel
         {
             public enum CacheEntry

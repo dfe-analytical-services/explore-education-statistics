@@ -1,0 +1,6 @@
+@import '~govuk-frontend/govuk/base';
+
+.tableContainer {
+  margin: govuk-spacing(6) govuk-spacing(4);
+  overflow: auto;
+}

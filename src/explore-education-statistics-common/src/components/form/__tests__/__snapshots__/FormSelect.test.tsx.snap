@@ -31,6 +31,9 @@ exports[`FormSelect renders with error message 1`] = `
 <span class="govuk-error-message"
       id="test-select-error"
 >
+  <span class="govuk-visually-hidden">
+    Error:
+  </span>
   Something went wrong
 </span>
 <select aria-describedby="test-select-error"

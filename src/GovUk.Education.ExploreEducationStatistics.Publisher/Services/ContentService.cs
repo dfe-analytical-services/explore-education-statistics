@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
@@ -9,15 +8,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.IBlobStorageService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -29,10 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IReleaseService _releaseService;
         private readonly IPublicationService _publicationService;
         private readonly IMethodologyCacheService _methodologyCacheService;
+        private readonly IReleaseCacheService _releaseCacheService;
         private readonly IThemeCacheService _themeCacheService;
-
-        private readonly JsonSerializerSettings _jsonSerializerSettingsCamelCase =
-            GetJsonSerializerSettings(new CamelCaseNamingStrategy());
 
         public ContentService(
             IBlobCacheService privateBlobCacheService,
@@ -41,6 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             IReleaseService releaseService,
             IPublicationService publicationService,
             IMethodologyCacheService methodologyCacheService,
+            IReleaseCacheService releaseCacheService,
             IThemeCacheService themeCacheService)
         {
             _privateBlobCacheService = privateBlobCacheService;
@@ -49,6 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _releaseService = releaseService;
             _publicationService = publicationService;
             _methodologyCacheService = methodologyCacheService;
+            _releaseCacheService = releaseCacheService;
             _themeCacheService = themeCacheService;
         }
 
@@ -103,28 +98,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        /**
-         * Intended to be used as a Development / BAU Function to perform a full content refresh
-         */
-        public async Task UpdateAllContentAsync()
-        {
-            var context = new PublishContext(DateTime.UtcNow, false);
-
-            await DeleteAllContentExcludingStaging();
-
-            var publications = _publicationService.GetPublicationsWithPublishedReleases();
-
-            foreach (var publication in publications)
-            {
-                var releases = publication.Releases.Where(release => release.IsLatestPublishedVersionOfRelease());
-                await CacheLatestRelease(publication, context);
-                foreach (var release in releases)
-                {
-                    await CacheRelease(release, context);
-                }
-            }
-        }
-
         public async Task UpdateContent(PublishContext context, params Guid[] releaseIds)
         {
             var releases = (await _releaseService
@@ -154,46 +127,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task CacheLatestRelease(Publication publication, PublishContext context, params Guid[] includedReleaseIds)
         {
-            var viewModel = await _releaseService.GetLatestReleaseViewModel(publication.Id, includedReleaseIds, context);
-            await Upload(prefix => PublicContentLatestReleasePath(publication.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
+            var latestRelease = await _releaseService.GetLatestRelease(publication.Id, includedReleaseIds);
+            await _releaseCacheService.UpdateRelease(context.Staging,
+                context.Published,
+                latestRelease.Id,
+                publication.Slug);
         }
 
         private async Task CacheRelease(Release release, PublishContext context)
         {
-            var viewModel = await _releaseService.GetReleaseViewModel(release.Id, context);
-            await Upload(prefix => PublicContentReleasePath(release.Publication.Slug, release.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
-        }
-
-        private async Task DeleteAllContentExcludingStaging()
-        {
-            await _publicBlobStorageService.DeleteBlobs(
-                containerName: PublicContent,
-                options: new DeleteBlobsOptions
-                {
-                    ExcludeRegex = new Regex($"^{PublicContentStagingPath()}/.+$", RegexOptions.IgnoreCase | RegexOptions.Compiled)
-                }
-            );
-        }
-
-        private static JsonSerializerSettings GetJsonSerializerSettings(NamingStrategy namingStrategy)
-        {
-            return new JsonSerializerSettings
-            {
-                ContractResolver = new DefaultContractResolver
-                {
-                    NamingStrategy = namingStrategy,
-                },
-                NullValueHandling = NullValueHandling.Ignore,
-                TypeNameHandling = TypeNameHandling.Auto
-            };
-        }
-
-        private async Task Upload(Func<string?, string> pathFunction, PublishContext context, object value,
-            JsonSerializerSettings settings)
-        {
-            var pathPrefix = context.Staging ? PublicContentStagingPath() : null;
-            var blobName = pathFunction.Invoke(pathPrefix);
-            await _publicBlobStorageService.UploadAsJson(PublicContent, blobName, value, settings);
+            await _releaseCacheService.UpdateRelease(context.Staging,
+                context.Published,
+                release.Id,
+                release.Publication.Slug,
+                release.Slug);
         }
 
         private record ReleaseDataBlockResultsFolderCacheKey : IBlobCacheKey

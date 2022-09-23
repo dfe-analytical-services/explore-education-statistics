@@ -205,7 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var mocks = Mocks();
             var templateReleaseResult =
-                new Either<ActionResult, TitleAndIdViewModel>(new TitleAndIdViewModel());
+                new Either<ActionResult, IdTitleViewModel>(new IdTitleViewModel());
             mocks.ReleaseService
                 .Setup(s => s.GetLatestPublishedRelease(It.Is<Guid>(id => id == _releaseId)))
                 .Returns<Guid>(x => Task.FromResult(templateReleaseResult));

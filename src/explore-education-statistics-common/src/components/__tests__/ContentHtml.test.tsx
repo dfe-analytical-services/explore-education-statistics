@@ -77,4 +77,50 @@ describe('ContentHtml', () => {
       expect(glossaryButton).toBeInTheDocument();
     });
   });
+
+  test('fixes inaccessible table markup from CKEditor', () => {
+    const html = `
+      <figure class="table">
+        <table>
+          <tbody>
+          <tr>
+            <td>Test 1</td>
+            <td>Test 2</td>
+          </tr>
+          </tbody>
+        </table>
+        <figcaption>
+          Test <strong>bold</strong> caption
+        </figcaption>
+      </figure>
+    `;
+
+    const { container } = render(<ContentHtml html={html} />);
+
+    expect(container.innerHTML).toMatchInlineSnapshot(`
+      <div class="dfe-content">
+        <div class="tableContainer">
+          <table>
+            <caption>
+              Test
+              <strong>
+                bold
+              </strong>
+              caption
+            </caption>
+            <tbody>
+              <tr>
+                <td>
+                  Test 1
+                </td>
+                <td>
+                  Test 2
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `);
+  });
 });

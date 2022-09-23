@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable camelcase */
 import http from 'k6/http';
 import { AuthDetails } from './getAuthDetails';
 
@@ -32,20 +34,17 @@ export default function refreshAuthTokens({
   const response = http.post(`${adminUrl}/connect/token`, requestBody);
 
   if (response.status !== 200) {
-    /* eslint-disable-next-line no-console */
     console.log(
       `Unable to refresh access token. Got response ${response.json()}`,
     );
     return undefined;
   }
 
-  /* eslint-disable camelcase */
   const authTokens = (response.json() as unknown) as {
     access_token: string;
     refresh_token: string;
     expires_in: Date;
   };
-  /* eslint-enable camelcase */
 
   return {
     userName,

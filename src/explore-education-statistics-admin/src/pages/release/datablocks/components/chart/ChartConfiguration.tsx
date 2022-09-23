@@ -5,7 +5,6 @@ import Effect from '@common/components/Effect';
 import {
   Form,
   FormFieldRadioGroup,
-  FormFieldSelect,
   FormFieldTextInput,
 } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
@@ -13,7 +12,6 @@ import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import { ChartDefinition } from '@common/modules/charts/types/chart';
-import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import parseNumber from '@common/utils/number/parseNumber';
 import {
   convertServerFieldErrors,
@@ -53,9 +51,7 @@ interface Props {
   buttons?: ReactNode;
   chartOptions: ChartOptions;
   definition: ChartDefinition;
-  meta: FullTableMeta;
   submitError?: ServerValidationErrorResponse;
-  onBoundaryLevelChange?: (boundaryLevel: string) => void;
   onChange: (chartOptions: ChartOptions) => void;
   onSubmit: (chartOptions: ChartOptions) => void;
 }
@@ -66,9 +62,7 @@ const ChartConfiguration = ({
   buttons,
   chartOptions,
   definition,
-  meta,
   submitError,
-  onBoundaryLevelChange,
   onChange,
   onSubmit,
 }: Props) => {
@@ -139,16 +133,8 @@ const ChartConfiguration = ({
       });
     }
 
-    if (definition.type === 'map' && meta.boundaryLevels?.length) {
-      schema = schema.shape({
-        boundaryLevel: Yup.number()
-          .oneOf(meta.boundaryLevels.map(level => level.id))
-          .required('Choose a boundary level'),
-      });
-    }
-
     return schema;
-  }, [definition.capabilities.stackable, definition.type, meta.boundaryLevels]);
+  }, [definition.capabilities.stackable, definition.type]);
 
   const initialValues = useMemo<FormValues>(() => {
     return pick(chartOptions, Object.keys(validationSchema.fields));
@@ -286,30 +272,6 @@ const ChartConfiguration = ({
                 name="barThickness"
                 label="Bar thickness (pixels)"
                 width={5}
-              />
-            )}
-
-            {definition.type === 'map' && meta.boundaryLevels?.length && (
-              <FormFieldSelect
-                id={`${formId}-boundaryLevel`}
-                label="Select a version of geographical data to use"
-                name="boundaryLevel"
-                order={[]}
-                options={[
-                  {
-                    label: 'Please select',
-                    value: '',
-                  },
-                  ...meta.boundaryLevels.map(({ id, label }) => ({
-                    value: id,
-                    label,
-                  })),
-                ]}
-                onChange={e => {
-                  if (onBoundaryLevelChange) {
-                    onBoundaryLevelChange(e.target.value);
-                  }
-                }}
               />
             )}
 

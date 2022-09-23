@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 
         Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> ListMethodologies(Guid publicationId);
 
-        Task<Either<ActionResult, List<TitleAndIdViewModel>>> GetUnpublishedReleasesUsingMethodology(
+        Task<Either<ActionResult, List<IdTitleViewModel>>> GetUnpublishedReleasesUsingMethodology(
             Guid methodologyVersionId);
 
         Task<Either<ActionResult, MethodologyVersionViewModel>> UpdateMethodology(

@@ -1,4 +1,4 @@
-import countDecimals from '@common/utils/number/countDecimals';
+import countDecimalPlaces from '@common/utils/number/countDecimalPlaces';
 import round from 'lodash/round';
 
 export interface RoundNearestOptions {
@@ -47,7 +47,10 @@ export default function roundNearest(
   // Re-round using defined `precision` option or the
   // multiple's decimal places to correct potentially
   // inexact floating point numbers.
-  return round(roundedValue, options?.precision ?? countDecimals(multiple));
+  return round(
+    roundedValue,
+    options?.precision ?? countDecimalPlaces(multiple),
+  );
 }
 
 // Convenience wrappers to round up/down

@@ -2,10 +2,7 @@ import {
   PublicationTeamRouteParams,
   publicationTeamAccessRoute,
 } from '@admin/routes/publicationRoutes';
-import {
-  BasicPublicationDetails,
-  MyPublication,
-} from '@admin/services/publicationService';
+import { Publication, MyPublication } from '@admin/services/publicationService';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import userService from '@admin/services/userService';
 import Button from '@common/components/Button';
@@ -43,7 +40,7 @@ export const errorMappings = [
 
 interface Props {
   hideCancelButton?: boolean; // TODO EES-3217 remove when pages live
-  publication: BasicPublicationDetails | MyPublication; // TODO EES-3217 can be just one type when this goes live
+  publication: Publication | MyPublication; // TODO EES-3217 can be just one type when this goes live
   releases: ReleaseSummary[];
   releaseId: string;
   returnRoute?: string; // TODO EES-3217 remove when pages live

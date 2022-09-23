@@ -17,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -158,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var methodologiesScheduledWithRelease =
                         GetMethodologiesScheduledWithRelease(releaseId)
-                        .Select(m => new TitleAndIdViewModel(m.Id, m.Title))
+                        .Select(m => new IdTitleViewModel(m.Id, m.Title))
                         .ToList();
 
                     return new DeleteReleasePlan
@@ -329,7 +330,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, TitleAndIdViewModel?>> GetLatestPublishedRelease(Guid publicationId)
+        public async Task<Either<ActionResult, IdTitleViewModel?>> GetLatestPublishedRelease(Guid publicationId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, queryable =>
@@ -338,7 +339,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(publication =>
                 {
                     var latestRelease = publication.LatestPublishedRelease();
-                    return latestRelease != null ? new TitleAndIdViewModel
+                    return latestRelease != null ? new IdTitleViewModel
                     {
                         Id = latestRelease.Id,
                         Title = latestRelease.Title
@@ -613,6 +614,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
     public class DeleteReleasePlan
     {
-        public List<TitleAndIdViewModel> ScheduledMethodologies { get; set; } = new List<TitleAndIdViewModel>();
+        public List<IdTitleViewModel> ScheduledMethodologies { get; set; } = new List<IdTitleViewModel>();
     }
 }
