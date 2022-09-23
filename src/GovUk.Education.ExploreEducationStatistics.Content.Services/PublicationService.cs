@@ -27,7 +27,7 @@ public class PublicationService : IPublicationService
         _contentPersistenceHelper = contentPersistenceHelper;
     }
 
-    public async Task<Either<ActionResult, PublicationViewModel>> Get(string publicationSlug)
+    public async Task<Either<ActionResult, PublicationCacheViewModel>> Get(string publicationSlug)
     {
         return await _contentPersistenceHelper
             .CheckEntityExists<Publication>(query => query
@@ -50,9 +50,9 @@ public class PublicationService : IPublicationService
         return publication.LatestPublishedRelease() ?? new Either<ActionResult, Release>(new NotFoundResult());
     }
 
-    private async Task<PublicationViewModel> BuildPublicationViewModel(Publication publication, Release latestRelease)
+    private async Task<PublicationCacheViewModel> BuildPublicationViewModel(Publication publication, Release latestRelease)
     {
-        return new PublicationViewModel
+        return new PublicationCacheViewModel
         {
             Id = publication.Id,
             Title = publication.Title,

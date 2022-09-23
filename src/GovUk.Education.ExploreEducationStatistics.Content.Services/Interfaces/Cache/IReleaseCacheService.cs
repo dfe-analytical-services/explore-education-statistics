@@ -9,15 +9,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 
 public interface IReleaseCacheService
 {
-    Task<Either<ActionResult, CachedReleaseViewModel>> GetRelease(string publicationSlug, string? releaseSlug = null);
-
-    Task<Either<ActionResult, ReleaseSummaryViewModel>> GetReleaseSummary(string publicationSlug,
+    Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(string publicationSlug,
         string? releaseSlug = null);
 
-    Task<Either<ActionResult, ReleaseViewModel>> GetReleaseAndPublication(string publicationSlug,
-        string? releaseSlug = null);
-
-    Task<Either<ActionResult, CachedReleaseViewModel>> UpdateRelease(bool staging,
+    Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateRelease(bool staging,
         DateTime expectedPublishDate,
         Guid releaseId,
         string publicationSlug,

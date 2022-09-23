@@ -125,6 +125,62 @@ describe('PublicationReleasePage', () => {
     );
   });
 
+  test(`renders other releases including legacy releases`, async () => {
+    render(<PublicationReleasePage release={testRelease} />);
+
+    const usefulInfo = within(screen.getByRole('complementary'));
+
+    expect(
+      usefulInfo.getByRole('heading', { name: 'Past releases' }),
+    ).toBeInTheDocument();
+
+    expect(usefulInfo.getByTestId('current-release-title')).toHaveTextContent(
+      'Academic Year 2016/17',
+    );
+
+    const details = within(usefulInfo.getByRole('group'));
+
+    userEvent.click(
+      details.getByRole('button', {
+        name: 'See other releases (5) for Pupil absence in schools in England',
+      }),
+    );
+
+    const otherReleaseLinks = details.getAllByRole('link');
+
+    expect(otherReleaseLinks).toHaveLength(5);
+
+    expect(otherReleaseLinks[0]).toHaveTextContent('Academic Year 2018/19');
+    expect(otherReleaseLinks[0]).toHaveAttribute(
+      'href',
+      '/find-statistics/pupil-absence-in-schools-in-england/2018-19',
+    );
+
+    expect(otherReleaseLinks[1]).toHaveTextContent('Academic Year 2017/18');
+    expect(otherReleaseLinks[1]).toHaveAttribute(
+      'href',
+      '/find-statistics/pupil-absence-in-schools-in-england/2017-18',
+    );
+
+    expect(otherReleaseLinks[2]).toHaveTextContent('Academic Year 2014/15');
+    expect(otherReleaseLinks[2]).toHaveAttribute(
+      'href',
+      'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015',
+    );
+
+    expect(otherReleaseLinks[3]).toHaveTextContent('Academic Year 2013/14');
+    expect(otherReleaseLinks[3]).toHaveAttribute(
+      'href',
+      'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014',
+    );
+
+    expect(otherReleaseLinks[4]).toHaveTextContent('Academic Year 2012/13');
+    expect(otherReleaseLinks[4]).toHaveAttribute(
+      'href',
+      'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013',
+    );
+  });
+
   test('renders national statistics section', () => {
     render(<PublicationReleasePage release={testRelease} />);
 

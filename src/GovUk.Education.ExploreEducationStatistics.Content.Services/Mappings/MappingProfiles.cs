@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
 
             CreateMap<Publication, PublicationSummaryViewModel>();
 
-            CreateMap<Release, CachedReleaseViewModel>()
+            CreateMap<Release, ReleaseCacheViewModel>()
                 .ForMember(dest => dest.CoverageTitle,
                     m => m.MapFrom(release => release.TimePeriodCoverage.GetEnumLabel()))
                 .ForMember(dest => dest.Type,

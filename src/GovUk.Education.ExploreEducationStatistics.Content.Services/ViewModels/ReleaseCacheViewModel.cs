@@ -5,9 +5,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
-    public record CachedReleaseViewModel
+    public record ReleaseCacheViewModel
     {
-        public CachedReleaseViewModel(Guid id)
+        public ReleaseCacheViewModel(Guid id)
         {
             Id = id;
         }

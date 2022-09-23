@@ -23,13 +23,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
             publicationCacheService.Setup(mock => mock.GetPublication("publication-a"))
-                .ReturnsAsync(new PublicationViewModel
+                .ReturnsAsync(new PublicationCacheViewModel
                 {
                     Id = publicationId,
                     Title = "Test title",
                 });
 
-            var controller = BuildPublicationController(publicationCacheService.Object);
+            var controller = BuildPublicationController(publicationCacheService: publicationCacheService.Object);
 
             var result = await controller.GetPublicationTitle("publication-a");
 
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             publicationCacheService.Setup(mock => mock.GetPublication("missing-publication"))
                 .ReturnsAsync(new NotFoundResult());
 
-            var controller = BuildPublicationController(publicationCacheService.Object);
+            var controller = BuildPublicationController(publicationCacheService: publicationCacheService.Object);
 
             var result = await controller.GetPublicationTitle("missing-publication");
 

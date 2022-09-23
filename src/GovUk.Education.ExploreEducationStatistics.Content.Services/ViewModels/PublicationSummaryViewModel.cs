@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
         {
         }
 
-        public PublicationSummaryViewModel(PublicationViewModel publication)
+        public PublicationSummaryViewModel(PublicationCacheViewModel publication)
         {
             Id = publication.Id;
             Title = publication.Title;
