@@ -17,15 +17,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
-using MethodologyVersionSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MethodologyVersionSummaryViewModel;
-using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -179,7 +174,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Summary = publication.Summary,
                         TopicId = publication.TopicId,
                         Slug = publication.Slug,
-                        ExternalMethodology = publication.ExternalMethodology
                     });
 
                     await _context.SaveChangesAsync();
@@ -240,10 +234,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         publication.Slug = updatedPublication.Slug;
                     }
 
+                    // ExternalMethodology is absent as it's updated by a different endpoint
                     publication.Title = updatedPublication.Title;
                     publication.Summary = updatedPublication.Summary;
                     publication.TopicId = updatedPublication.TopicId;
-                    publication.ExternalMethodology = updatedPublication.ExternalMethodology;
                     publication.Updated = DateTime.UtcNow;
                     publication.SupersededById = updatedPublication.SupersededById;
 
@@ -323,6 +317,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Publication>(publicationId, HydratePublication)
                 .OnSuccess(_userService.CheckCanViewPublication)
                 .OnSuccess(publication => _mapper.Map<PublicationViewModel>(publication));
+        }
+
+        public async Task<Either<ActionResult, ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId)
+                .OnSuccessDo(_userService.CheckCanViewPublication)
+                .OnSuccess(publication => publication.ExternalMethodology != null
+                    ? new ExternalMethodologyViewModel(publication.ExternalMethodology)
+                    : NotFound<ExternalMethodologyViewModel>());
+        }
+
+        public async Task<Either<ActionResult, ExternalMethodologyViewModel>> UpdateExternalMethodology(
+            Guid publicationId, ExternalMethodologySaveRequest updatedExternalMethodology)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId)
+                .OnSuccessDo(_userService.CheckCanUpdatePublication)
+                .OnSuccess(async publication =>
+                {
+                    _context.Update(publication);
+                    publication.ExternalMethodology ??= new ExternalMethodology();
+                    publication.ExternalMethodology.Title = updatedExternalMethodology.Title;
+                    publication.ExternalMethodology.Url = updatedExternalMethodology.Url;
+                    await _context.SaveChangesAsync();
+
+                    // Update publication cache because ExternalMethodology is in Content.Services.ViewModels.PublicationViewModel
+                    await _publicationCacheService.UpdatePublication(publication.Slug);
+
+                    return new ExternalMethodologyViewModel(publication.ExternalMethodology);
+                });
+        }
+
+        public async Task<Either<ActionResult, Unit>> RemoveExternalMethodology(
+            Guid publicationId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId)
+                .OnSuccessDo(_userService.CheckCanUpdatePublication)
+                .OnSuccess(async publication =>
+                {
+                    _context.Update(publication);
+                    publication.ExternalMethodology = null;
+                    await _context.SaveChangesAsync();
+
+                    // Clear cache because ExternalMethodology is in Content.Services.ViewModels.PublicationViewModel
+                    await _publicationCacheService.UpdatePublication(publication.Slug);
+
+                    return Unit.Instance;
+                });
         }
 
         public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>>

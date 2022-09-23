@@ -19,7 +19,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 
 interface Model {
   methodologies: MethodologyVersionSummary[];
-  externalMethodology?: ExternalMethodology;
+  externalMethodology?: ExternalMethodology | undefined;
 }
 
 interface ReleasePreviewTableToolFinalStepProps {

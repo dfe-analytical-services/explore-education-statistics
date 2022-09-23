@@ -96,7 +96,6 @@ const PublicationSummary = ({
         >
           <MethodologySummary
             publication={publication}
-            topicId={topicId}
             onChangePublication={onChangePublication}
           />
         </div>

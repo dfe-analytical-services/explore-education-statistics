@@ -8,7 +8,6 @@ import _methodologyService, {
 import _publicationService, {
   ExternalMethodology,
   MyPublication,
-  UpdatePublicationRequest,
 } from '@admin/services/publicationService';
 import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -96,6 +95,7 @@ describe('PublicationMethodologiesPage', () => {
       testMethodology1,
       testMethodology2,
     ]);
+    publicationService.getExternalMethodology.mockResolvedValue(undefined);
     renderPage();
 
     await waitFor(() =>
@@ -128,6 +128,7 @@ describe('PublicationMethodologiesPage', () => {
 
   test('renders the methodologies page correctly with no methodologies', async () => {
     methodologyService.listMethodologyVersions.mockResolvedValue([]);
+    publicationService.getExternalMethodology.mockResolvedValue(undefined);
     renderPage();
 
     await waitFor(() =>
@@ -155,6 +156,7 @@ describe('PublicationMethodologiesPage', () => {
       };
 
       methodologyService.listMethodologyVersions.mockResolvedValue([]);
+      publicationService.getExternalMethodology.mockResolvedValue(undefined);
       methodologyService.createMethodology.mockResolvedValue(
         createdMethodology,
       );
@@ -193,6 +195,7 @@ describe('PublicationMethodologiesPage', () => {
 
     test('does not render the Create Methodology button if the user does not have permission to create one', async () => {
       methodologyService.listMethodologyVersions.mockResolvedValue([]);
+      publicationService.getExternalMethodology.mockResolvedValue(undefined);
       renderPage(
         produce(testPublication, draft => {
           draft.permissions.canCreateMethodologies = false;
@@ -215,6 +218,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology1Draft,
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -240,6 +244,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions = noMethodologyPermissions;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -270,6 +275,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canApproveMethodology = true;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -299,6 +305,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canApproveMethodology = false;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -328,6 +335,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canApproveMethodology = false;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -353,6 +361,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology1Draft,
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -375,6 +384,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canDeleteMethodology = false;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -397,6 +407,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology1Draft,
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -434,6 +445,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology1Draft,
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -466,6 +478,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology1,
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -491,6 +504,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology1,
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -512,6 +526,7 @@ describe('PublicationMethodologiesPage', () => {
             delete draft.published;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -533,6 +548,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canMakeAmendmentOfMethodology = true;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -554,6 +570,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology1,
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -577,6 +594,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology1Amendment,
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -610,6 +628,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canDeleteMethodology = true;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -632,6 +651,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canDeleteMethodology = false;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -657,6 +677,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canMakeAmendmentOfMethodology = true;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -704,6 +725,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canMakeAmendmentOfMethodology = true;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         render(
           <Router history={history}>
             <PublicationContextProvider
@@ -744,6 +766,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canDeleteMethodology = true;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -780,6 +803,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canDeleteMethodology = true;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -815,6 +839,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology2Draft,
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -846,6 +871,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions = noMethodologyPermissions;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -876,6 +902,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canApproveMethodology = true;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -905,6 +932,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canApproveMethodology = false;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -934,6 +962,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canApproveMethodology = false;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -961,6 +990,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canRemoveMethodologyLink = true;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -983,6 +1013,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canRemoveMethodologyLink = false;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -1006,6 +1037,7 @@ describe('PublicationMethodologiesPage', () => {
           testMethodology1,
           testMethodology2,
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -1044,6 +1076,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canRemoveMethodologyLink = true;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -1067,6 +1100,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canRemoveMethodologyLink = false;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -1089,6 +1123,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.listMethodologyVersions.mockResolvedValue([
           testMethodology2Amendment,
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -1130,6 +1165,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canRemoveMethodologyLink = true;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -1162,6 +1198,7 @@ describe('PublicationMethodologiesPage', () => {
             draft.permissions.canRemoveMethodologyLink = true;
           }),
         ]);
+        publicationService.getExternalMethodology.mockResolvedValue(undefined);
         renderPage();
 
         await waitFor(() =>
@@ -1378,15 +1415,12 @@ describe('PublicationMethodologiesPage', () => {
 
         userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
-        const updatedPublication: UpdatePublicationRequest = {
-          ...testPublication,
-          externalMethodology: undefined,
-        };
-
         await waitFor(() => {
-          expect(publicationService.updatePublication).toHaveBeenCalledWith<
-            Parameters<typeof publicationService.updatePublication>
-          >(testPublication.id, updatedPublication);
+          expect(
+            publicationService.removeExternalMethodology,
+          ).toHaveBeenCalledWith<
+            Parameters<typeof publicationService.removeExternalMethodology>
+          >(testPublication.id);
         });
       });
     });

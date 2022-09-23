@@ -1,9 +1,6 @@
 #nullable enable
 using System;
-using System.ComponentModel.DataAnnotations;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using static System.String;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {

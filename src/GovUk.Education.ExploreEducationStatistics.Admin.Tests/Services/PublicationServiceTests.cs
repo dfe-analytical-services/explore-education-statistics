@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -2950,6 +2951,186 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("https://test1.com", legacyReleases[0].Url);
                 Assert.Equal(1, legacyReleases[0].Order);
             }
+        }
+
+        [Fact]
+        public async Task GetExternalMethodology()
+        {
+            var publication = new Publication
+            {
+                ExternalMethodology = new ExternalMethodology
+                {
+                    Title = "Test external methodology",
+                    Url = "http://test.external.methodology",
+                }
+            };
+
+            var contentDbContext = InMemoryApplicationDbContext();
+            await contentDbContext.Publications.AddAsync(publication);
+            await contentDbContext.SaveChangesAsync();
+
+            var service = BuildPublicationService(context: contentDbContext);
+
+            var result = await service.GetExternalMethodology(publication.Id);
+            var externalMethodology = result.AssertRight();
+
+            Assert.Equal(publication.ExternalMethodology.Title, externalMethodology.Title);
+            Assert.Equal(publication.ExternalMethodology.Url, externalMethodology.Url);
+        }
+
+        [Fact]
+        public async Task GetExternalMethodology_NoPublication()
+        {
+            var contentDbContext = InMemoryApplicationDbContext();
+
+            var service = BuildPublicationService(context: contentDbContext);
+
+            var result = await service.GetExternalMethodology(Guid.NewGuid());
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task GetExternalMethodology_NoExternalMethodology()
+        {
+            var publication = new Publication
+            {
+                ExternalMethodology = null,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildPublicationService(context: contentDbContext);
+
+                var result = await service.GetExternalMethodology(publication.Id);
+                result.AssertNotFound();
+            }
+        }
+
+        [Fact]
+        public async Task UpdateExternalMethodology()
+        {
+            var publication = new Publication
+            {
+                ExternalMethodology = new ExternalMethodology
+                {
+                    Title = "Original external methodology",
+                    Url = "http://test.external.methodology/original",
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+                publicationCacheService.Setup(s => s.UpdatePublication(publication.Slug))
+                    .ReturnsAsync(new PublicationViewModel());
+
+                var service = BuildPublicationService(context: contentDbContext,
+                    publicationCacheService: publicationCacheService.Object);
+
+                var result = await service.UpdateExternalMethodology(
+                    publication.Id,
+                    new ExternalMethodologySaveRequest
+                    {
+                        Title = "New external methodology",
+                        Url = "http://test.external.methodology/new",
+                    });
+
+                VerifyAllMocks(publicationCacheService);
+
+                var externalMethodology = result.AssertRight();
+
+                Assert.Equal("New external methodology", externalMethodology.Title);
+                Assert.Equal("http://test.external.methodology/new", externalMethodology.Url);
+
+                var dbPublication = contentDbContext.Publications
+                    .Single(p => p.Id == publication.Id);
+
+                Assert.NotNull(dbPublication.ExternalMethodology);
+                Assert.Equal("New external methodology", dbPublication!.ExternalMethodology!.Title);
+                Assert.Equal("http://test.external.methodology/new", dbPublication.ExternalMethodology.Url);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateExternalMethodology_NoPublication()
+        {
+            var contentDbContext = InMemoryApplicationDbContext();
+            var service = BuildPublicationService(context: contentDbContext);
+
+            var result = await service.UpdateExternalMethodology(
+                publicationId: Guid.NewGuid(),
+                new ExternalMethodologySaveRequest
+                {
+                    Title = "New external methodology",
+                    Url = "http://test.external.methodology/new",
+                });
+
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task RemoveExternalMethodology()
+        {
+            var publication = new Publication
+            {
+                ExternalMethodology = new ExternalMethodology
+                {
+                    Title = "Original external methodology",
+                    Url = "http://test.external.methodology/original",
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+                publicationCacheService.Setup(s => s.UpdatePublication(publication.Slug))
+                    .ReturnsAsync(new PublicationViewModel());
+                var service = BuildPublicationService(context: contentDbContext,
+                    publicationCacheService: publicationCacheService.Object);
+
+                var result = await service.RemoveExternalMethodology(publication.Id);
+
+                VerifyAllMocks(publicationCacheService);
+
+                result.AssertRight();
+
+                var dbPublication = contentDbContext.Publications
+                    .Single(p => p.Id == publication.Id);
+
+                Assert.Null(dbPublication.ExternalMethodology);
+            }
+        }
+
+        [Fact]
+        public async Task RemoveExternalMethodology_NoPublication()
+        {
+            var contentDbContext = InMemoryApplicationDbContext();
+            var service = BuildPublicationService(context: contentDbContext);
+
+            var result = await service.RemoveExternalMethodology(publicationId: Guid.NewGuid());
+
+            result.AssertNotFound();
         }
 
         [Fact]
