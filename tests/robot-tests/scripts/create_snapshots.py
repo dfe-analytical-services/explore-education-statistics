@@ -88,7 +88,7 @@ def create_table_tool_snapshot(public_url: str, driver: webdriver) -> str:
         }
 
         publication_labels = driver.find_elements(By.CSS_SELECTOR,
-                                                  'label[for^="publicationForm-publicationForm-publications-"]')
+                                                  'label[for^="publicationForm-publications-"]')
         for publication_label in publication_labels:
             theme['publications'].append(publication_label.text)
 
@@ -112,7 +112,7 @@ def create_data_catalogue_snapshot(public_url: str, driver: webdriver) -> str:
         }
 
         publication_labels = driver.find_elements(By.CSS_SELECTOR,
-                                                  'label[for^="publicationForm-publicationForm-publications-"]')
+                                                  'label[for^="publicationForm-publications-"]')
         for publication_label in publication_labels:
             theme['publications'].append(publication_label.text)
 
