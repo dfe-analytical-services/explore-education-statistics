@@ -841,7 +841,7 @@
       {
         "name": "[concat(parameters('subscription'),'StatsDBCpuPercent')]",
         "description": "Statistics DB CPU percentage",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('coreStatisticsDbName'))]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('coreStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "cpu_percent",
         "threshold": 85,
@@ -852,7 +852,7 @@
       {
         "name": "[concat(parameters('subscription'),'StatsDBDataIOPercent')]",
         "description": "Statistics DB Data IO Percentage",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('coreStatisticsDbName'))]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('coreStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "physical_data_read_percent",
         "threshold": 50,
@@ -863,7 +863,7 @@
       {
         "name": "[concat(parameters('subscription'),'StatsDBFailedConnections')]",
         "description": "Statistics DB Failed Connections",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('coreStatisticsDbName'))]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('coreStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "connection_failed",
         "threshold": 0,
@@ -874,7 +874,7 @@
       {
         "name": "[concat(parameters('subscription'),'StatsDBDeadlock')]",
         "description": "Statistics DB Deadlock",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('coreStatisticsDbName'))]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('coreStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "deadlock",
         "threshold": 0,
@@ -885,7 +885,7 @@
       {
         "name": "[concat(parameters('subscription'),'StatsDBDataSpaceUsedPercent')]",
         "description": "Statistics DB Data Space Used Percentage",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('coreStatisticsDbName'))]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('coreStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
         "threshold": 85,
@@ -896,7 +896,7 @@
       {
         "name": "[concat(parameters('subscription'),'StatsDBDataSpaceUsedPercentUrgent')]",
         "description": "Statistics DB Data Space Used Percentage - URGENT",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('coreStatisticsDbName'))]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('coreStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
         "threshold": 95,
@@ -907,7 +907,7 @@
       {
         "name": "[concat(parameters('subscription'),'StatsDBBlockedByFirewall')]",
         "description": "Statistics DB Blocked By Firewall",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('coreStatisticsDbName'))]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('coreStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "blocked_by_firewall",
         "threshold": 0,
@@ -918,7 +918,7 @@
       {
         "name": "[concat(parameters('subscription'),'ContentDBCpuPercent')]",
         "description": "Content DB CPU percentage",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('contentDbName'))]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "cpu_percent",
         "threshold": 85,
@@ -929,7 +929,7 @@
       {
         "name": "[concat(parameters('subscription'),'ContentDBDataIOPercent')]",
         "description": "Content DB Data IO Percentage",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('contentDbName'))]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "physical_data_read_percent",
         "threshold": 50,
@@ -940,7 +940,7 @@
       {
         "name": "[concat(parameters('subscription'),'ContentDBFailedConnections')]",
         "description": "Content DB Failed Connections",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('contentDbName'))]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "connection_failed",
         "threshold": 0,
@@ -951,7 +951,7 @@
       {
         "name": "[concat(parameters('subscription'),'ContentDBDeadlock')]",
         "description": "Content DB Deadlock",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('contentDbName'))]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "deadlock",
         "threshold": 0,
@@ -962,7 +962,7 @@
       {
         "name": "[concat(parameters('subscription'),'ContentDBDataSpaceUsedPercent')]",
         "description": "Content DB Data Space Used Percentage",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('contentDbName'))]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
         "threshold": 85,
@@ -973,7 +973,7 @@
       {
         "name": "[concat(parameters('subscription'),'ContentDBDataSpaceUsedPercentUrgent')]",
         "description": "Content DB Data Space Used Percentage - URGENT",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('contentDbName'))]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
         "threshold": 95,
@@ -984,7 +984,7 @@
       {
         "name": "[concat(parameters('subscription'),'ContentDBBlockedByFirewall')]",
         "description": "Content DB Blocked By Firewall",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), variables('contentDbName'))]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "blocked_by_firewall",
         "threshold": 0,
@@ -1610,7 +1610,7 @@
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('coreStatisticsDbName'), ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('coreStatisticsDbName'), ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
             },
             {
               "name": "ContentDb",
@@ -2898,7 +2898,7 @@
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('coreStatisticsDbName'), ';User Id=', parameters('sqlImporterUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlImporterUserPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('coreStatisticsDbName'), ';User Id=', parameters('sqlImporterUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlImporterUserPassword'), ';')]"
             },
             {
               "name": "ContentDb",
@@ -3059,7 +3059,7 @@
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('coreStatisticsDbName'), ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('coreStatisticsDbName'), ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
             },
             {
               "name": "PublicStatisticsDb",
