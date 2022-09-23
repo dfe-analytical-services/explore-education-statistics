@@ -2155,7 +2155,7 @@
           }
         },
         {
-          "name": "[concat(string(variables('coreSqlServerName')), '/statistics/current')]",
+          "name": "[concat(string(variables('coreSqlServerName')), '/', variables('coreStatisticsDbName'), '/current')]",
           "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
           "apiVersion": "2014-04-01",
           "properties": {
@@ -2163,11 +2163,11 @@
           },
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
-            "[concat(resourceId('Microsoft.Sql/servers', variables('coreSqlServerName')), '/databases/statistics')]"
+            "[concat(resourceId('Microsoft.Sql/servers', variables('coreSqlServerName')), '/databases/', variables('coreStatisticsDbName'))]"
           ]
         },
         {
-          "name": "[concat(string(variables('coreSqlServerName')), '/content/current')]",
+          "name": "[concat(string(variables('coreSqlServerName')), '/', variables('contentDbName'), '/current')]",
           "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
           "apiVersion": "2014-04-01",
           "properties": {
@@ -2175,7 +2175,7 @@
           },
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
-            "[concat(resourceId('Microsoft.Sql/servers', variables('coreSqlServerName')), '/databases/content')]"
+            "[concat(resourceId('Microsoft.Sql/servers', variables('coreSqlServerName')), '/databases/', variables('contentDbName'))]"
           ]
         },
 
@@ -2369,7 +2369,7 @@
           }
         },
         {
-          "name": "[concat(string(variables('publicSqlServerName')), '/public-statistics/current')]",
+          "name": "[concat(string(variables('publicSqlServerName')), '/', variables('publicStatisticsDbName'), '/current')]",
           "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
           "apiVersion": "2014-04-01",
           "properties": {
@@ -2377,7 +2377,7 @@
           },
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
-            "[concat(resourceId('Microsoft.Sql/servers', variables('publicSqlServerName')), '/databases/public-statistics')]"
+            "[concat(resourceId('Microsoft.Sql/servers', variables('publicSqlServerName')), '/databases/', variables('publicStatisticsDbName'))]"
           ]
         },
 
