@@ -3034,7 +3034,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
                 publicationCacheService.Setup(s => s.UpdatePublication(publication.Slug))
-                    .ReturnsAsync(new PublicationViewModel());
+                    .ReturnsAsync(new PublicationCacheViewModel());
 
                 var service = BuildPublicationService(context: contentDbContext,
                     publicationCacheService: publicationCacheService.Object);
@@ -3103,7 +3103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
                 publicationCacheService.Setup(s => s.UpdatePublication(publication.Slug))
-                    .ReturnsAsync(new PublicationViewModel());
+                    .ReturnsAsync(new PublicationCacheViewModel());
                 var service = BuildPublicationService(context: contentDbContext,
                     publicationCacheService: publicationCacheService.Object);
 
