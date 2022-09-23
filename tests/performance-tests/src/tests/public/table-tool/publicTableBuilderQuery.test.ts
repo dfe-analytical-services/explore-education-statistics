@@ -204,7 +204,7 @@ const performTest = ({ publicationId, subjectId, subjectMeta }: SetupData) => {
         .slice(1),
   );
 
-  const maxSelectedFilterItemIds = 35;
+  const maxSelectedFilterItemIds = 10;
 
   const someFilterItemIds = [
     ...oneFilterItemIdFromEachFilter,
@@ -223,10 +223,19 @@ const performTest = ({ publicationId, subjectId, subjectMeta }: SetupData) => {
     indicatorGroup.options.map(indicator => indicator.value),
   );
 
-  const allLocationIds = Object.values(
-    subjectMeta.locations,
-  ).flatMap(geographicLevel =>
-    geographicLevel.options.map(location => location.id),
+  const allLocationIds = Object.values(subjectMeta.locations).flatMap(
+    geographicLevel =>
+      geographicLevel.options.flatMap(location => {
+        if (location.options) {
+          return location.options.flatMap(o => o.id);
+        }
+        return [location.id!];
+      }),
+  );
+
+  const someLocationIds = allLocationIds.slice(
+    0,
+    Math.min(allLocationIds.length, 20),
   );
 
   const someTimePeriods = {
@@ -245,7 +254,7 @@ const performTest = ({ publicationId, subjectId, subjectMeta }: SetupData) => {
     subjectId,
     filterIds: someFilterItemIds,
     indicatorIds: allIndicationIds,
-    locationIds: allLocationIds,
+    locationIds: someLocationIds,
     ...someTimePeriods,
   });
 

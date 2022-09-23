@@ -44,7 +44,11 @@ export interface SubjectMeta {
   locations: {
     [geographicLevel: string]: {
       options: {
-        id: string;
+        id?: string;
+        level?: string;
+        options?: {
+          id: string;
+        }[];
       }[];
     };
   };
