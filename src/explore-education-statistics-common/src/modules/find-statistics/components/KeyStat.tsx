@@ -74,7 +74,7 @@ const KeyStat = ({
                 summary={summary?.dataDefinitionTitle[0] || 'Help'}
                 className={styles.definition}
                 hiddenText={
-                  !summary?.dataDefinitionTitle[0]
+                  summary?.dataDefinitionTitle[0] === 'Help'
                     ? `for ${keyStat.title}`
                     : undefined
                 }
@@ -86,7 +86,6 @@ const KeyStat = ({
                 </div>
               </Details>
             )}
-
             {children}
           </>
         )}
