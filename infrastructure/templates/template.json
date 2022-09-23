@@ -645,7 +645,7 @@
   "variables": {
     "contentDbName": "content",
     "coreStatisticsDbName": "statistics",
-    "publicStatisticsDbName": "statistics",
+    "publicStatisticsDbName": "statistics-replica",
     "dataAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-data')]",
     "dataPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-data')]",
     "dataAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-data')]",
