@@ -141,7 +141,9 @@ describe('PublicationReleasePage', () => {
     const details = within(usefulInfo.getByRole('group'));
 
     userEvent.click(
-      details.getByRole('button', { name: 'See other releases (5)' }),
+      details.getByRole('button', {
+        name: 'See other releases (5) for Pupil absence in schools in England',
+      }),
     );
 
     const otherReleaseLinks = details.getAllByRole('link');
