@@ -9,7 +9,7 @@ import ResetFormOnPreviousStep from '@common/modules/table-tool/components/Reset
 import { Subject } from '@common/services/tableBuilderService';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import React, { ReactNode, useMemo } from 'react';
+import React, { createElement, ReactNode, useMemo } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 
@@ -22,6 +22,7 @@ export type SubjectFormSubmitHandler = (values: { subjectId: string }) => void;
 const formId = 'publicationSubjectForm';
 
 interface Props extends InjectedWizardProps {
+  hasFeaturedTables?: boolean;
   legend?: ReactNode;
   legendSize?: FormFieldsetProps['legendSize'];
   legendHint?: string;
@@ -31,6 +32,7 @@ interface Props extends InjectedWizardProps {
 }
 
 const SubjectForm = ({
+  hasFeaturedTables = false,
   legend,
   legendSize = 'l',
   legendHint,
@@ -72,7 +74,16 @@ const SubjectForm = ({
               className="govuk-!-margin-bottom-2"
               hiddenText={`for ${option.name}`}
             >
-              <h4>This subject includes the following data:</h4>
+              {createElement(
+                hasFeaturedTables ? 'h4' : 'h3',
+                hasFeaturedTables
+                  ? null
+                  : {
+                      className: 'govuk-heading-s',
+                    },
+                'This subject includes the following data:',
+              )}
+
               <SummaryList>
                 {geographicLevels && (
                   <SummaryListItem term="Geographic levels">
@@ -96,7 +107,7 @@ const SubjectForm = ({
           ),
         };
       }),
-    [options],
+    [hasFeaturedTables, options],
   );
   return (
     <Formik<SubjectFormValues>
