@@ -80,6 +80,8 @@ const MethodologyPage = ({
 
   return (
     <Page wide breadcrumbs={[{ name: 'Edit methodology' }]}>
+      {' '}
+      {/* @MarkFix Add link to publication here? */}
       <LoadingSpinner loading={isLoading}>
         {methodology ? (
           <>
