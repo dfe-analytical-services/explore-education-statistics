@@ -569,6 +569,13 @@
         "description": "Override cron expression for all entities cached in memory"
       }
     },
+    "releaseStatusPollTimeMillis": {
+      "type": "int",
+      "defaultValue": 10000,
+      "metadata": {
+        "description": "Interval in milliseconds between checking for the publication status of a Release on the Release Sign-off page"
+      }
+    },
     "requestTimeoutsTableBuilderQuery": {
       "type": "int",
       "defaultValue": 210000,
@@ -1673,7 +1680,8 @@
         "PreReleaseAccess:AccessWindow:MinutesBeforeReleaseTimeEnd": "[parameters('preReleaseMinutesBeforeEnd')]",
         "enableSwagger": "[parameters('enableSwagger')]",
         "enableThemeDeletion": "[parameters('enableThemeDeletion')]",
-        "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]"
+        "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]",
+        "RELEASE_STATUS_POLL_TIME_MILLIS": "[parameters('releaseStatusPollTimeMillis')]"
       }
     },
     {
@@ -1926,7 +1934,7 @@
         "NODE_ENV": "production",
         "PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
         "WEBSITE_NODE_DEFAULT_VERSION": "14.16.0",
-        "WEBSITE_RUN_FROM_PACKAGE": "1"
+        "WEBSITE_RUN_FROM_PACKAGE": "1",
       }
     },
     {

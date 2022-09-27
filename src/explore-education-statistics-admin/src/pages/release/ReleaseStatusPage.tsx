@@ -90,6 +90,10 @@ const ReleaseStatusPage = () => {
     );
   }
 
+  const refreshPeriod =
+    parseInt(process.env.RELEASE_STATUS_POLL_TIME_MILLIS ?? '', 10) ||
+    undefined;
+
   return (
     <>
       <h2>Sign off</h2>
@@ -115,7 +119,7 @@ const ReleaseStatusPage = () => {
           <SummaryListItem term="Release process status">
             <ReleasePublishingStatus
               releaseId={releaseId}
-              refreshPeriod={500}
+              refreshPeriod={refreshPeriod}
             />
           </SummaryListItem>
         )}

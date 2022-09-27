@@ -91,6 +91,9 @@
     },
     "dataFactoryConcurrency": {
       "value": 10
+    },
+    "releaseStatusPollTimeMillis": {
+      "value": 500
     }
   }
 }
