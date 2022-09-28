@@ -53,15 +53,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("api/me/publication/{publicationId}")]
-        public async Task<ActionResult<MyPublicationViewModel>> GetMyPublication(
-            [FromRoute(Name = "publicationId"), Required] Guid publicationId)
-        {
-            return await _publicationService
-                .GetMyPublication(publicationId)
-                .HandleFailuresOrOk();
-        }
-
         [HttpGet("api/publications/{publicationId}")]
         public async Task<ActionResult<PublicationViewModel>> GetPublication(
             [Required] Guid publicationId, [FromQuery] bool includePermissions = false)

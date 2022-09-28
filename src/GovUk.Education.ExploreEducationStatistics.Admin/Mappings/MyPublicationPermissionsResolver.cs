@@ -7,19 +7,20 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 {
+    // @MarkFix remove this
     public class MyPublicationPermissionsResolver : IMyPublicationPermissionsResolver
     {
         private readonly IUserService _userService;
- 
+
         public MyPublicationPermissionsResolver(IUserService userService)
         {
             _userService = userService;
         }
- 
+
         public MyPublicationViewModel.PermissionsSet Resolve(
-            Publication source, 
-            MyPublicationViewModel destination, 
-            MyPublicationViewModel.PermissionsSet destMember, 
+            Publication source,
+            MyPublicationViewModel destination,
+            MyPublicationViewModel.PermissionsSet destMember,
             ResolutionContext context)
         {
             return new MyPublicationViewModel.PermissionsSet
