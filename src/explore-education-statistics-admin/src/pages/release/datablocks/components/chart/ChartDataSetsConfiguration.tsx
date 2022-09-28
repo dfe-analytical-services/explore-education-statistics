@@ -4,7 +4,9 @@ import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/com
 import generateDataSetLabel from '@admin/pages/release/datablocks/components/chart/utils/generateDataSetLabel';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
+import ErrorSummary from '@common/components/ErrorSummary';
 import { Form, FormFieldSelect, FormSelect } from '@common/components/form';
+import ModalConfirm from '@common/components/ModalConfirm';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import expandDataSet from '@common/modules/charts/util/expandDataSet';
@@ -48,6 +50,7 @@ const ChartDataSetsConfiguration = ({
 }: Props) => {
   const { forms, updateForm, submitForms } = useChartBuilderFormsContext();
   const [isReordering, toggleIsReordering] = useToggle(false);
+  const [showConfirmModal, toggleConfirmModal] = useToggle(false);
 
   const indicatorOptions = useMemo(() => Object.values(meta.indicators), [
     meta.indicators,
@@ -211,140 +214,168 @@ const ChartDataSetsConfiguration = ({
         )}
       </Formik>
 
-      {dataSets?.length > 0 && (
-        <>
-          <DragDropContext
-            onDragEnd={result => {
-              if (!result.destination) {
-                return;
-              }
-              const reorderedDataSets = reorder(
-                dataSets,
-                result.source.index,
-                result.destination.index,
-              ).map((dataSet, index) => {
-                return {
-                  ...dataSet,
-                  order: index,
-                };
+      {forms.dataSets &&
+        forms.dataSets.submitCount > 0 &&
+        dataSets.length === 0 && (
+          <ErrorSummary
+            title="Cannot save chart"
+            id={`${formId}-dataSets-errorSummary`}
+            errors={[
+              {
+                id: forms.dataSets.id,
+                message: 'One or more data sets are required.',
+              },
+            ]}
+          />
+        )}
+
+      <DragDropContext
+        onDragEnd={result => {
+          if (!result.destination) {
+            return;
+          }
+          const reorderedDataSets = reorder(
+            dataSets,
+            result.source.index,
+            result.destination.index,
+          ).map((dataSet, index) => {
+            return {
+              ...dataSet,
+              order: index,
+            };
+          });
+          onChange(reorderedDataSets);
+        }}
+      >
+        <Droppable droppableId="dataSets" isDropDisabled={!isReordering}>
+          {(droppableProvided, droppableSnapshot) => (
+            <table>
+              <thead>
+                <tr>
+                  <th>Data set</th>
+                  {!isReordering && (
+                    <th className="dfe-align--right">
+                      <VisuallyHidden>Remove data sets:</VisuallyHidden>
+                      {dataSets.length > 0 && (
+                        <ButtonText
+                          className="govuk-!-margin-bottom-0"
+                          onClick={toggleConfirmModal.on}
+                        >
+                          Remove all
+                        </ButtonText>
+                      )}
+                    </th>
+                  )}
+                </tr>
+              </thead>
+              <tbody
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                {...droppableProvided.droppableProps}
+                ref={droppableProvided.innerRef}
+                className={classNames({
+                  [styles.dropArea]: droppableSnapshot.isDraggingOver,
+                })}
+              >
+                {orderBy(dataSets, 'order').map((dataSet, index) => {
+                  const expandedDataSet = expandDataSet(dataSet, meta);
+                  const label = generateDataSetLabel(expandedDataSet);
+                  const key = generateDataSetKey(dataSet);
+
+                  return (
+                    <Draggable
+                      draggableId={key}
+                      isDragDisabled={!isReordering}
+                      key={key}
+                      index={index}
+                    >
+                      {(draggableProvided, draggableSnapshot) => (
+                        <tr
+                          // eslint-disable-next-line react/jsx-props-no-spreading
+                          {...draggableProvided.draggableProps}
+                          // eslint-disable-next-line react/jsx-props-no-spreading
+                          {...draggableProvided.dragHandleProps}
+                          className={classNames(styles.item, {
+                            [styles.isDragging]: draggableSnapshot.isDragging,
+                            [styles.isReordering]: isReordering,
+                          })}
+                          ref={draggableProvided.innerRef}
+                        >
+                          <td
+                            className={classNames({
+                              [styles.labelReordering]: isReordering,
+                            })}
+                          >
+                            {label}
+                          </td>
+                          {!isReordering && (
+                            <td className="dfe-align--right">
+                              <ButtonText
+                                className="govuk-!-margin-bottom-0"
+                                onClick={() => {
+                                  const nextDataSets = [...dataSets];
+                                  nextDataSets.splice(index, 1);
+                                  onChange(nextDataSets);
+                                }}
+                              >
+                                Remove
+                              </ButtonText>
+                            </td>
+                          )}
+                        </tr>
+                      )}
+                    </Draggable>
+                  );
+                })}
+                {droppableProvided.placeholder}
+              </tbody>
+            </table>
+          )}
+        </Droppable>
+      </DragDropContext>
+
+      <div className="dfe-flex dfe-justify-content--space-between">
+        <div className="dfe-flex-grow--1">
+          <ChartBuilderSaveActions
+            formId={formId}
+            formKey="dataSets"
+            onClick={async () => {
+              updateForm({
+                formKey: 'dataSets',
+                submitCount: forms.dataSets
+                  ? forms.dataSets.submitCount + 1
+                  : 1,
               });
-              onChange(reorderedDataSets);
+
+              await submitForms();
             }}
           >
-            <Droppable droppableId="dataSets" isDropDisabled={!isReordering}>
-              {(droppableProvided, droppableSnapshot) => (
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Data set</th>
-                      {!isReordering && (
-                        <th>
-                          <VisuallyHidden>Actions</VisuallyHidden>
-                        </th>
-                      )}
-                    </tr>
-                  </thead>
-                  <tbody
-                    // eslint-disable-next-line react/jsx-props-no-spreading
-                    {...droppableProvided.droppableProps}
-                    ref={droppableProvided.innerRef}
-                    className={classNames({
-                      [styles.dropArea]: droppableSnapshot.isDraggingOver,
-                    })}
-                  >
-                    {orderBy(dataSets, 'order').map((dataSet, index) => {
-                      const expandedDataSet = expandDataSet(dataSet, meta);
-                      const label = generateDataSetLabel(expandedDataSet);
-                      const key = generateDataSetKey(dataSet);
-
-                      return (
-                        <Draggable
-                          draggableId={key}
-                          isDragDisabled={!isReordering}
-                          key={key}
-                          index={index}
-                        >
-                          {(draggableProvided, draggableSnapshot) => (
-                            <tr
-                              // eslint-disable-next-line react/jsx-props-no-spreading
-                              {...draggableProvided.draggableProps}
-                              // eslint-disable-next-line react/jsx-props-no-spreading
-                              {...draggableProvided.dragHandleProps}
-                              className={classNames(styles.item, {
-                                [styles.isDragging]:
-                                  draggableSnapshot.isDragging,
-                                [styles.isReordering]: isReordering,
-                              })}
-                              ref={draggableProvided.innerRef}
-                            >
-                              <td
-                                className={classNames({
-                                  [styles.labelReordering]: isReordering,
-                                })}
-                              >
-                                {label}
-                              </td>
-                              {!isReordering && (
-                                <td className="dfe-align--right">
-                                  <ButtonText
-                                    className="govuk-!-margin-bottom-0"
-                                    onClick={() => {
-                                      const nextDataSets = [...dataSets];
-                                      nextDataSets.splice(index, 1);
-                                      onChange(nextDataSets);
-                                    }}
-                                  >
-                                    Remove
-                                  </ButtonText>
-                                </td>
-                              )}
-                            </tr>
-                          )}
-                        </Draggable>
-                      );
-                    })}
-                    {droppableProvided.placeholder}
-                  </tbody>
-                </table>
-              )}
-            </Droppable>
-          </DragDropContext>
-
-          <div className="dfe-flex dfe-justify-content--space-between">
-            <div className="dfe-flex-grow--1">
-              <ChartBuilderSaveActions
-                formId={formId}
-                formKey="dataSets"
-                onClick={async () => {
-                  if (!forms.dataSets) {
-                    return;
-                  }
-
-                  updateForm({
-                    formKey: 'dataSets',
-                    submitCount: forms.dataSets.submitCount + 1,
-                  });
-
-                  await submitForms();
-                }}
-              >
-                {buttons}
-              </ChartBuilderSaveActions>
-            </div>
-            {dataSets.length > 1 && (
-              <Button
-                className="dfe-align-self-end govuk-!-margin-left-2"
-                variant="secondary"
-                onClick={
-                  isReordering ? toggleIsReordering.off : toggleIsReordering.on
-                }
-              >
-                {isReordering ? 'Finish reordering' : 'Reorder data sets'}
-              </Button>
-            )}
-          </div>
-        </>
-      )}
+            {buttons}
+          </ChartBuilderSaveActions>
+        </div>
+        {dataSets.length > 1 && (
+          <Button
+            className="dfe-align-self-end govuk-!-margin-left-2"
+            variant="secondary"
+            onClick={
+              isReordering ? toggleIsReordering.off : toggleIsReordering.on
+            }
+          >
+            {isReordering ? 'Finish reordering' : 'Reorder data sets'}
+          </Button>
+        )}
+      </div>
+      <ModalConfirm
+        title="Remove all data sets"
+        open={showConfirmModal}
+        onConfirm={() => {
+          onChange([]);
+          toggleConfirmModal.off();
+        }}
+        onExit={toggleConfirmModal.off}
+        onCancel={toggleConfirmModal.off}
+      >
+        <p>Are you sure you want to remove all data sets?</p>
+      </ModalConfirm>
     </>
   );
 };

@@ -11,7 +11,6 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
-
 *** Variables ***
 ${TOPIC_NAME}=              %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}=        UI tests - create data block with chart %{RUN_IDENTIFIER}
@@ -19,7 +18,6 @@ ${DATABLOCK_NAME}=          UI test data block
 ${CONTENT_SECTION_NAME}=    Test data block section
 ${FOOTNOTE_1}=              Test footnote from bau
 ${FOOTNOTE_UPDATED}=        Updated test footnote from bau
-
 
 *** Test Cases ***
 Create test publication and release via API
@@ -337,6 +335,26 @@ Configure basic line chart
 
     user clicks link    Data sets
     user waits until h3 is visible    Data sets
+
+    user chooses select option    id:chartDataSetsConfigurationForm-location    Nailsea Youngwood
+    user clicks button    Add data set
+
+    user chooses select option    id:chartDataSetsConfigurationForm-location    Syon
+    user clicks button    Add data set
+
+    user chooses select option    id:chartDataSetsConfigurationForm-location    Bolton 001
+    user clicks button    Add data set
+
+    user checks chart legend item contains    id:chartBuilderPreview    1    Admission Numbers (Nailsea Youngwood)
+    user checks chart legend item contains    id:chartBuilderPreview    2    Admission Numbers (Syon)
+    user checks chart legend item contains    id:chartBuilderPreview    3    Admission Numbers (Bolton 001)
+
+Change data sets
+    user clicks link    Data sets
+
+    user clicks button    Remove all
+    user clicks button    Confirm
+
     user chooses select option    id:chartDataSetsConfigurationForm-location    Nailsea Youngwood
     user clicks button    Add data set
 
@@ -742,7 +760,6 @@ Delete data block
 
     user waits until h2 is visible    Data blocks
     user waits until page contains    No data blocks have been created.
-
 
 *** Keywords ***
 user counts legend form item rows
