@@ -69,7 +69,7 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
         id={id}
         ref={ref}
         role={hasSiblings ? onMedia('tabpanel') : undefined}
-        tabIndex={onMedia(-1)}
+        tabIndex={hasSiblings ? onMedia(-1) : undefined}
       >
         {headingTitle && createElement(headingTag, null, headingTitle)}
         {children}

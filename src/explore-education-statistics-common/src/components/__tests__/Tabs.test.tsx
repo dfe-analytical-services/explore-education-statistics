@@ -5,7 +5,7 @@ import Tabs from '../Tabs';
 import TabsSection from '../TabsSection';
 
 describe('Tabs', () => {
-  test('renders with aria-hidden tabs when there is only one section', () => {
+  test('renders without tabs when there is only one section', () => {
     const { container } = render(
       <Tabs id="test-tabs">
         <TabsSection title="Tab 1" headingTitle="Tab Heading 1">
@@ -15,16 +15,15 @@ describe('Tabs', () => {
     );
 
     expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
-    expect(screen.queryByRole('tablist', { hidden: true })).toHaveAttribute(
-      'aria-hidden',
-      'true',
-    );
-
     expect(screen.queryByRole('tab')).not.toBeInTheDocument();
     expect(screen.queryByRole('tabpanel')).not.toBeInTheDocument();
     expect(
       screen.queryByRole('link', { name: 'Tab 1' }),
     ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Tab Heading 1' }),
+    ).toBeInTheDocument();
     expect(screen.getByText('Test section 1 content')).toBeInTheDocument();
 
     expect(container).toMatchSnapshot();
