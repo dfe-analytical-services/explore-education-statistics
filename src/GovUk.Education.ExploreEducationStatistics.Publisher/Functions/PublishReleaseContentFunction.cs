@@ -6,7 +6,9 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusContentStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -50,17 +52,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName,
                 DateTime.UtcNow);
 
-            await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Started);
+            await UpdateContentStage(message.ReleaseId, message.ReleaseStatusId, Started);
 
             var context = new PublishContext(DateTime.UtcNow, false);
 
             try
             {
                 await _contentService.UpdateContent(context, message.ReleaseId);
-                await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Complete);
-                await _publishingCompletionService.CompletePublishingIfAllStagesComplete(
-                    message.ReleaseId, 
-                    message.ReleaseStatusId,
+                await UpdateContentStage(message.ReleaseId, message.ReleaseStatusId, Complete);
+                await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
+                    ListOf((message.ReleaseId, message.ReleaseStatusId)), 
                     context.Published);
             }
             catch (Exception e)
@@ -69,49 +70,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     executionContext.FunctionName);
                 logger.LogError("{StackTrace}", e.StackTrace);
 
-                await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Failed,
-                    new ReleasePublishingStatusLogMessage($"Exception publishing release immediately: {e.Message}"));
+                await UpdateContentStage(message.ReleaseId, message.ReleaseStatusId, Failed,
+                    new ReleasePublishingStatusLogMessage($"Exception publishing Release Content immediately: {e.Message}"));
             }
 
             logger.LogInformation("{0} completed", executionContext.FunctionName);
         }
 
-        private async Task UpdateStage(Guid releaseId, Guid releaseStatusId, State state,
+        private async Task UpdateContentStage(
+            Guid releaseId, 
+            Guid releaseStatusId, 
+            ReleasePublishingStatusContentStage state,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            switch (state)
-            {
-                case State.Started:
-                    await _releasePublishingStatusService.UpdateStagesAsync(releaseId,
-                        releaseStatusId,
-                        logMessage: logMessage,
-                        publishing: ReleasePublishingStatusPublishingStage.Started,
-                        content: ReleasePublishingStatusContentStage.Started);
-                    break;
-                case State.Complete:
-                    await _releasePublishingStatusService.UpdateStagesAsync(releaseId,
-                        releaseStatusId,
-                        logMessage: logMessage,
-                        publishing: ReleasePublishingStatusPublishingStage.Complete,
-                        content: ReleasePublishingStatusContentStage.Complete);
-                    break;
-                case State.Failed:
-                    await _releasePublishingStatusService.UpdateStagesAsync(releaseId,
-                        releaseStatusId,
-                        logMessage: logMessage,
-                        publishing: ReleasePublishingStatusPublishingStage.Failed,
-                        content: ReleasePublishingStatusContentStage.Failed);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(state), state, null);
-            }
-        }
-
-        private enum State
-        {
-            Started,
-            Complete,
-            Failed
+            await _releasePublishingStatusService.UpdateContentStageAsync(releaseId, releaseStatusId, state, logMessage);
         }
     }
 }

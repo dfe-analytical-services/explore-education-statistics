@@ -113,11 +113,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 
         public bool AllStagesPriorToPublishingComplete()
         {
-            var states = State;
-
-            return states.Content == ReleasePublishingStatusContentStage.Complete &&
-                   states.Files == ReleasePublishingStatusFilesStage.Complete &&
-                   states.Content == ReleasePublishingStatusContentStage.Complete;
+            return State.Content == ReleasePublishingStatusContentStage.Complete &&
+                   State.Files == ReleasePublishingStatusFilesStage.Complete;
         }
     }
 }

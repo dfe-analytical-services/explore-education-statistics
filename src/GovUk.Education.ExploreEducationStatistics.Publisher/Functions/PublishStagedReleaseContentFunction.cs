@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusPublishingStage;
@@ -50,35 +49,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName,
                 DateTime.UtcNow);
 
-            var scheduled = (await QueryScheduledReleases()).ToList();
+            var scheduled = (await QueryScheduledReleases()).ToArray();
             if (scheduled.Any())
             {
-
-                await UpdateStage(scheduled, Started);
-
                 // Move all cached releases in the staging directory of the public content container to the root
+                await UpdatePublishingStage(scheduled, Started);
                 await _publishingService.PublishStagedReleaseContent();
-
-
-                await UpdateStage(scheduled, Complete);
-                    
-                foreach (var releaseStatus in scheduled)
-                {
-                    try
-                    {
-                        await _publishingCompletionService.CompletePublishingIfAllStagesComplete(
-                            releaseId: releaseStatus.ReleaseId, 
-                            releaseStatusId: releaseStatus.Id,
-                            DateTime.UtcNow);
-                    }
-                    catch (Exception e)
-                    {
-                        logger.LogError(e, "Exception occured while executing {FunctionName}",
-                            executionContext.FunctionName);
-                        await UpdateStage(releaseStatus, Failed,
-                            new ReleasePublishingStatusLogMessage($"Exception in publishing stage: {e.Message}"));
-                    }
-                }
+                
+                // Finalise publishing of these releases
+                await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
+                    scheduled,
+                    DateTime.UtcNow);
             }
 
             logger.LogInformation(
@@ -94,20 +75,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 publishing: Scheduled);
         }
 
-        private async Task UpdateStage(IEnumerable<ReleasePublishingStatus> releaseStatuses, ReleasePublishingStatusPublishingStage stage,
+        private async Task UpdatePublishingStage(
+            IEnumerable<ReleasePublishingStatus> releaseStatuses, 
+            ReleasePublishingStatusPublishingStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            foreach (var releaseStatus in releaseStatuses)
-            {
-                await UpdateStage(releaseStatus, stage, logMessage);
-            }
-        }
-
-        private async Task UpdateStage(ReleasePublishingStatus releasePublishingStatus, ReleasePublishingStatusPublishingStage stage,
-            ReleasePublishingStatusLogMessage? logMessage = null)
-        {
-            await _releasePublishingStatusService.UpdatePublishingStageAsync(releasePublishingStatus.ReleaseId, releasePublishingStatus.Id, stage,
-                logMessage);
+            await releaseStatuses
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(status =>
+                    _releasePublishingStatusService.UpdatePublishingStageAsync(
+                        status.ReleaseId,
+                        status.Id, 
+                        stage, 
+                        logMessage));
         }
     }
 }

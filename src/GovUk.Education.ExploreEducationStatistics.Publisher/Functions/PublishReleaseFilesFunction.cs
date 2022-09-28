@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -15,18 +16,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     {
         private readonly IPublishingService _publishingService;
         // TODO DW - should we be completing the "all stages complete" step via a queue message?
-        private readonly IQueueService _queueService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
         private readonly IPublishingCompletionService _publishingCompletionService;
 
         public PublishReleaseFilesFunction(
             IPublishingService publishingService,
-            IQueueService queueService,
             IReleasePublishingStatusService releasePublishingStatusService, 
             IPublishingCompletionService publishingCompletionService)
         {
             _publishingService = publishingService;
-            _queueService = queueService;
             _releasePublishingStatusService = releasePublishingStatusService;
             _publishingCompletionService = publishingCompletionService;
         }
@@ -54,40 +52,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName,
                 message);
 
-            foreach (var (releaseId, releaseStatusId) in message.Releases)
-            {
-                try
-                {
-                    await UpdateStage(releaseId, releaseStatusId, Started);
+            await UpdateFilesStage(message.Releases, Started);
 
-                    await _publishingService.PublishMethodologyFilesIfApplicableForRelease(releaseId);
-                    await _publishingService.PublishReleaseFiles(releaseId);
-                    
-                    await UpdateStage(releaseId, releaseStatusId, Complete);
-                    
-                    await _publishingCompletionService.CompletePublishingIfAllStagesComplete(
-                        releaseId, 
-                        releaseStatusId,
-                        DateTime.UtcNow);
-                }
-                catch (Exception e)
+            var successfulReleases = await message
+                .Releases
+                .ToAsyncEnumerable()
+                .WhereAwait(async releaseStatus =>
                 {
-                    logger.LogError(e, "Exception occured while executing {FunctionName}",
-                        executionContext.FunctionName);
-                    logger.LogError("{StackTrace}", e.StackTrace);
+                    try
+                    {
+                        await _publishingService.PublishMethodologyFilesIfApplicableForRelease(releaseStatus.ReleaseId);
+                        await _publishingService.PublishReleaseFiles(releaseStatus.ReleaseId);
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogError(e, "Exception occured while executing {FunctionName}",
+                            executionContext.FunctionName);
 
-                    await UpdateStage(releaseId, releaseStatusId, Failed,
-                        new ReleasePublishingStatusLogMessage($"Exception in files stage: {e.Message}"));
-                }
-            }
+                        logger.LogError("{StackTrace}", e.StackTrace);
+
+                        return false;
+                    }
+                })
+                .ToListAsync();
+
+            var unsuccessfulReleases = message
+                .Releases
+                .Except(successfulReleases);
+
+            await UpdateFilesStage(successfulReleases, Complete);
+            await UpdateFilesStage(unsuccessfulReleases, Failed);
+                
+            await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
+                successfulReleases, 
+                DateTime.UtcNow);
 
             logger.LogInformation("{FunctionName} completed", executionContext.FunctionName);
         }
 
-        private async Task UpdateStage(Guid releaseId, Guid releaseStatusId, ReleasePublishingStatusFilesStage stage,
+        private async Task UpdateFilesStage(
+            IEnumerable<(Guid releaseId, Guid releaseStatusId)> releaseStatuses, 
+            ReleasePublishingStatusFilesStage stage,
             ReleasePublishingStatusLogMessage logMessage = null)
         {
-            await _releasePublishingStatusService.UpdateFilesStageAsync(releaseId, releaseStatusId, stage, logMessage);
+            await releaseStatuses
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(status => 
+                    _releasePublishingStatusService.UpdateFilesStageAsync(
+                        status.releaseId, 
+                        status.releaseStatusId, 
+                        stage, 
+                        logMessage));
         }
     }
 }

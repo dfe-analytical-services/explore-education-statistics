@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
@@ -17,7 +18,6 @@ public class PublishingCompletionService : IPublishingCompletionService
     private readonly IReleasePublishingStatusService _releasePublishingStatusService;
     private readonly IPublicationCacheService _publicationCacheService;
     private readonly IReleaseService _releaseService;
-    private readonly ILogger<PublishingCompletionService> _logger;
 
     public PublishingCompletionService(
         ContentDbContext contentDbContext,
@@ -25,8 +25,7 @@ public class PublishingCompletionService : IPublishingCompletionService
         INotificationsService notificationsService,
         IReleasePublishingStatusService releasePublishingStatusService, 
         IPublicationCacheService publicationCacheService,
-        IReleaseService releaseService,
-        ILogger<PublishingCompletionService> logger)
+        IReleaseService releaseService)
     {
         _contentDbContext = contentDbContext;
         _contentService = contentService;
@@ -34,41 +33,74 @@ public class PublishingCompletionService : IPublishingCompletionService
         _releasePublishingStatusService = releasePublishingStatusService;
         _publicationCacheService = publicationCacheService;
         _releaseService = releaseService;
-        _logger = logger;
     }
 
-    public async Task CompletePublishingIfAllStagesComplete(Guid releaseId, Guid releaseStatusId, DateTime publishedDate)
+    public async Task CompletePublishingIfAllPriorStagesComplete(
+        IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releaseAndReleaseStatusIds, 
+        DateTime publishedDate)
     {
-        var releaseStatus = await _releasePublishingStatusService.GetAsync(releaseId, releaseStatusId);
+        var releaseStatuses = await releaseAndReleaseStatusIds
+            .ToAsyncEnumerable()
+            .SelectAwait(async status => await _releasePublishingStatusService.GetAsync(status.ReleaseId, status.ReleaseStatusId))
+            .ToArrayAsync();
 
-        if (releaseStatus.AllStagesPriorToPublishingComplete())
-        {
-            var release = await _contentDbContext.Releases
-                .SingleAsync(r => r.Id == releaseId);
+        await CompletePublishingIfAllPriorStagesComplete(releaseStatuses, publishedDate);
+    }
 
-            await _releaseService.SetPublishedDates(releaseId, publishedDate);
-            
-            // Update the cached publication and any cached superseded publications.
-            // If this is the first live release of the publication, the superseding is now enforced
-            var publicationsToUpdate = await _contentDbContext.Publications
-                .Where(p => p.Id == release.PublicationId || p.SupersededById == release.PublicationId)
-                .ToListAsync();
+    public async Task CompletePublishingIfAllPriorStagesComplete(
+        ReleasePublishingStatus[] releaseStatuses, 
+        DateTime publishedDate)
+    {
+        var prePublishingStagesComplete = releaseStatuses
+            .Where(status => status.AllStagesPriorToPublishingComplete())
+            .ToList();
+        
+        var releaseIdsToUpdate = prePublishingStagesComplete
+            .Select(status => status.ReleaseId)
+            .ToArray();
 
-            await publicationsToUpdate
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(
-                    publication => _publicationCacheService.UpdatePublication(publication.Slug));
+        await releaseIdsToUpdate
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(releaseId => _releaseService.SetPublishedDates(releaseId, publishedDate));
 
-            await _contentService.DeletePreviousVersionsDownloadFiles(releaseId);
-            await _contentService.DeletePreviousVersionsContent(releaseId);
+        var publicationSlugs = prePublishingStagesComplete
+            .Select(status => status.PublicationSlug)
+            .Distinct();
 
-            await _notificationsService.NotifySubscribersIfApplicable(releaseId);
+        var directlyRelatedPublicationIds = await _contentDbContext
+            .Publications
+            .Where(p => publicationSlugs.Contains(p.Slug))
+            .Select(p => p.Id)
+            .ToListAsync();
+        
+        // Update the cached publication and any cached superseded publications.
+        // If this is the first live release of the publication, the superseding is now enforced
+        var publicationSlugsToUpdate = await _contentDbContext
+            .Publications
+            .Where(p => directlyRelatedPublicationIds.Contains(p.Id) || 
+                        (p.SupersededById != null && directlyRelatedPublicationIds.Contains(p.SupersededById.Value)))
+            .Select(p => p.Slug)
+            .ToListAsync();
+        
+        await publicationSlugsToUpdate
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(publicationSlug => _publicationCacheService.UpdatePublication(publicationSlug));
 
-            // Update the cached trees in case any methodologies/publications
-            // are now accessible for the first time after publishing these releases
-            await _contentService.UpdateCachedTaxonomyBlobs();
+        await _contentService.DeletePreviousVersionsDownloadFiles(releaseIdsToUpdate);
+        await _contentService.DeletePreviousVersionsContent(releaseIdsToUpdate);
 
-            _logger.LogInformation("Publishing of Release {ReleaseId} complete", releaseId);
-        }
+        await _notificationsService.NotifySubscribersIfApplicable(releaseIdsToUpdate);
+
+        // Update the cached trees in case any methodologies/publications
+        // are now accessible for the first time after publishing these releases
+        await _contentService.UpdateCachedTaxonomyBlobs();
+        
+        await releaseStatuses
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(status => _releasePublishingStatusService
+                .UpdatePublishingStageAsync(
+                    status.ReleaseId, 
+                    status.Id, 
+                    ReleasePublishingStatusPublishingStage.Complete));
     }
 }
