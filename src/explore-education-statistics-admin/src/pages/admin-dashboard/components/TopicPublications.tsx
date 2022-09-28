@@ -33,7 +33,7 @@ const TopicPublications = ({ topic, themeTitle }: Props) => {
 
   return (
     <div className={styles.publication} data-testid="topic-publications">
-      <div>
+      <div data-testid={`topic-publications-${themeTitle}-${topic.title}`}>
         <h3>{`${themeTitle} / ${topic.title}`}</h3>
         <LoadingSpinner
           hideText

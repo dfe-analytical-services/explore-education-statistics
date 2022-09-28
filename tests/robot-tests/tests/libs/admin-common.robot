@@ -74,7 +74,7 @@ user navigates to editable release summary from admin dashboard
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
-    user navigates to release summary from admin dashboard
+    bau user navigates to release summary from admin dashboard
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}
@@ -86,7 +86,7 @@ user navigates to editable release amendment summary from admin dashboard
     ...    ${DETAILS_HEADING}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
-    user navigates to release summary from admin dashboard
+    bau user navigates to release summary from admin dashboard
     ...    ${PUBLICATION_NAME}
     ...    ${THEME_NAME}
     ...    ${TOPIC_NAME}
@@ -97,13 +97,13 @@ user navigates to readonly release summary from admin dashboard
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
-    user navigates to release summary from admin dashboard
+    bau user navigates to release summary from admin dashboard
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}
     ...    ${TOPIC_NAME}
 
-user navigates to release summary from admin dashboard
+bau user navigates to release summary from admin dashboard
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
@@ -581,8 +581,8 @@ user navigates to admin dashboard
         user waits until page contains title caption    Welcome ${USER}
     END
     user waits until page contains element
-    ...    css:#publicationsReleases-themeTopic-themeId,[data-testid='no-permission-to-access-releases']
-    ...    %{WAIT_LONG}
+    ...    css:[data-testid='topic-publications'],[data-testid='no-permission-to-access-releases']
+    ...    %{WAIT_SMALL}    # @MarkFix change back to WAIT_LONG?
 
 user uploads subject
     [Arguments]    ${SUBJECT_NAME}    ${SUBJECT_FILE}    ${META_FILE}
