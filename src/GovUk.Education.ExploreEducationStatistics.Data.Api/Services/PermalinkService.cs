@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
@@ -81,16 +82,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         public async Task<Either<ActionResult, PermalinkViewModel>> Create(Guid releaseId,
             PermalinkCreateViewModel request)
         {
-            return await _tableBuilderService.Query(releaseId, request.Query).OnSuccess(async result =>
-            {
-                var permalinkTableResult = new PermalinkTableBuilderResult(result);
-                var permalink = new LegacyPermalink(request.Configuration, permalinkTableResult, request.Query);
-                await _blobStorageService.UploadAsJson(containerName: Permalinks,
-                    path: permalink.Id.ToString(),
-                    content: permalink,
-                    settings: BuildJsonSerializerSettings());
-                return await BuildViewModel(permalink);
-            });
+            return await _tableBuilderService.Query(releaseId, request.Query)
+                .OnSuccess(async result =>
+                {
+                    var permalinkTableResult = new PermalinkTableBuilderResult(result);
+                    var permalink = new Permalink
+                    {
+                        Created = DateTime.UtcNow,
+                        PublicationTitle = result.SubjectMeta.PublicationName,
+                        DataSetTitle = result.SubjectMeta.SubjectName,
+                        ReleaseId = releaseId,
+                        SubjectId = request.Query.SubjectId
+                    };
+
+                    _contentDbContext.Permalinks.Add(permalink);
+                    await _contentDbContext.SaveChangesAsync();
+
+                    var legacyPermalink = new LegacyPermalink(
+                        permalink.Id,
+                        permalink.Created,
+                        request.Configuration,
+                        permalinkTableResult,
+                        request.Query);
+
+                    await _blobStorageService.UploadAsJson(containerName: Permalinks,
+                        path: permalink.Id.ToString(),
+                        content: legacyPermalink,
+                        settings: BuildJsonSerializerSettings());
+
+                    return await BuildViewModel(legacyPermalink);
+                });
         }
 
         private static JsonSerializerSettings BuildJsonSerializerSettings()

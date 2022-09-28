@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -100,7 +101,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var tableResult = new TableBuilderResultViewModel
             {
-                SubjectMeta = new ResultSubjectMetaViewModel()
+                SubjectMeta = new ResultSubjectMetaViewModel
+                {
+                    SubjectName = "Test data set",
+                    PublicationName = "Test publication"
+                }
             };
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
@@ -110,8 +115,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             // Permalink id is assigned on creation and used as the blob path
             // Capture it so we can compare it with the view model result
-            string blobPath = string.Empty;
-            var blobPathCapture = new CaptureMatch<string>(callback => blobPath = callback);
+            Guid? expectedPermalinkId = null;
+            var blobPathCapture = new CaptureMatch<string>(callback => expectedPermalinkId = Guid.Parse(callback));
 
             blobStorageService.Setup(s => s.UploadAsJson(
                     Permalinks,
@@ -123,17 +128,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     It.IsAny<JsonSerializerSettings>()))
                 .Returns(Task.CompletedTask);
 
-           releaseRepository
-               .Setup(s => s.GetLatestPublishedRelease(_publicationId))
-               .Returns(new Release
-               {
-                   Id = contentRelease.Id,
-                   PublicationId = _publicationId,
-                   TimeIdentifier = TimeIdentifier.AcademicYear,
-                   Year = 2000,
-               });
+            releaseRepository
+                .Setup(s => s.GetLatestPublishedRelease(_publicationId))
+                .Returns(new Release
+                {
+                    Id = contentRelease.Id,
+                    PublicationId = _publicationId,
+                    TimeIdentifier = TimeIdentifier.AcademicYear,
+                    Year = 2000,
+                });
 
-           subjectRepository
+            subjectRepository
                 .Setup(s => s.GetPublicationIdForSubject(subject.Id))
                 .ReturnsAsync(_publicationId);
 
@@ -176,9 +181,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     subjectRepository,
                     tableBuilderService);
 
-                Assert.Equal(Guid.Parse(blobPath), result.Id);
+                Assert.Equal(expectedPermalinkId, result.Id);
                 Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
                 Assert.Equal(PermalinkStatus.Current, result.Status);
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var permalink = contentDbContext.Permalinks.Single(permalink => permalink.Id == expectedPermalinkId);
+                Assert.InRange(DateTime.UtcNow.Subtract(permalink.Created).Milliseconds, 0, 1500);
+                Assert.Equal("Test publication", permalink.PublicationTitle);
+                Assert.Equal("Test data set", permalink.DataSetTitle);
+                Assert.Equal(contentRelease.Id, permalink.ReleaseId);
+                Assert.Equal(subject.Id, permalink.SubjectId);
             }
         }
 
@@ -197,7 +212,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var tableResult = new TableBuilderResultViewModel
             {
-                SubjectMeta = new ResultSubjectMetaViewModel()
+                SubjectMeta = new ResultSubjectMetaViewModel
+                {
+                    SubjectName = "Test data set",
+                    PublicationName = "Test publication"
+                }
             };
 
             var release = new Content.Model.Release
@@ -217,8 +236,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             // Permalink id is assigned on creation and used as the blob path
             // Capture it so we can compare it with the view model result
-            string blobPath = string.Empty;
-            var blobPathCapture = new CaptureMatch<string>(callback => blobPath = callback);
+            Guid? expectedPermalinkId = null;
+            var blobPathCapture = new CaptureMatch<string>(callback => expectedPermalinkId = Guid.Parse(callback));
 
             blobStorageService.Setup(s => s.UploadAsJson(
                     Permalinks,
@@ -265,9 +284,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     blobStorageService,
                     tableBuilderService);
 
-                Assert.Equal(Guid.Parse(blobPath), result.Id);
+                Assert.Equal(expectedPermalinkId, result.Id);
                 Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
                 Assert.Equal(PermalinkStatus.Current, result.Status);
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var permalink = contentDbContext.Permalinks.Single(permalink => permalink.Id == expectedPermalinkId);
+                Assert.InRange(DateTime.UtcNow.Subtract(permalink.Created).Milliseconds, 0, 1500);
+                Assert.Equal("Test publication", permalink.PublicationTitle);
+                Assert.Equal("Test data set", permalink.DataSetTitle);
+                Assert.Equal(release.Id, permalink.ReleaseId);
+                Assert.Equal(subjectId, permalink.SubjectId);
             }
         }
 
@@ -289,6 +318,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var subjectId = Guid.NewGuid();
 
             var permalink = new LegacyPermalink(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -335,7 +366,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 MockUtils.VerifyAllMocks(blobStorageService);
 
                 Assert.Equal(permalink.Id, result.Id);
-                Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
+                Assert.Equal(permalink.Created, result.Created);
                 Assert.Equal(PermalinkStatus.Current, result.Status);
             }
         }
@@ -378,6 +409,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             };
 
             var permalink = new LegacyPermalink(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -488,6 +521,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         public async Task Get_SubjectNotFound()
         {
             var permalink = new LegacyPermalink(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -552,6 +587,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var subjectId = Guid.NewGuid();
 
             var permalink = new LegacyPermalink(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -639,6 +676,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var subjectId = Guid.NewGuid();
 
             var permalink = new LegacyPermalink(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -717,6 +756,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var subjectId = Guid.NewGuid();
 
             var permalink = new LegacyPermalink(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -798,6 +839,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var subjectId = Guid.NewGuid();
 
             var permalink = new LegacyPermalink(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -858,6 +901,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var subjectId = Guid.NewGuid();
 
             var permalink = new LegacyPermalink(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {

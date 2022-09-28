@@ -20,12 +20,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
         {
         }
 
-        public LegacyPermalink(TableBuilderConfiguration configuration,
+        public LegacyPermalink(
+            Guid id,
+            DateTime created,
+            TableBuilderConfiguration configuration,
             PermalinkTableBuilderResult result,
             ObservationQueryContext query)
         {
-            Id = Guid.NewGuid();
-            Created = DateTime.UtcNow;
+            Id = id;
+            Created = created;
             Configuration = configuration;
             FullTable = result;
             Query = query;
