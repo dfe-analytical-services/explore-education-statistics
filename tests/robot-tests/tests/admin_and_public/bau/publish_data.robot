@@ -35,8 +35,8 @@ Create new publication and release via API
     user create test release via api    ${PUBLICATION_ID}    FY    3000
 
 Navigate to release
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
-    ...    ${RELEASE_1_NAME} (not Live)
+    user navigates to release summary from admin dashboard    ${PUBLICATION_NAME}
+    ...    ${RELEASE_1_NAME}
 
 Add public prerelease access list
     user clicks link    Pre-release access
@@ -58,9 +58,9 @@ Go to "Sign off" page and approve release
 Create another release for the same publication
     user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    ${TOPIC_NAME}
     user waits until page contains link    Create new publication
-    user opens accordion section    ${PUBLICATION_NAME}
-    user clicks element    testid:Create new release link for ${PUBLICATION_NAME}
-    user creates release for publication    ${PUBLICATION_NAME}    Financial Year    3001
+    user clicks link    ${PUBLICATION_NAME}
+
+    user creates release from Manage publication page    ${PUBLICATION_NAME}    Financial Year    3001
 
 Verify new release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]

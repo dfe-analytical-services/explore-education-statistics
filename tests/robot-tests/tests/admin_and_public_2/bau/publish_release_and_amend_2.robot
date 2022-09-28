@@ -28,7 +28,7 @@ Create publication
 Create new release
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user clicks link    Create new release
-    user creates release for publication    ${PUBLICATION_NAME}    Academic Year Q1    2020
+    user creates release from Manage publication page    ${PUBLICATION_NAME}    Academic Year Q1    2020
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Upload another subject (for deletion later)

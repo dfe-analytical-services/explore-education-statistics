@@ -62,25 +62,23 @@ user selects theme and topic from admin dashboard
         user waits until page contains element    id:publicationsReleases-themeTopic-topicId    %{WAIT_MEDIUM}
         user chooses select option    id:publicationsReleases-themeTopic-topicId    ${topic}
     END
-    user waits until h2 is visible    ${theme}    %{WAIT_MEDIUM}
-    user waits until h3 is visible    ${topic}
+    user waits until h3 is visible    ${theme} / ${topic}    %{WAIT_MEDIUM}
     user waits until page does not contain loading spinner
-    user waits until page contains element
-    ...    xpath://*[@data-testid="accordion"]|//*[text()="No publications available"]
-    ...    %{WAIT_MEDIUM}
+    #user waits until page contains element    # @MarkFix necessary?
+    #...    xpath://*[@data-testid="accordion"]|//*[text()="No publications available"]
+    #...    %{WAIT_MEDIUM}
 
 user navigates to editable release summary from admin dashboard
     [Arguments]
     ...    ${PUBLICATION_NAME}
-    ...    ${DETAILS_HEADING}
+    ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     user navigates to release summary from admin dashboard
     ...    ${PUBLICATION_NAME}
-    ...    ${DETAILS_HEADING}
+    ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}
     ...    ${TOPIC_NAME}
-    ...    Edit release
 
 user navigates to editable release amendment summary from admin dashboard
     [Arguments]
@@ -90,42 +88,53 @@ user navigates to editable release amendment summary from admin dashboard
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     user navigates to release summary from admin dashboard
     ...    ${PUBLICATION_NAME}
-    ...    ${DETAILS_HEADING}
     ...    ${THEME_NAME}
     ...    ${TOPIC_NAME}
-    ...    Edit release amendment
 
 user navigates to readonly release summary from admin dashboard
     [Arguments]
     ...    ${PUBLICATION_NAME}
-    ...    ${DETAILS_HEADING}
+    ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     user navigates to release summary from admin dashboard
     ...    ${PUBLICATION_NAME}
-    ...    ${DETAILS_HEADING}
+    ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}
     ...    ${TOPIC_NAME}
-    ...    View release
 
 user navigates to release summary from admin dashboard
     [Arguments]
     ...    ${PUBLICATION_NAME}
-    ...    ${DETAILS_HEADING}
+    ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
-    ...    ${RELEASE_SUMMARY_LINK_TEXT}=Edit release
-    ${details}=    user opens release summary on the admin dashboard
-    ...    ${PUBLICATION_NAME}
-    ...    ${DETAILS_HEADING}
-    ...    ${THEME_NAME}
-    ...    ${TOPIC_NAME}
 
-    ${summary_button}=    user waits until element contains link    ${details}    ${RELEASE_SUMMARY_LINK_TEXT}
-    ...    %{WAIT_SMALL}
-    user clicks element    ${summary_button}
+    user selects theme and topic from admin dashboard    ${THEME_NAME}    ${TOPIC_NAME}
+    user waits until page contains link    ${PUBLICATION_NAME}
+    user clicks link    ${PUBLICATION_NAME}
+
+    user waits until h2 is visible    Manage releases
+    user waits until h3 is visible    Draft releases
+
+    ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-draft-releases
+    user clicks element    xpath://a[text()="Edit"]    ${ROW}    # @MarkFix because "user clicks link" doesn't work
+
     user waits until h2 is visible    Release summary    %{WAIT_SMALL}
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
+
+    # @MarkFix remove
+    #${details}=    user opens release summary on the admin dashboard
+    #...    ${PUBLICATION_NAME}
+    #...    ${DETAILS_HEADING}
+    #...    ${THEME_NAME}
+    #...    ${TOPIC_NAME}
+
+    #${summary_button}=    user waits until element contains link    ${details}    ${RELEASE_SUMMARY_LINK_TEXT}
+    #...    %{WAIT_SMALL}
+    #user clicks element    ${summary_button}
+    #user waits until h2 is visible    Release summary    %{WAIT_SMALL}
+    #user checks summary list contains    Publication title    ${PUBLICATION_NAME}
 
 user opens release summary on the admin dashboard
     [Arguments]
@@ -153,10 +162,15 @@ user creates publication
     user clicks button    Save publication
     user waits until h1 is visible    Dashboard    %{WAIT_MEDIUM}
 
-user creates release for publication
+user creates release from Manage publication page
     [Arguments]    ${publication}    ${time_period_coverage}    ${start_year}
-    user waits until page contains title caption    ${publication}    %{WAIT_SMALL}
-    user waits until h1 is visible    Create new release
+    # @MarkFix remove ${publication} argument?
+    user waits until page contains title caption    Manage publication    %{WAIT_SMALL}
+    user waits until h1 is visible    ${publication}
+
+    user waits until page contains link    Create new release
+    user clicks link    Create new release
+
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverage    %{WAIT_SMALL}
     user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    ${time_period_coverage}
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    ${start_year}
