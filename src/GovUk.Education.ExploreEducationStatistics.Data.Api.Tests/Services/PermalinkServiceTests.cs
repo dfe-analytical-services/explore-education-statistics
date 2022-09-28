@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             blobStorageService.Setup(s => s.UploadAsJson(
                     Permalinks,
                     Capture.With(blobPathCapture),
-                    It.Is<Permalink>(p =>
+                    It.Is<LegacyPermalink>(p =>
                         p.Configuration.Equals(request.Configuration) &&
                         p.FullTable.IsDeepEqualTo(new PermalinkTableBuilderResult(tableResult)) &&
                         p.Query.Equals(request.Query)),
@@ -223,7 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             blobStorageService.Setup(s => s.UploadAsJson(
                     Permalinks,
                     Capture.With(blobPathCapture),
-                    It.Is<Permalink>(p =>
+                    It.Is<LegacyPermalink>(p =>
                         p.Configuration.Equals(request.Configuration) &&
                         p.FullTable.IsDeepEqualTo(new PermalinkTableBuilderResult(tableResult)) &&
                         p.Query.Equals(request.Query)),
@@ -288,7 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var subjectId = Guid.NewGuid();
 
-            var permalink = new Permalink(
+            var permalink = new LegacyPermalink(
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -377,7 +377,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var permalink = new Permalink(
+            var permalink = new LegacyPermalink(
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -487,7 +487,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task Get_SubjectNotFound()
         {
-            var permalink = new Permalink(
+            var permalink = new LegacyPermalink(
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -551,7 +551,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var subjectId = Guid.NewGuid();
 
-            var permalink = new Permalink(
+            var permalink = new LegacyPermalink(
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -638,7 +638,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var subjectId = Guid.NewGuid();
 
-            var permalink = new Permalink(
+            var permalink = new LegacyPermalink(
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -716,7 +716,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var subjectId = Guid.NewGuid();
 
-            var permalink = new Permalink(
+            var permalink = new LegacyPermalink(
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -797,7 +797,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var subjectId = Guid.NewGuid();
 
-            var permalink = new Permalink(
+            var permalink = new LegacyPermalink(
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -857,7 +857,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var releaseId = Guid.NewGuid();
             var subjectId = Guid.NewGuid();
 
-            var permalink = new Permalink(
+            var permalink = new LegacyPermalink(
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {

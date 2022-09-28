@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             try
             {
                 var text = await _blobStorageService.DownloadBlobText(Permalinks, id.ToString());
-                var permalink = JsonConvert.DeserializeObject<Permalink>(
+                var permalink = JsonConvert.DeserializeObject<LegacyPermalink>(
                     value: text,
                     settings: BuildJsonSerializerSettings());
                 return await BuildViewModel(permalink!);
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return await _tableBuilderService.Query(releaseId, request.Query).OnSuccess(async result =>
             {
                 var permalinkTableResult = new PermalinkTableBuilderResult(result);
-                var permalink = new Permalink(request.Configuration, permalinkTableResult, request.Query);
+                var permalink = new LegacyPermalink(request.Configuration, permalinkTableResult, request.Query);
                 await _blobStorageService.UploadAsJson(containerName: Permalinks,
                     path: permalink.Id.ToString(),
                     content: permalink,
@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        private async Task<PermalinkViewModel> BuildViewModel(Permalink permalink)
+        private async Task<PermalinkViewModel> BuildViewModel(LegacyPermalink permalink)
         {
             var viewModel = _mapper.Map<PermalinkViewModel>(permalink);
 

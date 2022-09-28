@@ -17,12 +17,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
             // Null collections will be mapped to null collections instead of empty collections.
             AllowNullCollections = true;
 
-            ConfigureForPermalinks();
+            ConfigureForLegacyPermalinks();
         }
 
-        private void ConfigureForPermalinks()
+        private void ConfigureForLegacyPermalinks()
         {
-            CreateMap<Permalink, PermalinkViewModel>();
+            CreateMap<LegacyPermalink, PermalinkViewModel>();
             CreateMap<PermalinkTableBuilderResult, TableBuilderResultViewModel>();
             CreateMap<PermalinkResultSubjectMeta, ResultSubjectMetaViewModel>()
                 .ForMember(dest => dest.Locations,
