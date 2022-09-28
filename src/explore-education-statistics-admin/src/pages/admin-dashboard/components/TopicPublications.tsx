@@ -23,7 +23,7 @@ interface Props {
 const TopicPublications = ({ topic, themeTitle }: Props) => {
   const { value, isLoading } = useAsyncHandledRetry(async () => {
     const [publications, canCreatePublication] = await Promise.all([
-      publicationService.getMyPublicationsByTopic(topic.id),
+      publicationService.listPublications(false, topic.id),
       permissionService.canCreatePublicationForTopic(topic.id),
     ]);
     return { publications, canCreatePublication };
