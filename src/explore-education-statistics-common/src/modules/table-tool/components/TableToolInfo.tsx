@@ -31,9 +31,7 @@ const TableToolInfo = ({
             If you have a question about the data or methods used to create this
             table contact the named statistician:
           </p>
-          <h4 className="govuk-heading-s govuk-!-font-weight-bold">
-            {contactDetails.teamName}
-          </h4>
+          <h3 className="govuk-heading-s">{contactDetails.teamName}</h3>
           <p>Named statistician: {contactDetails.contactName}</p>
           <p>
             Email:{' '}
