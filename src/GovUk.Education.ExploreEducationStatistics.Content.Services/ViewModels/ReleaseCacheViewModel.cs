@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
@@ -25,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public string Slug { get; set; } = string.Empty;
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseType Type { get; set; }
 
         public PartialDate? NextReleaseDate { get; set; }
