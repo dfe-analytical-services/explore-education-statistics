@@ -15,7 +15,7 @@ import ButtonLink from '@frontend/components/ButtonLink';
 import React, { useEffect, useState } from 'react';
 
 const linkInstructions =
-  ' Use the link below to see a version of this page that you can bookmark for future reference, or copy the link to send on to somebody else to view.';
+  'Use the link below to see a version of this page that you can bookmark for future reference, or copy the link to send on to somebody else to view.';
 
 interface Props {
   tableHeaders?: TableHeadersConfig;
