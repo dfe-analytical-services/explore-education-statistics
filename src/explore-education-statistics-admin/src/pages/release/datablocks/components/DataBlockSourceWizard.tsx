@@ -117,6 +117,7 @@ const DataBlockSourceWizard = ({
 }: DataBlockSourceWizardProps) => {
   return (
     <div className="govuk-!-margin-bottom-8">
+      <h2 className="govuk-heading-m">Data source</h2>
       <p>Configure data source for the data block</p>
       {dataBlock && dataBlock.charts.length > 0 && (
         <WarningMessage>

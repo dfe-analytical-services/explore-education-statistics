@@ -16,9 +16,8 @@
   }
 }
 
-.mobileHidden {
-  display: none;
+.singleTab {
   @include govuk-media-query($from: tablet) {
-    display: block;
+    border-top: 1px solid govuk-colour('mid-grey');
   }
 }
