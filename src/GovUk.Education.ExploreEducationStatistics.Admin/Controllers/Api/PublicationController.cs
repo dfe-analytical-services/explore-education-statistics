@@ -36,15 +36,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("api/me/publications")]
-        public async Task<ActionResult<List<MyPublicationViewModel>>> GetMyPublications(
-            [FromQuery(Name = "topicId"), Required] Guid topicId)
-        {
-            return await _publicationService
-                .GetMyPublicationsAndReleasesByTopic(topicId)
-                .HandleFailuresOrOk();
-        }
-
         [HttpGet("api/publication-summaries")]
         public async Task<ActionResult<List<PublicationSummaryViewModel>>> ListPublicationSummaries()
         {

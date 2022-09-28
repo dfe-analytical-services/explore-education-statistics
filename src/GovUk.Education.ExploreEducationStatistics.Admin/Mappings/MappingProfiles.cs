@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
@@ -76,19 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(
                     dest => dest.Theme,
                     m => m.MapFrom(p => p.Topic.Theme));
-
-            CreateMap<Publication, MyPublicationViewModel>()
-                .ForMember(
-                    dest => dest.ThemeId,
-                    m => m.MapFrom(p => p.Topic.ThemeId))
-                .ForMember(dest => dest.Releases,
-                    m => m.MapFrom(p => p.Releases
-                        .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))
-                        .OrderByDescending(r => r.Year)
-                        .ThenByDescending(r => r.TimePeriodCoverage)))
-                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationPermissionsResolver>())
-                // Methodologies are hydrated after executing the mapping from Publication to MyPublicationViewModel
-                .ForMember(dest => dest.Methodologies, m => m.Ignore());
 
             CreateMap<Contact, ContactViewModel>();
 

@@ -87,32 +87,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(
-            Guid topicId)
-        {
-            return await _userService
-                .CheckCanAccessSystem()
-                .OnSuccess(_ => _userService.CheckCanViewAllReleases()
-                    .OnSuccess(async () =>
-                    {
-                        var hydratedPublication = HydratePublication(
-                            _publicationRepository.QueryPublicationsForTopic(topicId));
-                        return await hydratedPublication.ToListAsync();
-                    })
-                    .OrElse(() =>
-                    {
-                        var userId = _userService.GetUserId();
-                        return _publicationRepository.ListPublicationsForUser(userId, topicId);
-                    })
-                )
-                .OnSuccess(async publicationViewModels =>
-                {
-                    return (await HydrateMyPublicationsViewModels(publicationViewModels))
-                        .OrderBy(publicationViewModel => publicationViewModel.Title)
-                        .ToList();
-                });
-        }
-
         public async Task<Either<ActionResult, List<PublicationSummaryViewModel>>> ListPublicationSummaries()
         {
             return await _userService
@@ -517,35 +491,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             publicationCreateViewModel.IsSuperseded = _publicationRepository.IsSuperseded(publication);
 
             return publicationCreateViewModel;
-        }
-
-        private async Task<List<MyPublicationViewModel>> HydrateMyPublicationsViewModels(List<Publication> publications)
-        {
-            return await publications
-                .ToAsyncEnumerable()
-                .SelectAwait(async publication => await HydrateMyPublicationViewModel(publication))
-                .ToListAsync();
-        }
-
-        private async Task<MyPublicationViewModel> HydrateMyPublicationViewModel(Publication publication)
-        {
-            var publicationViewModel = _mapper.Map<MyPublicationViewModel>(publication);
-
-            publicationViewModel.IsSuperseded = _publicationRepository.IsSuperseded(publication);
-
-            await publicationViewModel.Releases
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async releaseViewModel =>
-            {
-                var release = publication.Releases.Single(release => release.Id == releaseViewModel.Id);
-                releaseViewModel.Permissions = await PermissionsUtils.GetReleasePermissions(_userService, release);
-            });
-
-            publicationViewModel.Methodologies = (await HydrateMethodologyVersionViewModels(publication))
-                .OrderBy(viewModel => viewModel.Title)
-                .ToList();
-
-            return publicationViewModel;
         }
 
         private async Task<ReleaseSummaryViewModel> HydrateReleaseListItemViewModel(Release release, bool includePermissions)

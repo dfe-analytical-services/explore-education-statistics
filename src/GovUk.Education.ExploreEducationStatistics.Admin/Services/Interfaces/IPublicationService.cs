@@ -14,8 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(bool includePermissions, Guid? topicId);
 
-        Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(Guid topicId);
-
         Task<Either<ActionResult, List<PublicationSummaryViewModel>>> ListPublicationSummaries();
 
         Task<Either<ActionResult, PublicationCreateViewModel>> CreatePublication(

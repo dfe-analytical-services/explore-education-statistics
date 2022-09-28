@@ -2,7 +2,7 @@ import {
   PublicationTeamRouteParams,
   publicationTeamAccessRoute,
 } from '@admin/routes/publicationRoutes';
-import { Publication, MyPublication } from '@admin/services/publicationService';
+import { Publication } from '@admin/services/publicationService';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import userService from '@admin/services/userService';
 import Button from '@common/components/Button';

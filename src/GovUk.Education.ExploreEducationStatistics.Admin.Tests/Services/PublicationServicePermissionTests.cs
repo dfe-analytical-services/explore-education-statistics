@@ -54,20 +54,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetMyPublicationsAndReleasesByTopic_NoAccessOfSystem()
-        {
-            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(SecurityPolicies.CanAccessSystem)
-                .AssertForbidden(async userService =>
-                {
-                    var service = BuildPublicationService(
-                        context: Mock.Of<ContentDbContext>(Strict),
-                        userService: userService.Object);
-                    return await service.GetMyPublicationsAndReleasesByTopic(Guid.NewGuid());
-                });
-        }
-
-        [Fact]
         public async Task ListPublicationSummaries()
         {
             await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
