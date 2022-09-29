@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IPublicationService
     {
-        Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(bool permissions, Guid? topicId);
+        Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(bool includePermissions, Guid? topicId);
 
         Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(Guid topicId);
 
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid publicationId,
             PublicationSaveRequest updatedPublication);
 
-        Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId, bool permissions);
+        Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId, bool includePermissions);
 
         Task<Either<ActionResult, ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId);
 
@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, Unit>> RemoveExternalMethodology(
             Guid publicationId);
 
-        Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId, bool permissions);
+        Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId, bool includePermissions);
 
         Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId, Contact updatedContact);
 

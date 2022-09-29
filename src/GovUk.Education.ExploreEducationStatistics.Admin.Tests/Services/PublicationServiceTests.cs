@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService: userService.Object);
 
                 var result = await publicationService
-                    .ListPublications(permissions: false, publication1.Topic.Id);
+                    .ListPublications(includePermissions: false, publication1.Topic.Id);
 
                 var publicationViewModelList = result.AssertRight();
 
@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService: userService.Object);
 
                 var result = await publicationService
-                    .ListPublications(permissions: false, topic.Id);
+                    .ListPublications(includePermissions: false, topic.Id);
 
                 var publicationViewModelList = result.AssertRight();
 
@@ -222,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService: userService.Object);
 
                 var result = await publicationService
-                    .ListPublications(permissions: false);
+                    .ListPublications(includePermissions: false);
 
                 var publicationViewModelList = result.AssertRight();
 
@@ -299,7 +299,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService: userService.Object);
 
                 var result = await publicationService
-                    .ListPublications(permissions: true, topic.Id);
+                    .ListPublications(includePermissions: true, topic.Id);
 
                 var publicationViewModelList = result.AssertRight();
 
@@ -395,7 +395,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService: userService.Object);
 
                 var result = await publicationService
-                    .ListPublications(permissions: false, topic.Id);
+                    .ListPublications(includePermissions: false, topic.Id);
 
                 var publicationViewModelList = result.AssertRight();
 
@@ -484,7 +484,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService: userService.Object);
 
                 var result = await publicationService
-                    .ListPublications(permissions: false, topic.Id);
+                    .ListPublications(includePermissions: false, topic.Id);
 
                 var publicationViewModelList = result.AssertRight();
 
@@ -577,7 +577,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService: userService.Object);
 
                 var result = await publicationService
-                    .ListPublications(permissions: false);
+                    .ListPublications(includePermissions: false);
 
                 var publicationViewModelList = result.AssertRight();
 
@@ -667,7 +667,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService: userService.Object);
 
                 var result = await publicationService
-                    .ListPublications(permissions: true, topic.Id);
+                    .ListPublications(includePermissions: true, topic.Id);
 
                 var publicationViewModelList = result.AssertRight();
 
@@ -1715,7 +1715,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publicationService = BuildPublicationService(context,
                     userService: userService.Object);
 
-                var result = (await publicationService.GetPublication(publication.Id, permissions: true)).AssertRight();
+                var result = (await publicationService.GetPublication(publication.Id, includePermissions: true)).AssertRight();
 
                 Assert.Equal(publication.Id, result.Id);
 
@@ -1766,7 +1766,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = (await publicationService.GetPublication(publication.Id, permissions: true)).AssertRight();
+                var result = (await publicationService.GetPublication(publication.Id, includePermissions: true)).AssertRight();
 
                 Assert.Equal(publication.Id, result.Id);
 
@@ -1811,7 +1811,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = (await publicationService.GetPublication(publication.Id, permissions: true)).AssertRight();
+                var result = (await publicationService.GetPublication(publication.Id, includePermissions: true)).AssertRight();
 
                 Assert.Equal(publication.Id, result.Id);
 

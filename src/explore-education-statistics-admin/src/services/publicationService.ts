@@ -54,6 +54,8 @@ export interface MyPublication {
   contact: Contact;
   permissions: PublicationPermissions;
   supersededById?: string;
+  // NOTE: isSuperseded is necessary, as a publication only becomes superseded when it's SupersededById is set
+  // _and_ that publication has a live release.
   isSuperseded?: boolean;
 }
 
@@ -107,7 +109,7 @@ export interface ListReleasesParams {
   live?: boolean;
   page?: number;
   pageSize?: number;
-  permissions?: boolean;
+  includePermissions?: boolean;
 }
 
 export type UpdatePublicationLegacyRelease = Partial<
@@ -140,10 +142,10 @@ const publicationService = {
 
   getPublication(
     publicationId: string,
-    permissions = false,
+    includePermissions = false,
   ): Promise<Publication> {
     return client.get<Publication>(`/publications/${publicationId}`, {
-      params: { permissions },
+      params: { includePermissions },
     });
   },
 
@@ -180,9 +182,12 @@ const publicationService = {
     return client.delete(`/publication/${publicationId}/external-methodology`);
   },
 
-  getContact(publicationId: string, permissions = false): Promise<Contact> {
+  getContact(
+    publicationId: string,
+    includePermissions = false,
+  ): Promise<Contact> {
     return client.get(`publication/${publicationId}/contact`, {
-      params: { permissions },
+      params: { includePermissions },
     });
   },
 

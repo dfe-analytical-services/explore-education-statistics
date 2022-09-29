@@ -20,6 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public Guid? SupersededById { get; set; }
 
+        // NOTE: IsSuperseded is necessary, as a publication only becomes superseded when it's SupersededById is set
+        // _and_ that publication has a live release.
         public bool IsSuperseded { get; set; }
 
         public PublicationPermissions? Permissions { get; set; }

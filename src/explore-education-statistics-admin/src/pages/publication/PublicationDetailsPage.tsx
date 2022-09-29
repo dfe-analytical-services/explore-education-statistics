@@ -26,15 +26,16 @@ const PublicationDetailsPage = () => {
   } = publication as Publication;
   const [readOnly, toggleReadOnly] = useToggle(true);
 
-  const { value: supersedingPublication, isLoading } = useAsyncHandledRetry(
-    async () => {
-      if (!supersededById) {
-        return undefined;
-      }
+  const {
+    value: supersedingPublication,
+    isLoading,
+  } = useAsyncHandledRetry(async () => {
+    if (!supersededById) {
+      return undefined;
+    }
 
-      return publicationService.getPublication(supersededById);
-    },
-  );
+    return publicationService.getPublication(supersededById);
+  }, [supersededById]);
 
   const handleSubmit = async (values: PublicationDetailsFormValues) => {
     await publicationService.updatePublication(publication.id, {

@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(
-            bool permissions = false,
+            bool includePermissions = false,
             Guid? topicId = null)
         {
             return await _userService
@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return await publications
                         .ToAsyncEnumerable()
-                        .SelectAwait(async publication => await GeneratePublicationViewModel(publication, permissions))
+                        .SelectAwait(async publication => await GeneratePublicationViewModel(publication, includePermissions))
                         .OrderBy(publicationViewModel => publicationViewModel.Title)
                         .ToListAsync();
                 });
@@ -299,12 +299,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, PublicationViewModel>> GetPublication(
-            Guid publicationId, bool permissions = false)
+            Guid publicationId, bool includePermissions = false)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, HydratePublication)
                 .OnSuccess(_userService.CheckCanViewPublication)
-                .OnSuccess(publication => GeneratePublicationViewModel(publication, permissions));
+                .OnSuccess(publication => GeneratePublicationViewModel(publication, includePermissions));
         }
 
         public async Task<Either<ActionResult, ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId)
@@ -357,7 +357,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId, bool permissions)
+        public async Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId, bool includePermissions)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, query =>
@@ -367,7 +367,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var contact = _mapper.Map<ContactViewModel>(publication.Contact);
 
-                    if (permissions)
+                    if (includePermissions)
                     {
                         contact.Permissions = await PermissionsUtils.GetContactPermissions(_userService, publication);
                     }
@@ -518,13 +518,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ThenInclude(p => p.Versions);
         }
 
-        private async Task<PublicationViewModel> GeneratePublicationViewModel(Publication publication, bool permissions)
+        private async Task<PublicationViewModel> GeneratePublicationViewModel(Publication publication, bool includePermissions)
         {
             var publicationViewModel = _mapper.Map<PublicationViewModel>(publication);
 
             publicationViewModel.IsSuperseded = _publicationRepository.IsSuperseded(publication);
 
-            if (permissions)
+            if (includePermissions)
             {
                 publicationViewModel.Permissions =
                     await PermissionsUtils.GetPublicationPermissions(_userService, publication);
@@ -606,7 +606,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         InternalReleaseNote = latestVersion.InternalReleaseNote,
                         MethodologyId = latestVersion.MethodologyId,
                         PreviousVersionId = latestVersion.PreviousVersionId,
-                        Permissions = permissions
+                        Permissions = permissions,
                     };
                 })
                 .ToListAsync();

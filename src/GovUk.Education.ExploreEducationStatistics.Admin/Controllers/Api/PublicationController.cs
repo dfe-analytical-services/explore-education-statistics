@@ -28,11 +28,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpGet("api/publications")]
         public async Task<ActionResult<List<PublicationViewModel>>> ListPublications(
-            [FromQuery] bool permissions,
+            [FromQuery] bool includePermissions,
             [FromQuery] Guid? topicId)
         {
             return await _publicationService
-                .ListPublications(permissions, topicId)
+                .ListPublications(includePermissions, topicId)
                 .HandleFailuresOrOk();
         }
 
@@ -64,10 +64,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpGet("api/publications/{publicationId}")]
         public async Task<ActionResult<PublicationViewModel>> GetPublication(
-            [Required] Guid publicationId, [FromQuery] bool permissions = false)
+            [Required] Guid publicationId, [FromQuery] bool includePermissions = false)
         {
             return await _publicationService
-                .GetPublication(publicationId, permissions)
+                .GetPublication(publicationId, includePermissions)
                 .HandleFailuresOrOk();
         }
 
@@ -97,9 +97,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("api/publication/{publicationId:guid}/contact")]
         public async Task<ActionResult<ContactViewModel>> GetContact(
             Guid publicationId,
-            [FromQuery] bool permissions = false)
+            [FromQuery] bool includePermissions = false)
         {
-            return await _publicationService.GetContact(publicationId, permissions)
+            return await _publicationService.GetContact(publicationId, includePermissions)
                 .HandleFailuresOrOk();
         }
 
@@ -116,11 +116,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] Guid publicationId,
             [FromQuery, Range(1, double.PositiveInfinity)] int page = 1,
             [FromQuery, Range(0, double.PositiveInfinity)] int pageSize = 5,
-            [FromQuery] bool permissions = false,
-            [FromQuery] bool? live = null)
+            [FromQuery] bool? live = null,
+            [FromQuery] bool includePermissions = false)
         {
             return await _publicationService
-                .ListActiveReleasesPaginated(publicationId, page, pageSize, live, includePermissions: permissions)
+                .ListActiveReleasesPaginated(publicationId, page, pageSize, live, includePermissions)
                 .HandleFailuresOrOk();
         }
 
