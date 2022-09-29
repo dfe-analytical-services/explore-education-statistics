@@ -59,7 +59,9 @@ describe('ReleaseDataAccordion', () => {
   const mockAllFilesButton = <a href="#">Mock download all data (zip)</a>;
   const mockCreateTablesButton = <a href="#">Mock create tables button</a>;
   const mockDataCatalogueLink = <a href="#">Mock data catalogue link</a>;
-  const mockDownloadLink = (file: FileInfo) => <a href="/">{file.name}</a>;
+  const mockDownloadLink = (file: FileInfo) => (
+    <a href="/">{`${file.name} (${file.extension}, ${file.size})`}</a>
+  );
   const mockDataGuidanceLink = <a href="#">Mock data guidance link</a>;
 
   test('renders the download all data button if files are available', () => {
@@ -159,20 +161,14 @@ describe('ReleaseDataAccordion', () => {
 
     expect(
       within(downloadFiles[0]).getByRole('link', {
-        name: 'Test data file 1',
+        name: 'Test data file 1 (csv, 10 KB)',
       }),
-    ).toBeInTheDocument();
-    expect(
-      within(downloadFiles[0]).getByText('(csv, 10 KB)'),
     ).toBeInTheDocument();
 
     expect(
       within(downloadFiles[1]).getByRole('link', {
-        name: 'Test data file 2',
+        name: 'Test data file 2 (csv, 15 KB)',
       }),
-    ).toBeInTheDocument();
-    expect(
-      within(downloadFiles[1]).getByText('(csv, 15 KB)'),
     ).toBeInTheDocument();
   });
 
@@ -286,10 +282,9 @@ describe('ReleaseDataAccordion', () => {
     // File 1
     expect(
       within(otherFiles[0]).getByRole('link', {
-        name: 'Test ancillary file 1',
+        name: 'Test ancillary file 1 (txt, 25 KB)',
       }),
     ).toBeInTheDocument();
-    expect(within(otherFiles[0]).getByText('(txt, 25 KB)')).toBeInTheDocument();
     expect(
       within(otherFiles[0]).getByText('A Test ancillary file 1 summary'),
     ).toBeInTheDocument();
@@ -297,10 +292,9 @@ describe('ReleaseDataAccordion', () => {
     // File 2
     expect(
       within(otherFiles[1]).getByRole('link', {
-        name: 'Test ancillary file 2',
+        name: 'Test ancillary file 2 (pdf, 20 KB)',
       }),
     ).toBeInTheDocument();
-    expect(within(otherFiles[1]).getByText('(pdf, 20 KB)')).toBeInTheDocument();
     expect(
       within(otherFiles[1]).getByText('Test ancillary file 2 summary'),
     ).toBeInTheDocument();

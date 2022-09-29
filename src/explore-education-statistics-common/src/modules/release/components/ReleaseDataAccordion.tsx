@@ -100,10 +100,7 @@ const ReleaseDataAccordion = ({
                   >
                     <ul className="govuk-list" data-testid="data-files">
                       {dataFiles.map(file => (
-                        <li key={file.id}>
-                          {renderDownloadLink(file)}
-                          {` (${file.extension}, ${file.size})`}
-                        </li>
+                        <li key={file.id}>{renderDownloadLink(file)}</li>
                       ))}
                     </ul>
                   </Details>
@@ -167,7 +164,6 @@ const ReleaseDataAccordion = ({
                     {ancillaryFiles.map(file => (
                       <li key={file.id}>
                         {renderDownloadLink(file)}
-                        {` (${file.extension}, ${file.size})`}
 
                         {file.summary && (
                           <Details

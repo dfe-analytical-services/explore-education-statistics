@@ -449,7 +449,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                   });
                 }}
               >
-                {file.name}
+                {`${file.name} (${file.extension}, ${file.size})`}
               </Link>
             );
           }}

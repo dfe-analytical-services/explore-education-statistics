@@ -9,11 +9,9 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
-
 *** Variables ***
 ${TOPIC_NAME}=          %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}=    UI tests - upload files %{RUN_IDENTIFIER}
-
 
 *** Test Cases ***
 Create test publication and release via api
@@ -141,7 +139,7 @@ Validate 'Explore data and files' accordion
     user opens details dropdown    Download files
     user checks list has x items    testid:data-files    1    ${section}
     ${data_files_1}=    user gets list item element    testid:data-files    1    ${section}
-    user checks element contains button    ${data_files_1}    Updated Absence in PRUs
+    user checks element contains button    ${data_files_1}    Updated Absence in PRUs (csv, 141 Kb)
 
     # Ancillary files
     user waits until h3 is visible    All supporting files
@@ -149,7 +147,7 @@ Validate 'Explore data and files' accordion
     ${other_files}=    user gets details content element    List of all supporting files    ${section}
     ${other_files_1}=    get child element    ${other_files}    css:li:nth-child(1)
 
-    user checks element contains button    ${other_files_1}    Test 1
+    user checks element contains button    ${other_files_1}    Test 1 (txt, 12 B)
 
     user opens details dropdown    More details    ${other_files_1}
     ${other_files_1_details}=    user gets details content element    More details    ${other_files_1}
