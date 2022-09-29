@@ -125,7 +125,7 @@ const PublicationMethodologiesPage = () => {
 
       {methodologyVersions.length > 0 || externalMethodology ? (
         <>
-          <table className="dfe-hide-empty-cells">
+          <table className="dfe-hide-empty-cells" data-testid="methodologies">
             <caption className="govuk-table__caption--m">
               Methodologies associated to this publication
             </caption>

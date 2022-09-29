@@ -386,7 +386,7 @@ Validate no methodologies
     user waits until page contains    No methodologies available
 
 Create and validate methodology
-    user creates methodology for publication    ${PUBLICATION_NAME}
+    bau user creates methodology for publication    ${PUBLICATION_NAME}
     approve methodology from methodology view
     user navigates to admin frontend    ${RELEASE_URL}/prerelease/methodologies
     user waits until h1 is visible    Methodologies

@@ -9,8 +9,10 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - invite contributor %{RUN_IDENTIFIER}
+
 
 *** Test Cases ***
 Create Publication as bau1
@@ -19,7 +21,7 @@ Create Publication as bau1
     user create test release via api    ${PUBLICATION_ID}    AY    2001
     user create test release via api    ${PUBLICATION_ID}    AY    2002
 
-    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user checks element contains link    ${accordion}    Manage team access
 
 Assign various release access permissions to analysts
@@ -37,7 +39,7 @@ Switch to analyst1
     user changes to analyst1
 
 Check Manage team access button is not visible
-    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user checks element does not contain link    ${accordion}    Manage team access
 
 Assign publication owner permissions to analyst1
@@ -48,7 +50,7 @@ Switch to analyst1 again
     user changes to analyst1
 
 Check Manage team access button is visible
-    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user checks element contains link    ${accordion}    Manage team access
 
 Go to Manage team access page
@@ -157,6 +159,7 @@ Validate contributors for 2000/01 release again
     user checks page does not contain    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
     user waits until page contains    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk    %{WAIT_SMALL}
     user checks page contains tag    Pending Invite
+
 
 *** Keywords ***
 user clicks remove user button for row

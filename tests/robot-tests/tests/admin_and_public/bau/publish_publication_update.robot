@@ -26,7 +26,7 @@ Publish release
     user approves release for immediate publication
 
 Navigate to publication on admin dashboard
-    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Manage publication    ${accordion}
     user waits until page contains title    Manage publication
 
@@ -42,7 +42,7 @@ Update publication details
     user waits until page does not contain button    Confirm
 
 Check publication is updated on dashboard
-    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME_UPDATED}
+    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME_UPDATED}
     user waits until page contains element    testid:Team name for ${PUBLICATION_NAME_UPDATED}
     user checks element contains child element    ${accordion}
     ...    xpath://*[@data-testid="Team name for ${PUBLICATION_NAME_UPDATED}" and text()="Team name updated"]

@@ -52,7 +52,7 @@ User redirects to the dashboard after saving publication
     user waits until h1 is visible    Dashboard
 
 Verify that new publication has been created
-    user opens publication on the admin dashboard    ${PUBLICATION_NAME} (created)
+    bau user goes to publication page from dashboard    ${PUBLICATION_NAME} (created)
 
     user checks testid element contains    Team name for ${PUBLICATION_NAME} (created)    Post-16 statistics team
     user checks testid element contains    Team email for ${PUBLICATION_NAME} (created)
@@ -85,10 +85,11 @@ Update publication
     user clicks button    Confirm
 
 Add a methodology
-    user creates methodology for publication    ${PUBLICATION_NAME}    ${CREATED_THEME_NAME}    ${CREATED_TOPIC_NAME}
+    bau user creates methodology for publication    ${PUBLICATION_NAME}    ${CREATED_THEME_NAME}
+    ...    ${CREATED_TOPIC_NAME}
 
 Verify publication has been updated
-    user opens publication on the admin dashboard    ${PUBLICATION_NAME}    ${CREATED_THEME_NAME}
+    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}    ${CREATED_THEME_NAME}
     ...    ${CREATED_TOPIC_NAME}
     user checks testid element contains    Team name for ${PUBLICATION_NAME}
     ...    Special educational needs statistics team

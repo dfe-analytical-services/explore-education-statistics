@@ -8,10 +8,12 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
+
 *** Variables ***
 ${PUBLICATION_NAME}=        UI tests - legacy releases %{RUN_IDENTIFIER}
 ${DESCRIPTION}=             legacy release description
 ${UPDATED_DESCRIPTION}=     updated legacy release description
+
 
 *** Test Cases ***
 Create new publication for topic
@@ -77,7 +79,7 @@ Check legacy release appears on public frontend
     user checks element attribute value should be    ${other_release_1_link}    href    http://test.com/
 
 Navigate to publication to update legacy releases
-    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
+    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user opens accordion section    ${PUBLICATION_NAME}
     user clicks element    testid:Edit publication link for ${PUBLICATION_NAME}
     user waits until page contains title caption    ${PUBLICATION_NAME}
@@ -121,7 +123,7 @@ Validate public frontend shows changes made to legacy release after saving publi
     user checks element attribute value should be    ${other_release_1_link}    href    http://test2.com/
 
 Navigate to publication to update legacy releases again
-    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
+    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user opens accordion section    ${PUBLICATION_NAME}
     user clicks element    testid:Edit publication link for ${PUBLICATION_NAME}
     user waits until page contains title caption    ${PUBLICATION_NAME}
@@ -180,6 +182,7 @@ Validate reordered legacy releases
     user checks results table cell contains    3    1    1
     user checks results table cell contains    3    2    Test collection 3
     user checks results table cell contains    3    3    http://test-3.com
+
 
 *** Keywords ***
 user creates legacy release

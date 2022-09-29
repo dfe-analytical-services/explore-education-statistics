@@ -69,7 +69,7 @@ Set archive-publication to be superseded by superseding-publication
     user waits until modal is not visible    Confirm publication changes
 
 Validate archive warning is on Admin dashboard for archive-publication release
-    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME_ARCHIVE}
+    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME_ARCHIVE}
     user checks element should contain    ${accordion}
     ...    This publication will be archived when its superseding publication has a live release published.
 

@@ -103,7 +103,7 @@ Move release status back to Draft
     ...    expected_next_release_date=January 3001
 
 Check that having a Draft owned Methodology attached to this Release's Publication will show a checklist warning
-    user creates methodology for publication    ${PUBLICATION_NAME}
+    bau user creates methodology for publication    ${PUBLICATION_NAME}
     user navigates to this release
     user edits release status
     user waits until element is visible    testid:releaseChecklist-warnings    %{WAIT_SMALL}
@@ -122,8 +122,8 @@ Approve the owned methodology and verify the warning disappears
 
 Adopt a Draft methodology
     user creates test publication via api    ${ADOPTED_PUBLICATION_NAME}
-    user creates methodology for publication    ${ADOPTED_PUBLICATION_NAME}
-    ${accordion}    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
+    bau user creates methodology for publication    ${ADOPTED_PUBLICATION_NAME}
+    ${accordion}    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user checks element contains link    ${accordion}    Adopt an existing methodology
     user clicks link    Adopt an existing methodology
     user waits until page contains title    Adopt a methodology

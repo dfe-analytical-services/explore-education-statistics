@@ -23,7 +23,7 @@ Create a draft release
     user create test release via api    ${PUBLICATION_ID}    AY    2021
 
 Create a methodology
-    user creates methodology for publication    ${PUBLICATION_NAME}
+    bau user creates methodology for publication    ${PUBLICATION_NAME}
 
 Add content to methodology
     user clicks link    Manage content
@@ -105,7 +105,7 @@ Verify that the user cannot edit the status of the methodology
     user checks page does not contain    Edit status
 
 Verify that the methodology 'Published' tag is shown
-    user opens publication on the admin dashboard    ${PUBLICATION_NAME}    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
+    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
 
     user waits until page contains element
     ...    //*[@data-testid="Methodology for ${PUBLICATION_NAME}"]//div//span[text()="Published"]

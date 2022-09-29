@@ -17,7 +17,7 @@ ${PUBLICATION_NAME}=    UI tests - manage publication as publication owner %{RUN
 *** Test Cases ***
 Create Publication as bau1
     user creates test publication via api    ${PUBLICATION_NAME}
-    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
 
 Assign publication owner permissions to analyst1
     user gives analyst publication owner access    ${PUBLICATION_NAME}
@@ -26,7 +26,7 @@ Switch to analyst1
     user changes to analyst1
 
 Go to Manage publication page
-    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Manage publication    ${accordion}
     user waits until page contains title    Manage publication
 
@@ -44,7 +44,7 @@ Update publication
     user waits until page does not contain button    Confirm
 
 Check publication is updated on dashboard
-    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user waits until page contains element    testid:Team name for ${PUBLICATION_NAME}
     user checks element contains child element    ${accordion}
     ...    xpath://*[@data-testid="Team name for ${PUBLICATION_NAME}" and text()="UI test team name updated"]
