@@ -171,7 +171,7 @@ Verify all is as expected on the Amendment after the Amendment content changes
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
 Revisit the original Methodology and check that its content remains unaffected by the changes to the Amendment
-    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
     user clicks link    View existing version    ${accordion}
     user clicks link    Manage content
@@ -181,7 +181,7 @@ Approve the Methodology Amendment
     user approves methodology amendment for publication    ${PUBLICATION_NAME}
 
 Revisit the Publication on the dashboard and check that the new Amendment is now the live Methodology
-    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
     user checks element contains link    ${accordion}    View methodology
     user checks element does not contain link    ${accordion}    Edit methodology
@@ -205,7 +205,7 @@ Create and cancel an Amendment
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
     user cancels methodology amendment for publication    ${PUBLICATION_NAME}
 
-    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
     user checks element contains link    ${accordion}    View methodology
     user checks element does not contain link    ${accordion}    Edit methodology

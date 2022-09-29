@@ -122,7 +122,7 @@ Validates Release status table is correct again
     table cell should contain    css:table    3    5    ees-test.analyst1@education.gov.uk    # By user
 
 Check that a publication owner can make a new release
-    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user waits until page does not contain loading spinner
     user clicks link    Create new release
     user creates release from Manage publication page    ${PUBLICATION_NAME}    Academic Year Q1    2020
@@ -156,7 +156,7 @@ Swap the release approver role for publication owner to test removing the approv
 
 Check publication owner cannot remove approved methodology
     user changes to analyst1
-    ${accordion}    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    ${accordion}    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     ${details}    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
     user cannot see the remove controls for methodology    ${details}
 
@@ -259,6 +259,6 @@ Swap the release approver role for publication owner to test that an approved me
 
 Check publication owner cannot cancel approved methodology amendment
     user changes to analyst1
-    ${accordion}    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    ${accordion}    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     ${details}    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
     user cannot see the cancel amendment controls for methodology    ${details}

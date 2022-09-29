@@ -21,7 +21,7 @@ Create Publication as bau1
     user create test release via api    ${PUBLICATION_ID}    AY    2001
     user create test release via api    ${PUBLICATION_ID}    AY    2002
 
-    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user checks element contains link    ${accordion}    Manage team access
 
 Assign various release access permissions to analysts
@@ -39,7 +39,7 @@ Switch to analyst1
     user changes to analyst1
 
 Check Manage team access button is not visible
-    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user checks element does not contain link    ${accordion}    Manage team access
 
 Assign publication owner permissions to analyst1
@@ -50,7 +50,7 @@ Switch to analyst1 again
     user changes to analyst1
 
 Check Manage team access button is visible
-    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user checks element contains link    ${accordion}    Manage team access
 
 Go to Manage team access page

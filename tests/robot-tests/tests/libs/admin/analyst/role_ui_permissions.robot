@@ -6,7 +6,7 @@ Resource    ../../admin-common.robot
 *** Keywords ***
 user navigates to publication on admin dashboard
     [Arguments]    ${publication}    ${theme}    ${topic}
-    ${publication_accordion}=    bau user goes to publication page from dashboard    ${publication}    ${theme}
+    ${publication_accordion}=    user goes to publication page from dashboard    ${publication}    ${theme}
     ...    ${topic}
     set suite variable    ${publication_accordion}
 

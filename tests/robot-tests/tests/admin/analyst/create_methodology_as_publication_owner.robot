@@ -18,7 +18,7 @@ ${PUBLICATION_NAME}=    UI tests - methodology alternative title %{RUN_IDENTIFIE
 Create Publication as bau1
     user creates test publication via api    ${PUBLICATION_NAME}
 
-    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    user goes to publication page from dashboard    ${PUBLICATION_NAME}
 
     user clicks link    Methodologies
     user waits until h2 is visible    Manage methodologies
@@ -83,7 +83,8 @@ Update methodology title
     user clicks radio    Set an alternative title
     user waits until element is visible    label:Enter methodology title
     user checks input field contains    label:Enter methodology title    ${PUBLICATION_NAME} - New methodology title
-    user enters text into element    label:Enter methodology title    ${PUBLICATION_NAME} - Another new methodology title
+    user enters text into element    label:Enter methodology title
+    ...    ${PUBLICATION_NAME} - Another new methodology title
     user clicks button    Update methodology
     user verifies methodology summary details    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - Another new methodology title

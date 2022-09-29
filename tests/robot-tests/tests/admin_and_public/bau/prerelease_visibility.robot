@@ -45,7 +45,7 @@ Return to admin
     user navigates to admin dashboard    Bau1
 
 Select release from admin dashboard
-    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     ${accordion}=    user gets accordion section content element    ${PUBLICATION_NAME}
     user opens details dropdown    ${RELEASE_NAME} (not Live)    ${accordion}
     ${details}=    user gets details content element    ${RELEASE_NAME} (not Live)    ${accordion}

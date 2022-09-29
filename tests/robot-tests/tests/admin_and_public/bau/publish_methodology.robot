@@ -105,7 +105,7 @@ Verify that the user cannot edit the status of the methodology
     user checks page does not contain    Edit status
 
 Verify that the methodology 'Published' tag is shown
-    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
+    user goes to publication page from dashboard    ${PUBLICATION_NAME}    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
 
     user waits until page contains element
     ...    //*[@data-testid="Methodology for ${PUBLICATION_NAME}"]//div//span[text()="Published"]

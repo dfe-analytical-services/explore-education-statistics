@@ -123,7 +123,7 @@ Approve the owned methodology and verify the warning disappears
 Adopt a Draft methodology
     user creates test publication via api    ${ADOPTED_PUBLICATION_NAME}
     bau user creates methodology for publication    ${ADOPTED_PUBLICATION_NAME}
-    ${accordion}    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    ${accordion}    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user checks element contains link    ${accordion}    Adopt an existing methodology
     user clicks link    Adopt an existing methodology
     user waits until page contains title    Adopt a methodology

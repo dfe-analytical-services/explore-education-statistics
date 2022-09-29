@@ -79,7 +79,7 @@ Check legacy release appears on public frontend
     user checks element attribute value should be    ${other_release_1_link}    href    http://test.com/
 
 Navigate to publication to update legacy releases
-    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user opens accordion section    ${PUBLICATION_NAME}
     user clicks element    testid:Edit publication link for ${PUBLICATION_NAME}
     user waits until page contains title caption    ${PUBLICATION_NAME}
@@ -123,7 +123,7 @@ Validate public frontend shows changes made to legacy release after saving publi
     user checks element attribute value should be    ${other_release_1_link}    href    http://test2.com/
 
 Navigate to publication to update legacy releases again
-    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user opens accordion section    ${PUBLICATION_NAME}
     user clicks element    testid:Edit publication link for ${PUBLICATION_NAME}
     user waits until page contains title caption    ${PUBLICATION_NAME}

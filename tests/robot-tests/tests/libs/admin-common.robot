@@ -52,6 +52,16 @@ user changes to analyst1
 user signs out
     user clicks link    Sign out    css:#navigation
 
+user selects dashboard theme and topic if possible
+    [Arguments]    ${theme_name}    ${topic_name}
+    ${DROPDOWNS_EXIST}=    user checks dashboard theme topic dropdowns exist
+    IF    ${DROPDOWNS_EXIST}
+        user chooses select option    id:publicationsReleases-themeTopic-themeId    ${theme_name}
+        user waits until page contains element    id:publicationsReleases-themeTopic-topicId
+        user chooses select option    id:publicationsReleases-themeTopic-topicId    ${topic_name}
+        user waits until page contains    ${theme_name} / ${topic_name}
+    END
+
 user selects theme and topic from admin dashboard
     [Arguments]    ${theme}    ${topic}
     user navigates to admin dashboard
@@ -74,7 +84,7 @@ user navigates to editable release summary from admin dashboard
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
-    bau user navigates to release summary from admin dashboard
+    user goes to publication page from dashboardvigates to release summary from admin dashboard
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}
@@ -97,21 +107,21 @@ user navigates to readonly release summary from admin dashboard
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
-    bau user navigates to release summary from admin dashboard
+    user navigates to release summary from admin dashboard
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}
     ...    ${TOPIC_NAME}
 
-bau user navigates to release summary from admin dashboard
+user navigates to release summary from admin dashboard
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
 
-    user selects theme and topic from admin dashboard    ${THEME_NAME}    ${TOPIC_NAME}
-    user waits until page contains link    ${PUBLICATION_NAME}
+    user selects dashboard theme and topic if possible    ${THEME_NAME}    ${TOPIC_NAME}
+
     user clicks link    ${PUBLICATION_NAME}
 
     user waits until h2 is visible    Manage releases
@@ -123,26 +133,13 @@ bau user navigates to release summary from admin dashboard
     user waits until h2 is visible    Release summary    %{WAIT_SMALL}
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
 
-    # @MarkFix remove
-    #${details}=    user opens release summary on the admin dashboard
-    #...    ${PUBLICATION_NAME}
-    #...    ${DETAILS_HEADING}
-    #...    ${THEME_NAME}
-    #...    ${TOPIC_NAME}
-
-    #${summary_button}=    user waits until element contains link    ${details}    ${RELEASE_SUMMARY_LINK_TEXT}
-    #...    %{WAIT_SMALL}
-    #user clicks element    ${summary_button}
-    #user waits until h2 is visible    Release summary    %{WAIT_SMALL}
-    #user checks summary list contains    Publication title    ${PUBLICATION_NAME}
-
 user opens release summary on the admin dashboard
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${DETAILS_HEADING}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
-    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
+    user goes to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
 
     ${accordion}=    user gets accordion section content element    ${PUBLICATION_NAME}
     user opens details dropdown    ${DETAILS_HEADING}    ${accordion}
@@ -182,15 +179,13 @@ user creates release from Manage publication page
     user waits until page contains element    xpath://a[text()="Edit release summary"]    %{WAIT_SMALL}
     user waits until h2 is visible    Release summary    %{WAIT_SMALL}
 
-bau user goes to publication page from dashboard
+user goes to publication page from dashboard
     [Arguments]
     ...    ${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
-    user selects theme and topic from admin dashboard    ${theme}    ${topic}
-    user waits until page contains    ${theme} / ${topic}
-    user waits until page contains link    ${publication}
 
+    user selects dashboard theme and topic if possible    ${theme}    ${topic}
     user clicks link    ${publication}
     user waits until h1 is visible    ${publication}
 
@@ -200,7 +195,7 @@ bau user creates methodology for publication
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
 
-    bau user goes to publication page from dashboard    ${publication}    ${theme}    ${topic}
+    user goes to publication page from dashboard    ${publication}    ${theme}    ${topic}
 
     user clicks link    Methodologies
     user waits until h2 is visible    Manage methodologies
@@ -213,7 +208,7 @@ user views methodology for publication
     ...    ${publication}
     ...    ${methodology_title}=${publication}
     ...    ${view_button_text}=Edit methodology
-    ${accordion}=    bau user goes to publication page from dashboard    ${publication}
+    ${accordion}=    user goes to publication page from dashboard    ${publication}
     user views methodology for open publication accordion
     ...    ${accordion}
     ...    ${methodology_title}
@@ -221,7 +216,7 @@ user views methodology for publication
 
 user views methodology amendment for publication
     [Arguments]    ${publication}    ${methodology_title}=${publication}
-    ${accordion}=    bau user goes to publication page from dashboard    ${publication}
+    ${accordion}=    user goes to publication page from dashboard    ${publication}
     user views methodology for open publication accordion    ${accordion}    ${methodology_title}
     ...    Edit amendment
 
@@ -323,7 +318,7 @@ approve methodology for publication
     ...    ${with_release}
     ...    ${edit_button_text}
 
-    ${accordion}=    bau user goes to publication page from dashboard    ${publication}    ${theme}    ${topic}
+    ${accordion}=    user goes to publication page from dashboard    ${publication}    ${theme}    ${topic}
     user opens details dropdown    ${methodology_title}    ${accordion}
     user clicks link    ${edit_button_text}    ${accordion}
     approve methodology from methodology view    ${publishing_strategy}    ${with_release}
@@ -350,7 +345,7 @@ user creates methodology amendment for publication
     ...    ${methodology_title}=${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
-    ${accordion}=    bau user goes to publication page from dashboard    ${publication}
+    ${accordion}=    user goes to publication page from dashboard    ${publication}
     user opens details dropdown    ${methodology_title}    ${accordion}
     user clicks button    Amend methodology    ${accordion}
     user waits until modal is visible    Confirm you want to amend this live methodology
@@ -364,7 +359,7 @@ user cancels methodology amendment for publication
     ...    ${methodology_title}=${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
-    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user opens details dropdown    ${methodology_title}    ${accordion}
     user clicks button    Cancel amendment    ${accordion}
     user waits until modal is visible    Confirm you want to cancel this amended methodology
@@ -408,14 +403,14 @@ user links publication to external methodology
     ...    ${publication}
     ...    ${title}=External methodology
     ...    ${link}=https://example.com
-    ${accordion}=    bau user goes to publication page from dashboard    ${publication}
+    ${accordion}=    user goes to publication page from dashboard    ${publication}
     user clicks link    Use an external methodology    ${accordion}
     user waits until page contains title    Link to an externally hosted methodology
     user enters text into element    label:Link title    ${title}
     user enters text into element    label:URL    ${link}
     user clicks button    Save
     user waits until page does not contain button    Save
-    ${accordion}=    bau user goes to publication page from dashboard    ${publication}
+    ${accordion}=    user goes to publication page from dashboard    ${publication}
     user waits until parent contains element    ${accordion}    //*[text()="External methodology (External)"]
 
 user edits an external methodology
@@ -426,7 +421,7 @@ user edits an external methodology
     ...    ${original_title}=External methodology
     ...    ${original_link}=https://example.com
 
-    ${accordion}=    bau user goes to publication page from dashboard    ${publication}
+    ${accordion}=    user goes to publication page from dashboard    ${publication}
     user clicks link    Edit external methodology    ${accordion}
     user waits until page contains title    Edit external methodology link
     user checks input field contains    label:Link title    ${original_title}
@@ -437,7 +432,7 @@ user edits an external methodology
 
 user removes an external methodology from publication
     [Arguments]    ${publication}
-    ${accordion}=    bau user goes to publication page from dashboard    ${publication}
+    ${accordion}=    user goes to publication page from dashboard    ${publication}
     user clicks button    Remove external methodology    ${accordion}
     user waits until modal is visible    Remove external methodology
     user clicks button    Confirm
@@ -530,7 +525,7 @@ user enters text into data guidance data file content editor
 
 user creates amendment for release
     [Arguments]    ${PUBLICATION_NAME}    ${RELEASE_NAME}    ${RELEASE_STATUS}
-    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     ${accordion}=    user gets accordion section content element    ${PUBLICATION_NAME}
     user opens details dropdown    ${RELEASE_NAME} ${RELEASE_STATUS}    ${accordion}
     ${details}=    user gets details content element    ${RELEASE_NAME} ${RELEASE_STATUS}    ${accordion}

@@ -17,13 +17,13 @@ ${PUBLICATION_NAME}=    UI tests - create methodology publication %{RUN_IDENTIFI
 *** Test Cases ***
 Create Publication and check available Methodology controls
     user creates test publication via api    ${PUBLICATION_NAME}
-    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user checks element contains button    ${accordion}    Create methodology
     user checks element contains link    ${accordion}    Use an external methodology
 
 Create a Methodology
     bau user creates methodology for publication    ${PUBLICATION_NAME}
-    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user checks element does not contain button    ${accordion}    Create methodology
     user checks element contains link    ${accordion}    Use an external methodology
     ${details}=    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
@@ -34,14 +34,14 @@ Create a Methodology
     user verifies methodology summary details    ${PUBLICATION_NAME}
 
 Remove the Methodology
-    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     ${details}=    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
     user clicks button    Remove    ${details}
     user waits until modal is visible    Confirm you want to remove this methodology
     user clicks button    Confirm
     user waits until modal is not visible    Confirm you want to remove this methodology
 
-    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     user checks element contains button    ${accordion}    Create methodology
 
 Create a Methodology again
@@ -90,7 +90,7 @@ Approve the Methodology
     ...    Not yet published
 
 Check the controls available are as expected for an approved Methodology that is not yet publicly visible
-    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     ${details}=    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
     user checks element contains link    ${details}    Edit methodology
     user checks element does not contain button    ${details}    Remove
@@ -105,7 +105,7 @@ Unapprove the Methodology
     user clicks link    Sign off
     user changes methodology status to Draft
 
-    ${accordion}=    bau user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
     ${details}=    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
     user checks element contains link    ${details}    Edit methodology
     user checks element contains button    ${details}    Remove

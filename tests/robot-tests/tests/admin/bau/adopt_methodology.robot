@@ -22,7 +22,7 @@ Create Publications and a Methodology to adopt
     user creates test publication via api    ${ADOPTING_PUBLICATION_NAME}
 
 Adopt a Methodology
-    ${accordion}=    bau user goes to publication page from dashboard    ${ADOPTING_PUBLICATION_NAME}
+    ${accordion}=    user goes to publication page from dashboard    ${ADOPTING_PUBLICATION_NAME}
     user checks element contains link    ${accordion}    Adopt an existing methodology
     user clicks link    Adopt an existing methodology    ${accordion}
     user waits until page contains title    Adopt a methodology
@@ -37,13 +37,13 @@ Adopt a Methodology
     user waits until page contains title    Dashboard
 
 Validate methodology adopted
-    ${accordion}=    bau user goes to publication page from dashboard    ${ADOPTING_PUBLICATION_NAME}
+    ${accordion}=    user goes to publication page from dashboard    ${ADOPTING_PUBLICATION_NAME}
     ${details}=    user opens details dropdown    ${OWNING_PUBLICATION_NAME} (Adopted)    ${accordion}
     user checks element contains button    ${details}    Remove methodology
     user views methodology for open publication accordion    ${accordion}    ${OWNING_PUBLICATION_NAME}
 
 Drop adopted Methodology
-    ${accordion}=    bau user goes to publication page from dashboard    ${ADOPTING_PUBLICATION_NAME}
+    ${accordion}=    user goes to publication page from dashboard    ${ADOPTING_PUBLICATION_NAME}
     ${details}=    user opens details dropdown    ${OWNING_PUBLICATION_NAME} (Adopted)    ${accordion}
     user clicks button    Remove methodology    ${accordion}
     user waits until modal is visible    Remove methodology
@@ -51,5 +51,5 @@ Drop adopted Methodology
     user waits until modal is not visible    Remove methodology
 
 Validate adopted methodology is dropped
-    ${accordion}=    bau user goes to publication page from dashboard    ${ADOPTING_PUBLICATION_NAME}
+    ${accordion}=    user goes to publication page from dashboard    ${ADOPTING_PUBLICATION_NAME}
     user checks element does not contain    ${accordion}    ${OWNING_PUBLICATION_NAME} (Adopted)
