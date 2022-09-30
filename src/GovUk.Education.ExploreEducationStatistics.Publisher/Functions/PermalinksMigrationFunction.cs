@@ -1,29 +1,21 @@
 ﻿#nullable enable
 using System;
-using System.Linq;
 using System.Threading.Tasks;
-using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 
 public class PermalinksMigrationFunction
 {
-    private readonly BlobServiceClient _blobServiceClient;
-    private readonly IStorageQueueService _storageQueueService;
+    private readonly IPermalinkMigrationService _permalinkMigrationService;
 
-    public PermalinksMigrationFunction(
-        BlobServiceClient blobServiceClient,
-        IStorageQueueService storageQueueService)
+    public PermalinksMigrationFunction(IPermalinkMigrationService permalinkMigrationService)
     {
-        _blobServiceClient = blobServiceClient;
-        _storageQueueService = storageQueueService;
+        _permalinkMigrationService = permalinkMigrationService;
     }
 
     /// <summary>
@@ -44,30 +36,7 @@ public class PermalinksMigrationFunction
 
         try
         {
-            string? continuationToken = null;
-
-            var blobContainer = _blobServiceClient.GetBlobContainerClient(Permalinks.Name);
-
-            do
-            {
-                var pages = blobContainer
-                    .GetBlobsAsync(BlobTraits.None, prefix: null)
-                    .AsPages(continuationToken);
-
-                await foreach (var page in pages)
-                {
-                    var messages = page.Values.Select(blobItem =>
-                    {
-                        var name = blobItem.Name;
-                        var permalinkId = Guid.Parse(name);
-                        return new PermalinkMigrationMessage(permalinkId);
-                    }).ToList();
-
-                    await _storageQueueService.AddMessages(PermalinkMigrationQueue, messages);
-
-                    continuationToken = page.ContinuationToken;
-                }
-            } while (continuationToken != string.Empty);
+            await _permalinkMigrationService.EnumerateAllPermalinksForMigration();
         }
         catch (Exception e)
         {
