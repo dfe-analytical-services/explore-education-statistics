@@ -594,6 +594,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             AddPersistenceHelper<UsersAndRolesDbContext>(services);
             services.AddTransient<AuthorizationHandlerResourceRoleService>();
 
+            // Permalinks migration
+            services.AddTransient<IPermalinkMigrationService, PermalinkMigrationService>();
+
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
 

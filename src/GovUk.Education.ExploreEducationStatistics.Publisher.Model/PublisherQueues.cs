@@ -11,5 +11,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public const string PublishTaxonomyQueue = "publish-taxonomy";
         public const string RetryStageQueue = "retry";
         public const string NotifyChangeQueue = "notify";
+
+        // Permalinks migration
+        public const string PermalinksMigrationQueue = "permalinks-migration";
+        public const string PermalinkMigrationQueue = "permalink-migration";
     }
 }
