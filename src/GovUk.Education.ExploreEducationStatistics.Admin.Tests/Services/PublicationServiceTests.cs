@@ -284,6 +284,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             userService.Setup(s => s.MatchesPolicy(
                 It.Is<Publication>(p => p.Id == publication.Id),
                 CanManageExternalMethodologyForSpecificPublication)).ReturnsAsync(false);
+            userService.Setup(s => s.MatchesPolicy(
+                    It.Is<Tuple<Publication, ReleaseRole>>(tuple =>
+                        tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor),
+                    CanUpdateSpecificReleaseRole))
+                .ReturnsAsync(false);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -317,6 +322,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(publicationViewModel.Permissions.CanAdoptMethodologies);
                 Assert.False(publicationViewModel.Permissions.CanCreateMethodologies);
                 Assert.False(publicationViewModel.Permissions.CanManageExternalMethodology);
+                Assert.True(publicationViewModel.Permissions.CanUpdateContact);
+                Assert.False(publicationViewModel.Permissions.CanUpdateContributorReleaseRole);
             }
         }
 
@@ -645,6 +652,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             userService.Setup(s => s.MatchesPolicy(
                 It.Is<Publication>(p => p.Id == publication.Id),
                 CanManageExternalMethodologyForSpecificPublication)).ReturnsAsync(false);
+            userService.Setup(s => s.MatchesPolicy(
+                    It.Is<Tuple<Publication, ReleaseRole>>(tuple =>
+                        tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor),
+                    CanUpdateSpecificReleaseRole))
+                .ReturnsAsync(false);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -681,6 +693,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(publicationViewModel.Permissions.CanAdoptMethodologies);
                 Assert.False(publicationViewModel.Permissions.CanCreateMethodologies);
                 Assert.False(publicationViewModel.Permissions.CanManageExternalMethodology);
+                Assert.True(publicationViewModel.Permissions.CanUpdateContact);
+                Assert.False(publicationViewModel.Permissions.CanUpdateContributorReleaseRole);
             }
         }
 
@@ -793,6 +807,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         It.Is<Publication>(p => p.Id == publication.Id),
                         CanManageExternalMethodologyForSpecificPublication))
                     .ReturnsAsync(false);
+                userService.Setup(s => s.MatchesPolicy(
+                        It.Is<Tuple<Publication, ReleaseRole>>(tuple =>
+                            tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor),
+                        CanUpdateSpecificReleaseRole))
+                    .ReturnsAsync(false);
 
                 var publicationService = BuildPublicationService(context,
                     userService: userService.Object);
@@ -810,6 +829,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(result.Permissions.CanCreateMethodologies);
                 Assert.False(result.Permissions.CanManageExternalMethodology);
                 Assert.True(result.Permissions.CanUpdateContact);
+                Assert.False(result.Permissions.CanUpdateContributorReleaseRole);
             }
         }
 

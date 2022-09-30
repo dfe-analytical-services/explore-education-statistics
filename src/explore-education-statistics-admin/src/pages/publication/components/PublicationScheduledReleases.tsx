@@ -27,7 +27,7 @@ const PublicationScheduledReleases = ({ publicationId, releases }: Props) => {
   ] = useToggle(false);
 
   if (releases.length === 0) {
-    return <InsetText>There are no scheduled releases.</InsetText>;
+    return <InsetText>There are no scheduled releases.</InsetText>; // @MarkFix might also not have permission
   }
 
   return (

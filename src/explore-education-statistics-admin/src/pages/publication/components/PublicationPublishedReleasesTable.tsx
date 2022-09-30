@@ -78,17 +78,24 @@ export default function PublicationPublishedReleasesTable({
                 )}
               </td>
               <td>
-                <Link
-                  to={generatePath<ReleaseRouteParams>(
-                    releaseSummaryRoute.path,
-                    {
-                      publicationId,
-                      releaseId: release.id,
-                    },
-                  )}
-                >
-                  View<VisuallyHidden> {release.title}</VisuallyHidden>
-                </Link>
+                {release.permissions.canViewRelease ? (
+                  <Link
+                    to={generatePath<ReleaseRouteParams>(
+                      releaseSummaryRoute.path,
+                      {
+                        publicationId,
+                        releaseId: release.id,
+                      },
+                    )}
+                  >
+                    View<VisuallyHidden> {release.title}</VisuallyHidden>
+                  </Link>
+                ) : (
+                  <>
+                    No permission
+                    <VisuallyHidden> {release.title}</VisuallyHidden>
+                  </>
+                )}
                 {release.permissions.canMakeAmendmentOfRelease && (
                   <ButtonText
                     className="govuk-!-margin-left-4"

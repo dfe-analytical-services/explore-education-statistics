@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MethodologyVersionSummaryViewModel;
 using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 
@@ -17,6 +18,7 @@ public static class PermissionsUtils
         return new ReleasePermissions
         {
             CanAddPrereleaseUsers = await userService.CheckCanAssignPrereleaseContactsToRelease(release).IsRight(),
+            CanViewRelease = await userService.CheckCanViewRelease(release).IsRight(),
             CanUpdateRelease = await userService.CheckCanUpdateRelease(release).IsRight(),
             CanDeleteRelease = await userService.CheckCanDeleteRelease(release).IsRight(),
             CanMakeAmendmentOfRelease = await userService.CheckCanMakeAmendmentOfRelease(release).IsRight()
@@ -38,7 +40,9 @@ public static class PermissionsUtils
             CanCreateMethodologies = await userService.CheckCanCreateMethodologyForPublication(publication).IsRight(),
             CanManageExternalMethodology =
                 await userService.CheckCanManageExternalMethodologyForPublication(publication).IsRight(),
-            CanUpdateContact = canUpdatePublication, // EES-3576 Switch to CheckCanUpdateContact permission
+            CanUpdateContact = canUpdatePublication, // EES-3596 Switch to CheckCanUpdateContact permission
+            CanUpdateContributorReleaseRole =
+                await userService.CheckCanUpdateReleaseRole(publication, Contributor).IsRight(),
         };
     }
 

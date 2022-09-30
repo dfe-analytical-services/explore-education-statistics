@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(
-            bool includePermissions = false,
+            bool includePermissions = false, // @MarkFix remove? default to false to prevent abuse
             Guid? topicId = null)
         {
             return await _userService

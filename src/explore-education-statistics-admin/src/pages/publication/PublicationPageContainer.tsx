@@ -63,6 +63,13 @@ const PublicationPageContainer = ({
     ),
   );
 
+  const getNavRoutes = () => {
+    if (!publication?.permissions?.canUpdateContributorReleaseRole) {
+      return navRoutes.filter(route => route !== publicationTeamAccessRoute);
+    }
+    return navRoutes;
+  };
+
   return (
     <LoadingSpinner loading={loadingPublication}>
       {publication ? (
@@ -100,7 +107,7 @@ const PublicationPageContainer = ({
           </div>
 
           <NavBar
-            routes={navRoutes.map(route => ({
+            routes={getNavRoutes().map(route => ({
               title: route.title,
               to: generatePath<PublicationRouteParams>(route.path, {
                 publicationId,

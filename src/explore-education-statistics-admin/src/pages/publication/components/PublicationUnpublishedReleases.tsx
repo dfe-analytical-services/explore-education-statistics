@@ -33,8 +33,9 @@ export default function PublicationUnpublishedReleases({
     return (
       releases?.results.filter(
         release =>
-          release.approvalStatus === 'Draft' ||
-          release.approvalStatus === 'HigherLevelReview',
+          (release.approvalStatus === 'Draft' ||
+            release.approvalStatus === 'HigherLevelReview') &&
+          release.permissions?.canViewRelease, // We don't display draft releases they have no permission to view
       ) ?? []
     );
   }, [releases?.results]);
@@ -42,7 +43,9 @@ export default function PublicationUnpublishedReleases({
   const scheduledReleases = useMemo(() => {
     return (
       releases?.results.filter(
-        release => release.approvalStatus === 'Approved',
+        release =>
+          release.approvalStatus === 'Approved' &&
+          release.permissions?.canViewRelease, // We don't display scheduled releases they have no permission to view
       ) ?? []
     );
   }, [releases?.results]);

@@ -26,5 +26,6 @@ export const testPublication: PublicationWithPermissions = {
     canCreateMethodologies: true,
     canManageExternalMethodology: true,
     canUpdateContact: true,
+    canUpdateContributorReleaseRole: true,
   },
 };

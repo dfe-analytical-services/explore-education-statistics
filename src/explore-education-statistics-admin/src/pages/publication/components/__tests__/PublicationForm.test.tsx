@@ -464,6 +464,7 @@ describe('PublicationForm', () => {
         canUpdateRelease: false,
         canDeleteRelease: false,
         canMakeAmendmentOfRelease: false,
+        canViewRelease: false,
       },
       preReleaseAccessList: '',
       previousVersionId: 'prev-version-id-1',
@@ -506,6 +507,7 @@ describe('PublicationForm', () => {
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
         canUpdateContact: true,
+        canUpdateContributorReleaseRole: true,
       },
     };
 

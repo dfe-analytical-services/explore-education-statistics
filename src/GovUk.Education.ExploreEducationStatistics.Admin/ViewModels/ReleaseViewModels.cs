@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public string PublicationSlug { get; set; } = string.Empty;
 
         public int Year { get; set; }
-        
+
         public string YearTitle { get; set; } = string.Empty;
 
         public PartialDate? NextReleaseDate { get; set; }
@@ -69,10 +69,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public ReleasePermissions? Permissions { get; set; }
     }
-    
+
     public record ReleasePermissions
     {
         public bool CanAddPrereleaseUsers { get; init; }
+
+        public bool CanViewRelease { get; set; }
 
         public bool CanUpdateRelease { get; init; }
 
@@ -191,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public string Slug { get; init; } = string.Empty;
 
         public int Year { get; init; }
-        
+
         public string YearTitle { get; init; } = string.Empty;
 
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
@@ -213,9 +215,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public ReleaseType Type { get; init; }
 
         public bool Amendment { get; init; }
-        
+
         public Guid? PreviousVersionId { get; init; }
-        
+
         public ReleasePermissions? Permissions { get; set; }
     }
 }

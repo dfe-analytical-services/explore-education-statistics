@@ -27,6 +27,7 @@ describe('PublicationScheduledReleases', () => {
       canUpdateRelease: true,
       canDeleteRelease: false,
       canMakeAmendmentOfRelease: true,
+      canViewRelease: false,
     },
     previousVersionId: 'release-previous-id',
     publishScheduled: '2022-01-01T00:00:00',

@@ -169,6 +169,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             .ReturnsAsync(true);
 
                         userService
+                            .Setup(s => s.MatchesPolicy(list[0], ContentSecurityPolicies.CanViewSpecificRelease))
+                            .ReturnsAsync(true);
+
+                        userService
                             .Setup(s => s.MatchesPolicy(list[0], CanUpdateSpecificRelease))
                             .ReturnsAsync(true);
 
@@ -225,6 +229,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         userService
                             .Setup(s => s.MatchesPolicy(list[0], CanAssignPrereleaseContactsToSpecificRelease))
+                            .ReturnsAsync(true);
+
+                        userService
+                            .Setup(s => s.MatchesPolicy(list[0], ContentSecurityPolicies.CanViewSpecificRelease))
                             .ReturnsAsync(true);
 
                         userService

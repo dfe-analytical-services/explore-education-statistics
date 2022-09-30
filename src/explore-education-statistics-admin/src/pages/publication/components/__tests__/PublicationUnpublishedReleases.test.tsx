@@ -27,6 +27,7 @@ describe('PublicationUnpublishedReleases', () => {
     canUpdateRelease: true,
     canDeleteRelease: true,
     canMakeAmendmentOfRelease: true,
+    canViewRelease: true,
   };
 
   const testRelease1: ReleaseSummaryWithPermissions = {

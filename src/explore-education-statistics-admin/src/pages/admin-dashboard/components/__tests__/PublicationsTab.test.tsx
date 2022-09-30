@@ -95,6 +95,7 @@ describe('PublicationsTab', () => {
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
         canUpdateContact: true,
+        canUpdateContributorReleaseRole: true,
       },
     },
     {
@@ -113,6 +114,7 @@ describe('PublicationsTab', () => {
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
         canUpdateContact: true,
+        canUpdateContributorReleaseRole: true,
       },
     },
   ];
@@ -134,6 +136,7 @@ describe('PublicationsTab', () => {
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
         canUpdateContact: true,
+        canUpdateContributorReleaseRole: true,
       },
     },
   ];
@@ -155,6 +158,7 @@ describe('PublicationsTab', () => {
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
         canUpdateContact: true,
+        canUpdateContributorReleaseRole: true,
       },
     },
   ];
@@ -176,6 +180,7 @@ describe('PublicationsTab', () => {
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
         canUpdateContact: true,
+        canUpdateContributorReleaseRole: true,
       },
     },
   ];
