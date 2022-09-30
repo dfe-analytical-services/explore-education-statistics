@@ -78,13 +78,28 @@ user selects theme and topic from admin dashboard
     #...    xpath://*[@data-testid="accordion"]|//*[text()="No publications available"]
     #...    %{WAIT_MEDIUM}
 
+user navigates to draft release page from dashboard
+    [Arguments]
+    ...    ${PUBLICATION_NAME}
+    ...    ${RELEASE_NAME}
+    ...    ${THEME_NAME}=%{TEST_THEME_NAME}
+    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
+
+    user goes to publication page from dashboard
+    ...    ${PUBLICATION_NAME}
+    ...    ${THEME_NAME}
+    ...    ${TOPIC_NAME}
+
+    ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-draft-releases
+    user clicks element    xpath://*[text()="Edit"]    ${ROW}
+
 user navigates to editable release summary from admin dashboard
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
-    user goes to publication page from dashboardvigates to release summary from admin dashboard
+    user goes to publication page from dashboard
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}
