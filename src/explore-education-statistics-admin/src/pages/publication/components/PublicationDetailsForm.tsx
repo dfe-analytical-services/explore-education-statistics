@@ -101,32 +101,32 @@ const PublicationDetailsForm = ({
         {form => (
           <>
             <Form id={id}>
-              {canUpdatePublicationTitle && (
-                <FormFieldset id="details" legend="Publication details">
+              <FormFieldset id="details" legend="Publication details">
+                {canUpdatePublicationTitle && (
                   <FormFieldTextInput<PublicationDetailsFormValues>
                     name="title"
                     label="Publication title"
                     className="govuk-!-width-one-half"
                   />
+                )}
 
-                  <FormFieldTextArea<PublicationDetailsFormValues>
-                    name="summary"
-                    label="Publication summary"
-                    className="govuk-!-width-one-half"
-                    maxLength={160}
+                <FormFieldTextArea<PublicationDetailsFormValues>
+                  name="summary"
+                  label="Publication summary"
+                  className="govuk-!-width-one-half"
+                  maxLength={160}
+                />
+                {themes && initialValues?.topicId && (
+                  <FormFieldThemeTopicSelect<PublicationDetailsFormValues>
+                    id={id}
+                    inline={false}
+                    legend="Choose a topic for this publication"
+                    legendHidden
+                    name="topicId"
+                    themes={themes}
                   />
-                  {themes && initialValues?.topicId && (
-                    <FormFieldThemeTopicSelect<PublicationDetailsFormValues>
-                      id={id}
-                      inline={false}
-                      legend="Choose a topic for this publication"
-                      legendHidden
-                      name="topicId"
-                      themes={themes}
-                    />
-                  )}
-                </FormFieldset>
-              )}
+                )}
+              </FormFieldset>
               {canUpdatePublicationSupersededBy && (
                 <FormFieldset
                   id="supersede"
