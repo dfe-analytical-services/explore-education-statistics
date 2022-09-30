@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -63,8 +64,13 @@ public class PermalinkMigrationService : IPermalinkMigrationService
     public async Task<Permalink> AddPermalinkToDbFromStorage(Guid permalinkId)
     {
         var permalink = await GetPermalinkFromStorage(permalinkId);
-        _contentDbContext.Permalinks.Add(permalink);
-        await _contentDbContext.SaveChangesAsync();
+
+        if (!await _contentDbContext.Permalinks.AnyAsync(p => p.Id == permalinkId))
+        {
+            _contentDbContext.Permalinks.Add(permalink);
+            await _contentDbContext.SaveChangesAsync();
+        }
+
         return permalink;
     }
 
