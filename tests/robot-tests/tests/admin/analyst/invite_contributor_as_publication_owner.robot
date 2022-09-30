@@ -21,8 +21,12 @@ Create Publication as bau1
     user create test release via api    ${PUBLICATION_ID}    AY    2001
     user create test release via api    ${PUBLICATION_ID}    AY    2002
 
-    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
-    user checks element contains link    ${accordion}    Manage team access
+    user goes to publication page from dashboard    ${PUBLICATION_NAME}
+
+    user waits until page contains link    Team access
+    user clicks link    Team access
+    user waits until page contains link    Add or remove users
+    # @MarkFix requires more checks to see if can add users?
 
 Assign various release access permissions to analysts
     user changes to bau1
@@ -39,8 +43,10 @@ Switch to analyst1
     user changes to analyst1
 
 Check Manage team access button is not visible
-    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
-    user checks element does not contain link    ${accordion}    Manage team access
+    user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    user waits until h2 is visible    Manage releases
+
+    user checks page does not contain button    Team access
 
 Assign publication owner permissions to analyst1
     user changes to bau1
@@ -50,13 +56,15 @@ Switch to analyst1 again
     user changes to analyst1
 
 Check Manage team access button is visible
-    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
-    user checks element contains link    ${accordion}    Manage team access
+    user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    user waits until page contains link    Team access
 
 Go to Manage team access page
-    user clicks link    Manage team access
-    user waits until page contains    Update access for release (Academic Year 2002/03)
+    user clicks link    Team access
+    user waits until page contains link    Add or remove users
 
+    user waits until page contains    Update release access
+    user waits until h3 is visible    Academic Year 2002/03 (Not live)
     user checks page contains    There are no contributors or pending contributor invites for this release.
 
 Validate Select release dropdown
@@ -82,7 +90,8 @@ Invite existing user analyst2 to be a contributor for 2002/03 release
     user checks checkbox is not checked    Academic Year 2000/01
 
     user clicks button    Invite user
-    user waits until page contains    Update access for release (Academic Year 2002/03)
+    user waits until page contains    Update release access
+    user waits until h3 is visible    Academic Year 2002/03 (Not live)
 
 Validate contributors for 2002/03 release
     user waits until page contains    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
@@ -108,7 +117,7 @@ Add new contributors to release
     user checks checkbox is checked    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
 
     user clicks button    Update contributors
-    user waits until page contains    Update access for release (Academic Year 2002/03)
+    user waits until page contains    Update release access
 
 Validate contributors for 2002/03 release again
     user waits until page contains    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
@@ -131,7 +140,7 @@ Validate contributors for 2002/03 release for the third time
 
 Validate contributors for 2001/02 release
     user chooses select option    id:currentRelease    Academic Year 2001/02
-    user waits until page contains    Update access for release (Academic Year 2001/02)
+    user waits until h3 is visible    Academic Year 2001/02 (Not live)
 
     user waits until page contains    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
     user checks page does not contain    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
@@ -139,7 +148,7 @@ Validate contributors for 2001/02 release
 
 Validate contributors for 2000/01 release
     user chooses select option    id:currentRelease    Academic Year 2000/01
-    user waits until page contains    Update access for release (Academic Year 2000/01)
+    user waits until h3 is visible    Academic Year 2000/01 (Not live)
 
     user waits until page contains    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
     user checks page does not contain    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
@@ -151,7 +160,8 @@ Invite brand new user
     user enters text into element    id:email    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk
 
     user clicks button    Invite user
-    user waits until page contains    Update access for release (Academic Year 2000/01)
+    user waits until page contains    Update release access
+    user waits until h3 is visible    Academic Year 2000/01 (Not live)
 
 Validate contributors for 2000/01 release again
     user waits until page contains    Analyst1 User1 (ees-test.analyst1@education.gov.uk)

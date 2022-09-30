@@ -220,6 +220,10 @@ user waits until page does not contain link
     [Arguments]    ${link_text}    ${wait}=${timeout}
     wait until page does not contain element    xpath://a[.="${link_text}"]    timeout=${wait}
 
+user checks page does not contain link
+    [Arguments]    ${link_text}
+    user checks page does not contain element    xpath://a[.="${link_text}"]    timeout=${wait}
+
 user waits until element contains link
     [Arguments]    ${element}    ${link_text}    ${wait}=${timeout}
     user waits until parent contains element    ${element}    link:${link_text}    timeout=${wait}
