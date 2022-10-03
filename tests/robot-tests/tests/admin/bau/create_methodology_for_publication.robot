@@ -17,35 +17,45 @@ ${PUBLICATION_NAME}=    UI tests - create methodology publication %{RUN_IDENTIFI
 *** Test Cases ***
 Create Publication and check available Methodology controls
     user creates test publication via api    ${PUBLICATION_NAME}
-    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
-    user checks element contains button    ${accordion}    Create methodology
-    user checks element contains link    ${accordion}    Use an external methodology
+    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
+    user checks page contains button    Create new methodology
+    user waits until page contains link    Add external methodology
+    user waits until page contains link    Adopt an existing methodology
 
 Create a Methodology
-    bau user creates methodology for publication    ${PUBLICATION_NAME}
-    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
-    user checks element does not contain button    ${accordion}    Create methodology
-    user checks element contains link    ${accordion}    Use an external methodology
-    ${details}=    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user checks element contains link    ${details}    Edit methodology
-    user checks element contains button    ${details}    Remove
-    user checks element does not contain button    ${details}    Amend methodology
-    user views methodology for open publication accordion    ${accordion}    ${PUBLICATION_NAME}
+    user creates methodology for publication    ${PUBLICATION_NAME}
+
+    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
+    user checks page does not contain button    Create new methodology
+    user waits until page contains link    Add external methodology
+    user waits until page contains link    Adopt an existing methodology
+
+    ${ROW}=    user gets table row    ${PUBLICATION_NAME}    testid:methodologies
+
+    user checks element contains link    ${ROW}    Edit
+    user checks element contains button    ${ROW}    Delete draft
+    user checks element does not contain button    ${ROW}    Amend
+
+    user clicks element    xpath://*[text()="Edit"]    testid:methodologies
+    user waits until h2 is visible    Methodology summary
+
     user verifies methodology summary details    ${PUBLICATION_NAME}
 
 Remove the Methodology
-    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
-    ${details}=    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user clicks button    Remove    ${details}
-    user waits until modal is visible    Confirm you want to remove this methodology
-    user clicks button    Confirm
-    user waits until modal is not visible    Confirm you want to remove this methodology
+    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
 
-    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
-    user checks element contains button    ${accordion}    Create methodology
+    ${ROW}=    user gets table row    ${PUBLICATION_NAME}    testid:methodologies
+    user clicks element    xpath://*[text()="Delete draft"]    testid:methodologies
+
+    user waits until modal is visible    Confirm you want to delete this draft methodology
+    user clicks button    Confirm
+    user waits until modal is not visible    Confirm you want to delete this draft methodology
+
+    user waits until h2 is visible    Manage methodologies
+    user checks page contains button    Create new methodology
 
 Create a Methodology again
-    bau user creates methodology for publication    ${PUBLICATION_NAME}
+    user creates methodology for publication    ${PUBLICATION_NAME}
 
 Update Methodology Summary
     user edits methodology summary for publication    ${PUBLICATION_NAME}    ${PUBLICATION_NAME}
@@ -90,22 +100,26 @@ Approve the Methodology
     ...    Not yet published
 
 Check the controls available are as expected for an approved Methodology that is not yet publicly visible
-    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
-    ${details}=    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user checks element contains link    ${details}    Edit methodology
-    user checks element does not contain button    ${details}    Remove
+    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
+
+    ${ROW}=    user gets table row    ${PUBLICATION_NAME} - another new methodology title    testid:methodologies
+    user checks element contains link    ${ROW}    Edit
+    user checks element does not contain button    ${ROW}    Delete draft
 
     # Check that the Amend methodology button is not yet present.    This is because the Methodology, although set to
     # publish immediately, is attached to a Publication that does not yet have any live Releases, and so this
     # Methodology can still be unapproved and edited rather than needing to be amended.
-    user checks element does not contain button    ${details}    Amend methodology
+    user checks element does not contain button    ${ROW}    Amend
 
 Unapprove the Methodology
-    user views methodology for publication    ${PUBLICATION_NAME}
+    ${ROW}=    user gets table row    ${PUBLICATION_NAME} - another new methodology title    testid:methodologies
+    user clicks element    xpath://*[text()="Edit"]    ${ROW}
+    user waits until h2 is visible    Methodology summary
+
     user clicks link    Sign off
     user changes methodology status to Draft
 
-    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
-    ${details}=    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user checks element contains link    ${details}    Edit methodology
-    user checks element contains button    ${details}    Remove
+    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
+    ${ROW}=    user gets table row    ${PUBLICATION_NAME} - another new methodology title    testid:methodologies
+    user checks element contains link    ${ROW}    Edit
+    user checks element contains button    ${ROW}    Delete draft
