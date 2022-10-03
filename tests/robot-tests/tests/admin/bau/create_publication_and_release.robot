@@ -85,7 +85,7 @@ Update publication
     user clicks button    Confirm
 
 Add a methodology
-    bau user creates methodology for publication    ${PUBLICATION_NAME}    ${CREATED_THEME_NAME}
+    user creates methodology for publication    ${PUBLICATION_NAME}    ${CREATED_THEME_NAME}
     ...    ${CREATED_TOPIC_NAME}
 
 Verify publication has been updated

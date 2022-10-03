@@ -205,30 +205,26 @@ user goes to publication page from dashboard
     user clicks link    ${publication}
     user waits until h1 is visible    ${publication}
 
-bau user creates methodology for publication
+user creates methodology for publication
     [Arguments]
     ...    ${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
 
-    user goes to publication page from dashboard    ${publication}    ${theme}    ${topic}
-
-    user clicks link    Methodologies
-    user waits until h2 is visible    Manage methodologies
+    user navigates to methodologies page for publication    ${publication}    ${theme}    ${topic}
 
     user clicks button    Create new methodology
     user verifies methodology summary details    ${publication}
 
-user views methodology for publication
+user navigates to methodologies page for publication
     [Arguments]
     ...    ${publication}
-    ...    ${methodology_title}=${publication}
-    ...    ${view_button_text}=Edit methodology
-    ${accordion}=    user goes to publication page from dashboard    ${publication}
-    user views methodology for open publication accordion
-    ...    ${accordion}
-    ...    ${methodology_title}
-    ...    ${view_button_text}
+    ...    ${theme}=%{TEST_THEME_NAME}
+    ...    ${topic}=%{TEST_TOPIC_NAME}
+    user goes to publication page from dashboard    ${publication}    ${theme}    ${topic}
+
+    user clicks link    Methodologies
+    user waits until h2 is visible    Manage methodologies
 
 user views methodology amendment for publication
     [Arguments]    ${publication}    ${methodology_title}=${publication}
@@ -250,8 +246,13 @@ user edits methodology summary for publication
     ...    ${publication}
     ...    ${existing_methodology_title}
     ...    ${new_methodology_title}
-    ...    ${edit_button_text}=Edit methodology
-    user views methodology for publication    ${publication}    ${existing_methodology_title}    ${edit_button_text}
+    ...    ${edit_button_text}=Edit
+    user navigates to methodologies page for publication    ${publication}
+    ${ROW}=    user gets table row    ${existing_methodology_title}    testid:methodologies
+    user clicks element    xpath://*[text()="${edit_button_text}"]    ${ROW}
+
+    user waits until h2 is visible    Methodology summary
+
     user clicks link    Edit summary
     user waits until h2 is visible    Edit methodology summary    %{WAIT_MEDIUM}
 
@@ -334,9 +335,12 @@ approve methodology for publication
     ...    ${with_release}
     ...    ${edit_button_text}
 
-    ${accordion}=    user goes to publication page from dashboard    ${publication}    ${theme}    ${topic}
-    user opens details dropdown    ${methodology_title}    ${accordion}
-    user clicks link    ${edit_button_text}    ${accordion}
+    user navigates to methodologies page for publication    ${publication}    ${theme}    ${topic}
+
+    ${ROW}=    user gets table row    ${methodology_title}    testid:methodologies
+    user clicks element    xpath://*[text()="Edit"]    ${ROW}
+    user waits until h2 is visible    Methodology summary
+
     approve methodology from methodology view    ${publishing_strategy}    ${with_release}
 
 approve methodology from methodology view
@@ -352,7 +356,7 @@ user creates approved methodology for publication
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
 
-    bau user creates methodology for publication    ${publication}    ${theme}    ${topic}
+    user creates methodology for publication    ${publication}    ${theme}    ${topic}
     user approves methodology for publication    ${publication}    ${publication}    ${theme}    ${topic}
 
 user creates methodology amendment for publication
@@ -361,12 +365,14 @@ user creates methodology amendment for publication
     ...    ${methodology_title}=${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
-    ${accordion}=    user goes to publication page from dashboard    ${publication}
-    user opens details dropdown    ${methodology_title}    ${accordion}
-    user clicks button    Amend methodology    ${accordion}
-    user waits until modal is visible    Confirm you want to amend this live methodology
+    user navigates to methodologies page for publication    ${publication}    ${theme}    ${topic}
+
+    ${ROW}=    user gets table row    ${methodology_title}    testid:methodologies
+    user clicks element    xpath://*[text()="Amend"]    ${ROW}
+
+    user waits until modal is visible    Confirm you want to amend this published methodology
     user clicks button    Confirm
-    user waits until modal is not visible    Confirm you want to amend this live methodology
+    user waits until modal is not visible    Confirm you want to amend this published methodology
     user waits until h2 is visible    Methodology summary
 
 user cancels methodology amendment for publication
@@ -375,9 +381,11 @@ user cancels methodology amendment for publication
     ...    ${methodology_title}=${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
-    ${accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
-    user opens details dropdown    ${methodology_title}    ${accordion}
-    user clicks button    Cancel amendment    ${accordion}
+    user navigates to methodologies page for publication    ${publication}    ${theme}    ${topic}
+
+    ${ROW}=    user gets table row    ${methodology_title}    testid:methodologies
+    user clicks element    xpath://*[text()="Cancel amendment"]    ${ROW}
+
     user waits until modal is visible    Confirm you want to cancel this amended methodology
     user clicks button    Confirm
     user waits until modal is not visible    Confirm you want to cancel this amended methodology

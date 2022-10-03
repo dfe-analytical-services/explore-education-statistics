@@ -18,7 +18,7 @@ ${ADOPTING_PUBLICATION_NAME}=       UI tests - adopting methodology publication 
 *** Test Cases ***
 Create Publications and a Methodology to adopt
     user creates test publication via api    ${OWNING_PUBLICATION_NAME}
-    bau user creates methodology for publication    ${OWNING_PUBLICATION_NAME}
+    user creates methodology for publication    ${OWNING_PUBLICATION_NAME}
     user creates test publication via api    ${ADOPTING_PUBLICATION_NAME}
 
 Adopt a Methodology

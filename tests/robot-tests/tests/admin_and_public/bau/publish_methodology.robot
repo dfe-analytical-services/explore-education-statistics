@@ -23,7 +23,7 @@ Create a draft release
     user create test release via api    ${PUBLICATION_ID}    AY    2021
 
 Create a methodology
-    bau user creates methodology for publication    ${PUBLICATION_NAME}
+    user creates methodology for publication    ${PUBLICATION_NAME}
 
 Add content to methodology
     user clicks link    Manage content
@@ -61,7 +61,7 @@ Approve the methodology for publishing immediately
     user approves methodology for publication    ${PUBLICATION_NAME}
 
 Verify the expected public URL of the methodology on the Sign off tab
-    user views methodology for publication    ${PUBLICATION_NAME}
+    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
     user clicks link    Sign off
     user waits until page contains testid    public-methodology-url
     ${ACCESSIBLE_METHODOLOGY_URL}=    Get Value    xpath://*[@data-testid="public-methodology-url"]
@@ -96,7 +96,7 @@ Approve the release
     user approves original release for immediate publication
 
 Verify that the user cannot edit the status of the methodology
-    user views methodology for publication
+    user navigates to methodologies page for publication
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME}
     ...    View methodology
