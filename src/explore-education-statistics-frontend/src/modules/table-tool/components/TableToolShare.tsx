@@ -16,6 +16,7 @@ import React, { useEffect, useState } from 'react';
 
 const linkInstructions =
   'Use the link below to see a version of this page that you can bookmark for future reference, or copy the link to send on to somebody else to view.';
+const permalinkBaseUrl = `${window.location.origin}/data-tables/permalink`;
 
 interface Props {
   tableHeaders?: TableHeadersConfig;
@@ -59,11 +60,7 @@ const TableToolShare = ({
   };
 
   const handleCopyClick = () => {
-    const el = document.querySelector(
-      "[data-testid='permalink-generated-url']",
-    ) as HTMLInputElement;
-    el?.select();
-    document.execCommand('copy');
+    navigator.clipboard.writeText(`${permalinkBaseUrl}/${permalinkId}`);
     setScreenReaderMessage('Link copied to the clipboard.');
   };
 
@@ -95,7 +92,7 @@ const TableToolShare = ({
           <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-2">
             <UrlContainer
               data-testid="permalink-generated-url"
-              url={`${window.location.origin}/data-tables/permalink/${permalinkId}`}
+              url={`${permalinkBaseUrl}/${permalinkId}`}
             />
           </p>
 
