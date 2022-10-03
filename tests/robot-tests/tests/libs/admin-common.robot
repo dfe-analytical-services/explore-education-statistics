@@ -201,6 +201,7 @@ user goes to publication page from dashboard
     ...    ${topic}=%{TEST_TOPIC_NAME}
 
     user navigates to admin dashboard if needed    %{ADMIN_URL}
+    user waits until h1 is visible    Dashboard
     user selects dashboard theme and topic if possible    ${theme}    ${topic}
     user clicks link    ${publication}
     user waits until h1 is visible    ${publication}
