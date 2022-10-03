@@ -101,7 +101,6 @@ user navigates to editable release summary from admin dashboard
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     user goes to publication page from dashboard
     ...    ${PUBLICATION_NAME}
-    ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}
     ...    ${TOPIC_NAME}
 
@@ -696,9 +695,10 @@ user verifies release summary
     user waits until h2 is visible    Release summary
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
     user checks summary list contains    Publication summary    ${PUBLICATION_SUMMARY}
+    user checks summary list contains    Lead statistician    ${LEAD_STATISTICIAN}
+
     user checks summary list contains    Time period    ${TIME_PERIOD}
     user checks summary list contains    Release period    ${RELEASE_PERIOD}
-    user checks summary list contains    Lead statistician    ${LEAD_STATISTICIAN}
     user checks summary list contains    Release type    ${RELEASE_TYPE}
 
 user changes methodology status to Approved
