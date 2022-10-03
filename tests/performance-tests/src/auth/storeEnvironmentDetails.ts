@@ -14,6 +14,7 @@ export interface Environment {
   publicUrl: string;
   adminUrl: string;
   contentApiUrl: string;
+  dataApiUrl: string;
   idp: IdpOption;
   users: User[];
   supportsRefreshTokens: boolean;
