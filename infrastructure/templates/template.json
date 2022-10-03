@@ -569,13 +569,6 @@
         "description": "Override cron expression for all entities cached in memory"
       }
     },
-    "releaseStatusPollTimeMillis": {
-      "type": "int",
-      "defaultValue": 10000,
-      "metadata": {
-        "description": "Interval in milliseconds between checking for the publication status of a Release on the Release Sign-off page"
-      }
-    },
     "requestTimeoutsTableBuilderQuery": {
       "type": "int",
       "defaultValue": 210000,
@@ -653,7 +646,7 @@
     "contentDbName": "content",
     "coreStatisticsDbName": "statistics",
     "publicStatisticsDbName": "public-statistics",
-    "statisticsReplicaDbName": "statistics-replica",
+    "statisticsReplicaDbName": "statistics",
     "dataAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-data')]",
     "dataPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-data')]",
     "dataAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-data')]",
@@ -848,7 +841,7 @@
       },
       {
         "name": "[concat(parameters('subscription'),'StatisticsReplicaDBCpuPercent')]",
-        "description": "Public Statistics DB CPU percentage",
+        "description": "Statistics Replica DB CPU percentage",
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "cpu_percent",
@@ -859,7 +852,7 @@
       },
       {
         "name": "[concat(parameters('subscription'),'StatisticsReplicaDBDataIOPercent')]",
-        "description": "Public Statistics DB Data IO Percentage",
+        "description": "Statistics Replica DB Data IO Percentage",
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "physical_data_read_percent",
@@ -870,7 +863,7 @@
       },
       {
         "name": "[concat(parameters('subscription'),'StatisticsReplicaDBFailedConnections')]",
-        "description": "Public Statistics DB Failed Connections",
+        "description": "Statistics Replica DB Failed Connections",
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "connection_failed",
@@ -881,7 +874,7 @@
       },
       {
         "name": "[concat(parameters('subscription'),'StatisticsReplicaDBDeadlock')]",
-        "description": "Public Statistics DB Deadlock",
+        "description": "Statistics Replica DB Deadlock",
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "deadlock",
@@ -892,7 +885,7 @@
       },
       {
         "name": "[concat(parameters('subscription'),'StatisticsReplicaDBDataSpaceUsedPercent')]",
-        "description": "Public Statistics DB Data Space Used Percentage",
+        "description": "Statistics Replica DB Data Space Used Percentage",
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
@@ -903,7 +896,7 @@
       },
       {
         "name": "[concat(parameters('subscription'),'StatisticsReplicaDBDataSpaceUsedPercentUrgent')]",
-        "description": "Public Statistics DB Data Space Used Percentage - URGENT",
+        "description": "Statistics Replica DB Data Space Used Percentage - URGENT",
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
@@ -914,7 +907,7 @@
       },
       {
         "name": "[concat(parameters('subscription'),'StatisticsReplicaDBBlockedByFirewall')]",
-        "description": "Public Statistics DB Blocked By Firewall",
+        "description": "Statistics Replica DB Blocked By Firewall",
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "blocked_by_firewall",
@@ -2011,7 +2004,7 @@
         "NODE_ENV": "production",
         "PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
         "WEBSITE_NODE_DEFAULT_VERSION": "14.16.0",
-        "WEBSITE_RUN_FROM_PACKAGE": "1",
+        "WEBSITE_RUN_FROM_PACKAGE": "1"
       }
     },
     {
@@ -3246,11 +3239,14 @@
       ],
       "properties": {
         "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
-        "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
+        "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",        
+        "AzureWebJobs.PublishReleaseData.Disabled": "[parameters('publishReleaseDataFunctionDisabled')]",
         "PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
         "PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
         "ClientId": "[parameters('publisherClientId')]",
         "ClientSecret": "[parameters('publisherClientSecret')]",
+        "DataFactoryName": "[variables('dataFactoryName')]",
+        "PipelineName": "[parameters('publisherPipelineName')]",
         "ResourceGroupName": "[resourceGroup().name]",
         "SubscriptionId": "[subscription().subscriptionId]",
         "TenantId": "[subscription().tenantId]",
@@ -3545,6 +3541,54 @@
       }
     },
     {
+      "name": "datafactory",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "properties": {
+        "mode": "incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateBaseUrl'), 'datafactory/template.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "subscription": {
+            "value": "[parameters('subscription')]"
+          },
+          "environment": {
+            "value": "[parameters('environment')]"
+          },
+          "publisherAppName": {
+            "value": "[variables('publisherAppName')]"
+          },
+          "dataFactoryName": {
+            "value": "[variables('dataFactoryName')]"
+          },
+          "dataFactoryConcurrency": {
+            "value": "[parameters('dataFactoryConcurrency')]"
+          },
+          "keyVaultName": {
+            "value": "[variables('keyVaultName')]"
+          },
+          "branch": {
+            "value": "[parameters('branch')]"
+          },
+          "actionGroupAlerts": {
+            "value": "[variables('actionGroupAlerts')]"
+          },
+          "enableAlerts": {
+            "value": "[parameters('enableAlerts')]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
+        "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
+        "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+        "[resourceId('microsoft.insights/actionGroups', variables('actionGroupAlerts'))]"
+      ]
+    },
+    {
       "name": "[variables('keyVaultName')]",
       "type": "Microsoft.KeyVault/vaults",
       "apiVersion": "2016-10-01",
@@ -3572,7 +3616,21 @@
         "enabledForDiskEncryption": true,
         "enabledForTemplateDeployment": true,
         "enableSoftDelete": true,
-        "accessPolicies": [
+        "accessPolicies": [          
+          {
+            "tenantId": "[subscription().tenantId]",
+            "objectId": "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId]",
+            "permissions": {
+              "keys": [
+              ],
+              "secrets": [
+                "Get",
+                "List"
+              ],
+              "certificates": [
+              ]
+            }
+          },
           {
             "tenantId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName'), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2015-08-31-PREVIEW').tenantId]",
             "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName'), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2015-08-31-PREVIEW').principalId]",

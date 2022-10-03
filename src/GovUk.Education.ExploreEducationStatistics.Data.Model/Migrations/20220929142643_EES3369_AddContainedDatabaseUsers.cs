@@ -2,8 +2,6 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations.MigrationConstants;
 
-#nullable disable
-
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     public partial class EES3369_AddContainedDatabaseUsers : Migration

@@ -162,10 +162,8 @@ The service can be started against a set of non-existent database. If no pre-exi
 `statistics` databases yet exist on the target SQL Server instance:
 
 1. Create empty `content` and `statistics` databases.
-2. Create the users necessary to access the databases using the 
-[Create Database Users script](useful-scripts/sql/database-users/create-new-database-logins.sql).
-3. Perform a one-off creation of database logins and users:
-   1. Using Azure Data Studio or similar, connect to your databases and run:
+2. Perform a one-off creation of database logins and users.  Using Azure Data Studio or similar, 
+   connect to these new databases and run:
       ```sql
       -- Against the `master` database
       CREATE Login [adminapp] WITH PASSWORD = 'Your_Password123';
@@ -193,19 +191,10 @@ The service can be started against a set of non-existent database. If no pre-exi
       GRANT EXECUTE ON OBJECT::FilteredFootnotes TO [adminapp];
       GRANT SELECT ON OBJECT::geojson TO [adminapp];
       ```
-      ```
-   2. Replace the username and password credentials in 
-      [Admin appsettings](src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Development.json) with
-      the SA user's credentials.
-   3. Start up the Admin project:
-      ```bash
-      cd useful-scripts
-      ./run.js admin
-      ```
-      This will create Contained Users for the `content` and `statistics` databases.
-4. Replace the contents of [Admin appsettings](src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Development.json)
-   with its original settings. The Admin project can then be started using its Contained User credentials as well as the other 
-   projects.
+   This will create contained users for the `content` and `statistics` databases as well as allowing the `adminapp` user  
+   to manage the permissions of the contained users.
+3. Start the Admin project and this will configure the contained users' permissions via database migrations. The other 
+   projects will then be able to be started, using their own contained users to connect to the databases. 
 
 ### Running a different identity provider (optional)
 
