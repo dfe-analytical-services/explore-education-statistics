@@ -255,13 +255,12 @@ const ChartDataSetsConfiguration = ({
                   <th>Data set</th>
                   {!isReordering && (
                     <th className="dfe-align--right">
-                      <VisuallyHidden>Remove data sets:</VisuallyHidden>
                       {dataSets.length > 0 && (
                         <ButtonText
                           className="govuk-!-margin-bottom-0"
                           onClick={toggleConfirmModal.on}
                         >
-                          Remove all
+                          Remove all<VisuallyHidden> data sets</VisuallyHidden>
                         </ButtonText>
                       )}
                     </th>
@@ -356,9 +355,7 @@ const ChartDataSetsConfiguration = ({
           <Button
             className="dfe-align-self-end govuk-!-margin-left-2"
             variant="secondary"
-            onClick={
-              isReordering ? toggleIsReordering.off : toggleIsReordering.on
-            }
+            onClick={toggleIsReordering}
           >
             {isReordering ? 'Finish reordering' : 'Reorder data sets'}
           </Button>

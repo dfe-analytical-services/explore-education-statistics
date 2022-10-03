@@ -1022,7 +1022,9 @@ describe('ChartDataSetsConfiguration', () => {
 
       expect(handleChange).not.toHaveBeenCalled();
 
-      userEvent.click(screen.getByRole('button', { name: 'Remove all' }));
+      userEvent.click(
+        screen.getByRole('button', { name: 'Remove all data sets' }),
+      );
 
       const modal = within(screen.getByRole('dialog'));
       expect(modal.getByText('Remove all data sets')).toBeInTheDocument();

@@ -333,6 +333,7 @@ Configure basic line chart
     user enters text into element    id:chartConfigurationForm-height    400
     user enters text into element    id:chartConfigurationForm-width    900
 
+Validate changing data sets
     user clicks link    Data sets
     user waits until h3 is visible    Data sets
 
@@ -349,14 +350,16 @@ Configure basic line chart
     user checks chart legend item contains    id:chartBuilderPreview    2    Admission Numbers (Syon)
     user checks chart legend item contains    id:chartBuilderPreview    3    Admission Numbers (Bolton 001)
 
-Change data sets
-    user clicks link    Data sets
-
     user clicks button    Remove all
     user clicks button    Confirm
 
+    user checks page contains    Configure the chart and add data to view a preview
+
+Configure line chart data sets
     user chooses select option    id:chartDataSetsConfigurationForm-location    Nailsea Youngwood
     user clicks button    Add data set
+
+    user checks chart legend item contains    id:chartBuilderPreview    1    Admission Numbers (Nailsea Youngwood)
 
     user clicks link    Legend
     user chooses select option    id:chartLegendConfigurationForm-items-0-symbol    Circle
