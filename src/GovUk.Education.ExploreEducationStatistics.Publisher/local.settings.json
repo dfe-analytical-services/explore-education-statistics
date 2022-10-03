@@ -9,12 +9,13 @@
     "CoreStorage": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://data-storage:10000/devstoreaccount1;",
     "NotificationStorage": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;QueueEndpoint=http://data-storage:10001/devstoreaccount1;",
     "PublisherStorage": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://data-storage:10000/devstoreaccount1;QueueEndpoint=http://data-storage:10001/devstoreaccount1;TableEndpoint=http://data-storage:10002/devstoreaccount1;",
-    "PublicStorage": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://data-storage:10000/devstoreaccount1;TableEndpoint=http://data-storage:10002/devstoreaccount1;"
+    "PublicStorage": "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://data-storage:10000/devstoreaccount1;TableEndpoint=http://data-storage:10002/devstoreaccount1;",
+    "StorageSupportsBatchDeletes": false
   },
   "ConnectionStrings": {
-    "ContentDb": "Server=db;Database=content;User=SA;Password=Your_Password123;",
-    "StatisticsDb": "Server=db;Database=statistics;User=SA;Password=Your_Password123;",
-    "PublicStatisticsDb": "Server=db;Database=statistics;User=SA;Password=Your_Password123;"
+    "ContentDb": "Server=db;Database=content;User=publisher;Password=Your_Password123;",
+    "StatisticsDb": "Server=db;Database=statistics;User=publisher;Password=Your_Password123;",
+    "PublicStatisticsDb": "Server=db;Database=statistics;User=publisher;Password=Your_Password123;"
   },
   "Host": {
     "CORS": "*"

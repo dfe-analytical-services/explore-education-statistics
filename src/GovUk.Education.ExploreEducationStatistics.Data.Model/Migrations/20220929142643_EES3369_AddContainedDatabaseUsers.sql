@@ -1,32 +1,32 @@
-IF EXISTS (SELECT name 
-            FROM [sys].[server_principals]
-            WHERE name = 'adminapp')
-AND NOT EXISTS (SELECT name
-            FROM [sys].[database_principals]
-            WHERE name = 'adminapp')
-BEGIN
-    CREATE USER [adminapp] FROM LOGIN [adminapp];
-    
-    ALTER ROLE [db_ddladmin] ADD MEMBER [adminapp];
-    ALTER ROLE [db_datareader] ADD MEMBER [adminapp];
-    ALTER ROLE [db_datawriter] ADD MEMBER [adminapp];
-    GRANT EXECUTE ON TYPE::IdListGuidType TO [adminapp];
-    GRANT EXECUTE ON OBJECT::FilteredFootnotes TO [adminapp];
-END
-
-
-IF EXISTS (SELECT name 
-            FROM [sys].[server_principals]
-            WHERE name = 'importer')
-AND NOT EXISTS (SELECT name
+IF NOT EXISTS (SELECT name
                 FROM [sys].[database_principals]
                 WHERE name = 'importer')
 BEGIN
     CREATE USER [importer] FROM LOGIN [importer];
 
---     ALTER ROLE [db_ddladmin] ADD MEMBER [importer];
-    ALTER ROLE [db_datareader] ADD MEMBER [importer];
-    ALTER ROLE [db_datawriter] ADD MEMBER [importer];
+    GRANT ALL ON [dbo].[BoundaryLevel] TO [importer];
+    GRANT ALL ON [dbo].[Filter] TO [importer];
+    GRANT ALL ON [dbo].[FilterFootnote] TO [importer];
+    GRANT ALL ON [dbo].[FilterGroup] TO [importer];
+    GRANT ALL ON [dbo].[FilterGroupFootnote] TO [importer];
+    GRANT ALL ON [dbo].[FilterItem] TO [importer];
+    GRANT ALL ON [dbo].[FilterItemFootnote] TO [importer];
+    GRANT ALL ON [dbo].[Footnote] TO [importer];
+    GRANT ALL ON [dbo].[geometry] TO [importer];
+    GRANT ALL ON [dbo].[geometry_columns] TO [importer];
+    GRANT ALL ON [dbo].[Indicator] TO [importer];
+    GRANT ALL ON [dbo].[IndicatorFootnote] TO [importer];
+    GRANT ALL ON [dbo].[IndicatorGroup] TO [importer];
+    GRANT ALL ON [dbo].[Location] TO [importer];
+    GRANT ALL ON [dbo].[Observation] TO [importer];
+    GRANT ALL ON [dbo].[ObservationFilterItem] TO [importer];
+    GRANT ALL ON [dbo].[Release] TO [importer];
+    GRANT ALL ON [dbo].[ReleaseFootnote] TO [importer];
+    GRANT ALL ON [dbo].[ReleaseSubject] TO [importer];
+    GRANT ALL ON [dbo].[spatial_ref_sys] TO [importer];
+    GRANT ALL ON [dbo].[Subject] TO [importer];
+    GRANT ALL ON [dbo].[SubjectFootnote] TO [importer];
+
     GRANT EXECUTE ON TYPE::ObservationType TO [importer];
     GRANT EXECUTE ON TYPE::ObservationFilterItemType TO [importer];
     GRANT EXECUTE ON OBJECT::InsertObservations TO [importer];
@@ -34,25 +34,38 @@ BEGIN
 END
 
 
-IF EXISTS (SELECT name 
-            FROM [sys].[server_principals]
-            WHERE name = 'publisher')
-AND NOT EXISTS (SELECT name
+IF NOT EXISTS (SELECT name
                 FROM [sys].[database_principals]
                 WHERE name = 'publisher')
 BEGIN
     CREATE USER [publisher] FROM LOGIN [publisher];
 
---     ALTER ROLE [db_ddladmin] ADD MEMBER [publisher];
-    ALTER ROLE [db_datareader] ADD MEMBER [publisher];
-    ALTER ROLE [db_datawriter] ADD MEMBER [publisher];
+    GRANT ALL ON [dbo].[BoundaryLevel] TO [publisher];
+    GRANT ALL ON [dbo].[Filter] TO [publisher];
+    GRANT ALL ON [dbo].[FilterFootnote] TO [publisher];
+    GRANT ALL ON [dbo].[FilterGroup] TO [publisher];
+    GRANT ALL ON [dbo].[FilterGroupFootnote] TO [publisher];
+    GRANT ALL ON [dbo].[FilterItem] TO [publisher];
+    GRANT ALL ON [dbo].[FilterItemFootnote] TO [publisher];
+    GRANT ALL ON [dbo].[Footnote] TO [publisher];
+    GRANT ALL ON [dbo].[geometry] TO [publisher];
+    GRANT ALL ON [dbo].[geometry_columns] TO [publisher];
+    GRANT ALL ON [dbo].[Indicator] TO [publisher];
+    GRANT ALL ON [dbo].[IndicatorFootnote] TO [publisher];
+    GRANT ALL ON [dbo].[IndicatorGroup] TO [publisher];
+    GRANT ALL ON [dbo].[Location] TO [publisher];
+    GRANT ALL ON [dbo].[Observation] TO [publisher];
+    GRANT ALL ON [dbo].[ObservationFilterItem] TO [publisher];
+    GRANT ALL ON [dbo].[Release] TO [publisher];
+    GRANT ALL ON [dbo].[ReleaseFootnote] TO [publisher];
+    GRANT ALL ON [dbo].[ReleaseSubject] TO [publisher];
+    GRANT ALL ON [dbo].[spatial_ref_sys] TO [publisher];
+    GRANT ALL ON [dbo].[Subject] TO [publisher];
+    GRANT ALL ON [dbo].[SubjectFootnote] TO [publisher];
 END
 
 
-IF EXISTS (SELECT name 
-            FROM [sys].[server_principals]
-            WHERE name = 'content')
-AND NOT EXISTS (SELECT name
+IF NOT EXISTS (SELECT name
                 FROM [sys].[database_principals]
                 WHERE name = 'content')
 BEGIN
@@ -83,10 +96,7 @@ BEGIN
 END
 
 
-IF EXISTS (SELECT name 
-            FROM [sys].[server_principals]
-            WHERE name = 'data')
-AND NOT EXISTS (SELECT name
+IF NOT EXISTS (SELECT name
                 FROM [sys].[database_principals]
                 WHERE name = 'data')
 BEGIN
