@@ -1915,6 +1915,181 @@ exports[`MultiHeaderTable renders table with \`rowgroup\` header merged with mul
 </table>
 `;
 
+exports[`MultiHeaderTable renders table with deeply nested rows and multiple identical headers 1`] = `
+<table class="govuk-table table">
+  <thead class="tableHead">
+    <tr>
+      <td colspan="4"
+          rowspan="1"
+          class="borderBottom"
+      >
+      </td>
+      <th colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        1
+      </th>
+      <th colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        2
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th class
+          rowspan="1"
+          colspan="4"
+          scope="row"
+      >
+        A
+      </th>
+      <td class="govuk-table__cell--numeric">
+        AAAA1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        AAAA2
+      </td>
+    </tr>
+    <tr>
+      <th class="borderBottom"
+          rowspan="2"
+          colspan="2"
+          scope="rowgroup"
+      >
+        B
+      </th>
+      <th class
+          rowspan="1"
+          colspan="2"
+          scope="row"
+      >
+        B
+      </th>
+      <td class="govuk-table__cell--numeric">
+        BBBB1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        BBBB2
+      </td>
+    </tr>
+    <tr>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="1"
+          scope="rowgroup"
+      >
+        C
+      </th>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        D
+      </th>
+      <td class="govuk-table__cell--numeric borderBottom">
+        BBBC1
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        BBBC2
+      </td>
+    </tr>
+    <tr>
+      <th class="borderBottom"
+          rowspan="4"
+          colspan="1"
+          scope="rowgroup"
+      >
+        E
+      </th>
+      <th class="borderBottom"
+          rowspan="4"
+          colspan="1"
+          scope="rowgroup"
+      >
+        F
+      </th>
+      <th class="borderBottom"
+          rowspan="2"
+          colspan="1"
+          scope="rowgroup"
+      >
+        F
+      </th>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        F
+      </th>
+      <td class="govuk-table__cell--numeric">
+        EFFF1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        EFFF2
+      </td>
+    </tr>
+    <tr>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        G
+      </th>
+      <td class="govuk-table__cell--numeric">
+        EFFG1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        EFFG2
+      </td>
+    </tr>
+    <tr>
+      <th class="borderBottom"
+          rowspan="2"
+          colspan="1"
+          scope="rowgroup"
+      >
+        H
+      </th>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        I
+      </th>
+      <td class="govuk-table__cell--numeric borderBottom">
+        EFHI1
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        EFHI2
+      </td>
+    </tr>
+    <tr>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        J
+      </th>
+      <td class="govuk-table__cell--numeric">
+        EFHJ1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        EFHJ2
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
 exports[`MultiHeaderTable renders table with multi-span \`colgroup\` merged with its identical groups 1`] = `
 <table class="govuk-table table">
   <thead class="tableHead">
@@ -1995,6 +2170,129 @@ exports[`MultiHeaderTable renders table with multi-span \`colgroup\` merged with
       </td>
       <td class="govuk-table__cell--numeric borderBottom">
         CCF2
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`MultiHeaderTable renders table with multi-span \`rowgroup\` header merged with 2 identical groups  1`] = `
+<table class="govuk-table table">
+  <thead class="tableHead">
+    <tr>
+      <td colspan="3"
+          rowspan="1"
+          class="borderBottom"
+      >
+      </td>
+      <th colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        1
+      </th>
+      <th colspan="1"
+          rowspan="1"
+          scope="col"
+      >
+        2
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="1"
+          scope="rowgroup"
+      >
+        A
+      </th>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="1"
+          scope="rowgroup"
+      >
+        B
+      </th>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        C
+      </th>
+      <td class="govuk-table__cell--numeric">
+        ABC1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        ABC2
+      </td>
+    </tr>
+    <tr>
+      <th class="borderBottom"
+          rowspan="2"
+          colspan="2"
+          scope="rowgroup"
+      >
+        D
+      </th>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        D
+      </th>
+      <td class="govuk-table__cell--numeric">
+        DDD1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        DDD2
+      </td>
+    </tr>
+    <tr>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        E
+      </th>
+      <td class="govuk-table__cell--numeric borderBottom">
+        DDE1
+      </td>
+      <td class="govuk-table__cell--numeric borderBottom">
+        DDE2
+      </td>
+    </tr>
+    <tr>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="1"
+          scope="rowgroup"
+      >
+        F
+      </th>
+      <th class="borderBottom"
+          rowspan="1"
+          colspan="1"
+          scope="rowgroup"
+      >
+        G
+      </th>
+      <th class
+          rowspan="1"
+          colspan="1"
+          scope="row"
+      >
+        H
+      </th>
+      <td class="govuk-table__cell--numeric">
+        FGH1
+      </td>
+      <td class="govuk-table__cell--numeric">
+        FGH2
       </td>
     </tr>
   </tbody>
