@@ -69,7 +69,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     logger.LogError("{StackTrace}", e.StackTrace);
 
                     await UpdateStage(releaseId, releaseStatusId, Failed,
-                        new ReleasePublishingStatusLogMessage($"Exception in files stage: {e.Message}"));
+                        new ReleasePublishingStatusLogMessage("Exception in files stage: " +
+                                                              $"{e.Message}\n{e.StackTrace}"));
                 }
             }
 

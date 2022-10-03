@@ -83,7 +83,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 logger.LogError(e, "Exception occured while executing {0}",
                     executionContext.FunctionName);
                 await UpdateStage(message, Failed,
-                    new ReleasePublishingStatusLogMessage($"Exception in data stage: {e.Message}"));
+                    new ReleasePublishingStatusLogMessage("Exception in data stage: " +
+                                                          $"{e.Message}\n{e.StackTrace}"));
             }
 
             logger.LogInformation("{0} completed",

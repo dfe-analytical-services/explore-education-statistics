@@ -109,7 +109,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 logger.LogError("{StackTrace}", e.StackTrace);
 
                 await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Failed,
-                    new ReleasePublishingStatusLogMessage($"Exception publishing release immediately: {e.Message}"));
+                    new ReleasePublishingStatusLogMessage("Exception publishing release immediately: " +
+                                                          $"{e.Message}\n{e.StackTrace}"));
             }
 
             logger.LogInformation("{0} completed", executionContext.FunctionName);

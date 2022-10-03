@@ -58,7 +58,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     executionContext.FunctionName);
                 logger.LogError("{0}", e.StackTrace);
                 await UpdateStage(message, Failed,
-                    new ReleasePublishingStatusLogMessage($"Exception in content stage: {e.Message}"));
+                    new ReleasePublishingStatusLogMessage("Exception in content stage: " +
+                                                          $"{e.Message}\n{e.StackTrace}"));
             }
 
             logger.LogInformation("{0} completed",
