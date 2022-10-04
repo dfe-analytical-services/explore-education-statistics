@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
 
         private void ConfigureForLegacyPermalinks()
         {
-            CreateMap<LegacyPermalink, PermalinkViewModel>();
+            CreateMap<LegacyPermalink, LegacyPermalinkViewModel>();
             CreateMap<PermalinkTableBuilderResult, TableBuilderResultViewModel>();
             CreateMap<PermalinkResultSubjectMeta, ResultSubjectMetaViewModel>()
                 .ForMember(dest => dest.Locations,

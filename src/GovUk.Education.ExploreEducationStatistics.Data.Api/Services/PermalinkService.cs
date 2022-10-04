@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _mapper = mapper;
         }
 
-        public async Task<Either<ActionResult, PermalinkViewModel>> Get(Guid id)
+        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Get(Guid id)
         {
             try
             {
@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
         }
 
-        public async Task<Either<ActionResult, PermalinkViewModel>> Create(PermalinkCreateViewModel request)
+        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Create(PermalinkCreateViewModel request)
         {
             var publicationId = await _subjectRepository.GetPublicationIdForSubject(request.Query.SubjectId);
             var release = _releaseRepository.GetLatestPublishedRelease(publicationId);
@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return await Create(release.Id, request);
         }
 
-        public async Task<Either<ActionResult, PermalinkViewModel>> Create(Guid releaseId,
+        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Create(Guid releaseId,
             PermalinkCreateViewModel request)
         {
             return await _tableBuilderService.Query(releaseId, request.Query)
@@ -123,9 +123,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        private async Task<PermalinkViewModel> BuildViewModel(LegacyPermalink permalink)
+        private async Task<LegacyPermalinkViewModel> BuildViewModel(LegacyPermalink permalink)
         {
-            var viewModel = _mapper.Map<PermalinkViewModel>(permalink);
+            var viewModel = _mapper.Map<LegacyPermalinkViewModel>(permalink);
 
             viewModel.Status = await GetPermalinkStatus(permalink.Query.SubjectId);
 
