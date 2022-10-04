@@ -9,6 +9,7 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
@@ -155,6 +156,59 @@ public class PermalinkMigrationServiceTests
 
         Assert.Equal($"Blob not found for permalink {permalinkId}", exception.Message);
         Assert.Null(contentDbContext.Permalinks.SingleOrDefault(permalink => permalink.Id == permalinkId));
+    }
+
+    [Fact]
+    public async Task AddPermalinkToDbFromStorage_PermalinkAlreadyExists()
+    {
+        var existingPermalink = new Permalink
+        {
+            Id = Guid.NewGuid(),
+            PublicationTitle = "Existing permalink publication",
+            DataSetTitle = "Existing permalink data set",
+            SubjectId = Guid.NewGuid(),
+            Created = DateTime.UtcNow
+        };
+
+        var blobServiceClient = MockBlobServiceClientForPermalink(existingPermalink.Id);
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        // Setup a permalink already in the database
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            contentDbContext.Permalinks.Add(existingPermalink);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var service = SetupService(contentDbContext: contentDbContext,
+                blobServiceClient: blobServiceClient.Object
+            );
+
+            // Call to add permalink to db from storage should ignore it since it already exists  
+            var permalink = await service.AddPermalinkToDbFromStorage(existingPermalink.Id);
+
+            Assert.Equal(existingPermalink.Id, permalink!.Id);
+            Assert.Equal(existingPermalink.Created, permalink.Created);
+            Assert.Equal(existingPermalink.PublicationTitle, permalink.PublicationTitle);
+            Assert.Equal(existingPermalink.DataSetTitle, permalink.DataSetTitle);
+            Assert.Equal(existingPermalink.SubjectId, permalink.SubjectId);
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var found = contentDbContext.Permalinks.SingleOrDefault(permalink => permalink.Id == existingPermalink.Id);
+            Assert.NotNull(found);
+
+            // Permalink found in the database shouldn't have been updated since it already existed
+            Assert.Equal(existingPermalink.Id, found!.Id);
+            Assert.Equal(existingPermalink.Created, found.Created);
+            Assert.Equal(existingPermalink.PublicationTitle, found.PublicationTitle);
+            Assert.Equal(existingPermalink.DataSetTitle, found.DataSetTitle);
+            Assert.Equal(existingPermalink.SubjectId, found.SubjectId);
+        }
     }
 
     private Mock<BlobServiceClient> MockBlobServiceClientForPermalink(Guid permalinkId,

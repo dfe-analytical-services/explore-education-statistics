@@ -66,15 +66,18 @@ public class PermalinkMigrationService : IPermalinkMigrationService
 
     public async Task<Permalink> AddPermalinkToDbFromStorage(Guid permalinkId)
     {
-        var permalink = await GetPermalinkFromStorage(permalinkId);
-
-        if (!await _contentDbContext.Permalinks.AnyAsync(p => p.Id == permalinkId))
+        var existingPermalink = await _contentDbContext.Permalinks.SingleOrDefaultAsync(p => p.Id == permalinkId);
+        if (existingPermalink != null)
         {
-            _contentDbContext.Permalinks.Add(permalink);
-            await _contentDbContext.SaveChangesAsync();
+            // Permalink already exists so no need to migrate it from storage
+            return existingPermalink;
         }
 
-        return permalink;
+        var permalinkFromStorage = await GetPermalinkFromStorage(permalinkId);
+        _contentDbContext.Permalinks.Add(permalinkFromStorage);
+        await _contentDbContext.SaveChangesAsync();
+
+        return permalinkFromStorage;
     }
 
     private async Task<Permalink> GetPermalinkFromStorage(Guid permalinkId)
