@@ -1,48 +1,32 @@
 ﻿#nullable enable
 using System;
-using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Utils;
 using Microsoft.Azure.WebJobs;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusContentStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     // ReSharper disable once UnusedType.Global
     public class PublishReleaseContentFunction
     {
-        private readonly ContentDbContext _contentDbContext;
         private readonly IContentService _contentService;
-        private readonly INotificationsService _notificationsService;
-        private readonly IPublicationCacheService _publicationCacheService;
-        private readonly IPublicationRepository _publicationRepository;
-        private readonly IReleaseService _releaseService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
+        private readonly IPublishingCompletionService _publishingCompletionService;
 
         public PublishReleaseContentFunction(
-            ContentDbContext contentDbContext,
             IContentService contentService,
-            INotificationsService notificationsService,
-            IPublicationCacheService publicationCacheService,
-            IPublicationRepository publicationRepository,
-            IReleaseService releaseService,
-            IReleasePublishingStatusService releasePublishingStatusService)
+            IReleasePublishingStatusService releasePublishingStatusService, 
+            IPublishingCompletionService publishingCompletionService)
         {
-            _contentDbContext = contentDbContext;
             _contentService = contentService;
-            _notificationsService = notificationsService;
-            _publicationCacheService = publicationCacheService;
-            _publicationRepository = publicationRepository;
-            _releaseService = releaseService;
             _releasePublishingStatusService = releasePublishingStatusService;
+            _publishingCompletionService = publishingCompletionService;
         }
 
         /// <summary>
@@ -64,100 +48,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation("{0} triggered at: {1}",
+            logger.LogInformation("{FunctionName} triggered at: {DateTime}",
                 executionContext.FunctionName,
                 DateTime.UtcNow);
 
-            await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Started);
+            await UpdateContentStage(message.ReleaseId, message.ReleaseStatusId, Started);
 
             var context = new PublishContext(DateTime.UtcNow, false);
 
             try
             {
                 await _contentService.UpdateContent(context, message.ReleaseId);
-                await _releaseService.SetPublishedDates(message.ReleaseId, context.Published);
-
-                if (!EnvironmentUtils.IsLocalEnvironment())
-                {
-                    await _releaseService.DeletePreviousVersionsStatisticalData(message.ReleaseId);
-                }
-
-                var release = await _releaseService.Get(message.ReleaseId);
-                
-                // TODO EES-3369 (Read Replica-2) This call needs moving to the new PublishingCompletionService 
-                await _publicationRepository.UpdateLatestPublishedRelease(release.PublicationId);
-
-                // Update the cached publication and any cached superseded publications.
-                // If this is the first live release of the publication, the superseding is now enforced
-                var publicationsToUpdate = await _contentDbContext.Publications
-                    .Where(p => p.Id == release.PublicationId || p.SupersededById == release.PublicationId)
-                    .Select(p => p.Slug)
-                    .ToListAsync();
-
-                await publicationsToUpdate
-                    .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(_publicationCacheService.UpdatePublication);
-
-                await _contentService.DeletePreviousVersionsDownloadFiles(message.ReleaseId);
-                await _contentService.DeletePreviousVersionsContent(message.ReleaseId);
-
-                await _notificationsService.NotifySubscribersIfApplicable(message.ReleaseId);
-
-                // Update the cached trees in case any methodologies/publications
-                // are now accessible for the first time after publishing these releases
-                await _contentService.UpdateCachedTaxonomyBlobs();
-
-                await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Complete);
+                await UpdateContentStage(message.ReleaseId, message.ReleaseStatusId, Complete);
+                await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
+                    ListOf((message.ReleaseId, message.ReleaseStatusId)), 
+                    context.Published);
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Exception occured while executing {0}",
+                logger.LogError(e, "Exception occured while executing {FunctionName}",
                     executionContext.FunctionName);
                 logger.LogError("{StackTrace}", e.StackTrace);
 
-                await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Failed,
-                    new ReleasePublishingStatusLogMessage($"Exception publishing release immediately: {e.Message}"));
+                await UpdateContentStage(message.ReleaseId, message.ReleaseStatusId, Failed,
+                    new ReleasePublishingStatusLogMessage($"Exception publishing Release Content immediately: {e.Message}"));
             }
 
             logger.LogInformation("{0} completed", executionContext.FunctionName);
         }
 
-        private async Task UpdateStage(Guid releaseId, Guid releaseStatusId, State state,
+        private async Task UpdateContentStage(
+            Guid releaseId, 
+            Guid releaseStatusId, 
+            ReleasePublishingStatusContentStage state,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            switch (state)
-            {
-                case State.Started:
-                    await _releasePublishingStatusService.UpdateStagesAsync(releaseId,
-                        releaseStatusId,
-                        logMessage: logMessage,
-                        publishing: ReleasePublishingStatusPublishingStage.Started,
-                        content: ReleasePublishingStatusContentStage.Started);
-                    break;
-                case State.Complete:
-                    await _releasePublishingStatusService.UpdateStagesAsync(releaseId,
-                        releaseStatusId,
-                        logMessage: logMessage,
-                        publishing: ReleasePublishingStatusPublishingStage.Complete,
-                        content: ReleasePublishingStatusContentStage.Complete);
-                    break;
-                case State.Failed:
-                    await _releasePublishingStatusService.UpdateStagesAsync(releaseId,
-                        releaseStatusId,
-                        logMessage: logMessage,
-                        publishing: ReleasePublishingStatusPublishingStage.Failed,
-                        content: ReleasePublishingStatusContentStage.Failed);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(state), state, null);
-            }
-        }
-
-        private enum State
-        {
-            Started,
-            Complete,
-            Failed
+            await _releasePublishingStatusService.UpdateContentStageAsync(releaseId, releaseStatusId, state, logMessage);
         }
     }
 }

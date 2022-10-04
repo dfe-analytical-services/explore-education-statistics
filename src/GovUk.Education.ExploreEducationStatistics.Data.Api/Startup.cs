@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
 using Azure.Storage.Blobs;
@@ -119,6 +119,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "Explore education statistics - Data API", Version = "v1"});
             });
+            
+            //
+            // Services
+            //
+
+            var publicStorageConnectionString = Configuration.GetValue<string>("PublicStorage");
 
             services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
@@ -132,17 +138,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
             services.AddSingleton<IBlobStorageService, BlobStorageService>(provider =>
-                {
-                    var connectionString = Configuration.GetValue<string>("PublicStorage");
-
-                    return new BlobStorageService(
-                        connectionString,
-                        new BlobServiceClient(connectionString),
+                new BlobStorageService(
+                        publicStorageConnectionString,
+                        new BlobServiceClient(publicStorageConnectionString),
                         provider.GetRequiredService<ILogger<BlobStorageService>>(),
-                        new StorageInstanceCreationUtil()
-                    );
-                }
-            );
+                        new StorageInstanceCreationUtil()));
             services.AddTransient<IFilterItemRepository, FilterItemRepository>();
             services.AddTransient<IFilterRepository, FilterRepository>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();
@@ -161,6 +161,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
+            services.AddTransient<ITableStorageService, TableStorageService>(s =>
+                new TableStorageService(
+                    publicStorageConnectionString,
+                    new StorageInstanceCreationUtil()));
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<ICacheKeyService, CacheKeyService>();
 
@@ -197,19 +201,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
         {
             // Enable caching and register any caching services.
             CacheAspect.Enabled = true;
-            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
+            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetRequiredService<IBlobCacheService>());
             // Enable cancellation aspects and register request timeout configuration.
             CancellationTokenTimeoutAspect.Enabled = true;
             CancellationTokenTimeoutAttribute.SetTimeoutConfiguration(Configuration.GetSection("RequestTimeouts"));
-
-            // TODO EES-3369 - We don't need to run these migrations against the statistics database in local
-            // development, as the Admin project will have applied these migrations already against the sole statistics
-            // database but in Azure environments, the Data API is responsible still for applying migrations to 
-            // the `public-statistics` database.
-            if (!env.IsDevelopment())
-            {
-                UpdateDatabase(app);
-            }
 
             if (env.IsDevelopment())
             {
@@ -250,19 +245,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 
             app.UseMvc();
             app.UseHealthChecks("/api/health");
-        }
-
-        private static void UpdateDatabase(IApplicationBuilder app)
-        {
-            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
-                .CreateScope())
-            {
-                using (var context = serviceScope.ServiceProvider.GetService<StatisticsDbContext>())
-                {
-                    context.Database.SetCommandTimeout(int.MaxValue);
-                    context.Database.Migrate();
-                }
-            }
         }
     }
 }

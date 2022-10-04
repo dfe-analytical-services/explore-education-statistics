@@ -11,7 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     {
         public static TableQuery<ReleasePublishingStatus> QueryPublishLessThanEndOfTodayWithStages(
             ReleasePublishingStatusContentStage? content = null,
-            ReleasePublishingStatusDataStage? data = null,
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null)
@@ -21,11 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             if (content.HasValue)
             {
                 filter = CombineFilters(filter, And, FilterContentStageEquals(content.Value));
-            }
-
-            if (data.HasValue)
-            {
-                filter = CombineFilters(filter, And, FilterDataStageEquals(data.Value));
             }
 
             if (files.HasValue)
@@ -51,9 +45,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private static string FilterContentStageEquals(ReleasePublishingStatusContentStage stage) =>
             GenerateFilterCondition(nameof(ReleasePublishingStatus.ContentStage), Equal, stage.ToString());
-
-        private static string FilterDataStageEquals(ReleasePublishingStatusDataStage stage) =>
-            GenerateFilterCondition(nameof(ReleasePublishingStatus.DataStage), Equal, stage.ToString());
 
         private static string FilterFilesStageEquals(ReleasePublishingStatusFilesStage stage) =>
             GenerateFilterCondition(nameof(ReleasePublishingStatus.FilesStage), Equal, stage.ToString());

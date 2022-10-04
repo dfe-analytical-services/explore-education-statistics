@@ -6,14 +6,17 @@ import React from 'react';
 interface ReleasePublishingStatusProps {
   isApproved?: boolean;
   releaseId: string;
+  refreshPeriod?: number;
 }
 
 const ReleasePublishingStatus = ({
   isApproved = false,
   releaseId,
+  refreshPeriod,
 }: ReleasePublishingStatusProps) => {
   const { currentStatus, currentStatusDetail } = useReleasePublishingStatus({
     releaseId,
+    refreshPeriod,
   });
   return (
     <>

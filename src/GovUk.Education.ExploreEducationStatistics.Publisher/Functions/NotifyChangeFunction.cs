@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusOverallStage;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusStates;
@@ -49,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation("{0} triggered: {1}",
+            logger.LogInformation("{FunctionName} triggered: {Message}",
                 executionContext.FunctionName,
                 message);
             var lease = await _fileStorageService.AcquireLease(message.ReleaseId.ToString());
@@ -67,10 +68,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                                     await CreateReleaseStatusAsync(message, ImmediateReleaseStartedState);
                                 await _queueService.QueuePublishReleaseFilesMessageAsync(releaseStatus.ReleaseId,
                                     releaseStatus.Id);
+                                await _queueService.QueuePublishReleaseContentMessageAsync(message.ReleaseId,
+                                    message.ReleaseStatusId);
                             }
                             else
                             {
-                                await CreateReleaseStatusAsync(message, ScheduledState);
+                                // Create a Release Status entry here for the midnight job to pick up.
+                                // Stage the Release Content ahead of time.
+                                var releaseStatus = await CreateReleaseStatusAsync(message, ScheduledState);
+                                await _queueService.QueueGenerateStagedReleaseContentMessageAsync(
+                                    ListOf((message.ReleaseId, releaseStatus.Id)));
                             }
                         })
                         .OnFailureDo(async logMessages =>
@@ -84,8 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 await lease.Release();
             }
 
-            logger.LogInformation("{0} completed",
-                executionContext.FunctionName);
+            logger.LogInformation("{FunctionName} completed", executionContext.FunctionName);
         }
 
         private async Task<ReleasePublishingStatus> CreateReleaseStatusAsync(NotifyChangeMessage message,
