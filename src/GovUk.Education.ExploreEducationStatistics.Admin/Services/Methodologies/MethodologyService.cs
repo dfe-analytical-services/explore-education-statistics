@@ -17,6 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -33,6 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IMethodologyRepository _methodologyRepository;
         private readonly IMethodologyImageService _methodologyImageService;
         private readonly IMethodologyApprovalService _methodologyApprovalService;
+        private readonly IMethodologyCacheService _methodologyCacheService;
         private readonly IUserService _userService;
 
         public MethodologyService(
@@ -43,6 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             IMethodologyRepository methodologyRepository,
             IMethodologyImageService methodologyImageService,
             IMethodologyApprovalService methodologyApprovalService,
+            IMethodologyCacheService methodologyCacheService,
             IUserService userService)
         {
             _persistenceHelper = persistenceHelper;
@@ -52,6 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _methodologyRepository = methodologyRepository;
             _methodologyImageService = methodologyImageService;
             _methodologyApprovalService = methodologyApprovalService;
+            _methodologyCacheService = methodologyCacheService;
             _userService = userService;
         }
 
@@ -77,6 +81,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     _context.Publications.Update(publication);
                     await _context.SaveChangesAsync();
+
+                    await _methodologyCacheService.UpdateSummariesTree();
 
                     return Unit.Instance;
                 });
@@ -104,6 +110,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 {
                     _context.PublicationMethodologies.Remove(link);
                     await _context.SaveChangesAsync();
+
+                    await _methodologyCacheService.UpdateSummariesTree();
                 });
         }
 

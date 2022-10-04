@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
@@ -234,6 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             IMethodologyRepository? methodologyRepository = null,
             IMethodologyImageService? methodologyImageService = null,
             IMethodologyApprovalService? methodologyApprovalService = null,
+            IMethodologyCacheService? methodologyCacheService = null,
             IUserService? userService = null)
         {
             return new(
@@ -244,7 +246,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 methodologyRepository ?? Mock.Of<IMethodologyRepository>(),
                 methodologyImageService ?? Mock.Of<IMethodologyImageService>(),
                 methodologyApprovalService ?? Mock.Of<IMethodologyApprovalService>(Strict),
-                userService ?? Mock.Of<IUserService>()
+                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
+            userService ?? Mock.Of<IUserService>()
             );
         }
 
