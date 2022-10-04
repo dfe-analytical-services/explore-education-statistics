@@ -84,7 +84,7 @@ If running Ubuntu and running the tests against your local machine, ports under 
 will be protected by default by `Ubuntu Firewall`.
 
 To grant access to these ports from containers on the 
-[K6 subnet as defined in docker-compose.yml](tests/performance-tests/docker-compose.yml), 
+[K6 subnet as defined in docker-compose.yml](docker-compose.yml), 
 run the following commands:
 
 ```bash
@@ -95,7 +95,7 @@ sudo ufw allow from 172.30.0.0/24 to any port 5021 # Admin site / Admin API
 sudo ufw allow from 172.30.0.0/24 to any port 5030 # Keycloak
 ```
 
-#### Obtain auth tokens for Admin testing
+#### Obtain auth tokens for Admin testing and data creation during test setup
 
 This step is only required if running performance tests that require access to the Admin API.
 It requires the above step of creating environment-specific .env.json files first.
@@ -158,6 +158,48 @@ http://localhost:3005/d/k6/k6-load-testing-results?orgId=1&refresh=5s
 
 This is an out-of-the-box Grafana / K6 Dashboard that captures general low-level performance
 statistics.
+
+## Individual test options
+
+Some variables are available in certain tests to allow the running of the tests with different
+test data should we need to do so, but without needing to alter the test code. We use environment
+variables to supply the tests with variables using the `-e` flag.  All variables have default 
+values to fall back on.
+
+Note that in various tests that deal with file imports, we allow the selection of data files to 
+use with that test on the command line. We can supply large data files as ZIP files using the naming 
+convention of `big-file1.zip`, `big-file2.zip` etc, and place them in the 
+[imports assets folder](src/tests/admin/import/assets). With this naming convention, they will
+be ignored by Git.
+
+Full sets of options per test are available below as examples:
+
+### import.test.js
+
+* PUBLICATION_TITLE - default value is "import.test.ts".
+* DATA_FILE - default value is "small-file.csv" which is in source control.  See notes above on the use 
+  of large ZIP files.
+
+`npm run test dist/import.test.js --environment=dev --users=bau1 -- 
+-e PUBLICATION_TITLE="Import publication" -e DATA_FILE="big-file1.zip"`
+
+### publicTableBuilderQuery.test.js
+
+* PUBLICATION_TITLE - default value is "publicTableBuilderQuery.test.ts".
+* DATA_FILE - default value is "small-file.csv" which is in source control.  See notes above on the use
+  of large ZIP files.
+
+`npm run test dist/publicTableBuilderQuery.test.js --environment=dev --users=bau1 --
+-e PUBLICATION_TITLE="Public table builder query" -e DATA_FILE="big-file1.zip"`
+
+### adminTableBuilderQuery.test.js
+
+* PUBLICATION_TITLE - default value is "adminTableBuilderQuery.test.ts".
+* DATA_FILE - default value is "small-file.csv" which is in source control.  See notes above on the use
+  of large ZIP files.
+
+`npm run test dist/adminTableBuilderQuery.test.js --environment=dev --users=bau1 --
+-e PUBLICATION_TITLE="Admin table builder query" -e DATA_FILE="big-file1.zip"`
 
 ## Transpiling and Bundling
 

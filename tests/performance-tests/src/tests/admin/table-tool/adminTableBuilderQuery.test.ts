@@ -7,14 +7,15 @@ import createAdminService, { SubjectMeta } from '../../../utils/adminService';
 import testData from '../../testData';
 import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
+import utils from '../../../utils/utils';
 
-const PUBLICATION =
-  'UI test publication - Performance tests - adminTableBuilderQuery.test.ts';
-const RELEASE = 2022;
-const SUBJECT =
-  'UI test subject - Performance tests - adminTableBuilderQuery.test.ts';
-
-const alwaysCreateNewDataPerTest = false;
+const tearDownData = false;
+const publicationTitle =
+  __ENV.PUBLICATION_TITLE ?? 'adminTableBuilderQuery.test.ts';
+const dataFile = __ENV.DATA_FILE ?? 'small-file.csv';
+const uploadFileStrategy = utils.getDataFileUploadStrategy({
+  filename: dataFile,
+});
 
 export const options: Options = {
   scenarios: {
@@ -30,7 +31,7 @@ export const options: Options = {
   noConnectionReuse: true,
   insecureSkipTLSVerify: true,
   linger: true,
-  setupTimeout: '5m',
+  setupTimeout: uploadFileStrategy.isZip ? '30m' : '10m',
 };
 
 interface SetupData {
@@ -53,9 +54,6 @@ export const tableQueryFailureCount = new Counter(
   'ees_admin_table_query_failure_count',
 );
 
-const subjectFile = open('admin/import/assets/dates.csv', 'b');
-const subjectMetaFile = open('admin/import/assets/dates.meta.csv', 'b');
-
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT as string,
 );
@@ -72,20 +70,14 @@ function getOrCreateReleaseWithSubject() {
     authTokens?.accessToken as string,
   );
 
-  const suffix = alwaysCreateNewDataPerTest
-    ? `-${Date.now()}-${Math.random()}`
-    : '';
-
   const { id: themeId } = adminService.getOrCreateTheme({
-    title: `${testData.themeName}${suffix}`,
+    title: testData.themeName,
   });
 
   const { id: topicId } = adminService.getOrCreateTopic({
     themeId,
-    title: `${testData.topicName}${suffix}`,
+    title: testData.topicName,
   });
-
-  const publicationTitle = `${PUBLICATION}${suffix}`;
 
   const { id: publicationId } = adminService.getOrCreatePublication({
     topicId,
@@ -96,22 +88,14 @@ function getOrCreateReleaseWithSubject() {
     publicationId,
     publicationTitle,
     topicId,
-    year: RELEASE,
+    year: 2022,
     timePeriodCoverage: 'AY',
   });
 
-  const { id: fileId } = adminService.getOrImportDataFile({
-    title: `${SUBJECT}${suffix}`,
+  const { id: fileId } = uploadFileStrategy.getOrImportSubject(
+    adminService,
     releaseId,
-    dataFile: {
-      file: subjectFile,
-      filename: `subject.csv`,
-    },
-    metaFile: {
-      file: subjectMetaFile,
-      filename: `subject.meta.csv`,
-    },
-  });
+  );
 
   adminService.waitForDataFileToImport({ releaseId, fileId });
 
@@ -170,10 +154,14 @@ const performTest = ({ releaseId, subjectId, subjectMeta }: SetupData) => {
     indicatorGroup.options.map(indicator => indicator.value),
   );
 
-  const allLocationIds = Object.values(
-    subjectMeta.locations,
-  ).flatMap(geographicLevel =>
-    geographicLevel.options.map(location => location.id),
+  const allLocationIds = Object.values(subjectMeta.locations).flatMap(
+    geographicLevel =>
+      geographicLevel.options.flatMap(location => {
+        if (location.options) {
+          return location.options.flatMap(o => o.id);
+        }
+        return [location.id!];
+      }),
   );
 
   const someTimePeriods = {
@@ -208,7 +196,7 @@ const performTest = ({ releaseId, subjectId, subjectMeta }: SetupData) => {
 };
 
 export const teardown = ({ themeId, topicId }: SetupData) => {
-  if (alwaysCreateNewDataPerTest) {
+  if (tearDownData) {
     const accessToken = getOrRefreshAccessTokens(
       supportsRefreshTokens,
       userName,
