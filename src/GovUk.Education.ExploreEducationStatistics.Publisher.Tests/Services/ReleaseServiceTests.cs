@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -16,6 +15,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
@@ -298,13 +298,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var published = DateTime.UtcNow;
 
             var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
             var publicStatisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             await using (var publicStatisticsDbContext = InMemoryPublicStatisticsDbContext(publicStatisticsDbContextId))
             {
                 await contentDbContext.Releases.AddAsync(contentRelease);
                 await contentDbContext.SaveChangesAsync();
+
+                await statisticsDbContext.Release.AddAsync(statisticsRelease);
+                await statisticsDbContext.SaveChangesAsync();
 
                 await publicStatisticsDbContext.Release.AddAsync(statisticsRelease);
                 await publicStatisticsDbContext.SaveChangesAsync();
@@ -317,35 +322,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             await using (var publicStatisticsDbContext = InMemoryPublicStatisticsDbContext(publicStatisticsDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
                     publicStatisticsDbContext: publicStatisticsDbContext,
                     methodologyService: methodologyService.Object);
 
                 await service.SetPublishedDates(contentRelease.Id, published);
 
-                MockUtils.VerifyAllMocks(methodologyService);
+                VerifyAllMocks(methodologyService);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             await using (var publicStatisticsDbContext = InMemoryPublicStatisticsDbContext(publicStatisticsDbContextId))
             {
                 var actualContentRelease = await contentDbContext.Releases
                     .Include(r => r.Publication)
                     .SingleAsync(r => r.Id == contentRelease.Id);
-                var actualStatisticsRelease = await publicStatisticsDbContext.Release.FindAsync(contentRelease.Id);
-
+                
                 Assert.NotNull(actualContentRelease);
-                Assert.NotNull(actualStatisticsRelease);
-
-                Assert.Equal(published, actualContentRelease.Published);
-                Assert.Equal(published, actualContentRelease.Publication.Published);
-                Assert.Equal(published, actualStatisticsRelease!.Published);
-
                 Assert.True(actualContentRelease.DataLastPublished.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(actualContentRelease.DataLastPublished!.Value).Milliseconds, 0,
                     1500);
+                Assert.Equal(published, actualContentRelease.Published);
+                Assert.Equal(published, actualContentRelease.Publication.Published);
+
+                var actualStatisticsRelease = await statisticsDbContext.Release.FindAsync(contentRelease.Id);
+
+                Assert.NotNull(actualStatisticsRelease);
+                Assert.Equal(published, actualStatisticsRelease!.Published);
+
+                var actualPublicStatisticsRelease = await publicStatisticsDbContext.Release.FindAsync(contentRelease.Id);
+                Assert.Equal(published, actualPublicStatisticsRelease!.Published);
             }
         }
 
@@ -377,15 +388,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryPublicStatisticsDbContext())
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext())
+            await using (var publicStatisticsDbContext = InMemoryPublicStatisticsDbContext())
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
-                    publicStatisticsDbContext: statisticsDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    publicStatisticsDbContext: publicStatisticsDbContext,
                     methodologyService: methodologyService.Object);
 
                 await service.SetPublishedDates(contentRelease.Id, published);
 
-                MockUtils.VerifyAllMocks(methodologyService);
+                VerifyAllMocks(methodologyService);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -436,7 +449,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var publicStatisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryPublicStatisticsDbContext(publicStatisticsDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(publicStatisticsDbContextId))
+            await using (var publicStatisticsDbContext = InMemoryPublicStatisticsDbContext(publicStatisticsDbContextId))
             {
                 await contentDbContext.Publications.AddAsync(publication);
                 await contentDbContext.Releases.AddRangeAsync(previousContentRelease, contentRelease);
@@ -444,6 +458,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 await statisticsDbContext.Release.AddAsync(statisticsRelease);
                 await statisticsDbContext.SaveChangesAsync();
+
+                await publicStatisticsDbContext.Release.AddAsync(statisticsRelease);
+                await publicStatisticsDbContext.SaveChangesAsync();
             }
 
             var methodologyService = new Mock<IMethodologyService>(Strict);
@@ -453,35 +470,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(publicStatisticsDbContextId))
             await using (var publicStatisticsDbContext = InMemoryPublicStatisticsDbContext(publicStatisticsDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
                     publicStatisticsDbContext: publicStatisticsDbContext,
                     methodologyService: methodologyService.Object);
 
                 await service.SetPublishedDates(contentRelease.Id, DateTime.UtcNow);
 
-                MockUtils.VerifyAllMocks(methodologyService);
+                VerifyAllMocks(methodologyService);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(publicStatisticsDbContextId))
             await using (var publicStatisticsDbContext = InMemoryPublicStatisticsDbContext(publicStatisticsDbContextId))
             {
                 var actualContentRelease = await contentDbContext.Releases
                     .Include(r => r.Publication)
                     .SingleAsync(r => r.Id == contentRelease.Id);
-                var actualStatisticsRelease = await publicStatisticsDbContext.Release.FindAsync(contentRelease.Id);
-
                 Assert.NotNull(actualContentRelease);
-                Assert.NotNull(actualStatisticsRelease);
-
                 Assert.Equal(previousContentRelease.Published.Value, actualContentRelease.Published);
                 Assert.Equal(previousContentRelease.Published.Value, actualContentRelease.Publication.Published);
-                Assert.Equal(previousContentRelease.Published.Value, actualStatisticsRelease!.Published);
-
                 Assert.True(actualContentRelease.DataLastPublished.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(actualContentRelease.DataLastPublished!.Value).Milliseconds, 0,
                     1500);
+                
+                var actualStatisticsRelease = await statisticsDbContext.Release.FindAsync(contentRelease.Id);
+                Assert.NotNull(actualStatisticsRelease);
+                Assert.Equal(previousContentRelease.Published.Value, actualStatisticsRelease!.Published);
+                
+                var actualPublicStatisticsRelease = await publicStatisticsDbContext.Release.FindAsync(contentRelease.Id);
+                Assert.NotNull(actualPublicStatisticsRelease);
+                Assert.Equal(previousContentRelease.Published.Value, actualPublicStatisticsRelease!.Published);
+
             }
         }
 
