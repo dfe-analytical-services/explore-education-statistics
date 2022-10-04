@@ -13,6 +13,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
@@ -60,16 +63,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+            var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
+
+            methodologyCacheService.Setup(mock => mock.UpdateSummariesTree())
+                .ReturnsAsync(
+                    new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
+                        new List<AllMethodologiesThemeViewModel>()));
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(
-                    contentDbContext: context);
+                    contentDbContext: context,
+                    methodologyCacheService: methodologyCacheService.Object);
 
                 var result = await service.AdoptMethodology(publication.Id, methodology.Id);
 
-                VerifyAllMocks(methodologyRepository);
+                VerifyAllMocks(methodologyCacheService);
 
                 result.AssertRight();
             }
@@ -123,16 +132,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(
                     contentDbContext: context);
 
                 var result = await service.AdoptMethodology(publication.Id, methodology.Id);
-
-                VerifyAllMocks(methodologyRepository);
 
                 result.AssertBadRequest(CannotAdoptMethodologyAlreadyLinkedToPublication);
             }
@@ -181,16 +186,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(
                     contentDbContext: context);
 
                 var result = await service.AdoptMethodology(publication.Id, methodology.Id);
-
-                VerifyAllMocks(methodologyRepository);
 
                 result.AssertBadRequest(CannotAdoptMethodologyAlreadyLinkedToPublication);
             }
@@ -232,16 +233,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(
                     contentDbContext: context);
 
                 var result = await service.AdoptMethodology(Guid.NewGuid(), methodology.Id);
-
-                VerifyAllMocks(methodologyRepository);
 
                 result.AssertNotFound();
             }
@@ -293,11 +290,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var repository = new Mock<IMethodologyVersionRepository>(Strict);
+                var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
 
                 var service = SetupMethodologyService(
-                    context,
-                    methodologyVersionRepository: repository.Object);
+                    contentDbContext: context,
+                    methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 var createdMethodology = new MethodologyVersion
                 {
@@ -319,14 +316,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Status = Draft
                 };
 
-                repository
+                methodologyVersionRepository
                     .Setup(s => s.CreateMethodologyForPublication(publication.Id, UserId))
                     .ReturnsAsync(createdMethodology);
 
                 context.Attach(createdMethodology);
 
                 var viewModel = (await service.CreateMethodology(publication.Id)).AssertRight();
-                VerifyAllMocks(repository);
+                VerifyAllMocks(methodologyVersionRepository);
 
                 Assert.Equal(createdMethodology.Id, viewModel.Id);
                 Assert.Equal("test-publication", viewModel.Slug);
@@ -376,16 +373,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+            var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
+
+            methodologyCacheService.Setup(mock => mock.UpdateSummariesTree())
+                .ReturnsAsync(
+                    new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
+                        new List<AllMethodologiesThemeViewModel>()));
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(
-                    contentDbContext: context);
+                    contentDbContext: context,
+                    methodologyCacheService: methodologyCacheService.Object);
 
                 var result = await service.DropMethodology(publication.Id, methodology.Id);
 
-                VerifyAllMocks(methodologyRepository);
+                VerifyAllMocks(methodologyCacheService);
 
                 result.AssertRight();
             }
@@ -434,16 +437,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(
                     contentDbContext: context);
 
                 var result = await service.DropMethodology(publication.Id, methodology.Id);
-
-                VerifyAllMocks(methodologyRepository);
 
                 result.AssertNotFound();
             }
@@ -488,16 +487,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(
                     contentDbContext: context);
 
                 var result = await service.DropMethodology(Guid.NewGuid(), methodology.Id);
-
-                VerifyAllMocks(methodologyRepository);
 
                 result.AssertNotFound();
             }
@@ -516,16 +511,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.SaveChangesAsync();
             }
 
-            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(
                     contentDbContext: context);
 
                 var result = await service.DropMethodology(publication.Id, Guid.NewGuid());
-
-                VerifyAllMocks(methodologyRepository);
 
                 result.AssertNotFound();
             }
@@ -2043,6 +2034,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             IMethodologyRepository? methodologyRepository = null,
             IMethodologyImageService? methodologyImageService = null,
             IMethodologyApprovalService? methodologyApprovalService = null,
+            IMethodologyCacheService? methodologyCacheService = null,
             IUserService? userService = null)
         {
             return new(
@@ -2053,6 +2045,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 methodologyRepository ?? Mock.Of<IMethodologyRepository>(Strict),
                 methodologyImageService ?? Mock.Of<IMethodologyImageService>(Strict),
                 methodologyApprovalService ?? Mock.Of<IMethodologyApprovalService>(Strict),
+                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
                 userService ?? AlwaysTrueUserService(UserId).Object);
         }
     }
