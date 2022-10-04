@@ -11,6 +11,9 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
+/// <summary>
+/// TODO EES-3755 Remove after Permalink snapshot migration work is complete
+/// </summary>
 public class PermalinkMigrationServicePermissionTests
 {
     [Fact]

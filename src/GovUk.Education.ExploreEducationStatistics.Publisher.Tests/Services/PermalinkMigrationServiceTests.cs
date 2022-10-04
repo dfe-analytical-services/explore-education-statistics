@@ -23,6 +23,9 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services;
 
+/// <summary>
+/// TODO EES-3755 Remove after Permalink snapshot migration work is complete
+/// </summary>
 public class PermalinkMigrationServiceTests
 {
     private readonly Guid _subjectId = Guid.NewGuid();

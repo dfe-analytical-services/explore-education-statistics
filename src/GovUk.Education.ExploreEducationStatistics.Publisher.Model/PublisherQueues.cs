@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public const string RetryStageQueue = "retry";
         public const string NotifyChangeQueue = "notify";
 
-        // Permalinks migration
+        // TODO EES-3755 Remove after Permalink snapshot migration work is complete
         public const string PermalinksMigrationQueue = "permalinks-migration";
         public const string PermalinkMigrationQueue = "permalink-migration";
     }

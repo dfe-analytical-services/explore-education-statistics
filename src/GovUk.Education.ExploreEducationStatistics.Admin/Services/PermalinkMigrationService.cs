@@ -13,6 +13,9 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
+/// <summary>
+/// TODO EES-3755 Remove after Permalink snapshot migration work is complete
+/// </summary>
 public class PermalinkMigrationService : IPermalinkMigrationService
 {
     private readonly IStorageQueueService _storageQueueService;

@@ -9,6 +9,9 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Publishe
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 
+/// <summary>
+/// TODO EES-3755 Remove after Permalink snapshot migration work is complete
+/// </summary>
 public class PermalinkMigrationFunction
 {
     private readonly IPermalinkMigrationService _permalinkMigrationService;

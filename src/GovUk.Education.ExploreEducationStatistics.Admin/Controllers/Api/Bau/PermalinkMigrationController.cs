@@ -9,6 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
 
+/// <summary>
+/// TODO EES-3755 Remove after Permalink snapshot migration work is complete
+/// </summary>
 [Route("api")]
 [ApiController]
 [Authorize(Roles = GlobalRoles.RoleNames.BauUser)]

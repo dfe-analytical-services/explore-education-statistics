@@ -18,6 +18,9 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.Publishe
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
+/// <summary>
+/// TODO EES-3755 Remove after Permalink snapshot migration work is complete
+/// </summary>
 public class PermalinkMigrationService : IPermalinkMigrationService
 {
     private readonly ContentDbContext _contentDbContext;
