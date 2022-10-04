@@ -595,7 +595,7 @@ describe('PublicationsTab', () => {
 
       await waitFor(() => {
         expect(history.location.search).toBe(
-          '?themeId=theme-2&topicId=topic-4&showNewDashboard=',
+          '?themeId=theme-2&topicId=topic-4',
         );
       });
     });

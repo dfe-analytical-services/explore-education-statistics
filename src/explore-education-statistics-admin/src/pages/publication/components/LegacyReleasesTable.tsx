@@ -42,14 +42,10 @@ const getModalTitle = (confirmAction?: ConfirmAction): string => {
 };
 
 interface Props {
-  createRoute?: string; // TODO EES-3217 remove when live
-  editRoute?: (id: string) => string; // TODO EES-3217 remove when live
   legacyReleases: LegacyRelease[];
   publicationId: string;
 }
 const LegacyReleasesTable = ({
-  createRoute,
-  editRoute,
   legacyReleases: initialLegacyReleases,
   publicationId,
 }: Props) => {
@@ -275,28 +271,25 @@ const LegacyReleasesTable = ({
           switch (confirmAction?.type) {
             case 'create': {
               history.push(
-                createRoute ??
-                  generatePath<PublicationRouteParams>(
-                    publicationCreateLegacyReleaseRoute.path,
-                    {
-                      publicationId,
-                    },
-                  ),
+                generatePath<PublicationRouteParams>(
+                  publicationCreateLegacyReleaseRoute.path,
+                  {
+                    publicationId,
+                  },
+                ),
               );
               break;
             }
             case 'edit': {
               if (confirmAction.id) {
                 history.push(
-                  editRoute
-                    ? editRoute(confirmAction.id)
-                    : generatePath<PublicationEditLegacyReleaseRouteParams>(
-                        publicationEditLegacyReleaseRoute.path,
-                        {
-                          publicationId,
-                          legacyReleaseId: confirmAction.id,
-                        },
-                      ),
+                  generatePath<PublicationEditLegacyReleaseRouteParams>(
+                    publicationEditLegacyReleaseRoute.path,
+                    {
+                      publicationId,
+                      legacyReleaseId: confirmAction.id,
+                    },
+                  ),
                 );
               }
               break;

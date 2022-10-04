@@ -37,7 +37,6 @@ export interface MethodologyVersion extends BaseMethodologyVersion {
 }
 
 export interface MethodologyVersionSummary extends BaseMethodologyVersion {
-  internalReleaseNote?: string; // TODO EES-3576 Remove internalReleaseNote added to support the old Admin dashboard
   owned: boolean;
   permissions: {
     canDeleteMethodology: boolean;

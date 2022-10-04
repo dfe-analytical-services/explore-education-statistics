@@ -17,9 +17,7 @@ interface Props {
 }
 
 const PublicationsTab = ({ isBauUser }: Props) => {
-  const { showNewDashboard, themeId, topicId } = useQueryParams<
-    ThemeTopicParams
-  >();
+  const { themeId, topicId } = useQueryParams<ThemeTopicParams>();
   const location = useLocation();
   const history = useHistory();
 
@@ -139,7 +137,6 @@ const PublicationsTab = ({ isBauUser }: Props) => {
                   appendQuery<ThemeTopicParams>(dashboardRoute.path, {
                     themeId: nextThemeId,
                     topicId: nextTopicId,
-                    showNewDashboard,
                   }),
                 );
               }}

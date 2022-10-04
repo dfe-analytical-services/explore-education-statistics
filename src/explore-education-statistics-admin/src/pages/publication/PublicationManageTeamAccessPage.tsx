@@ -2,12 +2,7 @@ import Page from '@admin/components/Page';
 import PublicationManageTeamAccess from '@admin/pages/publication/components/PublicationManageTeamAccess';
 import PublicationInviteNewUsersForm from '@admin/pages/publication/components/PublicationInviteNewUsersForm';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
-import {
-  publicationManageTeamAccessReleaseRoute,
-  publicationReleaseContributorsRoute,
-  publicationManageTeamAccessRoute,
-  PublicationRouteParams,
-} from '@admin/routes/routes';
+import { publicationManageTeamAccessReleaseRoute } from '@admin/routes/routes';
 import publicationService, {
   Publication,
 } from '@admin/services/publicationService';
@@ -104,30 +99,15 @@ const PublicationManageTeamAccessPage = ({
             <Tabs id="manageTeamAccessTabs">
               <TabsSection id="manage-access" title="Manage team access">
                 <PublicationManageTeamAccess
-                  addUserPath={generatePath<ReleaseRouteParams>(
-                    publicationReleaseContributorsRoute.path,
-                    {
-                      publicationId,
-                      releaseId: release.id,
-                    },
-                  )}
-                  heading={<h2>Update access for release ({release.title})</h2>}
                   publicationId={publication.id}
                   release={release}
                 />
               </TabsSection>
               <TabsSection id="invite-users" title="Invite new users">
                 <PublicationInviteNewUsersForm
-                  hideCancelButton
                   publication={publication}
                   releases={releases}
                   releaseId={releaseId}
-                  returnRoute={generatePath<PublicationRouteParams>(
-                    publicationManageTeamAccessRoute.path,
-                    {
-                      publicationId: publication.id,
-                    },
-                  )}
                 />
               </TabsSection>
             </Tabs>

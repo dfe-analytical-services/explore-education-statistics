@@ -39,19 +39,15 @@ export const errorMappings = [
 ];
 
 interface Props {
-  hideCancelButton?: boolean; // TODO EES-3217 remove when pages live
-  publication: Publication | MyPublication; // TODO EES-3217 can be just one type when this goes live
+  publication: Publication;
   releases: ReleaseSummary[];
   releaseId: string;
-  returnRoute?: string; // TODO EES-3217 remove when pages live
 }
 
 const PublicationInviteNewUsersForm = ({
-  hideCancelButton = false,
   publication,
   releases,
   releaseId,
-  returnRoute,
 }: Props) => {
   const history = useHistory();
 
@@ -63,14 +59,13 @@ const PublicationInviteNewUsersForm = ({
         values.releaseIds,
       );
       history.push(
-        returnRoute ??
-          generatePath<PublicationTeamRouteParams>(
-            publicationTeamAccessRoute.path,
-            {
-              publicationId: publication.id,
-              releaseId,
-            },
-          ),
+        generatePath<PublicationTeamRouteParams>(
+          publicationTeamAccessRoute.path,
+          {
+            publicationId: publication.id,
+            releaseId,
+          },
+        ),
       );
     },
     errorMappings,
@@ -120,23 +115,21 @@ const PublicationInviteNewUsersForm = ({
                 <Button type="submit" disabled={form.isSubmitting}>
                   Invite user
                 </Button>
-                {!hideCancelButton && (
-                  <ButtonText
-                    onClick={() => {
-                      history.push(
-                        generatePath<PublicationTeamRouteParams>(
-                          publicationTeamAccessRoute.path,
-                          {
-                            publicationId: publication.id,
-                            releaseId,
-                          },
-                        ),
-                      );
-                    }}
-                  >
-                    Cancel
-                  </ButtonText>
-                )}
+                <ButtonText
+                  onClick={() => {
+                    history.push(
+                      generatePath<PublicationTeamRouteParams>(
+                        publicationTeamAccessRoute.path,
+                        {
+                          publicationId: publication.id,
+                          releaseId,
+                        },
+                      ),
+                    );
+                  }}
+                >
+                  Cancel
+                </ButtonText>
               </ButtonGroup>
             </Form>
           );

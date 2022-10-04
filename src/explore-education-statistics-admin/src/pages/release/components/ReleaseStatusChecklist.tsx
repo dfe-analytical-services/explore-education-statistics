@@ -13,10 +13,7 @@ import {
   releasePreReleaseAccessRoute,
   ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
-import {
-  publicationEditRoute,
-  PublicationRouteParams,
-} from '@admin/routes/routes';
+import { publicationRoute, PublicationRouteParams } from '@admin/routes/routes';
 import {
   Release,
   ReleaseChecklist,
@@ -148,7 +145,7 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
             message:
               'An in-EES methodology page has not been linked to this publication',
             link: generatePath<PublicationRouteParams>(
-              publicationEditRoute.path,
+              publicationRoute.path, // @MarkFix check this works
               { publicationId: release.publicationId },
             ),
           };
