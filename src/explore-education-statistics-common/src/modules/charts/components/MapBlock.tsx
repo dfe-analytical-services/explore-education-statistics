@@ -28,6 +28,7 @@ export const mapBlockDefinition: ChartDefinition = {
   type: 'map',
   name: 'Geographic',
   capabilities: {
+    canPositionLegendOnLine: false,
     canSize: true,
     canSort: false,
     hasGridLines: false,

@@ -22,4 +22,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         wye,
         none
     }
+
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public enum ChartLineChartLegendPosition
+    {
+        above, below
+    }
 }

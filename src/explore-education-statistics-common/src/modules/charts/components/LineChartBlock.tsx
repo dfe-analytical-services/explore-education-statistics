@@ -23,6 +23,7 @@ import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisD
 import { Dictionary } from '@common/types';
 import formatPretty from '@common/utils/number/formatPretty';
 import parseNumber from '@common/utils/number/parseNumber';
+import LineChartLegendLabel from '@common/modules/charts/components/LineChartLegendLabel';
 import getUnit from '@common/modules/charts/util/getUnit';
 import React, { memo } from 'react';
 import {
@@ -153,7 +154,7 @@ const LineChartBlock = ({
             wrapperStyle={{ zIndex: 1000 }}
           />
 
-          {legend.position !== 'none' && (
+          {legend.position !== 'none' && legend.position !== 'line' && (
             <Legend content={renderLegend} align="left" layout="vertical" />
           )}
 
@@ -199,6 +200,17 @@ const LineChartBlock = ({
               dot={getDot(config.symbol)}
               strokeWidth="2"
               strokeDasharray={lineStyles[config.lineStyle ?? 'solid']}
+              label={props =>
+                legend.position === 'line' ? (
+                  <LineChartLegendLabel
+                    {...props}
+                    name={config.label}
+                    colour={config.colour}
+                    totalDataPoints={chartData.length}
+                    labelPosition={config.lineChartLegendPosition}
+                  />
+                ) : null
+              }
             />
           ))}
 
@@ -231,6 +243,7 @@ export const lineChartBlockDefinition: ChartDefinition = {
   type: 'line',
   name: 'Line',
   capabilities: {
+    canPositionLegendOnLine: true,
     canSize: true,
     canSort: true,
     hasGridLines: true,

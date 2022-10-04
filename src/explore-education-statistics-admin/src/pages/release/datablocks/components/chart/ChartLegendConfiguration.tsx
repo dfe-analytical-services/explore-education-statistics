@@ -22,8 +22,10 @@ import {
   LegendItem,
   LegendItemConfiguration,
   LegendPosition,
+  LineChartLegendPosition,
 } from '@common/modules/charts/types/legend';
 import {
+  lineChartLegendPositions,
   colours,
   legendPositions,
   lineStyles,
@@ -37,6 +39,7 @@ import Yup from '@common/validation/yup';
 import { Formik, FormikTouched } from 'formik';
 import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
+
 import toPath from 'lodash/toPath';
 import upperFirst from 'lodash/upperFirst';
 import React, { ReactNode, useCallback, useMemo, useRef } from 'react';
@@ -56,6 +59,13 @@ const lineStyleOptions: SelectOption[] = lineStyles.map(lineStyle => ({
   label: upperFirst(lineStyle),
   value: lineStyle,
 }));
+
+const lineChartLegendPositionOptions: SelectOption[] = lineChartLegendPositions.map(
+  position => ({
+    label: upperFirst(position),
+    value: position,
+  }),
+);
 
 function getLegendItemNumber(path: string): number {
   const [, index] = toPath(path);
@@ -121,6 +131,9 @@ const ChartLegendConfiguration = ({
     const defaultConfig: Partial<LegendItemConfiguration> = {
       symbol: capabilities.hasSymbols ? 'none' : undefined,
       lineStyle: capabilities.hasLineStyle ? 'solid' : undefined,
+      lineChartLegendPosition: capabilities.canPositionLegendOnLine
+        ? 'above'
+        : undefined,
     };
 
     const items = dataSetCategoryConfigs.map(({ config, rawDataSet }) => ({
@@ -139,6 +152,7 @@ const ChartLegendConfiguration = ({
     data,
     meta,
     legend.position,
+    capabilities.canPositionLegendOnLine,
     capabilities.hasSymbols,
     capabilities.hasLineStyle,
   ]);
@@ -172,6 +186,18 @@ const ChartLegendConfiguration = ({
           )}`,
       ),
     });
+
+    if (capabilities.canPositionLegendOnLine) {
+      itemSchema = itemSchema.shape({
+        lineChartLegendPosition: Yup.string().oneOf<LineChartLegendPosition>(
+          ['above', 'below'],
+          params =>
+            `Choose a valid position for legend item ${getLegendItemNumber(
+              params.path as string,
+            )}`,
+        ),
+      });
+    }
 
     if (capabilities.hasLineStyle) {
       itemSchema = itemSchema.shape({
@@ -213,7 +239,7 @@ const ChartLegendConfiguration = ({
     if (capabilities.hasLegendPosition) {
       baseSchema = baseSchema.shape({
         position: Yup.string().oneOf<LegendPosition>(
-          ['none', 'bottom', 'top'],
+          ['none', 'bottom', 'top', 'line'],
           'Select a valid legend position',
         ),
       });
@@ -221,6 +247,7 @@ const ChartLegendConfiguration = ({
 
     return baseSchema;
   }, [
+    capabilities.canPositionLegendOnLine,
     capabilities.hasLegendPosition,
     capabilities.hasLineStyle,
     capabilities.hasSymbols,
@@ -274,8 +301,12 @@ const ChartLegendConfiguration = ({
           {validationSchema.fields.position && (
             <FormFieldSelect<FormValues>
               name="position"
-              label="Position"
-              options={positionOptions}
+              label="Legend position"
+              options={
+                capabilities.canPositionLegendOnLine
+                  ? positionOptions
+                  : positionOptions.filter(option => option.value !== 'line')
+              }
               order={FormSelect.unordered}
             />
           )}
@@ -342,6 +373,19 @@ const ChartLegendConfiguration = ({
                                 formGroup={false}
                                 showError={false}
                                 options={lineStyleOptions}
+                              />
+                            </div>
+                          )}
+
+                          {form.values.position === 'line' && (
+                            <div className={styles.configurationInput}>
+                              <FormFieldSelect
+                                name={`${itemName}.lineChartLegendPosition`}
+                                label="Position"
+                                order={FormSelect.unordered}
+                                formGroup={false}
+                                showError={false}
+                                options={lineChartLegendPositionOptions}
                               />
                             </div>
                           )}

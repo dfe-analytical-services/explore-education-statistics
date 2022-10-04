@@ -101,7 +101,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    expect(screen.getByLabelText('Position')).toHaveValue('top');
+    expect(screen.getByLabelText('Legend position')).toHaveValue('top');
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(1);
@@ -145,7 +145,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    expect(screen.getByLabelText('Position')).toHaveValue('top');
+    expect(screen.getByLabelText('Legend position')).toHaveValue('top');
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(2);
@@ -208,7 +208,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    expect(screen.getByLabelText('Position')).toHaveValue('top');
+    expect(screen.getByLabelText('Legend position')).toHaveValue('top');
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(1);
@@ -274,7 +274,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    expect(screen.getByLabelText('Position')).toHaveValue('top');
+    expect(screen.getByLabelText('Legend position')).toHaveValue('top');
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(2);
@@ -342,7 +342,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    expect(screen.getByLabelText('Position')).toHaveValue('top');
+    expect(screen.getByLabelText('Legend position')).toHaveValue('top');
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(1);
@@ -413,7 +413,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    expect(screen.getByLabelText('Position')).toHaveValue('top');
+    expect(screen.getByLabelText('Legend position')).toHaveValue('top');
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(2);
@@ -551,6 +551,66 @@ describe('ChartLegendConfiguration', () => {
     expect(legendItem1.queryByLabelText('Style')).not.toBeInTheDocument();
   });
 
+  test('renders the legend item position field if a line chart with legend position `chart`', () => {
+    render(
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={lineChartBlockDefinition}
+          meta={testTable.subjectMeta}
+          data={testTable.results}
+          axisMajor={{
+            dataSets: [
+              {
+                location: {
+                  value: 'barnet',
+                  level: 'localAuthority',
+                },
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+              },
+            ],
+            groupBy: 'timePeriod',
+            referenceLines: [],
+            type: 'major',
+            visible: true,
+          }}
+          legend={{
+            position: 'line',
+            items: [
+              {
+                dataSet: {
+                  location: {
+                    value: 'barnet',
+                    level: 'localAuthority',
+                  },
+                  filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                  indicator: 'authorised-absence-sessions',
+                },
+                label: 'Legend item 1',
+                colour: '#ff0000',
+              },
+            ],
+          }}
+          onSubmit={noop}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
+    );
+
+    expect(screen.getByLabelText('Legend position')).toHaveValue('line');
+
+    const legendItems = screen.getAllByRole('group');
+    expect(legendItems).toHaveLength(1);
+
+    const legendItem1 = within(legendItems[0]);
+
+    expect(legendItem1.getByLabelText('Label')).toHaveValue('Legend item 1');
+    expect(legendItem1.getByLabelText('Colour')).toHaveValue('#ff0000');
+    expect(legendItem1.getByLabelText('Symbol')).toHaveValue('none');
+    expect(legendItem1.getByLabelText('Style')).toHaveValue('solid');
+    expect(legendItem1.getByLabelText('Position')).toHaveValue('above');
+  });
+
   test('calls `onChange` handler if form values change', async () => {
     const handleChange = jest.fn();
 
@@ -586,6 +646,8 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
+    userEvent.selectOptions(screen.getByLabelText('Legend position'), 'line');
+
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(1);
 
@@ -597,8 +659,10 @@ describe('ChartLegendConfiguration', () => {
       'Updated legend item 1',
     );
 
+    userEvent.selectOptions(legendItem1.getByLabelText('Position'), 'below');
+
     expect(handleChange).toHaveBeenCalledWith<[LegendConfiguration]>({
-      position: 'top',
+      position: 'line',
       items: [
         {
           dataSet,
@@ -606,6 +670,7 @@ describe('ChartLegendConfiguration', () => {
           colour: '#12436D',
           lineStyle: 'solid',
           symbol: 'none',
+          lineChartLegendPosition: 'below',
         },
       ],
     });
@@ -799,7 +864,7 @@ describe('ChartLegendConfiguration', () => {
             visible: true,
           }}
           legend={{
-            position: 'top',
+            position: 'bottom',
             items: [],
           }}
           onSubmit={handleSubmit}
@@ -808,7 +873,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.selectOptions(screen.getByLabelText('Position'), 'bottom');
+    userEvent.selectOptions(screen.getByLabelText('Legend position'), 'line');
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(1);
@@ -829,6 +894,7 @@ describe('ChartLegendConfiguration', () => {
 
     userEvent.selectOptions(legendItem1.getByLabelText('Symbol'), 'diamond');
     userEvent.selectOptions(legendItem1.getByLabelText('Style'), 'dotted');
+    userEvent.selectOptions(legendItem1.getByLabelText('Position'), 'below');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
@@ -836,7 +902,7 @@ describe('ChartLegendConfiguration', () => {
 
     await waitFor(() => {
       const values: LegendConfiguration = {
-        position: 'bottom',
+        position: 'line',
         items: [
           {
             dataSet: {
@@ -851,6 +917,7 @@ describe('ChartLegendConfiguration', () => {
             colour: '#d53880',
             lineStyle: 'dotted',
             symbol: 'diamond',
+            lineChartLegendPosition: 'below',
           },
         ],
       };

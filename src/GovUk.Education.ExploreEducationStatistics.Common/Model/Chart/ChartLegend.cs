@@ -19,7 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         none,
         bottom,
-        top
+        top,
+        line
     }
 
     public class ChartLegendItem
@@ -33,6 +34,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
         [JsonConverter(typeof(StringEnumConverter))]
         public ChartLineStyle? LineStyle;
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ChartLineChartLegendPosition? LineChartLegendPosition;
     }
 
     public class ChartLegendItemDataSet
