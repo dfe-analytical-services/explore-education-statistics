@@ -35,7 +35,7 @@ Create new publication and release via API
     user create test release via api    ${PUBLICATION_ID}    FY    3000
 
 Navigate to release
-    user navigates to release summary from admin dashboard    ${PUBLICATION_NAME}
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_1_NAME}
 
 Add public prerelease access list

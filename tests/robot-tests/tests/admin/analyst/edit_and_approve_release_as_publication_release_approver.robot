@@ -29,7 +29,7 @@ Create new publication and release for "UI tests topic" topic and adds analyst1 
 
 Go to "Release summary" page
     user reloads page
-    user navigates to release summary from admin dashboard    ${PUBLICATION_NAME}
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
 
 Verify release summary

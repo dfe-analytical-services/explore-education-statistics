@@ -78,7 +78,7 @@ user clicks button in table cell
     [Arguments]    ${row}    ${column}    ${button_text}    ${parent}=css:table
     user waits until parent contains element    ${parent}
     ...    xpath:.//tbody/tr[${row}]/td[${column}]/button[contains(., "${button_text}")]
-    ${link}=    get child element
+    ${button}=    get child element
     ...    ${parent}
     ...    xpath:.//tbody/tr[${row}]/td[${column}]/button[contains(., "${button_text}")]
-    user clicks element    ${link}
+    user clicks element    ${button}

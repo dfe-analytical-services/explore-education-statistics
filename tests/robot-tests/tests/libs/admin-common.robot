@@ -91,7 +91,11 @@ user navigates to draft release page from dashboard
     ...    ${TOPIC_NAME}
 
     ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-draft-releases
-    user clicks element    xpath://*[text()="Edit"]    ${ROW}
+    # @MarkFix because "user clicks link" doesn't work
+    user clicks element    xpath://a[text()="Edit"]    ${ROW}
+
+    user waits until h2 is visible    Release summary    %{WAIT_SMALL}
+    user checks summary list contains    Publication title    ${PUBLICATION_NAME}
 
 user navigates to editable release summary from admin dashboard
     [Arguments]
@@ -115,7 +119,7 @@ user navigates to editable release amendment summary from admin dashboard
     ...    ${THEME_NAME}
     ...    ${TOPIC_NAME}
 
-user navigates to readonly release summary from admin dashboard
+user navigates to readonly release summary from admin dashboard    # @MarkFix remove for navigates to draft release
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
@@ -127,12 +131,13 @@ user navigates to readonly release summary from admin dashboard
     ...    ${THEME_NAME}
     ...    ${TOPIC_NAME}
 
-user navigates to release summary from admin dashboard
+user navigates to release summary from admin dashboard    # @MarkFix remove for navigates to draft release
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
+    ...    ${LINK_TEXT}=Edit
 
     user selects dashboard theme and topic if possible    ${THEME_NAME}    ${TOPIC_NAME}
 
@@ -142,7 +147,8 @@ user navigates to release summary from admin dashboard
     user waits until h3 is visible    Draft releases
 
     ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-draft-releases
-    user clicks element    xpath://a[text()="Edit"]    ${ROW}    # @MarkFix because "user clicks link" doesn't work
+    # @MarkFix because "user clicks link" doesn't work
+    user clicks element    xpath://a[text()="${LINK_TEXT}"]    ${ROW}
 
     user waits until h2 is visible    Release summary    %{WAIT_SMALL}
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}

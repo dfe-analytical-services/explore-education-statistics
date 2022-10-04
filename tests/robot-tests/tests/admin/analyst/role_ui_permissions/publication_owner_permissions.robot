@@ -23,7 +23,7 @@ Check can create a Methodology for the owned Publication
     user can see the create methodologies controls for publication    ${publication_accordion}
 
 Check cannot edit content for published release
-    user navigates to readonly release summary from admin dashboard    ${PUBLICATION_NAME}
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)    ${THEME_NAME}    ${TOPIC_NAME}
     user cannot see edit controls for release content    ${PUBLICATION_NAME}
 
