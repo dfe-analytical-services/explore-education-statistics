@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.RetryStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
 {
@@ -27,10 +26,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
         /// <param name="releaseId"></param>
         /// <returns></returns>
         [HttpPut("bau/release/{releaseId}/publish/content")]
-        public async Task<ActionResult<Unit>> RetryContentAndPublishing(Guid releaseId)
+        public async Task<ActionResult<Unit>> RetryReleasePublishing(Guid releaseId)
         {
             return await _publishingService
-                .RetryReleaseStage(releaseId, ContentAndPublishing)
+                .RetryReleasePublishing(releaseId)
                 .HandleFailuresOrOk();
         }
     }

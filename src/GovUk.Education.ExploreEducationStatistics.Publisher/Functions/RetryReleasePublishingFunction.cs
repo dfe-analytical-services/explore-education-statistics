@@ -6,12 +6,11 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.RetryStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     // ReSharper disable once UnusedType.Global
-    public class RetryStageFunction
+    public class RetryReleasePublishingFunction
     {
         private readonly IQueueService _queueService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
@@ -21,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ReleasePublishingStatusOverallStage.Complete, ReleasePublishingStatusOverallStage.Failed
         };
 
-        public RetryStageFunction(
+        public RetryReleasePublishingFunction(
             IQueueService queueService,
             IReleasePublishingStatusService releasePublishingStatusService)
         {
@@ -39,8 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         [FunctionName("RetryStage")]
         // ReSharper disable once UnusedMember.Global
         public async Task RetryStage(
-            [QueueTrigger(RetryStageQueue)]
-            RetryStageMessage message,
+            [QueueTrigger(RetryReleasePublishingQueue)]
+            RetryReleasePublishingMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {
@@ -68,16 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 }
                 else
                 {
-                    // TODO DW - EES-3369 - remove switch and enum completely
-                    switch (message.Stage)
-                    {
-                        case ContentAndPublishing:
-                            await _queueService.QueuePublishReleaseContentMessageAsync(message.ReleaseId,
-                                releaseStatus.Id);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
+                    await _queueService.QueuePublishReleaseContentMessageAsync(message.ReleaseId, releaseStatus.Id);
                 }
             }
 
