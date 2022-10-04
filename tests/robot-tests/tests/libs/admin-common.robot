@@ -422,46 +422,6 @@ user edits methodology note
     user clicks button    Update note
     user waits until page contains    ${note} - edited
 
-user links publication to external methodology
-    [Arguments]
-    ...    ${publication}
-    ...    ${title}=External methodology
-    ...    ${link}=https://example.com
-    ${accordion}=    user goes to publication page from dashboard    ${publication}
-    user clicks link    Use an external methodology    ${accordion}
-    user waits until page contains title    Link to an externally hosted methodology
-    user enters text into element    label:Link title    ${title}
-    user enters text into element    label:URL    ${link}
-    user clicks button    Save
-    user waits until page does not contain button    Save
-    ${accordion}=    user goes to publication page from dashboard    ${publication}
-    user waits until parent contains element    ${accordion}    //*[text()="External methodology (External)"]
-
-user edits an external methodology
-    [Arguments]
-    ...    ${publication}
-    ...    ${new_title}=External methodology updated
-    ...    ${new_link}=https://example.com/updated
-    ...    ${original_title}=External methodology
-    ...    ${original_link}=https://example.com
-
-    ${accordion}=    user goes to publication page from dashboard    ${publication}
-    user clicks link    Edit external methodology    ${accordion}
-    user waits until page contains title    Edit external methodology link
-    user checks input field contains    label:Link title    ${original_title}
-    user checks input field contains    label:URL    ${original_link}
-    user enters text into element    label:Link title    ${new_title}
-    user enters text into element    label:URL    ${new_link}
-    user clicks button    Save
-
-user removes an external methodology from publication
-    [Arguments]    ${publication}
-    ${accordion}=    user goes to publication page from dashboard    ${publication}
-    user clicks button    Remove external methodology    ${accordion}
-    user waits until modal is visible    Remove external methodology
-    user clicks button    Confirm
-    user waits until modal is not visible    Remove external methodology
-
 user creates public prerelease access list
     [Arguments]    ${content}
     user clicks link    Public access list
