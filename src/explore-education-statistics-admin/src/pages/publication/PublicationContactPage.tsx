@@ -12,20 +12,28 @@ import useToggle from '@common/hooks/useToggle';
 import React from 'react';
 
 const PublicationContactPage = () => {
-  const { publicationId, onReload } = usePublicationContext();
+  const { publication, onReload } = usePublicationContext();
   const [readOnly, toggleReadOnly] = useToggle(true);
 
-  const { value: contact } = useAsyncHandledRetry(
-    async () => publicationService.getContact(publicationId, true),
-    [publicationId],
+  const {
+    value: contact,
+    setState: setContact,
+  } = useAsyncHandledRetry(
+    async () => publicationService.getContact(publication.id),
+    [publication],
   );
 
   const handleSubmit = async (updatedContact: PublicationContactFormValues) => {
     if (!contact) {
       return;
     }
-    await publicationService.updateContact(publicationId, updatedContact);
+    const nextContact = await publicationService.updateContact(
+      publication.id,
+      updatedContact,
+    );
 
+    setContact({ value: nextContact });
+    toggleReadOnly.on();
     onReload();
   };
 
@@ -62,7 +70,7 @@ const PublicationContactPage = () => {
               {contact.contactTelNo}
             </SummaryListItem>
           </SummaryList>
-          {contact.permissions?.canUpdatePublication && (
+          {publication.permissions.canUpdateContact && (
             <Button variant="secondary" onClick={toggleReadOnly.off}>
               Edit contact details
             </Button>

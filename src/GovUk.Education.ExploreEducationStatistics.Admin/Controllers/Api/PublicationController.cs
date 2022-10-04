@@ -96,10 +96,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpGet("api/publication/{publicationId:guid}/contact")]
         public async Task<ActionResult<ContactViewModel>> GetContact(
-            Guid publicationId,
-            [FromQuery] bool includePermissions = false)
+            Guid publicationId)
         {
-            return await _publicationService.GetContact(publicationId, includePermissions)
+            return await _publicationService.GetContact(publicationId)
                 .HandleFailuresOrOk();
         }
 

@@ -99,7 +99,7 @@ const PublicationMethodologiesPage = () => {
             to an external file that contains methodology details.
           </p>
 
-          {permissions?.canCreateMethodologies && (
+          {permissions.canCreateMethodologies && (
             <Button
               className="govuk-!-margin-bottom-0"
               onClick={async () => {
@@ -294,7 +294,7 @@ const PublicationMethodologiesPage = () => {
                   <td />
                   <td />
                   <td>
-                    {permissions?.canManageExternalMethodology && (
+                    {permissions.canManageExternalMethodology && (
                       <Link
                         className="govuk-!-margin-right-4"
                         to={generatePath<PublicationRouteParams>(
@@ -323,7 +323,7 @@ const PublicationMethodologiesPage = () => {
                       </VisuallyHidden>
                     </Link>
 
-                    {permissions?.canManageExternalMethodology && (
+                    {permissions.canManageExternalMethodology && (
                       <ButtonText
                         variant="warning"
                         onClick={toggleRemovingExternalMethodology.on}
@@ -346,7 +346,7 @@ const PublicationMethodologiesPage = () => {
 
       <h3>Other options</h3>
 
-      {permissions?.canManageExternalMethodology && !externalMethodology && (
+      {permissions.canManageExternalMethodology && !externalMethodology && (
         <>
           <Link
             to={generatePath<PublicationRouteParams>(
@@ -364,7 +364,7 @@ const PublicationMethodologiesPage = () => {
         </>
       )}
 
-      {permissions?.canAdoptMethodologies && (
+      {permissions.canAdoptMethodologies && (
         <>
           <Link
             to={generatePath<PublicationRouteParams>(

@@ -18,7 +18,9 @@ import {
   publicationEditLegacyReleaseRoute,
   PublicationRouteParams,
 } from '@admin/routes/publicationRoutes';
-import publicationService from '@admin/services/publicationService';
+import publicationService, {
+  PublicationWithPermissions,
+} from '@admin/services/publicationService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import WarningMessage from '@common/components/WarningMessage';
@@ -55,7 +57,10 @@ const PublicationPageContainer = ({
     isLoading: loadingPublication,
     retry: reloadPublication,
   } = useAsyncHandledRetry(() =>
-    publicationService.getPublication(publicationId, true),
+    publicationService.getPublication<PublicationWithPermissions>(
+      publicationId,
+      true,
+    ),
   );
 
   return (

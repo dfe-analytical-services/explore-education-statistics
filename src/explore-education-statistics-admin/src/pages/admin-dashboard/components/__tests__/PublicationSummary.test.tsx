@@ -31,6 +31,7 @@ describe('PublicationSummary', () => {
     canUpdatePublicationSupersededBy: true,
     canCreateMethodologies: true,
     canManageExternalMethodology: true,
+    canUpdateContact: true,
   };
 
   const testPublication: MyPublication = {
@@ -50,6 +51,7 @@ describe('PublicationSummary', () => {
       canUpdatePublicationSupersededBy: false,
       canCreateMethodologies: false,
       canManageExternalMethodology: false,
+      canUpdateContact: false,
     },
   };
 

@@ -9,9 +9,6 @@ export const testContact: Contact = {
   contactTelNo: '0777777777',
   teamEmail: 'john.smith@test.com',
   teamName: 'Team Smith',
-  permissions: {
-    canUpdatePublication: true,
-  },
 };
 
 export const testPublication: PublicationWithPermissions = {
@@ -29,6 +26,7 @@ export const testPublication: PublicationWithPermissions = {
     canUpdatePublicationSupersededBy: true,
     canCreateMethodologies: true,
     canManageExternalMethodology: true,
+    canUpdateContact: true,
   },
 };
 
@@ -49,5 +47,6 @@ export const testMyPublication: MyPublication = {
     canUpdatePublicationSupersededBy: true,
     canCreateMethodologies: true,
     canManageExternalMethodology: true,
+    canUpdateContact: true,
   },
 };

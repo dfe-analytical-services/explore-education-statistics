@@ -35,6 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
             public bool CanAdoptMethodologies { get; set; }
             public bool CanCreateMethodologies { get; set; }
             public bool CanManageExternalMethodology { get; set; }
+            public bool CanUpdateContact { get; set; }
         }
     }
 }

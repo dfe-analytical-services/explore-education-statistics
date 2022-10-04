@@ -3,7 +3,7 @@ import { PublicationContextProvider } from '@admin/pages/publication/contexts/Pu
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import _publicationService, {
   ExternalMethodology,
-  Publication,
+  PublicationWithPermissions,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -158,7 +158,7 @@ describe('PublicationExternalMethodologyPage', () => {
   });
 });
 
-function renderPage(publication: Publication) {
+function renderPage(publication: PublicationWithPermissions) {
   render(
     <MemoryRouter>
       <PublicationContextProvider

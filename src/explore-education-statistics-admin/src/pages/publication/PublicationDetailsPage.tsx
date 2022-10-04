@@ -23,7 +23,7 @@ const PublicationDetailsPage = () => {
     supersededById,
     theme,
     topic,
-  } = publication as Publication;
+  } = publication;
   const [readOnly, toggleReadOnly] = useToggle(true);
 
   const {
@@ -62,7 +62,7 @@ const PublicationDetailsPage = () => {
                 : 'This publication is not archived'}
             </SummaryListItem>
           </SummaryList>
-          {permissions?.canUpdatePublication && (
+          {permissions.canUpdatePublication && (
             <Button variant="secondary" onClick={toggleReadOnly.off}>
               Edit publication details
             </Button>
@@ -71,9 +71,9 @@ const PublicationDetailsPage = () => {
       ) : (
         <PublicationDetailsForm
           canUpdatePublicationSupersededBy={
-            permissions?.canUpdatePublicationSupersededBy
+            permissions.canUpdatePublicationSupersededBy
           }
-          canUpdatePublicationTitle={permissions?.canUpdatePublicationTitle}
+          canUpdatePublicationTitle={permissions.canUpdatePublicationTitle}
           initialValues={{
             supersededById,
             title,

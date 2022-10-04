@@ -96,6 +96,7 @@ describe('PublicationsTab', () => {
         canUpdatePublicationSupersededBy: true,
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
+        canUpdateContact: true,
       },
     },
     {
@@ -115,6 +116,7 @@ describe('PublicationsTab', () => {
         canUpdatePublicationSupersededBy: true,
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
+        canUpdateContact: true,
       },
     },
   ];
@@ -137,6 +139,7 @@ describe('PublicationsTab', () => {
         canUpdatePublicationSupersededBy: true,
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
+        canUpdateContact: true,
       },
     },
   ];
@@ -159,6 +162,7 @@ describe('PublicationsTab', () => {
         canUpdatePublicationSupersededBy: true,
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
+        canUpdateContact: true,
       },
     },
   ];
@@ -181,6 +185,7 @@ describe('PublicationsTab', () => {
         canUpdatePublicationSupersededBy: true,
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
+        canUpdateContact: true,
       },
     },
   ];

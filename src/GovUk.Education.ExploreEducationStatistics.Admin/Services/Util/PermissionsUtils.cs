@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MethodologyVersionSummaryViewModel;
 using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 
@@ -37,6 +38,7 @@ public static class PermissionsUtils
             CanCreateMethodologies = await userService.CheckCanCreateMethodologyForPublication(publication).IsRight(),
             CanManageExternalMethodology =
                 await userService.CheckCanManageExternalMethodologyForPublication(publication).IsRight(),
+            CanUpdateContact = await userService.CheckCanUpdatePublication(publication).IsRight(),
         };
     }
 
@@ -59,17 +61,6 @@ public static class PermissionsUtils
                 await userService.CheckCanMakeAmendmentOfMethodology(methodologyVersion).IsRight(),
             CanRemoveMethodologyLink =
                 await userService.CheckCanDropMethodologyLink(publicationMethodology).IsRight()
-        };
-    }
-
-    public static async Task<ContactViewModel.ContactPermissions> GetContactPermissions(
-        IUserService userService,
-        Publication publication
-    )
-    {
-        return new ContactViewModel.ContactPermissions
-        {
-            CanUpdatePublication = await userService.CheckCanUpdatePublication(publication).IsRight(),
         };
     }
 }

@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, Unit>> RemoveExternalMethodology(
             Guid publicationId);
 
-        Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId, bool includePermissions);
+        Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId);
 
         Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId, Contact updatedContact);
 

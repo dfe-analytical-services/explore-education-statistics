@@ -19,7 +19,7 @@ const PublicationReleasesPage = () => {
 
       <p>View, edit or amend releases contained within this publication.</p>
 
-      {publication?.permissions?.canCreateReleases && (
+      {publication?.permissions.canCreateReleases && (
         <ButtonLink
           to={generatePath<PublicationRouteParams>(releaseCreateRoute.path, {
             publicationId,

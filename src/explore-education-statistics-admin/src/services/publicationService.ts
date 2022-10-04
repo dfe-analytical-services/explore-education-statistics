@@ -13,16 +13,11 @@ import { OmitStrict } from '@common/types';
 import { PublicationSummary } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
 
-export interface ContactPermissions {
-  canUpdatePublication: boolean;
-}
-
 export interface Contact {
   contactName: string;
   contactTelNo: string;
   teamEmail: string;
   teamName: string;
-  permissions?: ContactPermissions;
 }
 
 export interface ContactSave {
@@ -67,6 +62,7 @@ export interface PublicationPermissions {
   canUpdatePublicationSupersededBy: boolean;
   canCreateMethodologies: boolean;
   canManageExternalMethodology: boolean;
+  canUpdateContact: boolean;
 }
 
 export interface PublicationWithPermissions extends Publication {
@@ -140,11 +136,11 @@ const publicationService = {
     return client.put(`/publications/${publicationId}`, publication);
   },
 
-  getPublication(
+  getPublication<TPublication extends Publication = Publication>(
     publicationId: string,
     includePermissions = false,
-  ): Promise<Publication> {
-    return client.get<Publication>(`/publications/${publicationId}`, {
+  ): Promise<TPublication> {
+    return client.get<TPublication>(`/publications/${publicationId}`, {
       params: { includePermissions },
     });
   },
@@ -182,13 +178,10 @@ const publicationService = {
     return client.delete(`/publication/${publicationId}/external-methodology`);
   },
 
-  getContact(
+  getContact<TContact extends Contact = Contact>(
     publicationId: string,
-    includePermissions = false,
-  ): Promise<Contact> {
-    return client.get(`publication/${publicationId}/contact`, {
-      params: { includePermissions },
-    });
+  ): Promise<TContact> {
+    return client.get<TContact>(`publication/${publicationId}/contact`);
   },
 
   updateContact(

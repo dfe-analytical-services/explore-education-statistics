@@ -505,6 +505,7 @@ describe('PublicationForm', () => {
         canUpdatePublicationSupersededBy: true,
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
+        canUpdateContact: true,
       },
     };
 

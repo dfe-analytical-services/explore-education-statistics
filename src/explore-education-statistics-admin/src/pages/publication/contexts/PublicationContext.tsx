@@ -1,10 +1,10 @@
-import { Publication } from '@admin/services/publicationService';
+import { PublicationWithPermissions } from '@admin/services/publicationService';
 import React, { createContext, ReactNode, useContext, useMemo } from 'react';
 
 export interface PublicationContextState {
-  publication: Publication;
+  publication: PublicationWithPermissions;
   publicationId: string;
-  onPublicationChange: (nextPublication: Publication) => void;
+  onPublicationChange: (nextPublication: PublicationWithPermissions) => void;
   onReload: () => void;
 }
 
@@ -14,8 +14,8 @@ const PublicationContext = createContext<PublicationContextState | undefined>(
 
 interface PublicationContextProviderProps {
   children: ReactNode;
-  publication: Publication;
-  onPublicationChange: (nextPublication: Publication) => void;
+  publication: PublicationWithPermissions;
+  onPublicationChange: (nextPublication: PublicationWithPermissions) => void;
   onReload: () => void;
 }
 

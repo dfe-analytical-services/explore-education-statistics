@@ -3,6 +3,7 @@ import { PublicationContextProvider } from '@admin/pages/publication/contexts/Pu
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import _publicationService, {
   Publication,
+  PublicationWithPermissions,
 } from '@admin/services/publicationService';
 import _themeService, { Theme } from '@admin/services/themeService';
 import { PublicationSummary } from '@common/services/publicationService';
@@ -406,7 +407,7 @@ describe('PublicationDetailsPage', () => {
   });
 });
 
-function renderPage(publication: Publication) {
+function renderPage(publication: PublicationWithPermissions) {
   render(
     <MemoryRouter>
       <PublicationContextProvider

@@ -357,7 +357,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId, bool includePermissions)
+        public async Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, query =>
@@ -366,11 +366,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async publication =>
                 {
                     var contact = _mapper.Map<ContactViewModel>(publication.Contact);
-
-                    if (includePermissions)
-                    {
-                        contact.Permissions = await PermissionsUtils.GetContactPermissions(_userService, publication);
-                    }
 
                     return contact;
                 });

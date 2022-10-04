@@ -13,11 +13,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string ContactTelNo { get; set; } = string.Empty;
 
-        public ContactPermissions? Permissions { get; set; }
+        public ContactPermissions? Permissions { get; set; } // @MarkFix remove
 
-        public record ContactPermissions
+        public record ContactPermissions // @MarkFix remove
         {
-            public bool CanUpdatePublication { get; set; }
+            public bool CanUpdateContact { get; set; }
         }
     }
 

@@ -4,7 +4,7 @@ import { testPublication } from '@admin/pages/publication/__data__/testPublicati
 import _legacyReleaseService, {
   LegacyRelease,
 } from '@admin/services/legacyReleaseService';
-import { Publication } from '@admin/services/publicationService';
+import { PublicationWithPermissions } from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
@@ -72,7 +72,7 @@ describe('PublicationLegacyReleasesPage', () => {
   });
 });
 
-function renderPage(publication: Publication) {
+function renderPage(publication: PublicationWithPermissions) {
   render(
     <MemoryRouter>
       <PublicationContextProvider

@@ -96,6 +96,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
         canUpdatePublicationSupersededBy: true,
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
+        canUpdateContact: true,
       },
     },
     {
@@ -115,6 +116,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
         canUpdatePublicationSupersededBy: true,
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
+        canUpdateContact: true,
       },
     },
   ];

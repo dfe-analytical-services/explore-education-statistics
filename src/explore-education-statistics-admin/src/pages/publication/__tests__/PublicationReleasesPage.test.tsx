@@ -3,7 +3,7 @@ import { testPublication } from '@admin/pages/publication/__data__/testPublicati
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import PublicationReleasesPage from '@admin/pages/publication/PublicationReleasesPage';
 import _publicationService, {
-  Publication,
+  PublicationWithPermissions,
 } from '@admin/services/publicationService';
 import _releaseService from '@admin/services/releaseService';
 import { screen, waitFor } from '@testing-library/react';
@@ -46,7 +46,7 @@ describe('PublicationReleasesPage', () => {
   });
 
   test('does not show the create release button if you do not have permission', async () => {
-    const publication: Publication = {
+    const publication: PublicationWithPermissions = {
       ...testPublication,
       permissions: {
         ...testPublication.permissions,
@@ -67,7 +67,7 @@ describe('PublicationReleasesPage', () => {
   });
 });
 
-function renderPage(publication: Publication) {
+function renderPage(publication: PublicationWithPermissions) {
   render(
     <MemoryRouter>
       <PublicationContextProvider

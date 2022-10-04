@@ -462,7 +462,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var service = BuildPublicationService(
                         context: contentDbContext,
                         userService: userService.Object);
-                    return await service.GetContact(publication.Id, false);
+                    return await service.GetContact(publication.Id);
                 });
         }
 

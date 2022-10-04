@@ -115,6 +115,7 @@ const testPublicationNoMethodology: MyPublication = {
     canUpdatePublicationSupersededBy: true,
     canCreateMethodologies: true,
     canManageExternalMethodology: true,
+    canUpdateContact: true,
   },
 };
 const testPublicationWithMethodology = produce(
