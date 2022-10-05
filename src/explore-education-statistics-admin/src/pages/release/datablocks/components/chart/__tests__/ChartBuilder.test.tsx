@@ -1,12 +1,8 @@
-import { testTableData } from '@admin/pages/release/datablocks/__data__/tableToolServiceData';
+import { testFullTable } from '@admin/pages/release/datablocks/components/chart/__tests__/__data__/testTableData';
 import {
   ChartBuilderForms,
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
-import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
-import mapFullTableMeta from '@common/modules/table-tool/utils/mapFullTableMeta';
-import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
-import { TableDataSubjectMeta } from '@common/services/tableBuilderService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -29,85 +25,17 @@ describe('ChartBuilder', () => {
     },
   };
 
-  const testTable = mapFullTable(testTableData);
-  const testMeta: TableDataSubjectMeta = {
-    publicationName: '',
-    subjectName: '',
-    geoJsonAvailable: false,
-    footnotes: [],
-    boundaryLevels: [],
-    locations: {
-      localAuthority: [
-        { id: 'barnet', label: 'Barnet', value: 'barnet' },
-        { id: 'barnsley', label: 'Barnsley', value: 'barnsley' },
-      ],
-    },
-    timePeriodRange: [
-      {
-        label: '2019/20',
-        year: 2019,
-        code: 'AY',
-      },
-      {
-        label: '2020/21',
-        year: 2020,
-        code: 'AY',
-      },
-    ],
-    indicators: [
-      {
-        value: 'authorised-absence-sessions',
-        label: 'Number of authorised absence sessions',
-        unit: '',
-        name: 'sess_authorised',
-        decimalPlaces: 2,
-      },
-      {
-        value: 'unauthorised-absence-sessions',
-        label: 'Number of unauthorised absence sessions',
-        unit: '',
-        name: 'sess_unauthorised',
-        decimalPlaces: 2,
-      },
-    ],
-    filters: {
-      Characteristic: {
-        legend: 'Characteristic',
-        name: 'characteristic',
-        options: {
-          gender: {
-            id: 'gender',
-            label: 'Gender',
-            options: [
-              {
-                value: 'male',
-                label: 'Male',
-              },
-              {
-                value: 'female',
-                label: 'Female',
-              },
-            ],
-            order: 0,
-          },
-        },
-        order: 0,
-      },
-    },
-  };
-  const testSubjectMeta: FullTableMeta = mapFullTableMeta(testMeta);
-
   test('renders the chart type selector only when no initial value', () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartBuilder
           releaseId="release-1"
-          data={testTable.results}
-          meta={testSubjectMeta}
+          data={testFullTable.results}
+          meta={testFullTable.subjectMeta}
           tableTitle="Table title"
-          onChartSave={jest.fn(() => Promise.resolve())}
+          onChartSave={jest.fn()}
           onChartDelete={noop}
-          onTableQueryUpdate={jest.fn(() => Promise.resolve())}
+          onTableQueryUpdate={jest.fn()}
         />
       </ChartBuilderFormsContextProvider>,
     );
@@ -138,12 +66,12 @@ describe('ChartBuilder', () => {
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartBuilder
           releaseId="release-1"
-          data={testTable.results}
-          meta={testSubjectMeta}
+          data={testFullTable.results}
+          meta={testFullTable.subjectMeta}
           tableTitle="Table title"
-          onChartSave={jest.fn(() => Promise.resolve())}
+          onChartSave={jest.fn()}
           onChartDelete={noop}
-          onTableQueryUpdate={jest.fn(() => Promise.resolve())}
+          onTableQueryUpdate={jest.fn()}
         />
       </ChartBuilderFormsContextProvider>,
     );
@@ -154,17 +82,24 @@ describe('ChartBuilder', () => {
       screen.getByRole('button', { name: 'Chart preview' }),
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByRole('tab', { name: 'Chart configuration' }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'Data sets' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'Legend' })).toBeInTheDocument();
-    expect(
-      screen.getByRole('tab', { name: 'X Axis (major axis)' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('tab', { name: 'Y Axis (minor axis)' }),
-    ).toBeInTheDocument();
+    const tabs = screen.getAllByRole('tab');
+
+    expect(tabs).toHaveLength(5);
+
+    expect(tabs[0]).toHaveTextContent('Chart configuration');
+    expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+
+    expect(tabs[1]).toHaveTextContent('Data sets');
+    expect(tabs[1]).toHaveAttribute('aria-selected', 'false');
+
+    expect(tabs[2]).toHaveTextContent('Legend');
+    expect(tabs[2]).toHaveAttribute('aria-selected', 'false');
+
+    expect(tabs[3]).toHaveTextContent('X Axis (major axis)');
+    expect(tabs[3]).toHaveAttribute('aria-selected', 'false');
+
+    expect(tabs[4]).toHaveTextContent('Y Axis (minor axis)');
+    expect(tabs[4]).toHaveAttribute('aria-selected', 'false');
 
     expect(
       screen.getByRole('heading', { name: 'Chart configuration' }),
@@ -177,12 +112,12 @@ describe('ChartBuilder', () => {
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartBuilder
             releaseId="release-1"
-            data={testTable.results}
-            meta={testSubjectMeta}
+            data={testFullTable.results}
+            meta={testFullTable.subjectMeta}
             tableTitle="Table title"
-            onChartSave={jest.fn(() => Promise.resolve())}
+            onChartSave={jest.fn()}
             onChartDelete={noop}
-            onTableQueryUpdate={jest.fn(() => Promise.resolve())}
+            onTableQueryUpdate={jest.fn()}
           />
         </ChartBuilderFormsContextProvider>,
       );
@@ -195,11 +130,23 @@ describe('ChartBuilder', () => {
         screen.getByRole('heading', { name: 'Data sets' }),
       ).toBeInTheDocument();
 
-      userEvent.selectOptions(screen.getByLabelText('Characteristic'), 'male');
+      userEvent.selectOptions(
+        screen.getByLabelText('Characteristic'),
+        'ethnicity-major-chinese',
+      );
+      userEvent.selectOptions(
+        screen.getByLabelText('School type'),
+        'state-funded-primary',
+      );
       userEvent.selectOptions(
         screen.getByLabelText('Indicator'),
-        'unauthorised-absence-sessions',
+        'authorised-absence-sessions',
       );
+      userEvent.selectOptions(
+        screen.getByLabelText('Location'),
+        '{"level":"localAuthority","value":"barnet"}',
+      );
+      userEvent.selectOptions(screen.getByLabelText('Time period'), '2014_AY');
 
       userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
 
@@ -210,17 +157,26 @@ describe('ChartBuilder', () => {
       const tableRows = screen.getAllByRole('row');
       expect(tableRows).toHaveLength(2);
       expect(tableRows[1]).toHaveTextContent(
-        'Number of unauthorised absence sessions (Male, All locations, All time periods)',
+        'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, Barnet, 2014/15)',
       );
 
       userEvent.selectOptions(
         screen.getByLabelText('Characteristic'),
-        'female',
+        'ethnicity-major-chinese',
+      );
+      userEvent.selectOptions(
+        screen.getByLabelText('School type'),
+        'state-funded-secondary',
       );
       userEvent.selectOptions(
         screen.getByLabelText('Indicator'),
-        'unauthorised-absence-sessions',
+        'authorised-absence-sessions',
       );
+      userEvent.selectOptions(
+        screen.getByLabelText('Location'),
+        '{"level":"localAuthority","value":"barnet"}',
+      );
+      userEvent.selectOptions(screen.getByLabelText('Time period'), '2014_AY');
 
       userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
 
@@ -231,21 +187,21 @@ describe('ChartBuilder', () => {
       const updatedTableRows = screen.getAllByRole('row');
       expect(updatedTableRows).toHaveLength(3);
       expect(updatedTableRows[2]).toHaveTextContent(
-        'Number of unauthorised absence sessions (Female, All locations, All time periods)',
+        'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded secondary, Barnet, 2014/15)',
       );
     });
 
-    test('removing data sets', async () => {
+    test('removing a data set', async () => {
       render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartBuilder
             releaseId="release-1"
-            data={testTable.results}
-            meta={testSubjectMeta}
+            data={testFullTable.results}
+            meta={testFullTable.subjectMeta}
             tableTitle="Table title"
-            onChartSave={jest.fn(() => Promise.resolve())}
+            onChartSave={jest.fn()}
             onChartDelete={noop}
-            onTableQueryUpdate={jest.fn(() => Promise.resolve())}
+            onTableQueryUpdate={jest.fn()}
           />
         </ChartBuilderFormsContextProvider>,
       );
@@ -258,6 +214,12 @@ describe('ChartBuilder', () => {
         screen.getByRole('heading', { name: 'Data sets' }),
       ).toBeInTheDocument();
 
+      userEvent.selectOptions(
+        screen.getByLabelText('Indicator'),
+        'authorised-absence-sessions',
+      );
+      userEvent.selectOptions(screen.getByLabelText('Time period'), '2014_AY');
+
       userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
 
       await waitFor(() => {
@@ -267,16 +229,16 @@ describe('ChartBuilder', () => {
       const tableRows = screen.getAllByRole('row');
       expect(tableRows).toHaveLength(5);
       expect(tableRows[1]).toHaveTextContent(
-        'Number of authorised absence sessions (Male, All locations, All time periods)',
+        'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, All locations, 2014/15)',
       );
       expect(tableRows[2]).toHaveTextContent(
-        'Number of unauthorised absence sessions (Male, All locations, All time periods)',
+        'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded secondary, All locations, 2014/15)',
       );
       expect(tableRows[3]).toHaveTextContent(
-        'Number of authorised absence sessions (Female, All locations, All time periods)',
+        'Number of authorised absence sessions (Ethnicity Major Black Total, State-funded primary, All locations, 2014/15)',
       );
       expect(tableRows[4]).toHaveTextContent(
-        'Number of unauthorised absence sessions (Female, All locations, All time periods)',
+        'Number of authorised absence sessions (Ethnicity Major Black Total, State-funded secondary, All locations, 2014/15)',
       );
 
       userEvent.click(
@@ -286,10 +248,62 @@ describe('ChartBuilder', () => {
       await waitFor(() => {
         expect(
           screen.queryByText(
-            'Number of unauthorised absence sessions (Male, All locations, All time periods)',
+            'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded secondary, All locations, 2014/15)',
           ),
         ).not.toBeInTheDocument();
       });
+      expect(screen.getAllByRole('row')).toHaveLength(4);
+    });
+
+    test('removing all data sets', async () => {
+      render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartBuilder
+            releaseId="release-1"
+            data={testFullTable.results}
+            meta={testFullTable.subjectMeta}
+            tableTitle="Table title"
+            onChartSave={jest.fn()}
+            onChartDelete={noop}
+            onTableQueryUpdate={jest.fn()}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      userEvent.click(screen.getByRole('button', { name: 'Line' }));
+
+      userEvent.click(screen.getByRole('tab', { name: 'Data sets' }));
+
+      expect(
+        screen.getByRole('heading', { name: 'Data sets' }),
+      ).toBeInTheDocument();
+
+      userEvent.selectOptions(
+        screen.getByLabelText('Indicator'),
+        'authorised-absence-sessions',
+      );
+      userEvent.selectOptions(screen.getByLabelText('Time period'), '2014_AY');
+
+      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('Remove all')).toBeInTheDocument();
+      });
+
+      const tableRows = screen.getAllByRole('row');
+      expect(tableRows).toHaveLength(5);
+      expect(tableRows[1]).toHaveTextContent(
+        'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, All locations, 2014/15)',
+      );
+      expect(tableRows[2]).toHaveTextContent(
+        'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded secondary, All locations, 2014/15)',
+      );
+      expect(tableRows[3]).toHaveTextContent(
+        'Number of authorised absence sessions (Ethnicity Major Black Total, State-funded primary, All locations, 2014/15)',
+      );
+      expect(tableRows[4]).toHaveTextContent(
+        'Number of authorised absence sessions (Ethnicity Major Black Total, State-funded secondary, All locations, 2014/15)',
+      );
 
       userEvent.click(
         screen.getByRole('button', { name: 'Remove all data sets' }),
@@ -302,20 +316,27 @@ describe('ChartBuilder', () => {
       await waitFor(() => {
         expect(
           screen.queryByText(
-            'Number of authorised absence sessions (Male, All locations, All time periods)',
+            'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, All locations, 2014/15)',
           ),
         ).not.toBeInTheDocument();
         expect(
           screen.queryByText(
-            'Number of authorised absence sessions (Female, All locations, All time periods)',
+            'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded secondary, All locations, 2014/15)',
           ),
         ).not.toBeInTheDocument();
         expect(
           screen.queryByText(
-            'Number of unauthorised absence sessions (Female, All locations, All time periods)',
+            'Number of authorised absence sessions (Ethnicity Major Black Total, State-funded primary, All locations, 2014/15)',
+          ),
+        ).not.toBeInTheDocument();
+        expect(
+          screen.queryByText(
+            'Number of authorised absence sessions (Ethnicity Major Black Total, State-funded secondary, All locations, 2014/15)',
           ),
         ).not.toBeInTheDocument();
       });
+
+      expect(screen.getAllByRole('row')).toHaveLength(1);
     });
   });
 });

@@ -350,10 +350,14 @@ Validate changing data sets
     user checks chart legend item contains    id:chartBuilderPreview    2    Admission Numbers (Syon)
     user checks chart legend item contains    id:chartBuilderPreview    3    Admission Numbers (Bolton 001)
 
+    user checks table body has x rows    3    testid:chart-data-sets
+
     user clicks button    Remove all
     user clicks button    Confirm
 
     user checks page contains    Configure the chart and add data to view a preview
+
+    user checks table body has x rows    0    testid:chart-data-sets
 
 Configure line chart data sets
     user chooses select option    id:chartDataSetsConfigurationForm-location    Nailsea Youngwood

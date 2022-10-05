@@ -249,7 +249,7 @@ const ChartDataSetsConfiguration = ({
       >
         <Droppable droppableId="dataSets" isDropDisabled={!isReordering}>
           {(droppableProvided, droppableSnapshot) => (
-            <table>
+            <table data-testId="chart-data-sets">
               <thead>
                 <tr>
                   <th>Data set</th>
