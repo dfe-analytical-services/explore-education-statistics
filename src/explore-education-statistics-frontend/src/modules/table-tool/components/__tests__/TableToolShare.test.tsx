@@ -52,31 +52,78 @@ describe('TableToolShare', () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.queryByRole('button', {
-          name: 'Generate shareable link',
-        }),
-      ).not.toBeInTheDocument();
-
       expect(screen.getByText('Generated share link')).toBeInTheDocument();
+    });
 
-      const urlInput = screen.getByTestId('permalink-generated-url');
-      expect(urlInput).toBeInTheDocument();
-      expect(urlInput).toHaveValue(
-        'http://localhost/data-tables/permalink/permalink-id',
-      );
+    expect(
+      screen.queryByRole('button', {
+        name: 'Generate shareable link',
+      }),
+    ).not.toBeInTheDocument();
 
-      expect(
-        screen.getByRole('button', {
-          name: 'Copy link',
-        }),
-      ).toBeInTheDocument();
+    const urlInput = screen.getByTestId('permalink-generated-url');
+    expect(urlInput).toBeInTheDocument();
+    expect(urlInput).toHaveValue(
+      'http://localhost/data-tables/permalink/permalink-id',
+    );
 
-      expect(
-        screen.getByRole('link', {
-          name: 'View share link',
-        }),
-      ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', {
+        name: 'Copy link',
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', {
+        name: 'View share link',
+      }),
+    ).toBeInTheDocument();
+  });
+
+  test('copies the link to the clipboard when the copy button is clicked', async () => {
+    permalinkService.createPermalink.mockResolvedValue({
+      id: 'permalink-id',
+    } as Permalink);
+
+    const originalClipboard = { ...window.navigator.clipboard };
+    Object.assign(window.navigator, {
+      clipboard: {
+        writeText: jest.fn(),
+      },
+    });
+
+    render(
+      <TableToolShare
+        query={testQuery}
+        tableHeaders={testTableHeaders}
+        selectedPublication={testSelectedPublicationWithLatestRelease}
+      />,
+    );
+
+    userEvent.click(
+      screen.getByRole('button', {
+        name: 'Generate shareable link',
+      }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Generated share link')).toBeInTheDocument();
+    });
+
+    userEvent.click(
+      screen.getByRole('button', {
+        name: 'Copy link',
+      }),
+    );
+
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+      'http://localhost/data-tables/permalink/permalink-id',
+    );
+
+    Object.assign(window.navigator, {
+      clipboard: {
+        writeText: originalClipboard,
+      },
     });
   });
 });

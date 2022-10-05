@@ -16,7 +16,6 @@ import React, { useEffect, useState } from 'react';
 
 const linkInstructions =
   'Use the link below to see a version of this page that you can bookmark for future reference, or copy the link to send on to somebody else to view.';
-const permalinkBaseUrl = `${window.location.origin}/data-tables/permalink`;
 
 interface Props {
   tableHeaders?: TableHeadersConfig;
@@ -29,12 +28,12 @@ const TableToolShare = ({
   query,
   selectedPublication,
 }: Props) => {
-  const [permalinkId, setPermalinkId] = useState<string>('');
+  const [permalinkUrl, setPermalinkUrl] = useState('');
   const [permalinkLoading, setPermalinkLoading] = useState<boolean>(false);
   const [screenReaderMessage, setScreenReaderMessage] = useState('');
 
   useEffect(() => {
-    setPermalinkId('');
+    setPermalinkUrl('');
   }, [tableHeaders]);
 
   const handlePermalinkClick = async () => {
@@ -53,20 +52,20 @@ const TableToolShare = ({
       selectedPublication.selectedRelease.id,
     );
 
-    setPermalinkId(id);
+    setPermalinkUrl(`${window.location.origin}/data-tables/permalink/${id}`);
     setPermalinkLoading(false);
 
     setScreenReaderMessage(`Shareable link generated. ${linkInstructions}`);
   };
 
   const handleCopyClick = () => {
-    navigator.clipboard.writeText(`${permalinkBaseUrl}/${permalinkId}`);
+    navigator.clipboard.writeText(permalinkUrl);
     setScreenReaderMessage('Link copied to the clipboard.');
   };
 
   return (
     <>
-      {!permalinkId ? (
+      {!permalinkUrl ? (
         <>
           <h3 className="govuk-heading-s">Save table</h3>
           <LoadingSpinner
@@ -92,7 +91,7 @@ const TableToolShare = ({
           <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-2">
             <UrlContainer
               data-testid="permalink-generated-url"
-              url={`${permalinkBaseUrl}/${permalinkId}`}
+              url={permalinkUrl}
             />
           </p>
 
@@ -101,9 +100,7 @@ const TableToolShare = ({
               Copy link
             </Button>
 
-            <ButtonLink to={`/data-tables/permalink/${permalinkId}`}>
-              View share link
-            </ButtonLink>
+            <ButtonLink to={permalinkUrl}>View share link</ButtonLink>
           </ButtonGroup>
         </>
       )}
