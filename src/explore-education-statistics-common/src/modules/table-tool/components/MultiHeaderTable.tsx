@@ -108,15 +108,13 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
 
           // Add the current header to the row when:
           // - it doesn't match the previous header
-          // - it does match the previous header but it's in a sub-group so needs
-          // to be included or the layout breaks.
+          // - it does match the previous header, but it's in a sub-group with
+          //   siblings so needs to be included or the layout breaks.
           // Otherwise, we want the previous header to span
           // across where the current header would be in the row.
           if (
             !matchesPreviousHeader ||
-            (matchesPreviousHeader &&
-              current.parent &&
-              current.parent.children.length > 1)
+            (matchesPreviousHeader && current.hasSiblings())
           ) {
             row.push({
               id: current.id,

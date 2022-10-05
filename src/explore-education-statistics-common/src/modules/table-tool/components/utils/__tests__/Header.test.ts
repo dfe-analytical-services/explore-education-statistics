@@ -411,4 +411,22 @@ describe('Header', () => {
       expect(header.getNextSibling()?.id).toBeUndefined();
     });
   });
+
+  describe('hasSiblings', () => {
+    test('returns true if has siblings', () => {
+      const header = new Header('0b', 'Header 0b');
+
+      new Header('0', 'Header 0')
+        .addChild(new Header('0a', 'Header 0a'))
+        .addChild(header)
+        .addChild(new Header('0c', 'Header 0c'));
+
+      expect(header.hasSiblings()).toBe(true);
+    });
+
+    test('returns false if does not havee siblings', () => {
+      const header = new Header('0b', 'Header 0a');
+      expect(header.hasSiblings()).toBe(false);
+    });
+  });
 });

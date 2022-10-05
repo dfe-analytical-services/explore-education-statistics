@@ -104,6 +104,10 @@ export default class Header {
     return last(this.children);
   }
 
+  public hasSiblings(): boolean {
+    return !!this.parent && this.parent.children.length > 1;
+  }
+
   public getPrevSibling(): Header | undefined {
     if (!this.parent) {
       return undefined;
