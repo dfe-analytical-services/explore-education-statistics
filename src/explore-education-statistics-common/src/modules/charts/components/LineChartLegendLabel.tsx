@@ -1,4 +1,4 @@
-import { LineChartLegendPosition } from '@common/modules/charts/types/legend';
+import { LegendInlinePosition } from '@common/modules/charts/types/legend';
 import { LabelProps } from 'recharts';
 import React from 'react';
 
@@ -6,7 +6,7 @@ interface Props extends LabelProps {
   colour: string;
   index: number;
   name: string;
-  labelPosition: LineChartLegendPosition;
+  labelPosition: LegendInlinePosition;
   totalDataPoints: number;
 }
 

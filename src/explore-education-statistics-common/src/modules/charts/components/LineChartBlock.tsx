@@ -154,7 +154,7 @@ const LineChartBlock = ({
             wrapperStyle={{ zIndex: 1000 }}
           />
 
-          {legend.position !== 'none' && legend.position !== 'line' && (
+          {legend.position !== 'none' && legend.position !== 'inline' && (
             <Legend content={renderLegend} align="left" layout="vertical" />
           )}
 
@@ -201,13 +201,13 @@ const LineChartBlock = ({
               strokeWidth="2"
               strokeDasharray={lineStyles[config.lineStyle ?? 'solid']}
               label={props =>
-                legend.position === 'line' ? (
+                legend.position === 'inline' ? (
                   <LineChartLegendLabel
                     {...props}
                     name={config.label}
                     colour={config.colour}
                     totalDataPoints={chartData.length}
-                    labelPosition={config.lineChartLegendPosition}
+                    labelPosition={config.inlinePosition}
                   />
                 ) : null
               }
@@ -243,7 +243,7 @@ export const lineChartBlockDefinition: ChartDefinition = {
   type: 'line',
   name: 'Line',
   capabilities: {
-    canPositionLegendOnLine: true,
+    canPositionLegendInline: true,
     canSize: true,
     canSort: true,
     hasGridLines: true,

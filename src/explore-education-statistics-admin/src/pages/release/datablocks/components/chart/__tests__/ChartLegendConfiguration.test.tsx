@@ -551,7 +551,7 @@ describe('ChartLegendConfiguration', () => {
     expect(legendItem1.queryByLabelText('Style')).not.toBeInTheDocument();
   });
 
-  test('renders the legend item position field if a line chart with legend position `chart`', () => {
+  test('renders the item position field when the legend position is `inline`', () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartLegendConfiguration
@@ -575,7 +575,7 @@ describe('ChartLegendConfiguration', () => {
             visible: true,
           }}
           legend={{
-            position: 'line',
+            position: 'inline',
             items: [
               {
                 dataSet: {
@@ -597,7 +597,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    expect(screen.getByLabelText('Legend position')).toHaveValue('line');
+    expect(screen.getByLabelText('Legend position')).toHaveValue('inline');
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(1);
@@ -646,7 +646,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.selectOptions(screen.getByLabelText('Legend position'), 'line');
+    userEvent.selectOptions(screen.getByLabelText('Legend position'), 'inline');
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(1);
@@ -662,7 +662,7 @@ describe('ChartLegendConfiguration', () => {
     userEvent.selectOptions(legendItem1.getByLabelText('Position'), 'below');
 
     expect(handleChange).toHaveBeenCalledWith<[LegendConfiguration]>({
-      position: 'line',
+      position: 'inline',
       items: [
         {
           dataSet,
@@ -670,7 +670,7 @@ describe('ChartLegendConfiguration', () => {
           colour: '#12436D',
           lineStyle: 'solid',
           symbol: 'none',
-          lineChartLegendPosition: 'below',
+          inlinePosition: 'below',
         },
       ],
     });
@@ -873,7 +873,7 @@ describe('ChartLegendConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.selectOptions(screen.getByLabelText('Legend position'), 'line');
+    userEvent.selectOptions(screen.getByLabelText('Legend position'), 'inline');
 
     const legendItems = screen.getAllByRole('group');
     expect(legendItems).toHaveLength(1);
@@ -902,7 +902,7 @@ describe('ChartLegendConfiguration', () => {
 
     await waitFor(() => {
       const values: LegendConfiguration = {
-        position: 'line',
+        position: 'inline',
         items: [
           {
             dataSet: {
@@ -917,7 +917,7 @@ describe('ChartLegendConfiguration', () => {
             colour: '#d53880',
             lineStyle: 'dotted',
             symbol: 'diamond',
-            lineChartLegendPosition: 'below',
+            inlinePosition: 'below',
           },
         ],
       };

@@ -36,6 +36,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public ChartLineStyle? LineStyle;
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public ChartLineChartLegendPosition? LineChartLegendPosition;
+        public ChartInlinePosition? InlinePosition;
     }
 }

@@ -22,10 +22,10 @@ import {
   LegendItem,
   LegendItemConfiguration,
   LegendPosition,
-  LineChartLegendPosition,
+  LegendInlinePosition,
 } from '@common/modules/charts/types/legend';
 import {
-  lineChartLegendPositions,
+  legendInlinePositions,
   colours,
   legendPositions,
   lineStyles,
@@ -60,7 +60,7 @@ const lineStyleOptions: SelectOption[] = lineStyles.map(lineStyle => ({
   value: lineStyle,
 }));
 
-const lineChartLegendPositionOptions: SelectOption[] = lineChartLegendPositions.map(
+const inlinePositionOptions: SelectOption[] = legendInlinePositions.map(
   position => ({
     label: upperFirst(position),
     value: position,
@@ -131,7 +131,7 @@ const ChartLegendConfiguration = ({
     const defaultConfig: Partial<LegendItemConfiguration> = {
       symbol: capabilities.hasSymbols ? 'none' : undefined,
       lineStyle: capabilities.hasLineStyle ? 'solid' : undefined,
-      lineChartLegendPosition: capabilities.canPositionLegendOnLine
+      inlinePosition: capabilities.canPositionLegendInline
         ? 'above'
         : undefined,
     };
@@ -152,7 +152,7 @@ const ChartLegendConfiguration = ({
     data,
     meta,
     legend.position,
-    capabilities.canPositionLegendOnLine,
+    capabilities.canPositionLegendInline,
     capabilities.hasSymbols,
     capabilities.hasLineStyle,
   ]);
@@ -187,9 +187,9 @@ const ChartLegendConfiguration = ({
       ),
     });
 
-    if (capabilities.canPositionLegendOnLine) {
+    if (capabilities.canPositionLegendInline) {
       itemSchema = itemSchema.shape({
-        lineChartLegendPosition: Yup.string().oneOf<LineChartLegendPosition>(
+        inlinePosition: Yup.string().oneOf<LegendInlinePosition>(
           ['above', 'below'],
           params =>
             `Choose a valid position for legend item ${getLegendItemNumber(
@@ -239,7 +239,7 @@ const ChartLegendConfiguration = ({
     if (capabilities.hasLegendPosition) {
       baseSchema = baseSchema.shape({
         position: Yup.string().oneOf<LegendPosition>(
-          ['none', 'bottom', 'top', 'line'],
+          ['none', 'bottom', 'top', 'inline'],
           'Select a valid legend position',
         ),
       });
@@ -247,7 +247,7 @@ const ChartLegendConfiguration = ({
 
     return baseSchema;
   }, [
-    capabilities.canPositionLegendOnLine,
+    capabilities.canPositionLegendInline,
     capabilities.hasLegendPosition,
     capabilities.hasLineStyle,
     capabilities.hasSymbols,
@@ -303,9 +303,9 @@ const ChartLegendConfiguration = ({
               name="position"
               label="Legend position"
               options={
-                capabilities.canPositionLegendOnLine
+                capabilities.canPositionLegendInline
                   ? positionOptions
-                  : positionOptions.filter(option => option.value !== 'line')
+                  : positionOptions.filter(option => option.value !== 'inline')
               }
               order={FormSelect.unordered}
             />
@@ -377,15 +377,15 @@ const ChartLegendConfiguration = ({
                             </div>
                           )}
 
-                          {form.values.position === 'line' && (
+                          {form.values.position === 'inline' && (
                             <div className={styles.configurationInput}>
                               <FormFieldSelect
-                                name={`${itemName}.lineChartLegendPosition`}
+                                name={`${itemName}.inlinePosition`}
                                 label="Position"
                                 order={FormSelect.unordered}
                                 formGroup={false}
                                 showError={false}
-                                options={lineChartLegendPositionOptions}
+                                options={inlinePositionOptions}
                               />
                             </div>
                           )}

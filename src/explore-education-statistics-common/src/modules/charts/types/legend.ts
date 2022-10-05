@@ -1,7 +1,7 @@
 import { ChartSymbol, LineStyle } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 
-export type LegendPosition = 'none' | 'top' | 'bottom' | 'line';
+export type LegendPosition = 'none' | 'top' | 'bottom' | 'inline';
 
 export interface LegendConfiguration {
   position?: LegendPosition;
@@ -13,11 +13,11 @@ export interface LegendItemConfiguration {
   colour: string;
   symbol?: ChartSymbol;
   lineStyle?: LineStyle;
-  lineChartLegendPosition?: LineChartLegendPosition;
+  inlinePosition?: LegendInlinePosition;
 }
 
 export interface LegendItem extends LegendItemConfiguration {
   dataSet: DataSet;
 }
 
-export type LineChartLegendPosition = 'above' | 'below';
+export type LegendInlinePosition = 'above' | 'below';

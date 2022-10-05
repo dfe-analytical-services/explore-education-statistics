@@ -196,7 +196,7 @@ export const verticalBarBlockDefinition: ChartDefinition = {
   type: 'verticalbar',
   name: 'Vertical bar',
   capabilities: {
-    canPositionLegendOnLine: false,
+    canPositionLegendInline: false,
     canSize: true,
     canSort: true,
     hasGridLines: true,

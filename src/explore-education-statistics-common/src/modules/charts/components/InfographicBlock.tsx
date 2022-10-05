@@ -60,7 +60,7 @@ export const infographicBlockDefinition: ChartDefinition = {
   },
   legend: {},
   capabilities: {
-    canPositionLegendOnLine: false,
+    canPositionLegendInline: false,
     canSize: true,
     canSort: false,
     hasGridLines: false,
