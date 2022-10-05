@@ -7,7 +7,6 @@ exports[`Tabs renders multiple tabs correctly with titles 1`] = `
     id="test-tabs"
   >
     <ul
-      aria-hidden="false"
       class="govuk-tabs__list"
       role="tablist"
     >
@@ -83,7 +82,6 @@ exports[`Tabs renders multiple tabs correctly without titles 1`] = `
     id="test-tabs"
   >
     <ul
-      aria-hidden="false"
       class="govuk-tabs__list"
       role="tablist"
     >
@@ -148,37 +146,15 @@ exports[`Tabs renders multiple tabs correctly without titles 1`] = `
 </div>
 `;
 
-exports[`Tabs renders with aria-hidden tabs when there is only one section 1`] = `
+exports[`Tabs renders without tabs when there is only one section 1`] = `
 <div>
   <div
-    class="govuk-tabs tabs"
+    class="govuk-tabs tabs singleTab"
     id="test-tabs"
   >
-    <ul
-      aria-hidden="true"
-      class="govuk-tabs__list mobileHidden"
-      role="tablist"
-    >
-      <li
-        class="govuk-tabs__list-item govuk-tabs__list-item--selected"
-        role="presentation"
-      >
-        <a
-          aria-controls="test-tabs-1"
-          aria-selected="true"
-          class="govuk-tabs__tab"
-          href="#test-tabs-1"
-          id="test-tabs-1-tab"
-          role="tab"
-        >
-          Tab 1
-        </a>
-      </li>
-    </ul>
     <section
       class="govuk-tabs__panel panel"
       id="test-tabs-1"
-      tabindex="-1"
     >
       <h3>
         Tab Heading 1

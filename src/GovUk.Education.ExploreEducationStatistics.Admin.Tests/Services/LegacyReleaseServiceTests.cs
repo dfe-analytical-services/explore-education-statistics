@@ -12,13 +12,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
-using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels.PublicationViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -145,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
             publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
-                .ReturnsAsync(new PublicationViewModel());
+                .ReturnsAsync(new PublicationCacheViewModel());
 
             using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -209,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
             publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
-                .ReturnsAsync(new PublicationViewModel());
+                .ReturnsAsync(new PublicationCacheViewModel());
 
             using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -269,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
             publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
-                .ReturnsAsync(new PublicationViewModel());
+                .ReturnsAsync(new PublicationCacheViewModel());
 
             using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -347,7 +347,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
             publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
-                .ReturnsAsync(new PublicationViewModel());
+                .ReturnsAsync(new PublicationCacheViewModel());
 
             using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -431,7 +431,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
             publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
-                .ReturnsAsync(new PublicationViewModel());
+                .ReturnsAsync(new PublicationCacheViewModel());
 
             using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -500,7 +500,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
             publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
-                .ReturnsAsync(new PublicationViewModel());
+                .ReturnsAsync(new PublicationCacheViewModel());
 
             using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -568,7 +568,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
             publicationCacheService.Setup(s => s.UpdatePublication(PublicationSlug))
-                .ReturnsAsync(new PublicationViewModel());
+                .ReturnsAsync(new PublicationCacheViewModel());
 
             using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {

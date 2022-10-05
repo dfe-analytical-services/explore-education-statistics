@@ -261,7 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<Release>()
                 .Property(release => release.Type)
-                .HasConversion(new EnumToEnumValueConverter<ReleaseType>());
+                .HasConversion(new EnumToStringConverter<ReleaseType>());
 
             modelBuilder.Entity<Release>()
                 .HasIndex(release => release.Type);

@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             _mapper = mapper;
         }
 
-        public async Task<Either<ActionResult, CachedReleaseViewModel>> GetRelease(string publicationSlug,
+        public async Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(string publicationSlug,
             string? releaseSlug = null)
         {
             return await _persistenceHelper.CheckEntityExists<Publication>(q =>
@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 });
         }
 
-        public async Task<Either<ActionResult, CachedReleaseViewModel>> GetRelease(Guid releaseId,
+        public async Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(Guid releaseId,
             DateTime? expectedPublishDate = null)
         {
             // Note this method is allowed to return an unpublished Release so that Publisher can use it
@@ -92,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     nameof(expectedPublishDate));
             }
 
-            var releaseViewModel = _mapper.Map<CachedReleaseViewModel>(release);
+            var releaseViewModel = _mapper.Map<ReleaseCacheViewModel>(release);
 
             // Filter content blocks to remove any non-public or unnecessary information
             releaseViewModel.HeadlinesSection?.Content.ForEach(FilterContentBlock);

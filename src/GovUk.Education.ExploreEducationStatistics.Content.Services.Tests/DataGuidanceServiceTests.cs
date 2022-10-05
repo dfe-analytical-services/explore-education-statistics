@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
                 .ReturnsAsync(
-                    new PublicationViewModel
+                    new PublicationCacheViewModel
                     {
                         Id = publicationId,
                         Title = "Test publication",
@@ -71,15 +71,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             releaseCacheService.Setup(mock => mock.GetRelease(publicationSlug, releaseSlug))
                 .ReturnsAsync(
-                    new CachedReleaseViewModel(releaseId)
+                    new ReleaseCacheViewModel(releaseId)
                     {
                         Title = "2016-17",
                         Slug = "2016-17",
-                        DataGuidance = "Release Guidance",
-                        Type = new ReleaseTypeViewModel
-                        {
-                            Title = "National Statistics"
-                        }
+                        DataGuidance = "Release Guidance"
                     }
                 );
 
@@ -153,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             );
 
             publicationCacheService.Setup(mock => mock.GetPublication(publicationSlug))
-                .ReturnsAsync(new PublicationViewModel());
+                .ReturnsAsync(new PublicationCacheViewModel());
 
             releaseCacheService.Setup(mock => mock.GetRelease(publicationSlug, releaseSlug))
                 .ReturnsAsync(

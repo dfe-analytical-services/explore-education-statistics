@@ -345,7 +345,7 @@ const ReleaseContent = () => {
                 )
               }
             >
-              {file.name}
+              {`${file.name} (${file.extension}, ${file.size})`}
             </ButtonText>
           )}
           renderDataGuidanceLink={

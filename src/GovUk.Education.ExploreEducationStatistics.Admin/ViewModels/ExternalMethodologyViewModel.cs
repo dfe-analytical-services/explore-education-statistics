@@ -1,7 +1,8 @@
 ﻿#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
 public record ExternalMethodologyViewModel
 {

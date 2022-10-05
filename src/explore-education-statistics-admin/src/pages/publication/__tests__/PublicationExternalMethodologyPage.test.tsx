@@ -20,7 +20,7 @@ const publicationService = _publicationService as jest.Mocked<
 
 describe('PublicationExternalMethodologyPage', () => {
   const testExternalMethodology: ExternalMethodology = {
-    title: 'External methodolology title',
+    title: 'External methodology title',
     url: 'http://test.com',
   };
 
@@ -54,7 +54,7 @@ describe('PublicationExternalMethodologyPage', () => {
     ).toBeInTheDocument();
 
     expect(screen.getByLabelText('Link title')).toHaveValue(
-      'External methodolology title',
+      'External methodology title',
     );
 
     expect(screen.getByLabelText('URL')).toHaveValue('http://test.com');
@@ -86,14 +86,11 @@ describe('PublicationExternalMethodologyPage', () => {
     userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
-      expect(publicationService.updatePublication).toHaveBeenCalledWith(
+      expect(publicationService.updateExternalMethodology).toHaveBeenCalledWith(
         'publication-1',
         {
-          ...testPublication,
-          externalMethodology: {
-            title: 'The link title',
-            url: 'https://test.com',
-          },
+          title: 'The link title',
+          url: 'https://test.com',
         },
       );
     });

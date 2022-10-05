@@ -126,7 +126,18 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
     };
   }, [sections, selectTab, selectedTabIndex]);
 
-  const hasSingleTab = sections.length === 1;
+  if (sections.length === 1) {
+    return (
+      <div
+        className={classNames('govuk-tabs', styles.tabs, styles.singleTab)}
+        id={id}
+        data-testid={testId}
+        ref={ref}
+      >
+        {sections[0]}
+      </div>
+    );
+  }
 
   return (
     <div
@@ -135,13 +146,7 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
       data-testid={testId}
       ref={ref}
     >
-      <ul
-        aria-hidden={hasSingleTab}
-        className={classNames('govuk-tabs__list', {
-          [styles.mobileHidden]: hasSingleTab,
-        })}
-        role="tablist"
-      >
+      <ul className="govuk-tabs__list" role="tablist">
         {sections.map(({ props }, index) => {
           const sectionId = props.id || `${id}-${index + 1}`;
 

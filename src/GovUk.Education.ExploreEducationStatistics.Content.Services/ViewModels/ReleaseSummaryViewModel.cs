@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public PublicationSummaryViewModel? Publication { get; }
 
-        public ReleaseSummaryViewModel(CachedReleaseViewModel release, PublicationViewModel publication)
+        public ReleaseSummaryViewModel(ReleaseCacheViewModel release, PublicationCacheViewModel publication)
         {
             Id = release.Id;
             Title = release.Title;
@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             Published = release.Published;
             ReleaseName = release.ReleaseName;
             NextReleaseDate = release.NextReleaseDate;
-            Type = ReleaseViewModel.ReleaseTypeTitleMap[release.Type.Title];
+            Type = release.Type;
             LatestRelease = Id == publication.LatestReleaseId;
             DataLastPublished = release.DataLastPublished;
             Publication = new PublicationSummaryViewModel(publication);

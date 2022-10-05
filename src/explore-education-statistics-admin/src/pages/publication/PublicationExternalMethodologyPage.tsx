@@ -6,7 +6,6 @@ import {
 } from '@admin/routes/publicationRoutes';
 import publicationService, {
   ExternalMethodology,
-  UpdatePublicationRequest,
 } from '@admin/services/publicationService';
 import React from 'react';
 import { generatePath, useHistory } from 'react-router';
@@ -29,17 +28,14 @@ const PublicationExternalMethodologyPage = () => {
     if (!publication) {
       return;
     }
-    const updatedPublication: UpdatePublicationRequest = {
-      ...publication,
-      externalMethodology: {
-        title: values.title,
-        url: values.url,
-      },
+    const updatedExternalMethodology: ExternalMethodology = {
+      title: values.title,
+      url: values.url,
     };
 
-    await publicationService.updatePublication(
+    await publicationService.updateExternalMethodology(
       publicationId,
-      updatedPublication,
+      updatedExternalMethodology,
     );
     onReload();
     history.push(returnRoute);

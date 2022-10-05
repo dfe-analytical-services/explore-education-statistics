@@ -1,5 +1,6 @@
 import Button from '@common/components/Button';
 import { FormGroup } from '@common/components/form';
+import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import useToggle from '@common/hooks/useToggle';
 import useMounted from '@common/hooks/useMounted';
 import TableHeadersAxis from '@common/modules/table-tool/components/TableHeadersAxis';
@@ -93,12 +94,7 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
         ? 'You have moved the group from row headers to column headers'
         : 'You have moved the group from column headers to row headers';
 
-    // Clear the message then repopulate to ensure the new message is read,
-    // and only read once.
-    setScreenReaderMessage('');
-    setTimeout(() => {
-      setScreenReaderMessage(message);
-    }, 200);
+    setScreenReaderMessage(message);
   };
 
   const handleDragEnd = (
@@ -262,14 +258,7 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
             </div>
           )}
 
-          <div
-            aria-live="assertive"
-            aria-atomic="true"
-            aria-relevant="additions"
-            className="govuk-visually-hidden"
-          >
-            {screenReaderMessage}
-          </div>
+          <ScreenReaderMessage message={screenReaderMessage} />
         </>
       )}
     </TableHeadersContextProvider>

@@ -5,11 +5,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
-using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
-using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
@@ -31,6 +28,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             PublicationSaveRequest updatedPublication);
 
         Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId);
+
+        Task<Either<ActionResult, ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId);
+
+        Task<Either<ActionResult, ExternalMethodologyViewModel>> UpdateExternalMethodology(
+            Guid publicationId, ExternalMethodologySaveRequest updatedExternalMethodology);
+
+        Task<Either<ActionResult, Unit>> RemoveExternalMethodology(
+            Guid publicationId);
 
         Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>> ListActiveReleasesPaginated(
             Guid publicationId,

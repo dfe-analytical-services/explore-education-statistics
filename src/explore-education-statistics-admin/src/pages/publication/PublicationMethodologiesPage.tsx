@@ -18,7 +18,6 @@ import methodologyService, {
 } from '@admin/services/methodologyService';
 import publicationService, {
   ExternalMethodology,
-  UpdatePublicationRequest,
 } from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
@@ -78,15 +77,7 @@ const PublicationMethodologiesPage = () => {
     if (!publication) {
       return;
     }
-    const updatedPublication: UpdatePublicationRequest = {
-      ...publication,
-      externalMethodology: undefined,
-    };
-
-    await publicationService.updatePublication(
-      publication.id,
-      updatedPublication,
-    );
+    await publicationService.removeExternalMethodology(publication.id);
     toggleRemovingExternalMethodology.off();
     onReload();
   };

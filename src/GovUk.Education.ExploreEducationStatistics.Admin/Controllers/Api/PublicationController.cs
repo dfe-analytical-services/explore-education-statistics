@@ -6,13 +6,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
-using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -72,6 +70,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .GetPublication(publicationId)
                 .HandleFailuresOrOk();
         }
+
+        [HttpGet("api/publication/{publicationId:guid}/external-methodology")]
+        public async Task<ActionResult<ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId)
+        {
+            return await _publicationService.GetExternalMethodology(publicationId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPut("api/publication/{publicationId:guid}/external-methodology")]
+        public async Task<ActionResult<ExternalMethodologyViewModel>> UpdateExternalMethodology(
+            Guid publicationId, ExternalMethodologySaveRequest updatedExternalMethodology)
+        {
+            return await _publicationService.UpdateExternalMethodology(publicationId, updatedExternalMethodology)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpDelete("api/publication/{publicationId:guid}/external-methodology")]
+        public async Task<ActionResult<Unit>> RemoveExternalMethodology(
+            Guid publicationId)
+        {
+            return await _publicationService.RemoveExternalMethodology(publicationId)
+                .HandleFailuresOrNoContent();
+        }
+
 
         [HttpGet("api/publication/{publicationId}/releases")]
         public async Task<ActionResult<PaginatedListViewModel<ReleaseSummaryViewModel>>> ListActiveReleases(

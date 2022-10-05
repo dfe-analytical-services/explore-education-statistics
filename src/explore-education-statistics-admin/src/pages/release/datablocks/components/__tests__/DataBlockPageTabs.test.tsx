@@ -106,17 +106,18 @@ describe('DataBlockPageTabs', () => {
     });
   });
 
-  test('does not render table or chart tabs when no data block is selected', async () => {
+  test('renders the data source form without other tabs when no data block is selected', async () => {
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
 
     render(<DataBlockPageTabs releaseId="release-1" onDataBlockSave={noop} />);
 
     await waitFor(() => {
-      const tabs = screen.getAllByRole('tab', { hidden: true });
-
-      expect(tabs).toHaveLength(1);
-      expect(tabs[0]).toHaveTextContent('Data source');
+      expect(screen.getByText('Data source')).toBeInTheDocument();
     });
+    expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+    expect(screen.queryByRole('tabpanel')).not.toBeInTheDocument();
+    expect(screen.queryByText('Table')).not.toBeInTheDocument();
+    expect(screen.queryByText('Chart')).not.toBeInTheDocument();
   });
 
   test('renders fully initialised table tool when data block is selected', async () => {

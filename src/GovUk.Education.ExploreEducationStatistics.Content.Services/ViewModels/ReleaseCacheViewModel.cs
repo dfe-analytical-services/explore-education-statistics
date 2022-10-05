@@ -2,12 +2,15 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
-    public record CachedReleaseViewModel
+    public record ReleaseCacheViewModel
     {
-        public CachedReleaseViewModel(Guid id)
+        public ReleaseCacheViewModel(Guid id)
         {
             Id = id;
         }
@@ -24,8 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public string Slug { get; set; } = string.Empty;
 
-        // TODO EES-3127 Replace ReleaseTypeViewModel with ReleaseType. Requires a content cache refresh
-        public ReleaseTypeViewModel Type { get; set; } = null!;
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ReleaseType Type { get; set; }
 
         public PartialDate? NextReleaseDate { get; set; }
 

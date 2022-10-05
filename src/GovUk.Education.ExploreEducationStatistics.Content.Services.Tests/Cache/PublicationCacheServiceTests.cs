@@ -21,7 +21,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 {
     private const string PublicationSlug = "publication-slug";
 
-    private readonly PublicationViewModel _publicationViewModel = new()
+    private readonly PublicationCacheViewModel _publicationViewModel = new()
     {
         Id = Guid.NewGuid(),
         Slug = "",
@@ -40,15 +40,6 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
             Url = ""
         },
         LatestReleaseId = Guid.NewGuid(),
-        Methodologies = new List<MethodologyVersionSummaryViewModel>
-        {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Slug = "",
-                Title = ""
-            }
-        },
         LegacyReleases = new List<LegacyReleaseViewModel>
         {
             new()
@@ -76,7 +67,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new PublicationCacheKey(PublicationSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(PublicationViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(PublicationCacheViewModel)))
             .ReturnsAsync(null);
 
         PublicBlobCacheService
@@ -104,7 +95,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new PublicationCacheKey(PublicationSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(PublicationViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(PublicationCacheViewModel)))
             .ReturnsAsync(_publicationViewModel);
 
         var service = BuildService();
@@ -122,7 +113,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new PublicationCacheKey(PublicationSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(PublicationViewModel)))
+            .Setup(s => s.GetItem(cacheKey, typeof(PublicationCacheViewModel)))
             .ReturnsAsync(null);
 
         var publicationService = new Mock<IPublicationService>(Strict);
@@ -167,9 +158,9 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     }
 
     [Fact]
-    public void PublicationViewModel_SerializeAndDeserialize()
+    public void PublicationCacheViewModel_SerializeAndDeserialize()
     {
-        var converted = DeserializeObject<PublicationViewModel>(SerializeObject(_publicationViewModel));
+        var converted = DeserializeObject<PublicationCacheViewModel>(SerializeObject(_publicationViewModel));
         converted.AssertDeepEqualTo(_publicationViewModel);
     }
 

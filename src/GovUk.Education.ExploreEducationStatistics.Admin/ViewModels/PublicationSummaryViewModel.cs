@@ -1,7 +1,7 @@
 #nullable enable
 using System;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
     public record PublicationSummaryViewModel
     {
@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
         {
         }
 
-        public PublicationSummaryViewModel(PublicationCacheViewModel publication)
+        public PublicationSummaryViewModel(PublicationViewModel publication)
         {
             Id = publication.Id;
             Title = publication.Title;

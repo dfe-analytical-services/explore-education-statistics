@@ -30,15 +30,10 @@ import classNames from 'classnames';
 
 export interface Props {
   publication: MyPublication;
-  topicId: string;
   onChangePublication: () => void;
 }
 
-const MethodologySummary = ({
-  publication,
-  topicId,
-  onChangePublication,
-}: Props) => {
+const MethodologySummary = ({ publication, onChangePublication }: Props) => {
   const history = useHistory();
   const [amendMethodologyId, setAmendMethodologyId] = useState<string>();
   const [deleteMethodologyDetails, setDeleteMethodologyDetails] = useState<{
@@ -52,26 +47,14 @@ const MethodologySummary = ({
   ] = useToggle(false);
 
   const {
-    contact,
     externalMethodology,
     methodologies,
     id: publicationId,
     title,
-    summary,
   } = publication;
 
   const handleRemoveExternalMethodology = async () => {
-    const updatedPublication = {
-      title,
-      summary,
-      contact,
-      topicId,
-    };
-
-    await publicationService.updatePublication(
-      publicationId,
-      updatedPublication,
-    );
+    await publicationService.removeExternalMethodology(publicationId);
     toggleRemovingExternalMethodology.off();
     onChangePublication();
   };

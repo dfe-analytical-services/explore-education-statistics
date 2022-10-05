@@ -67,6 +67,7 @@ const SubjectStep = ({
           )
         }
         legendHint="Choose a subject to create your table from, more information on the data coverage can be found by viewing more details"
+        hasFeaturedTables={hasFeaturedTables}
       />
     );
 

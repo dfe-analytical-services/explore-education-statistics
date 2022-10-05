@@ -33,6 +33,11 @@ export interface ExternalMethodology {
   url: string;
 }
 
+export interface ExternalMethodologySaveRequest {
+  title: string;
+  url: string;
+}
+
 export interface MyPublication {
   id: string;
   title: string;
@@ -71,12 +76,10 @@ export interface PublicationMethodologyDetails {
   externalMethodology?: ExternalMethodology;
 }
 
-export interface SavePublicationRequest {
+export interface PublicationSaveRequest {
   title: string;
   summary: string;
   contact: SavePublicationContact;
-  selectedMethodologyId?: string;
-  externalMethodology?: ExternalMethodology;
   supersededById?: string;
   topicId: string;
 }
@@ -87,9 +90,6 @@ export interface ListReleasesParams {
   pageSize?: number;
   permissions?: boolean;
 }
-
-export type CreatePublicationRequest = SavePublicationRequest;
-export type UpdatePublicationRequest = SavePublicationRequest;
 
 export type UpdatePublicationLegacyRelease = Partial<
   OmitStrict<UpdateLegacyRelease, 'publicationId'>
@@ -106,15 +106,13 @@ const publicationService = {
     return client.get('/publication-summaries');
   },
 
-  createPublication(
-    publication: CreatePublicationRequest,
-  ): Promise<Publication> {
+  createPublication(publication: PublicationSaveRequest): Promise<Publication> {
     return client.post('/publications', publication);
   },
 
   updatePublication(
     publicationId: string,
-    publication: UpdatePublicationRequest,
+    publication: PublicationSaveRequest,
   ): Promise<Publication> {
     return client.put(`/publications/${publicationId}`, publication);
   },
@@ -130,10 +128,30 @@ const publicationService = {
   getExternalMethodology(
     publicationId: string,
   ): Promise<ExternalMethodology | undefined> {
-    // TODO EES-3666 Replace with external methodology request
     return client
-      .get<MyPublication>(`/me/publication/${publicationId}`)
-      .then(response => response.externalMethodology);
+      .get<ExternalMethodology>(
+        `/publication/${publicationId}/external-methodology`,
+      )
+      .catch(err => {
+        if (err.response.status !== 404) {
+          throw err;
+        }
+        return undefined;
+      });
+  },
+
+  updateExternalMethodology(
+    publicationId: string,
+    updatedExternalMethodology: ExternalMethodologySaveRequest,
+  ): Promise<ExternalMethodology> {
+    return client.put<ExternalMethodology>(
+      `/publication/${publicationId}/external-methodology`,
+      updatedExternalMethodology,
+    );
+  },
+
+  removeExternalMethodology(publicationId: string): Promise<boolean> {
+    return client.delete(`/publication/${publicationId}/external-methodology`);
   },
 
   listReleases<TReleaseSummary extends ReleaseSummary = ReleaseSummary>(
