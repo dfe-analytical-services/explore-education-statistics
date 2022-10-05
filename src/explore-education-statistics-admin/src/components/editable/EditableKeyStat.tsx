@@ -141,6 +141,8 @@ const EditableKeyStat = ({
       );
     }
 
+    const dataDefinitionTitle = summary?.dataDefinitionTitle[0] || 'Help';
+
     return (
       <>
         <KeyStatTile
@@ -158,8 +160,13 @@ const EditableKeyStat = ({
 
         {summary?.dataDefinition[0] && !isReordering && (
           <Details
-            summary={summary?.dataDefinitionTitle[0] || 'Help'}
+            summary={dataDefinitionTitle}
             className={styles.definition}
+            hiddenText={
+              dataDefinitionTitle === 'Help'
+                ? `for ${keyStat.title}`
+                : undefined
+            }
           >
             <div data-testid={`${testId}-definition`}>
               {summary.dataDefinition.map(data => (

@@ -118,6 +118,100 @@ describe('KeyStat', () => {
     });
   });
 
+  test('renders correctly with a default data definition title of "Help"', async () => {
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testTableDataResponse,
+    );
+
+    render(
+      <KeyStat
+        releaseId="release-1"
+        dataBlockId="block-1"
+        summary={{
+          dataSummary: ['Down from 620,330 in 2017'],
+          dataDefinitionTitle: ['Help'],
+          dataDefinition: [
+            'Total number of applications received for places at primary and secondary schools.',
+          ],
+          dataKeys: [],
+        }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(
+        1,
+      );
+
+      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
+        'Number of applications received',
+      );
+
+      expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
+
+      expect(screen.getByTestId('keyStat-summary')).toHaveTextContent(
+        'Down from 620,330 in 2017',
+      );
+
+      expect(
+        screen.getByRole('button', {
+          name: 'Help for Number of applications received',
+        }),
+      ).toBeInTheDocument();
+
+      expect(screen.getByTestId('keyStat-definition')).toHaveTextContent(
+        'Total number of applications received for places at primary and secondary schools.',
+      );
+    });
+  });
+
+  test('renders correctly with a blank data definition title', async () => {
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testTableDataResponse,
+    );
+
+    render(
+      <KeyStat
+        releaseId="release-1"
+        dataBlockId="block-1"
+        summary={{
+          dataSummary: ['Down from 620,330 in 2017'],
+          dataDefinitionTitle: [''],
+          dataDefinition: [
+            'Total number of applications received for places at primary and secondary schools.',
+          ],
+          dataKeys: [],
+        }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(
+        1,
+      );
+
+      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
+        'Number of applications received',
+      );
+
+      expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
+
+      expect(screen.getByTestId('keyStat-summary')).toHaveTextContent(
+        'Down from 620,330 in 2017',
+      );
+
+      expect(
+        screen.getByRole('button', {
+          name: 'Help for Number of applications received',
+        }),
+      ).toBeInTheDocument();
+
+      expect(screen.getByTestId('keyStat-definition')).toHaveTextContent(
+        'Total number of applications received for places at primary and secondary schools.',
+      );
+    });
+  });
+
   test('renders correctly without summary', async () => {
     tableBuilderService.getDataBlockTableData.mockResolvedValue(
       testTableDataResponse,
