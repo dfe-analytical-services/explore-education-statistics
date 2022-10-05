@@ -63,6 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<HtmlBlock> HtmlBlocks { get; set; }
         public DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
         public DbSet<MethodologyNote> MethodologyNotes { get; set; }
+        public DbSet<Permalink> Permalinks { get; set; } = null!;
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
         public DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
@@ -415,6 +416,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<MarkDownBlock>()
                 .Property(block => block.Body)
                 .HasColumnName("Body");
+            
+            modelBuilder.Entity<Permalink>()
+                .Property(permalink => permalink.Created)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            modelBuilder.Entity<Permalink>()
+                .HasIndex(data => data.ReleaseId);
+
+            modelBuilder.Entity<Permalink>()
+                .HasIndex(data => data.SubjectId);
 
             modelBuilder.Entity<ReleaseContentSection>()
                 .HasKey(item => new {item.ReleaseId, item.ContentSectionId});

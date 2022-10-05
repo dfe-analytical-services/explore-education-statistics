@@ -594,6 +594,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             AddPersistenceHelper<UsersAndRolesDbContext>(services);
             services.AddTransient<AuthorizationHandlerResourceRoleService>();
 
+            // TODO EES-3755 Remove after Permalink snapshot migration work is complete
+            services.AddTransient<IPermalinkMigrationService, PermalinkMigrationService>();
+
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
 

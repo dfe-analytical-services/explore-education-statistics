@@ -100,5 +100,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         NoTableHighlights,
         NoPublicPreReleaseAccessList,
         MethodologyNotApproved,
+
+        // TODO EES-3755 Remove after Permalink snapshot migration work is complete
+        NullMessageCountForPermalinksMigrationQueue,
+        NonEmptyPermalinksMigrationQueue,
     }
 }

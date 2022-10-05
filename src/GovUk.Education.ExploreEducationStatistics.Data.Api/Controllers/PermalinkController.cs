@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<PermalinkViewModel>> Get(string id)
+        public async Task<ActionResult<LegacyPermalinkViewModel>> Get(string id)
         {
             if (Guid.TryParse(id, out var idAsGuid))
             {
@@ -31,13 +31,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<PermalinkViewModel>> Create([FromBody] PermalinkCreateViewModel request)
+        public async Task<ActionResult<LegacyPermalinkViewModel>> Create([FromBody] PermalinkCreateViewModel request)
         {
             return await _permalinkService.Create(request).HandleFailuresOrOk();
         }
 
         [HttpPost("release/{releaseId}")]
-        public async Task<ActionResult<PermalinkViewModel>> Create(Guid releaseId,
+        public async Task<ActionResult<LegacyPermalinkViewModel>> Create(Guid releaseId,
             [FromBody] PermalinkCreateViewModel request)
         {
             return await _permalinkService.Create(releaseId, request).HandleFailuresOrOk();

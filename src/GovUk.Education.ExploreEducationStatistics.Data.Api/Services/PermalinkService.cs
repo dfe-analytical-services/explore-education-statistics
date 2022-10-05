@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
@@ -48,12 +49,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _mapper = mapper;
         }
 
-        public async Task<Either<ActionResult, PermalinkViewModel>> Get(Guid id)
+        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Get(Guid id)
         {
             try
             {
                 var text = await _blobStorageService.DownloadBlobText(Permalinks, id.ToString());
-                var permalink = JsonConvert.DeserializeObject<Permalink>(
+                var permalink = JsonConvert.DeserializeObject<LegacyPermalink>(
                     value: text,
                     settings: BuildJsonSerializerSettings());
                 return await BuildViewModel(permalink!);
@@ -65,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
         }
 
-        public async Task<Either<ActionResult, PermalinkViewModel>> Create(PermalinkCreateViewModel request)
+        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Create(PermalinkCreateViewModel request)
         {
             var publicationId = await _subjectRepository.GetPublicationIdForSubject(request.Query.SubjectId);
             var release = _releaseRepository.GetLatestPublishedRelease(publicationId);
@@ -78,19 +79,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return await Create(release.Id, request);
         }
 
-        public async Task<Either<ActionResult, PermalinkViewModel>> Create(Guid releaseId,
+        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Create(Guid releaseId,
             PermalinkCreateViewModel request)
         {
-            return await _tableBuilderService.Query(releaseId, request.Query).OnSuccess(async result =>
-            {
-                var permalinkTableResult = new PermalinkTableBuilderResult(result);
-                var permalink = new Permalink(request.Configuration, permalinkTableResult, request.Query);
-                await _blobStorageService.UploadAsJson(containerName: Permalinks,
-                    path: permalink.Id.ToString(),
-                    content: permalink,
-                    settings: BuildJsonSerializerSettings());
-                return await BuildViewModel(permalink);
-            });
+            return await _tableBuilderService.Query(releaseId, request.Query)
+                .OnSuccess(async result =>
+                {
+                    var permalinkTableResult = new PermalinkTableBuilderResult(result);
+                    var permalink = new Permalink
+                    {
+                        Created = DateTime.UtcNow,
+                        PublicationTitle = result.SubjectMeta.PublicationName,
+                        DataSetTitle = result.SubjectMeta.SubjectName,
+                        ReleaseId = releaseId,
+                        SubjectId = request.Query.SubjectId
+                    };
+
+                    _contentDbContext.Permalinks.Add(permalink);
+                    await _contentDbContext.SaveChangesAsync();
+
+                    var legacyPermalink = new LegacyPermalink(
+                        permalink.Id,
+                        permalink.Created,
+                        request.Configuration,
+                        permalinkTableResult,
+                        request.Query);
+
+                    await _blobStorageService.UploadAsJson(containerName: Permalinks,
+                        path: permalink.Id.ToString(),
+                        content: legacyPermalink,
+                        settings: BuildJsonSerializerSettings());
+
+                    return await BuildViewModel(legacyPermalink);
+                });
         }
 
         private static JsonSerializerSettings BuildJsonSerializerSettings()
@@ -102,9 +123,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        private async Task<PermalinkViewModel> BuildViewModel(Permalink permalink)
+        private async Task<LegacyPermalinkViewModel> BuildViewModel(LegacyPermalink permalink)
         {
-            var viewModel = _mapper.Map<PermalinkViewModel>(permalink);
+            var viewModel = _mapper.Map<LegacyPermalinkViewModel>(permalink);
 
             viewModel.Status = await GetPermalinkStatus(permalink.Query.SubjectId);
 
