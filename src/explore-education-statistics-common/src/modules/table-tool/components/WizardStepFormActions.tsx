@@ -65,6 +65,7 @@ const WizardStepFormActions = ({
           // in the `WizardStepSummary` component, so we
           // don't need to this one to alert as well.
           alert={isLoadingNextStep}
+          className="govuk-!-margin-left-2"
           inline
           hideText
           loading={loading}
