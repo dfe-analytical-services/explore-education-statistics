@@ -195,6 +195,7 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
   type: 'horizontalbar',
   name: 'Horizontal bar',
   capabilities: {
+    canPositionLegendInline: false,
     canSize: true,
     canSort: true,
     hasGridLines: true,
