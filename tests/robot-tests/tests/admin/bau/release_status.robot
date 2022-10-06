@@ -1,7 +1,6 @@
 *** Settings ***
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
-Resource            ../../libs/admin-common.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
@@ -21,7 +20,9 @@ Create new publication and release via API
     user create test release via api    ${PUBLICATION_ID}    FY    3000
 
 Go to release sign off page and verify initial release checklist
-    user navigates to this release
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    Financial Year 3000-01
+
     user edits release status
 
     user checks checklist warnings contains
@@ -104,7 +105,8 @@ Move release status back to Draft
 
 Check that having a Draft owned Methodology attached to this Release's Publication will show a checklist warning
     user creates methodology for publication    ${PUBLICATION_NAME}
-    user navigates to this release
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    Financial Year 3000-01
     user edits release status
     user waits until element is visible    testid:releaseChecklist-warnings    %{WAIT_SMALL}
     user checks checklist warnings contains
@@ -113,7 +115,8 @@ Check that having a Draft owned Methodology attached to this Release's Publicati
 
 Approve the owned methodology and verify the warning disappears
     user approves methodology for publication    ${PUBLICATION_NAME}
-    user navigates to this release
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    Financial Year 3000-01
     user edits release status
     user waits until element is visible    testid:releaseChecklist-warnings    %{WAIT_SMALL}
     user checks checklist warnings contains
@@ -123,15 +126,22 @@ Approve the owned methodology and verify the warning disappears
 Adopt a Draft methodology
     user creates test publication via api    ${ADOPTED_PUBLICATION_NAME}
     user creates methodology for publication    ${ADOPTED_PUBLICATION_NAME}
-    ${accordion}    user goes to publication page from dashboard    ${PUBLICATION_NAME}
-    user checks element contains link    ${accordion}    Adopt an existing methodology
+
+    user waits until page contains link    ${ADOPTED_PUBLICATION_NAME}
+
+    user goes to publication page from dashboard    ${PUBLICATION_NAME}
+
+    user clicks link    Methodologies
+    user waits until h2 is visible    Manage methodologies
+
     user clicks link    Adopt an existing methodology
-    user waits until page contains title    Adopt a methodology
+    user waits until h2 is visible    Adopt a methodology
     user clicks radio    ${ADOPTED_PUBLICATION_NAME}
     user clicks button    Save
 
 Check that having a Draft methodology adopted by this Release's Publication will show a checklist warning
-    user navigates to this release
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    Financial Year 3000-01
     user edits release status
     user checks checklist warnings contains
     ...    2 things you may have forgotten, but do not need to resolve to publish this release.
@@ -139,7 +149,8 @@ Check that having a Draft methodology adopted by this Release's Publication will
 
 Approve the adopted methodology and verify the warning disappears
     user approves methodology for publication    ${ADOPTED_PUBLICATION_NAME}
-    user navigates to this release
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    Financial Year 3000-01
     user edits release status
     user checks checklist warnings contains
     ...    1 thing you may have forgotten, but do not need to resolve to publish this release.
@@ -147,27 +158,12 @@ Approve the adopted methodology and verify the warning disappears
 
 
 *** Keywords ***
-user navigates to this release
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
-    ...    Financial Year 3000-01 (not Live)
-
-user navigates to sign off page
+user edits release status
     user clicks link    Sign off
     user waits until h2 is visible    Sign off    %{WAIT_SMALL}
 
-user edits release status
-    user navigates to sign off page
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
-
-user checks checklist errors contains
-    [Arguments]    ${text}
-    user waits until element contains    testid:releaseChecklist-errors    ${text}
-
-user checks checklist errors contains link
-    [Arguments]    ${text}
-    user waits until page contains testid    releaseChecklist-errors
-    user waits until parent contains element    testid:releaseChecklist-errors    link:${text}
 
 user checks checklist warnings contains
     [Arguments]    ${text}
