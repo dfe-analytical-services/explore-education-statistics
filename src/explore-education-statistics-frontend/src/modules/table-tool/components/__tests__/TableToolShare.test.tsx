@@ -85,13 +85,6 @@ describe('TableToolShare', () => {
       id: 'permalink-id',
     } as Permalink);
 
-    const originalClipboard = { ...window.navigator.clipboard };
-    Object.assign(window.navigator, {
-      clipboard: {
-        writeText: jest.fn(),
-      },
-    });
-
     render(
       <TableToolShare
         query={testQuery}
@@ -119,11 +112,5 @@ describe('TableToolShare', () => {
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
       'http://localhost/data-tables/permalink/permalink-id',
     );
-
-    Object.assign(window.navigator, {
-      clipboard: {
-        writeText: originalClipboard,
-      },
-    });
   });
 });
