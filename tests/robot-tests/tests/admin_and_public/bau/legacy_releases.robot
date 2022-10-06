@@ -16,36 +16,27 @@ ${UPDATED_DESCRIPTION}=     updated legacy release description
 
 
 *** Test Cases ***
-Create new publication for topic
+Create new publication and release via api
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     Set Suite Variable    ${PUBLICATION_ID}
-
-Create new release
     user create test release via api    ${PUBLICATION_ID}    AY    2020
 
-Verify new publication
-    user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
-    user waits until page contains button    ${PUBLICATION_NAME}
-
-Go to manage publication page
-    user opens accordion section    ${PUBLICATION_NAME}
-    user clicks element    testid:Edit publication link for ${PUBLICATION_NAME}
-    user waits until page contains title caption    ${PUBLICATION_NAME}
-    user waits until h1 is visible    Manage publication
-
 Create legacy release
-    user scrolls to element    //*[button[contains(text(),'Create legacy release')]]
+    user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    user clicks link    Legacy releases
+    user waits until h2 is visible    Legacy releases
     user clicks button    Create legacy release
-    user waits until modal is visible    Create legacy release
-    user clicks button    OK
-    user waits until modal is not visible    Create legacy release
-    user waits until h1 is visible    Create legacy release
+
+    ${modal}=    user waits until modal is visible    Create legacy release
+    user clicks button    OK    ${modal}
+
+    user waits until page contains element    id:legacyReleaseForm-description
     user enters text into element    id:legacyReleaseForm-description    ${DESCRIPTION}
     user enters text into element    id:legacyReleaseForm-url    http://test.com
     user clicks button    Save legacy release
 
 Validate created legacy release
-    user waits until h1 is visible    Manage publication
+    user waits until h2 is visible    Legacy releases
     user checks element count is x    css:tbody tr    1
     user checks results table cell contains    1    1    1
     user checks results table cell contains    1    2    ${DESCRIPTION}
@@ -56,7 +47,7 @@ Navigate to admin dashboard to create new release
 
 Navigate to release in admin
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Academic Year 2020/21 (not Live)
+    ...    Academic Year 2020/21
 
 Approve release
     user clicks link    Sign off
@@ -80,35 +71,28 @@ Check legacy release appears on public frontend
 
 Navigate to publication to update legacy releases
     user goes to publication page from dashboard    ${PUBLICATION_NAME}
-    user opens accordion section    ${PUBLICATION_NAME}
-    user clicks element    testid:Edit publication link for ${PUBLICATION_NAME}
-    user waits until page contains title caption    ${PUBLICATION_NAME}
-    user waits until h1 is visible    Manage publication
+    user clicks link    Legacy releases
+    user waits until h2 is visible    Legacy releases
 
 Update legacy release
     user clicks element    xpath://tr[1]//*[text()="Edit"]
-    user waits until modal is visible    Edit legacy release
-    user clicks button    OK
-    user waits until modal is not visible    Edit legacy release
-    user waits until h1 is visible    Edit legacy release
+    ${modal}=    user waits until modal is visible    Edit legacy release
+    user clicks button    OK    ${modal}
+
+    user waits until page contains element    id:legacyReleaseForm-description
     user enters text into element    id:legacyReleaseForm-description    ${UPDATED_DESCRIPTION}
     user enters text into element    id:legacyReleaseForm-url    http://test2.com
     user clicks button    Save legacy release
 
 Validate updated legacy release
-    user waits until h1 is visible    Manage publication
+    user waits until h2 is visible    Legacy releases
     user checks element count is x    css:tbody tr    1
     user checks results table cell contains    1    1    1
     user checks results table cell contains    1    2    ${UPDATED_DESCRIPTION}
     user checks results table cell contains    1    3    http://test2.com
 
 Validate public frontend shows changes made to legacy release after saving publication
-    user clicks button    Save publication
-    user waits until modal is visible    Confirm publication changes
-    user clicks button    Confirm
-    user waits until modal is not visible    Confirm publication changes
-
-    sleep    %{WAIT_MEMORY_CACHE_EXPIRY}
+    #sleep    %{WAIT_MEMORY_CACHE_EXPIRY}    # @MarkFix
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
 
     user opens details dropdown    See other releases (1)
@@ -124,14 +108,16 @@ Validate public frontend shows changes made to legacy release after saving publi
 
 Navigate to publication to update legacy releases again
     user goes to publication page from dashboard    ${PUBLICATION_NAME}
-    user opens accordion section    ${PUBLICATION_NAME}
-    user clicks element    testid:Edit publication link for ${PUBLICATION_NAME}
-    user waits until page contains title caption    ${PUBLICATION_NAME}
-    user waits until h1 is visible    Manage publication
+    user clicks link    Legacy releases
+    user waits until h2 is visible    Legacy releases
 
 Delete legacy release
-    user clicks element    xpath://tr[1]//*[text()="Delete"]
-    user clicks button    Confirm
+    ${ROW}=    user gets table row    1
+    user clicks element    xpath://*[text()="Delete"]    ${ROW}
+
+    ${modal}=    user waits until modal is visible    Delete legacy release
+    user clicks button    Confirm    ${modal}
+
     user waits until page does not contain element    css:table
 
 Create multiple legacy releases
@@ -188,11 +174,15 @@ Validate reordered legacy releases
 user creates legacy release
     [Arguments]    ${description}    ${url}
     user clicks button    Create legacy release
-    user waits until modal is visible    Create legacy release
-    user clicks button    OK
-    user waits until modal is not visible    Create legacy release
-    user waits until h1 is visible    Create legacy release
+
+    ${modal}=    user waits until modal is visible    Create legacy release
+    user clicks button    OK    ${modal}
+
+    user waits until page contains element    id:legacyReleaseForm-description
     user enters text into element    id:legacyReleaseForm-description    ${description}
     user enters text into element    id:legacyReleaseForm-url    ${url}
     user clicks button    Save legacy release
-    user waits until h1 is visible    Manage publication
+    user waits until h2 is visible    Legacy releases
+
+    user waits until page contains    ${description}
+    user checks page contains    ${url}
