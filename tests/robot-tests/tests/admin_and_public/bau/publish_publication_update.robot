@@ -21,7 +21,7 @@ Create Publication as bau1
     user create test release via api    ${PUBLICATION_ID}    AY    2046
 
 Publish release
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Academic Year 2046/47 (not Live)
     user approves release for immediate publication
 

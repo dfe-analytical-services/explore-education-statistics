@@ -91,7 +91,7 @@ Verify that the methodology is still not publicly accessible by URL without publ
     user waits until page contains    Page not found
 
 Approve the release
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME} (not Live)
     user approves original release for immediate publication
 

@@ -11,10 +11,12 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - publish release %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Financial Year 3000-01
 ${DATABLOCK_NAME}=      Dates data block name
+
 
 *** Test Cases ***
 Create new publication for "UI tests topic" topic
@@ -22,7 +24,7 @@ Create new publication for "UI tests topic" topic
     user create test release via api    ${PUBLICATION_ID}    FY    3000
 
 Go to "Release summary" page
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME} (not Live)
 
 Verify release summary

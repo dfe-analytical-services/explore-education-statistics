@@ -97,17 +97,6 @@ user navigates to draft release page from dashboard
     user waits until h2 is visible    Release summary    %{WAIT_SMALL}
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
 
-user navigates to editable release summary from admin dashboard
-    [Arguments]
-    ...    ${PUBLICATION_NAME}
-    ...    ${RELEASE_NAME}
-    ...    ${THEME_NAME}=%{TEST_THEME_NAME}
-    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
-    user goes to publication page from dashboard
-    ...    ${PUBLICATION_NAME}
-    ...    ${THEME_NAME}
-    ...    ${TOPIC_NAME}
-
 user navigates to editable release amendment summary from admin dashboard
     [Arguments]
     ...    ${PUBLICATION_NAME}
@@ -210,6 +199,7 @@ user goes to publication page from dashboard
     user selects dashboard theme and topic if possible    ${theme}    ${topic}
     user clicks link    ${publication}
     user waits until h1 is visible    ${publication}
+    user waits until h2 is visible    Manage releases
 
 user creates methodology for publication
     [Arguments]

@@ -55,7 +55,7 @@ Navigate to admin dashboard to create new release
     user navigates to admin dashboard    Bau1
 
 Navigate to release in admin
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Academic Year 2020/21 (not Live)
 
 Approve release

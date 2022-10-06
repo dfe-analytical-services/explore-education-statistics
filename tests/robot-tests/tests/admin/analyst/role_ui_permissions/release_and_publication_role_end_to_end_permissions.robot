@@ -43,7 +43,7 @@ Check publication owner cannot approve methodology for publication
     user cannot see the edit status controls for methodology
 
 Check publication owner can upload subject file
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_TYPE} (not Live)
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
@@ -177,7 +177,7 @@ Check release approver can approve methodology for publishing with the release
     ...    with_release=${RELEASE_NAME}
 
 Check release approver can access release
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_TYPE} (not Live)
 
 Navigate to 'Footnotes' section

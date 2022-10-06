@@ -54,6 +54,6 @@ Check can create an amendment of a published release
     user can see the create amendment controls for release    ${details}
 
 Check cannot approve a draft release
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${DRAFT_RELEASE_TYPE} (not Live)    ${THEME_NAME}    ${TOPIC_NAME}
     user cannot see the enabled approve release controls for release

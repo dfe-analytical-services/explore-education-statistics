@@ -20,7 +20,7 @@ Create test publication and release via API
     user create test release via api    ${PUBLICATION_ID}    CY    2000
 
 Verify release summary
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME} (not Live)
     user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary    Calendar Year    2000
     ...    UI test contact name    National statistics
@@ -117,7 +117,7 @@ Check "Page not found" appears
 
 Go to admin release summary
     user navigates to admin dashboard    Bau1
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME} (not Live)
 
 Approve release for immediate publication but don't wait to finish

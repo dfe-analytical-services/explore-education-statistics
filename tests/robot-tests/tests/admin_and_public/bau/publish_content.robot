@@ -21,7 +21,7 @@ Create new publication and release via API
     user create test release via api    ${PUBLICATION_ID}    CY    2001    AdHocStatistics
 
 Navigate to release content
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME} (not Live)
     user clicks link    Content
     user waits until page contains button    Add dashboards section
