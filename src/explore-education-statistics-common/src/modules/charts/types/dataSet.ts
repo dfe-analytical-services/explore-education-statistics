@@ -1,5 +1,4 @@
 import { ChartSymbol, LineStyle } from '@common/modules/charts/types/chart';
-import { LegendInlinePosition } from '@common/modules/charts/types/legend';
 import {
   CategoryFilter,
   Filter,
@@ -51,7 +50,6 @@ export interface DataSetConfigurationOptions {
   colour: string;
   symbol?: ChartSymbol;
   lineStyle?: LineStyle;
-  inlinePosition?: LegendInlinePosition;
 }
 
 /**
