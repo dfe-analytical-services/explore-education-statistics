@@ -6,9 +6,10 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using NCrontab;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.CronExpressionUtil;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusContentStage;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Services.CronScheduleUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -48,7 +49,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             await UpdateStage(message, Started);
             try
             {
-                var context = new PublishContext(GetNextScheduledPublishingTime(), true);
+                var publishStagedReleasesCronExpression = Environment.GetEnvironmentVariable("PublishReleaseContentCronSchedule") ?? "";
+                var nextScheduledPublishingTime = CrontabSchedule.Parse(publishStagedReleasesCronExpression, new CrontabSchedule.ParseOptions
+                {
+                    IncludingSeconds = CronExpressionHasSecondPrecision(publishStagedReleasesCronExpression)
+                }).GetNextOccurrence(DateTime.UtcNow);
+                var context = new PublishContext(nextScheduledPublishingTime, true);
                 await _contentService.UpdateContent(context, message.Releases.Select(tuple => tuple.ReleaseId).ToArray());
                 await UpdateStage(message, Complete);
             }
