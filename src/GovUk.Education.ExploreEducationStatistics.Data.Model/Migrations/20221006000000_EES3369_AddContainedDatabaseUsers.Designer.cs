@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [DbContext(typeof(StatisticsDbContext))]
-    [Migration("20220929142643_EES3369_AddContainedDatabaseUsers")]
+    [Migration("20221006000000_EES3369_AddContainedDatabaseUsers")]
     partial class EES3369_AddContainedDatabaseUsers
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

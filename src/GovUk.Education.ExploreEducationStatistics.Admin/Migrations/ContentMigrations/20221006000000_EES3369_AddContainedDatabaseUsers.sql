@@ -18,6 +18,7 @@ Begin
     GRANT ALL ON [dbo].[MethodologyFiles] TO [importer];
     GRANT ALL ON [dbo].[MethodologyNotes] TO [importer];
     GRANT ALL ON [dbo].[MethodologyVersions] TO [importer];
+    GRANT ALL ON [dbo].[Permalinks] TO [importer];
     GRANT ALL ON [dbo].[PublicationMethodologies] TO [importer];
     GRANT ALL ON [dbo].[Publications] TO [importer];
     GRANT ALL ON [dbo].[ReleaseContentBlocks] TO [importer];
@@ -50,6 +51,7 @@ Begin
     GRANT ALL ON [dbo].[MethodologyFiles] TO [publisher];
     GRANT ALL ON [dbo].[MethodologyNotes] TO [publisher];
     GRANT ALL ON [dbo].[MethodologyVersions] TO [publisher];
+    GRANT ALL ON [dbo].[Permalinks] TO [publisher];
     GRANT ALL ON [dbo].[PublicationMethodologies] TO [publisher];
     GRANT ALL ON [dbo].[Publications] TO [publisher];
     GRANT ALL ON [dbo].[ReleaseContentBlocks] TO [publisher];
@@ -83,6 +85,7 @@ Begin
     GRANT SELECT ON [dbo].[MethodologyFiles] TO [content];
     GRANT SELECT ON [dbo].[MethodologyNotes] TO [content];
     GRANT SELECT ON [dbo].[MethodologyVersions] TO [content];
+    GRANT SELECT ON [dbo].[Permalinks] TO [content];
     GRANT SELECT ON [dbo].[PublicationMethodologies] TO [content];
     GRANT SELECT ON [dbo].[Publications] TO [content];
     GRANT SELECT ON [dbo].[ReleaseContentBlocks] TO [content];
@@ -115,6 +118,7 @@ Begin
     GRANT SELECT ON [dbo].[MethodologyFiles] TO [data];
     GRANT SELECT ON [dbo].[MethodologyNotes] TO [data];
     GRANT SELECT ON [dbo].[MethodologyVersions] TO [data];
+    GRANT SELECT ON [dbo].[Permalinks] TO [data];
     GRANT SELECT ON [dbo].[PublicationMethodologies] TO [data];
     GRANT SELECT ON [dbo].[Publications] TO [data];
     GRANT SELECT ON [dbo].[ReleaseContentBlocks] TO [data];
