@@ -446,10 +446,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
             var publicStatisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(publicStatisticsDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             await using (var publicStatisticsDbContext = InMemoryPublicStatisticsDbContext(publicStatisticsDbContextId))
             {
                 await contentDbContext.Publications.AddAsync(publication);
@@ -470,7 +471,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(publicStatisticsDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             await using (var publicStatisticsDbContext = InMemoryPublicStatisticsDbContext(publicStatisticsDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext,
@@ -484,7 +485,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(publicStatisticsDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             await using (var publicStatisticsDbContext = InMemoryPublicStatisticsDbContext(publicStatisticsDbContextId))
             {
                 var actualContentRelease = await contentDbContext.Releases

@@ -148,13 +148,13 @@ This data will need to be loaded into SQL Server:
   give all OS users appropriate access to this directory.
   - In Linux:
     - The ees-mssql folder needs to be present in an unencrypted folder / partition. The 
-      `ees-mssql` folder in the uneencrypted location can then be symlinked in to the `data` folder
+      `ees-mssql` folder in the unencrypted location can then be symlinked in to the `data` folder
       using `ln -s /path/to/unencrypted/ees-mssql /path/to/ees/data/ees-mssql`.
     - The Docker container user needs ownership fo the ees-mssql folder. Run  
     `sudo chown -R 10001 /path/to/ees-mssql` to give this Docker user (with id 10001) appropriate 
      permissions.
   - In Windows
-    - Attach the database using SQL Management Studio.
+    - Attach the database using SSMS.
 
 #### Use a bare database
 
