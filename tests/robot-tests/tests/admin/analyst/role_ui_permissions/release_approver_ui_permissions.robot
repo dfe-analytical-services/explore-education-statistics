@@ -17,7 +17,7 @@ Import permissions test variables
     Set suite variable    ${PUBLICATION_NAME}    ${PUBLICATION_FOR_PUBLICATION_RELEASE_APPROVER}
 
 Navigate to Release where analyst has Release Approver role
-    user navigates to publication on admin dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
 
 Check cannot create a Methodology for a Publication if they don't have Publication Owner role
     user cannot see the create methodologies controls for publication    ${publication_accordion}
@@ -28,7 +28,7 @@ Check cannot edit content for published release
     user cannot see edit controls for release content    ${PUBLICATION_NAME}
 
 Navigate back to admin dashboard for publication
-    user navigates to publication on admin dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
 
 Check cannot create an amendment of a published release
     ${details}=    user opens details dropdown    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)

@@ -17,43 +17,54 @@ Import permissions test variables
     Set suite variable    ${PUBLICATION_NAME}    ${PUBLICATION_FOR_PUBLICATION_OWNER}
 
 Navigate to Publication where analyst has Publication Owner role
-    user navigates to publication on admin dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
 
 Check can create a Methodology for the owned Publication
-    user can see the create methodologies controls for publication    ${publication_accordion}
+    user clicks link    Methodologies
+    user waits until h2 is visible    Manage methodologies
+
+    user checks page contains button    Create new methodology
+    user waits until page contains link    Add external methodology
+    user waits until page contains link    Adopt an existing methodology
 
 Check cannot edit content for published release
-    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)    ${THEME_NAME}    ${TOPIC_NAME}
+    user navigates to published release page from dashboard    ${PUBLICATION_NAME}
+    ...    ${PUBLISHED_RELEASE_TYPE}    ${THEME_NAME}    ${TOPIC_NAME}
     user cannot see edit controls for release content    ${PUBLICATION_NAME}
 
-Navigate back to admin dashboard for publication
-    user navigates to publication on admin dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
+Check Edit publication details page inputs are correct
+    user navigates to details on publication page    ${PUBLICATION_NAME}
+    user clicks button    Edit publication details
 
-Check Edit publication page inputs are correct
-    ${accordion}=    user gets accordion section content element    ${PUBLICATION_NAME}
-    user clicks link    Manage publication    ${accordion}
-    user waits until page contains title    Manage publication
-
-    user waits until page contains element    label:Select theme
-    user waits until page contains element    label:Select topic
-    user waits until page contains element    label:Team name
-    user waits until page contains element    label:Team email address
-    user waits until page contains element    label:Contact name
-    user waits until page contains element    label:Contact telephone number
+    user waits until page contains element    label:Publication summary
+    # @MarkFix needs sorting out on frontend
+    #user checks page does not contain element    label:Select theme    # Only BAU users should see this
+    #user checks page does not contain element    label:Select topic    # Only BAU users should see this
     user checks page does not contain element    label:Publication title    # Only BAU users should see this
+    user checks page does not contain element    label:Superseding publication    # Only BAU users should see this
 
-    user clicks link    Cancel
-    user waits until page does not contain link    Cancel
+    user clicks button    Cancel
+    user waits until page does not contain button    Cancel
+
+Check Edit publication contact page inputs are correct
+    user clicks link    Contact
+    user waits until h2 is visible    Contact for this publication
+    user clicks button    Edit contact details
+
+    user waits until page contains element    label:Team name
+    user waits until page contains element    label:Team email
+    user waits until page contains element    label:Contact name
+    user waits until page contains element    label:Contact telephone
+
+    user clicks button    Cancel
+    user waits until page does not contain button    Cancel
 
 Check can create an amendment of a published release
-    user navigates to publication on admin dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
 
-    ${details}=    user opens details dropdown    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)
-    ...    ${publication_accordion}
-    user can see the create amendment controls for release    ${details}
+    user can see the create amendment controls for release    ${PUBLISHED_RELEASE_TYPE}
 
 Check cannot approve a draft release
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    ${DRAFT_RELEASE_TYPE} (not Live)    ${THEME_NAME}    ${TOPIC_NAME}
+    ...    ${DRAFT_RELEASE_TYPE}    ${THEME_NAME}    ${TOPIC_NAME}
     user cannot see the enabled approve release controls for release

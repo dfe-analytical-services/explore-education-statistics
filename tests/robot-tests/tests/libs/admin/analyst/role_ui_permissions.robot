@@ -4,12 +4,6 @@ Resource    ../../admin-common.robot
 
 
 *** Keywords ***
-user navigates to publication on admin dashboard
-    [Arguments]    ${publication}    ${theme}    ${topic}
-    ${publication_accordion}=    user navigates to publication page from dashboard    ${publication}    ${theme}
-    ...    ${topic}
-    set suite variable    ${publication_accordion}
-
 user cannot see the create methodologies controls for publication
     [Arguments]    ${PUBLICATION_ACCORDION}
     user checks element does not contain button    ${PUBLICATION_ACCORDION}    Create methodology
@@ -45,15 +39,10 @@ user cannot see the enabled approve release controls for release
     user scrolls to element    id:releaseStatusForm-approvalStatus-Approved
     user checks element is disabled    id:releaseStatusForm-approvalStatus-Approved
 
-user can see the create methodologies controls for publication
-    [Arguments]    ${PUBLICATION_ACCORDION}
-    user checks element contains button    ${PUBLICATION_ACCORDION}    Create methodology
-    user checks element contains link    ${PUBLICATION_ACCORDION}    Use an external methodology
-
 user can see the create amendment controls for release
-    [Arguments]    ${RELEASE_DETAILS_SECTION}
-    user waits until element contains link    ${RELEASE_DETAILS_SECTION}    View release    %{WAIT_SMALL}
-    user checks element contains button    ${RELEASE_DETAILS_SECTION}    Amend release
+    [Arguments]    ${RELEASE_NAME}
+    ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
+    user checks element contains button    ${ROW}    Amend
 
 user cannot see the edit status controls for methodology
     user clicks link    Sign off
