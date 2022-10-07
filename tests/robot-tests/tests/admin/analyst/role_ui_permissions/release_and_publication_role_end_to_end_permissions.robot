@@ -31,7 +31,6 @@ Sign in as Analyst1 User1 (publication owner)
 
 Check publication owner can create methodology for publication
     user creates methodology for publication    ${PUBLICATION_NAME}
-    user verifies methodology summary details    ${PUBLICATION_NAME}
 
 Check publication owner can update methodology summary
     user edits methodology summary for publication
@@ -44,7 +43,7 @@ Check publication owner cannot approve methodology for publication
 
 Check publication owner can upload subject file
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    ${RELEASE_TYPE} (not Live)
+    ...    ${RELEASE_TYPE}
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Check publication owner can add data guidance to ${SUBJECT_NAME}
@@ -123,8 +122,6 @@ Validates Release status table is correct again
 
 Check that a publication owner can make a new release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user waits until page does not contain loading spinner
-    user clicks link    Create new release
     user creates release from publication page    ${PUBLICATION_NAME}    Academic Year Q1    2020
 
 Check publication owner can upload subject file on new release
@@ -146,7 +143,7 @@ Swap the publication owner role for release approver to test approving the metho
 
 Check release approver can approve methodology for publication
     user changes to analyst1
-    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
+    user navigates to methodology    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} - Updated methodology
     approve methodology from methodology view
 
 Swap the release approver role for publication owner to test removing the approved methodology
@@ -156,9 +153,8 @@ Swap the release approver role for publication owner to test removing the approv
 
 Check publication owner cannot remove approved methodology
     user changes to analyst1
-    ${accordion}    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    ${details}    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user cannot see the remove controls for methodology    ${details}
+    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
+    user cannot see the remove controls for methodology
 
 Swap the publication owner role for release approver to test unapproving the methodology
     user changes to bau1
@@ -167,8 +163,7 @@ Swap the publication owner role for release approver to test unapproving the met
 
 Check release approver can unapprove methodology
     user changes to analyst1
-    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
-    user clicks link    Sign off
+    user navigates to methodology    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} - Updated methodology
     user changes methodology status to Draft
 
 Check release approver can approve methodology for publishing with the release
@@ -178,7 +173,7 @@ Check release approver can approve methodology for publishing with the release
 
 Check release approver can access release
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    ${RELEASE_TYPE} (not Live)
+    ...    ${RELEASE_TYPE}
 
 Navigate to 'Footnotes' section
     user clicks link    Footnotes
@@ -213,11 +208,16 @@ Swap the release approver role for publication owner now that the publication is
     user removes release access from analyst    ${PUBLICATION_NAME}    ${RELEASE_TYPE}    Approver
     user gives analyst publication owner access    ${PUBLICATION_NAME}
 
+# @MarkFix what is this keyword doing?
+
 Check publication owner can create and cancel methodology amendments on a live publication
     user changes to analyst1
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - Updated methodology
     user cancels methodology amendment for publication    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - Updated methodology
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - Updated methodology
 
 Swap the publication owner role for release approver to test approving methodology amendments
     user changes to bau1
@@ -227,6 +227,7 @@ Swap the publication owner role for release approver to test approving methodolo
 Check release approver can approve methodology amendments on a live publication
     user changes to analyst1
     user approves methodology amendment for publication    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - Updated methodology
 
 Swap the release approver role for publication owner to test creating a new release amendment
     user changes to bau1
@@ -235,10 +236,11 @@ Swap the release approver role for publication owner to test creating a new rele
 
 Check publication owner can create a new release amendment
     user changes to analyst1
-    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_TYPE}    (Live - Latest release)
+    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_TYPE}
 
 Create a new methodology amendment
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - Updated methodology
 
 Swap the publication owner role for release approver to test approving the methodology amendment
     user changes to bau1
@@ -249,6 +251,7 @@ Check release approver can approve the methodology amendment for publishing with
     user changes to analyst1
     user approves methodology amendment for publication
     ...    publication=${PUBLICATION_NAME}
+    ...    methodology_title=${PUBLICATION_NAME} - Updated methodology
     ...    publishing_strategy=WithRelease
     ...    with_release=${RELEASE_NAME}
 
@@ -259,6 +262,5 @@ Swap the release approver role for publication owner to test that an approved me
 
 Check publication owner cannot cancel approved methodology amendment
     user changes to analyst1
-    ${accordion}    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    ${details}    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user cannot see the cancel amendment controls for methodology    ${details}
+    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
+    user cannot see the cancel amendment controls for methodology

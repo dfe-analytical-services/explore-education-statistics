@@ -57,11 +57,11 @@ user cannot see the edit status controls for methodology
     user checks page does not contain    Edit status
 
 user cannot see the remove controls for methodology
-    [Arguments]    ${DETAILS_SECTION}
-    user checks element contains link    ${DETAILS_SECTION}    View methodology
-    user checks element does not contain button    ${DETAILS_SECTION}    Remove
+    user waits until h2 is visible    Manage methodologies
+    user checks page does not contain button    Delete draft
+    user checks page does not contain button    Remove
 
 user cannot see the cancel amendment controls for methodology
-    [Arguments]    ${DETAILS_SECTION}
-    user checks element contains link    ${DETAILS_SECTION}    View amendment
-    user checks element does not contain button    ${DETAILS_SECTION}    Cancel amendment
+    user waits until page contains link    View
+    user waits until page contains link    View original
+    user checks page does not contain button    Cancel amendment

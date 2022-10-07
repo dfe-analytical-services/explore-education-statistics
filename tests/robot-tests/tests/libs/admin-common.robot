@@ -393,6 +393,7 @@ approve methodology from methodology view
     ...    ${publishing_strategy}=Immediately
     ...    ${with_release}=
     user clicks link    Sign off
+    user waits until h2 is visible    Sign off
     user changes methodology status to Approved    ${publishing_strategy}    ${with_release}
 
 user creates approved methodology for publication
@@ -731,6 +732,9 @@ user changes methodology status to Approved
     END
 
 user changes methodology status to Draft
+    user clicks link    Sign off
+    user waits until h2 is visible    Sign off
+
     user clicks button    Edit status
     user clicks element    id:methodologyStatusForm-status-Draft
     user clicks button    Update status
