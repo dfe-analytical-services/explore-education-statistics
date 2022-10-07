@@ -18,7 +18,7 @@ ${PUBLICATION_NAME}=    UI tests - methodology alternative title %{RUN_IDENTIFIE
 Create Publication as bau1
     user creates test publication via api    ${PUBLICATION_NAME}
 
-    user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
 
     user clicks link    Methodologies
     user waits until h2 is visible    Manage methodologies

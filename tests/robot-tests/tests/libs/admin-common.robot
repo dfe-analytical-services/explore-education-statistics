@@ -78,24 +78,68 @@ user selects theme and topic from admin dashboard
     #...    xpath://*[@data-testid="accordion"]|//*[text()="No publications available"]
     #...    %{WAIT_MEDIUM}
 
+user navigates to release page from dashboard
+    [Arguments]
+    ...    ${TABLE_TESTID}
+    ...    ${LINK_TEXT}
+    ...    ${PUBLICATION_NAME}
+    ...    ${RELEASE_NAME}
+    ...    ${THEME_NAME}=%{TEST_THEME_NAME}
+    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
+
+    user navigates to publication page from dashboard
+    ...    ${PUBLICATION_NAME}
+    ...    ${THEME_NAME}
+    ...    ${TOPIC_NAME}
+
+    ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:${TABLE_TESTID}
+    # @MarkFix because "user clicks link" doesn't work
+    user clicks element    xpath://a[text()="${LINK_TEXT}"]    ${ROW}
+
+    user waits until h2 is visible    Release summary    %{WAIT_SMALL}
+    user checks summary list contains    Publication title    ${PUBLICATION_NAME}
+
 user navigates to draft release page from dashboard
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
-
-    user goes to publication page from dashboard
+    user navigates to release page from dashboard
+    ...    publication-draft-releases
+    ...    Edit
     ...    ${PUBLICATION_NAME}
+    ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}
     ...    ${TOPIC_NAME}
 
-    ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-draft-releases
-    # @MarkFix because "user clicks link" doesn't work
-    user clicks element    xpath://a[text()="Edit"]    ${ROW}
+user navigates to scheduled release page from dashboard
+    [Arguments]
+    ...    ${PUBLICATION_NAME}
+    ...    ${RELEASE_NAME}
+    ...    ${THEME_NAME}=%{TEST_THEME_NAME}
+    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
+    user navigates to release page from dashboard
+    ...    publication-scheduled-releases
+    ...    Edit
+    ...    ${PUBLICATION_NAME}
+    ...    ${RELEASE_NAME}
+    ...    ${THEME_NAME}
+    ...    ${TOPIC_NAME}
 
-    user waits until h2 is visible    Release summary    %{WAIT_SMALL}
-    user checks summary list contains    Publication title    ${PUBLICATION_NAME}
+user navigates to published release page from dashboard
+    [Arguments]
+    ...    ${PUBLICATION_NAME}
+    ...    ${RELEASE_NAME}
+    ...    ${THEME_NAME}=%{TEST_THEME_NAME}
+    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
+    user navigates to release page from dashboard
+    ...    publication-published-releases
+    ...    View
+    ...    ${PUBLICATION_NAME}
+    ...    ${RELEASE_NAME}
+    ...    ${THEME_NAME}
+    ...    ${TOPIC_NAME}
 
 user navigates to editable release amendment summary from admin dashboard
     [Arguments]
@@ -148,7 +192,7 @@ user opens release summary on the admin dashboard
     ...    ${DETAILS_HEADING}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
-    user goes to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
 
     ${accordion}=    user gets accordion section content element    ${PUBLICATION_NAME}
     user opens details dropdown    ${DETAILS_HEADING}    ${accordion}
@@ -188,7 +232,7 @@ user creates release from Manage publication page
     user waits until page contains element    xpath://a[text()="Edit release summary"]    %{WAIT_SMALL}
     user waits until h2 is visible    Release summary    %{WAIT_SMALL}
 
-user goes to publication page from dashboard
+user navigates to publication page from dashboard
     [Arguments]
     ...    ${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
@@ -217,14 +261,14 @@ user navigates to methodologies page for publication
     ...    ${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
-    user goes to publication page from dashboard    ${publication}    ${theme}    ${topic}
+    user navigates to publication page from dashboard    ${publication}    ${theme}    ${topic}
 
     user clicks link    Methodologies
     user waits until h2 is visible    Manage methodologies
 
 user views methodology amendment for publication
     [Arguments]    ${publication}    ${methodology_title}=${publication}
-    ${accordion}=    user goes to publication page from dashboard    ${publication}
+    ${accordion}=    user navigates to publication page from dashboard    ${publication}
     user views methodology for open publication accordion    ${accordion}    ${methodology_title}
     ...    Edit amendment
 
@@ -505,7 +549,7 @@ user enters text into data guidance data file content editor
 
 user creates amendment for release
     [Arguments]    ${PUBLICATION_NAME}    ${RELEASE_NAME}    ${RELEASE_STATUS}
-    user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     ${accordion}=    user gets accordion section content element    ${PUBLICATION_NAME}
     user opens details dropdown    ${RELEASE_NAME} ${RELEASE_STATUS}    ${accordion}
     ${details}=    user gets details content element    ${RELEASE_NAME} ${RELEASE_STATUS}    ${accordion}

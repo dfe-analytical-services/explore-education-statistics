@@ -52,7 +52,7 @@ User redirects to the dashboard after saving publication
     user waits until h1 is visible    Dashboard
 
 Verify new publication has no releases
-    user goes to publication page from dashboard    ${PUBLICATION_NAME} (created)
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME} (created)
 
     user checks page contains    There are no scheduled releases.
     user checks page contains    There are no draft releases.

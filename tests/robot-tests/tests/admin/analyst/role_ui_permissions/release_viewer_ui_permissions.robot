@@ -17,7 +17,7 @@ Import permissions test variables
     Set suite variable    ${PUBLICATION_NAME}    ${PUBLICATION_FOR_RELEASE_VIEWER}
 
 Navigate to Release where analyst has Release Viewer role
-    ${publication_accordion}=    user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    ${publication_accordion}=    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     ...    ${THEME_NAME}    ${TOPIC_NAME}
     Set suite variable    ${publication_accordion}
 

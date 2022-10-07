@@ -21,7 +21,7 @@ Create Publication as bau1
     user create test release via api    ${PUBLICATION_ID}    AY    2001
     user create test release via api    ${PUBLICATION_ID}    AY    2002
 
-    user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
 
     user waits until page contains link    Team access
     user clicks link    Team access
@@ -43,7 +43,7 @@ Switch to analyst1
     user changes to analyst1
 
 Check Manage team access button is not visible
-    user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user waits until h2 is visible    Manage releases
 
     user checks page does not contain button    Team access
@@ -56,7 +56,7 @@ Switch to analyst1 again
     user changes to analyst1
 
 Check Manage team access button is visible
-    user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user waits until page contains link    Team access
 
 Go to Manage team access page

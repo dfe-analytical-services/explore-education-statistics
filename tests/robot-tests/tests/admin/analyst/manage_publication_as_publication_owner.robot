@@ -17,7 +17,7 @@ ${PUBLICATION_NAME}=    UI tests - manage publication as publication owner %{RUN
 *** Test Cases ***
 Create Publication as bau1
     user creates test publication via api    ${PUBLICATION_NAME}
-    user goes to publication page from dashboard    ${PUBLICATION_NAME}    # @MarkFix why do this?
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}    # @MarkFix why do this?
 
 Assign publication owner permissions to analyst1
     user gives analyst publication owner access    ${PUBLICATION_NAME}
@@ -26,7 +26,7 @@ Switch to analyst1
     user changes to analyst1
 
 Go to Manage publication page
-    user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user waits until page contains title caption    Manage publication
 
 Update publication contact

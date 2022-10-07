@@ -22,7 +22,7 @@ Create new publication and release via api
     user create test release via api    ${PUBLICATION_ID}    AY    2020
 
 Create legacy release
-    user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Legacy releases
     user waits until h2 is visible    Legacy releases
     user clicks button    Create legacy release
@@ -70,7 +70,7 @@ Check legacy release appears on public frontend
     user checks element attribute value should be    ${other_release_1_link}    href    http://test.com/
 
 Navigate to publication to update legacy releases
-    user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Legacy releases
     user waits until h2 is visible    Legacy releases
 
@@ -107,7 +107,7 @@ Validate public frontend shows changes made to legacy release after saving publi
     user checks element attribute value should be    ${other_release_1_link}    href    http://test2.com/
 
 Navigate to publication to update legacy releases again
-    user goes to publication page from dashboard    ${PUBLICATION_NAME}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Legacy releases
     user waits until h2 is visible    Legacy releases
 

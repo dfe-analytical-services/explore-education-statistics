@@ -53,7 +53,7 @@ Create new publication to supersede other publication and release via API
     user create test release via api    ${PUBLICATION_ID_SUPERSEDE}    FY    2000
 
 Set archive-publication to be superseded by superseding-publication
-    user goes to publication page from dashboard    ${PUBLICATION_NAME_ARCHIVE}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME_ARCHIVE}
 
     user clicks link    Details
     user waits until h2 is visible    Publication details
@@ -70,7 +70,7 @@ Set archive-publication to be superseded by superseding-publication
     user waits until modal is not visible    Confirm publication changes
 
 Validate archive warning is on Admin dashboard for archive-publication release
-    user goes to publication page from dashboard    ${PUBLICATION_NAME_ARCHIVE}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME_ARCHIVE}
     user waits until page contains
     ...    This publication will be archived when its superseding publication has a live release published.
 
@@ -264,7 +264,7 @@ Check archive-publication permalink has out-of-date warning
     ...    WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.
 
 Set archive-publication to be no longer be superseded
-    user goes to publication page from dashboard    ${PUBLICATION_NAME_ARCHIVE}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME_ARCHIVE}
 
     user clicks link    Details
     user waits until h2 is visible    Publication details
