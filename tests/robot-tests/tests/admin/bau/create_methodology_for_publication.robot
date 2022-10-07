@@ -17,7 +17,7 @@ ${PUBLICATION_NAME}=    UI tests - create methodology publication %{RUN_IDENTIFI
 *** Test Cases ***
 Create Publication and check available Methodology controls
     user creates test publication via api    ${PUBLICATION_NAME}
-    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
+    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
     user checks page contains button    Create new methodology
     user waits until page contains link    Add external methodology
     user waits until page contains link    Adopt an existing methodology
@@ -25,7 +25,7 @@ Create Publication and check available Methodology controls
 Create a Methodology
     user creates methodology for publication    ${PUBLICATION_NAME}
 
-    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
+    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
     user checks page does not contain button    Create new methodology
     user waits until page contains link    Add external methodology
     user waits until page contains link    Adopt an existing methodology
@@ -42,7 +42,7 @@ Create a Methodology
     user verifies methodology summary details    ${PUBLICATION_NAME}
 
 Remove the Methodology
-    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
+    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
 
     ${ROW}=    user gets table row    ${PUBLICATION_NAME}    testid:methodologies
     user clicks element    xpath://*[text()="Delete draft"]    testid:methodologies
@@ -100,7 +100,7 @@ Approve the Methodology
     ...    Not yet published
 
 Check the controls available are as expected for an approved Methodology that is not yet publicly visible
-    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
+    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
 
     ${ROW}=    user gets table row    ${PUBLICATION_NAME} - another new methodology title    testid:methodologies
     user checks element contains link    ${ROW}    Edit
@@ -119,7 +119,7 @@ Unapprove the Methodology
     user clicks link    Sign off
     user changes methodology status to Draft
 
-    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
+    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
     ${ROW}=    user gets table row    ${PUBLICATION_NAME} - another new methodology title    testid:methodologies
     user checks element contains link    ${ROW}    Edit
     user checks element contains button    ${ROW}    Delete draft

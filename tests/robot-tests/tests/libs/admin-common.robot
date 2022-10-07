@@ -53,7 +53,9 @@ user signs out
     user clicks link    Sign out    css:#navigation
 
 user selects dashboard theme and topic if possible
-    [Arguments]    ${theme_name}    ${topic_name}
+    [Arguments]
+    ...    ${theme_name}=%{TEST_THEME_NAME}
+    ...    ${topic_name}=%{TEST_TOPIC_NAME}
     ${DROPDOWNS_EXIST}=    user checks dashboard theme topic dropdowns exist
     IF    ${DROPDOWNS_EXIST}
         user chooses select option    id:publicationsReleases-themeTopic-themeId    ${theme_name}
@@ -251,12 +253,22 @@ user creates methodology for publication
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
 
-    user navigates to methodologies page for publication    ${publication}    ${theme}    ${topic}
+    user navigates to methodologies on publication page    ${publication}    ${theme}    ${topic}
 
     user clicks button    Create new methodology
     user verifies methodology summary details    ${publication}
 
-user navigates to methodologies page for publication
+user navigates to details on publication page
+    [Arguments]
+    ...    ${publication}
+    ...    ${theme}=%{TEST_THEME_NAME}
+    ...    ${topic}=%{TEST_TOPIC_NAME}
+    user navigates to publication page from dashboard    ${publication}    ${theme}    ${topic}
+
+    user clicks link    Details
+    user waits until h2 is visible    Publication details
+
+user navigates to methodologies on publication page
     [Arguments]
     ...    ${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
@@ -280,7 +292,7 @@ user navigates to methodology
     ...    ${publication}
     ...    ${methodology_title}
     ...    ${action_button_text}=Edit
-    user navigates to methodologies page for publication    ${publication}
+    user navigates to methodologies on publication page    ${publication}
     ${ROW}=    user gets table row    ${methodology_title}    testid:methodologies
     user clicks element    xpath://*[text()="${action_button_text}"]    ${ROW}
 
@@ -378,7 +390,7 @@ approve methodology for publication
     ...    ${with_release}
     ...    ${action_button_text}
 
-    user navigates to methodologies page for publication    ${publication}    ${theme}    ${topic}
+    user navigates to methodologies on publication page    ${publication}    ${theme}    ${topic}
 
     ${ROW}=    user gets table row    ${methodology_title}    testid:methodologies
     user clicks element    xpath://*[text()="${action_button_text}"]    ${ROW}
@@ -408,7 +420,7 @@ user creates methodology amendment for publication
     ...    ${methodology_title}=${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
-    user navigates to methodologies page for publication    ${publication}    ${theme}    ${topic}
+    user navigates to methodologies on publication page    ${publication}    ${theme}    ${topic}
 
     ${ROW}=    user gets table row    ${methodology_title}    testid:methodologies
     user clicks element    xpath://*[text()="Amend"]    ${ROW}
@@ -424,7 +436,7 @@ user cancels methodology amendment for publication
     ...    ${methodology_title}=${publication}
     ...    ${theme}=%{TEST_THEME_NAME}
     ...    ${topic}=%{TEST_TOPIC_NAME}
-    user navigates to methodologies page for publication    ${publication}    ${theme}    ${topic}
+    user navigates to methodologies on publication page    ${publication}    ${theme}    ${topic}
 
     ${ROW}=    user gets table row    ${methodology_title}    testid:methodologies
     user clicks element    xpath://*[text()="Cancel amendment"]    ${ROW}

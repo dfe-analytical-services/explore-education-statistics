@@ -146,7 +146,7 @@ Swap the publication owner role for release approver to test approving the metho
 
 Check release approver can approve methodology for publication
     user changes to analyst1
-    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
+    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
     approve methodology from methodology view
 
 Swap the release approver role for publication owner to test removing the approved methodology
@@ -167,7 +167,7 @@ Swap the publication owner role for release approver to test unapproving the met
 
 Check release approver can unapprove methodology
     user changes to analyst1
-    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
+    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
     user clicks link    Sign off
     user changes methodology status to Draft
 

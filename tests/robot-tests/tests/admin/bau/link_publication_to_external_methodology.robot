@@ -16,7 +16,7 @@ ${PUBLICATION_NAME}=    UI tests - link external methodology publication %{RUN_I
 *** Test Cases ***
 Link Publication to External Methodology
     user creates test publication via api    ${PUBLICATION_NAME}
-    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
+    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
 
     user checks page contains button    Create new methodology
     user waits until page contains link    Add external methodology

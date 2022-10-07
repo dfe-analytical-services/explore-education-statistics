@@ -97,7 +97,7 @@ Approve the Methodology
 
 Verify the summary for the original Methodology is as expected
     ${expected_published_date}=    get current datetime    %-d %B %Y
-    user navigates to methodologies page for publication
+    user navigates to methodologies on publication page
     ...    ${PUBLICATION_NAME}
 
     ${ROW}=    user gets table row    ${PUBLICATION_NAME} - first methodology version    testid:methodologies
@@ -175,7 +175,7 @@ Verify all is as expected on the Amendment after the Amendment content changes
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
 Revisit the original Methodology and check that its content remains unaffected by the changes to the Amendment
-    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
+    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
 
     ${ROW}=    user gets table row    ${PUBLICATION_NAME}    testid:methodologies
     user clicks element    xpath://*[text()="View original"]    ${ROW}
@@ -188,7 +188,7 @@ Approve the Methodology Amendment
     user approves methodology amendment for publication    ${PUBLICATION_NAME}
 
 Revisit the Publication methodologies page and check that the new Amendment is now the live Methodology
-    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
+    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
 
     ${ROW}=    user gets table row    ${PUBLICATION_NAME}    testid:methodologies
 

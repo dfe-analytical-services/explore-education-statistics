@@ -106,7 +106,7 @@ Verify that the user cannot edit the status of the methodology
     user checks page does not contain    Edit status
 
 Verify that the methodology 'Published' tag and datetime is shown
-    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
+    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
 
     ${ROW}=    user gets table row    ${PUBLICATION_NAME}
     user checks element contains    ${ROW}    Published
