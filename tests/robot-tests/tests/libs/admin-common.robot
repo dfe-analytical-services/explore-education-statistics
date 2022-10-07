@@ -143,30 +143,19 @@ user navigates to published release page from dashboard
     ...    ${THEME_NAME}
     ...    ${TOPIC_NAME}
 
-user navigates to editable release amendment summary from admin dashboard
-    [Arguments]
-    ...    ${PUBLICATION_NAME}
-    ...    ${DETAILS_HEADING}
-    ...    ${THEME_NAME}=%{TEST_THEME_NAME}
-    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
-    bau user navigates to release summary from admin dashboard
-    ...    ${PUBLICATION_NAME}
-    ...    ${THEME_NAME}
-    ...    ${TOPIC_NAME}
-
 user navigates to readonly release summary from admin dashboard    # @MarkFix remove for navigates to draft release
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
-    user navigates to release summary from admin dashboard
+    user navigates to release summary from dashboard
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}
     ...    ${TOPIC_NAME}
 
-user navigates to release summary from admin dashboard    # @MarkFix remove for navigates to draft release
+user navigates to release summary from dashboard    # @MarkFix remove for navigates to draft release
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
@@ -174,6 +163,7 @@ user navigates to release summary from admin dashboard    # @MarkFix remove for 
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     ...    ${LINK_TEXT}=Edit
 
+    user navigates to admin dashboard
     user selects dashboard theme and topic if possible    ${THEME_NAME}    ${TOPIC_NAME}
 
     user clicks link    ${PUBLICATION_NAME}

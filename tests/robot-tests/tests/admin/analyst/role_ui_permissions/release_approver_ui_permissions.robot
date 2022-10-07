@@ -16,11 +16,9 @@ Import permissions test variables
     Import bootstrap data roles and permissions variables
     Set suite variable    ${PUBLICATION_NAME}    ${PUBLICATION_FOR_PUBLICATION_RELEASE_APPROVER}
 
-Navigate to Release where analyst has Release Approver role
-    user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
-
 Check cannot create a Methodology for a Publication if they don't have Publication Owner role
-    user cannot see the create methodologies controls for publication    ${publication_accordion}
+    user goes to methodologies and checks cannot create methodologies for publication
+    ...    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
 
 Check cannot edit content for published release
     user navigates to readonly release summary from admin dashboard    ${PUBLICATION_NAME}

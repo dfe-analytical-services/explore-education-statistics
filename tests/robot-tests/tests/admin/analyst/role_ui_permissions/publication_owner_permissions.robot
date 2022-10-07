@@ -61,7 +61,6 @@ Check Edit publication contact page inputs are correct
 
 Check can create an amendment of a published release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
-
     user can see the create amendment controls for release    ${PUBLISHED_RELEASE_TYPE}
 
 Check cannot approve a draft release
