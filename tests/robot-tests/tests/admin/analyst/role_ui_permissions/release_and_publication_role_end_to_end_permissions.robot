@@ -263,4 +263,5 @@ Swap the release approver role for publication owner to test that an approved me
 Check publication owner cannot cancel approved methodology amendment
     user changes to analyst1
     user navigates to methodologies on publication page    ${PUBLICATION_NAME}
+
     user cannot see the cancel amendment controls for methodology

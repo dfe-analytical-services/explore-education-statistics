@@ -62,6 +62,6 @@ user cannot see the remove controls for methodology
     user checks page does not contain button    Remove
 
 user cannot see the cancel amendment controls for methodology
-    user waits until page contains link    View
-    user waits until page contains link    View original
-    user checks page does not contain button    Cancel amendment
+    user waits until page contains element    testid:view
+    user waits until page contains element    testid:view-original
+    user checks page does not contain element    testid:cancel-amendment

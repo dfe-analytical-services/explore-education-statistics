@@ -42,15 +42,12 @@ user switches to analyst1 browser
     user switches browser    ${ANALYST1_BROWSER}
 
 user changes to bau1
-    user signs out
+    user clicks link    Sign out    css:#navigation
     user signs in as bau1    False
 
 user changes to analyst1
-    user signs out
-    user signs in as analyst1    False
-
-user signs out
     user clicks link    Sign out    css:#navigation
+    user signs in as analyst1    False
 
 user selects dashboard theme and topic if possible
     [Arguments]
@@ -63,22 +60,6 @@ user selects dashboard theme and topic if possible
         user chooses select option    id:publicationsReleases-themeTopic-topicId    ${topic_name}
         user waits until page contains    ${theme_name} / ${topic_name}
     END
-
-user selects theme and topic from admin dashboard
-    [Arguments]    ${theme}    ${topic}
-    user navigates to admin dashboard
-    ${correct_theme_and_topic_selected}=    user is on admin dashboard with theme and topic selected    %{ADMIN_URL}
-    ...    ${theme}    ${topic}
-    IF    ${correct_theme_and_topic_selected} is ${FALSE}
-        user chooses select option    id:publicationsReleases-themeTopic-themeId    ${theme}
-        user waits until page contains element    id:publicationsReleases-themeTopic-topicId    %{WAIT_MEDIUM}
-        user chooses select option    id:publicationsReleases-themeTopic-topicId    ${topic}
-    END
-    user waits until h3 is visible    ${theme} / ${topic}    %{WAIT_MEDIUM}
-    user waits until page does not contain loading spinner
-    #user waits until page contains element    # @MarkFix necessary?
-    #...    xpath://*[@data-testid="accordion"]|//*[text()="No publications available"]
-    #...    %{WAIT_MEDIUM}
 
 user navigates to release page from dashboard
     [Arguments]
@@ -144,54 +125,6 @@ user navigates to published release page from dashboard
     ...    ${THEME_NAME}
     ...    ${TOPIC_NAME}
 
-user navigates to readonly release summary from admin dashboard    # @MarkFix remove for navigates to draft release
-    [Arguments]
-    ...    ${PUBLICATION_NAME}
-    ...    ${RELEASE_NAME}
-    ...    ${THEME_NAME}=%{TEST_THEME_NAME}
-    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
-    user navigates to release summary from dashboard
-    ...    ${PUBLICATION_NAME}
-    ...    ${RELEASE_NAME}
-    ...    ${THEME_NAME}
-    ...    ${TOPIC_NAME}
-
-user navigates to release summary from dashboard    # @MarkFix remove for navigates to draft release
-    [Arguments]
-    ...    ${PUBLICATION_NAME}
-    ...    ${RELEASE_NAME}
-    ...    ${THEME_NAME}=%{TEST_THEME_NAME}
-    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
-    ...    ${LINK_TEXT}=Edit
-
-    user navigates to admin dashboard
-    user selects dashboard theme and topic if possible    ${THEME_NAME}    ${TOPIC_NAME}
-
-    user clicks link    ${PUBLICATION_NAME}
-
-    user waits until h2 is visible    Manage releases
-    user waits until h3 is visible    Draft releases
-
-    ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-draft-releases
-    # @MarkFix because "user clicks link" doesn't work
-    user clicks element    xpath://a[text()="${LINK_TEXT}"]    ${ROW}
-
-    user waits until h2 is visible    Release summary    %{WAIT_SMALL}
-    user checks summary list contains    Publication title    ${PUBLICATION_NAME}
-
-user opens release summary on the admin dashboard
-    [Arguments]
-    ...    ${PUBLICATION_NAME}
-    ...    ${DETAILS_HEADING}
-    ...    ${THEME_NAME}=%{TEST_THEME_NAME}
-    ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
-    user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
-
-    ${accordion}=    user gets accordion section content element    ${PUBLICATION_NAME}
-    user opens details dropdown    ${DETAILS_HEADING}    ${accordion}
-    ${details}=    user gets details content element    ${DETAILS_HEADING}    ${accordion}
-    [Return]    ${details}
-
 user creates publication
     [Arguments]    ${title}
     user waits until h1 is visible    Create new publication
@@ -207,7 +140,6 @@ user creates publication
 
 user creates release from publication page
     [Arguments]    ${publication}    ${time_period_coverage}    ${start_year}
-    # @MarkFix remove ${publication} argument?
     user waits until page contains title caption    Manage publication    %{WAIT_SMALL}
     user waits until h1 is visible    ${publication}
 
@@ -268,15 +200,6 @@ user navigates to methodologies on publication page
 
     user clicks link    Methodologies
     user waits until h2 is visible    Manage methodologies
-
-user views methodology for open publication accordion
-    [Arguments]
-    ...    ${accordion}
-    ...    ${methodology_title}
-    ...    ${edit_button_text}=Edit methodology
-    user opens details dropdown    ${methodology_title}    ${accordion}
-    user clicks link    ${edit_button_text}    ${accordion}
-    user waits until h2 is visible    Methodology summary
 
 user navigates to methodology
     [Arguments]
@@ -397,15 +320,6 @@ approve methodology from methodology view
     user waits until h2 is visible    Sign off
     user changes methodology status to Approved    ${publishing_strategy}    ${with_release}
 
-user creates approved methodology for publication
-    [Arguments]
-    ...    ${publication}
-    ...    ${theme}=%{TEST_THEME_NAME}
-    ...    ${topic}=%{TEST_TOPIC_NAME}
-
-    user creates methodology for publication    ${publication}    ${theme}    ${topic}
-    user approves methodology for publication    ${publication}    ${publication}    ${theme}    ${topic}
-
 user creates methodology amendment for publication
     [Arguments]
     ...    ${publication}
@@ -488,32 +402,6 @@ user updates public prerelease access list
     user presses keys    ${content}
     user clicks button    Save access list
     user waits until element contains    css:[data-testid="publicPreReleaseAccessListPreview"]    ${content}
-
-user checks draft releases tab contains publication
-    [Arguments]    ${publication_name}
-    user checks page contains element    xpath://*[@id="draft-releases"]//h3[text()="${publication_name}"]
-
-user waits until draft releases tab contains publication
-    [Arguments]    ${publication_name}
-    user waits until page contains element    xpath://*[@id="draft-releases"]//h3[text()="${publication_name}"]
-
-user checks draft releases tab publication has release
-    [Arguments]    ${publication_name}    ${release_text}
-    user checks page contains element
-    ...    xpath://*[@id="draft-releases"]//*[@data-testid="releaseByStatusTab ${publication_name}"]//*[contains(@data-testid, "${release_text}")]
-
-user checks scheduled releases tab contains publication
-    [Arguments]    ${publication_name}
-    user checks page contains element    xpath://*[@id="scheduled-releases"]//h3[text()="${publication_name}"]
-
-user waits until scheduled releases tab contains publication
-    [Arguments]    ${publication_name}
-    user waits until page contains element    xpath://*[@id="scheduled-releases"]//h3[text()="${publication_name}"]
-
-user checks scheduled releases tab publication has release
-    [Arguments]    ${publication_name}    ${release_text}
-    user checks page contains element
-    ...    xpath://*[@id="scheduled-releases"]//*[@data-testid="releaseByStatusTab ${publication_name}"]//*[contains(@data-testid, "${release_text}")]
 
 user clicks footnote subject radio
     [Arguments]    ${subject_label}    ${radio_label}
