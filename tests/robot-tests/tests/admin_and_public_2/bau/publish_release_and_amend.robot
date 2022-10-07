@@ -25,7 +25,7 @@ Create new publication for "UI tests topic" topic
 
 Go to "Release summary" page
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    ${RELEASE_NAME} (not Live)
+    ...    ${RELEASE_NAME}
 
 Verify release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
@@ -341,7 +341,7 @@ Verify Test text accordion section contains correct text
 
 Return to Admin and Create amendment
     user navigates to admin dashboard    Bau1
-    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}    (Live - Latest release)
+    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
 Change the Release type
     user waits until page contains link    Edit release summary
@@ -351,8 +351,12 @@ Change the Release type
     user clicks radio    Experimental statistics
     user clicks button    Update release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary    Financial Year    3000-01
-    ...    UI test contact name    Experimental statistics
+    user verifies release summary    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} summary
+    ...    Financial Year
+    ...    3000-01
+    ...    UI test contact name
+    ...    Experimental statistics
 
 Navigate to data replacement page
     user clicks link    Data and files
@@ -737,7 +741,7 @@ Verify amendment Test text accordion section contains correct text
 
 Check next release date can be updated
     user navigates to admin dashboard    Bau1
-    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}    (Live - Latest release)
+    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
     user clicks link    Sign off
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status    %{WAIT_SMALL}

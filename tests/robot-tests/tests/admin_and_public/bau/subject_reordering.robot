@@ -23,7 +23,7 @@ Create new publication and release via API
 Navigate to release
     user navigates to draft release page from dashboard
     ...    ${PUBLICATION_NAME}
-    ...    ${RELEASE_NAME} (not Live)
+    ...    ${RELEASE_NAME}
 
 Upload subjects to release
     user uploads subject

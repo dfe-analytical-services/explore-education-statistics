@@ -72,6 +72,8 @@ Check publication is updated on dashboard
 
     user waits until page contains link    ${PUBLICATION_NAME_UPDATED}
 
+# @MarkFix check on release page?
+
 Go to public release page
     user checks publication is on find statistics page    ${PUBLICATION_NAME_UPDATED}
     user clicks element    testid:View stats link for ${PUBLICATION_NAME_UPDATED}
