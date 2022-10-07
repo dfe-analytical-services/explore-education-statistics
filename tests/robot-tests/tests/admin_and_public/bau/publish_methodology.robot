@@ -18,7 +18,7 @@ ${RELEASE_NAME}=                        Academic Year 2021/22
 
 
 *** Test Cases ***
-Create a draft release
+Create a draft release via api
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user create test release via api    ${PUBLICATION_ID}    AY    2021
 
@@ -61,7 +61,7 @@ Approve the methodology for publishing immediately
     user approves methodology for publication    ${PUBLICATION_NAME}
 
 Verify the expected public URL of the methodology on the Sign off tab
-    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
+    user navigates to methodology    ${PUBLICATION_NAME}    ${PUBLICATION_NAME}
     user clicks link    Sign off
     user waits until page contains testid    public-methodology-url
     ${ACCESSIBLE_METHODOLOGY_URL}=    Get Value    xpath://*[@data-testid="public-methodology-url"]
@@ -92,24 +92,26 @@ Verify that the methodology is still not publicly accessible by URL without publ
 
 Approve the release
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    ${RELEASE_NAME} (not Live)
+    ...    ${RELEASE_NAME}
     user approves original release for immediate publication
 
 Verify that the user cannot edit the status of the methodology
-    user navigates to methodologies page for publication
+    user navigates to methodology
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME}
-    ...    View methodology
+    ...    View
+
     user clicks link    Sign off
     user waits until h2 is visible    Sign off
     user checks page does not contain    Edit status
 
-Verify that the methodology 'Published' tag is shown
-    user navigates to publication page from dashboard    ${PUBLICATION_NAME}    %{TEST_THEME_NAME}
-    ...    %{TEST_TOPIC_NAME}
+Verify that the methodology 'Published' tag and datetime is shown
+    user navigates to methodologies page for publication    ${PUBLICATION_NAME}
 
-    user waits until page contains element
-    ...    //*[@data-testid="Methodology for ${PUBLICATION_NAME}"]//div//span[text()="Published"]
+    ${ROW}=    user gets table row    ${PUBLICATION_NAME}
+    user checks element contains    ${ROW}    Published
+    ${DATE}=    get current datetime    %-d %B %Y
+    user checks element contains    ${ROW}    ${DATE}
 
 Verify that the methodology is visible on the public methodologies page with the expected URL
     user navigates to public methodologies page
@@ -177,7 +179,7 @@ Amend the methodology in preparation to test publishing immediately
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - Amended methodology
-    ...    Edit amendment
+    ...    Edit
 
 Update the methodology amendment's content
     user clicks link    Manage content
@@ -331,16 +333,22 @@ Verify that the amended methodology is visible on the public methodologies page
     ...    ${PUBLIC_METHODOLOGY_URL_ENDING}
 
 Schedule a methodology amendment to be published with a release amendment
-    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}    (Live - Latest release)
+    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - Amended methodology
     user approves methodology amendment for publication
     ...    publication=${PUBLICATION_NAME}
+    ...    methodology_title=${PUBLICATION_NAME} - Amended methodology
     ...    publishing_strategy=WithRelease
     ...    with_release=${PUBLICATION_NAME} - ${RELEASE_NAME}
 
 Cancel the release amendment and validate that the appropriate warning modal is shown
-    ${details}=    user opens release summary on the admin dashboard    ${PUBLICATION_NAME}    ${RELEASE_NAME}
-    user clicks button    Cancel amendment    ${details}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+
+    ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-draft-releases
+    user checks element contains    ${ROW}    Draft Amendment
+    user clicks button    Cancel amendment    ${ROW}
+
     ${modal}=    user waits until modal is visible    Confirm you want to cancel this amended release
     user waits until element contains    ${modal}
     ...    The following methodologies are scheduled to be published with this amended release
@@ -349,12 +357,22 @@ Cancel the release amendment and validate that the appropriate warning modal is 
     user waits until modal is not visible    Confirm you want to cancel this amended release
 
 Verify that the methodology that was scheduled with the cancelled release amendment is set back to Draft / Immediately
-    user views methodology amendment for publication    ${PUBLICATION_NAME}
-    ...    ${PUBLICATION_NAME} - Amended methodology
+    user clicks link    Methodologies
+    user waits until h2 is visible    Manage methodologies
+
+    ${ROW}=    user gets table row    ${PUBLICATION_NAME} - Amended methodology
+    user clicks element    xpath://*[text()="Edit"]    ${ROW}
+    user waits until h2 is visible    Methodology summary
+
     user clicks link    Sign off
     user waits until h2 is visible    Sign off
+
+    user checks summary list contains    Status    In Draft
+    user checks summary list contains    Owning publication    ${PUBLICATION_NAME}
+
     user clicks button    Edit status
     user waits until h2 is visible    Edit methodology status
     user checks radio is checked    In draft
     user clicks radio    Approved for publication
     user checks radio is checked    Immediately
+    # @MarkFix this test suite seems to end abruptly?

@@ -125,7 +125,7 @@ Check that a publication owner can make a new release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user waits until page does not contain loading spinner
     user clicks link    Create new release
-    user creates release from Manage publication page    ${PUBLICATION_NAME}    Academic Year Q1    2020
+    user creates release from publication page    ${PUBLICATION_NAME}    Academic Year Q1    2020
 
 Check publication owner can upload subject file on new release
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv

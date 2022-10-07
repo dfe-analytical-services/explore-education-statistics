@@ -22,7 +22,7 @@ Create new publication and release via API
 
 Navigate to release content
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    ${RELEASE_NAME} (not Live)
+    ...    ${RELEASE_NAME}
     user clicks link    Content
     user waits until page contains button    Add dashboards section
     user waits until page contains button    Add new section

@@ -80,7 +80,7 @@ user selects theme and topic from admin dashboard
 
 user navigates to release page from dashboard
     [Arguments]
-    ...    ${TABLE_TESTID}
+    ...    ${RELEASE_TABLE_TESTID}
     ...    ${LINK_TEXT}
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
@@ -92,7 +92,7 @@ user navigates to release page from dashboard
     ...    ${THEME_NAME}
     ...    ${TOPIC_NAME}
 
-    ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:${TABLE_TESTID}
+    ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:${RELEASE_TABLE_TESTID}
     # @MarkFix because "user clicks link" doesn't work
     user clicks element    xpath://a[text()="${LINK_TEXT}"]    ${ROW}
 
@@ -212,7 +212,7 @@ user creates publication
     user clicks button    Save publication
     user waits until h1 is visible    Dashboard    %{WAIT_MEDIUM}
 
-user creates release from Manage publication page
+user creates release from publication page
     [Arguments]    ${publication}    ${time_period_coverage}    ${start_year}
     # @MarkFix remove ${publication} argument?
     user waits until page contains title caption    Manage publication    %{WAIT_SMALL}
@@ -266,12 +266,6 @@ user navigates to methodologies page for publication
     user clicks link    Methodologies
     user waits until h2 is visible    Manage methodologies
 
-user views methodology amendment for publication
-    [Arguments]    ${publication}    ${methodology_title}=${publication}
-    ${accordion}=    user navigates to publication page from dashboard    ${publication}
-    user views methodology for open publication accordion    ${accordion}    ${methodology_title}
-    ...    Edit amendment
-
 user views methodology for open publication accordion
     [Arguments]
     ...    ${accordion}
@@ -281,17 +275,26 @@ user views methodology for open publication accordion
     user clicks link    ${edit_button_text}    ${accordion}
     user waits until h2 is visible    Methodology summary
 
+user navigates to methodology
+    [Arguments]
+    ...    ${publication}
+    ...    ${methodology_title}
+    ...    ${action_button_text}=Edit
+    user navigates to methodologies page for publication    ${publication}
+    ${ROW}=    user gets table row    ${methodology_title}    testid:methodologies
+    user clicks element    xpath://*[text()="${action_button_text}"]    ${ROW}
+
+    user waits until h2 is visible    Methodology summary
+
 user edits methodology summary for publication
     [Arguments]
     ...    ${publication}
     ...    ${existing_methodology_title}
     ...    ${new_methodology_title}
-    ...    ${edit_button_text}=Edit
-    user navigates to methodologies page for publication    ${publication}
-    ${ROW}=    user gets table row    ${existing_methodology_title}    testid:methodologies
-    user clicks element    xpath://*[text()="${edit_button_text}"]    ${ROW}
-
-    user waits until h2 is visible    Methodology summary
+    ...    ${action_button_text}=Edit
+    user navigates to methodology    ${publication}
+    ...    ${existing_methodology_title}
+    ...    ${action_button_text}
 
     user clicks link    Edit summary
     user waits until h2 is visible    Edit methodology summary    %{WAIT_MEDIUM}
@@ -345,7 +348,7 @@ user approves methodology for publication
     ...    ${topic}
     ...    ${publishing_strategy}
     ...    ${with_release}
-    ...    Edit methodology
+    ...    Edit
 
 user approves methodology amendment for publication
     [Arguments]
@@ -363,7 +366,7 @@ user approves methodology amendment for publication
     ...    ${topic}
     ...    ${publishing_strategy}
     ...    ${with_release}
-    ...    Edit amendment
+    ...    Edit
 
 approve methodology for publication
     [Arguments]
@@ -373,12 +376,12 @@ approve methodology for publication
     ...    ${topic}
     ...    ${publishing_strategy}
     ...    ${with_release}
-    ...    ${edit_button_text}
+    ...    ${action_button_text}
 
     user navigates to methodologies page for publication    ${publication}    ${theme}    ${topic}
 
     ${ROW}=    user gets table row    ${methodology_title}    testid:methodologies
-    user clicks element    xpath://*[text()="Edit"]    ${ROW}
+    user clicks element    xpath://*[text()="${action_button_text}"]    ${ROW}
     user waits until h2 is visible    Methodology summary
 
     approve methodology from methodology view    ${publishing_strategy}    ${with_release}
@@ -548,14 +551,14 @@ user enters text into data guidance data file content editor
     user enters text into element    ${editor}    ${text}
 
 user creates amendment for release
-    [Arguments]    ${PUBLICATION_NAME}    ${RELEASE_NAME}    ${RELEASE_STATUS}
+    [Arguments]    ${PUBLICATION_NAME}    ${RELEASE_NAME}
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    ${accordion}=    user gets accordion section content element    ${PUBLICATION_NAME}
-    user opens details dropdown    ${RELEASE_NAME} ${RELEASE_STATUS}    ${accordion}
-    ${details}=    user gets details content element    ${RELEASE_NAME} ${RELEASE_STATUS}    ${accordion}
-    user waits until parent contains element    ${details}    xpath:.//a[text()="View release"]
-    user clicks button    Amend release    ${details}
-    user clicks button    Confirm
+
+    ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
+    user clicks element    xpath://*[text()="Amend"]    ${ROW}
+
+    ${modal}=    user waits until modal is visible    Confirm you want to amend this published release
+    user clicks button    Confirm    ${modal}
     user waits until page contains title    ${PUBLICATION_NAME}
     user waits until page contains title caption    Amend release for ${RELEASE_NAME}
     user checks page contains tag    Amendment

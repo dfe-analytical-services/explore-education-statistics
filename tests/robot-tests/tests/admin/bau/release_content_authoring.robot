@@ -26,7 +26,7 @@ Create publication
 
 Create new release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user creates release from Manage publication page    ${PUBLICATION_NAME}    Academic Year Q1    2020
+    user creates release from publication page    ${PUBLICATION_NAME}    Academic Year Q1    2020
 
 Give analyst1 publication owner permissions to work on release
     user gives analyst publication owner access    ${PUBLICATION_NAME}
