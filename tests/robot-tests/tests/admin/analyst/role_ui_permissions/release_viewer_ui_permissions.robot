@@ -21,19 +21,15 @@ Check cannot create a Methodology for a Publication if they don't have Publicati
     ...    ${THEME_NAME}    ${TOPIC_NAME}
 
 Check cannot edit content for published release
-    user navigates to readonly release summary from admin dashboard    ${PUBLICATION_NAME}
-    ...    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)    ${THEME_NAME}    ${TOPIC_NAME}
+    user navigates to published release page from dashboard    ${PUBLICATION_NAME}
+    ...    ${PUBLISHED_RELEASE_TYPE}    ${THEME_NAME}    ${TOPIC_NAME}
     user cannot see edit controls for release content    ${PUBLICATION_NAME}
 
-Navigate back to admin dashboard for publication
-    user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
-
 Check cannot create an amendment of a published release
-    ${details}=    user opens details dropdown    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)
-    ...    ${publication_accordion}
-    user cannot see the create amendment controls for release    ${details}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
+    user cannot see the create amendment controls for release    ${PUBLISHED_RELEASE_TYPE}
 
 Check cannot edit the release status of a Draft Release
-    user navigates to readonly release summary from admin dashboard    ${PUBLICATION_NAME}
-    ...    ${DRAFT_RELEASE_TYPE} (not Live)    ${THEME_NAME}    ${TOPIC_NAME}
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    ${DRAFT_RELEASE_TYPE}    ${THEME_NAME}    ${TOPIC_NAME}    View
     user cannot see the edit release status controls for release

@@ -107,9 +107,10 @@ user navigates to draft release page from dashboard
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}=%{TEST_THEME_NAME}
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
+    ...    ${ACTION_LINK_TEXT}=Edit
     user navigates to release page from dashboard
     ...    publication-draft-releases
-    ...    Edit
+    ...    ${ACTION_LINK_TEXT}
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}
