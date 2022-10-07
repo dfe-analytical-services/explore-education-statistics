@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -17,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -254,7 +256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task CreateReleaseStatus_Approved_FailsNoPublishScheduledDate()
+        public async Task CreateReleaseStatus_Approved_FailsNoPublishDate()
         {
             var release = new Release
             {
@@ -289,11 +291,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
                             LatestInternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
+                            PublishScheduled = null,
                             NextReleaseDate = new PartialDate {Month="12", Year="2000"}
                         }
                     );
 
-                result.AssertBadRequest(ApprovedReleaseMustHavePublishScheduledDate);
+                result.AssertBadRequest(PublishDateCannotBeEmpty);
             }
         }
 
@@ -1229,15 +1232,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        private static IOptions<ReleaseApprovalOptions> DefaultReleaseApprovalOptions()
+        {
+            return Options.Create(new ReleaseApprovalOptions
+            {
+                PublishReleasesCronSchedule = "0 0 0 * * *",
+                PublishReleaseContentCronSchedule = "0 30 9 * * *"
+            });
+        }
+
         private ReleaseApprovalService BuildService(
             ContentDbContext contentDbContext,
+            DateTimeProvider? dateTimeProvider = null,
             IPublishingService? publishingService = null,
             IReleaseFileRepository? releaseFileRepository = null,
             IReleaseFileService? releaseFileService = null,
             IReleaseChecklistService? releaseChecklistService = null,
             IContentService? contentService = null,
             IPreReleaseUserService? preReleaseUserService = null,
-            IReleaseRepository? releaseRepository = null)
+            IReleaseRepository? releaseRepository = null,
+            IOptions<ReleaseApprovalOptions>? options = null)
         {
             var userService = AlwaysTrueUserService();
 
@@ -1248,6 +1262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new ReleaseApprovalService(
                 contentDbContext,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
+                dateTimeProvider ?? new DateTimeProvider(),
                 userService.Object,
                 publishingService ?? Mock.Of<IPublishingService>(MockBehavior.Strict),
                 releaseChecklistService ?? Mock.Of<IReleaseChecklistService>(MockBehavior.Strict),
@@ -1255,7 +1270,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 preReleaseUserService ?? Mock.Of<IPreReleaseUserService>(MockBehavior.Strict),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 releaseFileService ?? Mock.Of<IReleaseFileService>(MockBehavior.Strict),
-                releaseRepository ?? Mock.Of<IReleaseRepository>(MockBehavior.Strict));
+                releaseRepository ?? Mock.Of<IReleaseRepository>(MockBehavior.Strict),
+                options ?? DefaultReleaseApprovalOptions());
         }
     }
 }

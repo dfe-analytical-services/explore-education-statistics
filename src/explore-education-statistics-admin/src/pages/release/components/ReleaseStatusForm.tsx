@@ -50,14 +50,24 @@ const errorMappings = [
   mapFieldErrors<ReleaseStatusFormValues>({
     target: 'approvalStatus',
     messages: {
-      ApprovedReleaseMustHavePublishScheduledDate:
-        'Enter a publish scheduled date before approving',
       PublishedReleaseCannotBeUnapproved:
         'Release has already been published and cannot be un-approved',
       ...mapValues(
         keyBy(ReleaseChecklistErrorCode, value => value),
         _ => 'Resolve all errors in the publishing checklist',
       ),
+    },
+  }),
+  mapFieldErrors<ReleaseStatusFormValues>({
+    target: 'publishScheduled',
+    messages: {
+      PublishDateCannotBeEmpty: 'Enter a publish date before approving',
+      PublishDateCannotBeBeforeToday: `Publish date cannot be before ${format(
+        new Date(),
+        'do MMMM yyyy',
+      )}`,
+      PublishDateHasNoPublishingScheduled:
+        'Publications must be scheduled at least one day in advance. Please enter a later date',
     },
   }),
   mapFieldErrors<ReleaseStatusFormValues>({
