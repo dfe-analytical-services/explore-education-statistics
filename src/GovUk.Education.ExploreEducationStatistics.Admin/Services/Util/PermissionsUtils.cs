@@ -28,9 +28,10 @@ public static class PermissionsUtils
         IUserService userService,
         Publication publication)
     {
+        var canUpdatePublication = await userService.CheckCanUpdatePublication(publication).IsRight();
         return new PublicationPermissions
         {
-            CanUpdatePublication = await userService.CheckCanUpdatePublication(publication).IsRight(),
+            CanUpdatePublication = canUpdatePublication,
             CanUpdatePublicationTitle = await userService.CheckCanUpdatePublicationTitle().IsRight(),
             CanUpdatePublicationSupersededBy = await userService.CheckCanUpdatePublicationSupersededBy().IsRight(),
             CanCreateReleases = await userService.CheckCanCreateReleaseForPublication(publication).IsRight(),
@@ -38,7 +39,7 @@ public static class PermissionsUtils
             CanCreateMethodologies = await userService.CheckCanCreateMethodologyForPublication(publication).IsRight(),
             CanManageExternalMethodology =
                 await userService.CheckCanManageExternalMethodologyForPublication(publication).IsRight(),
-            CanUpdateContact = await userService.CheckCanUpdatePublication(publication).IsRight(),
+            CanUpdateContact = canUpdatePublication, // EES-3576 Switch to CheckCanUpdateContact permission
         };
     }
 
