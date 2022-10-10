@@ -52,17 +52,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanViewSpecificPublication.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificPublicationRequirement()));
 
-                // does this user have permission to update a specific Publication?
-                options.AddPolicy(SecurityPolicies.CanUpdateSpecificPublication.ToString(), policy =>
-                    policy.Requirements.Add(new UpdatePublicationRequirement()));
+                // does this user have permission to update a specific Publication summary?
+                options.AddPolicy(SecurityPolicies.CanUpdateSpecificPublicationSummary.ToString(), policy =>
+                    policy.Requirements.Add(new UpdatePublicationSummaryRequirement()));
 
-                // does this user have permission to update publication titles?
-                options.AddPolicy(SecurityPolicies.CanUpdatePublicationTitles.ToString(), policy =>
+                // does this user have permission to update publication details (e.g. title, theme/topic, supersededById)
+                options.AddPolicy(SecurityPolicies.CanUpdatePublication.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.UpdateAllPublications.ToString()));
 
-                // does this user have permission to update a publication to change which publication it is superseded by?
-                options.AddPolicy(SecurityPolicies.CanUpdatePublicationSupersededBy.ToString(), policy =>
-                    policy.RequireClaim(SecurityClaimTypes.UpdateAllPublications.ToString()));
+                // does this user have permission to update a publication's contact?
+                options.AddPolicy(SecurityPolicies.CanUpdatePublicationContact.ToString(), policy =>
+                    policy.Requirements.Add(new UpdatePublicationContactRequirement()));
 
                 // does this user have permission to update a ReleaseRole on a specific Publication?
                 options.AddPolicy(SecurityPolicies.CanUpdateSpecificReleaseRole.ToString(), policy =>
@@ -233,7 +233,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
              * Publication management
              */
             services.AddTransient<IAuthorizationHandler, ViewSpecificPublicationAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, UpdatePublicationAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, UpdatePublicationSummaryAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, UpdatePublicationContactAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreatePublicationForSpecificTopicAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreateReleaseForSpecificPublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreateMethodologyForSpecificPublicationAuthorizationHandler>();

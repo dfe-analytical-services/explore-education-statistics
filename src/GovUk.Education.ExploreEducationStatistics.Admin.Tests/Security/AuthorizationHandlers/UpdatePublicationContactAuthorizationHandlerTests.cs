@@ -14,12 +14,12 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
-    public class UpdatePublicationSummaryAuthorizationHandlerTests
+    public class UpdatePublicationContactAuthorizationHandlerTests
     {
         [Fact]
-        public async Task CanUpdateAllPublicationsSummaryAuthorizationHandler_SucceedsWithClaim()
+        public async Task CanUpdateAllPublicationsContactAuthorizationHandler_SucceedsWithClaim()
         {
-            await AssertHandlerSucceedsWithCorrectClaims<Publication, UpdatePublicationSummaryRequirement>(
+            await AssertHandlerSucceedsWithCorrectClaims<Publication, UpdatePublicationContactRequirement>(
                 CreateHandler,
                 new Publication(),
                 UpdateAllPublications
@@ -27,15 +27,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         [Fact]
-        public async Task CanUpdateAllPublicationsSummaryAuthorizationHandler_SucceedsWithPublicationOwner()
+        public async Task CanUpdateAllPublicationsContactAuthorizationHandler_SucceedsWithPublicationOwner()
         {
-            await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdatePublicationSummaryRequirement>(
+            await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdatePublicationContactRequirement>(
                 CreateHandler, Owner);
         }
 
-        private static UpdatePublicationSummaryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+        private static UpdatePublicationContactAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
         {
-            return new UpdatePublicationSummaryAuthorizationHandler(
+            return new UpdatePublicationContactAuthorizationHandler(
                 new AuthorizationHandlerResourceRoleService(
                     Mock.Of<IUserReleaseRoleRepository>(Strict),
                     new UserPublicationRoleRepository(contentDbContext),

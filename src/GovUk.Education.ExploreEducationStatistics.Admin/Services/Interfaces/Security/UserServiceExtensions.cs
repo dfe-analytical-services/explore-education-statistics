@@ -131,22 +131,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(topic, SecurityPolicies.CanCreatePublicationForSpecificTopic);
         }
 
-        public static Task<Either<ActionResult, Publication>> CheckCanUpdatePublication(
+        public static Task<Either<ActionResult, Publication>> CheckCanUpdatePublicationSummary(
             this IUserService userService, Publication publication)
         {
-            return userService.CheckPolicy(publication, SecurityPolicies.CanUpdateSpecificPublication);
+            return userService.CheckPolicy(publication, SecurityPolicies.CanUpdateSpecificPublicationSummary);
         }
 
-        public static Task<Either<ActionResult, Unit>> CheckCanUpdatePublicationTitle(
+        public static Task<Either<ActionResult, Unit>> CheckCanUpdatePublication(
             this IUserService userService)
         {
-            return userService.CheckPolicy(SecurityPolicies.CanUpdatePublicationTitles);
+            return userService.CheckPolicy(SecurityPolicies.CanUpdatePublication);
         }
 
-        public static Task<Either<ActionResult, Unit>> CheckCanUpdatePublicationSupersededBy(
-            this IUserService userService)
+        public static Task<Either<ActionResult, Publication>> CheckCanUpdateContact(
+            this IUserService userService, Publication publication)
         {
-            return userService.CheckPolicy(SecurityPolicies.CanUpdatePublicationSupersededBy);
+            return userService.CheckPolicy(publication, SecurityPolicies.CanUpdatePublicationContact);
         }
 
         public static Task<Either<ActionResult, Tuple<Publication, ReleaseRole>>> CheckCanUpdateReleaseRole(

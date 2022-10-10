@@ -40,8 +40,8 @@ export interface PublicationDetailsFormValues {
 }
 
 interface Props {
-  canUpdatePublicationSupersededBy?: boolean;
-  canUpdatePublicationTitle?: boolean;
+  canUpdatePublication?: boolean;
+  canUpdatePublicationSummary?: boolean;
   initialValues: PublicationDetailsFormValues;
   publicationId: string;
   onCancel: () => void;
@@ -49,8 +49,8 @@ interface Props {
 }
 
 const PublicationDetailsForm = ({
-  canUpdatePublicationSupersededBy = false,
-  canUpdatePublicationTitle = false,
+  canUpdatePublication = false,
+  canUpdatePublicationSummary = false,
   initialValues,
   publicationId,
   onCancel,
@@ -60,7 +60,8 @@ const PublicationDetailsForm = ({
 
   const { value, isLoading } = useAsyncHandledRetry(async () => {
     const themes = await themeService.getThemes();
-    if (!canUpdatePublicationSupersededBy) {
+    if (!canUpdatePublication) {
+      // @MarkFix correct?
       return { themes };
     }
 
@@ -102,7 +103,7 @@ const PublicationDetailsForm = ({
           <>
             <Form id={id}>
               <FormFieldset id="details" legend="Publication details">
-                {canUpdatePublicationTitle && (
+                {canUpdatePublication && (
                   <FormFieldTextInput<PublicationDetailsFormValues>
                     name="title"
                     label="Publication title"
@@ -110,13 +111,15 @@ const PublicationDetailsForm = ({
                   />
                 )}
 
-                <FormFieldTextArea<PublicationDetailsFormValues>
-                  name="summary"
-                  label="Publication summary"
-                  className="govuk-!-width-one-half"
-                  maxLength={160}
-                />
-                {themes && initialValues?.topicId && (
+                {canUpdatePublicationSummary && (
+                  <FormFieldTextArea<PublicationDetailsFormValues>
+                    name="summary"
+                    label="Publication summary"
+                    className="govuk-!-width-one-half"
+                    maxLength={160}
+                  />
+                )}
+                {canUpdatePublication && themes && initialValues?.topicId && (
                   <FormFieldThemeTopicSelect<PublicationDetailsFormValues>
                     id={id}
                     inline={false}
@@ -127,7 +130,7 @@ const PublicationDetailsForm = ({
                   />
                 )}
               </FormFieldset>
-              {canUpdatePublicationSupersededBy && (
+              {canUpdatePublication && (
                 <FormFieldset
                   id="supersede"
                   legend="Archive this publication"

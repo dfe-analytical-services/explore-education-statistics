@@ -146,12 +146,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, query =>
                     query.Include(p => p.Contact))
-                .OnSuccess(_userService.CheckCanUpdatePublication)
+                .OnSuccess(_userService.CheckCanUpdatePublicationSummary)
                 .OnSuccessDo(async publication =>
                 {
                     if (publication.Title != updatedPublication.Title)
                     {
-                        return await _userService.CheckCanUpdatePublicationTitle();
+                        return await _userService.CheckCanUpdatePublication();
                     }
 
                     return Unit.Instance;
@@ -160,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     if (publication.SupersededById != updatedPublication.SupersededById)
                     {
-                        return await _userService.CheckCanUpdatePublicationSupersededBy();
+                        return await _userService.CheckCanUpdatePublication();
                     }
 
                     return Unit.Instance;
@@ -170,6 +170,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     if (publication.TopicId != updatedPublication.TopicId)
                     {
                         return await ValidateSelectedTopic(updatedPublication.TopicId);
+                    }
+
+                    return Unit.Instance;
+                })
+                .OnSuccessDo(async publication =>  // @MarkFix doing this correct?
+                {
+                    if (publication.TopicId != updatedPublication.TopicId)
+                    {
+                        return await _userService.CheckCanUpdatePublication();
                     }
 
                     return Unit.Instance;
@@ -331,7 +340,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, query =>
                     query.Include(p => p.Contact))
-                .OnSuccessDo(_userService.CheckCanUpdatePublication)
+                .OnSuccessDo(_userService.CheckCanUpdateContact)
                 .OnSuccess(async publication =>
                 {
                     // Replace existing contact that is shared with another publication with a new

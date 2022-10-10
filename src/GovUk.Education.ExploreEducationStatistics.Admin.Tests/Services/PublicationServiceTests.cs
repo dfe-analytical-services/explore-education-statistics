@@ -605,11 +605,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(true);
                 userService.Setup(s => s.MatchesPolicy(
                         It.Is<Publication>(p => p.Id == publication.Id),
-                        CanUpdateSpecificPublication))
+                        CanUpdateSpecificPublicationSummary))
                     .ReturnsAsync(true);
-                userService.Setup(s => s.MatchesPolicy(CanUpdatePublicationTitles))
+                userService.Setup(s => s.MatchesPolicy(CanUpdatePublication))
                     .ReturnsAsync(true);
-                userService.Setup(s => s.MatchesPolicy(CanUpdatePublicationSupersededBy))
+                userService.Setup(s => s.MatchesPolicy(CanUpdatePublicationContact))
                     .ReturnsAsync(true);
                 userService.Setup(s => s.MatchesPolicy(
                         It.Is<Publication>(p => p.Id == publication.Id),
@@ -628,6 +628,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         CanManageExternalMethodologyForSpecificPublication))
                     .ReturnsAsync(false);
                 userService.Setup(s => s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        CanUpdatePublicationContact))
+                    .ReturnsAsync(true);
+                userService.Setup(s => s.MatchesPolicy(
                         It.Is<Tuple<Publication, ReleaseRole>>(tuple =>
                             tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor),
                         CanUpdateSpecificReleaseRole))
@@ -642,8 +646,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.NotNull(result.Permissions);
                 Assert.True(result.Permissions!.CanUpdatePublication);
-                Assert.True(result.Permissions.CanUpdatePublicationTitle);
-                Assert.True(result.Permissions.CanUpdatePublicationSupersededBy);
+                Assert.True(result.Permissions.CanUpdatePublicationSummary);
                 Assert.False(result.Permissions.CanCreateReleases);
                 Assert.False(result.Permissions.CanAdoptMethodologies);
                 Assert.False(result.Permissions.CanCreateMethodologies);

@@ -35,11 +35,10 @@ export interface ExternalMethodologySaveRequest {
 }
 
 export interface PublicationPermissions {
-  canAdoptMethodologies: boolean;
-  canCreateReleases: boolean;
   canUpdatePublication: boolean;
-  canUpdatePublicationTitle: boolean;
-  canUpdatePublicationSupersededBy: boolean;
+  canUpdatePublicationSummary: boolean;
+  canCreateReleases: boolean;
+  canAdoptMethodologies: boolean;
   canCreateMethodologies: boolean;
   canManageExternalMethodology: boolean;
   canUpdateContact: boolean;

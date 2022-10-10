@@ -56,13 +56,16 @@ Update publication details
 
     user clicks button    Edit publication details
 
-    user waits until page contains element    id:publicationDetailsForm-summary
-    # @MarkFix only BAU should see theme and topic
-    user checks page contains element    id:publicationDetailsForm-themeId
-    user checks page contains element    id:publicationDetailsForm-topicId
-
-    # Only BAU users should see title and supersededById fields
+    # Only BAU should see title
     user checks page does not contain element    id:publicationDetailsForm-title
+
+    user waits until page contains element    id:publicationDetailsForm-summary
+
+    # Only BAU should see theme and topic
+    user checks page does not contain element    id:publicationDetailsForm-themeId
+    user checks page does not contain element    id:publicationDetailsForm-topicId
+
+    # Only BAU users should see supersededById
     user checks page does not contain element    id:publicationDetailsForm-supersededById
 
     user enters text into element    id:publicationDetailsForm-summary    UI test publication summary

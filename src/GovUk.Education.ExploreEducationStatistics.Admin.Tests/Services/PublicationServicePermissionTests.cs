@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -16,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -115,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 _publication,
                 userService,
                 publicationService,
-                SecurityPolicies.CanUpdatePublicationTitles);
+                SecurityPolicies.CanUpdatePublication);
         }
 
         [Fact]
@@ -141,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 _publication,
                 userService,
                 publicationService,
-                SecurityPolicies.CanUpdateSpecificPublication);
+                SecurityPolicies.CanUpdateSpecificPublicationSummary);
         }
 
         [Fact]
@@ -171,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdatePublication_NoPermissionToChangeTitle()
+        public async Task UpdatePublication_NoPermissionToChangeSummary()
         {
             var publication = new Publication
             {
@@ -193,11 +191,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s =>
                     s.MatchesPolicy(
                         It.Is<Publication>(p => p.Id == publication.Id),
-                        SecurityPolicies.CanUpdateSpecificPublication))
+                        SecurityPolicies.CanUpdateSpecificPublicationSummary))
                 .ReturnsAsync(true);
             userService
                 .Setup(s =>
-                    s.MatchesPolicy(SecurityPolicies.CanUpdatePublicationTitles))
+                    s.MatchesPolicy(SecurityPolicies.CanUpdatePublication))
                 .ReturnsAsync(false);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -220,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdatePublication_NoPermissionToChangeSupersededBy()
+        public async Task UpdatePublication_NoPermissionToChangeTitle()
         {
             var publication = new Publication
             {
@@ -243,11 +241,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s =>
                     s.MatchesPolicy(
                         It.Is<Publication>(p => p.Id == publication.Id),
-                        SecurityPolicies.CanUpdateSpecificPublication))
+                        SecurityPolicies.CanUpdateSpecificPublicationSummary))
                 .ReturnsAsync(true);
             userService
                 .Setup(s =>
-                    s.MatchesPolicy(SecurityPolicies.CanUpdatePublicationSupersededBy))
+                    s.MatchesPolicy(SecurityPolicies.CanUpdatePublication))
                 .ReturnsAsync(false);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -259,9 +257,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publication.Id,
                     new PublicationSaveRequest
                     {
-                        Title = "Old publication title",
+                        Title = "New publication title",
                         Slug = "publication-slug",
-                        SupersededById = Guid.NewGuid(),
                     }
                 );
 
@@ -299,7 +296,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s =>
                     s.MatchesPolicy(
                         It.Is<Publication>(p => p.Id == publication.Id),
-                        SecurityPolicies.CanUpdateSpecificPublication))
+                        SecurityPolicies.CanUpdateSpecificPublicationSummary))
                 .ReturnsAsync(true);
 
             userService
@@ -320,6 +317,68 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Title = "Publication title",
                         TopicId = newTopic.Id,
+                    }
+                );
+
+                result.AssertForbidden();
+            }
+        }
+
+        [Fact]
+        public async Task UpdatePublication_NoPermissionToChangeSupersededById()
+        {
+            var newTopic = new Topic
+            {
+                Title = "New topic title"
+            };
+            var publication = new Publication
+            {
+                Title = "Publication title",
+                Slug = "publication-slug",
+                Topic = new Topic { Title = "Old topic title" },
+                Contact = new Contact(),
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication, newTopic);
+                await context.SaveChangesAsync();
+            }
+
+            var userService = new Mock<IUserService>(Strict);
+
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        SecurityPolicies.CanUpdateSpecificPublicationSummary))
+                .ReturnsAsync(true);
+
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(SecurityPolicies.CanUpdatePublication))
+                .ReturnsAsync(false);
+
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(
+                        It.Is<Topic>(t => t.Id == newTopic.Id),
+                        SecurityPolicies.CanCreatePublicationForSpecificTopic))
+                .ReturnsAsync(false);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationService = BuildPublicationService(context,
+                    userService: userService.Object);
+
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new PublicationSaveRequest
+                    {
+                        Title = "Publication title",
+                        TopicId = publication.Topic.Id,
+                        SupersededById = Guid.NewGuid(),
                     }
                 );
 
@@ -468,7 +527,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(publication, SecurityPolicies.CanUpdateSpecificPublication)
+                .SetupResourceCheckToFail(publication, SecurityPolicies.CanUpdatePublicationContact)
                 .AssertForbidden(async userService =>
                 {
                     var contentDbContext = InMemoryApplicationDbContext();
