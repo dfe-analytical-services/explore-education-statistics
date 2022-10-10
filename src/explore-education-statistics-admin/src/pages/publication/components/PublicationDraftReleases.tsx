@@ -35,7 +35,7 @@ const PublicationDraftReleases = ({
   const [showIssuesGuidance, toggleIssuesGuidance] = useToggle(false);
 
   if (releases.length === 0) {
-    return <InsetText>There are no draft releases.</InsetText>; // @MarkFix might also not have permission to view
+    return <InsetText>You have no draft releases.</InsetText>;
   }
 
   return (

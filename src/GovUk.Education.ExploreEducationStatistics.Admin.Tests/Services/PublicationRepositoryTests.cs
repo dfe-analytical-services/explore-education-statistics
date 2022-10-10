@@ -248,19 +248,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(3, result.Count);
 
                 Assert.Equal("Related publication 2", result[0].Title);
-                Assert.Equal(2, result[0].Releases.Count);
-                Assert.Equal("Academic Year 2015/16", result[0].Releases[0].Title);
-                Assert.Equal("Academic Year 2016/17", result[0].Releases[1].Title);
+                Assert.Empty(result[0].Releases);  // ListPublicationsForUser doesn't hydrate releases
 
                 Assert.Equal("Related publication 3", result[1].Title);
-                Assert.Equal(2, result[1].Releases.Count);
-                Assert.Equal("Academic Year 2015/16", result[1].Releases[0].Title);
-                Assert.Equal("Academic Year 2016/17", result[1].Releases[1].Title);
+                Assert.Empty(result[1].Releases);  // ListPublicationsForUser doesn't hydrate releases
 
                 Assert.Equal("Related publication 1", result[2].Title);
-                Assert.Equal(2, result[2].Releases.Count);
-                Assert.Equal("Academic Year 2011/12", result[2].Releases[0].Title);
-                Assert.Equal("Academic Year 2012/13", result[2].Releases[1].Title);
+                Assert.Empty(result[2].Releases);  // ListPublicationsForUser doesn't hydrate releases
             }
         }
 
@@ -435,35 +429,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(result.Exists(pub => pub.Title == "Release PrereleaseViewer publication"));
 
                 Assert.Equal("Publication Owner publication", result[0].Title);
-                Assert.Equal(2, result[0].Releases.Count);
-                Assert.Equal("Academic Year 2015/16", result[0].Releases[0].Title);
-                Assert.Equal("Academic Year 2016/17", result[0].Releases[1].Title);
+                Assert.Empty(result[0].Releases);   // ListPublicationsForUser doesn't hydrate releases
 
                 Assert.Equal("Publication ReleaseApprover publication", result[1].Title);
-                Assert.Equal(2, result[1].Releases.Count);
-                Assert.Equal("Academic Year 2015/16", result[1].Releases[0].Title);
-                Assert.Equal("Academic Year 2016/17", result[1].Releases[1].Title);
+                Assert.Empty(result[1].Releases);
 
                 Assert.Equal("Publication Owner publication 2", result[2].Title);
-                Assert.Single(result[2].Releases);
-                Assert.Equal("Academic Year 2012/13", result[2].Releases[0].Title);
+                Assert.Empty(result[2].Releases);
 
                 Assert.Equal("Release Contributor publication", result[3].Title);
-                Assert.Single(result[3].Releases);
-                Assert.Equal("Academic Year 2014/15", result[3].Releases[0].Title);
+                Assert.Empty(result[3].Releases);
 
                 Assert.Equal("Release Viewer publication", result[4].Title);
-                Assert.Single(result[4].Releases);
-                Assert.Equal("Academic Year 2012/13", result[4].Releases[0].Title);
+                Assert.Empty(result[4].Releases);
 
                 Assert.Equal("Release Contributor publication 2", result[5].Title);
-                Assert.Single(result[5].Releases);
-                Assert.Equal("Academic Year 2011/12", result[5].Releases[0].Title);
+                Assert.Empty(result[5].Releases);
             }
         }
 
         [Fact]
-        public async Task ListPublicationsForUser_MethodologiesReturned()
+        public async Task ListPublicationsForUser_MethodologiesNotHydrated()
         {
             var user = new User();
             var topic = new Topic
@@ -572,19 +558,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var publication = Assert.Single(result);
                 Assert.NotNull(publication);
-                Assert.Equal(3, publication.Methodologies.Count);
-
-                var methodology2Version0 = Assert.Single(publication.Methodologies[0].Methodology.Versions);
-                Assert.Equal(methodology2Id, methodology2Version0.Id);
-
-                var methodology1Version0 = Assert.Single(publication.Methodologies[1].Methodology.Versions);
-                Assert.Equal(methodology1Id, methodology1Version0.Id);
-
-                Assert.Equal(2, publication.Methodologies[2].Methodology.Versions.Count);
-                var methodology3Version0 = publication.Methodologies[2].Methodology.Versions[0];
-                var methodology3Version1 = publication.Methodologies[2].Methodology.Versions[1];
-                Assert.Equal(methodology3Version0Id, methodology3Version0.Id);
-                Assert.Equal(methodology3Version1Id, methodology3Version1.Id);
+                Assert.Empty(publication.Methodologies);  // ListPublicationsForUser doesn't hydrate methodologies
             }
         }
 
@@ -1095,185 +1069,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var repository = new PublicationRepository(context);
                 var latestRelease = await repository.GetLatestReleaseForPublication(publication.Id);
                 Assert.Null(latestRelease);
-            }
-        }
-
-        [Fact]
-        public async Task GetPublicationWithAllReleases()
-        {
-            var release1 = new Release
-            {
-                ReleaseName = "2000",
-                TimePeriodCoverage = AcademicYear,
-            };
-            var release2 = new Release
-            {
-                ReleaseName = "2001",
-                TimePeriodCoverage = AcademicYear,
-            };
-            var methodologyVersion = new MethodologyVersion
-            {
-                AlternativeTitle = "Methodology Alternative Title",
-                Version = 0,
-                Status = Draft
-            };
-            var publication = new Publication
-            {
-                Title = "Publication title",
-                Summary = "Publication summary",
-                Topic = new Topic
-                {
-                    Theme = new Theme(),
-                },
-                Contact = new Contact
-                {
-                    ContactName = "Contact name",
-                },
-                Releases = new List<Release>
-                {
-                    release1, release2,
-                },
-                Methodologies = new List<PublicationMethodology>
-                {
-                    new()
-                    {
-                        Owner = false,
-                        Methodology = new Methodology
-                        {
-                            Versions = new List<MethodologyVersion>
-                            {
-                                methodologyVersion,
-                            }
-                        }
-                    },
-                }
-            };
-
-            var otherUnseenPublication = new Publication
-            {
-                Topic = new Topic
-                {
-                    Theme = new Theme(),
-                },
-                Releases = new List<Release>
-                {
-                    new Release()
-                },
-                Methodologies = new List<PublicationMethodology>
-                {
-                    new()
-                    {
-                        Owner = false,
-                        Methodology = new Methodology
-                        {
-                            Versions = new List<MethodologyVersion>
-                            {
-                                new MethodologyVersion(),
-                            }
-                        }
-                    }
-                },
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.AddRangeAsync(publication, otherUnseenPublication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var repository = new PublicationRepository(context);
-                var resultPublication = await repository.GetPublicationWithAllReleases(publication.Id);
-
-                Assert.Equal(publication.Id, resultPublication.Id);
-                Assert.Equal(publication.Title, resultPublication.Title);
-                Assert.Equal(publication.Summary, resultPublication.Summary);
-                Assert.Equal(publication.TopicId, resultPublication.TopicId);
-                Assert.Equal(publication.Contact.ContactName, resultPublication.Contact.ContactName);
-
-                Assert.Equal(2, resultPublication.Releases.Count);
-
-                Assert.Single(resultPublication.Methodologies);
-                Assert.Equal(publication.Methodologies[0].MethodologyId, resultPublication.Methodologies[0].Methodology.Id);
-                Assert.Equal(publication.Methodologies[0].Methodology.Versions[0].AlternativeTitle,
-                    resultPublication.Methodologies[0].Methodology.Versions[0].AlternativeTitle);
-            }
-        }
-
-        [Fact]
-        public async Task GetPublicationWithAllReleases_NoReleasesNoMethodologies()
-        {
-            var publication = new Publication
-            {
-                Topic = new Topic
-                {
-                    Theme = new Theme(),
-                },
-                Contact = new Contact(),
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.AddAsync(publication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var repository = new PublicationRepository(context);
-                var resultPublication = await repository.GetPublicationWithAllReleases(publication.Id);
-                Assert.Equal(publication.Id, resultPublication.Id);
-            }
-        }
-
-        [Fact]
-        public async Task GetPublicationForUser_NoReleaseMethodology()
-        {
-            var userId = Guid.NewGuid();
-            var release1 = new Release
-            {
-                Id = Guid.NewGuid(),
-                ReleaseName = "2000",
-                TimePeriodCoverage = AcademicYear,
-            };
-
-            var publication = new Publication
-            {
-                Title = "Test title",
-                Summary = "Test summary",
-                Topic = new Topic
-                {
-                    Theme = new Theme(),
-                },
-                Releases = new List<Release>
-                {
-                    release1,
-                },
-                Contact = new Contact(),
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.AddRangeAsync(publication);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var repository = new PublicationRepository(context);
-                var resultPublication = await repository.GetPublicationForUser(publication.Id, userId);
-
-                Assert.Equal(publication.Id, resultPublication.Id);
-                Assert.Equal(publication.Title, resultPublication.Title);
-                Assert.Equal(publication.Summary, resultPublication.Summary);
-                Assert.Equal(publication.TopicId, resultPublication.TopicId);
-
-                Assert.Empty(resultPublication.Releases);
-                Assert.Empty(resultPublication.Methodologies);
             }
         }
 

@@ -19,7 +19,7 @@ ${CREATED_TOPIC_NAME}       UI test topic - create publication %{RUN_IDENTIFIER}
 
 *** Test Cases ***
 Go to Create publication page for "UI tests topic" topic
-    user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
+    user selects dashboard theme and topic if possible
     user waits until page contains link    Create new publication
     user checks page does not contain button    ${PUBLICATION_NAME}
     user clicks link    Create new publication
@@ -54,9 +54,9 @@ User redirects to the dashboard after saving publication
 Verify new publication has no releases
     user navigates to publication page from dashboard    ${PUBLICATION_NAME} (created)
 
-    user checks page contains    There are no scheduled releases.
-    user checks page contains    There are no draft releases.
-    user checks page contains    There are no published releases.
+    user checks page contains    You have no scheduled releases.
+    user checks page contains    You have no draft releases.
+    user checks page contains    You have no published releases.
 
 Verify new publication's contact
     user clicks link    Contact

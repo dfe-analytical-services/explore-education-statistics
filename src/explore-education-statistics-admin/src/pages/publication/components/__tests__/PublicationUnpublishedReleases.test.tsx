@@ -181,10 +181,58 @@ describe('PublicationUnpublishedReleases', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('There are no scheduled releases.'),
+        screen.getByText('You have no scheduled releases.'),
       ).toBeInTheDocument();
       expect(
-        screen.getByText('There are no draft releases.'),
+        screen.getByText('You have no draft releases.'),
+      ).toBeInTheDocument();
+    });
+
+    expect(
+      screen.queryByTestId('publication-scheduled-releases'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('publication-draft-releases'),
+    ).not.toBeInTheDocument();
+  });
+
+  test("shows empty messages if don't have permission to view draft or scheduled releases", async () => {
+    publicationService.listReleases.mockResolvedValue({
+      paging: {
+        page: 1,
+        pageSize: 20,
+        totalPages: 1,
+        totalResults: 0,
+      },
+      results: [
+        {
+          ...testRelease1,
+          approvalStatus: 'Approved',
+          permissions: { ...testPermissions, canViewRelease: false },
+        },
+        {
+          ...testRelease2,
+          approvalStatus: 'Draft',
+          permissions: { ...testPermissions, canViewRelease: false },
+        },
+        {
+          ...testRelease3,
+          approvalStatus: 'HigherLevelReview',
+          permissions: { ...testPermissions, canViewRelease: false },
+        },
+      ],
+    });
+
+    render(
+      <PublicationUnpublishedReleases publicationId={testPublicationId} />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('You have no scheduled releases.'),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('You have no draft releases.'),
       ).toBeInTheDocument();
     });
 

@@ -213,9 +213,7 @@ describe('PublicationDraftReleases', () => {
       />,
     );
 
-    expect(
-      screen.getByText('There are no draft releases.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('You have no draft releases.')).toBeInTheDocument();
   });
 
   test('shows a view instead of edit link if you do not have permission to edit the release', () => {

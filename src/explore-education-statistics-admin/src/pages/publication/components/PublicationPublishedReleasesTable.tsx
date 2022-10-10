@@ -36,7 +36,7 @@ export default function PublicationPublishedReleasesTable({
   }, [focusReleaseId]);
 
   if (releases.length === 0) {
-    return <InsetText>There are no published releases.</InsetText>;
+    return <InsetText>You have no published releases.</InsetText>;
   }
 
   return (

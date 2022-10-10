@@ -28,11 +28,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpGet("api/publications")]
         public async Task<ActionResult<List<PublicationViewModel>>> ListPublications(
-            [FromQuery] bool includePermissions,
             [FromQuery] Guid? topicId)
         {
             return await _publicationService
-                .ListPublications(includePermissions, topicId)
+                .ListPublications(topicId)
                 .HandleFailuresOrOk();
         }
 

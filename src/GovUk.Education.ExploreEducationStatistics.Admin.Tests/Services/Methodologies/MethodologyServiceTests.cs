@@ -1125,7 +1125,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(new DateTime(2021, 1, 1), viewModels[0].Published);
                 Assert.Equal(Approved, viewModels[0].Status);
                 Assert.Equal("Methodology 1 Version 1", viewModels[0].Title);
-                Assert.Equal("Methodology 1 Version 1 release note", viewModels[0].InternalReleaseNote);
                 Assert.Equal(methodology1.Id, viewModels[0].MethodologyId);
                 Assert.Null(viewModels[0].PreviousVersionId);
 
@@ -1135,7 +1134,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(viewModels[1].Published);
                 Assert.Equal(Draft, viewModels[1].Status);
                 Assert.Equal("Methodology 2 Version 2", viewModels[1].Title);
-                Assert.Null(viewModels[1].InternalReleaseNote);
                 Assert.Equal(methodology2.Id, viewModels[1].MethodologyId);
                 Assert.Equal(methodology2.Versions[0].Id, viewModels[1].PreviousVersionId);
 
@@ -1145,7 +1143,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(new DateTime(2022, 1, 1), viewModels[2].Published);
                 Assert.Equal(Approved, viewModels[2].Status);
                 Assert.Equal("Methodology 3 Version 2", viewModels[2].Title);
-                Assert.Equal("Methodology 3 Version 2 release note", viewModels[2].InternalReleaseNote);
                 Assert.Equal(methodology3.Id, viewModels[2].MethodologyId);
                 Assert.Equal(methodology3.Versions[0].Id, viewModels[2].PreviousVersionId);
             }

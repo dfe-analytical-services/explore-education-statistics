@@ -2,11 +2,8 @@ import {
   LegacyRelease,
   UpdateLegacyRelease,
 } from '@admin/services/legacyReleaseService';
-import {
-  MethodologyVersion,
-  MethodologyVersionSummary,
-} from '@admin/services/methodologyService';
-import { Release, ReleaseSummary } from '@admin/services/releaseService';
+import { MethodologyVersion } from '@admin/services/methodologyService';
+import { ReleaseSummary } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import { OmitStrict } from '@common/types';
@@ -37,24 +34,6 @@ export interface ExternalMethodologySaveRequest {
   url: string;
 }
 
-// @MarkFix Remove this
-export interface MyPublication {
-  id: string;
-  title: string;
-  summary: string;
-  releases: Release[];
-  methodologies: MethodologyVersionSummary[];
-  externalMethodology?: ExternalMethodology;
-  topicId: string;
-  themeId: string;
-  contact: Contact;
-  permissions: PublicationPermissions;
-  supersededById?: string;
-  // NOTE: isSuperseded is necessary, as a publication only becomes superseded when it's SupersededById is set
-  // _and_ that publication has a live release.
-  isSuperseded?: boolean;
-}
-
 export interface PublicationPermissions {
   canAdoptMethodologies: boolean;
   canCreateReleases: boolean;
@@ -81,11 +60,6 @@ export interface Publication {
   supersededById?: string;
   isSuperseded?: boolean;
   permissions?: PublicationPermissions;
-}
-
-export interface PublicationMethodologyDetails {
-  selectedMethodologyId?: string;
-  externalMethodology?: ExternalMethodology;
 }
 
 export interface PublicationSaveRequest {
@@ -115,12 +89,9 @@ export type UpdatePublicationLegacyRelease = Partial<
 >;
 
 const publicationService = {
-  listPublications(
-    permissions: boolean,
-    topicId?: string,
-  ): Promise<Publication[]> {
+  listPublications(topicId?: string): Promise<Publication[]> {
     return client.get('/publications', {
-      params: { permissions, topicId },
+      params: { topicId },
     });
   },
 
@@ -232,18 +203,6 @@ const publicationService = {
     return client.delete(
       `/publication/${publicationId}/methodology/${methodologyId}`,
     );
-  },
-
-  // @MarkFix remove?
-  updatePublicationMethodology({
-    publicationId,
-    selectedMethodologyId: methodologyId,
-    externalMethodology,
-  }: PublicationMethodologyDetails & { publicationId: string }) {
-    return client.put(`/publications/${publicationId}/methodology`, {
-      methodologyId,
-      externalMethodology,
-    });
   },
 
   partialUpdateLegacyReleases(

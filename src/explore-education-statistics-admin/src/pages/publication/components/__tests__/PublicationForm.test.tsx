@@ -1,10 +1,9 @@
 import PublicationForm, {
   FormValues,
 } from '@admin/pages/publication/components/PublicationForm';
-import { Release } from '@admin/services/releaseService';
 import _themeService, { Theme } from '@admin/services/themeService';
 import _publicationService, {
-  MyPublication, // @MarkFix remove this
+  Publication,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -446,58 +445,13 @@ describe('PublicationForm', () => {
       ],
     };
 
-    const testRelease1: Release = {
-      amendment: false,
-      approvalStatus: 'Approved',
-      contact: {
-        contactName: 'Test contact name',
-        contactTelNo: 'Test contact tel',
-        teamEmail: 'test-contact@hiveit.co.uk',
-        teamName: 'Test team name',
-      },
-      id: 'release-id-1',
-      latestInternalReleaseNote: 'Test internal release note',
-      latestRelease: true,
-      live: true,
-      permissions: {
-        canAddPrereleaseUsers: false,
-        canUpdateRelease: false,
-        canDeleteRelease: false,
-        canMakeAmendmentOfRelease: false,
-        canViewRelease: false,
-      },
-      preReleaseAccessList: '',
-      previousVersionId: 'prev-version-id-1',
-      publicationId: 'publication-id-1',
-      publicationTitle: 'Publication 1',
-      publicationSummary: 'Publication 1 summary',
-      publicationSlug: 'publication-slug-1',
-      published: '2021-01-01T11:21:17',
-      slug: 'release-slug-1',
-      timePeriodCoverage: {
-        label: 'Academic year',
-        value: 'AY',
-      },
-      title: 'Release 1',
-      type: 'AdHocStatistics',
-      year: 2021,
-      yearTitle: '2021/22',
-    };
-
-    const testPublication1: MyPublication = {
+    const testPublication1: Publication = {
       id: 'publication-id-1',
       title: 'Publication 1',
+      slug: 'publication-1-slug',
       summary: 'Publcation 1 summary',
-      contact: {
-        contactName: 'John Smith',
-        contactTelNo: '0777777777',
-        teamEmail: 'john.smith@test.com',
-        teamName: 'Team Smith',
-      },
-      releases: [testRelease1],
-      methodologies: [],
-      themeId: 'theme-1',
-      topicId: 'topic-1',
+      theme: { id: 'theme-1', title: 'Theme 1' },
+      topic: { id: 'topic-1', title: 'Topic 1' },
       permissions: {
         canAdoptMethodologies: true,
         canCreateReleases: true,
@@ -511,21 +465,17 @@ describe('PublicationForm', () => {
       },
     };
 
-    const testPublication2: MyPublication = {
+    const testPublication2: Publication = {
       ...testPublication1,
       id: 'publication-id-2',
       title: 'Publication 2',
-      releases: [],
+      slug: 'publication-2-slug',
     };
 
     test('does not render the `Archive publication` field when showSupersededBy is false', async () => {
       themeService.getThemes.mockResolvedValue(testThemes);
       publicationService.getPublicationSummaries.mockResolvedValue([
-        {
-          id: testPublication1.id,
-          title: testPublication1.title,
-          slug: 'slug-1',
-        },
+        testPublication1,
       ]);
 
       render(
@@ -557,11 +507,7 @@ describe('PublicationForm', () => {
     test('renders the `Archive publication` field when showSupersededBy is true', async () => {
       themeService.getThemes.mockResolvedValue([testSingleTheme]);
       publicationService.getPublicationSummaries.mockResolvedValue([
-        {
-          id: testPublication1.id,
-          title: testPublication1.title,
-          slug: 'slug-1',
-        },
+        testPublication1,
       ]);
 
       render(
@@ -602,8 +548,8 @@ describe('PublicationForm', () => {
     test('shows correct publications in the superseded by select', async () => {
       themeService.getThemes.mockResolvedValue(testThemes);
       publicationService.getPublicationSummaries.mockResolvedValueOnce([
-        { ...testPublication1, slug: 'slug-1' },
-        { ...testPublication2, slug: 'slug-2' },
+        testPublication1,
+        testPublication2,
       ]);
 
       render(

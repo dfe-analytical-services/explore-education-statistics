@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IPublicationService
     {
-        Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(bool includePermissions, Guid? topicId);
+        Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(Guid? topicId);
 
         Task<Either<ActionResult, List<PublicationSummaryViewModel>>> ListPublicationSummaries();
 

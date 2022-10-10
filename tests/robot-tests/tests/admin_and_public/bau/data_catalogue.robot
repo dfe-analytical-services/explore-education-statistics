@@ -22,7 +22,7 @@ ${SUBJECT_NAME_4}=      UI test subject 4
 
 *** Test Cases ***
 Create publication
-    user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
+    user selects dashboard theme and topic if possible
     user clicks link    Create new publication
     user waits until h1 is visible    Create new publication
     user creates publication    ${PUBLICATION_NAME}

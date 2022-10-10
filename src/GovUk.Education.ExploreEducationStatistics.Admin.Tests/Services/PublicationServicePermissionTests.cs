@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var service = BuildPublicationService(
                         context: Mock.Of<ContentDbContext>(Strict),
                         userService: userService.Object);
-                    return await service.ListPublications(includePermissions: false, Guid.NewGuid());
+                    return await service.ListPublications(Guid.NewGuid());
                 });
         }
 

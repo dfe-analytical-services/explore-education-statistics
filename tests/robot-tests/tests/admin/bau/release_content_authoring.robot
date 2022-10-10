@@ -18,8 +18,7 @@ ${BLOCK_2_CONTENT}=     Block 2 content
 
 *** Test Cases ***
 Create publication
-    user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}
-    ...    UI test topic %{RUN_IDENTIFIER}
+    user selects dashboard theme and topic if possible
     user clicks link    Create new publication
     user waits until h1 is visible    Create new publication
     user creates publication    ${PUBLICATION_NAME}

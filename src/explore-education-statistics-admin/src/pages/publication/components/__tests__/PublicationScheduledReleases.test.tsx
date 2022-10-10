@@ -116,7 +116,7 @@ describe('PublicationScheduledReleases', () => {
     );
 
     expect(
-      screen.getByText('There are no scheduled releases.'),
+      screen.getByText('You have no scheduled releases.'),
     ).toBeInTheDocument();
   });
 

@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService: userService.Object);
 
                 var result = await publicationService
-                    .ListPublications(includePermissions: false, publication1.Topic.Id);
+                    .ListPublications(publication1.Topic.Id);
 
                 var publicationViewModelList = result.AssertRight();
 
@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService: userService.Object);
 
                 var result = await publicationService
-                    .ListPublications(includePermissions: false, topic.Id);
+                    .ListPublications(topic.Id);
 
                 var publicationViewModelList = result.AssertRight();
 
@@ -222,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService: userService.Object);
 
                 var result = await publicationService
-                    .ListPublications(includePermissions: false);
+                    .ListPublications();
 
                 var publicationViewModelList = result.AssertRight();
 
@@ -238,92 +238,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication3.Id, publicationViewModelList[2].Id);
                 Assert.Equal(publication3.Title, publicationViewModelList[2].Title);
                 Assert.Equal(publication3.TopicId, publicationViewModelList[2].Topic.Id);
-            }
-        }
-
-        [Fact]
-        public async Task ListPublications_CanViewAllPublications_Permissions()
-        {
-            var topic = new Topic
-            {
-                Title = "Topic title",
-                Theme = new Theme
-                {
-                    Title = "Theme title",
-                },
-            };
-
-            var publication = new Publication
-            {
-                Title = "Test Publication",
-                Topic = topic,
-                Contact = new Contact(),
-            };
-
-            var userService = new Mock<IUserService>(Strict);
-
-            userService.Setup(s => s.GetUserId()).Returns(new Guid());
-            userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(CanViewAllPublications)).ReturnsAsync(true);
-
-            userService.Setup(s => s.MatchesPolicy(
-                    It.Is<Publication>(p => p.Id == publication.Id),
-                    CanUpdateSpecificPublication))
-                .ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(CanUpdatePublicationTitles)).ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(CanUpdatePublicationSupersededBy)).ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(
-                It.Is<Publication>(p => p.Id == publication.Id),
-                CanCreateReleaseForSpecificPublication)).ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(
-                It.Is<Publication>(p => p.Id == publication.Id),
-                CanAdoptMethodologyForSpecificPublication)).ReturnsAsync(false);
-            userService.Setup(s => s.MatchesPolicy(
-                It.Is<Publication>(p => p.Id == publication.Id),
-                CanCreateMethodologyForSpecificPublication)).ReturnsAsync(false);
-            userService.Setup(s => s.MatchesPolicy(
-                It.Is<Publication>(p => p.Id == publication.Id),
-                CanManageExternalMethodologyForSpecificPublication)).ReturnsAsync(false);
-            userService.Setup(s => s.MatchesPolicy(
-                    It.Is<Tuple<Publication, ReleaseRole>>(tuple =>
-                        tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor),
-                    CanUpdateSpecificReleaseRole))
-                .ReturnsAsync(false);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.Publications.AddRangeAsync(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var publicationService = BuildPublicationService(
-                    context: contentDbContext,
-                    userService: userService.Object);
-
-                var result = await publicationService
-                    .ListPublications(includePermissions: true, topic.Id);
-
-                var publicationViewModelList = result.AssertRight();
-
-                var publicationViewModel = Assert.Single(publicationViewModelList);
-
-                Assert.Equal(publication.Id, publicationViewModel.Id);
-
-                Assert.False(publicationViewModel.IsSuperseded);
-
-                Assert.NotNull(publicationViewModel.Permissions);
-                Assert.True(publicationViewModel.Permissions!.CanUpdatePublication);
-                Assert.True(publicationViewModel.Permissions.CanUpdatePublicationTitle);
-                Assert.True(publicationViewModel.Permissions.CanUpdatePublicationSupersededBy);
-                Assert.True(publicationViewModel.Permissions.CanCreateReleases);
-                Assert.False(publicationViewModel.Permissions.CanAdoptMethodologies);
-                Assert.False(publicationViewModel.Permissions.CanCreateMethodologies);
-                Assert.False(publicationViewModel.Permissions.CanManageExternalMethodology);
-                Assert.True(publicationViewModel.Permissions.CanUpdateContact);
-                Assert.False(publicationViewModel.Permissions.CanUpdateContributorReleaseRole);
             }
         }
 
@@ -348,19 +262,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Slug = "test-slug",
                 Topic = topic,
                 SupersededBy = null,
-                Contact = new Contact(), // EES-3576 should be removable
+                Contact = new Contact(),
             };
 
             var publication2 = new Publication
             {
                 Topic = new Topic(),
-                Contact = new Contact(), // EES-3576 should be removable
+                Contact = new Contact(),
             };
 
             var publication3 = new Publication
             {
                 Topic = new Topic(),
-                Contact = new Contact(), // EES-3576 should be removable
+                Contact = new Contact(),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -402,7 +316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService: userService.Object);
 
                 var result = await publicationService
-                    .ListPublications(includePermissions: false, topic.Id);
+                    .ListPublications(topic.Id);
 
                 var publicationViewModelList = result.AssertRight();
 
@@ -435,21 +349,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "A",
                 Topic = topic,
-                Contact = new Contact(), // EES-3576 should be removable
+                Contact = new Contact(),
             };
 
             var publication2 = new Publication
             {
                 Title = "B",
                 Topic = topic,
-                Contact = new Contact(), // EES-3576 should be removable
+                Contact = new Contact(),
             };
 
             var publication3 = new Publication
             {
                 Title = "C",
                 Topic = topic,
-                Contact = new Contact(), // EES-3576 should be removable
+                Contact = new Contact(),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -491,7 +405,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService: userService.Object);
 
                 var result = await publicationService
-                    .ListPublications(includePermissions: false, topic.Id);
+                    .ListPublications(topic.Id);
 
                 var publicationViewModelList = result.AssertRight();
 
@@ -517,21 +431,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "publication1",
                 Topic = new Topic { Theme = new Theme(), },
-                Contact = new Contact(), // EES-3576 should be removable
+                Contact = new Contact(),
             };
 
             var publication2 = new Publication
             {
                 Title = "publication2",
                 Topic = new Topic { Theme = new Theme(), },
-                Contact = new Contact(), // EES-3576 should be removable
+                Contact = new Contact(),
             };
 
             var publication3 = new Publication
             {
                 Title = "publication3",
                 Topic = new Topic { Theme = new Theme(), },
-                Contact = new Contact(), // EES-3576 should be removable
+                Contact = new Contact(),
             };
 
             var publication4 = new Publication
@@ -584,7 +498,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService: userService.Object);
 
                 var result = await publicationService
-                    .ListPublications(includePermissions: false);
+                    .ListPublications();
 
                 var publicationViewModelList = result.AssertRight();
 
@@ -605,100 +519,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListPublications_CannotViewAllPublications_Permissions()
-        {
-            var userId = Guid.NewGuid();
-
-            var topic = new Topic
-            {
-                Title = "Topic title",
-                Theme = new Theme
-                {
-                    Title = "Theme title",
-                },
-            };
-
-            var publication = new Publication
-            {
-                Title = "Test Publication",
-                Summary = "Test summary",
-                Slug = "test-slug",
-                Topic = topic,
-                Contact = new Contact(),
-                SupersededBy = null,
-            };
-
-            var userService = new Mock<IUserService>(Strict);
-
-            userService.Setup(s => s.GetUserId()).Returns(userId);
-            userService.Setup(s => s.MatchesPolicy(CanAccessSystem)).ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(CanViewAllPublications)).ReturnsAsync(false);
-
-            userService.Setup(s => s.MatchesPolicy(
-                    It.Is<Publication>(p => p.Id == publication.Id),
-                    CanUpdateSpecificPublication))
-                .ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(CanUpdatePublicationTitles)).ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(CanUpdatePublicationSupersededBy)).ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(
-                It.Is<Publication>(p => p.Id == publication.Id),
-                CanCreateReleaseForSpecificPublication)).ReturnsAsync(true);
-            userService.Setup(s => s.MatchesPolicy(
-                It.Is<Publication>(p => p.Id == publication.Id),
-                CanAdoptMethodologyForSpecificPublication)).ReturnsAsync(false);
-            userService.Setup(s => s.MatchesPolicy(
-                It.Is<Publication>(p => p.Id == publication.Id),
-                CanCreateMethodologyForSpecificPublication)).ReturnsAsync(false);
-            userService.Setup(s => s.MatchesPolicy(
-                It.Is<Publication>(p => p.Id == publication.Id),
-                CanManageExternalMethodologyForSpecificPublication)).ReturnsAsync(false);
-            userService.Setup(s => s.MatchesPolicy(
-                    It.Is<Tuple<Publication, ReleaseRole>>(tuple =>
-                        tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor),
-                    CanUpdateSpecificReleaseRole))
-                .ReturnsAsync(false);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.Publications.AddRangeAsync(publication);
-                await contentDbContext.UserPublicationRoles.AddRangeAsync(
-                    new UserPublicationRole
-                    {
-                        User = new User { Id = userId },
-                        Publication = publication,
-                        Role = PublicationRole.Owner,
-                    });
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var publicationService = BuildPublicationService(
-                    context: contentDbContext,
-                    userService: userService.Object);
-
-                var result = await publicationService
-                    .ListPublications(includePermissions: true, topic.Id);
-
-                var publicationViewModelList = result.AssertRight();
-
-                var publicationViewModel = Assert.Single(publicationViewModelList);
-
-                Assert.NotNull(publicationViewModel.Permissions);
-                Assert.True(publicationViewModel.Permissions!.CanUpdatePublication);
-                Assert.True(publicationViewModel.Permissions.CanUpdatePublicationTitle);
-                Assert.True(publicationViewModel.Permissions.CanUpdatePublicationSupersededBy);
-                Assert.True(publicationViewModel.Permissions.CanCreateReleases);
-                Assert.False(publicationViewModel.Permissions.CanAdoptMethodologies);
-                Assert.False(publicationViewModel.Permissions.CanCreateMethodologies);
-                Assert.False(publicationViewModel.Permissions.CanManageExternalMethodology);
-                Assert.True(publicationViewModel.Permissions.CanUpdateContact);
-                Assert.False(publicationViewModel.Permissions.CanUpdateContributorReleaseRole);
-            }
-        }
-
-        [Fact]
         public async Task GetPublication()
         {
             var publication = new Publication
@@ -714,7 +534,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Title = "Test theme"
                     }
                 },
-                Contact = new Contact // EES-3576 should be removable
+                Contact = new Contact
                 {
                     ContactName = "Test contact",
                     ContactTelNo = "0123456789",
@@ -1949,7 +1769,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(publication.Contact.ContactTelNo, contact.ContactTelNo);
             Assert.Equal(publication.Contact.TeamName, contact.TeamName);
             Assert.Equal(publication.Contact.TeamEmail, contact.TeamEmail);
-            Assert.Null(contact.Permissions);
         }
 
         [Fact]

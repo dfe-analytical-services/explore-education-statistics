@@ -8,7 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     {
         public static IMapper AdminMapper()
         {
-            // @MarkFix er does this work now all the IMyPublicationResolver stuff is removed?
             return Common.Services.MapperUtils.MapperForProfile<MappingProfiles>();
         }
     }

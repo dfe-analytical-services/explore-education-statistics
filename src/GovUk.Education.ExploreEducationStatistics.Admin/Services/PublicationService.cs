@@ -59,7 +59,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(
-            bool includePermissions = false, // @MarkFix remove? default to false to prevent abuse
             Guid? topicId = null)
         {
             return await _userService
@@ -81,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return await publications
                         .ToAsyncEnumerable()
-                        .SelectAwait(async publication => await GeneratePublicationViewModel(publication, includePermissions))
+                        .SelectAwait(async publication => await GeneratePublicationViewModel(publication, false))
                         .OrderBy(publicationViewModel => publicationViewModel.Title)
                         .ToListAsync();
                 });
@@ -458,15 +457,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public static IQueryable<Publication> HydratePublication(IQueryable<Publication> values)
         {
             return values
-                .AsSplitQuery()
-                .Include(p => p.Contact) // EES-3576 remove when MyPublicationViewModel is gone
-                .Include(p => p.Releases) // EES-3576 remove when MyPublicationViewModel is gone
-                .ThenInclude(r => r.ReleaseStatuses)
                 .Include(p => p.Topic)
-                .ThenInclude(topic => topic.Theme)
-                .Include(p => p.Methodologies) // EES-3576 remove when MyPublicationViewModel is gone
-                .ThenInclude(p => p.Methodology) // EES-3576 remove when MyPublicationViewModel is gone
-                .ThenInclude(p => p.Versions);
+                .ThenInclude(topic => topic.Theme);
         }
 
         private async Task<PublicationViewModel> GeneratePublicationViewModel(Publication publication, bool includePermissions)
@@ -503,35 +495,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return viewModel;
-        }
-
-        private async Task<List<MethodologyVersionSummaryViewModel>> HydrateMethodologyVersionViewModels(
-            Publication publication)
-        {
-            return await publication.Methodologies
-                .ToAsyncEnumerable()
-                .SelectAwait(async publicationMethodology =>
-                {
-                    var latestVersion = publicationMethodology.Methodology.LatestVersion();
-                    var permissions = await PermissionsUtils.GetMethodologyVersionPermissions(_userService,
-                        latestVersion,
-                        publicationMethodology);
-
-                    return new MethodologyVersionSummaryViewModel
-                    {
-                        Id = latestVersion.Id,
-                        Amendment = latestVersion.Amendment,
-                        Owned = publicationMethodology.Owner,
-                        Published = latestVersion.Published,
-                        Status = latestVersion.Status,
-                        Title = latestVersion.Title,
-                        InternalReleaseNote = latestVersion.InternalReleaseNote,
-                        MethodologyId = latestVersion.MethodologyId,
-                        PreviousVersionId = latestVersion.PreviousVersionId,
-                        Permissions = permissions,
-                    };
-                })
-                .ToListAsync();
         }
     }
 }

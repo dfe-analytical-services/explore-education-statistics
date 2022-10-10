@@ -13,7 +13,7 @@ import {
   releasePreReleaseAccessRoute,
   ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
-import { publicationRoute, PublicationRouteParams } from '@admin/routes/routes';
+import { PublicationRouteParams } from '@admin/routes/routes';
 import {
   Release,
   ReleaseChecklist,
@@ -23,6 +23,7 @@ import {
 import InsetText from '@common/components/InsetText';
 import React, { useMemo } from 'react';
 import { generatePath } from 'react-router';
+import { publicationMethodologiesRoute } from '@admin/routes/publicationRoutes';
 import { formId } from './ReleaseStatusForm';
 
 interface ChecklistMessage {
@@ -145,7 +146,7 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
             message:
               'An in-EES methodology page has not been linked to this publication',
             link: generatePath<PublicationRouteParams>(
-              publicationRoute.path, // @MarkFix check this works
+              publicationMethodologiesRoute.path,
               { publicationId: release.publicationId },
             ),
           };

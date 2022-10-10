@@ -140,13 +140,12 @@ describe('ReleaseStatusChecklist', () => {
 
     expect(screen.getByText('8 things')).toBeInTheDocument();
 
-    // @MarkFix
-    //expect(
-    //  screen.getByRole('link', {
-    //    name:
-    //      'An in-EES methodology page has not been linked to this publication',
-    //  }),
-    //).toHaveAttribute('href', '/publication/publication-1/edit');
+    expect(
+      screen.getByRole('link', {
+        name:
+          'An in-EES methodology page has not been linked to this publication',
+      }),
+    ).toHaveAttribute('href', '/publication/publication-1/methodologies');
 
     expect(
       screen.getAllByRole('link', {

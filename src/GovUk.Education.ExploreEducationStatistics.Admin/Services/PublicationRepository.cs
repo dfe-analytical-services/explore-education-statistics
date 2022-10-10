@@ -32,7 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid userId,
             Guid? topicId = null)
         {
-            // EES-3576 Move hydration to PublicationService, and change to return an IQueryable
             var publicationsGrantedByPublicationRoleQueryable = _context
                 .UserPublicationRoles
                 .AsQueryable()
@@ -92,33 +91,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .SelectAsync(async publicationWithReleases =>
                 {
                     var publication = publicationWithReleases.Key;
-                    // Only include Releases of the Publication that the user has access to
-                    var releaseIds = publicationWithReleases.Select(r => r.Id);
-                    return await GetPublicationWithFilteredReleases(publication.Id, releaseIds);
+                    return await HydratePublication(_context.Publications)
+                        .AsNoTracking()
+                        .FirstAsync(p => p.Id == publication.Id);
                 }));
 
             return publications;
-        }
-
-        public async Task<Publication> GetPublicationForUser(Guid publicationId, Guid userId)
-        {
-            var userReleaseIdsForPublication = await _context
-                .UserReleaseRoles
-                .Include(r => r.Release)
-                .Where(r => r.UserId == userId
-                            && r.Release.PublicationId == publicationId
-                            && r.Role != ReleaseRole.PrereleaseViewer)
-                .Select(r => r.ReleaseId)
-                .Distinct()
-                .ToListAsync();
-
-            return await GetPublicationWithFilteredReleases(publicationId, userReleaseIdsForPublication);
-        }
-
-        public async Task<Publication> GetPublicationWithAllReleases(Guid publicationId)
-        {
-            return await HydratePublication(_context.Publications)
-                .FirstAsync(p => p.Id == publicationId);
         }
 
         public async Task<List<Release>> ListActiveReleases(Guid publicationId)
@@ -139,27 +117,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .SingleAsync(p => p.Id == publicationId);
 
             return publication.LatestRelease();
-        }
-
-        // NOTE: Should be removed as part of EES-3576
-        private async Task<Publication> GetPublicationWithFilteredReleases(Guid publicationId,
-            IEnumerable<Guid> releaseIds)
-        {
-            // Use AsNoTracking:
-            // - There should be no need to track changes as this method is only used to create a view model.
-            // - We also mutate Publication to filter only Releases visible to the user and this mutation shouldn't
-            //   be tracked otherwise it will affect any other code retrieving Publication from the context that's
-            //   expecting an unfiltered list of Releases. Entities tracked by the context can be returned immediately
-            //   without making a request to the database, e.g. when using DbContext.Find/FindAsync.
-            var hydratedPublication = await HydratePublication(_context.Publications)
-                .AsNoTracking()
-                .FirstAsync(p => p.Id == publicationId);
-
-            // TODO EES-2624 Don't mutate Publication
-            hydratedPublication.Releases = hydratedPublication.Releases
-                .FindAll(r => releaseIds.Contains(r.Id));
-
-            return hydratedPublication;
         }
 
         public bool IsSuperseded(Publication publication)
