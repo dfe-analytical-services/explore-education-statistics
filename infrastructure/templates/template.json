@@ -442,6 +442,15 @@
         "description": "Cron string that is used to control the schedule of the Publish Release Content Function in the Publisher App"
       }
     },
+
+    "publishReleaseDataFunctionDisabled": {
+      "type": "string",
+      "defaultValue": "false",
+      "metadata": {
+        "description": "Disable the Publish Release Data Function in the Publisher App which triggers the Datafactory pipeline"
+      }
+    },
+
     "preReleaseMinutesBeforeStart": {
       "type": "int",
       "defaultValue": 870,
@@ -466,6 +475,14 @@
       "type": "string",
       "metadata": {
         "description": "Publisher Active Directory Application Client secret used to prove its identity during authentication requests"
+      }
+    },
+
+    "publisherPipelineName": {
+      "type": "string",
+      "defaultValue": "pl_release_statistics",
+      "metadata": {
+        "description": "Name of pipeline used by the Datafactory in the Publish Release Data Function in the Publisher App"
       }
     },
     "blobDeleteRetentionEnabled": {
@@ -640,6 +657,10 @@
       "metadata": {
         "description": "Slack webhook URI for alerts"
       }
+    },
+    "dataFactoryConcurrency": {
+      "type": "int",
+      "defaultValue": 1
     }
   },
   "variables": {
@@ -1123,6 +1144,7 @@
       }
     ],
 
+    "dataFactoryName": "[concat(parameters('subscription'), '-df-', parameters('environment'), '-release')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
 
     "ees-notify-apikey": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-apikey')]",
@@ -3576,7 +3598,7 @@
         "enabledForDiskEncryption": true,
         "enabledForTemplateDeployment": true,
         "enableSoftDelete": true,
-        "accessPolicies": [          
+        "accessPolicies": [
           {
             "tenantId": "[subscription().tenantId]",
             "objectId": "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId]",
