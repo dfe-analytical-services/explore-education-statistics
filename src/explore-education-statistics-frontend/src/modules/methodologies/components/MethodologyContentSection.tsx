@@ -3,7 +3,7 @@ import { useMobileMedia } from '@common/hooks/useMedia';
 import useMounted from '@common/hooks/useMounted';
 import MethodologySectionBlocks from '@frontend/modules/methodologies/components/MethodologySectionBlocks';
 import { ContentBlock } from '@common/services/types/blocks';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
 interface MethodologySectionProps {
   content: ContentBlock[];
@@ -22,6 +22,8 @@ const MethodologyContentSection = ({
 
   const { isMedia: isMobileMedia } = useMobileMedia();
 
+  const [hasIndex, setHasIndex] = useState<boolean>(false);
+
   const { isMounted } = useMounted();
 
   if (!isMounted) {
@@ -35,16 +37,23 @@ const MethodologyContentSection = ({
 
   return (
     <div className="govuk-grid-row">
-      <div className="govuk-grid-column-one-quarter">
-        <ContentSectionIndex
-          id={id}
-          contentRef={contentRef}
-          sticky={open}
-          visible={!isMobileMedia}
-        />
-      </div>
+      <ContentSectionIndex
+        id={id}
+        className="govuk-grid-column-one-quarter"
+        contentRef={contentRef}
+        sticky={open}
+        visible={!isMobileMedia}
+        onMount={setHasIndex}
+      />
 
-      <div className="govuk-grid-column-three-quarters" ref={contentRef}>
+      <div
+        className={
+          hasIndex
+            ? 'govuk-grid-column-three-quarters'
+            : 'govuk-grid-column-full'
+        }
+        ref={contentRef}
+      >
         <MethodologySectionBlocks
           blocks={content}
           methodologyId={methodologyId}

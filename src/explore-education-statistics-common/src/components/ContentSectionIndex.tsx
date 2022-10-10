@@ -1,5 +1,7 @@
+import generateContentList from '@common/components/util/generateContentList';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import useMounted from '@common/hooks/useMounted';
+import classNames from 'classnames';
 import React, {
   CSSProperties,
   RefObject,
@@ -8,18 +10,9 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import generateContentList from '@common/components/util/generateContentList';
 
 const TOP_MARGIN = 20;
 const BOTTOM_MARGIN = 40;
-
-interface Props {
-  contentRef: RefObject<HTMLElement>;
-  id: string;
-  selector?: string;
-  sticky?: boolean;
-  visible?: boolean;
-}
 
 interface ListItem {
   id: string;
@@ -33,12 +26,24 @@ export interface ParentListItem extends ListItem {
 
 type ViewportPosition = 'before' | 'within' | 'after';
 
+interface Props {
+  className?: string;
+  contentRef: RefObject<HTMLElement>;
+  id: string;
+  selector?: string;
+  sticky?: boolean;
+  visible?: boolean;
+  onMount?: (hasIndex: boolean) => void;
+}
+
 const ContentSectionIndex = ({
+  className,
   contentRef,
   id,
   selector = 'h3, h4',
   sticky,
   visible = true,
+  onMount,
 }: Props) => {
   const outerRef = useRef<HTMLDivElement>(null);
   const ref = useRef<HTMLDivElement>(null);
@@ -63,6 +68,7 @@ const ContentSectionIndex = ({
         }
       });
 
+      onMount?.(headingElements.length > 0);
       setHeadingsList(generateContentList(headingElements));
     }
   });
@@ -160,7 +166,7 @@ const ContentSectionIndex = ({
     return null;
   }
   return (
-    <div ref={outerRef} className="dfe-print-hidden">
+    <div ref={outerRef} className={classNames('dfe-print-hidden', className)}>
       <div
         style={{
           position: 'relative',
