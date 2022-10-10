@@ -146,8 +146,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 /**
                  * Legacy release management
                  */
-                options.AddPolicy(SecurityPolicies.CanCreateLegacyRelease.ToString(), policy =>
-                    policy.Requirements.Add(new CreateLegacyReleaseRequirement()));
+                options.AddPolicy(SecurityPolicies.CanManageLegacyReleases.ToString(), policy =>
+                    policy.Requirements.Add(new ManageLegacyReleasesRequirement()));
                 options.AddPolicy(SecurityPolicies.CanViewLegacyRelease.ToString(), policy =>
                     policy.Requirements.Add(new ViewLegacyReleaseRequirement()));
                 options.AddPolicy(SecurityPolicies.CanUpdateLegacyRelease.ToString(), policy =>
@@ -262,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             /**
              * Legacy release management
              */
-            services.AddTransient<IAuthorizationHandler, CreateLegacyReleaseAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ManageLegacyReleasesAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewLegacyReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdateLegacyReleaseAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, DeleteLegacyReleaseAuthorizationHandler>();

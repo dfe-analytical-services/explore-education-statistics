@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     legacyRelease.PublicationId,
                     publication => publication.Include(p => p.LegacyReleases)
                 )
-                .OnSuccess(_userService.CheckCanCreateLegacyRelease)
+                .OnSuccess(_userService.CheckCanManageLegacyReleases)
                 .OnSuccess(async publication =>
                 {
                     var saved = await _context.LegacyReleases.AddAsync(new LegacyRelease

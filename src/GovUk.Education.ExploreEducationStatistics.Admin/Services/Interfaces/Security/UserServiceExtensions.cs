@@ -302,10 +302,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(file, SecurityPolicies.CanCancelOngoingImports);
         }
 
-        public static Task<Either<ActionResult, Publication>> CheckCanCreateLegacyRelease(
+        public static Task<Either<ActionResult, Publication>> CheckCanManageLegacyReleases(
             this IUserService userService, Publication publication)
         {
-            return userService.CheckPolicy(publication, SecurityPolicies.CanCreateLegacyRelease);
+            return userService.CheckPolicy(publication, SecurityPolicies.CanManageLegacyReleases);
         }
 
         public static Task<Either<ActionResult, LegacyRelease>> CheckCanViewLegacyRelease(

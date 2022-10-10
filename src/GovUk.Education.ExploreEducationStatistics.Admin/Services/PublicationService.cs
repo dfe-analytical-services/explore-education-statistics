@@ -277,7 +277,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
-                .OnSuccessDo(_userService.CheckCanUpdatePublication)
+                .OnSuccessDo(_userService.CheckCanManageExternalMethodologyForPublication)
                 .OnSuccess(async publication =>
                 {
                     _context.Update(publication);
@@ -298,7 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
-                .OnSuccessDo(_userService.CheckCanUpdatePublication)
+                .OnSuccessDo(_userService.CheckCanManageExternalMethodologyForPublication)
                 .OnSuccess(async publication =>
                 {
                     _context.Update(publication);
@@ -408,7 +408,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     publicationId,
                     publication => publication.Include(p => p.LegacyReleases)
                 )
-                .OnSuccess(_userService.CheckCanUpdatePublication)
+                .OnSuccess(_userService.CheckCanManageLegacyReleases)
                 .OnSuccess(async publication =>
                 {
                     publication.LegacyReleases.ForEach(legacyRelease =>

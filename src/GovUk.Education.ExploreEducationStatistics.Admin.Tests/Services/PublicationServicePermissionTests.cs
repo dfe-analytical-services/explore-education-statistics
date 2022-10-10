@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -382,7 +383,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(publication, SecurityPolicies.CanUpdateSpecificPublication)
+                .SetupResourceCheckToFail(publication, SecurityPolicies.CanManageExternalMethodologyForSpecificPublication)
                 .AssertForbidden(async userService =>
                 {
                     var contentDbContext = InMemoryApplicationDbContext();
@@ -409,7 +410,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(publication, SecurityPolicies.CanUpdateSpecificPublication)
+                .SetupResourceCheckToFail(publication, SecurityPolicies.CanManageExternalMethodologyForSpecificPublication)
                 .AssertForbidden(async userService =>
                 {
                     var contentDbContext = InMemoryApplicationDbContext();
@@ -495,6 +496,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService,
                 publicationService,
                 SecurityPolicies.CanViewSpecificPublication);
+        }
+
+        [Fact]
+        public void PartialUpdateLegacyReleases()
+        {
+            var userService = AlwaysTrueUserService();
+            var publicationService = BuildPublicationService(
+                context: Mock.Of<ContentDbContext>(Strict),
+                userService: userService.Object);
+
+            PermissionTestUtil.AssertSecurityPoliciesChecked(
+                async service => await service.PartialUpdateLegacyReleases(_publication.Id, new List<LegacyReleasePartialUpdateViewModel>()),
+                _publication,
+                userService,
+                publicationService,
+                SecurityPolicies.CanManageLegacyReleases);
         }
 
         private static PublicationService BuildPublicationService(

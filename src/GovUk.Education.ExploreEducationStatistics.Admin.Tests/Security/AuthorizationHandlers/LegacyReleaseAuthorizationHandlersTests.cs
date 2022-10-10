@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task CreateLegacyRelease_Claims()
             {
-                await AssertHandlerSucceedsWithCorrectClaims<Publication, CreateLegacyReleaseRequirement>(
+                await AssertHandlerSucceedsWithCorrectClaims<Publication, ManageLegacyReleasesRequirement>(
                     CreateHandler,
                     new Publication(),
                     CreateAnyRelease
@@ -36,13 +36,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task CreateLegacyRelease_PublicationRoles()
             {
-                await AssertPublicationHandlerSucceedsWithPublicationRoles<CreateLegacyReleaseRequirement>(
+                await AssertPublicationHandlerSucceedsWithPublicationRoles<ManageLegacyReleasesRequirement>(
                     CreateHandler, Owner);
             }
 
-            private static CreateLegacyReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+            private static ManageLegacyReleasesAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
             {
-                return new CreateLegacyReleaseAuthorizationHandler(
+                return new ManageLegacyReleasesAuthorizationHandler(
                     new AuthorizationHandlerResourceRoleService(
                         Mock.Of<IUserReleaseRoleRepository>(Strict),
                         new UserPublicationRoleRepository(contentDbContext),

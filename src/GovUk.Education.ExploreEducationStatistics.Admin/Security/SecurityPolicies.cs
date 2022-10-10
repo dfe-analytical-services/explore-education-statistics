@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         /**
          * Legacy release management
          */
-        CanCreateLegacyRelease,
+        CanManageLegacyReleases,
         CanViewLegacyRelease,
         CanUpdateLegacyRelease,
         CanDeleteLegacyRelease,
