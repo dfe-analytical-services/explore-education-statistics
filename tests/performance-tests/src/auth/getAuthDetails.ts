@@ -27,6 +27,8 @@ export const getAuthTokens = async (
   refresh_token: string;
   expires_at: Date;
 }> => {
+  console.log(`Getting authentication details for user ${email}`);
+
   const browser = await puppeteer.launch({
     headless: true,
     ignoreHTTPSErrors: true,
@@ -90,10 +92,24 @@ const getAuthTokensAzure = async (
 
   await btn[0].click();
 
-  await page.waitForXPath("//*[.='Enter password']", {
-    visible: true,
-    timeout: 5000,
-  });
+  try {
+    await page.waitForXPath("//*[.='Enter password']", {
+      visible: true,
+      timeout: 5000,
+    });
+  } catch (e) {
+    const content = await page.content();
+    if (content.includes("We couldn't find an account with that username")) {
+      throw new Error(
+        `User with email ${email} not recognized - received message 'We couldn't find an account with that username'`,
+      );
+    }
+    if (content.includes('This username may be incorrect')) {
+      throw new Error(
+        `User with email ${email} not recognized - received message 'This username may be incorrect'`,
+      );
+    }
+  }
 
   const pwdInput = await page.$x("//*[@name='passwd']");
   await pwdInput[0].type(password);
@@ -101,16 +117,30 @@ const getAuthTokensAzure = async (
   const signInBtn = await page.$x("//*[@type='submit']");
   await signInBtn[0].click();
 
-  await page.waitForXPath("//*[.='Stay signed in?']", {
-    visible: true,
-    timeout: 5000,
-  });
+  try {
+    await page.waitForXPath("//*[.='Stay signed in?']", {
+      visible: true,
+      timeout: 5000,
+    });
+  } catch (e) {
+    const content = await page.content();
+    if (content.includes('You cannot access this right now')) {
+      throw new Error(
+        `User ${email} cannot login from this location - received message 'You cannot access this right now'`,
+      );
+    }
+    if (content.includes('Your account or password is incorrect')) {
+      throw new Error(
+        `Password for user ${email} incorrect - received message 'Your account or password is incorrect'`,
+      );
+    }
+  }
 
   await page.click('#idBtn_Back');
 
   await page.waitForXPath("//*[.='Dashboard']", {
     visible: true,
-    timeout: 5000,
+    timeout: 10000,
   });
 };
 

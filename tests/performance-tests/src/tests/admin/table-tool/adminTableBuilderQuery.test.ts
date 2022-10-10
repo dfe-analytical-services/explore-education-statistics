@@ -3,18 +3,19 @@
 import { check } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
-import createDataService, { SubjectMeta } from '../../../utils/dataService';
+import createAdminService, { SubjectMeta } from '../../../utils/adminService';
 import testData from '../../testData';
 import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
+import utils from '../../../utils/utils';
 
-const PUBLICATION =
-  'UI test publication - Performance tests - adminTableBuilderQuery.test.ts';
-const RELEASE = '2022';
-const SUBJECT =
-  'UI test subject - Performance tests - adminTableBuilderQuery.test.ts';
-
-const alwaysCreateNewDataPerTest = false;
+const tearDownData = false;
+const publicationTitle =
+  __ENV.PUBLICATION_TITLE ?? 'adminTableBuilderQuery.test.ts';
+const dataFile = __ENV.DATA_FILE ?? 'small-file.csv';
+const uploadFileStrategy = utils.getDataFileUploadStrategy({
+  filename: dataFile,
+});
 
 export const options: Options = {
   scenarios: {
@@ -30,7 +31,7 @@ export const options: Options = {
   noConnectionReuse: true,
   insecureSkipTLSVerify: true,
   linger: true,
-  setupTimeout: '5m',
+  setupTimeout: uploadFileStrategy.isZip ? '30m' : '10m',
 };
 
 interface SetupData {
@@ -42,16 +43,16 @@ interface SetupData {
 }
 
 export const errorRate = new Rate('ees_errors');
-export const tableQuerySpeedTrend = new Trend('ees_table_query_speed', true);
+export const tableQuerySpeedTrend = new Trend(
+  'ees_admin_table_query_speed',
+  true,
+);
 export const tableQueryCompleteCount = new Counter(
-  'ees_table_query_complete_count',
+  'ees_admin_table_query_complete_count',
 );
 export const tableQueryFailureCount = new Counter(
-  'ees_table_query_failure_count',
+  'ees_admin_table_query_failure_count',
 );
-
-const subjectFile = open('admin/import/assets/dates.csv', 'b');
-const subjectMetaFile = open('admin/import/assets/dates.meta.csv', 'b');
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT as string,
@@ -64,55 +65,41 @@ const { authTokens, userName } = environmentAndUsers.users.find(
 )!;
 
 function getOrCreateReleaseWithSubject() {
-  const dataService = createDataService(
+  const adminService = createAdminService(
     adminUrl,
     authTokens?.accessToken as string,
   );
 
-  const suffix = alwaysCreateNewDataPerTest
-    ? `-${Date.now()}-${Math.random()}`
-    : '';
-
-  const { id: themeId } = dataService.getOrCreateTheme({
-    title: `${testData.themeName}${suffix}`,
+  const { id: themeId } = adminService.getOrCreateTheme({
+    title: testData.themeName,
   });
 
-  const { id: topicId } = dataService.getOrCreateTopic({
+  const { id: topicId } = adminService.getOrCreateTopic({
     themeId,
-    title: `${testData.topicName}${suffix}`,
+    title: testData.topicName,
   });
 
-  const publicationTitle = `${PUBLICATION}${suffix}`;
-
-  const { id: publicationId } = dataService.getOrCreatePublication({
+  const { id: publicationId } = adminService.getOrCreatePublication({
     topicId,
     title: publicationTitle,
   });
 
-  const { id: releaseId } = dataService.getOrCreateRelease({
+  const { id: releaseId } = adminService.getOrCreateRelease({
     publicationId,
     publicationTitle,
     topicId,
-    releaseName: RELEASE,
+    year: 2022,
     timePeriodCoverage: 'AY',
   });
 
-  const { id: fileId } = dataService.getOrImportDataFile({
-    title: `${SUBJECT}${suffix}`,
+  const { id: fileId } = uploadFileStrategy.getOrImportSubject(
+    adminService,
     releaseId,
-    dataFile: {
-      file: subjectFile,
-      filename: `subject.csv`,
-    },
-    metaFile: {
-      file: subjectMetaFile,
-      filename: `subject.meta.csv`,
-    },
-  });
+  );
 
-  dataService.waitForDataFileToImport({ releaseId, fileId });
+  adminService.waitForDataFileToImport({ releaseId, fileId });
 
-  const { subjects } = dataService.getSubjects({ releaseId });
+  const { subjects } = adminService.getSubjects({ releaseId });
   const subjectId = subjects[0].id;
 
   return {
@@ -125,7 +112,7 @@ function getOrCreateReleaseWithSubject() {
 }
 
 export function setup(): SetupData {
-  const dataService = createDataService(adminUrl, authTokens.accessToken);
+  const adminService = createAdminService(adminUrl, authTokens.accessToken);
 
   const {
     themeId,
@@ -134,7 +121,7 @@ export function setup(): SetupData {
     subjectId,
   } = getOrCreateReleaseWithSubject();
 
-  const { subjectMeta } = dataService.getSubjectMeta({ releaseId, subjectId });
+  const { subjectMeta } = adminService.getSubjectMeta({ releaseId, subjectId });
 
   return {
     themeId,
@@ -153,7 +140,7 @@ const performTest = ({ releaseId, subjectId, subjectMeta }: SetupData) => {
     authTokens,
   );
 
-  const dataService = createDataService(adminUrl, accessToken);
+  const adminService = createAdminService(adminUrl, accessToken);
 
   const allFilterIds = Object.values(subjectMeta.filters).flatMap(filter =>
     Object.values(filter.options).flatMap(filterGroup =>
@@ -167,10 +154,14 @@ const performTest = ({ releaseId, subjectId, subjectMeta }: SetupData) => {
     indicatorGroup.options.map(indicator => indicator.value),
   );
 
-  const allLocationIds = Object.values(
-    subjectMeta.locations,
-  ).flatMap(geographicLevel =>
-    geographicLevel.options.map(location => location.id),
+  const allLocationIds = Object.values(subjectMeta.locations).flatMap(
+    geographicLevel =>
+      geographicLevel.options.flatMap(location => {
+        if (location.options) {
+          return location.options.flatMap(o => o.id);
+        }
+        return [location.id!];
+      }),
   );
 
   const someTimePeriods = {
@@ -182,7 +173,7 @@ const performTest = ({ releaseId, subjectId, subjectMeta }: SetupData) => {
 
   const startTimeMillis = Date.now();
 
-  const { response, results } = dataService.tableQuery({
+  const { response, results } = adminService.tableQuery({
     releaseId,
     subjectId,
     filterIds: allFilterIds,
@@ -205,7 +196,7 @@ const performTest = ({ releaseId, subjectId, subjectMeta }: SetupData) => {
 };
 
 export const teardown = ({ themeId, topicId }: SetupData) => {
-  if (alwaysCreateNewDataPerTest) {
+  if (tearDownData) {
     const accessToken = getOrRefreshAccessTokens(
       supportsRefreshTokens,
       userName,
@@ -213,10 +204,10 @@ export const teardown = ({ themeId, topicId }: SetupData) => {
       authTokens,
     );
 
-    const dataService = createDataService(adminUrl, accessToken);
+    const adminService = createAdminService(adminUrl, accessToken);
 
-    dataService.deleteTopic({ topicId });
-    dataService.deleteTheme({ themeId });
+    adminService.deleteTopic({ topicId });
+    adminService.deleteTheme({ themeId });
 
     console.log(`Deleted Theme ${themeId}, Topic ${topicId}`);
   }

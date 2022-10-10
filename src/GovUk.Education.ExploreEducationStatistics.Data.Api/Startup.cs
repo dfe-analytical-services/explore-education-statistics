@@ -198,7 +198,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             CancellationTokenTimeoutAspect.Enabled = true;
             CancellationTokenTimeoutAttribute.SetTimeoutConfiguration(Configuration.GetSection("RequestTimeouts"));
 
-            UpdateDatabase(app);
+            // TODO EES-3369 - We don't need to run these migrations against the statistics database in local
+            // development, as the Admin project will have applied these migrations already against the sole statistics
+            // database but in Azure environments, the Data API is responsible still for applying migrations to 
+            // the `public-statistics` database.
+            if (!env.IsDevelopment())
+            {
+                UpdateDatabase(app);
+            }
 
             if (env.IsDevelopment())
             {
