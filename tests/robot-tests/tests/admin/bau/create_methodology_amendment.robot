@@ -10,10 +10,8 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
-
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - create methodology amendment publication %{RUN_IDENTIFIER}
-
 
 *** Test Cases ***
 Create publicly accessible Publication
@@ -175,7 +173,7 @@ Verify all is as expected on the Amendment after the Amendment content changes
 Revisit the original Methodology and check that its content remains unaffected by the changes to the Amendment
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user clicks link    View original methodology    ${accordion}
+    user clicks link    View existing version    ${accordion}
     user clicks link    Manage content
     user verifies original Methodology readonly content
 
@@ -218,7 +216,6 @@ Revisit the live Amendment after the cancellation to double check it remains una
     user clicks link    View methodology
     user clicks link    Manage content
     user verifies amended Methodology readonly content
-
 
 *** Keywords ***
 user verifies original Methodology readonly content

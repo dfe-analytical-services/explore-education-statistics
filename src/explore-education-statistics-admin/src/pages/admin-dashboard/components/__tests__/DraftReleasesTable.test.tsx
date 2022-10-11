@@ -147,7 +147,7 @@ describe('DraftReleasesTable', () => {
     ).not.toBeInTheDocument();
     expect(
       within(row3cells[2]).queryByRole('link', {
-        name: 'View original for Release 1',
+        name: 'View existing version for Release 1',
       }),
     ).not.toBeInTheDocument();
 
@@ -171,7 +171,7 @@ describe('DraftReleasesTable', () => {
     ).not.toBeInTheDocument();
     expect(
       within(row4cells[2]).queryByRole('link', {
-        name: 'View original for Release 3',
+        name: 'View existing version for Release 3',
       }),
     ).not.toBeInTheDocument();
 
@@ -199,7 +199,7 @@ describe('DraftReleasesTable', () => {
     ).toBeInTheDocument();
     expect(
       within(row6cells[2]).getByRole('link', {
-        name: 'View original for Release 2',
+        name: 'View existing version for Release 2',
       }),
     ).toBeInTheDocument();
     expect(
@@ -232,7 +232,7 @@ describe('DraftReleasesTable', () => {
     ).toBeInTheDocument();
     expect(
       within(row8cells[2]).queryByRole('link', {
-        name: 'View original for Release 4',
+        name: 'View existing version for Release 4',
       }),
     ).toBeInTheDocument();
   });
@@ -281,7 +281,7 @@ describe('DraftReleasesTable', () => {
     ).not.toBeInTheDocument();
     expect(
       within(row3cells[3]).queryByRole('link', {
-        name: 'View original for Release 1',
+        name: 'View existing version for Release 1',
       }),
     ).not.toBeInTheDocument();
 
@@ -305,7 +305,7 @@ describe('DraftReleasesTable', () => {
     ).not.toBeInTheDocument();
     expect(
       within(row4cells[3]).queryByRole('link', {
-        name: 'View original for Release 3',
+        name: 'View existing version for Release 3',
       }),
     ).not.toBeInTheDocument();
 
@@ -336,7 +336,7 @@ describe('DraftReleasesTable', () => {
     ).toBeInTheDocument();
     expect(
       within(row6cells[3]).getByRole('link', {
-        name: 'View original for Release 2',
+        name: 'View existing version for Release 2',
       }),
     ).toBeInTheDocument();
 
@@ -366,7 +366,7 @@ describe('DraftReleasesTable', () => {
     ).toBeInTheDocument();
     expect(
       within(row8cells[3]).queryByRole('link', {
-        name: 'View original for Release 4',
+        name: 'View existing version for Release 4',
       }),
     ).toBeInTheDocument();
   });

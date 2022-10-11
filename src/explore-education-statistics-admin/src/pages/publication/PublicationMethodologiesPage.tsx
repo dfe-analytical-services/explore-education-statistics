@@ -216,7 +216,7 @@ const PublicationMethodologiesPage = () => {
                                 )}
                                 unvisited
                               >
-                                View original
+                                View existing version
                                 <VisuallyHidden>
                                   {` for ${methodology.title}`}
                                 </VisuallyHidden>

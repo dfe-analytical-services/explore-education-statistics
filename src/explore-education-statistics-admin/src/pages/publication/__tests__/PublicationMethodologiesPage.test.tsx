@@ -617,7 +617,7 @@ describe('PublicationMethodologiesPage', () => {
 
         expect(
           within(row1Cells[4]).getByRole('link', {
-            name: 'View original for Methodology 1',
+            name: 'View existing version for Methodology 1',
           }),
         ).toHaveAttribute('href', '/methodology/previous-version-id/summary');
       });
@@ -1146,7 +1146,7 @@ describe('PublicationMethodologiesPage', () => {
 
         expect(
           within(row1Cells[4]).queryByRole('link', {
-            name: 'View original for Methodology 2',
+            name: 'View existing version for Methodology 2',
           }),
         ).not.toBeInTheDocument();
 
