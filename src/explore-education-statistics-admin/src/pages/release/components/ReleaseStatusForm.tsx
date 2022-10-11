@@ -15,6 +15,7 @@ import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import WarningMessage from '@common/components/WarningMessage';
 import useFormSubmit from '@common/hooks/useFormSubmit';
+import useToggle from '@common/hooks/useToggle';
 import { ReleaseApprovalStatus } from '@common/services/publicationService';
 import FormattedDate from '@common/components/FormattedDate';
 import {
@@ -31,7 +32,7 @@ import Yup from '@common/validation/yup';
 import ModalConfirm from '@common/components/ModalConfirm';
 import { endOfDay, format, isValid, parseISO } from 'date-fns';
 import { Formik } from 'formik';
-import React, { useState } from 'react';
+import React from 'react';
 import { StringSchema } from 'yup';
 import { keyBy, mapValues } from 'lodash';
 
@@ -97,9 +98,9 @@ const ReleaseStatusForm = ({
   onCancel,
   onSubmit,
 }: Props) => {
-  const [showScheduledConfirmModal, setShowScheduledConfirmModal] = useState<
-    boolean
-  >(false);
+  const [showConfirmScheduleModal, toggleConfirmScheduleModal] = useToggle(
+    false,
+  );
 
   const handleSubmit = useFormSubmit<ReleaseStatusFormValues>(
     async ({ approvalStatus, publishMethod, publishScheduled, ...values }) => {
@@ -279,19 +280,23 @@ const ReleaseStatusForm = ({
               <Button
                 type="submit"
                 disabled={form.isSubmitting}
-                onClick={e => {
+                onClick={async e => {
                   e.preventDefault();
+
                   if (form.values.approvalStatus !== 'Approved') {
                     form.setFieldValue('notifySubscribers', undefined);
                   }
+
                   if (
                     form.values.approvalStatus === 'Approved' &&
                     form.values.publishMethod === 'Scheduled' &&
                     form.values.publishScheduled
                   ) {
-                    return setShowScheduledConfirmModal(true);
+                    toggleConfirmScheduleModal.on();
+                    return;
                   }
-                  return form.submitForm();
+
+                  await form.submitForm();
                 }}
               >
                 Update status
@@ -306,15 +311,15 @@ const ReleaseStatusForm = ({
               </ButtonText>
             </ButtonGroup>
           </Form>
+
           <ModalConfirm
             title="Confirm publish date"
+            open={showConfirmScheduleModal}
             onConfirm={async () => {
               await form.submitForm();
-              setShowScheduledConfirmModal(false);
+              toggleConfirmScheduleModal.off();
             }}
-            onExit={() => setShowScheduledConfirmModal(false)}
-            onCancel={() => setShowScheduledConfirmModal(false)}
-            open={showScheduledConfirmModal}
+            onExit={toggleConfirmScheduleModal.off}
           >
             <p>
               This release will be published at 09:30 on{' '}
