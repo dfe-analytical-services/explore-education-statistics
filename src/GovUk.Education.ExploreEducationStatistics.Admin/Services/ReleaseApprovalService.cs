@@ -212,7 +212,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     DateTimeStyles.None);
 
                 // Publish date can't be before today when compared with 'today' in the same timezone that we expect
-                // the user to be located in and the Publishing functions to be running in, both of which are the UK.
+                // the user to be located in and the Publisher functions to be running in, both of which are the UK.
 
                 // Example (1) - valid because publish date is same as today:
                 // Time now (UTC): 2023-01-01 23:00:00

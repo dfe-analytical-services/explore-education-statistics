@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -221,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 releaseChecklistService
                     .Setup(s =>
-                            s.GetErrors(It.Is<Release>(r => r.Id == release.Id)))
+                        s.GetErrors(It.Is<Release>(r => r.Id == release.Id)))
                     .ReturnsAsync(
                         new List<ReleaseChecklistIssue>
                         {
@@ -250,25 +251,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(releaseChecklistService);
 
                 result.AssertBadRequest(
-                    DataFileImportsMustBeCompleted, 
+                    DataFileImportsMustBeCompleted,
                     DataFileReplacementsMustBeCompleted);
             }
         }
 
         [Fact]
-        public async Task CreateReleaseStatus_Approved_FailsNoPublishDate()
+        public async Task CreateReleaseStatus_Approved_FailsNullPublishDate()
         {
             var release = new Release
             {
                 Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication
-                {
-                    Title = "Old publication",
-                },
+                Publication = new Publication(),
                 ReleaseName = "2030",
                 Slug = "2030",
                 Published = DateTime.Now,
-                PublishScheduled = DateTime.UtcNow,
+                PublishScheduled = DateTime.UtcNow
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -297,6 +295,382 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 result.AssertBadRequest(PublishDateCannotBeEmpty);
+            }
+        }
+
+        [Fact]
+        public async Task CreateReleaseStatus_Approved_FailsEmptyPublishDate()
+        {
+            var release = new Release
+            {
+                Type = ReleaseType.AdHocStatistics,
+                Publication = new Publication(),
+                ReleaseName = "2030",
+                Slug = "2030",
+                Published = DateTime.Now,
+                PublishScheduled = DateTime.UtcNow
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildService(context);
+
+                var result = await releaseService
+                    .CreateReleaseStatus(
+                        release.Id,
+                        new ReleaseStatusCreateViewModel
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Approved,
+                            LatestInternalReleaseNote = "Test note",
+                            PublishMethod = PublishMethod.Scheduled,
+                            PublishScheduled = "",
+                            NextReleaseDate = new PartialDate {Month="12", Year="2000"}
+                        }
+                    );
+
+                result.AssertBadRequest(PublishDateCannotBeEmpty);
+            }
+        }
+
+        [Fact]
+        public async Task CreateReleaseStatus_Approved_FailsPublishDateBeforeToday()
+        {
+            var release = new Release
+            {
+                Type = ReleaseType.AdHocStatistics,
+                Publication = new Publication(),
+                ReleaseName = "2030",
+                Slug = "2030",
+                Published = DateTime.Now,
+                PublishScheduled = DateTime.UtcNow
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            // Set up the current time in UTC
+            var dateTimeProvider =
+                new DateTimeProvider(DateTime.Parse("2023-01-01T00:00:00Z", styles: DateTimeStyles.RoundtripKind));
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildService(context,
+                    dateTimeProvider: dateTimeProvider);
+
+                // Request a publish day which is earlier than today
+                var result = await releaseService
+                    .CreateReleaseStatus(
+                        release.Id,
+                        new ReleaseStatusCreateViewModel
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Approved,
+                            LatestInternalReleaseNote = "Test note",
+                            PublishMethod = PublishMethod.Scheduled,
+                            PublishScheduled = "2022-12-31",
+                            NextReleaseDate = new PartialDate {Month="12", Year="2000"}
+                        }
+                    );
+
+                result.AssertBadRequest(PublishDateCannotBeBeforeToday);
+            }
+        }
+
+        [Fact]
+        public async Task CreateReleaseStatus_Approved_FailsPublishDateBeforeToday_DaylightSavingTime()
+        {
+            var release = new Release
+            {
+                Type = ReleaseType.AdHocStatistics,
+                Publication = new Publication(),
+                ReleaseName = "2030",
+                Slug = "2030",
+                Published = DateTime.Now,
+                PublishScheduled = DateTime.UtcNow
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            // Set up a current time in UTC which crosses a day boundary in British Summer Time.
+            // Date is 6th June UTC but 7th June in British Summer Time which is the timezone we expect the user to be
+            // located in and the Publisher functions to be running in.
+            var dateTimeProvider =
+                new DateTimeProvider(DateTime.Parse("2023-06-06T23:00:00Z", styles: DateTimeStyles.RoundtripKind));
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildService(context,
+                    dateTimeProvider: dateTimeProvider);
+
+                // Request a publish day which is the same as the UTC day but earlier than the BST day
+                var result = await releaseService
+                    .CreateReleaseStatus(
+                        release.Id,
+                        new ReleaseStatusCreateViewModel
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Approved,
+                            LatestInternalReleaseNote = "Test note",
+                            PublishMethod = PublishMethod.Scheduled,
+                            PublishScheduled = "2023-06-06",
+                            NextReleaseDate = new PartialDate {Month="12", Year="2000"}
+                        }
+                    );
+
+                result.AssertBadRequest(PublishDateCannotBeBeforeToday);
+            }
+        }
+
+        [Fact]
+        public async Task CreateReleaseStatus_Approved_FailsPublishDateHasNoPublishingScheduled_SameDay()
+        {
+            var release = new Release
+            {
+                Type = ReleaseType.AdHocStatistics,
+                Publication = new Publication(),
+                ReleaseName = "2030",
+                Slug = "2030",
+                Published = DateTime.Now,
+                PublishScheduled = DateTime.UtcNow
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            // Set up a current time in UTC after the first publishing function has run
+            var dateTimeProvider =
+                new DateTimeProvider(DateTime.Parse("2023-01-01T01:00:00Z", styles: DateTimeStyles.RoundtripKind));
+
+            // Set up the cron schedules for publishing
+            var options = Options.Create(new ReleaseApprovalOptions
+            {
+                PublishReleasesCronSchedule = "0 0 0 * * *", // Next occurrence 2023-01-02T00:00:00Z
+                PublishReleaseContentCronSchedule = "0 30 9 * * *" // Next occurrence 2023-01-01T09:30:00Z
+            });
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildService(context,
+                    dateTimeProvider: dateTimeProvider,
+                    options: options);
+
+                // Request a publish day which is today
+                var result = await releaseService
+                    .CreateReleaseStatus(
+                        release.Id,
+                        new ReleaseStatusCreateViewModel
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Approved,
+                            LatestInternalReleaseNote = "Test note",
+                            PublishMethod = PublishMethod.Scheduled,
+                            PublishScheduled = "2023-01-01",
+                            NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
+                        }
+                    );
+
+                // Expect this to fail because there's no occurrence of the first function until 2023-01-02T00:00:00Z
+                // A publish date of 2023-01-01 needs to be approved on or before 2023-01-01T00:00:00Z
+                result.AssertBadRequest(PublishDateHasNoPublishingScheduled);
+            }
+        }
+
+        [Fact]
+        public async Task
+            CreateReleaseStatus_Approved_FailsPublishDateHasNoPublishingScheduled_SameDay_DaylightSavingTime()
+        {
+            var release = new Release
+            {
+                Type = ReleaseType.AdHocStatistics,
+                Publication = new Publication(),
+                ReleaseName = "2030",
+                Slug = "2030",
+                Published = DateTime.Now,
+                PublishScheduled = DateTime.UtcNow
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            // Set up a current time in UTC after the first publishing function has run.
+            // Based on a time now of 2023-06-06T23:30:00Z the cron schedule in the UK timezone will have had an
+            // occurrence at 2023-06-06T23:30:00Z and the next occurrence will not be until 2023-06-07T23:00:00Z.
+            var dateTimeProvider =
+                new DateTimeProvider(DateTime.Parse("2023-06-06T23:30:00Z", styles: DateTimeStyles.RoundtripKind));
+
+            // Set up the cron schedules for publishing
+            var options = Options.Create(new ReleaseApprovalOptions
+            {
+                PublishReleasesCronSchedule = "0 0 0 * * *", // Next occurrence 2023-06-07T23:00:00Z
+                PublishReleaseContentCronSchedule = "0 30 9 * * *" // Next occurrence 2023-06-07T08:30:00Z
+            });
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildService(context,
+                    dateTimeProvider: dateTimeProvider,
+                    options: options);
+
+                // Request a publish day which is today
+                var result = await releaseService
+                    .CreateReleaseStatus(
+                        release.Id,
+                        new ReleaseStatusCreateViewModel
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Approved,
+                            LatestInternalReleaseNote = "Test note",
+                            PublishMethod = PublishMethod.Scheduled,
+                            PublishScheduled = "2023-06-07",
+                            NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
+                        }
+                    );
+
+                // Expect this to fail because there's no occurrence of the first function until 2023-06-07T23:00:00Z
+                // A publish date of 2023-06-07 needs to be approved on or before 2023-06-06T23:00:00Z
+                result.AssertBadRequest(PublishDateHasNoPublishingScheduled);
+            }
+        }
+
+        [Fact]
+        public async Task CreateReleaseStatus_Approved_FailsPublishDateHasNoPublishingScheduled_FutureDay()
+        {
+            var release = new Release
+            {
+                Type = ReleaseType.AdHocStatistics,
+                Publication = new Publication(),
+                ReleaseName = "2030",
+                Slug = "2030",
+                Published = DateTime.Now,
+                PublishScheduled = DateTime.UtcNow
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            // Set up the current time in UTC
+            var dateTimeProvider =
+                new DateTimeProvider(DateTime.Parse("2023-01-01T00:00:00Z", styles: DateTimeStyles.RoundtripKind));
+
+            // Set up the cron schedules for publishing
+            var options = Options.Create(new ReleaseApprovalOptions
+            {
+                PublishReleasesCronSchedule = "0 0 0 * * 1-5", // Only occurs on weekdays Monday - Friday
+                PublishReleaseContentCronSchedule = "0 30 9 * * 1-5" // Only occurs on weekdays Monday - Friday
+            });
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildService(context,
+                    dateTimeProvider: dateTimeProvider,
+                    options: options);
+
+                // Request a publish day in the future which has no scheduled occurrence
+                var result = await releaseService
+                    .CreateReleaseStatus(
+                        release.Id,
+                        new ReleaseStatusCreateViewModel
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Approved,
+                            LatestInternalReleaseNote = "Test note",
+                            PublishMethod = PublishMethod.Scheduled,
+                            PublishScheduled = "2023-01-08", // Sunday
+                            NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
+                        }
+                    );
+
+                // Expect this to fail because there's no occurrences of the functions on a Sunday
+                // A publish date of 2023-01-08 can't be requested
+                result.AssertBadRequest(PublishDateHasNoPublishingScheduled);
+            }
+        }
+
+        [Fact]
+        public async Task
+            CreateReleaseStatus_Approved_FailsPublishDateHasNoPublishingScheduled_SecondFunctionHasNoOccurrence()
+        {
+            var release = new Release
+            {
+                Type = ReleaseType.AdHocStatistics,
+                Publication = new Publication(),
+                ReleaseName = "2030",
+                Slug = "2030",
+                Published = DateTime.Now,
+                PublishScheduled = DateTime.UtcNow
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            // Set up a current time in UTC in the last hour of the day but before the first publishing function has run
+            var dateTimeProvider =
+                new DateTimeProvider(DateTime.Parse("2023-01-01T23:20:00Z", styles: DateTimeStyles.RoundtripKind));
+
+            // Set up cron schedules for publishing hourly on specific minutes
+            var options = Options.Create(new ReleaseApprovalOptions
+            {
+                PublishReleasesCronSchedule = "0 30 * * * *", // Occurs hourly at minute 30
+                PublishReleaseContentCronSchedule = "0 15 * * * *" // Occurs hourly at minute 15
+            });
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildService(context,
+                    dateTimeProvider: dateTimeProvider,
+                    options: options);
+
+                var result = await releaseService
+                    .CreateReleaseStatus(
+                        release.Id,
+                        new ReleaseStatusCreateViewModel
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Approved,
+                            LatestInternalReleaseNote = "Test note",
+                            PublishMethod = PublishMethod.Scheduled,
+                            PublishScheduled = "2023-01-01",
+                            NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
+                        }
+                    );
+
+                // Expect this to fail because there's no occurrences of the second function remaining on 2023-01-01.
+                // A publish date of 2023-01-01 needs to be approved on or before 2023-01-01T22:30:00Z
+                // in order to be published by the second function at 2023-01-01T23:15:00Z
+                result.AssertBadRequest(PublishDateHasNoPublishingScheduled);
             }
         }
 
@@ -392,7 +766,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         mock.SendPreReleaseUserInviteEmails(release.Id))
                     .ReturnsAsync(Unit.Instance);
 
-            var releaseService = BuildService(contentDbContext: context,
+                var releaseService = BuildService(contentDbContext: context,
                     releaseChecklistService: releaseChecklistService.Object,
                     publishingService: publishingService.Object,
                     contentService: contentService.Object,
@@ -491,7 +865,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 result.AssertRight();
             }
-            
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var saved = await context.Releases
@@ -593,7 +967,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 result.AssertRight();
             }
-            
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var saved = await context.Releases
@@ -694,7 +1068,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 result.AssertRight();
             }
-            
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var saved = await context.Releases
