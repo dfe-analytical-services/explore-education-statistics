@@ -22,12 +22,9 @@ Create Publications and a Methodology to adopt
     user creates test publication via api    ${ADOPTING_PUBLICATION_NAME}
 
 Adopt a Methodology
-    user navigates to publication page from dashboard    ${ADOPTING_PUBLICATION_NAME}
+    user navigates to methodologies on publication page    ${ADOPTING_PUBLICATION_NAME}
 
-    user clicks link    Methodologies
-    user waits until h2 is visible    Manage methodologies
     user waits until page contains link    Adopt an existing methodology
-
     user clicks link    Adopt an existing methodology
     user waits until h2 is visible    Adopt a methodology
 

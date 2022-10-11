@@ -7,22 +7,22 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
-    public class UpdatePublicationContactRequirement : IAuthorizationRequirement
+    public class UpdateContactRequirement : IAuthorizationRequirement
     {
     }
 
-    public class UpdatePublicationContactAuthorizationHandler : AuthorizationHandler<UpdatePublicationContactRequirement, Publication>
+    public class UpdateContactAuthorizationHandler : AuthorizationHandler<UpdateContactRequirement, Publication>
     {
         private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
-        public UpdatePublicationContactAuthorizationHandler(
+        public UpdateContactAuthorizationHandler(
             AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
         {
             _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
-            UpdatePublicationContactRequirement contactRequirement,
+            UpdateContactRequirement contactRequirement,
             Publication publication)
         {
             if (SecurityUtils.HasClaim(context.User, UpdateAllPublications))

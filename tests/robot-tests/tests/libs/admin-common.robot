@@ -76,8 +76,7 @@ user navigates to release page from dashboard
     ...    ${TOPIC_NAME}
 
     ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:${RELEASE_TABLE_TESTID}
-    # @MarkFix because "user clicks link" doesn't work
-    user clicks element    xpath://a[text()="${LINK_TEXT}"]    ${ROW}
+    user clicks element    xpath://a[text()="${LINK_TEXT}"]    ${ROW}    # "user clicks link" doesn't work
 
     user waits until h2 is visible    Release summary    %{WAIT_SMALL}
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
@@ -502,7 +501,7 @@ user navigates to admin dashboard
     END
     user waits until page contains element
     ...    css:[data-testid='topic-publications'],[data-testid='no-permission-to-access-releases']
-    ...    %{WAIT_SMALL}    # @MarkFix change back to WAIT_LONG?
+    ...    %{WAIT_SMALL}
 
 user uploads subject
     [Arguments]    ${SUBJECT_NAME}    ${SUBJECT_FILE}    ${META_FILE}

@@ -26,7 +26,23 @@ Create Publication as bau1
     user waits until page contains link    Team access
     user clicks link    Team access
     user waits until page contains link    Add or remove users
-    # @MarkFix requires more checks to see if can add users?
+    user waits until page contains link    Invite new users
+
+Validate Manage release contributors page
+    user clicks link    Add or remove users
+    user waits until h2 is visible    Manage release contributors (Academic Year 2002/03)
+    user waits until page contains    There are no contributors for this release's publication.
+
+Validate Invite new users page
+    user clicks button    Go back
+    user waits until h2 is visible    Update release access
+
+    user clicks link    Invite new users
+
+    user waits until page contains element    id:email
+    user checks checkbox is checked    Academic Year 2002/03
+    user checks checkbox is checked    Academic Year 2001/02
+    user checks checkbox is checked    Academic Year 2000/01
 
 Assign various release access permissions to analysts
     user changes to bau1

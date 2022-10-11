@@ -375,4 +375,3 @@ Verify that the methodology that was scheduled with the cancelled release amendm
     user checks radio is checked    In draft
     user clicks radio    Approved for publication
     user checks radio is checked    Immediately
-    # @MarkFix this test suite seems to end abruptly?

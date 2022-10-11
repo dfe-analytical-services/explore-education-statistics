@@ -18,7 +18,6 @@ ${UPDATED_DESCRIPTION}=     updated legacy release description
 *** Test Cases ***
 Create new publication and release via api
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    Set Suite Variable    ${PUBLICATION_ID}
     user create test release via api    ${PUBLICATION_ID}    AY    2020
 
 Create legacy release
@@ -92,7 +91,6 @@ Validate updated legacy release
     user checks results table cell contains    1    3    http://test2.com
 
 Validate public frontend shows changes made to legacy release after saving publication
-    #sleep    %{WAIT_MEMORY_CACHE_EXPIRY}    # @MarkFix
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
 
     user opens details dropdown    See other releases (1)

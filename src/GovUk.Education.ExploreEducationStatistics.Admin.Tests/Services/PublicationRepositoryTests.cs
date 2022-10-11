@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -36,7 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Related publication 1",
                 Topic = topic,
-                Contact = new Contact(),
             };
 
             userReleaseRoles.AddRange(new List<UserReleaseRole>
@@ -98,7 +96,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     },
                     Topic = topic,
-                    Contact = new Contact(),
                 },
                 User = user,
                 Role = Owner
@@ -126,7 +123,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     },
                     Topic = topic,
-                    Contact = new Contact(),
                 },
                 User = user,
                 Role = ReleaseApprover
@@ -144,7 +140,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Title = "Related publication 4",
                         Topic = topic,
-                        Contact = new Contact(),
                     }
                 },
                 User = user,
@@ -166,7 +161,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Theme = new Theme(),
                         },
-                        Contact = new Contact(),
                     }
                 },
                 User = user,
@@ -193,7 +187,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Theme = new Theme(),
                     },
-                    Contact = new Contact(),
                 },
                 User = user,
                 Role = Owner
@@ -219,7 +212,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Theme = new Theme(),
                     },
-                    Contact = new Contact(),
                 },
                 User = user,
                 Role = ReleaseApprover
@@ -284,7 +276,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             }
                         },
                         Topic = new Topic { Theme = new Theme(), },
-                        Contact = new Contact(),
                     },
                     User = user,
                     Role = Owner,
@@ -308,7 +299,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             }
                         },
                         Topic = new Topic { Theme = new Theme(), },
-                        Contact = new Contact(),
                     },
                     User = user,
                     Role = ReleaseApprover,
@@ -330,7 +320,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Theme = new Theme(),
                         },
-                        Contact = new Contact(),
                     },
                     User = user,
                     Role = Owner,
@@ -349,7 +338,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Title = "Release Contributor publication",
                             Topic = new Topic { Theme = new Theme(), },
-                            Contact = new Contact(),
                         },
                     },
                     User = user,
@@ -365,7 +353,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Title = "Release Viewer publication",
                             Topic = new Topic { Theme = new Theme(), },
-                            Contact = new Contact(),
                         },
                     },
                     User = user,
@@ -381,7 +368,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Title = "Release PrereleaseViewer publication",
                             Topic = new Topic { Theme = new Theme(), },
-                            Contact = new Contact(),
                         }
                     },
                     User = user,
@@ -400,7 +386,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             {
                                 Theme = new Theme(),
                             },
-                            Contact = new Contact(),
                         }
                     },
                     User = user,
@@ -471,7 +456,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Publication = new Publication
                     {
                         Title = "Related publication",
-                        Contact = new Contact(),
                         Methodologies = new List<PublicationMethodology>
                         {
                             new()
@@ -714,7 +698,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Title = "Related publication 1",
                         Releases = new List<Release>(),
                         Topic = topic,
-                        Contact = new Contact(),
                     },
                     User = user,
                     Role = Owner
@@ -729,7 +712,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Theme = new Theme(),
                         },
-                        Contact = new Contact(),
                     },
                     User = user,
                     Role = Owner
@@ -778,7 +760,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Publication",
                 Topic = topic,
-                Contact = new Contact(),
             };
 
             var release = new Release

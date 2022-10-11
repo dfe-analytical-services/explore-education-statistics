@@ -208,7 +208,7 @@ const PublicationMethodologiesPage = () => {
                             methodology.previousVersionId && (
                               <Link
                                 className="govuk-!-margin-right-4"
-                                data-testid="view-original"
+                                data-testid="view-existing-version"
                                 to={generatePath<MethodologyRouteParams>(
                                   methodologySummaryRoute.path,
                                   {

@@ -140,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetMyReleasesForReleaseStatusesAsync_CanViewAllReleases()
+        public async Task ListReleasesWithStatuses_CanViewAllReleases()
         {
             var releaseRepository = new Mock<IReleaseRepository>();
 
@@ -203,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetMyReleasesForReleaseStatusesAsync_CanViewRelatedReleases()
+        public async Task ListReleasesWithStatuses_CanViewRelatedReleases()
         {
             var repository = new Mock<IReleaseRepository>();
 
@@ -270,7 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetMyReleasesForReleaseStatusesAsync_NoAccessToSystem()
+        public async Task ListReleasesWithStatuses_NoAccessToSystem()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectCheckToFail(CanAccessSystem)

@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
         public static Task<Either<ActionResult, Publication>> CheckCanUpdateContact(
             this IUserService userService, Publication publication)
         {
-            return userService.CheckPolicy(publication, SecurityPolicies.CanUpdatePublicationContact);
+            return userService.CheckPolicy(publication, SecurityPolicies.CanUpdateContact);
         }
 
         public static Task<Either<ActionResult, Tuple<Publication, ReleaseRole>>> CheckCanUpdateReleaseRole(

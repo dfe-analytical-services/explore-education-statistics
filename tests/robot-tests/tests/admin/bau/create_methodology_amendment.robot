@@ -178,7 +178,7 @@ Revisit the original Methodology and check that its content remains unaffected b
     user navigates to methodologies on publication page    ${PUBLICATION_NAME}
 
     ${ROW}=    user gets table row    ${PUBLICATION_NAME}    testid:methodologies
-    user clicks element    xpath://*[text()="View original"]    ${ROW}
+    user clicks element    xpath://*[text()="View existing version"]    ${ROW}
     user waits until h2 is visible    Methodology summary
 
     user clicks link    Manage content
@@ -195,7 +195,7 @@ Revisit the Publication methodologies page and check that the new Amendment is n
     user checks element contains link    ${ROW}    View
     user checks element does not contain link    ${ROW}    Edit
     user checks element contains button    ${ROW}    Amend
-    user checks element does not contain link    ${ROW}    View original
+    user checks element does not contain link    ${ROW}    View existing version
 
 Visit the approved Amendment and check that its summary is as expected
     ${ROW}=    user gets table row    ${PUBLICATION_NAME}    testid:methodologies

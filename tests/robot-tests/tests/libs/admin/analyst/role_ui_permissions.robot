@@ -63,5 +63,5 @@ user cannot see the remove controls for methodology
 
 user cannot see the cancel amendment controls for methodology
     user waits until page contains element    testid:view
-    user waits until page contains element    testid:view-original
+    user waits until page contains element    testid:view-existing-version
     user checks page does not contain element    testid:cancel-amendment

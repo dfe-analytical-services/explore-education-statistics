@@ -61,8 +61,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                     policy.RequireClaim(SecurityClaimTypes.UpdateAllPublications.ToString()));
 
                 // does this user have permission to update a publication's contact?
-                options.AddPolicy(SecurityPolicies.CanUpdatePublicationContact.ToString(), policy =>
-                    policy.Requirements.Add(new UpdatePublicationContactRequirement()));
+                options.AddPolicy(SecurityPolicies.CanUpdateContact.ToString(), policy =>
+                    policy.Requirements.Add(new UpdateContactRequirement()));
 
                 // does this user have permission to update a ReleaseRole on a specific Publication?
                 options.AddPolicy(SecurityPolicies.CanUpdateSpecificReleaseRole.ToString(), policy =>
@@ -234,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
              */
             services.AddTransient<IAuthorizationHandler, ViewSpecificPublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdatePublicationSummaryAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, UpdatePublicationContactAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, UpdateContactAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreatePublicationForSpecificTopicAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreateReleaseForSpecificPublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreateMethodologyForSpecificPublicationAuthorizationHandler>();

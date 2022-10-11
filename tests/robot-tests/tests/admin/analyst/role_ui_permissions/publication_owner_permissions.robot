@@ -18,6 +18,12 @@ Import permissions test variables
 
 Navigate to Publication where analyst has Publication Owner role
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
+    user waits until page contains link    Releases
+    user waits until page contains link    Methodologies
+    user waits until page contains link    Details
+    user waits until page contains link    Contact
+    user waits until page contains link    Team access
+    user waits until page contains link    Legacy releases
 
 Check can create a Methodology for the owned Publication
     user clicks link    Methodologies
@@ -37,10 +43,9 @@ Check Edit publication details page inputs are correct
     user clicks button    Edit publication details
 
     user waits until page contains element    label:Publication summary
-    # @MarkFix needs sorting out on frontend
-    #user checks page does not contain element    label:Select theme    # Only BAU users should see this
-    #user checks page does not contain element    label:Select topic    # Only BAU users should see this
     user checks page does not contain element    label:Publication title    # Only BAU users should see this
+    user checks page does not contain element    label:Select theme    # Only BAU users should see this
+    user checks page does not contain element    label:Select topic    # Only BAU users should see this
     user checks page does not contain element    label:Superseding publication    # Only BAU users should see this
 
     user clicks button    Cancel

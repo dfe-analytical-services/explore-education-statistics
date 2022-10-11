@@ -14,12 +14,12 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
-    public class UpdatePublicationContactAuthorizationHandlerTests
+    public class UpdateContactAuthorizationHandlerTests
     {
         [Fact]
         public async Task CanUpdateAllPublicationsContactAuthorizationHandler_SucceedsWithClaim()
         {
-            await AssertHandlerSucceedsWithCorrectClaims<Publication, UpdatePublicationContactRequirement>(
+            await AssertHandlerSucceedsWithCorrectClaims<Publication, UpdateContactRequirement>(
                 CreateHandler,
                 new Publication(),
                 UpdateAllPublications
@@ -29,13 +29,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         [Fact]
         public async Task CanUpdateAllPublicationsContactAuthorizationHandler_SucceedsWithPublicationOwner()
         {
-            await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdatePublicationContactRequirement>(
+            await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdateContactRequirement>(
                 CreateHandler, Owner);
         }
 
-        private static UpdatePublicationContactAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+        private static UpdateContactAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
         {
-            return new UpdatePublicationContactAuthorizationHandler(
+            return new UpdateContactAuthorizationHandler(
                 new AuthorizationHandlerResourceRoleService(
                     Mock.Of<IUserReleaseRoleRepository>(Strict),
                     new UserPublicationRoleRepository(contentDbContext),

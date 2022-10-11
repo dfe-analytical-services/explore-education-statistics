@@ -61,7 +61,6 @@ const PublicationDetailsForm = ({
   const { value, isLoading } = useAsyncHandledRetry(async () => {
     const themes = await themeService.getThemes();
     if (!canUpdatePublication) {
-      // @MarkFix correct?
       return { themes };
     }
 

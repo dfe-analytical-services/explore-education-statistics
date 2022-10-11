@@ -129,10 +129,7 @@ Adopt a Draft methodology
 
     user waits until page contains link    ${ADOPTED_PUBLICATION_NAME}
 
-    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-
-    user clicks link    Methodologies
-    user waits until h2 is visible    Manage methodologies
+    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
 
     user clicks link    Adopt an existing methodology
     user waits until h2 is visible    Adopt a methodology

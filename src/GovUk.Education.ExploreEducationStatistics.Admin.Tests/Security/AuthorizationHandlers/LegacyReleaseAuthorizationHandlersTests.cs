@@ -21,10 +21,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     // ReSharper disable once ClassNeverInstantiated.Global
     public class LegacyReleaseAuthorizationHandlersTests
     {
-        public class CreateLegacyReleaseAuthorizationHandlerTests
+        public class ManageLegacyReleaseAuthorizationHandlerTests
         {
             [Fact]
-            public async Task CreateLegacyRelease_Claims()
+            public async Task ManageLegacyRelease_Claims()
             {
                 await AssertHandlerSucceedsWithCorrectClaims<Publication, ManageLegacyReleasesRequirement>(
                     CreateHandler,
@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
-            public async Task CreateLegacyRelease_PublicationRoles()
+            public async Task ManageLegacyRelease_PublicationRoles()
             {
                 await AssertPublicationHandlerSucceedsWithPublicationRoles<ManageLegacyReleasesRequirement>(
                     CreateHandler, Owner);

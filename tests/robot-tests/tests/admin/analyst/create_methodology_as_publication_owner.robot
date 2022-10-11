@@ -60,7 +60,7 @@ Navigate back to Publication page Methodologies
     user checks element contains link    ${ROW}    Edit
     user checks element contains button    ${ROW}    Delete draft
 
-    user checks element does not contain    ${ROW}    View original
+    user checks element does not contain    ${ROW}    View existing version
     user checks element does not contain    ${ROW}    Amend
 
     user clicks element    xpath://*[text()="Edit"]    ${ROW}

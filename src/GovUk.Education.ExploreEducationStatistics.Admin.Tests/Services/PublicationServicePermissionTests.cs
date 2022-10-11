@@ -176,7 +176,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Old publication title",
                 Slug = "publication-slug",
                 Topic = new Topic { Title = "Old topic title" },
-                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -226,7 +225,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Slug = "publication-slug",
                 Topic = new Topic { Title = "Old topic title" },
                 SupersededById = Guid.NewGuid(),
-                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -280,7 +278,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Publication title",
                 Slug = "publication-slug",
                 Topic = new Topic { Title = "Old topic title" },
-                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -336,7 +333,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Publication title",
                 Slug = "publication-slug",
                 Topic = new Topic { Title = "Old topic title" },
-                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -527,7 +523,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(publication, SecurityPolicies.CanUpdatePublicationContact)
+                .SetupResourceCheckToFail(publication, SecurityPolicies.CanUpdateContact)
                 .AssertForbidden(async userService =>
                 {
                     var contentDbContext = InMemoryApplicationDbContext();

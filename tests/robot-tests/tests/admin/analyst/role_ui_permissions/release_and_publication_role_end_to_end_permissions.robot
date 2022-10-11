@@ -208,8 +208,6 @@ Swap the release approver role for publication owner now that the publication is
     user removes release access from analyst    ${PUBLICATION_NAME}    ${RELEASE_TYPE}    Approver
     user gives analyst publication owner access    ${PUBLICATION_NAME}
 
-# @MarkFix what is this keyword doing?
-
 Check publication owner can create and cancel methodology amendments on a live publication
     user changes to analyst1
     user creates methodology amendment for publication    ${PUBLICATION_NAME}

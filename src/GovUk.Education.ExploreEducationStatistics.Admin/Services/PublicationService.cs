@@ -144,8 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             PublicationSaveRequest updatedPublication)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId, query =>
-                    query.Include(p => p.Contact))
+                .CheckEntityExists<Publication>(publicationId)
                 .OnSuccess(_userService.CheckCanUpdatePublicationSummary)
                 .OnSuccessDo(async publication =>
                 {
@@ -174,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     return Unit.Instance;
                 })
-                .OnSuccessDo(async publication =>  // @MarkFix doing this correct?
+                .OnSuccessDo(async publication =>
                 {
                     if (publication.TopicId != updatedPublication.TopicId)
                     {

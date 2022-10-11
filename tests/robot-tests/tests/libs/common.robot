@@ -674,7 +674,6 @@ user checks page contains link with text and url
     ...    ${text}
     ...    ${href}
     ...    ${parent}=css:body
-    #user waits until parent contains element    ${parent}    xpath:.//a[@href="${href}" and .="${text}"]    # @MarkFix
     user waits until parent contains element    ${parent}
     ...    xpath:.//a[@href="${href}" and contains(text(), "${text}")]
 

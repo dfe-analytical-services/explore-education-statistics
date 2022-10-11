@@ -26,7 +26,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Map
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -125,21 +124,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "A",
                 Topic = topic,
-                Contact = new Contact(),
             };
 
             var publication2 = new Publication
             {
                 Title = "B",
                 Topic = topic,
-                Contact = new Contact(),
             };
 
             var publication3 = new Publication
             {
                 Title = "C",
                 Topic = topic,
-                Contact = new Contact(),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -185,21 +181,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "publication1",
                 Topic = new Topic { Theme = new Theme(), },
-                Contact = new Contact(),
             };
 
             var publication2 = new Publication
             {
                 Title = "publication2",
                 Topic = new Topic { Theme = new Theme(), },
-                Contact = new Contact(),
             };
 
             var publication3 = new Publication
             {
                 Title = "publication3",
                 Topic = new Topic { Theme = new Theme(), },
-                Contact = new Contact(),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -262,19 +255,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Slug = "test-slug",
                 Topic = topic,
                 SupersededBy = null,
-                Contact = new Contact(),
             };
 
             var publication2 = new Publication
             {
                 Topic = new Topic(),
-                Contact = new Contact(),
             };
 
             var publication3 = new Publication
             {
                 Topic = new Topic(),
-                Contact = new Contact(),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -349,21 +339,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "A",
                 Topic = topic,
-                Contact = new Contact(),
             };
 
             var publication2 = new Publication
             {
                 Title = "B",
                 Topic = topic,
-                Contact = new Contact(),
             };
 
             var publication3 = new Publication
             {
                 Title = "C",
                 Topic = topic,
-                Contact = new Contact(),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -431,28 +418,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "publication1",
                 Topic = new Topic { Theme = new Theme(), },
-                Contact = new Contact(),
             };
 
             var publication2 = new Publication
             {
                 Title = "publication2",
                 Topic = new Topic { Theme = new Theme(), },
-                Contact = new Contact(),
             };
 
             var publication3 = new Publication
             {
                 Title = "publication3",
                 Topic = new Topic { Theme = new Theme(), },
-                Contact = new Contact(),
             };
 
             var publication4 = new Publication
             {
                 Title = "publication4",
                 Topic = new Topic { Theme = new Theme(), },
-                Contact = new Contact(),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -534,13 +517,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Title = "Test theme"
                     }
                 },
-                Contact = new Contact
-                {
-                    ContactName = "Test contact",
-                    ContactTelNo = "0123456789",
-                    TeamName = "Test team",
-                    TeamEmail = "team@test.com",
-                },
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -584,7 +560,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Theme = new Theme(),
                 },
-                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -609,7 +584,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(true);
                 userService.Setup(s => s.MatchesPolicy(CanUpdatePublication))
                     .ReturnsAsync(true);
-                userService.Setup(s => s.MatchesPolicy(CanUpdatePublicationContact))
+                userService.Setup(s => s.MatchesPolicy(CanUpdateContact))
                     .ReturnsAsync(true);
                 userService.Setup(s => s.MatchesPolicy(
                         It.Is<Publication>(p => p.Id == publication.Id),
@@ -629,7 +604,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(false);
                 userService.Setup(s => s.MatchesPolicy(
                         It.Is<Publication>(p => p.Id == publication.Id),
-                        CanUpdatePublicationContact))
+                        CanUpdateContact))
                     .ReturnsAsync(true);
                 userService.Setup(s => s.MatchesPolicy(
                         It.Is<Tuple<Publication, ReleaseRole>>(tuple =>
@@ -676,7 +651,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Theme = new Theme(),
                 },
-                Contact = new Contact(),
                 SupersededBy = supersedingPublication,
             };
 
@@ -721,7 +695,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Theme = new Theme(),
                 },
-                Contact = new Contact(),
                 SupersededBy = supersedingPublication,
             };
 
@@ -1024,7 +997,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(newSupersededById, viewModel.SupersededById);
 
                 // Do an in depth check of the saved release
-                var updatedPublication = await context.Publications.FindAsync(viewModel.Id);
+                var updatedPublication = await context.Publications
+                    .Include(p => p.Contact)
+                    .SingleAsync(p => p.Id == viewModel.Id);
 
                 Assert.NotNull(updatedPublication);
                 Assert.False(updatedPublication!.Live);
@@ -1083,7 +1058,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Slug = "superseded-slug",
                 SupersededBy = publication,
-                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1158,7 +1132,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(newSupersededById, viewModel.SupersededById);
 
                 // Do an in depth check of the saved release
-                var updatedPublication = await context.Publications.FindAsync(viewModel.Id);
+                var updatedPublication = await context.Publications
+                    .Include(p => p.Contact)
+                    .SingleAsync(p => p.Id == viewModel.Id);
 
                 Assert.NotNull(updatedPublication);
                 Assert.True(updatedPublication!.Live);
@@ -1262,7 +1238,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Theme = new Theme(),
                 },
                 Published = DateTime.UtcNow,
-                Contact = new Contact(),
             };
 
             var supersededPublication1 = new Publication
@@ -1270,7 +1245,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Superseded title 1",
                 Slug = "superseded-slug-1",
                 SupersededBy = publication,
-                Contact = new Contact(),
             };
 
             var supersededPublication2 = new Publication
@@ -1278,7 +1252,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Superseded title 2",
                 Slug = "superseded-slug-2",
                 SupersededBy = publication,
-                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1354,7 +1327,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Title = "Test topic"
                 },
-                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1395,14 +1367,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Test publication",
                 Slug = "test-publication",
                 Topic = topic,
-                Contact = new Contact(),
             };
             var otherPublication = new Publication
             {
                 Title = "Duplicated title",
                 Slug = "duplicated-title",
                 Topic = topic,
-                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
