@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation("{0} triggered at: {1}",
+            logger.LogInformation("{FunctionName} triggered at: {DateTime}",
                 executionContext.FunctionName,
                 DateTime.UtcNow);
 
@@ -53,9 +53,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             if (scheduled.Any())
             {
                 // Move all cached releases in the staging directory of the public content container to the root
-                await UpdatePublishingStage(scheduled, Started);
+                await UpdateContentStage(scheduled, ReleasePublishingStatusContentStage.Started);
                 await _publishingService.PublishStagedReleaseContent();
-                
+                await UpdateContentStage(scheduled, ReleasePublishingStatusContentStage.Complete);
+
                 // Finalise publishing of these releases
                 await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
                     scheduled,
@@ -63,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             }
 
             logger.LogInformation(
-                "{0} completed. {1}",
+                "{FunctionName} completed. {Count}",
                 executionContext.FunctionName,
                 timer.FormatNextOccurrences(1));
         }
@@ -85,6 +86,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 .ForEachAwaitAsync(status =>
                     _releasePublishingStatusService.UpdatePublishingStageAsync(
                         status.ReleaseId,
+                        status.Id, 
+                        stage, 
+                        logMessage));
+        }
+
+        private async Task UpdateContentStage(
+            IEnumerable<ReleasePublishingStatus> releaseStatuses, 
+            ReleasePublishingStatusContentStage stage,
+            ReleasePublishingStatusLogMessage logMessage = null)
+        {
+            await releaseStatuses
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(status => _releasePublishingStatusService
+                    .UpdateContentStageAsync(
+                        status.ReleaseId, 
                         status.Id, 
                         stage, 
                         logMessage));

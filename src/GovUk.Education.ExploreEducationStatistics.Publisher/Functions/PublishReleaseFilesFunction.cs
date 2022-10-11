@@ -15,7 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class PublishReleaseFilesFunction
     {
         private readonly IPublishingService _publishingService;
-        // TODO DW - should we be completing the "all stages complete" step via a queue message?
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
         private readonly IPublishingCompletionService _publishingCompletionService;
 

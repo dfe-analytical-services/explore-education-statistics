@@ -55,6 +55,14 @@ public class PublishingCompletionService : IPublishingCompletionService
             .Where(status => status.AllStagesPriorToPublishingComplete())
             .ToList();
         
+        await releaseStatuses
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(status => _releasePublishingStatusService
+                .UpdatePublishingStageAsync(
+                    status.ReleaseId, 
+                    status.Id, 
+                    ReleasePublishingStatusPublishingStage.Started));
+        
         var releaseIdsToUpdate = prePublishingStagesComplete
             .Select(status => status.ReleaseId)
             .ToArray();

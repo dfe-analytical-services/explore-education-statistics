@@ -43,10 +43,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation("{0} triggered: {1}",
+            logger.LogInformation("{FunctionName} triggered: {Message}",
                 executionContext.FunctionName,
                 message);
-            await UpdateStage(message, Started);
             try
             {
                 var publishStagedReleasesCronExpression = Environment.GetEnvironmentVariable("PublishReleaseContentCronSchedule") ?? "";
@@ -56,22 +55,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 }).GetNextOccurrence(DateTime.UtcNow);
                 var context = new PublishContext(nextScheduledPublishingTime, true);
                 await _contentService.UpdateContent(context, message.Releases.Select(tuple => tuple.ReleaseId).ToArray());
-                await UpdateStage(message, Complete);
             }
             catch (Exception e)
             {
                 logger.LogError(e, "Exception occured while executing {FunctionName}",
                     executionContext.FunctionName);
                 logger.LogError("{StackTrace}", e.StackTrace);
-                await UpdateStage(message, Failed,
+                await UpdateContentStage(message, Failed,
                     new ReleasePublishingStatusLogMessage($"Exception in content stage: {e.Message}"));
             }
 
-            logger.LogInformation("{0} completed",
-                executionContext.FunctionName);
+            logger.LogInformation("{FunctionName} completed", executionContext.FunctionName);
         }
 
-        private async Task UpdateStage(GenerateStagedReleaseContentMessage message, ReleasePublishingStatusContentStage stage,
+        private async Task UpdateContentStage(
+            GenerateStagedReleaseContentMessage message, 
+            ReleasePublishingStatusContentStage stage,
             ReleasePublishingStatusLogMessage logMessage = null)
         {
             foreach (var (releaseId, releaseStatusId) in message.Releases)
