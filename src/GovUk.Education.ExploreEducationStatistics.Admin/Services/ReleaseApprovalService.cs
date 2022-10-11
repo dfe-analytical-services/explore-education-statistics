@@ -240,16 +240,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 // Check if publishing will occur on the publish date as there may be no scheduled occurrences
                 // of the two Azure Functions which perform publishing.
-                if (!CheckPublishDateHasScheduledPublishingOccurrence(publishDate))
+                if (!CheckPublishDateCanBeScheduled(publishDate))
                 {
-                    return ValidationActionResult(PublishDateHasNoPublishingScheduled);
+                    return ValidationActionResult(PublishDateCannotBeScheduled);
                 }
             }
 
             return Unit.Instance;
         }
 
-        private bool CheckPublishDateHasScheduledPublishingOccurrence(DateTime publishDate)
+        private bool CheckPublishDateCanBeScheduled(DateTime publishDate)
         {
             // Publishing a scheduled release relies on two Azure Functions which are triggered by cron expressions.
             // These notes will refer to them as functions (1) and (2):

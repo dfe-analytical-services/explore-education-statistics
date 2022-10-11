@@ -439,7 +439,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task CreateReleaseStatus_Approved_FailsPublishDateHasNoPublishingScheduled_SameDay()
+        public async Task CreateReleaseStatus_Approved_FailsPublishDateCannotBeScheduled_SameDay()
         {
             var release = new Release
             {
@@ -492,13 +492,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Expect this to fail because there's no occurrence of the first function until 2023-01-02T00:00:00Z
                 // A publish date of 2023-01-01 needs to be approved on or before 2023-01-01T00:00:00Z
-                result.AssertBadRequest(PublishDateHasNoPublishingScheduled);
+                result.AssertBadRequest(PublishDateCannotBeScheduled);
             }
         }
 
         [Fact]
         public async Task
-            CreateReleaseStatus_Approved_FailsPublishDateHasNoPublishingScheduled_SameDay_DaylightSavingTime()
+            CreateReleaseStatus_Approved_FailsPublishDateCannotBeScheduled_SameDay_DaylightSavingTime()
         {
             var release = new Release
             {
@@ -553,12 +553,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Expect this to fail because there's no occurrence of the first function until 2023-06-07T23:00:00Z
                 // A publish date of 2023-06-07 needs to be approved on or before 2023-06-06T23:00:00Z
-                result.AssertBadRequest(PublishDateHasNoPublishingScheduled);
+                result.AssertBadRequest(PublishDateCannotBeScheduled);
             }
         }
 
         [Fact]
-        public async Task CreateReleaseStatus_Approved_FailsPublishDateHasNoPublishingScheduled_FutureDay()
+        public async Task CreateReleaseStatus_Approved_FailsPublishDateCannotBeScheduled_FutureDay()
         {
             var release = new Release
             {
@@ -611,13 +611,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Expect this to fail because there's no occurrences of the functions on a Sunday
                 // A publish date of 2023-01-08 can't be requested
-                result.AssertBadRequest(PublishDateHasNoPublishingScheduled);
+                result.AssertBadRequest(PublishDateCannotBeScheduled);
             }
         }
 
         [Fact]
-        public async Task
-            CreateReleaseStatus_Approved_FailsPublishDateHasNoPublishingScheduled_SecondFunctionHasNoOccurrence()
+        public async Task 
+            CreateReleaseStatus_Approved_FailsPublishDateCannotBeScheduled_SecondFunctionHasNoOccurrence()
         {
             var release = new Release
             {
@@ -670,7 +670,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Expect this to fail because there's no occurrences of the second function remaining on 2023-01-01.
                 // A publish date of 2023-01-01 needs to be approved on or before 2023-01-01T22:30:00Z
                 // in order to be published by the second function at 2023-01-01T23:15:00Z
-                result.AssertBadRequest(PublishDateHasNoPublishingScheduled);
+                result.AssertBadRequest(PublishDateCannotBeScheduled);
             }
         }
 

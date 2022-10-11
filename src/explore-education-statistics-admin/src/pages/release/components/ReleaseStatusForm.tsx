@@ -66,7 +66,7 @@ const errorMappings = [
         new Date(),
         'do MMMM yyyy',
       )}`,
-      PublishDateHasNoPublishingScheduled:
+      PublishDateCannotBeScheduled:
         'Publications must be scheduled at least one day in advance. Please enter a later date',
     },
   }),
