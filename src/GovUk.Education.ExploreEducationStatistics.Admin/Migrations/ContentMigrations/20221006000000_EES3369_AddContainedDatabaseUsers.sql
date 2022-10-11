@@ -85,7 +85,7 @@ Begin
     GRANT SELECT ON [dbo].[MethodologyFiles] TO [content];
     GRANT SELECT ON [dbo].[MethodologyNotes] TO [content];
     GRANT SELECT ON [dbo].[MethodologyVersions] TO [content];
-    GRANT INSERT ON [dbo].[Permalinks] TO [content];
+    GRANT SELECT ON [dbo].[Permalinks] TO [content];
     GRANT SELECT ON [dbo].[PublicationMethodologies] TO [content];
     GRANT SELECT ON [dbo].[Publications] TO [content];
     GRANT SELECT ON [dbo].[ReleaseContentBlocks] TO [content];
@@ -118,7 +118,7 @@ Begin
     GRANT SELECT ON [dbo].[MethodologyFiles] TO [data];
     GRANT SELECT ON [dbo].[MethodologyNotes] TO [data];
     GRANT SELECT ON [dbo].[MethodologyVersions] TO [data];
-    GRANT SELECT ON [dbo].[Permalinks] TO [data];
+    GRANT INSERT ON [dbo].[Permalinks] TO [data];
     GRANT SELECT ON [dbo].[PublicationMethodologies] TO [data];
     GRANT SELECT ON [dbo].[Publications] TO [data];
     GRANT SELECT ON [dbo].[ReleaseContentBlocks] TO [data];
