@@ -7,7 +7,7 @@ import _methodologyService, {
 } from '@admin/services/methodologyService';
 import _publicationService, {
   ExternalMethodology,
-  MyPublication,
+  PublicationWithPermissions,
 } from '@admin/services/publicationService';
 import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -1427,7 +1427,7 @@ describe('PublicationMethodologiesPage', () => {
   });
 });
 
-function renderPage(publication: MyPublication = testPublication) {
+function renderPage(publication: PublicationWithPermissions = testPublication) {
   render(
     <MemoryRouter>
       <PublicationContextProvider

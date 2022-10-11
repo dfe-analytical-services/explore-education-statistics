@@ -29,7 +29,7 @@ export interface Publication {
       title: string;
     };
   };
-  contact: PublicationContact;
+  contact: Contact;
   methodologies: MethodologySummary[];
   externalMethodology?: ExternalMethodology;
   supersededById?: string;
@@ -59,15 +59,7 @@ export interface PublicationSummaryWithRelease {
   title: string;
 }
 
-export interface BasicPublicationContact {
-  id?: string;
-  contactName: string;
-  contactTelNo: string;
-  teamEmail: string;
-  teamName?: string;
-}
-
-export interface PublicationContact {
+export interface Contact {
   teamName: string;
   teamEmail: string;
   contactName: string;

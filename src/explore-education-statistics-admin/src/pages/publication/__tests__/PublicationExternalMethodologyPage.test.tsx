@@ -3,7 +3,7 @@ import { PublicationContextProvider } from '@admin/pages/publication/contexts/Pu
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import _publicationService, {
   ExternalMethodology,
-  MyPublication,
+  PublicationWithPermissions,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -24,8 +24,16 @@ describe('PublicationExternalMethodologyPage', () => {
     url: 'http://test.com',
   };
 
-  test('renders the add an external methodology page correctly', () => {
+  test('renders the add an external methodology page correctly', async () => {
+    publicationService.getExternalMethodology.mockResolvedValue(undefined);
+
     renderPage(testPublication);
+
+    await waitFor(() => {
+      expect(publicationService.getExternalMethodology).toBeCalledWith(
+        testPublication.id,
+      );
+    });
 
     expect(
       screen.getByRole('heading', {
@@ -41,10 +49,17 @@ describe('PublicationExternalMethodologyPage', () => {
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
   });
 
-  test('renders the edit external methodology page correctly', () => {
-    renderPage({
-      ...testPublication,
-      externalMethodology: testExternalMethodology,
+  test('renders the edit external methodology page correctly', async () => {
+    publicationService.getExternalMethodology.mockResolvedValue(
+      testExternalMethodology,
+    );
+
+    renderPage(testPublication);
+
+    await waitFor(() => {
+      expect(publicationService.getExternalMethodology).toBeCalledWith(
+        testPublication.id,
+      );
     });
 
     expect(
@@ -67,6 +82,8 @@ describe('PublicationExternalMethodologyPage', () => {
   test('handles successful form submission', async () => {
     const history = createMemoryHistory();
 
+    publicationService.getExternalMethodology.mockResolvedValue(undefined);
+
     render(
       <Router history={history}>
         <PublicationContextProvider
@@ -79,6 +96,12 @@ describe('PublicationExternalMethodologyPage', () => {
       </Router>,
     );
 
+    await waitFor(() => {
+      expect(publicationService.getExternalMethodology).toBeCalledWith(
+        testPublication.id,
+      );
+    });
+
     userEvent.type(screen.getByLabelText('Link title'), 'The link title');
 
     userEvent.type(screen.getByLabelText('URL'), 'test.com');
@@ -87,7 +110,7 @@ describe('PublicationExternalMethodologyPage', () => {
 
     await waitFor(() => {
       expect(publicationService.updateExternalMethodology).toHaveBeenCalledWith(
-        'publication-1',
+        testPublication.id,
         {
           title: 'The link title',
           url: 'https://test.com',
@@ -103,6 +126,10 @@ describe('PublicationExternalMethodologyPage', () => {
   test('handles clicking the cancel button', async () => {
     const history = createMemoryHistory();
 
+    publicationService.getExternalMethodology.mockResolvedValue(
+      testExternalMethodology,
+    );
+
     render(
       <Router history={history}>
         <PublicationContextProvider
@@ -115,6 +142,12 @@ describe('PublicationExternalMethodologyPage', () => {
       </Router>,
     );
 
+    await waitFor(() => {
+      expect(publicationService.getExternalMethodology).toBeCalledWith(
+        testPublication.id,
+      );
+    });
+
     userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
     expect(publicationService.updatePublication).not.toHaveBeenCalled();
@@ -125,7 +158,7 @@ describe('PublicationExternalMethodologyPage', () => {
   });
 });
 
-function renderPage(publication: MyPublication) {
+function renderPage(publication: PublicationWithPermissions) {
   render(
     <MemoryRouter>
       <PublicationContextProvider

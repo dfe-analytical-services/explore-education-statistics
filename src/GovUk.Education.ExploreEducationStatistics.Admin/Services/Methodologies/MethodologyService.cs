@@ -168,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                                 InternalReleaseNote = latestVersion.InternalReleaseNote,
                                 MethodologyId = latestVersion.MethodologyId,
                                 PreviousVersionId = latestVersion.PreviousVersionId,
-                                Permissions = permissions
+                                Permissions = permissions,
                             };
                         })
                         .OrderBy(viewModel => viewModel.Title)

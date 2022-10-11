@@ -18,7 +18,6 @@ export const testRelease: Release = {
   title: 'Release Title',
   type: 'OfficialStatistics',
   contact: {
-    id: 'contact-1',
     teamName: 'Test name',
     teamEmail: 'test@test.com',
     contactName: 'Test contact name',

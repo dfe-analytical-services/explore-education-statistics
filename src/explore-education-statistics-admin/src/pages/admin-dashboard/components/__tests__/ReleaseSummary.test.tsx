@@ -18,7 +18,6 @@ describe('ReleaseSummary', () => {
     contact: {
       contactName: 'Test contact name',
       contactTelNo: 'Test contact tel',
-      id: 'test-contact-idc',
       teamEmail: 'test-contact@hiveit.co.uk',
       teamName: 'Test team name',
     },

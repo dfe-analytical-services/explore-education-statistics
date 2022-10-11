@@ -22,10 +22,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var publicationService = new Mock<IPublicationService>();
 
             publicationService
-                .Setup(s => s.CreatePublication(It.IsAny<PublicationSaveRequest>()))
-                .Returns<PublicationSaveRequest>(p =>
-                    Task.FromResult(new Either<ActionResult, PublicationViewModel>(
-                        new PublicationViewModel
+                .Setup(s => s.CreatePublication(It.IsAny<PublicationCreateRequest>()))
+                .Returns<PublicationCreateRequest>(p =>
+                    Task.FromResult(new Either<ActionResult, PublicationCreateViewModel>(
+                        new PublicationCreateViewModel
                         {
                             Topic = new IdTitleViewModel
                             {
@@ -40,12 +40,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var topicId = Guid.NewGuid();
 
             // Method under test
-            var result = await controller.CreatePublication(new PublicationSaveRequest()
+            var result = await controller.CreatePublication(new PublicationCreateRequest()
             {
                 TopicId = topicId
             });
 
-            Assert.IsType<PublicationViewModel>(result.Value);
+            Assert.IsType<PublicationCreateViewModel>(result.Value);
             Assert.Equal(topicId, result.Value.Topic.Id);
         }
 
@@ -55,19 +55,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var publicationService = new Mock<IPublicationService>();
 
             var validationResponse =
-                new Either<ActionResult, PublicationViewModel>(
+                new Either<ActionResult, PublicationCreateViewModel>(
                     ValidationUtils.ValidationActionResult(SlugNotUnique));
 
             publicationService
-                .Setup(s => s.CreatePublication(It.IsAny<PublicationSaveRequest>()))
-                .Returns<PublicationSaveRequest>(p => Task.FromResult(validationResponse));
+                .Setup(s => s.CreatePublication(It.IsAny<PublicationCreateRequest>()))
+                .Returns<PublicationCreateRequest>(p => Task.FromResult(validationResponse));
 
             var controller = new PublicationController(publicationService.Object);
 
             var topicId = Guid.NewGuid();
 
             // Method under test
-            var result = await controller.CreatePublication(new PublicationSaveRequest()
+            var result = await controller.CreatePublication(new PublicationCreateRequest()
             {
                 TopicId = topicId
             });

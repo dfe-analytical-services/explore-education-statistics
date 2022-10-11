@@ -45,7 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var publication = new Publication
             {
-                Title = "Publication"
+                Title = "Publication",
+                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -124,6 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Id = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
                         Title = "Publication",
+                        Contact = new Contact(),
                         Releases = new List<Release>
                         {
                             new() // Template release
@@ -237,7 +239,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var publication = new Publication
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                Contact = new Contact(),
             };
 
             var notLatestRelease = new Release
@@ -639,7 +642,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var release = new Release
             {
                 Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication(),
+                Publication = new Publication
+                {
+                    Contact = new Contact(),
+                },
                 ReleaseName = "2030",
                 PublishScheduled = DateTime.UtcNow,
                 NextReleaseDate = new PartialDate {Day = "15", Month = "6", Year = "2039"},
@@ -796,6 +802,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Test publication",
                 Summary = "Test summary",
                 Slug = "test-publication",
+                Contact = new Contact(),
                 Releases = new List<Release>
                 {
                     release
@@ -804,6 +811,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publication2 = new Publication
             {
+                Contact = new Contact(),
                 Releases = new List<Release>
                 {
                     new()
@@ -817,7 +825,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             }
                         }
                     }
-                }
+                },
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -870,10 +878,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publication = new Publication
             {
+                Contact = new Contact(),
                 Releases = new List<Release>
                 {
                     release
-                }
+                },
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -980,7 +989,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("June 2036", latest.Title);
             }
         }
-        
+
         [Fact]
         public async Task GetDeleteReleasePlan()
         {
@@ -988,7 +997,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = Guid.NewGuid()
             };
-            
+
             // This is just another unrelated Release that should not be affected.
             var releaseNotBeingDeleted = new Release
             {
@@ -1005,7 +1014,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     OwningPublicationTitle = "Methodology 1 owned Publication title"
                 }
             };
-            
+
             var methodology2ScheduledWithRelease1 = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
@@ -1033,7 +1042,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await context.Releases.AddRangeAsync(releaseBeingDeleted, releaseNotBeingDeleted);
                 await context.MethodologyVersions.AddRangeAsync(
-                    methodology1ScheduledWithRelease1, 
+                    methodology1ScheduledWithRelease1,
                     methodology2ScheduledWithRelease1,
                     methodologyScheduledWithRelease2,
                     methodologyNotScheduled);
@@ -1052,7 +1061,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2, plan.ScheduledMethodologies.Count);
                 var methodology1 = plan.ScheduledMethodologies.Single(m => m.Id == methodology1ScheduledWithRelease1.Id);
                 var methodology2 = plan.ScheduledMethodologies.Single(m => m.Id == methodology2ScheduledWithRelease1.Id);
-                
+
                 Assert.Equal("Methodology 1 with alternative title", methodology1.Title);
                 Assert.Equal("Methodology 2 with owned Publication title", methodology2.Title);
             }
@@ -1255,7 +1264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .First(r => r.Id == anotherUserReleaseInvite.Id);
 
                 Assert.False(retrievedAnotherReleaseInvite.SoftDeleted);
-                
+
                 // Assert that Methodologies that were scheduled to go out with this Release are no longer scheduled
                 // to do so
                 var retrievedMethodology = context.MethodologyVersions.Single(m => m.Id == methodologyScheduledWithRelease.Id);
@@ -1265,11 +1274,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(MethodologyStatus.Draft, retrievedMethodology.Status);
                 Assert.InRange(DateTime.UtcNow
                     .Subtract(retrievedMethodology.Updated!.Value).Milliseconds, 0, 1500);
-                
+
                 // Assert that Methodologies that were scheduled to go out with other Releases remain unaffected
                 var unrelatedMethodology = context.MethodologyVersions.Single(m => m.Id == methodologyScheduledWithAnotherRelease.Id);
                 Assert.True(unrelatedMethodology.ScheduledForPublishingWithRelease);
-                Assert.Equal(methodologyScheduledWithAnotherRelease.ScheduledWithReleaseId, 
+                Assert.Equal(methodologyScheduledWithAnotherRelease.ScheduledWithReleaseId,
                     unrelatedMethodology.ScheduledWithReleaseId);
             }
         }

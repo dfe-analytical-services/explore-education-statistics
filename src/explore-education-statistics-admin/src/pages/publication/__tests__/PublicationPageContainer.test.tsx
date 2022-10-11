@@ -31,7 +31,7 @@ describe('PublicationPageContainer', () => {
   };
 
   test('renders the page with the releases tab', async () => {
-    publicationService.getMyPublication.mockResolvedValue(testPublication);
+    publicationService.getPublication.mockResolvedValue(testPublication);
     publicationService.listReleases.mockResolvedValue(testEmptyReleases);
 
     renderPage();
@@ -67,7 +67,7 @@ describe('PublicationPageContainer', () => {
   });
 
   test('shows a message when the publication is archived', async () => {
-    publicationService.getMyPublication.mockResolvedValue({
+    publicationService.getPublication.mockResolvedValue({
       ...testPublication,
       isSuperseded: true,
       supersededById: 'publication-2',
@@ -86,7 +86,7 @@ describe('PublicationPageContainer', () => {
   });
 
   test('shows a message when the publication is superseded but not yet archived', async () => {
-    publicationService.getMyPublication.mockResolvedValue({
+    publicationService.getPublication.mockResolvedValue({
       ...testPublication,
       isSuperseded: false,
       supersededById: 'publication-2',

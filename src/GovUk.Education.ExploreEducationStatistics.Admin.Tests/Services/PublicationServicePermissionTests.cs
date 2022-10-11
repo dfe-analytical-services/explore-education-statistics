@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var service = BuildPublicationService(
                         context: Mock.Of<ContentDbContext>(Strict),
                         userService: userService.Object);
-                    return await service.ListPublications(permissions: false, Guid.NewGuid());
+                    return await service.ListPublications(includePermissions: false, Guid.NewGuid());
                 });
         }
 
@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
                 async service =>
-                    await service.CreatePublication(new PublicationSaveRequest
+                    await service.CreatePublication(new PublicationCreateRequest
                     {
                         TopicId = _topic.Id,
                     }),
@@ -124,13 +124,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         TopicId = _topic.Id,
                         Title = "Updated publication",
-                        Contact = new ContactSaveViewModel
-                        {
-                            TeamName = "Test team",
-                            TeamEmail = "team@test.com",
-                            ContactName = "John Smith",
-                            ContactTelNo = "0123456789"
-                        }
                     }),
                 _publication,
                 userService,
@@ -157,13 +150,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         TopicId = _topic.Id,
                         Title = "Updated publication",
-                        Contact = new ContactSaveViewModel
-                        {
-                            TeamName = "Test team",
-                            TeamEmail = "team@test.com",
-                            ContactName = "John Smith",
-                            ContactTelNo = "0123456789"
-                        }
                     }),
                 _publication,
                 userService,
@@ -190,13 +176,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         TopicId = _topic.Id,
                         Title = "Updated publication",
-                        Contact = new ContactSaveViewModel
-                        {
-                            TeamName = "Test team",
-                            TeamEmail = "team@test.com",
-                            ContactName = "John Smith",
-                            ContactTelNo = "0123456789"
-                        }
                     }),
                 _topic,
                 userService,
@@ -212,6 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Old publication title",
                 Slug = "publication-slug",
                 Topic = new Topic { Title = "Old topic title" },
+                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -261,6 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Slug = "publication-slug",
                 Topic = new Topic { Title = "Old topic title" },
                 SupersededById = Guid.NewGuid(),
+                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -315,6 +296,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "Publication title",
                 Slug = "publication-slug",
                 Topic = new Topic { Title = "Old topic title" },
+                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -452,6 +434,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         context: contentDbContext,
                         userService: userService.Object);
                     return await service.RemoveExternalMethodology(publication.Id);
+                });
+        }
+
+        [Fact]
+        public async Task GetContact()
+        {
+            var publication = new Publication
+            {
+                Contact = new Contact
+                {
+                    ContactName = "contact name",
+                    ContactTelNo = "12345",
+                    TeamName = "team name",
+                    TeamEmail = "team@email.com",
+                },
+            };
+
+            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(publication, SecurityPolicies.CanViewSpecificPublication)
+                .AssertForbidden(async userService =>
+                {
+                    var contentDbContext = InMemoryApplicationDbContext();
+                    await contentDbContext.Publications.AddAsync(publication);
+                    await contentDbContext.SaveChangesAsync();
+
+                    var service = BuildPublicationService(
+                        context: contentDbContext,
+                        userService: userService.Object);
+                    return await service.GetContact(publication.Id);
+                });
+        }
+
+        [Fact]
+        public async Task UpdateContact()
+        {
+            var publication = new Publication
+            {
+                Contact = new Contact
+                {
+                    ContactName = "test",
+                    ContactTelNo = "1234",
+                    TeamEmail = "test@test.com",
+                    TeamName = "test",
+                },
+            };
+
+            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(publication, SecurityPolicies.CanUpdateSpecificPublication)
+                .AssertForbidden(async userService =>
+                {
+                    var contentDbContext = InMemoryApplicationDbContext();
+                    await contentDbContext.Publications.AddAsync(publication);
+                    await contentDbContext.SaveChangesAsync();
+
+                    var service = BuildPublicationService(
+                        context: contentDbContext,
+                        userService: userService.Object);
+                    return await service.UpdateContact(publication.Id, new Contact());
                 });
         }
 

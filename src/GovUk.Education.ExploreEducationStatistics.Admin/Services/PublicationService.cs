@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(
-            bool permissions = false,
+            bool includePermissions = false,
             Guid? topicId = null)
         {
             return await _userService
@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return await publications
                         .ToAsyncEnumerable()
-                        .SelectAwait(async publication => await GeneratePublicationViewModel(publication, permissions))
+                        .SelectAwait(async publication => await GeneratePublicationViewModel(publication, includePermissions))
                         .OrderBy(publicationViewModel => publicationViewModel.Title)
                         .ToListAsync();
                 });
@@ -148,8 +148,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
-            PublicationSaveRequest publication)
+        public async Task<Either<ActionResult, PublicationCreateViewModel>> CreatePublication(
+            PublicationCreateRequest publication)
         {
             return await ValidateSelectedTopic(publication.TopicId)
                 .OnSuccess(async _ =>
@@ -178,7 +178,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.SaveChangesAsync();
 
-                    return await GetPublication(saved.Entity.Id);
+                    return await _persistenceHelper
+                        .CheckEntityExists<Publication>(saved.Entity.Id, HydratePublication)
+                        .OnSuccess(GeneratePublicationCreateViewModel);
                 });
         }
 
@@ -187,7 +189,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             PublicationSaveRequest updatedPublication)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId)
+                .CheckEntityExists<Publication>(publicationId, query =>
+                    query.Include(p => p.Contact))
                 .OnSuccess(_userService.CheckCanUpdatePublication)
                 .OnSuccessDo(async publication =>
                 {
@@ -234,27 +237,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         publication.Slug = updatedPublication.Slug;
                     }
 
-                    // ExternalMethodology is absent as it's updated by a different endpoint
                     publication.Title = updatedPublication.Title;
                     publication.Summary = updatedPublication.Summary;
                     publication.TopicId = updatedPublication.TopicId;
                     publication.Updated = DateTime.UtcNow;
                     publication.SupersededById = updatedPublication.SupersededById;
-
-                    // Add new contact if it doesn't exist, otherwise replace existing
-                    // contact that is shared with another publication with a new
-                    // contact, as we want each publication to have its own contact.
-                    if (publication.Contact == null ||
-                        _context.Publications
-                            .Any(p => p.ContactId == publication.ContactId && p.Id != publication.Id))
-                    {
-                        publication.Contact = new Contact();
-                    }
-
-                    publication.Contact.ContactName = updatedPublication.Contact.ContactName;
-                    publication.Contact.ContactTelNo = updatedPublication.Contact.ContactTelNo;
-                    publication.Contact.TeamName = updatedPublication.Contact.TeamName;
-                    publication.Contact.TeamEmail = updatedPublication.Contact.TeamEmail;
 
                     _context.Publications.Update(publication);
 
@@ -311,12 +298,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => Unit.Instance);
         }
 
-        public async Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId)
+        public async Task<Either<ActionResult, PublicationViewModel>> GetPublication(
+            Guid publicationId, bool includePermissions = false)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, HydratePublication)
                 .OnSuccess(_userService.CheckCanViewPublication)
-                .OnSuccess(publication => _mapper.Map<PublicationViewModel>(publication));
+                .OnSuccess(publication => GeneratePublicationViewModel(publication, includePermissions));
         }
 
         public async Task<Either<ActionResult, ExternalMethodologyViewModel>> GetExternalMethodology(Guid publicationId)
@@ -366,6 +354,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _publicationCacheService.UpdatePublication(publication.Slug);
 
                     return Unit.Instance;
+                });
+        }
+
+        public async Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId, query =>
+                    query.Include(p => p.Contact))
+                .OnSuccessDo(_userService.CheckCanViewPublication)
+                .OnSuccess(async publication =>
+                {
+                    var contact = _mapper.Map<ContactViewModel>(publication.Contact);
+
+                    return contact;
+                });
+        }
+
+        public async Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId, Contact updatedContact)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId, query =>
+                    query.Include(p => p.Contact))
+                .OnSuccessDo(_userService.CheckCanUpdatePublication)
+                .OnSuccess(async publication =>
+                {
+                    // Replace existing contact that is shared with another publication with a new
+                    // contact, as we want each publication to have its own contact.
+                    if (_context.Publications
+                            .Any(p => p.ContactId == publication.ContactId && p.Id != publication.Id))
+                    {
+                        publication.Contact = new Contact();
+                    }
+
+                    publication.Contact.ContactName = updatedContact.ContactName;
+                    publication.Contact.ContactTelNo = updatedContact.ContactTelNo;
+                    publication.Contact.TeamName = updatedContact.TeamName;
+                    publication.Contact.TeamEmail = updatedContact.TeamEmail;
+                    await _context.SaveChangesAsync();
+
+                    // Clear cache because Contact is in Content.Services.ViewModels.PublicationViewModel
+                    await _publicationCacheService.UpdatePublication(publication.Slug);
+
+                    return _mapper.Map<ContactViewModel>(updatedContact);
                 });
         }
 
@@ -472,7 +503,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return values
                 .AsSplitQuery()
-                .Include(p => p.Contact)
+                .Include(p => p.Contact) // EES-3576 remove when MyPublicationViewModel is gone
                 .Include(p => p.Releases) // EES-3576 remove when MyPublicationViewModel is gone
                 .ThenInclude(r => r.ReleaseStatuses)
                 .Include(p => p.Topic)
@@ -482,19 +513,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ThenInclude(p => p.Versions);
         }
 
-        private async Task<PublicationViewModel> GeneratePublicationViewModel(Publication publication, bool permissions)
+        private async Task<PublicationViewModel> GeneratePublicationViewModel(Publication publication, bool includePermissions)
         {
             var publicationViewModel = _mapper.Map<PublicationViewModel>(publication);
 
             publicationViewModel.IsSuperseded = _publicationRepository.IsSuperseded(publication);
 
-            if (permissions)
+            if (includePermissions)
             {
                 publicationViewModel.Permissions =
                     await PermissionsUtils.GetPublicationPermissions(_userService, publication);
             }
 
             return publicationViewModel;
+        }
+
+        private PublicationCreateViewModel GeneratePublicationCreateViewModel(Publication publication)
+        {
+            var publicationCreateViewModel = _mapper.Map<PublicationCreateViewModel>(publication);
+
+            publicationCreateViewModel.IsSuperseded = _publicationRepository.IsSuperseded(publication);
+
+            return publicationCreateViewModel;
         }
 
         private async Task<List<MyPublicationViewModel>> HydrateMyPublicationsViewModels(List<Publication> publications)
@@ -561,7 +601,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         InternalReleaseNote = latestVersion.InternalReleaseNote,
                         MethodologyId = latestVersion.MethodologyId,
                         PreviousVersionId = latestVersion.PreviousVersionId,
-                        Permissions = permissions
+                        Permissions = permissions,
                     };
                 })
                 .ToListAsync();

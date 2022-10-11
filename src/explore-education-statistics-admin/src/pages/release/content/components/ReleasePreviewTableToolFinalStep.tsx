@@ -2,6 +2,7 @@ import Link from '@admin/components/Link';
 import publicationService, {
   Publication,
   ExternalMethodology,
+  Contact,
 } from '@admin/services/publicationService';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
@@ -20,6 +21,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 interface Model {
   methodologies: MethodologyVersionSummary[];
   externalMethodology?: ExternalMethodology | undefined;
+  contact: Contact;
 }
 
 interface ReleasePreviewTableToolFinalStepProps {
@@ -39,12 +41,13 @@ const ReleasePreviewTableToolFinalStep = ({
   const dataTableRef = useRef<HTMLElement>(null);
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
-    const [methodologies, externalMethodology] = await Promise.all([
+    const [methodologies, externalMethodology, contact] = await Promise.all([
       methodologyService.listMethodologyVersions(publication.id),
       publicationService.getExternalMethodology(publication.id),
+      publicationService.getContact(publication.id),
     ]);
 
-    return { methodologies, externalMethodology };
+    return { methodologies, externalMethodology, contact };
   }, [publication]);
 
   const getMethodologyLinks = () => {
@@ -100,7 +103,7 @@ const ReleasePreviewTableToolFinalStep = ({
 
           <LoadingSpinner loading={isLoading}>
             <TableToolInfo
-              contactDetails={publication.contact}
+              contactDetails={model?.contact}
               methodologyLinks={getMethodologyLinks()}
               releaseLink={<span>{publication.title}</span>}
             />

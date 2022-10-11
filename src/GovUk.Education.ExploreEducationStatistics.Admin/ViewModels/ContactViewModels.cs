@@ -1,34 +1,34 @@
-using System;
+#nullable enable
 using System.ComponentModel.DataAnnotations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
     public class ContactViewModel
     {
-        public Guid Id { get; set; }
+        public string TeamName { get; set; } = string.Empty;
 
-        public string TeamName { get; set; }
+        public string TeamEmail { get; set; } = string.Empty;
 
-        public string TeamEmail { get; set; }
+        public string ContactName { get; set; } = string.Empty;
 
-        public string ContactName { get; set; }
+        public string ContactTelNo { get; set; } = string.Empty;
 
-        public string ContactTelNo { get; set; }
+        public ContactPermissions? Permissions { get; set; } // @MarkFix remove
+
+        public record ContactPermissions // @MarkFix remove
+        {
+            public bool CanUpdateContact { get; set; }
+        }
     }
 
     public class ContactSaveViewModel
     {
-        [Required]
-        public string TeamName { get; set; }
+        [Required] public string TeamName { get; set; } = string.Empty;
 
-        [Required]
-        [EmailAddress]
-        public string TeamEmail { get; set; }
+        [Required, EmailAddress] public string TeamEmail { get; set; } = string.Empty;
 
-        [Required]
-        public string ContactName { get; set; }
+        [Required] public string ContactName { get; set; } = string.Empty;
 
-        [Required]
-        public string ContactTelNo { get; set; }
+        [Required] public string ContactTelNo { get; set; } = string.Empty;
     }
 }

@@ -5,7 +5,7 @@ import {
 } from '@admin/routes/releaseRoutes';
 import _publicationService, {
   Publication,
-  PublicationContactDetails,
+  Contact,
 } from '@admin/services/publicationService';
 import _tableBuilderService from '@common/services/tableBuilderService';
 import { render, screen, waitFor, within } from '@testing-library/react';
@@ -24,8 +24,7 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService
 >;
 
-const testContact: PublicationContactDetails = {
-  id: 'contact-1',
+const testContact: Contact = {
   contactName: 'John Smith',
   contactTelNo: '0777777777',
   teamEmail: 'john.smith@test.com',
@@ -33,7 +32,6 @@ const testContact: PublicationContactDetails = {
 };
 
 const testPublication: Publication = {
-  contact: testContact,
   id: 'publication-1',
   title: 'Pupil absence',
   summary: 'Pupil absence summary',

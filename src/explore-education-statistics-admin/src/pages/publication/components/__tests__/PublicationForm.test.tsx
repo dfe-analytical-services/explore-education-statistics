@@ -452,7 +452,6 @@ describe('PublicationForm', () => {
       contact: {
         contactName: 'Test contact name',
         contactTelNo: 'Test contact tel',
-        id: 'test-contact-id',
         teamEmail: 'test-contact@hiveit.co.uk',
         teamName: 'Test team name',
       },
@@ -489,7 +488,6 @@ describe('PublicationForm', () => {
       title: 'Publication 1',
       summary: 'Publcation 1 summary',
       contact: {
-        id: 'contact-1',
         contactName: 'John Smith',
         contactTelNo: '0777777777',
         teamEmail: 'john.smith@test.com',
@@ -507,6 +505,7 @@ describe('PublicationForm', () => {
         canUpdatePublicationSupersededBy: true,
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
+        canUpdateContact: true,
       },
     };
 
