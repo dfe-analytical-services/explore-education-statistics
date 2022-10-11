@@ -300,13 +300,12 @@ describe('ReleaseStatusForm', () => {
       userEvent.tab();
 
       await waitFor(() => {
-        expect(
-          screen.getByRole('link', { name: 'Enter an internal note' }),
-        ).toHaveAttribute(
-          'href',
-          '#releaseStatusForm-latestInternalReleaseNote',
-        );
+        expect(screen.getByText('There is a problem')).toBeInTheDocument();
       });
+
+      expect(
+        screen.getByRole('link', { name: 'Enter an internal note' }),
+      ).toHaveAttribute('href', '#releaseStatusForm-latestInternalReleaseNote');
     });
 
     test('fails to submit with invalid values', async () => {
@@ -328,12 +327,13 @@ describe('ReleaseStatusForm', () => {
 
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
-        expect(
-          screen.getByRole('link', { name: 'Enter an internal note' }),
-        ).toBeInTheDocument();
-
-        expect(handleSubmit).not.toHaveBeenCalled();
       });
+
+      expect(
+        screen.getByRole('link', { name: 'Enter an internal note' }),
+      ).toBeInTheDocument();
+
+      expect(handleSubmit).not.toHaveBeenCalled();
     });
 
     test('submits successfully with updated values', async () => {
@@ -471,13 +471,12 @@ describe('ReleaseStatusForm', () => {
       userEvent.tab();
 
       await waitFor(() => {
-        expect(
-          screen.getByRole('link', { name: 'Enter an internal note' }),
-        ).toHaveAttribute(
-          'href',
-          '#releaseStatusForm-latestInternalReleaseNote',
-        );
+        expect(screen.getByText('There is a problem')).toBeInTheDocument();
       });
+
+      expect(
+        screen.getByRole('link', { name: 'Enter an internal note' }),
+      ).toHaveAttribute('href', '#releaseStatusForm-latestInternalReleaseNote');
     });
 
     test('shows error message when no publishing method selected', async () => {
@@ -499,10 +498,12 @@ describe('ReleaseStatusForm', () => {
       userEvent.tab();
 
       await waitFor(() => {
-        expect(
-          screen.getByRole('link', { name: 'Choose when to publish' }),
-        ).toHaveAttribute('href', '#releaseStatusForm-publishMethod');
+        expect(screen.getByText('There is a problem')).toBeInTheDocument();
       });
+
+      expect(
+        screen.getByRole('link', { name: 'Choose when to publish' }),
+      ).toHaveAttribute('href', '#releaseStatusForm-publishMethod');
     });
 
     test('shows error message when no publish date', async () => {
@@ -525,10 +526,12 @@ describe('ReleaseStatusForm', () => {
       userEvent.tab();
 
       await waitFor(() => {
-        expect(
-          screen.getByRole('link', { name: 'Enter a valid publish date' }),
-        ).toHaveAttribute('href', '#releaseStatusForm-publishScheduled');
+        expect(screen.getByText('There is a problem')).toBeInTheDocument();
       });
+
+      expect(
+        screen.getByRole('link', { name: 'Enter a valid publish date' }),
+      ).toHaveAttribute('href', '#releaseStatusForm-publishScheduled');
     });
 
     test('fails to submit with invalid values', async () => {
@@ -550,19 +553,21 @@ describe('ReleaseStatusForm', () => {
 
       await waitFor(() => {
         expect(screen.getByText('There is a problem')).toBeInTheDocument();
-        expect(
-          screen.getByRole('link', { name: 'Enter an internal note' }),
-        ).toBeInTheDocument();
-        expect(
-          screen.getByRole('link', { name: 'Choose when to publish' }),
-        ).toBeInTheDocument();
-
-        expect(handleSubmit).not.toHaveBeenCalled();
       });
+
+      expect(
+        screen.getByRole('link', { name: 'Enter an internal note' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'Choose when to publish' }),
+      ).toBeInTheDocument();
+
+      expect(handleSubmit).not.toHaveBeenCalled();
     });
 
-    ReleaseChecklistErrorCode.forEach(checklistError => {
-      test(`shows generic checklist error message from failed \`onSubmit\` with \`${checklistError}\` error code`, async () => {
+    test.each(ReleaseChecklistErrorCode)(
+      'shows checklist error message `%s` after failed submit',
+      async checklistError => {
         const handleSubmit = jest.fn().mockImplementation(() => {
           throw createServerValidationErrorMock([checklistError]);
         });
@@ -590,43 +595,39 @@ describe('ReleaseStatusForm', () => {
           'href',
           '#releaseStatusForm-approvalStatus',
         );
-      });
-    });
-
-    test(
-      'shows fallback error message mapped to `approvalStatus` field when receiving unmapped server ' +
-        'validation error from failed `onSubmit`',
-      async () => {
-        const handleSubmit = jest.fn().mockImplementation(() => {
-          throw createServerValidationErrorMock(['UnexpectedError']);
-        });
-
-        render(
-          <ReleaseStatusForm
-            release={testRelease}
-            statusPermissions={testStatusPermissions}
-            onCancel={noop}
-            onSubmit={handleSubmit}
-          />,
-        );
-
-        userEvent.click(screen.getByRole('button', { name: 'Update status' }));
-
-        await waitFor(() => {
-          expect(screen.getByText('There is a problem')).toBeInTheDocument();
-        });
-
-        const errorLink = screen.getByRole('link', {
-          name:
-            'There was a problem updating the approval status of this release',
-        });
-
-        expect(errorLink).toHaveAttribute(
-          'href',
-          '#releaseStatusForm-approvalStatus',
-        );
       },
     );
+
+    test('shows generic server validation error message for `approvalStatus` after failed submit', async () => {
+      const handleSubmit = jest.fn().mockImplementation(() => {
+        throw createServerValidationErrorMock(['UnexpectedError']);
+      });
+
+      render(
+        <ReleaseStatusForm
+          release={testRelease}
+          statusPermissions={testStatusPermissions}
+          onCancel={noop}
+          onSubmit={handleSubmit}
+        />,
+      );
+
+      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('There is a problem')).toBeInTheDocument();
+      });
+
+      const errorLink = screen.getByRole('link', {
+        name:
+          'There was a problem updating the approval status of this release',
+      });
+
+      expect(errorLink).toHaveAttribute(
+        'href',
+        '#releaseStatusForm-approvalStatus',
+      );
+    });
 
     test('submits successfully with updated values and Draft status', async () => {
       const handleSubmit = jest.fn();
@@ -734,18 +735,22 @@ describe('ReleaseStatusForm', () => {
       };
 
       await waitFor(() => {
-        const modal = within(screen.getByRole('dialog'));
-        expect(modal.getByRole('heading')).toHaveTextContent(
-          'Confirm publish date',
-        );
-        userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+        expect(screen.getByText('Confirm publish date')).toBeInTheDocument();
       });
+
+      const modal = within(screen.getByRole('dialog'));
+      expect(modal.getByRole('heading')).toHaveTextContent(
+        'Confirm publish date',
+      );
+
+      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
       await waitFor(() => {
         expect(handleSubmit).toHaveBeenCalledWith(expectedValues);
       });
     });
 
-    test('submits successfully with update values and immediate publish', async () => {
+    test('submits successfully with updated values and immediate publish', async () => {
       const handleSubmit = jest.fn();
 
       render(
@@ -795,7 +800,7 @@ describe('ReleaseStatusForm', () => {
       });
     });
 
-    test('Amendment should have "Notify subscribers by email" checkbox', async () => {
+    test('amendment should have "Notify subscribers by email" checkbox', async () => {
       const handleSubmit = jest.fn();
 
       render(
