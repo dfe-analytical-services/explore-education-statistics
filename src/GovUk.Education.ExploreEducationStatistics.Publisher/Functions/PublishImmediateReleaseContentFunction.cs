@@ -13,13 +13,13 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseP
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     // ReSharper disable once UnusedType.Global
-    public class PublishReleaseContentFunction
+    public class PublishImmediateReleaseContentFunction
     {
         private readonly IContentService _contentService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
         private readonly IPublishingCompletionService _publishingCompletionService;
 
-        public PublishReleaseContentFunction(
+        public PublishImmediateReleaseContentFunction(
             IContentService contentService,
             IReleasePublishingStatusService releasePublishingStatusService, 
             IPublishingCompletionService publishingCompletionService)
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <returns></returns>
         [FunctionName("PublishReleaseContent")]
         // ReSharper disable once UnusedMember.Global
-        public async Task PublishReleaseContent(
+        public async Task PublishImmediateReleaseContent(
             [QueueTrigger(PublishReleaseContentQueue)]
             PublishReleaseContentMessage message,
             ExecutionContext executionContext,
@@ -51,15 +51,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation("{FunctionName} triggered at: {DateTime}",
                 executionContext.FunctionName,
                 DateTime.UtcNow);
-
-            await UpdateContentStage(message.ReleaseId, message.ReleaseStatusId, Started);
-
+            
             var context = new PublishContext(DateTime.UtcNow, false);
 
             try
             {
+                await UpdateContentStage(message.ReleaseId, message.ReleaseStatusId, Started);
                 await _contentService.UpdateContent(context, message.ReleaseId);
                 await UpdateContentStage(message.ReleaseId, message.ReleaseStatusId, Complete);
+                
                 await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
                     ListOf((message.ReleaseId, message.ReleaseStatusId)), 
                     context.Published);
