@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await QueuePublishReleaseContentMessageAsync(new[] {(releaseId, releaseStatusId)});
         }
         
-        public async Task QueuePublishReleaseContentMessageAsync(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases)
+        private async Task QueuePublishReleaseContentMessageAsync(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases)
         {
             await releases
                 .ToAsyncEnumerable()

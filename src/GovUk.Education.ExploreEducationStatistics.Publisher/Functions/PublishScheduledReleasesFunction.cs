@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <returns></returns>
         [FunctionName("PublishStagedReleaseContent")]
         // ReSharper disable once UnusedMember.Global
-        public async Task PublishStagedReleaseContent([TimerTrigger("%PublishReleaseContentCronSchedule%")]
+        public async Task PublishScheduledReleases([TimerTrigger("%PublishReleaseContentCronSchedule%")]
             TimerInfo timer,
             ExecutionContext executionContext,
             ILogger logger)

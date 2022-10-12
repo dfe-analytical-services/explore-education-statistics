@@ -14,12 +14,12 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseP
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     // ReSharper disable once UnusedType.Global
-    public class GenerateReleaseContentFunction
+    public class StageReleaseContentFunction
     {
         private readonly IContentService _contentService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
 
-        public GenerateReleaseContentFunction(IContentService contentService,
+        public StageReleaseContentFunction(IContentService contentService,
             IReleasePublishingStatusService releasePublishingStatusService)
         {
             _contentService = contentService;
@@ -29,16 +29,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <summary>
         /// Azure function which generates the content for a Release into a staging directory.
         /// </summary>
-        /// <remarks>
-        /// Depends on the download files existing.
-        /// </remarks>
         /// <param name="message"></param>
         /// <param name="executionContext"></param>
         /// <param name="logger"></param>
         /// <returns></returns>
         [FunctionName("GenerateReleaseContent")]
         // ReSharper disable once UnusedMember.Global
-        public async Task GenerateStagedReleaseContent(
+        public async Task StageReleaseContent(
             [QueueTrigger(GenerateStagedReleaseContentQueue)] GenerateStagedReleaseContentMessage message,
             ExecutionContext executionContext,
             ILogger logger)
