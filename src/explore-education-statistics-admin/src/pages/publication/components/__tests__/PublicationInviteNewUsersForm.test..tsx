@@ -10,7 +10,6 @@ import React from 'react';
 jest.mock('@admin/services/userService');
 
 const publication: Publication = {
-  contact: testContact,
   id: 'publication-id',
   title: 'Publication title',
   summary: 'Publication summary',

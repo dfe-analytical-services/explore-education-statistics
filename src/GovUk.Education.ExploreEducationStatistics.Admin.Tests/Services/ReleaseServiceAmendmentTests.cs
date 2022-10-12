@@ -370,6 +370,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext.Add(new Publication
                 {
                     Id = publicationId,
+                    Contact = new Contact(),
                     Releases = new List<Release>
                     {
                         release

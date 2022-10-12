@@ -1,5 +1,5 @@
 import TopicPublications from '@admin/pages/admin-dashboard/components/TopicPublications';
-import { testPublication } from '@admin/pages/publication/__data__/testPublication';
+import { testMyPublication } from '@admin/pages/publication/__data__/testPublication';
 import _permissionService from '@admin/services/permissionService';
 import _publicationService, {
   MyPublication,
@@ -30,14 +30,14 @@ describe('TopicPublications', () => {
   };
   const testThemeTitle = 'Theme 1';
 
-  const testPublications: MyPublication[] = [
-    testPublication,
-    { ...testPublication, id: 'publication-2', title: 'Publication 2' },
+  const testMyPublications: MyPublication[] = [
+    testMyPublication,
+    { ...testMyPublication, id: 'publication-2', title: 'Publication 2' },
   ];
 
   test('renders correctly with list of publications', async () => {
     publicationService.getMyPublicationsByTopic.mockResolvedValue(
-      testPublications,
+      testMyPublications,
     );
     permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
 
@@ -80,7 +80,7 @@ describe('TopicPublications', () => {
 
   test("renders 'Create new publication' button if authorised", async () => {
     publicationService.getMyPublicationsByTopic.mockResolvedValue(
-      testPublications,
+      testMyPublications,
     );
     permissionService.canCreatePublicationForTopic.mockResolvedValue(true);
 
@@ -101,7 +101,7 @@ describe('TopicPublications', () => {
 
   test("does not render 'Create new publication' button if unauthorised", async () => {
     publicationService.getMyPublicationsByTopic.mockResolvedValue(
-      testPublications,
+      testMyPublications,
     );
     permissionService.canCreatePublicationForTopic.mockResolvedValue(false);
 

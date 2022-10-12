@@ -38,7 +38,6 @@ const releaseData: Release = {
   title: 'Release Title',
   type: 'OfficialStatistics',
   contact: {
-    id: '69416b29-8a20-4de1-11de-08d85fc33fc0',
     teamName: 'Test name',
     teamEmail: 'test@test.com',
     contactName: 'Test contact name',

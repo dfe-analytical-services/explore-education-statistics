@@ -18,10 +18,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public IdTitleViewModel Theme { get; set; } = null!;
 
-        public ContactViewModel Contact { get; set; } = null!;
-
         public Guid? SupersededById { get; set; }
 
+        // NOTE: IsSuperseded is necessary, as a publication only becomes superseded when it's SupersededById is set
+        // _and_ that publication has a live release.
         public bool IsSuperseded { get; set; }
 
         public PublicationPermissions? Permissions { get; set; }
@@ -35,6 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
             public bool CanAdoptMethodologies { get; set; }
             public bool CanCreateMethodologies { get; set; }
             public bool CanManageExternalMethodology { get; set; }
+            public bool CanUpdateContact { get; set; }
         }
     }
 }

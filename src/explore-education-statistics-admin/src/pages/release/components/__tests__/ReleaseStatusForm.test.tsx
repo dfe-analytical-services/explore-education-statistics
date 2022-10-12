@@ -31,7 +31,6 @@ describe('ReleaseStatusForm', () => {
     title: 'Release Title',
     type: 'OfficialStatistics',
     contact: {
-      id: 'contact-1',
       teamName: 'Test name',
       teamEmail: 'test@test.com',
       contactName: 'Test contact name',
@@ -678,6 +677,7 @@ describe('ReleaseStatusForm', () => {
 
     test('submits successfully with updated values and publish date', async () => {
       const handleSubmit = jest.fn();
+      const nextYear = new Date().getFullYear() + 1;
 
       render(
         <ReleaseStatusForm
@@ -705,7 +705,10 @@ describe('ReleaseStatusForm', () => {
 
       await userEvent.type(publishDate.getByLabelText('Day'), '10');
       await userEvent.type(publishDate.getByLabelText('Month'), '10');
-      await userEvent.type(publishDate.getByLabelText('Year'), '2022');
+      await userEvent.type(
+        publishDate.getByLabelText('Year'),
+        nextYear.toString(),
+      );
 
       const nextReleaseDate = within(
         screen.getByRole('group', { name: 'Next release expected (optional)' }),
@@ -722,7 +725,7 @@ describe('ReleaseStatusForm', () => {
         latestInternalReleaseNote: 'Test release note',
         approvalStatus: 'Approved',
         notifySubscribers: true,
-        publishScheduled: new Date('2022-10-10'),
+        publishScheduled: new Date(`${nextYear}-10-10`),
         publishMethod: 'Scheduled',
         nextReleaseDate: {
           month: 5,

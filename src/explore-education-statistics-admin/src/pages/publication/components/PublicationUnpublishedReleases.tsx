@@ -24,7 +24,7 @@ export default function PublicationUnpublishedReleases({
         {
           live: false,
           pageSize: 100,
-          permissions: true,
+          includePermissions: true,
         },
       ),
   );

@@ -2,7 +2,7 @@ import PublicationsTab from '@admin/pages/admin-dashboard/components/Publication
 import _permissionService from '@admin/services/permissionService';
 import _publicationService, {
   MyPublication,
-  PublicationContactDetails,
+  Contact,
 } from '@admin/services/publicationService';
 import _themeService, { Theme } from '@admin/services/themeService';
 import _storageService from '@common/services/storageService';
@@ -71,8 +71,7 @@ describe('PublicationsTab', () => {
     },
   ];
 
-  const testContact: PublicationContactDetails = {
-    id: 'contact-1',
+  const testContact: Contact = {
     contactName: 'John Smith',
     contactTelNo: '0777777777',
     teamEmail: 'john.smith@test.com',
@@ -97,6 +96,7 @@ describe('PublicationsTab', () => {
         canUpdatePublicationSupersededBy: true,
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
+        canUpdateContact: true,
       },
     },
     {
@@ -116,6 +116,7 @@ describe('PublicationsTab', () => {
         canUpdatePublicationSupersededBy: true,
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
+        canUpdateContact: true,
       },
     },
   ];
@@ -138,6 +139,7 @@ describe('PublicationsTab', () => {
         canUpdatePublicationSupersededBy: true,
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
+        canUpdateContact: true,
       },
     },
   ];
@@ -160,6 +162,7 @@ describe('PublicationsTab', () => {
         canUpdatePublicationSupersededBy: true,
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
+        canUpdateContact: true,
       },
     },
   ];
@@ -182,6 +185,7 @@ describe('PublicationsTab', () => {
         canUpdatePublicationSupersededBy: true,
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
+        canUpdateContact: true,
       },
     },
   ];

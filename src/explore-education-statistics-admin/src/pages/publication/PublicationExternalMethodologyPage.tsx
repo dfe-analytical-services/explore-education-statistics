@@ -9,11 +9,17 @@ import publicationService, {
 } from '@admin/services/publicationService';
 import React from 'react';
 import { generatePath, useHistory } from 'react-router';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
 const PublicationExternalMethodologyPage = () => {
   const history = useHistory();
   const { publicationId, publication, onReload } = usePublicationContext();
-  const { externalMethodology } = publication;
+  const { value: externalMethodology, isLoading } = useAsyncHandledRetry<
+    ExternalMethodology | undefined
+  >(async () => publicationService.getExternalMethodology(publicationId), [
+    publicationId,
+  ]);
 
   const returnRoute = generatePath<PublicationRouteParams>(
     publicationMethodologiesRoute.path,
@@ -42,7 +48,7 @@ const PublicationExternalMethodologyPage = () => {
   };
 
   return (
-    <>
+    <LoadingSpinner loading={isLoading}>
       <h2>
         {externalMethodology
           ? 'Edit external methodology link'
@@ -53,7 +59,7 @@ const PublicationExternalMethodologyPage = () => {
         onCancel={() => history.push(returnRoute)}
         onSubmit={handleExternalMethodologySubmit}
       />
-    </>
+    </LoadingSpinner>
   );
 };
 

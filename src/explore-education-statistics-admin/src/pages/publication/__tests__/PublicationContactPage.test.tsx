@@ -1,10 +1,19 @@
 import PublicationContactPage from '@admin/pages/publication/PublicationContactPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
-import { testPublication } from '@admin/pages/publication/__data__/testPublication';
+import {
+  testContact,
+  testPublication,
+} from '@admin/pages/publication/__data__/testPublication';
 import _publicationService, {
-  MyPublication,
+  PublicationWithPermissions,
 } from '@admin/services/publicationService';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
@@ -17,6 +26,8 @@ const publicationService = _publicationService as jest.Mocked<
 
 describe('PublicationContactPage', () => {
   test('renders the contact page correctly', async () => {
+    publicationService.getContact.mockResolvedValue(testContact);
+
     renderPage(testPublication);
 
     await waitFor(() => {
@@ -39,12 +50,11 @@ describe('PublicationContactPage', () => {
   });
 
   test('does not show the edit button if do not have permission', async () => {
+    publicationService.getContact.mockResolvedValue(testContact);
+
     renderPage({
       ...testPublication,
-      permissions: {
-        ...testPublication.permissions,
-        canUpdatePublication: false,
-      },
+      permissions: { ...testPublication.permissions, canUpdateContact: false },
     });
 
     await waitFor(() => {
@@ -59,6 +69,8 @@ describe('PublicationContactPage', () => {
   });
 
   test('clicking the edit button shows the edit form', async () => {
+    publicationService.getContact.mockResolvedValue(testContact);
+
     renderPage(testPublication);
 
     await waitFor(() => {
@@ -86,6 +98,8 @@ describe('PublicationContactPage', () => {
   });
 
   test('clicking the cancel button switches back to readOnly view', async () => {
+    publicationService.getContact.mockResolvedValue(testContact);
+
     renderPage(testPublication);
 
     await waitFor(() => {
@@ -119,6 +133,8 @@ describe('PublicationContactPage', () => {
   });
 
   test('shows validation errors when there are no contact details', async () => {
+    publicationService.getContact.mockResolvedValue(testContact);
+
     renderPage(testPublication);
 
     await waitFor(() => {
@@ -171,6 +187,8 @@ describe('PublicationContactPage', () => {
   });
 
   test('show validation error when contact email is not valid', async () => {
+    publicationService.getContact.mockResolvedValue(testContact);
+
     renderPage(testPublication);
 
     await waitFor(() => {
@@ -199,6 +217,8 @@ describe('PublicationContactPage', () => {
   });
 
   test('shows a confirmation modal on submit', async () => {
+    publicationService.getContact.mockResolvedValue(testContact);
+
     renderPage(testPublication);
 
     await waitFor(() => {
@@ -225,6 +245,47 @@ describe('PublicationContactPage', () => {
   });
 
   test('clicking confirm calls the publication service', async () => {
+    publicationService.getContact.mockResolvedValue(testContact);
+    renderPage(testPublication);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Contact for this publication'),
+      ).toBeInTheDocument();
+    });
+
+    userEvent.click(
+      screen.getByRole('button', { name: 'Edit contact details' }),
+    );
+
+    fireEvent.change(screen.getByLabelText('Team name'), {
+      target: { value: 'new team name' },
+    });
+
+    userEvent.click(
+      screen.getByRole('button', { name: 'Update contact details' }),
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+    await waitFor(() => {
+      expect(publicationService.updateContact).toHaveBeenCalledWith(
+        testPublication.id,
+        {
+          ...testContact,
+          teamName: 'new team name',
+        },
+      );
+    });
+  });
+
+  test('clicking confirm switches page to readOnly', async () => {
+    publicationService.getContact.mockResolvedValue(testContact);
+    publicationService.updateContact.mockResolvedValue({
+      ...testContact,
+      teamName: 'updated team name',
+    });
+
     renderPage(testPublication);
 
     await waitFor(() => {
@@ -244,23 +305,27 @@ describe('PublicationContactPage', () => {
     userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
     await waitFor(() => {
-      expect(publicationService.updatePublication).toHaveBeenCalledWith(
-        testPublication.id,
-        {
-          ...testPublication,
-          contact: {
-            contactName: 'John Smith',
-            contactTelNo: '0777777777',
-            teamEmail: 'john.smith@test.com',
-            teamName: 'Team Smith',
-          },
-        },
-      );
+      expect(
+        screen.getByRole('button', { name: 'Edit contact details' }),
+      ).toBeInTheDocument();
     });
+
+    expect(screen.getByTestId('Team name')).toHaveTextContent(
+      'updated team name',
+    );
+    expect(screen.getByTestId('Team email')).toHaveTextContent(
+      testContact.teamEmail,
+    );
+    expect(screen.getByTestId('Contact name')).toHaveTextContent(
+      testContact.contactName,
+    );
+    expect(screen.getByTestId('Contact telephone')).toHaveTextContent(
+      testContact.contactTelNo,
+    );
   });
 });
 
-function renderPage(publication: MyPublication) {
+function renderPage(publication: PublicationWithPermissions) {
   render(
     <MemoryRouter>
       <PublicationContextProvider

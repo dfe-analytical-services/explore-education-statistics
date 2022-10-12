@@ -8,7 +8,7 @@ import {
 import _legacyReleaseService, {
   LegacyRelease,
 } from '@admin/services/legacyReleaseService';
-import { MyPublication } from '@admin/services/publicationService';
+import { PublicationWithPermissions } from '@admin/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -81,7 +81,7 @@ describe('PublicationLegacyReleaseEditPage', () => {
   });
 });
 
-function renderPage(publication: MyPublication) {
+function renderPage(publication: PublicationWithPermissions) {
   render(
     <MemoryRouter
       initialEntries={[

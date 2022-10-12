@@ -1,17 +1,36 @@
 import {
   MyPublication,
-  PublicationContactDetails,
+  Contact,
+  PublicationWithPermissions,
 } from '@admin/services/publicationService';
 
-export const testContact: PublicationContactDetails = {
+export const testContact: Contact = {
   contactName: 'John Smith',
   contactTelNo: '0777777777',
-  id: 'contact-id-1',
   teamEmail: 'john.smith@test.com',
   teamName: 'Team Smith',
 };
 
-export const testPublication: MyPublication = {
+export const testPublication: PublicationWithPermissions = {
+  id: 'publication-1',
+  title: 'Publication 1',
+  summary: 'Publication 1 summary',
+  slug: 'publication-1-slug',
+  theme: { id: 'theme-1', title: 'Theme 1' },
+  topic: { id: 'theme-1-topic-2', title: 'Theme 1 Topic 2' },
+  permissions: {
+    canAdoptMethodologies: true,
+    canCreateReleases: true,
+    canUpdatePublication: true,
+    canUpdatePublicationTitle: true,
+    canUpdatePublicationSupersededBy: true,
+    canCreateMethodologies: true,
+    canManageExternalMethodology: true,
+    canUpdateContact: true,
+  },
+};
+
+export const testMyPublication: MyPublication = {
   id: 'publication-1',
   title: 'Publication 1',
   summary: 'Publication 1 summary',
@@ -28,5 +47,6 @@ export const testPublication: MyPublication = {
     canUpdatePublicationSupersededBy: true,
     canCreateMethodologies: true,
     canManageExternalMethodology: true,
+    canUpdateContact: true,
   },
 };

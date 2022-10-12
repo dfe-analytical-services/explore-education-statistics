@@ -2,10 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import React from 'react';
 import { noop } from 'lodash';
 import PublicationSummary from '@admin/pages/admin-dashboard/components/PublicationSummary';
-import {
-  MyPublication,
-  PublicationContactDetails,
-} from '@admin/services/publicationService';
+import { MyPublication, Contact } from '@admin/services/publicationService';
 import _releaseService, {
   Release,
   ReleaseStageStatuses,
@@ -19,8 +16,7 @@ const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 describe('PublicationSummary', () => {
   const testTopicId = 'test-topic';
 
-  const testContact: PublicationContactDetails = {
-    id: 'contact-1',
+  const testContact: Contact = {
     contactName: 'John Smith',
     contactTelNo: '0777777777',
     teamEmail: 'john.smith@test.com',
@@ -35,6 +31,7 @@ describe('PublicationSummary', () => {
     canUpdatePublicationSupersededBy: true,
     canCreateMethodologies: true,
     canManageExternalMethodology: true,
+    canUpdateContact: true,
   };
 
   const testPublication: MyPublication = {
@@ -54,6 +51,7 @@ describe('PublicationSummary', () => {
       canUpdatePublicationSupersededBy: false,
       canCreateMethodologies: false,
       canManageExternalMethodology: false,
+      canUpdateContact: false,
     },
   };
 
