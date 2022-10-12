@@ -89,6 +89,7 @@ const EditableKeyStat = ({
           onSubmit={values => {
             onSubmit({
               ...values,
+              dataDefinitionTitle: values.dataDefinitionTitle.trim(),
               dataDefinition: toMarkdown(values.dataDefinition),
             });
             toggleShowForm.off();

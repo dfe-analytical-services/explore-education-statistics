@@ -471,7 +471,7 @@ describe('EditableKeyStat', () => {
     userEvent.clear(screen.getByLabelText('Guidance title'));
     await userEvent.type(
       screen.getByLabelText('Guidance title'),
-      'New guidance title',
+      '  New guidance title  ',
     );
 
     // Note that we can't change 'Guidance text' field
