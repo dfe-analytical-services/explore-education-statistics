@@ -144,7 +144,7 @@ const MethodologySummary = ({ publication, onChangePublication }: Props) => {
                               )}
                               variant="secondary"
                             >
-                              View original methodology
+                              View existing version
                             </ButtonLink>
                           )}
                         </>

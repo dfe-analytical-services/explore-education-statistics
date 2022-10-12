@@ -98,7 +98,7 @@ describe('NonScheduledReleaseSummary', () => {
 
     expect(
       screen.queryByRole('link', {
-        name: 'View original release',
+        name: 'View existing version',
       }),
     ).not.toBeInTheDocument();
   });
@@ -162,7 +162,7 @@ describe('NonScheduledReleaseSummary', () => {
 
     expect(
       screen.queryByRole('link', {
-        name: 'View original release',
+        name: 'View existing version',
       }),
     ).not.toBeInTheDocument();
   });
@@ -226,7 +226,7 @@ describe('NonScheduledReleaseSummary', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'View original release',
+        name: 'View existing version',
       }),
     ).toBeInTheDocument();
   });
@@ -292,7 +292,7 @@ describe('NonScheduledReleaseSummary', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'View original release',
+        name: 'View existing version',
       }),
     ).toBeInTheDocument();
   });
