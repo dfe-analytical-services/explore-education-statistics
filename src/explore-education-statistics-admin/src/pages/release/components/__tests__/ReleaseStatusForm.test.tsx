@@ -763,9 +763,74 @@ describe('ReleaseStatusForm', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
+    test('shows error modal when submitted with publish date that could not be scheduled', async () => {
+      const handleSubmit = jest.fn().mockImplementation(() => {
+        throw createServerValidationErrorMock(['PublishDateCannotBeScheduled']);
+      });
+
+      render(
+        <ReleaseStatusForm
+          release={{
+            ...testRelease,
+            approvalStatus: 'Approved',
+            notifySubscribers: true,
+          }}
+          statusPermissions={testStatusPermissions}
+          onCancel={noop}
+          onSubmit={handleSubmit}
+        />,
+      );
+
+      await userEvent.type(
+        screen.getByLabelText('Internal note'),
+        'Test release note',
+      );
+
+      userEvent.click(screen.getByLabelText('On a specific date'));
+
+      const publishDate = within(
+        screen.getByRole('group', { name: 'Publish date' }),
+      );
+
+      const nextYear = new Date().getFullYear() + 1;
+
+      await userEvent.type(publishDate.getByLabelText('Day'), '10');
+      await userEvent.type(publishDate.getByLabelText('Month'), '10');
+      await userEvent.type(
+        publishDate.getByLabelText('Year'),
+        nextYear.toString(),
+      );
+
+      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('Confirm publish date')).toBeInTheDocument();
+      });
+
+      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Publish date cannot be scheduled'),
+        ).toBeInTheDocument();
+      });
+
+      const errorModal = within(screen.getByRole('dialog'));
+
+      expect(errorModal.getByRole('heading')).toHaveTextContent(
+        'Publish date cannot be scheduled',
+      );
+
+      expect(
+        screen.getByRole('link', {
+          name:
+            'Release must be scheduled at least one day in advance of the publishing day',
+        }),
+      ).toHaveAttribute('href', '#releaseStatusForm-publishScheduled');
+    });
+
     test('submits successfully with updated values and publish date', async () => {
       const handleSubmit = jest.fn();
-      const nextYear = new Date().getFullYear() + 1;
 
       render(
         <ReleaseStatusForm

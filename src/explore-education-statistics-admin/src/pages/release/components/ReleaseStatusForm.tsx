@@ -13,11 +13,12 @@ import {
 } from '@common/components/form';
 import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import FormattedDate from '@common/components/FormattedDate';
+import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import useToggle from '@common/hooks/useToggle';
 import { ReleaseApprovalStatus } from '@common/services/publicationService';
-import FormattedDate from '@common/components/FormattedDate';
 import {
   isPartialDateEmpty,
   isValidPartialDate,
@@ -25,16 +26,17 @@ import {
   PartialDate,
 } from '@common/utils/date/partialDate';
 import {
+  hasErrorMessage,
+  isServerValidationError,
   mapFallbackFieldError,
   mapFieldErrors,
 } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
-import ModalConfirm from '@common/components/ModalConfirm';
 import { endOfDay, format, isValid, parseISO } from 'date-fns';
 import { Formik } from 'formik';
+import { keyBy, mapValues } from 'lodash';
 import React from 'react';
 import { StringSchema } from 'yup';
-import { keyBy, mapValues } from 'lodash';
 
 export interface ReleaseStatusFormValues {
   publishMethod?: 'Scheduled' | 'Immediate';
@@ -68,7 +70,7 @@ const errorMappings = [
         'do MMMM yyyy',
       )}`,
       PublishDateCannotBeScheduled:
-        'Publications must be scheduled at least one day in advance. Please enter a later date',
+        'Release must be scheduled at least one day in advance of the publishing day',
     },
   }),
   mapFieldErrors<ReleaseStatusFormValues>({
@@ -101,20 +103,32 @@ const ReleaseStatusForm = ({
   const [showConfirmScheduleModal, toggleConfirmScheduleModal] = useToggle(
     false,
   );
+  const [showScheduleErrorModal, toggleScheduleErrorModal] = useToggle(false);
 
   const handleSubmit = useFormSubmit<ReleaseStatusFormValues>(
     async ({ approvalStatus, publishMethod, publishScheduled, ...values }) => {
       const isApproved = approvalStatus === 'Approved';
 
-      await onSubmit({
-        ...values,
-        approvalStatus,
-        publishMethod: isApproved ? publishMethod : undefined,
-        publishScheduled:
-          isApproved && publishScheduled && publishMethod === 'Scheduled'
-            ? publishScheduled
-            : undefined,
-      });
+      try {
+        await onSubmit({
+          ...values,
+          approvalStatus,
+          publishMethod: isApproved ? publishMethod : undefined,
+          publishScheduled:
+            isApproved && publishScheduled && publishMethod === 'Scheduled'
+              ? publishScheduled
+              : undefined,
+        });
+      } catch (err) {
+        if (
+          isServerValidationError(err) &&
+          hasErrorMessage(err, ['PublishDateCannotBeScheduled'])
+        ) {
+          toggleScheduleErrorModal.on();
+        }
+
+        throw err;
+      }
     },
     errorMappings,
     fallbackErrorMapping,
@@ -156,7 +170,7 @@ const ReleaseStatusForm = ({
             .required('Enter a valid publish date')
             .test({
               name: 'validDateIfAfterToday',
-              message: `Publish date can't be before ${format(
+              message: `Publish date cannot be before ${format(
                 new Date(),
                 'do MMMM yyyy',
               )}`,
@@ -335,6 +349,24 @@ const ReleaseStatusForm = ({
               .
             </p>
             <p>Are you sure?</p>
+          </ModalConfirm>
+
+          <ModalConfirm
+            title="Publish date cannot be scheduled"
+            confirmText="Back to form"
+            showCancel={false}
+            open={showScheduleErrorModal}
+            onConfirm={toggleScheduleErrorModal.off}
+            onExit={toggleScheduleErrorModal.off}
+          >
+            <WarningMessage>
+              Release must be scheduled at least one day in advance of the
+              publishing day. Please speak to{' '}
+              <a href="mailto:explore.statistics@education.gov.uk">
+                explore.statistics@education.gov.uk
+              </a>{' '}
+              if this is an issue.
+            </WarningMessage>
           </ModalConfirm>
         </>
       )}
