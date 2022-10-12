@@ -676,6 +676,93 @@ describe('ReleaseStatusForm', () => {
       });
     });
 
+    test('shows confirmation modal when submitting with valid values and publish date', async () => {
+      render(
+        <ReleaseStatusForm
+          release={{
+            ...testRelease,
+            approvalStatus: 'Approved',
+            notifySubscribers: true,
+          }}
+          statusPermissions={testStatusPermissions}
+          onCancel={noop}
+          onSubmit={noop}
+        />,
+      );
+
+      await userEvent.type(
+        screen.getByLabelText('Internal note'),
+        'Test release note',
+      );
+
+      userEvent.click(screen.getByLabelText('On a specific date'));
+
+      const publishDate = within(
+        screen.getByRole('group', { name: 'Publish date' }),
+      );
+
+      const nextYear = new Date().getFullYear() + 1;
+
+      await userEvent.type(publishDate.getByLabelText('Day'), '10');
+      await userEvent.type(publishDate.getByLabelText('Month'), '10');
+      await userEvent.type(
+        publishDate.getByLabelText('Year'),
+        nextYear.toString(),
+      );
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('Confirm publish date')).toBeInTheDocument();
+      });
+
+      const modal = within(screen.getByRole('dialog'));
+      expect(modal.getByRole('heading')).toHaveTextContent(
+        'Confirm publish date',
+      );
+    });
+
+    test('does not show confirmation modal when submitting invalid values with valid publish date', async () => {
+      render(
+        <ReleaseStatusForm
+          release={{
+            ...testRelease,
+            approvalStatus: 'Approved',
+          }}
+          statusPermissions={testStatusPermissions}
+          onCancel={noop}
+          onSubmit={noop}
+        />,
+      );
+
+      userEvent.click(screen.getByLabelText('On a specific date'));
+
+      const publishDate = within(
+        screen.getByRole('group', { name: 'Publish date' }),
+      );
+
+      const nextYear = new Date().getFullYear() + 1;
+
+      await userEvent.type(publishDate.getByLabelText('Day'), '10');
+      await userEvent.type(publishDate.getByLabelText('Month'), '10');
+      await userEvent.type(
+        publishDate.getByLabelText('Year'),
+        nextYear.toString(),
+      );
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('There is a problem')).toBeInTheDocument();
+      });
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
     test('submits successfully with updated values and publish date', async () => {
       const handleSubmit = jest.fn();
       const nextYear = new Date().getFullYear() + 1;
@@ -703,6 +790,8 @@ describe('ReleaseStatusForm', () => {
       const publishDate = within(
         screen.getByRole('group', { name: 'Publish date' }),
       );
+
+      const nextYear = new Date().getFullYear() + 1;
 
       await userEvent.type(publishDate.getByLabelText('Day'), '10');
       await userEvent.type(publishDate.getByLabelText('Month'), '10');

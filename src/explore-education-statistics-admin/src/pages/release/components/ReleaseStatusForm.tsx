@@ -292,8 +292,14 @@ const ReleaseStatusForm = ({
                     form.values.publishMethod === 'Scheduled' &&
                     form.values.publishScheduled
                   ) {
-                    toggleConfirmScheduleModal.on();
-                    return;
+                    // Ensure validation has been run as form state
+                    // may not be up-to-date (seems to only affect tests).
+                    const errors = await form.validateForm();
+
+                    if (Object.keys(errors).length === 0) {
+                      toggleConfirmScheduleModal.on();
+                      return;
+                    }
                   }
 
                   await form.submitForm();
