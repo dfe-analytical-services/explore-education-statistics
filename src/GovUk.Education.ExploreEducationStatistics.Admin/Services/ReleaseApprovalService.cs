@@ -211,33 +211,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     CultureInfo.InvariantCulture,
                     DateTimeStyles.None);
 
-                // Publish date can't be before today when compared with 'today' in the same timezone that we expect
-                // the user to be located in and the Publisher functions to be running in, both of which are the UK.
-
-                // Example (1) - valid because publish date is same as today:
-                // Time now (UTC): 2023-01-01 23:00:00
-                // Time now (GMT): 2023-01-01 23:00:00
-                // Publish date: 2023-01-01
-                // Date today for comparison: 2023-01-01
-
-                // Example (2) - valid because publish date is same as today:
-                // Time now (UTC): 2023-06-06 22:00:00
-                // Time now (BST): 2023-06-06 22:00:00
-                // Publish date: 2023-06-06
-                // Date today for comparison: 2023-06-06
-                
-                // Example (3) - invalid because publish date is before today:
-                // Time now (UTC): 2023-06-06 23:00:00
-                // Time now (BST): 2023-06-07 00:00:00
-                // Publish date: 2023-06-06
-                // Date today for comparison: 2023-06-07
-
-                var dateTodayUkTimezone = _dateTimeProvider.UtcNow.ConvertUtcToUkTimeZone().Date;
-                if (publishDate.Date < dateTodayUkTimezone)
-                {
-                    return ValidationActionResult(PublishDateCannotBeBeforeToday);
-                }
-
                 // Check if publishing will occur on the publish date as there may be no scheduled occurrences
                 // of the two Azure Functions which perform publishing.
                 if (!CheckPublishDateCanBeScheduled(publishDate))
@@ -269,7 +242,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var ukTimeZone = DateTimeExtensions.GetUkTimeZone();
             var fromUtc = TimeZoneInfo.ConvertTimeToUtc(publishDate.Date, ukTimeZone);
-            var toUtc = fromUtc.AddDays(1);
+            var toUtc = fromUtc.AddDays(1).AddTicks(-1);
+
+            // The publish date cannot be scheduled if it's already passed
+            if (_dateTimeProvider.UtcNow > toUtc)
+            {
+                return false;
+            }
 
             // The range should begin now rather than at midnight if the publish date is today
             if (_dateTimeProvider.UtcNow > fromUtc)
@@ -284,7 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     toUtc: toUtc,
                     timeZoneInfo: ukTimeZone,
                     fromInclusive: true,
-                    toInclusive: false,
+                    toInclusive: true,
                     out var nextOccurrenceUtc))
             {
                 // Publishing won't occur unless there's an occurrence of (2) after (1) but before the end of the range
@@ -294,7 +273,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     toUtc: toUtc,
                     timeZoneInfo: ukTimeZone,
                     fromInclusive: true,
-                    toInclusive: false,
+                    toInclusive: true,
                     out _);
             }
 

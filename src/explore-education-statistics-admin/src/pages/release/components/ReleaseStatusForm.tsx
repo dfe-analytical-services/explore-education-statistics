@@ -65,10 +65,6 @@ const errorMappings = [
     target: 'publishScheduled',
     messages: {
       PublishDateCannotBeEmpty: 'Enter a publish date before approving',
-      PublishDateCannotBeBeforeToday: `Publish date cannot be before ${format(
-        new Date(),
-        'do MMMM yyyy',
-      )}`,
       PublishDateCannotBeScheduled:
         'Release must be scheduled at least one day in advance of the publishing day',
     },

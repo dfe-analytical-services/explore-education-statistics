@@ -341,7 +341,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task CreateReleaseStatus_Approved_FailsPublishDateBeforeToday()
+        public async Task CreateReleaseStatus_Approved_FailsPublishDateCannotBeScheduled_PreviousDay()
         {
             var release = new Release
             {
@@ -365,10 +365,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dateTimeProvider =
                 new DateTimeProvider(DateTime.Parse("2023-01-01T00:00:00Z", styles: DateTimeStyles.RoundtripKind));
 
+            // Set up the cron schedules for publishing
+            var options = Options.Create(new ReleaseApprovalOptions
+            {
+                PublishReleasesCronSchedule = "0 0 0 * * *", // Next occurrence 2023-01-01T00:00:00Z
+                PublishReleaseContentCronSchedule = "0 30 9 * * *" // Next occurrence 2023-01-01T09:30:00Z
+            });
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildService(context,
-                    dateTimeProvider: dateTimeProvider);
+                    dateTimeProvider: dateTimeProvider,
+                    options: options);
 
                 // Request a publish day which is earlier than today
                 var result = await releaseService
@@ -384,12 +392,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                result.AssertBadRequest(PublishDateCannotBeBeforeToday);
+                // Expect this to fail because there's no occurrence of the first function until 2023-01-01T00:00:00Z
+                // A publish date of 2022-12-31 needs to be approved before 2022-12-31T00:00:00Z
+                result.AssertBadRequest(PublishDateCannotBeScheduled);
             }
         }
 
         [Fact]
-        public async Task CreateReleaseStatus_Approved_FailsPublishDateBeforeToday_DaylightSavingTime()
+        public async Task
+            CreateReleaseStatus_Approved_FailsPublishDateCannotBeScheduled_PreviousDay_DaylightSavingTime()
         {
             var release = new Release
             {
@@ -415,10 +426,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dateTimeProvider =
                 new DateTimeProvider(DateTime.Parse("2023-06-06T23:00:00Z", styles: DateTimeStyles.RoundtripKind));
 
+            // Set up the cron schedules for publishing
+            var options = Options.Create(new ReleaseApprovalOptions
+            {
+                PublishReleasesCronSchedule = "0 0 0 * * *", // Next occurrence 2023-06-06T23:00:00Z
+                PublishReleaseContentCronSchedule = "0 30 9 * * *" // Next occurrence 2023-06-07T08:30:00Z
+            });
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildService(context,
-                    dateTimeProvider: dateTimeProvider);
+                    dateTimeProvider: dateTimeProvider,
+                    options: options);
 
                 // Request a publish day which is the same as the UTC day but earlier than the BST day
                 var result = await releaseService
@@ -430,11 +449,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             LatestInternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2023-06-06",
-                            NextReleaseDate = new PartialDate {Month="12", Year="2000"}
+                            NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
                         }
                     );
 
-                result.AssertBadRequest(PublishDateCannotBeBeforeToday);
+                // Expect this to fail because there's no occurrence of the first function until 2023-06-06T23:00:00Z
+                // A publish date of 2022-06-06 needs to be approved before 2022-06-05T23:00:00Z
+                result.AssertBadRequest(PublishDateCannotBeScheduled);
             }
         }
 
@@ -491,7 +512,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 // Expect this to fail because there's no occurrence of the first function until 2023-01-02T00:00:00Z
-                // A publish date of 2023-01-01 needs to be approved on or before 2023-01-01T00:00:00Z
+                // A publish date of 2023-01-01 needs to be approved before 2023-01-01T00:00:00Z
                 result.AssertBadRequest(PublishDateCannotBeScheduled);
             }
         }
@@ -552,7 +573,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 // Expect this to fail because there's no occurrence of the first function until 2023-06-07T23:00:00Z
-                // A publish date of 2023-06-07 needs to be approved on or before 2023-06-06T23:00:00Z
+                // A publish date of 2023-06-07 needs to be approved before 2023-06-06T23:00:00Z
                 result.AssertBadRequest(PublishDateCannotBeScheduled);
             }
         }
@@ -668,7 +689,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 // Expect this to fail because there's no occurrences of the second function remaining on 2023-01-01.
-                // A publish date of 2023-01-01 needs to be approved on or before 2023-01-01T22:30:00Z
+                // A publish date of 2023-01-01 needs to be approved before 2023-01-01T22:30:00Z
                 // in order to be published by the second function at 2023-01-01T23:15:00Z
                 result.AssertBadRequest(PublishDateCannotBeScheduled);
             }

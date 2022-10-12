@@ -85,7 +85,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         ReleaseNotApproved,
         PublishedReleaseCannotBeUnapproved,
         PublishDateCannotBeEmpty,
-        PublishDateCannotBeBeforeToday,
         PublishDateCannotBeScheduled,
 
         // Release checklist errors
