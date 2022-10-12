@@ -59,7 +59,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 await MarkScheduledReleaseStatusAsSuperseded(message);
                 if (await _validationService.ValidatePublishingState(message.ReleaseId))
                 {
-                    await _validationService.ValidateRelease(message.ReleaseId)
+                    await _validationService
+                        .ValidateRelease(message.ReleaseId)
                         .OnSuccessDo(async () =>
                         {
                             if (message.Immediate)
@@ -74,10 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                             else
                             {
                                 // Create a Release Status entry here for the midnight job to pick up.
-                                // Stage the Release Content ahead of time.
-                                var releaseStatus = await CreateReleaseStatusAsync(message, ScheduledState);
-                                await _queueService.QueueGenerateStagedReleaseContentMessageAsync(
-                                    ListOf((message.ReleaseId, releaseStatus.Id)));
+                                await CreateReleaseStatusAsync(message, ScheduledState);
                             }
                         })
                         .OnFailureDo(async logMessages =>

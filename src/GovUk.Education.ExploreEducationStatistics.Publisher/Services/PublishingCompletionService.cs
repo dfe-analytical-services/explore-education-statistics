@@ -54,8 +54,13 @@ public class PublishingCompletionService : IPublishingCompletionService
         var prePublishingStagesComplete = releaseStatuses
             .Where(status => status.AllStagesPriorToPublishingComplete())
             .ToList();
-        
-        await releaseStatuses
+
+        if (!prePublishingStagesComplete.Any())
+        {
+            return;
+        }
+         
+        await prePublishingStagesComplete
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(status => _releasePublishingStatusService
                 .UpdatePublishingStageAsync(
@@ -103,7 +108,7 @@ public class PublishingCompletionService : IPublishingCompletionService
         // are now accessible for the first time after publishing these releases
         await _contentService.UpdateCachedTaxonomyBlobs();
         
-        await releaseStatuses
+        await prePublishingStagesComplete
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(status => _releasePublishingStatusService
                 .UpdatePublishingStageAsync(

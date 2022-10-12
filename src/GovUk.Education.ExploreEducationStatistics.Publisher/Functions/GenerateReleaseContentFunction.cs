@@ -46,6 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation("{FunctionName} triggered: {Message}",
                 executionContext.FunctionName,
                 message);
+            await UpdateContentStage(message, Started);
             try
             {
                 var publishStagedReleasesCronExpression = Environment.GetEnvironmentVariable("PublishReleaseContentCronSchedule") ?? "";
@@ -55,6 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 }).GetNextOccurrence(DateTime.UtcNow);
                 var context = new PublishContext(nextScheduledPublishingTime, true);
                 await _contentService.UpdateContent(context, message.Releases.Select(tuple => tuple.ReleaseId).ToArray());
+                await UpdateContentStage(message, Complete);
             }
             catch (Exception e)
             {
