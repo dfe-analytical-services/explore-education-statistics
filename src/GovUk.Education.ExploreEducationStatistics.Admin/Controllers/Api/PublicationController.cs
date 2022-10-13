@@ -28,11 +28,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpGet("api/publications")]
         public async Task<ActionResult<List<PublicationViewModel>>> ListPublications(
-            [FromQuery] bool permissions,
+            [FromQuery] bool includePermissions,
             [FromQuery] Guid? topicId)
         {
             return await _publicationService
-                .ListPublications(permissions, topicId)
+                .ListPublications(includePermissions, topicId)
                 .HandleFailuresOrOk();
         }
 
@@ -64,10 +64,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpGet("api/publications/{publicationId}")]
         public async Task<ActionResult<PublicationViewModel>> GetPublication(
-            [Required] Guid publicationId)
+            [Required] Guid publicationId, [FromQuery] bool includePermissions = false)
         {
             return await _publicationService
-                .GetPublication(publicationId)
+                .GetPublication(publicationId, includePermissions)
                 .HandleFailuresOrOk();
         }
 
@@ -94,23 +94,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrNoContent();
         }
 
+        [HttpGet("api/publication/{publicationId:guid}/contact")]
+        public async Task<ActionResult<ContactViewModel>> GetContact(
+            Guid publicationId)
+        {
+            return await _publicationService.GetContact(publicationId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPut("api/publication/{publicationId:guid}/contact")]
+        public async Task<ActionResult<ContactViewModel>> UpdateContact(
+            Guid publicationId, Contact updatedContact)
+        {
+            return await _publicationService.UpdateContact(publicationId, updatedContact)
+                .HandleFailuresOrOk();
+        }
 
         [HttpGet("api/publication/{publicationId}/releases")]
         public async Task<ActionResult<PaginatedListViewModel<ReleaseSummaryViewModel>>> ListActiveReleases(
             [Required] Guid publicationId,
             [FromQuery, Range(1, double.PositiveInfinity)] int page = 1,
             [FromQuery, Range(0, double.PositiveInfinity)] int pageSize = 5,
-            [FromQuery] bool permissions = false,
-            [FromQuery] bool? live = null)
+            [FromQuery] bool? live = null,
+            [FromQuery] bool includePermissions = false)
         {
             return await _publicationService
-                .ListActiveReleasesPaginated(publicationId, page, pageSize, live, includePermissions: permissions)
+                .ListActiveReleasesPaginated(publicationId, page, pageSize, live, includePermissions)
                 .HandleFailuresOrOk();
         }
 
         [HttpPost("api/publications")]
-        public async Task<ActionResult<PublicationViewModel>> CreatePublication(
-            PublicationSaveRequest publication)
+        public async Task<ActionResult<PublicationCreateViewModel>> CreatePublication(
+            PublicationCreateRequest publication)
         {
             return await _publicationService
                 .CreatePublication(publication)

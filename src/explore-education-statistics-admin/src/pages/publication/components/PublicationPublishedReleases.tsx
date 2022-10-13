@@ -56,7 +56,7 @@ export default function PublicationPublishedReleases({
           live: true,
           page: pageParam,
           pageSize,
-          permissions: true,
+          includePermissions: true,
         },
       );
     },

@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
         PublicationSuperseded
     }
 
-    public class PermalinkViewModel
+    public class LegacyPermalinkViewModel
     {
         public Guid Id { get; set; }
 

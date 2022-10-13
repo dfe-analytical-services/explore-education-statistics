@@ -24,7 +24,6 @@
         "description": "Data Hub Environment Name e.g. ees. Used as a prefix for created resources"
       }
     },
-
     "skuPublic": {
       "type": "string",
       "defaultValue": "B1 Basic",
@@ -241,7 +240,6 @@
       "type": "bool",
       "defaultValue": true
     },
-
     "publicAppBasicAuth": {
       "type": "string",
       "defaultValue": "true",
@@ -279,7 +277,6 @@
         "description": "Hotjar ID for the public app. Leave as empty string to disable Hotjar"
       }
     },
-
     "verificationEmailTemplateId": {
       "type": "securestring",
       "defaultValue": "",
@@ -411,11 +408,9 @@
         "description": "Tag Value - Enter the name of the main script (not the parameters file) used to deploy the component. If the component is deployed manually, the value should be N/A"
       }
     },
-
     "adminUri": {
       "type": "string"
     },
-
     "minTlsVersion": {
       "type": "string",
       "defaultValue": "1.2",
@@ -433,7 +428,6 @@
       "type": "bool",
       "defaultValue": true
     },
-
     "publishReleasesCronSchedule": {
       "type": "string",
       "defaultValue": "0 0 0 * * *",
@@ -441,7 +435,6 @@
         "description": "Cron string that is used to control the schedule of the Publish Releases Function in the Publisher App"
       }
     },
-
     "publishReleaseContentCronSchedule": {
       "type": "string",
       "defaultValue": "0 30 9 * * *",
@@ -472,14 +465,12 @@
         "description": "Prerelease end time as number of minutes before a release is scheduled to be published"
       }
     },
-
     "publisherClientId": {
       "type": "string",
       "metadata": {
         "description": "Publisher Active Directory Application Client Id used for authentication requests"
       }
     },
-
     "publisherClientSecret": {
       "type": "string",
       "metadata": {
@@ -541,7 +532,10 @@
     "openIdConnectSpaClientRefreshTokenUsage": {
       "type": "string",
       "defaultValue": "OneTimeOnly",
-      "allowedValues": ["ReUse", "OneTimeOnly"],
+      "allowedValues": [
+        "ReUse",
+        "OneTimeOnly"
+      ],
       "metadata": {
         "description": "Whether or not this environment's Admin API supports reusable or one-time refresh tokens"
       }
@@ -549,7 +543,10 @@
     "openIdConnectSpaClientRefreshTokenExpiration": {
       "type": "string",
       "defaultValue": "Absolute",
-      "allowedValues": ["Absolute", "Sliding"],
+      "allowedValues": [
+        "Absolute",
+        "Sliding"
+      ],
       "metadata": {
         "description": "Whether or not this environment's Admin API has refresh tokens expiring at a fixed date or in a within a sliding window that extends with each use of a refresh token"
       }
@@ -667,6 +664,10 @@
     }
   },
   "variables": {
+    "contentDbName": "content",
+    "coreStatisticsDbName": "statistics",
+    "publicStatisticsDbName": "public-statistics",
+    "statisticsReplicaDbName": "statistics",
     "dataAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-data')]",
     "dataPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-data')]",
     "dataAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-data')]",
@@ -683,7 +684,7 @@
     "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-public')]",
     "coreStorageAccountName": "[concat(parameters('subscription'), parameters('storageAccountPrefix'), 'eescore')]",
     "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('coreStorageAccountName'))]",
-    "sqlserverName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
+    "coreSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
     "publicSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-02')]",
     "importerAppName": "[concat(parameters('subscription'), '-fa-', parameters('environment'), '-importer')]",
     "importerPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-importer')]",
@@ -705,50 +706,6 @@
     "logicAppSlackAlerts": "[concat(parameters('subscription'), '-la-', parameters('environment'), '-slackwebhook')]",
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
     "metricAlerts": [
-      //{
-      //  "name": "[concat(parameters('subscription'),'AdminAppServiceHttpServiceErrors')]",
-      //  "description": "Admin App Service - Http Service Errors",
-      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
-      //  "resourceType": "Microsoft.Web/sites",
-      //  "metricName": "Http5xx",
-      //  "threshold": 0,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Total",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
-      //{
-      //  "name": "[concat(parameters('subscription'),'DataAppServiceHttpServiceErrors')]",
-      //  "description": "Data App Service - Http Service Errors",
-      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
-      //  "resourceType": "Microsoft.Web/sites",
-      //  "metricName": "Http5xx",
-      //  "threshold": 5,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Total",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
-      //{
-      //  "name": "[concat(parameters('subscription'),'ContentAppServiceHttpServiceErrors')]",
-      //  "description": "Content App Service - Http Service Errors",
-      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
-      //  "resourceType": "Microsoft.Web/sites",
-      //  "metricName": "Http5xx",
-      //  "threshold": 2,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Total",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
-      //{
-      //  "name": "[concat(parameters('subscription'),'PublicAppServiceHttpServiceErrors')]",
-      //  "description": "Public App Service - Http Service Errors",
-      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]",
-      //  "resourceType": "Microsoft.Web/sites",
-      //  "metricName": "Http5xx",
-      //  "threshold": 15,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Total",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
       {
         "name": "[concat(parameters('subscription'),'ImporterAppServiceHttpServiceErrors')]",
         "description": "Importer App Service - Http Service Errors",
@@ -782,50 +739,6 @@
         "timeAggregation": "Total",
         "criterionType": "StaticThresholdCriterion"
       },
-      //{
-      //  "name": "[concat(parameters('subscription'),'AdminAppInsightsExceptions')]",
-      //  "description": "Admin AppInsights - Exceptions",
-      //  "resourceId": "[resourceId('Microsoft.Insights/components', variables('adminAppInsights'))]",
-      //  "resourceType": "Microsoft.Insights/components",
-      //  "metricName": "exceptions/count",
-      //  "threshold": 10,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Count",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
-      //{
-      //  "name": "[concat(parameters('subscription'),'DataAppInsightsExceptions')]",
-      //  "description": "Data AppInsights - Exceptions",
-      //  "resourceId": "[resourceId('Microsoft.Insights/components', variables('dataAppInsights'))]",
-      //  "resourceType": "Microsoft.Insights/components",
-      //  "metricName": "exceptions/count",
-      //  "threshold": 5,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Count",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
-      //{
-      //  "name": "[concat(parameters('subscription'),'ContentAppInsightsExceptions')]",
-      //  "description": "Content AppInsights - Exceptions",
-      //  "resourceId": "[resourceId('Microsoft.Insights/components', variables('contentAppInsights'))]",
-      //  "resourceType": "Microsoft.Insights/components",
-      //  "metricName": "exceptions/count",
-      //  "threshold": 4,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Count",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
-      //{
-      //  "name": "[concat(parameters('subscription'),'PublicAppInsightsExceptions')]",
-      //  "description": "Content AppInsights - Exceptions",
-      //  "resourceId": "[resourceId('Microsoft.Insights/components', variables('publicAppInsights'))]",
-      //  "resourceType": "Microsoft.Insights/components",
-      //  "metricName": "exceptions/count",
-      //  "threshold": 15,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Count",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
       {
         "name": "[concat(parameters('subscription'),'ImporterAppInsightsExceptions')]",
         "description": "Importer AppInsights - Exceptions",
@@ -859,39 +772,6 @@
         "timeAggregation": "Count",
         "criterionType": "StaticThresholdCriterion"
       },
-      //{
-      //  "name": "[concat(parameters('subscription'),'AdminAppServiceResponseTime')]",
-      //  "description": "Admin App Service - Response Time",
-      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
-      //  "resourceType": "Microsoft.Web/sites",
-      //  "metricName": "HttpResponseTime",
-      //  "threshold": 10,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Average",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
-      //{
-      //  "name": "[concat(parameters('subscription'),'DataAppServiceResponseTime')]",
-      //  "description": "Data App Service - Response Time",
-      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
-      //  "resourceType": "Microsoft.Web/sites",
-      //  "metricName": "HttpResponseTime",
-      //  "threshold": 10,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Average",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
-      //{
-      //  "name": "[concat(parameters('subscription'),'ContentAppServiceResponseTime')]",
-      //  "description": "Content App Service - Response Time",
-      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
-      //  "resourceType": "Microsoft.Web/sites",
-      //  "metricName": "HttpResponseTime",
-      //  "threshold": 100,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Average",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
       {
         "name": "[concat(parameters('subscription'),'PublicAppServiceResponseTime')]",
         "description": "Public App Service - Response Time",
@@ -906,7 +786,7 @@
       {
         "name": "[concat(parameters('subscription'),'PubStatsDBCpuPercent')]",
         "description": "Public Statistics DB CPU percentage",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('publicStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "cpu_percent",
         "threshold": 85,
@@ -917,7 +797,7 @@
       {
         "name": "[concat(parameters('subscription'),'PubStatsDBDataIOPercent')]",
         "description": "Public Statistics DB Data IO Percentage",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('publicStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "physical_data_read_percent",
         "threshold": 50,
@@ -928,7 +808,7 @@
       {
         "name": "[concat(parameters('subscription'),'PubStatsDBFailedConnections')]",
         "description": "Public Statistics DB Failed Connections",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('publicStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "connection_failed",
         "threshold": 0,
@@ -939,7 +819,7 @@
       {
         "name": "[concat(parameters('subscription'),'PubStatsDBDeadlock')]",
         "description": "Public Statistics DB Deadlock",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('publicStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "deadlock",
         "threshold": 0,
@@ -950,7 +830,7 @@
       {
         "name": "[concat(parameters('subscription'),'PubStatsDBDataSpaceUsedPercent')]",
         "description": "Public Statistics DB Data Space Used Percentage",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('publicStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
         "threshold": 85,
@@ -961,7 +841,7 @@
       {
         "name": "[concat(parameters('subscription'),'PubStatsDBDataSpaceUsedPercentUrgent')]",
         "description": "Public Statistics DB Data Space Used Percentage - URGENT",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('publicStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
         "threshold": 95,
@@ -972,7 +852,84 @@
       {
         "name": "[concat(parameters('subscription'),'PubStatsDBBlockedByFirewall')]",
         "description": "Public Statistics DB Blocked By Firewall",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('publicStatisticsDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "blocked_by_firewall",
+        "threshold": 0,
+        "operator": "GreaterThan",
+        "timeAggregation": "Total",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatisticsReplicaDBCpuPercent')]",
+        "description": "Statistics Replica DB CPU percentage",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "cpu_percent",
+        "threshold": 85,
+        "operator": "GreaterThan",
+        "timeAggregation": "Average",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatisticsReplicaDBDataIOPercent')]",
+        "description": "Statistics Replica DB Data IO Percentage",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "physical_data_read_percent",
+        "threshold": 50,
+        "operator": "GreaterThan",
+        "timeAggregation": "Average",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatisticsReplicaDBFailedConnections')]",
+        "description": "Statistics Replica DB Failed Connections",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "connection_failed",
+        "threshold": 0,
+        "operator": "GreaterThan",
+        "timeAggregation": "Total",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatisticsReplicaDBDeadlock')]",
+        "description": "Statistics Replica DB Deadlock",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "deadlock",
+        "threshold": 0,
+        "operator": "GreaterThan",
+        "timeAggregation": "Total",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatisticsReplicaDBDataSpaceUsedPercent')]",
+        "description": "Statistics Replica DB Data Space Used Percentage",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "storage_percent",
+        "threshold": 85,
+        "operator": "GreaterThan",
+        "timeAggregation": "Maximum",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatisticsReplicaDBDataSpaceUsedPercentUrgent')]",
+        "description": "Statistics Replica DB Data Space Used Percentage - URGENT",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "storage_percent",
+        "threshold": 95,
+        "operator": "GreaterThan",
+        "timeAggregation": "Maximum",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'StatisticsReplicaDBBlockedByFirewall')]",
+        "description": "Statistics Replica DB Blocked By Firewall",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "blocked_by_firewall",
         "threshold": 0,
@@ -983,7 +940,7 @@
       {
         "name": "[concat(parameters('subscription'),'StatsDBCpuPercent')]",
         "description": "Statistics DB CPU percentage",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'statistics')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('coreStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "cpu_percent",
         "threshold": 85,
@@ -994,7 +951,7 @@
       {
         "name": "[concat(parameters('subscription'),'StatsDBDataIOPercent')]",
         "description": "Statistics DB Data IO Percentage",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'statistics')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('coreStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "physical_data_read_percent",
         "threshold": 50,
@@ -1005,7 +962,7 @@
       {
         "name": "[concat(parameters('subscription'),'StatsDBFailedConnections')]",
         "description": "Statistics DB Failed Connections",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'statistics')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('coreStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "connection_failed",
         "threshold": 0,
@@ -1016,7 +973,7 @@
       {
         "name": "[concat(parameters('subscription'),'StatsDBDeadlock')]",
         "description": "Statistics DB Deadlock",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'statistics')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('coreStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "deadlock",
         "threshold": 0,
@@ -1027,7 +984,7 @@
       {
         "name": "[concat(parameters('subscription'),'StatsDBDataSpaceUsedPercent')]",
         "description": "Statistics DB Data Space Used Percentage",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'statistics')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('coreStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
         "threshold": 85,
@@ -1038,7 +995,7 @@
       {
         "name": "[concat(parameters('subscription'),'StatsDBDataSpaceUsedPercentUrgent')]",
         "description": "Statistics DB Data Space Used Percentage - URGENT",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'statistics')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('coreStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
         "threshold": 95,
@@ -1049,7 +1006,7 @@
       {
         "name": "[concat(parameters('subscription'),'StatsDBBlockedByFirewall')]",
         "description": "Statistics DB Blocked By Firewall",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'statistics')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('coreStatisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "blocked_by_firewall",
         "threshold": 0,
@@ -1060,7 +1017,7 @@
       {
         "name": "[concat(parameters('subscription'),'ContentDBCpuPercent')]",
         "description": "Content DB CPU percentage",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "cpu_percent",
         "threshold": 85,
@@ -1071,7 +1028,7 @@
       {
         "name": "[concat(parameters('subscription'),'ContentDBDataIOPercent')]",
         "description": "Content DB Data IO Percentage",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "physical_data_read_percent",
         "threshold": 50,
@@ -1082,7 +1039,7 @@
       {
         "name": "[concat(parameters('subscription'),'ContentDBFailedConnections')]",
         "description": "Content DB Failed Connections",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "connection_failed",
         "threshold": 0,
@@ -1093,7 +1050,7 @@
       {
         "name": "[concat(parameters('subscription'),'ContentDBDeadlock')]",
         "description": "Content DB Deadlock",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "deadlock",
         "threshold": 0,
@@ -1104,7 +1061,7 @@
       {
         "name": "[concat(parameters('subscription'),'ContentDBDataSpaceUsedPercent')]",
         "description": "Content DB Data Space Used Percentage",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
         "threshold": 85,
@@ -1115,7 +1072,7 @@
       {
         "name": "[concat(parameters('subscription'),'ContentDBDataSpaceUsedPercentUrgent')]",
         "description": "Content DB Data Space Used Percentage - URGENT",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
         "threshold": 95,
@@ -1126,7 +1083,7 @@
       {
         "name": "[concat(parameters('subscription'),'ContentDBBlockedByFirewall')]",
         "description": "Content DB Blocked By Firewall",
-        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "blocked_by_firewall",
         "threshold": 0,
@@ -1307,12 +1264,12 @@
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlPublicDataApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublicDataApiPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('publicStatisticsDbName'), ';User Id=', parameters('sqlPublicDataApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublicDataApiPassword'), ';')]"
             },
             {
               "name": "ContentDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlDataApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlDataApiPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('contentDbName'), ';User Id=', parameters('sqlDataApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlDataApiPassword'), ';')]"
             }
           ]
         }
@@ -1532,12 +1489,12 @@
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlPublicContentApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublicContentApiPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('publicStatisticsDbName'), ';User Id=', parameters('sqlPublicContentApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublicContentApiPassword'), ';')]"
             },
             {
               "name": "ContentDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlContentApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlContentApiPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('contentDbName'), ';User Id=', parameters('sqlContentApiUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlContentApiPassword'), ';')]"
             }
           ]
         }
@@ -1753,12 +1710,12 @@
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('coreStatisticsDbName'), ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
             },
             {
               "name": "ContentDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('contentDbName'), ';User Id=', parameters('sqlAdminUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdminUserPassword'), ';')]"
             }
           ]
         }
@@ -1816,6 +1773,8 @@
         "PreReleaseAccess:AccessWindow:MinutesBeforeReleaseTimeEnd": "[parameters('preReleaseMinutesBeforeEnd')]",
         "enableSwagger": "[parameters('enableSwagger')]",
         "enableThemeDeletion": "[parameters('enableThemeDeletion')]",
+        "ReleaseApproval:PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
+        "ReleaseApproval:PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
         "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]"
       }
     },
@@ -2195,7 +2154,7 @@
       }
     },
     {
-      "name": "[variables('sqlserverName')]",
+      "name": "[variables('coreSqlServerName')]",
       "type": "Microsoft.Sql/servers",
       "apiVersion": "2019-06-01-preview",
       "location": "[resourceGroup().location]",
@@ -2207,7 +2166,7 @@
       "resources": [
         {
           "type": "databases",
-          "name": "statistics",
+          "name": "[variables('coreStatisticsDbName')]",
           "location": "[resourceGroup().location]",
           "tags": {
             "Department": "[parameters('departmentName')]",
@@ -2224,7 +2183,7 @@
           },
           "apiVersion": "2020-08-01-preview",
           "dependsOn": [
-            "[variables('sqlserverName')]"
+            "[variables('coreSqlServerName')]"
           ],
           "sku": {
             "name": "GP_S_Gen5",
@@ -2245,7 +2204,7 @@
           }
         },
         {
-          "name": "content",
+          "name": "[variables('contentDbName')]",
           "type": "databases",
           "location": "[resourceGroup().location]",
           "tags": {
@@ -2263,7 +2222,7 @@
           },
           "apiVersion": "2020-08-01-preview",
           "dependsOn": [
-            "[variables('sqlserverName')]"
+            "[variables('coreSqlServerName')]"
           ],
           "sku": {
             "name": "GP_S_Gen5",
@@ -2284,11 +2243,11 @@
           }
         },
         {
-          "name": "[concat(variables('sqlserverName'),'/activeDirectory')]",
+          "name": "[concat(variables('coreSqlServerName'),'/activeDirectory')]",
           "type": "Microsoft.Sql/servers/administrators",
           "apiVersion": "2014-04-01",
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]"
           ],
           "properties": {
             "administratorType": "ActiveDirectory",
@@ -2298,27 +2257,27 @@
           }
         },
         {
-          "name": "[concat(string(variables('sqlserverName')), '/statistics/current')]",
+          "name": "[concat(string(variables('coreSqlServerName')), '/', variables('coreStatisticsDbName'), '/current')]",
           "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
           "apiVersion": "2014-04-01",
           "properties": {
             "status": "Enabled"
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
-            "[concat(resourceId('Microsoft.Sql/servers', variables('sqlserverName')), '/databases/statistics')]"
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
+            "[concat(resourceId('Microsoft.Sql/servers', variables('coreSqlServerName')), '/databases/', variables('coreStatisticsDbName'))]"
           ]
         },
         {
-          "name": "[concat(string(variables('sqlserverName')), '/content/current')]",
+          "name": "[concat(string(variables('coreSqlServerName')), '/', variables('contentDbName'), '/current')]",
           "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
           "apiVersion": "2014-04-01",
           "properties": {
             "status": "Enabled"
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
-            "[concat(resourceId('Microsoft.Sql/servers', variables('sqlserverName')), '/databases/content')]"
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
+            "[concat(resourceId('Microsoft.Sql/servers', variables('coreSqlServerName')), '/databases/', variables('contentDbName'))]"
           ]
         },
 
@@ -2327,7 +2286,7 @@
           "name": "Default",
           "apiVersion": "2017-03-01-preview",
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]"
           ],
           "properties": {
             "state": "Enabled",
@@ -2342,8 +2301,8 @@
           "name": "Default",
           "apiVersion": "2018-06-01-preview",
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
-            "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', variables('sqlserverName'), 'Default')]",
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
+            "[resourceId('Microsoft.Sql/servers/securityAlertPolicies', variables('coreSqlServerName'), 'Default')]",
             "[resourceId('Microsoft.Storage/storageAccounts', variables('loggingStorageAccountName'))]"
           ],
           "properties": {
@@ -2372,7 +2331,7 @@
             "isAzureMonitorTargetEnabled": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]"
           ]
         },
         {
@@ -2390,7 +2349,7 @@
             "isAzureMonitorTargetEnabled": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+            "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]"
           ]
         }
       ],
@@ -2410,7 +2369,7 @@
     },
     {
       "type": "Microsoft.Sql/servers/firewallRules",
-      "name": "[concat(variables('sqlserverName'), '/', parameters('sqlFirewallRules')[copyIndex()].IPRangeName)]",
+      "name": "[concat(variables('coreSqlServerName'), '/', parameters('sqlFirewallRules')[copyIndex()].IPRangeName)]",
       "apiVersion": "2015-05-01-preview",
       "scale": null,
       "properties": {
@@ -2418,7 +2377,7 @@
         "endIpAddress": "[parameters('sqlFirewallRules')[copyIndex()].IPRangeEnd]"
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]"
+        "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]"
       ],
       "copy": {
         "name": "firewallloop",
@@ -2427,7 +2386,7 @@
     },
     {
       "condition": "[parameters('useSubnets')]",
-      "name": "[concat(variables('sqlserverName'), '/', variables('sqlAllowedSubnets')[copyIndex()].name)]",
+      "name": "[concat(variables('coreSqlServerName'), '/', variables('sqlAllowedSubnets')[copyIndex()].name)]",
       "type": "Microsoft.Sql/servers/virtualNetworkRules",
       "apiVersion": "2015-05-01-preview",
       "properties": {
@@ -2435,7 +2394,7 @@
         "ignoreMissingVnetServiceEndpoint": false
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
+        "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
         "[variables('vNetRef')]"
       ],
       "copy": {
@@ -2456,7 +2415,50 @@
       "resources": [
         {
           "type": "databases",
-          "name": "public-statistics",
+          "name": "[variables('statisticsReplicaDbName')]",
+          "location": "[resourceGroup().location]",
+          "tags": {
+            "Department": "[parameters('departmentName')]",
+            "Solution": "[parameters('solutionName')]",
+            "ServiceType": "SQL Database",
+            "Environment": "[parameters('environmentName')]",
+            "Subscription": "[parameters('subscriptionName')]",
+            "CostCentre": "[parameters('costCentre')]",
+            "ServiceOwner": "[parameters('serviceOwnerName')]",
+            "DateProvisioned": "[parameters('dateProvisioned')]",
+            "CreatedBy": "[parameters('createdBy')]",
+            "DeploymentRepo": "[parameters('deploymentRepo')]",
+            "DeploymentScript": "[parameters('deploymentScript')]"
+          },
+          "apiVersion": "2020-08-01-preview",
+          "dependsOn": [
+            "[variables('publicSqlServerName')]",
+            "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('coreStatisticsDbName'))]"
+          ],
+          "sku": {
+            "name": "GP_S_Gen5",
+            "tier": "GeneralPurpose",
+            "family": "Gen5",
+            "capacity": "[parameters('maxCapacityStatisticsDb')]"
+          },
+          "kind": "v12.0,user,vcore,serverless",
+          "properties": {
+            "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "maxSizeBytes": "[parameters('maxStatsDbSizeBytes')]",
+            "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+            "zoneRedundant": false,
+            "readScale": "Disabled",
+            "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]",
+            "storageAccountType": "GRS",
+            "minCapacity": "[parameters('minCapacityStatisticsDb')]",
+            "createMode": "OnlineSecondary",
+            "sourceDatabaseId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('coreStatisticsDbName'))]",
+            "secondaryType": "Geo"
+          }
+        },
+        {
+          "type": "databases",
+          "name": "[variables('publicStatisticsDbName')]",
           "location": "[resourceGroup().location]",
           "tags": {
             "Department": "[parameters('departmentName')]",
@@ -2508,7 +2510,7 @@
           }
         },
         {
-          "name": "[concat(string(variables('publicSqlServerName')), '/public-statistics/current')]",
+          "name": "[concat(string(variables('publicSqlServerName')), '/', variables('publicStatisticsDbName'), '/current')]",
           "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
           "apiVersion": "2014-04-01",
           "properties": {
@@ -2516,10 +2518,9 @@
           },
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
-            "[concat(resourceId('Microsoft.Sql/servers', variables('publicSqlServerName')), '/databases/public-statistics')]"
+            "[concat(resourceId('Microsoft.Sql/servers', variables('publicSqlServerName')), '/databases/', variables('publicStatisticsDbName'))]"
           ]
         },
-
         {
           "type": "securityAlertPolicies",
           "name": "Default",
@@ -2568,8 +2569,7 @@
             "isAzureMonitorTargetEnabled": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
-            "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]"
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
           ]
         },
         {
@@ -2587,8 +2587,7 @@
             "isAzureMonitorTargetEnabled": true
           },
           "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
-            "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]"
+            "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]"
           ]
         }
       ],
@@ -3037,12 +3036,12 @@
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlImporterUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlImporterUserPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('coreStatisticsDbName'), ';User Id=', parameters('sqlImporterUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlImporterUserPassword'), ';')]"
             },
             {
               "name": "ContentDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlImporterUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlImporterUserPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('contentDbName'), ';User Id=', parameters('sqlImporterUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlImporterUserPassword'), ';')]"
             }
           ],
           "use32BitWorkerProcess": false
@@ -3193,17 +3192,17 @@
             {
               "name": "ContentDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'content', ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('contentDbName'), ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
             },
             {
               "name": "StatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'statistics', ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('coreStatisticsDbName'), ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('coreSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
             },
             {
               "name": "PublicStatisticsDb",
               "type": "SQLAzure",
-              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', 'public-statistics', ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
+              "connectionString": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('publicSqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('publicStatisticsDbName'), ';User Id=', parameters('sqlPublisherUser'), '@', reference(concat('Microsoft.Sql/servers/', variables('publicSqlServerName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlPublisherUserPassword'), ';')]"
             }
           ]
         }
@@ -3224,7 +3223,7 @@
       ],
       "properties": {
         "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
-        "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
+        "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",        
         "AzureWebJobs.PublishReleaseData.Disabled": "[parameters('publishReleaseDataFunctionDisabled')]",
         "PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
         "PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
@@ -3566,7 +3565,7 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
+        "[resourceId('Microsoft.Sql/servers', variables('coreSqlServerName'))]",
         "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
         "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
         "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",

@@ -112,14 +112,15 @@ const PublicationEditPage = ({
                 {
                   ...values,
                   topicId: values.topicId ?? publication?.topicId,
-                  contact: {
-                    teamName,
-                    teamEmail,
-                    contactName,
-                    contactTelNo,
-                  },
                 },
               );
+
+              await publicationService.updateContact(publication.id, {
+                teamName,
+                teamEmail,
+                contactName,
+                contactTelNo,
+              });
 
               history.push(
                 appendQuery<ThemeTopicParams>(dashboardRoute.path, {

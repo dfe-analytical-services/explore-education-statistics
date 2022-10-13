@@ -22,6 +22,7 @@ describe('chartBuilderReducer', () => {
     type: 'line',
     name: 'Line',
     capabilities: {
+      canPositionLegendInline: true,
       canSize: true,
       canSort: true,
       hasGridLines: true,

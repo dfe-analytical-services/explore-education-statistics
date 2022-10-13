@@ -215,6 +215,23 @@ describe('ChartDataSetsConfiguration', () => {
     });
   });
 
+  test('submitting fails if there are no data sets', async () => {
+    render(
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartDataSetsConfiguration meta={testSubjectMeta} onChange={noop} />
+      </ChartBuilderFormsContextProvider>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Cannot save chart')).toBeInTheDocument();
+      expect(
+        screen.getByText('One or more data sets are required.'),
+      ).toBeInTheDocument();
+    });
+  });
+
   test('does not show the reorder button when there is only one dataset', () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
@@ -916,7 +933,7 @@ describe('ChartDataSetsConfiguration', () => {
     });
   });
 
-  describe('removing data set', () => {
+  describe('removing data sets', () => {
     test('calls `onChange` with only data set removed', () => {
       const handleChange = jest.fn();
 
@@ -942,7 +959,7 @@ describe('ChartDataSetsConfiguration', () => {
       expect(handleChange).toHaveBeenCalledWith([]);
     });
 
-    test('calls `onChange` with correct data set removed from multiple', () => {
+    test('calls `onChange` with correct data set removed from multiple data sets', () => {
       const handleChange = jest.fn();
 
       render(
@@ -977,6 +994,47 @@ describe('ChartDataSetsConfiguration', () => {
           indicator: 'unauthorised-absence-sessions',
         },
       ]);
+    });
+
+    test('removing all data sets', () => {
+      const handleChange = jest.fn();
+
+      render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartDataSetsConfiguration
+            meta={testSubjectMeta}
+            dataSets={[
+              {
+                filters: ['male'],
+                indicator: 'unauthorised-absence-sessions',
+              },
+              {
+                filters: ['male'],
+                indicator: 'unauthorised-absence-sessions',
+              },
+            ]}
+            onChange={handleChange}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      expect(screen.getAllByRole('row')).toHaveLength(3);
+
+      expect(handleChange).not.toHaveBeenCalled();
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Remove all data sets' }),
+      );
+
+      const modal = within(screen.getByRole('dialog'));
+      expect(modal.getByText('Remove all data sets')).toBeInTheDocument();
+      expect(
+        modal.getByText('Are you sure you want to remove all data sets?'),
+      ).toBeInTheDocument();
+
+      userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
+
+      expect(handleChange).toHaveBeenCalledWith([]);
     });
   });
 });

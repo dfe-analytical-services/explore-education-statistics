@@ -7,8 +7,8 @@
     "RowsPerBatch": 3000
   },
   "ConnectionStrings": {
-    "StatisticsDb": "Server=db;Database=statistics;User=SA;Password=Your_Password123;",
-    "ContentDb": "Server=db;Database=content;User=SA;Password=Your_Password123;"
+    "StatisticsDb": "Server=db;Database=statistics;User=importer;Password=Your_Password123;",
+    "ContentDb": "Server=db;Database=content;User=importer;Password=Your_Password123;"
   },
   "Host": {
     "CORS": "*"

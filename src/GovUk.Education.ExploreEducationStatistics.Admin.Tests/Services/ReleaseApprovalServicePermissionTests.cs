@@ -7,11 +7,13 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
@@ -117,6 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new ReleaseApprovalService(
                 Mock.Of<ContentDbContext>(),
                 DefaultPersistenceHelperMock().Object,
+                new DateTimeProvider(),
                 userService,
                 Mock.Of<IPublishingService>(),
                 Mock.Of<IReleaseChecklistService>(),
@@ -124,7 +127,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Mock.Of<IPreReleaseUserService>(),
                 Mock.Of<IReleaseFileRepository>(),
                 Mock.Of<IReleaseFileService>(),
-                Mock.Of<IReleaseRepository>());
+                Mock.Of<IReleaseRepository>(),
+                Options.Create(new ReleaseApprovalOptions())
+            );
         }
 
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()

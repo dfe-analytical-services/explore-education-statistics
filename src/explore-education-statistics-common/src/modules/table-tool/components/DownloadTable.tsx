@@ -102,6 +102,7 @@ const DownloadTable = ({
                 </Button>
                 <LoadingSpinner
                   alert
+                  className="govuk-!-margin-left-2"
                   inline
                   hideText
                   loading={processingData}

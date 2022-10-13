@@ -89,6 +89,7 @@ export interface StackedBarProps extends ChartProps {
 }
 
 export interface ChartCapabilities {
+  canPositionLegendInline: boolean;
   canSize: boolean;
   canSort: boolean;
   hasGridLines: boolean;

@@ -69,12 +69,12 @@ const NonScheduledReleaseSummary = ({
                       releaseId: release.previousVersionId,
                     },
                   )}
-                  data-testid={`View original release link for ${
+                  data-testid={`View existing version link for ${
                     release.publicationTitle
                   }, ${getReleaseSummaryLabel(release)}`}
                   variant="secondary"
                 >
-                  View original release
+                  View existing version
                 </ButtonLink>
               </>
             ) : (

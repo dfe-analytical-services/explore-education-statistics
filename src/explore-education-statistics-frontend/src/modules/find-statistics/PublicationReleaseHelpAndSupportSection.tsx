@@ -3,7 +3,7 @@ import AccordionSection from '@common/components/AccordionSection';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
 import OfficialStatisticsSection from '@common/modules/find-statistics/components/OfficialStatisticsSection';
-import { PublicationContact } from '@common/services/publicationService';
+import { Contact } from '@common/services/publicationService';
 import {
   ExternalMethodology,
   MethodologySummary,
@@ -23,7 +23,7 @@ interface Props {
   methodologies: MethodologySummary[];
   externalMethodology?: ExternalMethodology;
   releaseType?: ReleaseType;
-  publicationContact: PublicationContact;
+  publicationContact: Contact;
 }
 
 const PublicationReleaseHelpAndSupportSection = ({

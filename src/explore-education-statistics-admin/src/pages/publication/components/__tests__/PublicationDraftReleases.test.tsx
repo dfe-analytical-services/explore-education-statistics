@@ -130,7 +130,7 @@ describe('PublicationDraftReleases', () => {
 
     expect(
       within(row1Cells[4]).queryByRole('link', {
-        name: 'View original for Release 1',
+        name: 'View existing version for Release 1',
       }),
     ).not.toBeInTheDocument();
 
@@ -161,7 +161,7 @@ describe('PublicationDraftReleases', () => {
 
     expect(
       within(row2Cells[4]).queryByRole('link', {
-        name: 'View original for Release 2',
+        name: 'View existing for Release 2',
       }),
     ).not.toBeInTheDocument();
 
@@ -194,7 +194,7 @@ describe('PublicationDraftReleases', () => {
 
     expect(
       within(row3Cells[4]).getByRole('link', {
-        name: 'View original for Release 3',
+        name: 'View existing version for Release 3',
       }),
     ).toHaveAttribute(
       'href',

@@ -1,5 +1,8 @@
 import { ChartSymbol, LineStyle } from '@common/modules/charts/types/chart';
-import { LegendPosition } from '@common/modules/charts/types/legend';
+import {
+  LegendInlinePosition,
+  LegendPosition,
+} from '@common/modules/charts/types/legend';
 
 export const colours: string[] = [
   '#12436D',
@@ -11,7 +14,12 @@ export const colours: string[] = [
   '#BFBFBF',
 ];
 
-export const legendPositions: LegendPosition[] = ['bottom', 'top', 'none'];
+export const legendPositions: LegendPosition[] = [
+  'bottom',
+  'top',
+  'none',
+  'inline',
+];
 
 export const symbols: ChartSymbol[] = [
   'circle',
@@ -25,3 +33,5 @@ export const symbols: ChartSymbol[] = [
 ];
 
 export const lineStyles: LineStyle[] = ['dashed', 'dotted', 'solid'];
+
+export const legendInlinePositions: LegendInlinePosition[] = ['above', 'below'];

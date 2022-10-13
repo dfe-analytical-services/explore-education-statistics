@@ -82,10 +82,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Include(release => release.Publication)
                 .SingleOrDefaultAsync(r => r.Id == id);
 
-            var statisticsRelease = await _publicStatisticsDbContext.Release
-                .AsQueryable()
-                .SingleOrDefaultAsync(r => r.Id == id);
-
             if (contentRelease == null)
             {
                 throw new ArgumentException("Content Release does not exist", nameof(id));
@@ -117,12 +113,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _methodologyService.SetPublishedDatesByPublication(contentRelease.PublicationId, published);
 
             await _contentDbContext.SaveChangesAsync();
+            
+            var statisticsRelease = await _statisticsDbContext.Release
+                .AsQueryable()
+                .SingleOrDefaultAsync(r => r.Id == id);
+
+            var publicStatisticsRelease = await _publicStatisticsDbContext.Release
+                .AsQueryable()
+                .SingleOrDefaultAsync(r => r.Id == id);
 
             // The Release in the statistics database can be absent if no data files were ever created
             if (statisticsRelease != null)
             {
-                _publicStatisticsDbContext.Release.Update(statisticsRelease);
                 statisticsRelease.Published ??= published;
+                _statisticsDbContext.Release.Update(statisticsRelease);
+                await _statisticsDbContext.SaveChangesAsync();
+            }
+            
+            if (publicStatisticsRelease != null)
+            {
+                publicStatisticsRelease.Published ??= published;
+                _publicStatisticsDbContext.Release.Update(publicStatisticsRelease);
                 await _publicStatisticsDbContext.SaveChangesAsync();
             }
         }

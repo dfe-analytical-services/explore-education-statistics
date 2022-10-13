@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Runtime.InteropServices;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
@@ -13,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
          * - 2020-06-05T23:00:00 (when BST)
          * - 2020-06-06T00:00:00 (when GMT)
          */
-        public static DateTime AsStartOfDayUtcForTimeZone(this DateTime dateTime, TimeZoneInfo timezone = null)
+        public static DateTime AsStartOfDayUtcForTimeZone(this DateTime dateTime, TimeZoneInfo? timezone = null)
         {
             var dateTimeStartOfDay = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, 0, 0, 0, DateTimeKind.Unspecified);
             return TimeZoneInfo.ConvertTimeToUtc(dateTimeStartOfDay, timezone ?? GetUkTimeZone());

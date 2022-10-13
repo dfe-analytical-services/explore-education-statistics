@@ -13,15 +13,14 @@ import { OmitStrict } from '@common/types';
 import { PublicationSummary } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
 
-export interface PublicationContactDetails {
-  id: string;
+export interface Contact {
   contactName: string;
   contactTelNo: string;
   teamEmail: string;
   teamName: string;
 }
 
-export interface SavePublicationContact {
+export interface ContactSave {
   contactName: string;
   contactTelNo: string;
   teamEmail: string;
@@ -47,18 +46,27 @@ export interface MyPublication {
   externalMethodology?: ExternalMethodology;
   topicId: string;
   themeId: string;
-  contact: PublicationContactDetails;
-  permissions: {
-    canAdoptMethodologies: boolean;
-    canCreateReleases: boolean;
-    canUpdatePublication: boolean;
-    canUpdatePublicationTitle: boolean;
-    canUpdatePublicationSupersededBy: boolean;
-    canCreateMethodologies: boolean;
-    canManageExternalMethodology: boolean;
-  };
+  contact: Contact;
+  permissions: PublicationPermissions;
   supersededById?: string;
+  // NOTE: isSuperseded is necessary, as a publication only becomes superseded when it's SupersededById is set
+  // _and_ that publication has a live release.
   isSuperseded?: boolean;
+}
+
+export interface PublicationPermissions {
+  canAdoptMethodologies: boolean;
+  canCreateReleases: boolean;
+  canUpdatePublication: boolean;
+  canUpdatePublicationTitle: boolean;
+  canUpdatePublicationSupersededBy: boolean;
+  canCreateMethodologies: boolean;
+  canManageExternalMethodology: boolean;
+  canUpdateContact: boolean;
+}
+
+export interface PublicationWithPermissions extends Publication {
+  permissions: PublicationPermissions;
 }
 
 export interface Publication {
@@ -66,9 +74,11 @@ export interface Publication {
   title: string;
   summary: string;
   slug: string;
-  contact: PublicationContactDetails;
   theme: IdTitlePair;
   topic: IdTitlePair;
+  supersededById?: string;
+  isSuperseded?: boolean;
+  permissions?: PublicationPermissions;
 }
 
 export interface PublicationMethodologyDetails {
@@ -79,7 +89,14 @@ export interface PublicationMethodologyDetails {
 export interface PublicationSaveRequest {
   title: string;
   summary: string;
-  contact: SavePublicationContact;
+  supersededById?: string;
+  topicId: string;
+}
+
+export interface PublicationCreateRequest {
+  title: string;
+  summary: string;
+  contact: ContactSave;
   supersededById?: string;
   topicId: string;
 }
@@ -88,7 +105,7 @@ export interface ListReleasesParams {
   live?: boolean;
   page?: number;
   pageSize?: number;
-  permissions?: boolean;
+  includePermissions?: boolean;
 }
 
 export type UpdatePublicationLegacyRelease = Partial<
@@ -106,7 +123,9 @@ const publicationService = {
     return client.get('/publication-summaries');
   },
 
-  createPublication(publication: PublicationSaveRequest): Promise<Publication> {
+  createPublication(
+    publication: PublicationCreateRequest,
+  ): Promise<Publication> {
     return client.post('/publications', publication);
   },
 
@@ -117,8 +136,13 @@ const publicationService = {
     return client.put(`/publications/${publicationId}`, publication);
   },
 
-  getPublication(publicationId: string): Promise<Publication> {
-    return client.get<Publication>(`/publications/${publicationId}`);
+  getPublication<TPublication extends Publication = Publication>(
+    publicationId: string,
+    includePermissions = false,
+  ): Promise<TPublication> {
+    return client.get<TPublication>(`/publications/${publicationId}`, {
+      params: { includePermissions },
+    });
   },
 
   getMyPublication(publicationId: string): Promise<MyPublication> {
@@ -152,6 +176,19 @@ const publicationService = {
 
   removeExternalMethodology(publicationId: string): Promise<boolean> {
     return client.delete(`/publication/${publicationId}/external-methodology`);
+  },
+
+  getContact<TContact extends Contact = Contact>(
+    publicationId: string,
+  ): Promise<TContact> {
+    return client.get<TContact>(`publication/${publicationId}/contact`);
+  },
+
+  updateContact(
+    publicationId: string,
+    updatedContact: ContactSave,
+  ): Promise<Contact> {
+    return client.put(`publication/${publicationId}/contact`, updatedContact);
   },
 
   listReleases<TReleaseSummary extends ReleaseSummary = ReleaseSummary>(

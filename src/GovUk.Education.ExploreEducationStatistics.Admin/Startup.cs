@@ -394,6 +394,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.Configure<PreReleaseOptions>(Configuration);
             services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
+            services.Configure<ReleaseApprovalOptions>(
+                Configuration.GetSection(ReleaseApprovalOptions.ReleaseApproval));
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
@@ -593,6 +595,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             AddPersistenceHelper<StatisticsDbContext>(services);
             AddPersistenceHelper<UsersAndRolesDbContext>(services);
             services.AddTransient<AuthorizationHandlerResourceRoleService>();
+            services.AddScoped<DateTimeProvider>();
+
+            // TODO EES-3755 Remove after Permalink snapshot migration work is complete
+            services.AddTransient<IPermalinkMigrationService, PermalinkMigrationService>(provider =>
+                new PermalinkMigrationService(
+                    storageQueueService: new StorageQueueService(
+                        Configuration.GetValue<string>("PublisherStorage"),
+                        new StorageInstanceCreationUtil()),
+                    userService: provider.GetRequiredService<IUserService>()));
 
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();

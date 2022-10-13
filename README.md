@@ -145,24 +145,63 @@ These are already bootstrapped with seed data to run tests and start the project
 This data will need to be loaded into SQL Server:
 
 - Using Docker - copy the `ees-mssql` directory into the project's `data` directory. You **must** 
-  give all OS users full access to this directory i.e. in Linux, set the directory to `777` permissions.
-  
-  This is necessary to give the Docker container the right permissions to modify the directory contents.
-  
-- Using Windows - attach the database using SQL Management Studio.
+  give all OS users appropriate access to this directory.
+  - In Linux:
+    - The ees-mssql folder needs to be present in an unencrypted folder / partition. The 
+      `ees-mssql` folder in the unencrypted location can then be symlinked in to the `data` folder
+      using `ln -s /path/to/unencrypted/ees-mssql /path/to/ees/data/ees-mssql`.
+    - The Docker container user needs ownership fo the ees-mssql folder. Run  
+    `sudo chown -R 10001 /path/to/ees-mssql` to give this Docker user (with id 10001) appropriate 
+     permissions.
+  - In Windows
+    - Attach the database using SSMS.
 
 #### Use a bare database
 
 The service can be started against a set of non-existent database. If no pre-existing `content` or 
-`statistics` databases yet exist on the target SQL Server instance, starting up the service will 
-create them and provide the basic starting data to get up and running.
+`statistics` databases yet exist on the target SQL Server instance:
+
+1. Create empty `content` and `statistics` databases.
+2. Perform a one-off creation of database logins and users.  Using Azure Data Studio or similar, 
+   connect to these new databases and run:
+      ```sql
+      -- Against the `master` database
+      CREATE Login [adminapp] WITH PASSWORD = 'Your_Password123';
+      CREATE Login [importer] WITH PASSWORD = 'Your_Password123';
+      CREATE Login [publisher] WITH PASSWORD = 'Your_Password123';
+      CREATE Login [content] WITH PASSWORD = 'Your_Password123';
+      CREATE Login [data] WITH PASSWORD = 'Your_Password123';
+      
+      -- Against the `content` database
+      CREATE USER [adminapp] FROM LOGIN [adminapp];
+      ALTER ROLE [db_ddladmin] ADD MEMBER [adminapp];
+      ALTER ROLE [db_datareader] ADD MEMBER [adminapp];
+      ALTER ROLE [db_datawriter] ADD MEMBER [adminapp];
+      ALTER ROLE [db_securityadmin] add member [adminapp];
+      GRANT ALTER ANY USER TO [adminapp];
+      
+      -- Against the `statistics` database
+      CREATE USER [adminapp] FROM LOGIN [adminapp];
+      ALTER ROLE [db_ddladmin] ADD MEMBER [adminapp];
+      ALTER ROLE [db_datareader] ADD MEMBER [adminapp];
+      ALTER ROLE [db_datawriter] ADD MEMBER [adminapp];
+      ALTER ROLE [db_securityadmin] add member [adminapp];
+      GRANT ALTER ANY USER TO [adminapp];
+      GRANT EXECUTE ON TYPE::IdListGuidType TO [adminapp];
+      GRANT EXECUTE ON OBJECT::FilteredFootnotes TO [adminapp];
+      GRANT SELECT ON OBJECT::geojson TO [adminapp];
+      ```
+   This will create contained users for the `content` and `statistics` databases as well as allowing the `adminapp` user  
+   to manage the permissions of the contained users.
+3. Start the Admin project and this will configure the contained users' permissions via database migrations. The other 
+   projects will then be able to be started, using their own contained users to connect to the databases. 
 
 ### Running a different identity provider (optional)
 
 > For running the project day-to-day as a team member, you can ignore this step.
 
 Currently, the project defaults to using Active Directory as its identity provider. Typically, this
-will be used by things such as the admin service to allow users to log in.
+will be used by components such as the admin service to allow users to log in.
 
 If you wish use a different identity provider (e.g. working outside the team), you can use:
 
@@ -501,7 +540,7 @@ To generate a migration for the statistics db:
 
 ```
 cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.Data.Api
-dotnet ef migrations add E1234MigrationNameHere --context StatisticsDbContext --project ../GovUk.Education.ExploreEducationStatistics.Data.Model -v
+dotnet ef migrations add EES1234MigrationNameHere --context StatisticsDbContext --project ../GovUk.Education.ExploreEducationStatistics.Data.Model -v
 ```
 
 #### Users and Roles DB migrations

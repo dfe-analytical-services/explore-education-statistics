@@ -2,8 +2,9 @@ import PublicationDetailsForm, {
   PublicationDetailsFormValues,
 } from '@admin/pages/publication/components/PublicationDetailsForm';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
-import publicationService from '@admin/services/publicationService';
-import themeService from '@admin/services/themeService';
+import publicationService, {
+  Publication,
+} from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
@@ -15,39 +16,30 @@ import React from 'react';
 const PublicationDetailsPage = () => {
   const { publication, onReload } = usePublicationContext();
   const {
-    contact,
     id,
-    permissions,
-    supersededById,
-    themeId,
     title,
     summary,
-    topicId,
+    permissions,
+    supersededById,
+    theme,
+    topic,
   } = publication;
   const [readOnly, toggleReadOnly] = useToggle(true);
 
-  const { value, isLoading } = useAsyncHandledRetry(async () => {
-    const theme = await themeService.getTheme(themeId);
-    const topic = theme?.topics.find(themeTopic => themeTopic.id === topicId);
+  const {
+    value: supersedingPublication,
+    isLoading,
+  } = useAsyncHandledRetry(async () => {
     if (!supersededById) {
-      return { theme, topic };
+      return undefined;
     }
 
-    const supersedingPublication = await publicationService.getPublication(id);
-
-    return {
-      theme,
-      topic,
-      supersedingPublication,
-    };
-  });
-
-  const { theme, topic, supersedingPublication } = value ?? {};
+    return publicationService.getPublication(supersededById);
+  }, [supersededById]);
 
   const handleSubmit = async (values: PublicationDetailsFormValues) => {
     await publicationService.updatePublication(publication.id, {
       ...values,
-      contact,
     });
     onReload();
   };
@@ -86,7 +78,7 @@ const PublicationDetailsPage = () => {
             supersededById,
             title,
             summary,
-            topicId,
+            topicId: topic.id,
           }}
           publicationId={id}
           onCancel={toggleReadOnly.on}

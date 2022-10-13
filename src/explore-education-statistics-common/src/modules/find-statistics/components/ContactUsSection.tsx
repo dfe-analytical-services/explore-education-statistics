@@ -1,11 +1,11 @@
-import { PublicationContact } from '@common/services/publicationService';
+import { Contact } from '@common/services/publicationService';
 import React from 'react';
 
 const ContactUsSection = ({
   publicationContact,
   publicationTitle,
 }: {
-  publicationContact: PublicationContact;
+  publicationContact: Contact;
   publicationTitle: string;
 }) => {
   return (

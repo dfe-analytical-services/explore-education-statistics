@@ -18,6 +18,10 @@ beforeAll(() => {
   window.scroll = jest.fn();
   window.scrollTo = jest.fn();
 
+  window.navigator.clipboard = {
+    writeText: jest.fn(),
+  };
+
   URL.createObjectURL = jest.fn();
 });
 

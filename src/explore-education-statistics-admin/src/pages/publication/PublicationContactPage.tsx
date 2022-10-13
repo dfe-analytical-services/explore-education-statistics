@@ -1,4 +1,3 @@
-import { useLastLocation } from '@admin/contexts/LastLocationContext';
 import PublicationContactForm, {
   PublicationContactFormValues,
 } from '@admin/pages/publication/components/PublicationContactForm';
@@ -11,53 +10,36 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import React from 'react';
-import { useLocation } from 'react-router';
 
 const PublicationContactPage = () => {
-  const {
-    publicationId,
-    publication: contextPublication,
-    onReload,
-  } = usePublicationContext();
-  const location = useLocation();
-  const lastLocation = useLastLocation();
+  const { publication, onReload } = usePublicationContext();
   const [readOnly, toggleReadOnly] = useToggle(true);
 
-  const { value: publication } = useAsyncHandledRetry(
-    async () =>
-      lastLocation && lastLocation !== location
-        ? publicationService.getMyPublication(publicationId)
-        : contextPublication,
-    [publicationId],
+  const {
+    value: contact,
+    setState: setContact,
+  } = useAsyncHandledRetry(
+    async () => publicationService.getContact(publication.id),
+    [publication],
   );
 
-  const handleSubmit = async ({
-    teamName,
-    teamEmail,
-    contactName,
-    contactTelNo,
-  }: PublicationContactFormValues) => {
-    if (!publication) {
+  const handleSubmit = async (updatedContact: PublicationContactFormValues) => {
+    if (!contact) {
       return;
     }
-    await publicationService.updatePublication(publicationId, {
-      ...publication,
-      contact: {
-        teamName,
-        teamEmail,
-        contactName,
-        contactTelNo,
-      },
-    });
+    const nextContact = await publicationService.updateContact(
+      publication.id,
+      updatedContact,
+    );
 
+    setContact({ value: nextContact });
+    toggleReadOnly.on();
     onReload();
   };
 
-  if (!publication) {
+  if (!contact) {
     return <LoadingSpinner />;
   }
-
-  const { contact } = publication;
 
   return (
     <>
@@ -88,7 +70,7 @@ const PublicationContactPage = () => {
               {contact.contactTelNo}
             </SummaryListItem>
           </SummaryList>
-          {publication.permissions.canUpdatePublication && (
+          {publication.permissions.canUpdateContact && (
             <Button variant="secondary" onClick={toggleReadOnly.off}>
               Edit contact details
             </Button>

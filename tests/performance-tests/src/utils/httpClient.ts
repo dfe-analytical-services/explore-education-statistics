@@ -5,11 +5,11 @@ interface HttpHeaders {
 }
 
 export default class HttpClient {
-  private baseUrl: string;
+  private readonly baseUrl: string;
 
-  private accessToken: string;
+  private readonly accessToken?: string;
 
-  private checkResponseStatus: boolean;
+  private readonly checkResponseStatus: boolean;
 
   constructor({
     baseUrl,
@@ -17,7 +17,7 @@ export default class HttpClient {
     checkResponseStatus = true,
   }: {
     baseUrl: string;
-    accessToken: string;
+    accessToken?: string;
     checkResponseStatus?: boolean;
   }) {
     this.baseUrl = baseUrl;
@@ -28,6 +28,7 @@ export default class HttpClient {
   get<TJson>(
     url: string,
     headers?: HttpHeaders,
+    additionalAllowedHttpCodes?: number[],
   ): {
     json: TJson;
     response: RefinedResponse<'text'>;
@@ -41,12 +42,18 @@ export default class HttpClient {
       },
     });
 
-    if (this.checkResponseStatus && response.status !== 200) {
-      throw new Error(`Error with GET to url ${url}: ${response.body}`);
+    const successCodes = [200, ...(additionalAllowedHttpCodes ?? [])];
+
+    if (this.checkResponseStatus && !successCodes.includes(response.status)) {
+      throw new Error(
+        `${response.status} error with GET to url ${this.baseUrl}${url}: ${response.body}`,
+      );
     }
 
     return {
-      json: (response.json() as unknown) as TJson,
+      json: (response.status === 200
+        ? response.json()
+        : ({} as unknown)) as TJson,
       response,
     };
   }
@@ -69,7 +76,38 @@ export default class HttpClient {
     });
 
     if (this.checkResponseStatus && response.status !== 200) {
-      throw new Error(`Error with POST to url ${url}: ${response.body}`);
+      throw new Error(
+        `${response.status} error with POST to url ${this.baseUrl}${url} with request body\n\n${data}: ${response.body}`,
+      );
+    }
+
+    return {
+      json: (response.json() as unknown) as TJson,
+      response,
+    };
+  }
+
+  patch<TJson>(
+    url: string,
+    data: RequestBody | string,
+    headers?: HttpHeaders,
+  ): {
+    json: TJson;
+    response: RefinedResponse<'text'>;
+  } {
+    const params = HttpClient.getDefaultParams(this.accessToken);
+    const response = http.patch(`${this.baseUrl}${url}`, data, {
+      ...params,
+      headers: {
+        ...params.headers,
+        ...headers,
+      },
+    });
+
+    if (this.checkResponseStatus && response.status !== 200) {
+      throw new Error(
+        `${response.status} error with PATCH to url ${this.baseUrl}${url} with request body\n\n${data}: ${response.body}`,
+      );
     }
 
     return {
@@ -93,16 +131,22 @@ export default class HttpClient {
     });
 
     if (this.checkResponseStatus && response.status !== 204) {
-      throw new Error(`Error with DELETE to url ${url}: ${response.body}`);
+      throw new Error(
+        `Error with DELETE to url ${this.baseUrl}${url}: ${response.body}`,
+      );
     }
     return response;
   }
 
-  private static getDefaultParams(accessToken: string): RefinedParams<'text'> {
+  private static getDefaultParams(accessToken?: string): RefinedParams<'text'> {
     return {
       timeout: '300s',
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        ...(accessToken
+          ? {
+              Authorization: `Bearer ${accessToken}`,
+            }
+          : {}),
       },
     };
   }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
@@ -70,6 +69,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<Theme, IdTitleViewModel>();
             CreateMap<Topic, IdTitleViewModel>();
             CreateMap<Publication, PublicationViewModel>()
+                .ForMember(
+                    dest => dest.Theme,
+                    m => m.MapFrom(p => p.Topic.Theme));
+            CreateMap<Publication, PublicationCreateViewModel>()
                 .ForMember(
                     dest => dest.Theme,
                     m => m.MapFrom(p => p.Topic.Theme));

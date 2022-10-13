@@ -35,7 +35,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var relatedPublication1 = new Publication
             {
                 Title = "Related publication 1",
-                Topic = topic
+                Topic = topic,
+                Contact = new Contact(),
             };
 
             userReleaseRoles.AddRange(new List<UserReleaseRole>
@@ -96,7 +97,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TimePeriodCoverage = AcademicYear
                         }
                     },
-                    Topic = topic
+                    Topic = topic,
+                    Contact = new Contact(),
                 },
                 User = user,
                 Role = Owner
@@ -123,7 +125,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TimePeriodCoverage = AcademicYear
                         }
                     },
-                    Topic = topic
+                    Topic = topic,
+                    Contact = new Contact(),
                 },
                 User = user,
                 Role = ReleaseApprover
@@ -140,7 +143,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Publication = new Publication
                     {
                         Title = "Related publication 4",
-                        Topic = topic
+                        Topic = topic,
+                        Contact = new Contact(),
                     }
                 },
                 User = user,
@@ -162,6 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Theme = new Theme(),
                         },
+                        Contact = new Contact(),
                     }
                 },
                 User = user,
@@ -188,6 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Theme = new Theme(),
                     },
+                    Contact = new Contact(),
                 },
                 User = user,
                 Role = Owner
@@ -213,6 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Theme = new Theme(),
                     },
+                    Contact = new Contact(),
                 },
                 User = user,
                 Role = ReleaseApprover
@@ -283,6 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             }
                         },
                         Topic = new Topic { Theme = new Theme(), },
+                        Contact = new Contact(),
                     },
                     User = user,
                     Role = Owner,
@@ -306,6 +314,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             }
                         },
                         Topic = new Topic { Theme = new Theme(), },
+                        Contact = new Contact(),
                     },
                     User = user,
                     Role = ReleaseApprover,
@@ -327,6 +336,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Theme = new Theme(),
                         },
+                        Contact = new Contact(),
                     },
                     User = user,
                     Role = Owner,
@@ -345,6 +355,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Title = "Release Contributor publication",
                             Topic = new Topic { Theme = new Theme(), },
+                            Contact = new Contact(),
                         },
                     },
                     User = user,
@@ -360,6 +371,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Title = "Release Viewer publication",
                             Topic = new Topic { Theme = new Theme(), },
+                            Contact = new Contact(),
                         },
                     },
                     User = user,
@@ -375,6 +387,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Title = "Release PrereleaseViewer publication",
                             Topic = new Topic { Theme = new Theme(), },
+                            Contact = new Contact(),
                         }
                     },
                     User = user,
@@ -393,6 +406,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             {
                                 Theme = new Theme(),
                             },
+                            Contact = new Contact(),
                         }
                     },
                     User = user,
@@ -471,6 +485,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Publication = new Publication
                     {
                         Title = "Related publication",
+                        Contact = new Contact(),
                         Methodologies = new List<PublicationMethodology>
                         {
                             new()
@@ -724,7 +739,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Title = "Related publication 1",
                         Releases = new List<Release>(),
-                        Topic = topic
+                        Topic = topic,
+                        Contact = new Contact(),
                     },
                     User = user,
                     Role = Owner
@@ -739,6 +755,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Theme = new Theme(),
                         },
+                        Contact = new Contact(),
                     },
                     User = user,
                     Role = Owner
@@ -786,7 +803,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Title = "Publication",
-                Topic = topic
+                Topic = topic,
+                Contact = new Contact(),
             };
 
             var release = new Release
@@ -1193,6 +1211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Theme = new Theme(),
                 },
+                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1233,6 +1252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     release1,
                 },
+                Contact = new Contact(),
             };
 
             var contextId = Guid.NewGuid().ToString();

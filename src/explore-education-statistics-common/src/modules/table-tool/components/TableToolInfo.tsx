@@ -1,10 +1,10 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import React, { ReactNode } from 'react';
-import { BasicPublicationContact } from '@common/services/publicationService';
+import { Contact } from '@common/services/publicationService';
 
 interface Props {
-  contactDetails?: BasicPublicationContact;
+  contactDetails?: Contact;
   methodologyLinks?: ReactNode[];
   releaseLink?: ReactNode;
 }

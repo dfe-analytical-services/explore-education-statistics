@@ -74,7 +74,7 @@ const DraftReleaseRow = ({ publicationId, release, onDelete }: Props) => {
               releaseId: release.previousVersionId,
             })}
           >
-            View original
+            View existing version
             <VisuallyHidden> for {release.title}</VisuallyHidden>
           </Link>
         )}

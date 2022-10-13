@@ -1,7 +1,10 @@
 import Link from '@admin/components/Link';
 import { preReleaseContentRoute } from '@admin/routes/preReleaseRoutes';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
-import { Publication } from '@admin/services/publicationService';
+import publicationService, {
+  Contact,
+  Publication,
+} from '@admin/services/publicationService';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
@@ -11,6 +14,8 @@ import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
 import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
 import React, { memo, useRef } from 'react';
 import { generatePath } from 'react-router-dom';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 
 interface TableToolFinalStepProps {
   publication?: Publication;
@@ -30,6 +35,15 @@ const PreReleaseTableToolFinalStep = ({
   onReorderTableHeaders,
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
+
+  const { value: contact, isLoading } = useAsyncHandledRetry<
+    Contact | undefined
+  >(async () => {
+    if (!publication) {
+      return undefined;
+    }
+    return publicationService.getContact(publication.id);
+  }, [publication]);
 
   return (
     <div className="govuk-!-margin-bottom-4">
@@ -65,22 +79,24 @@ const PreReleaseTableToolFinalStep = ({
             tableRef={dataTableRef}
           />
 
-          <TableToolInfo
-            contactDetails={publication.contact}
-            releaseLink={
-              <Link
-                to={generatePath<ReleaseRouteParams>(
-                  preReleaseContentRoute.path,
-                  {
-                    publicationId: publication.id,
-                    releaseId,
-                  },
-                )}
-              >
-                {publication.title}
-              </Link>
-            }
-          />
+          <LoadingSpinner loading={isLoading}>
+            <TableToolInfo
+              contactDetails={contact}
+              releaseLink={
+                <Link
+                  to={generatePath<ReleaseRouteParams>(
+                    preReleaseContentRoute.path,
+                    {
+                      publicationId: publication.id,
+                      releaseId,
+                    },
+                  )}
+                >
+                  {publication.title}
+                </Link>
+              }
+            />
+          </LoadingSpinner>
         </>
       )}
     </div>

@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
-    public class Permalink
+    public class LegacyPermalink
     {
         public Guid Id { get; set; }
 
@@ -16,16 +16,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 
         public ObservationQueryContext Query { get; set; }
 
-        public Permalink()
+        public LegacyPermalink()
         {
         }
 
-        public Permalink(TableBuilderConfiguration configuration,
+        public LegacyPermalink(
+            Guid id,
+            DateTime created,
+            TableBuilderConfiguration configuration,
             PermalinkTableBuilderResult result,
             ObservationQueryContext query)
         {
-            Id = Guid.NewGuid();
-            Created = DateTime.UtcNow;
+            Id = id;
+            Created = created;
             Configuration = configuration;
             FullTable = result;
             Query = query;

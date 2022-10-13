@@ -52,6 +52,8 @@ const KeyStat = ({
     return null;
   }
 
+  const dataDefinitionTitle = summary?.dataDefinitionTitle[0] || 'Help';
+
   return (
     <KeyStatColumn testId={testId}>
       <LoadingSpinner loading={isLoading}>
@@ -71,10 +73,10 @@ const KeyStat = ({
 
             {summary?.dataDefinition[0] && (
               <Details
-                summary={summary?.dataDefinitionTitle[0] || 'Help'}
+                summary={dataDefinitionTitle}
                 className={styles.definition}
                 hiddenText={
-                  !summary?.dataDefinitionTitle[0]
+                  dataDefinitionTitle === 'Help'
                     ? `for ${keyStat.title}`
                     : undefined
                 }
@@ -86,7 +88,6 @@ const KeyStat = ({
                 </div>
               </Details>
             )}
-
             {children}
           </>
         )}

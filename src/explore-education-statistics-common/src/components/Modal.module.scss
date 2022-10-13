@@ -20,6 +20,7 @@
   background: #fff;
   cursor: initial;
   margin: 0 govuk-spacing(2);
+  max-width: map-get($govuk-breakpoints, 'desktop');
   min-width: 30vh;
   padding: govuk-spacing(6);
 

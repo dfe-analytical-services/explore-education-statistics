@@ -3,7 +3,7 @@ import { testPublication } from '@admin/pages/publication/__data__/testPublicati
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import PublicationReleasesPage from '@admin/pages/publication/PublicationReleasesPage';
 import _publicationService, {
-  MyPublication,
+  PublicationWithPermissions,
 } from '@admin/services/publicationService';
 import _releaseService from '@admin/services/releaseService';
 import { screen, waitFor } from '@testing-library/react';
@@ -32,7 +32,7 @@ describe('PublicationReleasesPage', () => {
   });
 
   test('shows the create release button if you have permission', async () => {
-    publicationService.getMyPublication.mockResolvedValue(testPublication);
+    publicationService.getPublication.mockResolvedValue(testPublication);
 
     renderPage(testPublication);
 
@@ -46,14 +46,14 @@ describe('PublicationReleasesPage', () => {
   });
 
   test('does not show the create release button if you do not have permission', async () => {
-    const publication: MyPublication = {
+    const publication: PublicationWithPermissions = {
       ...testPublication,
       permissions: {
         ...testPublication.permissions,
         canCreateReleases: false,
       },
     };
-    publicationService.getMyPublication.mockResolvedValue(publication);
+    publicationService.getPublication.mockResolvedValue(publication);
 
     renderPage(publication);
 
@@ -67,7 +67,7 @@ describe('PublicationReleasesPage', () => {
   });
 });
 
-function renderPage(publication: MyPublication) {
+function renderPage(publication: PublicationWithPermissions) {
   render(
     <MemoryRouter>
       <PublicationContextProvider

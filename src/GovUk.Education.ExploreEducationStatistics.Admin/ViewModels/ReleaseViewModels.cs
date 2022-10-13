@@ -157,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public PublishMethod? PublishMethod { get; init; }
 
         [DateTimeFormatValidator("yyyy-MM-dd")]
-        public string PublishScheduled { get; init; } = string.Empty;
+        public string? PublishScheduled { get; init; }
 
         public DateTime? PublishScheduledDate
         {

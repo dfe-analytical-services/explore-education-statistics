@@ -2,40 +2,46 @@
 import { check, fail } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
-import createDataService from '../../../utils/dataService';
+import exec from 'k6/execution';
+import createAdminService from '../../../utils/adminService';
 import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
+import testData from '../../testData';
+import utils from '../../../utils/utils';
 
 const IMPORT_STATUS_POLLING_DELAY_SECONDS = 5;
 
-const alwaysCreateNewDataPerTest = false;
+const tearDownData = false;
+const publicationTitle = __ENV.PUBLICATION_TITLE ?? 'import.test.ts';
+const dataFile = __ENV.DATA_FILE ?? 'small-file.csv';
+const uploadFileStrategy = utils.getDataFileUploadStrategy({
+  filename: dataFile,
+});
 
 export const options: Options = {
   stages: [
     {
       duration: '1s',
-      target: 2,
+      target: 10,
     },
     {
       duration: '119m',
-      target: 2,
+      target: 10,
     },
     {
       duration: '30s',
-      target: 0,
+      target: 10,
     },
   ],
   noConnectionReuse: true,
   insecureSkipTLSVerify: true,
   linger: true,
-  // vus: 5,
-  // duration: '120m',
 };
 
 interface SetupData {
   themeId: string;
   topicId: string;
-  releaseId: string;
+  publicationId: string;
 }
 
 export const errorRate = new Rate('ees_errors');
@@ -74,12 +80,6 @@ const processingStages: {
   {},
 );
 
-// TODO - use SharedArray instead of `open` here
-/* eslint-disable no-restricted-globals */
-const subjectFile = open('admin/import/assets/dates.csv', 'b');
-const subjectMetaFile = open('admin/import/assets/dates.meta.csv', 'b');
-/* eslint-enable no-restricted-globals */
-
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT as string,
 );
@@ -91,48 +91,34 @@ const { authTokens, userName } = environmentAndUsers.users.find(
 )!;
 
 export function setup(): SetupData {
-  const dataService = createDataService(adminUrl, authTokens.accessToken);
+  const adminService = createAdminService(adminUrl, authTokens.accessToken);
 
-  const suffix = alwaysCreateNewDataPerTest
-    ? `-${Date.now()}-${Math.random()}`
-    : '';
-
-  const { id: themeId } = dataService.getOrCreateTheme({
-    title: `UI test theme - Performance tests - "import.test.ts" - ${suffix}`,
+  const { id: themeId } = adminService.getOrCreateTheme({
+    title: testData.themeName,
   });
 
-  const { id: topicId } = dataService.getOrCreateTopic({
+  const { id: topicId } = adminService.getOrCreateTopic({
     themeId,
-    title: `UI test topic - Performance tests - "import.test.ts" - ${suffix}`,
+    title: testData.topicName,
   });
 
-  const publicationTitle = `UI test publication - Performance tests - "import.test.ts" - ${suffix}`;
-
-  const { id: publicationId } = dataService.getOrCreatePublication({
+  const { id: publicationId } = adminService.getOrCreatePublication({
     topicId,
     title: publicationTitle,
   });
 
-  const { id: releaseId } = dataService.getOrCreateRelease({
-    topicId,
-    publicationId,
-    publicationTitle,
-    releaseName: '2022',
-    timePeriodCoverage: 'AY',
-  });
-
   console.log(
-    `Created Theme ${themeId}, Topic ${topicId}, Publication ${publicationId}, Release ${releaseId}`,
+    `Created Theme ${themeId}, Topic ${topicId}, Publication ${publicationId}`,
   );
 
   return {
     themeId,
     topicId,
-    releaseId,
+    publicationId,
   };
 }
 
-const performTest = ({ releaseId }: SetupData) => {
+const performTest = ({ topicId, publicationId }: SetupData) => {
   const accessToken = getOrRefreshAccessTokens(
     supportsRefreshTokens,
     userName,
@@ -141,24 +127,28 @@ const performTest = ({ releaseId }: SetupData) => {
   );
 
   const uniqueId = Date.now();
-  const subjectName = `dates-${uniqueId}`;
+  const subjectName = `subject-${uniqueId}`;
 
-  const dataService = createDataService(adminUrl, accessToken, false);
+  const adminService = createAdminService(adminUrl, accessToken, false);
+
+  const year = 2000 + exec.scenario.iterationInTest;
+
+  console.log(`Creating Release ${year} for file import to be uploaded to`);
+
+  const { id: releaseId } = adminService.getOrCreateRelease({
+    topicId,
+    publicationId,
+    publicationTitle,
+    year,
+    timePeriodCoverage: 'AY',
+  });
 
   console.log(`Uploading subject ${subjectName}`);
 
-  const { response: uploadResponse, id: fileId } = dataService.uploadDataFile({
-    title: subjectName,
-    releaseId,
-    dataFile: {
-      file: subjectFile,
-      filename: `${subjectName}.csv`,
-    },
-    metaFile: {
-      file: subjectMetaFile,
-      filename: `${subjectName}.meta.csv`,
-    },
-  });
+  const {
+    response: uploadResponse,
+    id: fileId,
+  } = uploadFileStrategy.getOrImportSubject(adminService, releaseId);
 
   console.log(`Subject ${subjectName} finished uploading`);
 
@@ -184,7 +174,7 @@ const performTest = ({ releaseId }: SetupData) => {
 
   const importStartTime = Date.now();
 
-  dataService.waitForDataFileToImport({
+  adminService.waitForDataFileToImport({
     releaseId,
     fileId,
     pollingDelaySeconds: IMPORT_STATUS_POLLING_DELAY_SECONDS,
@@ -238,7 +228,7 @@ const performTest = ({ releaseId }: SetupData) => {
 };
 
 export const teardown = ({ themeId, topicId }: SetupData) => {
-  if (alwaysCreateNewDataPerTest) {
+  if (tearDownData) {
     const accessToken = getOrRefreshAccessTokens(
       supportsRefreshTokens,
       userName,
@@ -246,10 +236,10 @@ export const teardown = ({ themeId, topicId }: SetupData) => {
       authTokens,
     );
 
-    const dataService = createDataService(adminUrl, accessToken);
+    const adminService = createAdminService(adminUrl, accessToken);
 
-    dataService.deleteTopic({ topicId });
-    dataService.deleteTheme({ themeId });
+    adminService.deleteTopic({ topicId });
+    adminService.deleteTheme({ themeId });
 
     console.log(`Deleted Theme ${themeId}, Topic ${topicId}`);
   }

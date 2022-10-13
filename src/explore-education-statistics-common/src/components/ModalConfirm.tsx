@@ -14,6 +14,7 @@ interface Props {
   onConfirm(): void;
   onCancel?(): void;
   onExit(): void;
+  showCancel?: boolean;
   title: string;
   underlayClass?: string;
 }
@@ -27,6 +28,7 @@ const ModalConfirm = ({
   onConfirm,
   onExit,
   onCancel = onExit,
+  showCancel = true,
   title,
   underlayClass,
 }: Props) => {
@@ -62,13 +64,15 @@ const ModalConfirm = ({
       {children}
 
       <ButtonGroup>
-        <Button
-          variant="secondary"
-          onClick={handleAction(onCancel)}
-          disabled={isDisabled}
-        >
-          {cancelText}
-        </Button>
+        {showCancel && (
+          <Button
+            variant="secondary"
+            onClick={handleAction(onCancel)}
+            disabled={isDisabled}
+          >
+            {cancelText}
+          </Button>
+        )}
         <Button onClick={handleAction(onConfirm)} disabled={isDisabled}>
           {confirmText}
         </Button>
