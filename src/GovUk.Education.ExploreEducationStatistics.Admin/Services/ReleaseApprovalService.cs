@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -253,40 +252,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // The range should begin now rather than at midnight if the publish date is today
             if (_dateTimeProvider.UtcNow > fromUtc)
             {
-                fromUtc = _dateTimeProvider.UtcNow; 
+                fromUtc = _dateTimeProvider.UtcNow;
             }
 
             // Publishing won't occur unless there's an occurrence of (1) between the publishing range
-            if (TryGetNextOccurrenceForCronExpression(
-                    cronExpression: _options.PublishReleasesCronSchedule,
-                    fromUtc: fromUtc,
-                    toUtc: toUtc,
-                    timeZoneInfo: ukTimeZone,
-                    fromInclusive: true,
-                    toInclusive: true,
-                    out var nextOccurrenceUtc))
+            var nextOccurrenceUtc = GetNextOccurrenceForCronExpression(
+                cronExpression: _options.PublishReleasesCronSchedule,
+                fromUtc: fromUtc,
+                toUtc: toUtc,
+                timeZoneInfo: ukTimeZone);
+
+            if (nextOccurrenceUtc.HasValue)
             {
                 // Publishing won't occur unless there's an occurrence of (2) after (1) but before the end of the range
-                return TryGetNextOccurrenceForCronExpression(
+                return GetNextOccurrenceForCronExpression(
                     cronExpression: _options.PublishReleaseContentCronSchedule,
                     fromUtc: nextOccurrenceUtc.Value,
                     toUtc: toUtc,
-                    timeZoneInfo: ukTimeZone,
-                    fromInclusive: true,
-                    toInclusive: true,
-                    out _);
+                    timeZoneInfo: ukTimeZone).HasValue;
             }
 
             return false;
         }
 
-        private static bool TryGetNextOccurrenceForCronExpression(string cronExpression,
+        private static DateTime? GetNextOccurrenceForCronExpression(string cronExpression,
             DateTime fromUtc,
             DateTime toUtc,
             TimeZoneInfo timeZoneInfo,
-            bool fromInclusive,
-            bool toInclusive,
-            [NotNullWhen(true)] out DateTime? nextOccurrenceUtc)
+            bool fromInclusive = true,
+            bool toInclusive = true)
         {
             // Azure functions use a sixth field at the beginning of cron expressions for time precision in seconds
             // so we need to allow for this when parsing them.
@@ -295,8 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var occurrences = expression.GetOccurrences(fromUtc, toUtc, timeZoneInfo, fromInclusive, toInclusive)
                 .ToList();
-            nextOccurrenceUtc = occurrences.Any() ? occurrences[0] : null;
-            return nextOccurrenceUtc != null;
+            return occurrences.Any() ? occurrences[0] : null;
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateReleaseWithChecklist(Release release)
