@@ -12,6 +12,7 @@ import generateLegendDataGroups, {
 import {
   AxisConfiguration,
   ChartProps,
+  CustomDataGroup,
   DataClassification,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
@@ -59,6 +60,7 @@ export interface MapBlockProps extends ChartProps {
     major: AxisConfiguration;
   };
   boundaryLevel?: number;
+  customDataGroups?: CustomDataGroup[];
   dataGroups?: number;
   dataClassification?: DataClassification;
   id: string;
@@ -69,6 +71,7 @@ export interface MapBlockProps extends ChartProps {
 
 export default function MapBlockInternal({
   id,
+  customDataGroups = [],
   data,
   dataGroups = 5,
   dataClassification = 'EqualIntervals',
@@ -228,12 +231,15 @@ export default function MapBlockInternal({
         dataSetCategories,
         dataGroups,
         classification: dataClassification,
+        customDataGroups,
       });
 
       setFeatures(newFeatures);
       setLegendDataGroups(newDataGroups);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    customDataGroups.length,
     dataGroups,
     dataClassification,
     dataSetCategories,
@@ -507,11 +513,13 @@ export default function MapBlockInternal({
 
 function generateFeaturesAndDataGroups({
   classification,
+  customDataGroups,
   dataSetCategories,
   dataGroups: groups,
   selectedDataSetConfig,
 }: {
   classification: DataClassification;
+  customDataGroups: CustomDataGroup[];
   dataSetCategories: MapDataSetCategory[];
   dataGroups: number;
   selectedDataSetConfig: DataSetCategoryConfig;
@@ -540,6 +548,7 @@ function generateFeaturesAndDataGroups({
   const dataGroups = generateLegendDataGroups({
     colour,
     classification,
+    customDataGroups,
     decimalPlaces,
     groups,
     values,

@@ -211,7 +211,7 @@ const MethodologyNotesSection = ({ methodology }: Props) => {
                     <>
                       <FormattedDate
                         className="govuk-body govuk-!-font-weight-bold"
-                        data-testId="note-displayDate"
+                        data-testid="note-displayDate"
                       >
                         {note.displayDate}
                       </FormattedDate>

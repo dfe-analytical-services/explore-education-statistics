@@ -1199,4 +1199,172 @@ describe('generateLegendDataGroups', () => {
       ]);
     });
   });
+
+  describe('custom', () => {
+    test('returns custom groups for integer values and groups', () => {
+      const dataClasses = generateLegendDataGroups({
+        colour: 'rgba(0, 0, 0, 1)',
+        classification: 'Custom',
+        customDataGroups: [
+          { min: 1, max: 45 },
+          {
+            min: 46,
+            max: 100,
+          },
+        ],
+        groups: 5,
+        values: [1, 24, 35, 45, 111],
+      });
+
+      expect(dataClasses).toEqual<LegendDataGroup[]>([
+        {
+          colour: 'rgba(128, 128, 128, 1)',
+          max: '45',
+          maxRaw: 45,
+          min: '1',
+          minRaw: 1,
+        },
+        {
+          colour: 'rgba(0, 0, 0, 1)',
+          max: '100',
+          maxRaw: 100,
+          min: '46',
+          minRaw: 46,
+        },
+      ]);
+    });
+
+    test('returns groups for integer custom groups and non-integer values', () => {
+      const dataClasses = generateLegendDataGroups({
+        colour: 'rgba(0, 0, 0, 1)',
+        classification: 'Custom',
+        customDataGroups: [
+          { min: 0, max: 5 },
+          {
+            min: 6,
+            max: 10,
+          },
+        ],
+        groups: 5,
+        values: [2.5, 4.9, 5.2, 6.9, 7.4, 8.9, 9.8, 12.5],
+      });
+
+      expect(dataClasses).toEqual<LegendDataGroup[]>([
+        {
+          colour: 'rgba(128, 128, 128, 1)',
+          max: '5',
+          maxRaw: 5.4,
+          min: '0',
+          minRaw: -0.5,
+        },
+        {
+          colour: 'rgba(0, 0, 0, 1)',
+          max: '10',
+          maxRaw: 10.4,
+          min: '6',
+          minRaw: 5.5,
+        },
+      ]);
+    });
+
+    test('returns groups for non-integer custom groups and non-integer values with the same number of decimal places', () => {
+      const dataClasses = generateLegendDataGroups({
+        colour: 'rgba(0, 0, 0, 1)',
+        classification: 'Custom',
+        customDataGroups: [
+          { min: 2.2, max: 5.5 },
+          {
+            min: 5.6,
+            max: 7.3,
+          },
+        ],
+        groups: 5,
+        values: [2.5, 4.9, 5.2, 6.9, 7.4, 8.9, 9.8, 12.5],
+      });
+
+      expect(dataClasses).toEqual<LegendDataGroup[]>([
+        {
+          colour: 'rgba(128, 128, 128, 1)',
+          max: '5.5',
+          maxRaw: 5.5,
+          min: '2.2',
+          minRaw: 2.2,
+        },
+        {
+          colour: 'rgba(0, 0, 0, 1)',
+          max: '7.3',
+          maxRaw: 7.3,
+          min: '5.6',
+          minRaw: 5.6,
+        },
+      ]);
+    });
+
+    test('returns groups for non-integer custom groups and non-integer values with a different number of decimal places', () => {
+      const dataClasses = generateLegendDataGroups({
+        colour: 'rgba(0, 0, 0, 1)',
+        classification: 'Custom',
+        customDataGroups: [
+          { min: 2, max: 5.5 },
+          {
+            min: 5.6,
+            max: 7.3,
+          },
+        ],
+        groups: 5,
+        values: [1.89, 2.55, 4.91, 5.52, 6.93, 7.28, 8.39, 9.83, 12.53],
+      });
+
+      expect(dataClasses).toEqual<LegendDataGroup[]>([
+        {
+          colour: 'rgba(128, 128, 128, 1)',
+          max: '5.5',
+          maxRaw: 5.54,
+          min: '2',
+          minRaw: 1.95,
+        },
+        {
+          colour: 'rgba(0, 0, 0, 1)',
+          max: '7.3',
+          maxRaw: 7.34,
+          min: '5.6',
+          minRaw: 5.55,
+        },
+      ]);
+    });
+
+    test('handles more decimal places for non-integer custom groups and non-integer values with a different number of decimal places', () => {
+      const dataClasses = generateLegendDataGroups({
+        colour: 'rgba(0, 0, 0, 1)',
+        classification: 'Custom',
+        customDataGroups: [
+          { min: 1.123, max: 4.336 },
+          {
+            min: 6.988,
+            max: 10.569,
+          },
+        ],
+        decimalPlaces: 3,
+        groups: 5,
+        values: [1.12345, 4.33642, 6.98765, 10.56935],
+      });
+
+      expect(dataClasses).toEqual<LegendDataGroup[]>([
+        {
+          colour: 'rgba(128, 128, 128, 1)',
+          max: '4.336',
+          maxRaw: 4.3364,
+          min: '1.123',
+          minRaw: 1.1225,
+        },
+        {
+          colour: 'rgba(0, 0, 0, 1)',
+          max: '10.569',
+          maxRaw: 10.5694,
+          min: '6.988',
+          minRaw: 6.9875,
+        },
+      ]);
+    });
+  });
 });

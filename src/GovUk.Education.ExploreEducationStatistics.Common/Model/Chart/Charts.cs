@@ -66,7 +66,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         
         [JsonConverter(typeof(StringEnumConverter))]
         public ChartDataClassification? DataClassification { get; set; }
+        
         public int? DataGroups { get; set; }
+
+        public List<ChartCustomDataGroup>? CustomDataGroups { get; set; }
+    
     }
 
     public class InfographicChart : Chart
