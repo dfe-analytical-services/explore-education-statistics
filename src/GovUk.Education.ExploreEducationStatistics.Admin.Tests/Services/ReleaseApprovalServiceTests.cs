@@ -601,7 +601,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             // Set up the current time in UTC
             var dateTimeProvider =
-                new DateTimeProvider(DateTime.Parse("2023-01-01T00:00:00Z", styles: DateTimeStyles.RoundtripKind));
+                new DateTimeProvider(DateTime.Parse("2023-01-01T12:00:00Z", styles: DateTimeStyles.RoundtripKind));
 
             // Set up the cron schedules for publishing
             var options = Options.Create(new ReleaseApprovalOptions
@@ -658,11 +658,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            // Set up a current time in UTC in the last hour of the day but before the first publishing function has run
+            // Set up the current time in UTC
             var dateTimeProvider =
                 new DateTimeProvider(DateTime.Parse("2023-01-01T23:20:00Z", styles: DateTimeStyles.RoundtripKind));
 
-            // Set up cron schedules for publishing hourly on specific minutes
+            // Set up cron schedules for publishing hourly on specific minutes in a way that the first function
+            // will have an occurrence on the day, but not the second
             var options = Options.Create(new ReleaseApprovalOptions
             {
                 PublishReleasesCronSchedule = "0 30 * * * *", // Occurs hourly at minute 30
