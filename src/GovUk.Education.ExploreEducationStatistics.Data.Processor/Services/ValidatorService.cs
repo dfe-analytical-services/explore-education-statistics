@@ -100,28 +100,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     {
                         var dataFileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, 
                             import.File.Path());
-                        var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
+                        // var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
 
+                        var dataFileReader = new StreamReader(dataFileStream);
+                        using var csv = new CsvReader(dataFileReader, CultureInfo.InvariantCulture);
+                        csv.Read();
+                        csv.ReadHeader();
+                        var columnHeaders = csv.Context.Record.ToList();
+                        
                         var metaFileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles,
                             import.MetaFile.Path());
+                        
                         var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
 
                         return await ValidateMetaHeader(metaFileTable.Columns)
                             .OnSuccess(() => ValidateMetaRows(metaFileTable.Columns, metaFileTable.Rows))
-                            .OnSuccess(() => ValidateObservationHeaders(dataFileTable.Columns))
-                            .OnSuccess(
-                                () =>
-                                    ValidateAndCountObservations(dataFileTable.Columns, dataFileTable.Rows,
-                                            executionContext, import.Id)
-                                        .OnSuccess(
-                                            result =>
-                                            {
-                                                _logger.LogInformation(
-                                                    $"Validating: {import.File.Filename} complete");
-                                                return result;
-                                            }
-                                        )
-                            );
+                            .OnSuccess(() => ValidateObservationHeaders(columnHeaders))
+                            .OnSuccess(() => ValidateAndCountObservations(
+                                import,
+                                columnHeaders, 
+                                csv,
+                                executionContext, 
+                                import.Id)
+                            )
+                            .OnSuccessDo(async () =>
+                                _logger.LogInformation($"Validating: {import.File.Filename} complete"));
                 });
         }
 
@@ -213,9 +216,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return Unit.Instance;
         }
 
-        private static async Task<Either<List<DataImportError>, Unit>> ValidateObservationHeaders(DataColumnCollection cols)
+        private static async Task<Either<List<DataImportError>, Unit>> ValidateObservationHeaders(List<string> cols)
         {
-            var errors = new List<DataImportError>();
+            var errors = new List<DataImportError>();   
 
             foreach (var mandatoryCol in MandatoryObservationColumns)
             {
@@ -241,18 +244,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         private async Task<Either<List<DataImportError>, ProcessorStatistics>>
             ValidateAndCountObservations(
-                DataColumnCollection cols,
-                DataRowCollection rows,
+                DataImport import,
+                List<string> columnHeaders,
+                CsvReader csvReader,
                 ExecutionContext executionContext,
                 Guid importId)
         {
-            var colValues = CsvUtil.GetColumnValues(cols);
             var rowCountByGeographicLevel = new Dictionary<GeographicLevel, int>();
             var errors = new List<DataImportError>();
-            var totalRows = rows.Count;
+            var totalRows = 0;
 
+            while (await csvReader.ReadAsync())
+            {
+                totalRows++;
+            }
+            
+            var dataFileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, 
+                import.File.Path());
+
+
+            var dataFileReader2 = new StreamReader(dataFileStream);
+            using var csvReader2 = new CsvReader(dataFileReader2, CultureInfo.InvariantCulture);
+            
             var rowCounter = 0;
-            foreach (DataRow row in rows)
+            await csvReader2.ReadAsync();
+            while (await csvReader2.ReadAsync())
             {
                 rowCounter++;
                 if (errors.Count == 100)
@@ -263,11 +279,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 try
                 {
-                    var rowValues = CsvUtil.GetRowValues(row);
-                    _importerService.GetTimeIdentifier(rowValues, colValues);
-                    _importerService.GetYear(rowValues, colValues);
+                    var rowValues = Enumerable
+                        .Range(0, columnHeaders.Count - 1)
+                        .Select(csvReader2.GetField<string>)
+                        .ToArray();
+                    
+                    _importerService.GetTimeIdentifier(rowValues, columnHeaders);
+                    _importerService.GetYear(rowValues, columnHeaders);
 
-                    var level = CsvUtil.GetGeographicLevel(rowValues, colValues);
+                    var level = CsvUtil.GetGeographicLevel(rowValues, columnHeaders);
                     if (rowCountByGeographicLevel.ContainsKey(level))
                     {
                         rowCountByGeographicLevel[level]++;
