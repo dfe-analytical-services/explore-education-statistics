@@ -81,10 +81,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         ReplacementFileTypesMustBeData,
         ReplacementMustBeValid,
 
-        // Release
+        // Release approval
         ReleaseNotApproved,
-        ApprovedReleaseMustHavePublishScheduledDate,
         PublishedReleaseCannotBeUnapproved,
+        PublishDateCannotBeEmpty,
+        PublishDateCannotBeScheduled,
 
         // Release checklist errors
         DataFileImportsMustBeCompleted,

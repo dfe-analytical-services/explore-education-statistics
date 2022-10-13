@@ -1773,6 +1773,8 @@
         "PreReleaseAccess:AccessWindow:MinutesBeforeReleaseTimeEnd": "[parameters('preReleaseMinutesBeforeEnd')]",
         "enableSwagger": "[parameters('enableSwagger')]",
         "enableThemeDeletion": "[parameters('enableThemeDeletion')]",
+        "ReleaseApproval:PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
+        "ReleaseApproval:PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
         "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]"
       }
     },
