@@ -87,6 +87,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             });
         }
 
+        public static MetaRow GetMetaRow(List<string> cols, List<string> cells)
+        {
+            return CsvUtil.BuildType(
+                cells, 
+                cols, 
+                Enum.GetNames(typeof(MetaColumns)), 
+                values => new MetaRow
+                {
+                    ColumnName = values[0],
+                    ColumnType = (ColumnType) Enum.Parse(typeof(ColumnType), values[1]),
+                    Label = values[2],
+                    FilterGroupingColumn = values[3],
+                    FilterHint = values[4],
+                    IndicatorGrouping = values[5],
+                    IndicatorUnit = EnumUtil.GetFromString<Unit>(values[6] ?? ""),
+                    DecimalPlaces = values[7] == null ? (int?) null : int.Parse(values[7])
+                });
+        }
+
         private IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> ImportFilters(
             IEnumerable<MetaRow> metaRows, Subject subject, StatisticsDbContext context)
         {
