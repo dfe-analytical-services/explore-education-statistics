@@ -4,12 +4,13 @@ import getOrRefreshAccessTokens from '../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../utils/environmentAndUsers';
 import testData from '../testData';
 
+const environmentAndUsers = getEnvironmentAndUsersFromFile(
+  __ENV.TEST_ENVIRONMENT as string,
+);
+
 const performTest = () => {};
 
 export const teardown = () => {
-  const environmentAndUsers = getEnvironmentAndUsersFromFile(
-    __ENV.TEST_ENVIRONMENT as string,
-  );
   const { adminUrl, supportsRefreshTokens } = environmentAndUsers.environment;
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
