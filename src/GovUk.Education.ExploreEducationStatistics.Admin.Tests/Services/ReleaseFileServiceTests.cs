@@ -1691,11 +1691,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Entries are sorted alphabetically
                 Assert.Equal(3, zip.Entries.Count);
-                Assert.Equal("ancillary/ancillary.pdf", zip.Entries[0].FullName);
-                Assert.Equal("Test ancillary blob", zip.Entries[0].Open().ReadToEnd());
+                Assert.Equal("data/data.csv", zip.Entries[0].FullName);
+                Assert.Equal("Test data blob", zip.Entries[0].Open().ReadToEnd());
 
-                Assert.Equal("data/data.csv", zip.Entries[1].FullName);
-                Assert.Equal("Test data blob", zip.Entries[1].Open().ReadToEnd());
+                Assert.Equal("supporting-files/ancillary.pdf", zip.Entries[1].FullName);
+                Assert.Equal("Test ancillary blob", zip.Entries[1].Open().ReadToEnd());
 
                 // Data guidance is generated if there is at least one data file
                 Assert.Equal("data-guidance/data-guidance.txt", zip.Entries[2].FullName);
@@ -1912,13 +1912,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Entries are sorted alphabetically
                 Assert.Equal(3, zip.Entries.Count);
-                Assert.Equal("ancillary/test-1.pdf", zip.Entries[0].FullName);
+                Assert.Equal("supporting-files/test-1.pdf", zip.Entries[0].FullName);
                 Assert.Equal("Test 1 blob", zip.Entries[0].Open().ReadToEnd());
 
-                Assert.Equal("ancillary/test-2.pdf", zip.Entries[1].FullName);
+                Assert.Equal("supporting-files/test-2.pdf", zip.Entries[1].FullName);
                 Assert.Equal("Test 2 blob", zip.Entries[1].Open().ReadToEnd());
 
-                Assert.Equal("ancillary/test-3.pdf", zip.Entries[2].FullName);
+                Assert.Equal("supporting-files/test-3.pdf", zip.Entries[2].FullName);
                 Assert.Equal("Test 3 blob", zip.Entries[2].Open().ReadToEnd());
             }
         }
@@ -2298,7 +2298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Entries are sorted alphabetically
                 Assert.Single(zip.Entries);
-                Assert.Equal("ancillary/ancillary-1.pdf", zip.Entries[0].FullName);
+                Assert.Equal("supporting-files/ancillary-1.pdf", zip.Entries[0].FullName);
                 Assert.Equal("Test ancillary blob", zip.Entries[0].Open().ReadToEnd());
             }
         }

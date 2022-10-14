@@ -80,7 +80,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 
         public static string ZipFileEntryName(this File file)
         {
-            return file.Type.GetEnumLabel() + "/" + file.Filename;
+            return file.Type switch
+            {
+                Ancillary => $"supporting-files/{file.Filename}",
+                Data => $"data/{file.Filename}",
+                _ => throw new ArgumentOutOfRangeException(nameof(file.Type), "Unexpected file type"),
+            };
         }
     }
 }
