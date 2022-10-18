@@ -224,7 +224,7 @@ export default function ChartMapConfiguration({
 
           {form.values.dataClassification === 'Custom' && (
             <ChartMapCustomGroupsConfiguration
-              groups={form.values.customDataGroups}
+              groups={form.values.customDataGroups ?? []}
               id={`${formId}-customDataGroups`}
               showError={
                 hasSubmitted &&
