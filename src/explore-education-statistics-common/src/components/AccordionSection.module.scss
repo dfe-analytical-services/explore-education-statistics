@@ -1,3 +1,5 @@
+@import '~govuk-frontend/govuk/base';
+
 .section {
   @media print {
     display: block !important;
@@ -18,5 +20,23 @@
     overflow: visible;
     padding: 15px 0 !important;
     visibility: visible;
+  }
+}
+
+.copyLinkButton {
+  position: absolute;
+  right: 40px;
+  top: 4px;
+  width: auto;
+  z-index: 1;
+
+  @include govuk-media-query($from: tablet) {
+    left: -50px;
+    right: auto;
+    top: 10px;
+
+    &:active {
+      top: 10px;
+    }
   }
 }

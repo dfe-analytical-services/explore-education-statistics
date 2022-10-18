@@ -1,17 +1,19 @@
+import AccordionSection from '@common/components/AccordionSection';
 import React from 'react';
-import { render } from '@testing-library/react';
-import AccordionSection from '../AccordionSection';
+import { render, screen } from '@testing-library/react';
 
 describe('AccordionSection', () => {
   test('renders correctly with required props', () => {
-    const { container, getByText } = render(
+    const { container } = render(
       <AccordionSection heading="Test heading">
         <p>Test content</p>
       </AccordionSection>,
     );
 
-    expect(getByText('Test heading')).toBeDefined();
-    expect(getByText('Test content')).toBeDefined();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Test heading' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Test content')).toBeInTheDocument();
     expect(container.innerHTML).toMatchSnapshot();
   });
 
@@ -22,19 +24,55 @@ describe('AccordionSection', () => {
       </AccordionSection>,
     );
 
-    expect(container.querySelector('h2')).toBeNull();
-    expect(container.querySelector('h3')).not.toBeNull();
+    expect(screen.queryByRole('heading', { level: 2 })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3 })).toBeInTheDocument();
     expect(container.innerHTML).toMatchSnapshot();
   });
 
   test('renders with caption', () => {
-    const { container, getByText } = render(
+    const { container } = render(
       <AccordionSection heading="Test heading" caption="Some caption text">
         <p>Test content</p>
       </AccordionSection>,
     );
 
-    expect(getByText('Some caption text')).toBeDefined();
+    expect(screen.getByText('Some caption text')).toBeInTheDocument();
     expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('adds an id to the heading', () => {
+    render(
+      <AccordionSection heading="Test heading">
+        <p>Test content</p>
+      </AccordionSection>,
+    );
+    expect(
+      screen.getByRole('heading', { name: 'Test heading' }),
+    ).toHaveAttribute('id', 'test-heading');
+  });
+
+  test('adds a copy link button when anchorLinkUrl is set', () => {
+    const testUrl = 'http://test.com/1#test-heading';
+    render(
+      <AccordionSection anchorLinkUrl={testUrl} heading="Test heading">
+        <p>Test content</p>
+      </AccordionSection>,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Copy link to the clipboard' }),
+    ).toBeInTheDocument();
+  });
+
+  test('does not add  a copy link button when anchorLinkUrl is undefined', () => {
+    render(
+      <AccordionSection heading="Test heading">
+        <p>Test content</p>
+      </AccordionSection>,
+    );
+
+    expect(
+      screen.queryByRole('button', { name: 'Copy link to the clipboard' }),
+    ).not.toBeInTheDocument();
   });
 });
