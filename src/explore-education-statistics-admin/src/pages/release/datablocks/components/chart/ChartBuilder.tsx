@@ -137,6 +137,20 @@ const ChartBuilder = ({
     ServerValidationErrorResponse
   >();
 
+  const dataSetsUnits = useMemo(
+    () =>
+      axes.major?.dataSets.reduce<string[]>((acc, dataSet) => {
+        const foundIndicator = meta.indicators.find(
+          indicator => indicator.value === dataSet.indicator,
+        );
+        if (foundIndicator) {
+          acc.push(foundIndicator.unit);
+        }
+        return acc;
+      }, []),
+    [axes.major?.dataSets, meta.indicators],
+  );
+
   const chartProps = useMemo<ChartBuilderChartProps | undefined>(() => {
     if (!definition || !options) {
       return undefined;
@@ -333,8 +347,9 @@ const ChartBuilder = ({
                 >
                   <ChartDataSetsConfiguration
                     buttons={deleteButton}
-                    meta={meta}
                     dataSets={axes.major?.dataSets}
+                    dataSetsUnits={dataSetsUnits}
+                    meta={meta}
                     onChange={actions.updateDataSets}
                   />
                 </TabsSection>
@@ -348,6 +363,7 @@ const ChartBuilder = ({
                 >
                   <ChartMapConfiguration
                     buttons={deleteButton}
+                    dataSetsUnits={dataSetsUnits}
                     meta={meta}
                     options={options}
                     onBoundaryLevelChange={handleBoundaryLevelChange}

@@ -45,6 +45,7 @@ export const mapBlockDefinition: ChartDefinition = {
       height: 600,
       dataClassification: 'EqualIntervals',
       dataGroups: 5,
+      customDataGroups: [],
     },
   },
   legend: {

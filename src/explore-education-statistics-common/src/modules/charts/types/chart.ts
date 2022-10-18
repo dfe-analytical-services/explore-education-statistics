@@ -68,7 +68,12 @@ export type AxesConfiguration = {
   [key in AxisType]?: AxisConfiguration;
 };
 
-export type DataClassification = 'EqualIntervals' | 'Quantiles';
+export type DataClassification = 'EqualIntervals' | 'Quantiles' | 'Custom';
+
+export interface CustomDataGroup {
+  max: number;
+  min: number;
+}
 
 export interface ChartProps {
   data: TableDataResult[];
@@ -115,6 +120,7 @@ export interface ChartDefinitionOptions {
   boundaryLevel?: number;
   dataClassification?: DataClassification;
   dataGroups?: number;
+  customDataGroups?: CustomDataGroup[];
 }
 
 export interface ChartDefinition {
