@@ -1,3 +1,5 @@
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
+import { MethodologyContextProvider } from '@admin/pages/methodology/contexts/MethodologyContext';
 import PreReleaseMethodologyPage from '@admin/pages/release/pre-release/PreReleaseMethodologyPage';
 import {
   preReleaseMethodologyRoute,
@@ -6,6 +8,7 @@ import {
 import _methodologyContentService, {
   MethodologyContent,
 } from '@admin/services/methodologyContentService';
+import { MethodologyVersion } from '@admin/services/methodologyService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -18,6 +21,19 @@ const methodologyContentService = _methodologyContentService as jest.Mocked<
 >;
 
 describe('PreReleaseMethodologyPage', () => {
+  const testMethodologyVersion: MethodologyVersion = {
+    id: 'methodology-1',
+    amendment: false,
+    methodologyId: 'methodology-id-1',
+    owningPublication: {
+      id: 'publication-1',
+      title: 'Owning publication title',
+    },
+    slug: 'pupil-absence-in-schools-in-england',
+    status: 'Approved',
+    title: 'Pupil absence statistics: methodology',
+  };
+
   const testMethodology: MethodologyContent = {
     id: 'methodology-1',
     title: 'Pupil absence statistics: methodology',
@@ -322,10 +338,14 @@ describe('PreReleaseMethodologyPage', () => {
   ) => {
     return render(
       <MemoryRouter initialEntries={initialEntries}>
-        <Route
-          component={PreReleaseMethodologyPage}
-          path={preReleaseMethodologyRoute.path}
-        />
+        <TestConfigContextProvider>
+          <MethodologyContextProvider methodology={testMethodologyVersion}>
+            <Route
+              component={PreReleaseMethodologyPage}
+              path={preReleaseMethodologyRoute.path}
+            />
+          </MethodologyContextProvider>
+        </TestConfigContextProvider>
       </MemoryRouter>,
     );
   };

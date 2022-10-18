@@ -3,12 +3,16 @@ import React from 'react';
 import styles from './UrlContainer.module.scss';
 
 interface Props {
-  'data-testid'?: string | 'url';
+  'data-testid'?: string;
   className?: string;
   url: string;
 }
 
-const UrlContainer = ({ 'data-testid': dataTestId, className, url }: Props) => {
+const UrlContainer = ({
+  'data-testid': dataTestId = 'url',
+  className,
+  url,
+}: Props) => {
   const handleFocus = (event: React.FocusEvent<HTMLInputElement>) =>
     event.target.select();
   return (

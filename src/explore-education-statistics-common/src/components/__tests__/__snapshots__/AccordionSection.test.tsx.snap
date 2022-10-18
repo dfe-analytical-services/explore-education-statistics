@@ -6,7 +6,9 @@ exports[`AccordionSection renders correctly with required props 1`] = `
      id="accordionSection"
 >
   <div class="govuk-accordion__section-header">
-    <h2 class="govuk-accordion__section-heading">
+    <h2 class="govuk-accordion__section-heading"
+        id="test-heading"
+    >
       <button aria-controls="accordionSection-content"
               aria-expanded="false"
               class="govuk-accordion__section-button"
@@ -45,7 +47,9 @@ exports[`AccordionSection renders with caption 1`] = `
      id="accordionSection"
 >
   <div class="govuk-accordion__section-header">
-    <h2 class="govuk-accordion__section-heading">
+    <h2 class="govuk-accordion__section-heading"
+        id="test-heading"
+    >
       <button aria-controls="accordionSection-content"
               aria-expanded="false"
               class="govuk-accordion__section-button"
@@ -87,7 +91,9 @@ exports[`AccordionSection renders with different heading size 1`] = `
      id="accordionSection"
 >
   <div class="govuk-accordion__section-header">
-    <h3 class="govuk-accordion__section-heading">
+    <h3 class="govuk-accordion__section-heading"
+        id="test-heading"
+    >
       <button aria-controls="accordionSection-content"
               aria-expanded="false"
               class="govuk-accordion__section-button"
