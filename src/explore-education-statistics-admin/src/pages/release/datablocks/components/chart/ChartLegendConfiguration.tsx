@@ -10,6 +10,7 @@ import {
 } from '@common/components/form';
 import FormFieldColourInput from '@common/components/form/FormFieldColourInput';
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
+import WarningMessage from '@common/components/WarningMessage';
 import {
   AxisConfiguration,
   ChartDefinition,
@@ -83,6 +84,7 @@ interface Props {
   definition: ChartDefinition;
   legend: LegendConfiguration;
   meta: FullTableMeta;
+  showDataLabels?: boolean;
   onChange: (legend: LegendConfiguration) => void;
   onSubmit: (legend: LegendConfiguration) => void;
 }
@@ -94,6 +96,7 @@ const ChartLegendConfiguration = ({
   definition,
   legend,
   meta,
+  showDataLabels,
   onChange,
   onSubmit,
 }: Props) => {
@@ -299,16 +302,26 @@ const ChartLegendConfiguration = ({
           />
 
           {validationSchema.fields.position && (
-            <FormFieldSelect<FormValues>
-              name="position"
-              label="Legend position"
-              options={
-                capabilities.canPositionLegendInline
-                  ? positionOptions
-                  : positionOptions.filter(option => option.value !== 'inline')
-              }
-              order={FormSelect.unordered}
-            />
+            <>
+              <FormFieldSelect<FormValues>
+                name="position"
+                label="Legend position"
+                options={
+                  capabilities.canPositionLegendInline
+                    ? positionOptions
+                    : positionOptions.filter(
+                        option => option.value !== 'inline',
+                      )
+                }
+                order={FormSelect.unordered}
+              />
+              {showDataLabels && form.values.position === 'inline' && (
+                <WarningMessage>
+                  Data labels cannot be used with inline legends, please select
+                  a different legend position or turn off data labels.
+                </WarningMessage>
+              )}
+            </>
           )}
 
           <div className="govuk-!-margin-bottom-6">

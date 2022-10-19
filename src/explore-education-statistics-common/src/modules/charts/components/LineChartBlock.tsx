@@ -23,7 +23,7 @@ import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisD
 import { Dictionary } from '@common/types';
 import formatPretty from '@common/utils/number/formatPretty';
 import parseNumber from '@common/utils/number/parseNumber';
-import LineChartLegendLabel from '@common/modules/charts/components/LineChartLegendLabel';
+import LineChartLabel from '@common/modules/charts/components/LineChartLabel';
 import getUnit from '@common/modules/charts/util/getUnit';
 import React, { memo } from 'react';
 import {
@@ -85,6 +85,8 @@ const LineChartBlock = ({
   legend,
   width,
   includeNonNumericData,
+  showDataLabels,
+  dataLabelPosition,
 }: LineChartProps) => {
   const [legendProps, renderLegend] = useLegend();
 
@@ -200,17 +202,20 @@ const LineChartBlock = ({
               dot={getDot(config.symbol)}
               strokeWidth="2"
               strokeDasharray={lineStyles[config.lineStyle ?? 'solid']}
-              label={props =>
-                legend.position === 'inline' ? (
-                  <LineChartLegendLabel
-                    {...props}
-                    name={config.label}
-                    colour={config.colour}
-                    totalDataPoints={chartData.length}
-                    labelPosition={config.inlinePosition}
-                  />
-                ) : null
-              }
+              label={props => (
+                <LineChartLabel
+                  {...props}
+                  name={config.label}
+                  colour={config.colour}
+                  totalDataPoints={chartData.length}
+                  legendLabelPosition={config.inlinePosition}
+                  showDataLabels={showDataLabels}
+                  dataLabelPosition={dataLabelPosition}
+                  showLegendAsLabel={legend.position === 'inline'}
+                  unit={dataSet.indicator.unit}
+                  decimalPlaces={dataSet.indicator.decimalPlaces}
+                />
+              )}
             />
           ))}
 

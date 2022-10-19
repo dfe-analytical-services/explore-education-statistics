@@ -7,75 +7,94 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.Chart.Chart
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 {
-    [JsonConverter(typeof(ContentBlockChartConverter))]
-    public interface IChart
-    {
-        ChartType Type { get; }
-        string? Title { get; set; }
-        string Alt { get; set; }
-        int Height { get; set; }
-        int? Width { get; set; }
-        bool IncludeNonNumericData { get; set; }
 
-        Dictionary<string, ChartAxisConfiguration>? Axes { get; set; }
-        public ChartLegend? Legend { get; set; }
+  [JsonConverter(typeof(StringEnumConverter))]
+  public enum BarChartDataLabelPosition
+  {
+    inside, outside
+  }
 
-    }
+  [JsonConverter(typeof(StringEnumConverter))]
+  public enum LineChartDataLabelPosition
+  {
+    above, below
+  }
 
-    public abstract class Chart : IChart
-    {
-        public string? Title { get; set; }
-        public string Alt { get; set; }
-        public int Height { get; set; }
-        public int? Width { get; set; }
-        public bool IncludeNonNumericData { get; set; } = false;
+  [JsonConverter(typeof(ContentBlockChartConverter))]
+  public interface IChart
+  {
+    ChartType Type { get; }
+    string? Title { get; set; }
+    string Alt { get; set; }
+    int Height { get; set; }
+    int? Width { get; set; }
+    bool IncludeNonNumericData { get; set; }
 
-        public abstract ChartType Type { get; }
+    Dictionary<string, ChartAxisConfiguration>? Axes { get; set; }
+    public ChartLegend? Legend { get; set; }
 
-        public Dictionary<string, ChartAxisConfiguration>? Axes { get; set; }
-        public ChartLegend? Legend { get; set; }
-    }
+  }
 
-    public class LineChart : Chart
-    {
-        public override ChartType Type => Line;
-    }
+  public abstract class Chart : IChart
+  {
+    public string? Title { get; set; }
+    public string Alt { get; set; }
+    public int Height { get; set; }
+    public int? Width { get; set; }
+    public bool IncludeNonNumericData { get; set; } = false;
 
-    public class HorizontalBarChart : Chart
-    {
-        public override ChartType Type => HorizontalBar;
+    public abstract ChartType Type { get; }
 
-        public int? BarThickness { get; set; }
-        public bool Stacked;
-    }
+    public Dictionary<string, ChartAxisConfiguration>? Axes { get; set; }
+    public ChartLegend? Legend { get; set; }
+  }
 
-    public class VerticalBarChart : Chart
-    {
-        public override ChartType Type => VerticalBar;
+  public class LineChart : Chart
+  {
+    public override ChartType Type => Line;
+    public bool showDataLabels { get; set; }
+    public LineChartDataLabelPosition? DataLabelPosition { get; set; }
+  }
 
-        public int? BarThickness { get; set; }
-        public bool Stacked;
-    }
+  public class HorizontalBarChart : Chart
+  {
+    public override ChartType Type => HorizontalBar;
 
-    public class MapChart : Chart
-    {
-        public override ChartType Type => Map;
-        
-        // TODO EES-3319 - make mandatory when all Map Charts are migrated to have a Boundary Level set
-        public long? BoundaryLevel { get; set; }
-        
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ChartDataClassification? DataClassification { get; set; }
-        
-        public int? DataGroups { get; set; }
+    public int? BarThickness { get; set; }
+    public bool Stacked;
+    public bool showDataLabels { get; set; }
+    public BarChartDataLabelPosition? DataLabelPosition { get; set; }
+  }
 
-        public List<ChartCustomDataGroup>? CustomDataGroups { get; set; }
-    
-    }
+  public class VerticalBarChart : Chart
+  {
+    public override ChartType Type => VerticalBar;
 
-    public class InfographicChart : Chart
-    {
-        public override ChartType Type => Infographic;
-        public string FileId { get; set; }
-    }
+    public int? BarThickness { get; set; }
+    public bool Stacked;
+    public bool showDataLabels { get; set; }
+    public BarChartDataLabelPosition? DataLabelPosition { get; set; }
+  }
+
+  public class MapChart : Chart
+  {
+    public override ChartType Type => Map;
+
+    // TODO EES-3319 - make mandatory when all Map Charts are migrated to have a Boundary Level set
+    public long? BoundaryLevel { get; set; }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public ChartDataClassification? DataClassification { get; set; }
+
+    public int? DataGroups { get; set; }
+
+    public List<ChartCustomDataGroup>? CustomDataGroups { get; set; }
+
+  }
+
+  public class InfographicChart : Chart
+  {
+    public override ChartType Type => Infographic;
+    public string FileId { get; set; }
+  }
 }
