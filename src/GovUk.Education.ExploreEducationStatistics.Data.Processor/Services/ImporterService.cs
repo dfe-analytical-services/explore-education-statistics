@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -119,78 +120,81 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _logger = logger;
         }
 
-        public void ImportMeta(DataTable table, Subject subject, StatisticsDbContext context)
+        public void ImportMeta(
+            List<string> metaFileCsvHeaders,
+            List<List<string>> metaFileRows, 
+            Subject subject,
+            StatisticsDbContext context)
         {
-            _importerMetaService.Import(table.Columns, table.Rows, subject, context);
+            _importerMetaService.Import(metaFileCsvHeaders, metaFileRows, subject, context);
         }
 
-        public SubjectMeta GetMeta(DataTable table, Subject subject, StatisticsDbContext context)
+        public SubjectMeta GetMeta(
+            List<string> metaFileCsvHeaders,
+            List<List<string>> metaFileRows, 
+            Subject subject,
+            StatisticsDbContext context)
         {
-            return _importerMetaService.Get(table.Columns, table.Rows, subject, context);
+            return _importerMetaService.Get(metaFileCsvHeaders, metaFileRows, subject, context);
         }
 
         public async Task ImportFiltersAndLocations(
             DataImport dataImport,
-            DataColumnCollection cols,
-            DataRowCollection rows,
+            Func<Task<Stream>> dataFileStreamProvider,
             SubjectMeta subjectMeta,
             StatisticsDbContext context)
         {
             // Clearing the caches is required here as the seeder shares the cache with all subjects
             _memoryCache.Clear();
 
-            var colValues = CsvUtil.GetColumnValues(cols);
-            var rowCount = 1;
-            var totalRows = rows.Count;
+            var colValues = await CsvUtil.GetCsvHeaders(dataFileStreamProvider);
+            var totalRows = await CsvUtil.GetTotalRows(dataFileStreamProvider);
             var soleGeographicLevel = dataImport.HasSoleGeographicLevel();
 
-            foreach (DataRow row in rows)
+            await CsvUtil.ForEachRow(dataFileStreamProvider, async (cells, index) =>
             {
-                if (rowCount % Stage2RowCheck == 0)
+                if (index % Stage2RowCheck == 0)
                 {
                     var currentStatus = await _dataImportService.GetImportStatus(dataImport.Id);
 
                     if (currentStatus.IsFinishedOrAborting())
                     {
-                        _logger.LogInformation($"Import for {dataImport.File.Filename} has finished or is being aborted, " +
-                                               "so finishing importing Filters and Locations early");
-                        return;
+                        _logger.LogInformation(
+                            $"Import for {dataImport.File.Filename} has finished or is being aborted, " +
+                            "so finishing importing Filters and Locations early");
+                        return false;
                     }
-                    
+
                     await _dataImportService.UpdateStatus(dataImport.Id,
                         DataImportStatus.STAGE_2,
-                        (double) rowCount / totalRows * 100);
+                        (double) (index + 1) / totalRows * 100);
                 }
 
-                var rowValues = CsvUtil.GetRowValues(row);
-                if (CsvUtil.IsRowAllowed(soleGeographicLevel, rowValues, colValues))
+                if (CsvUtil.IsRowAllowed(soleGeographicLevel, cells, colValues))
                 {
-                    CreateFiltersAndLocationsFromCsv(context, rowValues, colValues, subjectMeta.Filters);
+                    CreateFiltersAndLocationsFromCsv(context, cells, colValues, subjectMeta.Filters);
                 }
 
-                rowCount++;
-            }
+                return true;
+            });
         }
 
-        public async Task ImportObservations(
-            DataImport import,
-            DataColumnCollection cols,
-            DataRowCollection rows,
+        public async Task ImportObservations(DataImport import,
+            Func<Task<Stream>> dataFileStreamProvider,
             Subject subject,
-            SubjectMeta subjectMeta, 
+            SubjectMeta subjectMeta,
             int batchNo,
             StatisticsDbContext context)
         {
             _memoryCache.Clear();
-
-            var observations = GetObservations(
+            
+            var observations = (await GetObservations(
                 import,
                 context,
-                rows,
-                CsvUtil.GetColumnValues(cols),
+                dataFileStreamProvider,
                 subject,
                 subjectMeta,
-                batchNo).ToList();
+                batchNo)).ToList();
 
             await InsertObservations(context, observations);
         }
@@ -220,42 +224,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return int.Parse(tp.Substring(0, 4));
         }
 
-        private IEnumerable<Observation> GetObservations(
+        private async Task<IEnumerable<Observation>> GetObservations(
             DataImport import,
             StatisticsDbContext context,
-            DataRowCollection rows,
-            List<string> colValues,
+            Func<Task<Stream>> dataFileStreamProvider,
             Subject subject,
             SubjectMeta subjectMeta,
             int batchNo)
         {
-            var observations = new List<Observation>();
-            var i = 0;
             var soleGeographicLevel = import.HasSoleGeographicLevel();
+            var csvHeaders = await CsvUtil.GetCsvHeaders(dataFileStreamProvider);
 
-            foreach (DataRow row in rows)
+            return (await CsvUtil.Select(dataFileStreamProvider, (cells, index) =>
             {
-                var rowValues = CsvUtil.GetRowValues(row).ToArray();
-
-                if (CsvUtil.IsRowAllowed(soleGeographicLevel, rowValues, colValues))
+                if (CsvUtil.IsRowAllowed(soleGeographicLevel, cells, csvHeaders))
                 {
-                    var o = ObservationFromCsv(
+                    return ObservationFromCsv(
                         context,
-                        rowValues,
-                        colValues,
+                        cells,
+                        csvHeaders,
                         subject,
                         subjectMeta,
-                        ((batchNo - 1) * import.RowsPerBatch) + i++ + 2);
-                    observations.Add(o);
+                        (batchNo - 1) * import.RowsPerBatch + index + 2);
                 }
-            }
 
-            return observations;
+                return null;
+            }))
+                .Where(observation => observation != null);
         }
 
         private Observation ObservationFromCsv(
             StatisticsDbContext context,
-            string[] rowValues,
+            List<string> rowValues,
             List<string> colValues,
             Subject subject,
             SubjectMeta subjectMeta,

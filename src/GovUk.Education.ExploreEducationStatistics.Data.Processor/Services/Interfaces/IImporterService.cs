@@ -1,6 +1,8 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -12,14 +14,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 {
     public interface IImporterService
     {
-        void ImportMeta(DataTable table, Subject subject, StatisticsDbContext context);
+        void ImportMeta(
+            List<string> metaFileCsvHeaders,
+            List<List<string>> metaFileRows, 
+            Subject subject, 
+            StatisticsDbContext context);
 
-        SubjectMeta GetMeta(DataTable table, Subject subject, StatisticsDbContext context);
+        SubjectMeta GetMeta(
+            List<string> metaFileCsvHeaders,
+            List<List<string>> metaFileRows, 
+            Subject subject, 
+            StatisticsDbContext context);
 
         Task ImportObservations(
             DataImport dataImport,
-            DataColumnCollection cols,
-            DataRowCollection rows,
+            Func<Task<Stream>> dataFileStreamProvider,
             Subject subject,
             SubjectMeta subjectMeta,
             int batchNo,
@@ -27,8 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 
         Task ImportFiltersAndLocations(
             DataImport dataImport,
-            DataColumnCollection cols,
-            DataRowCollection rows,
+            Func<Task<Stream>> dataFileStreamProvider,
             SubjectMeta subjectMeta,
             StatisticsDbContext context);
 

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -17,6 +17,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Models.SoloImportableLevels;
@@ -73,7 +74,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _importerService = importerService;
         }
 
+        /// <summary>
+        /// Intervals at which to perform import status checks and updates.
+        /// </summary>
         private const int Stage1RowCheck = 1000;
+        
+        /// <summary>
+        /// Number of lines to use as a content sample when validating a CSV file's Mime type.
+        /// </summary>
+        /// <remarks>
+        /// Without limiting this, the entire file contents is used in determining whether or not the given file is
+        /// of type application/csv by the Mime library.
+        ///</remarks>
+        private const int CsvMimeTypeSampleLineCount = 1000;
 
         private static readonly List<string> MandatoryObservationColumns = new()
         {
@@ -98,42 +111,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var metaFileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles,
                 import.MetaFile.Path());
 
-            return await 
-                ValidateCsvFile(import.File, dataFileStreamProvider, false)
-                .OnSuccessCombineWith(async _ => await ValidateCsvFile(import.MetaFile, metaFileStreamProvider, true))
-                .OnSuccess(async dataAndMetaCsvInfo =>
-                {
-                    var (dataFileColumnHeaders, dataFileTotalRows) = dataAndMetaCsvInfo.Item1;
-                    var metaFileColumnHeaders = dataAndMetaCsvInfo.Item2.columnHeaders;
-                    
-                    return await ValidateMetaHeader(metaFileColumnHeaders)
-                        .OnSuccess(() => ValidateMetaRows(metaFileColumnHeaders, metaFileStreamProvider))
-                        .OnSuccess(() => ValidateObservationHeaders(dataFileColumnHeaders))
-                        .OnSuccess(() => ValidateAndCountObservations(
-                            import,
-                            dataFileColumnHeaders,
-                            dataFileTotalRows,
-                            dataFileStreamProvider,
-                            executionContext, 
-                            import.Id)
-                        )
-                        .OnSuccessDo(async () =>
-                            _logger.LogInformation("Validating: {FileName} complete", import.File.Filename));
-                });
+            return await
+                ValidateCsvFileType(import.MetaFile, metaFileStreamProvider, true)
+                    .OnSuccess(() => ValidateCsvFileType(import.File, dataFileStreamProvider, false))
+                    .OnSuccess(() => ValidateMetadataFile(import.MetaFile, metaFileStreamProvider, true))
+                    .OnSuccess(async metaFileDetails =>
+                    {
+                        var dataFileColumnHeaders = await CsvUtil.GetCsvHeaders(dataFileStreamProvider);
+                        var dataFileTotalRows = await CsvUtil.GetTotalRows(dataFileStreamProvider);
+
+                        return await 
+                            ValidateObservationHeaders(dataFileColumnHeaders)
+                            .OnSuccess(() => ValidateAndCountObservations(
+                                import,
+                                dataFileColumnHeaders,
+                                dataFileTotalRows,
+                                dataFileStreamProvider,
+                                executionContext, 
+                                import.Id)
+                            )
+                            .OnSuccessDo(async () =>
+                                _logger.LogInformation("Validating: {FileName} complete", import.File.Filename));
+                    });
         }
 
-        private async Task<Either<List<DataImportError>, (List<string> columnHeaders, int rowCount)>> 
-            ValidateCsvFile(
-                File file, 
+        private async Task<Either<List<DataImportError>, Unit>> ValidateCsvFileType(
+            File file,
+            Func<Task<Stream>> fileStreamProvider,
+            bool isMetaFile)
+        {
+            if (!await IsCsvFile(file.Filename, fileStreamProvider))
+            {
+                return ListOf(isMetaFile
+                    ? new DataImportError($"{MetaFileMustBeCsvFile.GetEnumLabel()}")
+                    : new DataImportError($"{DataFileMustBeCsvFile.GetEnumLabel()}"));
+            }
+
+            return Unit.Instance;
+        }
+        
+        private async Task<Either<List<DataImportError>, (List<string> columnHeaders, int totalRows)>>
+            ValidateMetadataFile(
+                File file,
                 Func<Task<Stream>> fileStreamProvider,
                 bool isMetaFile)
         {
-            if (!await IsCsvFile(file))
-            {
-                return CollectionUtils.ListOf(isMetaFile ? new DataImportError($"{MetaFileMustBeCsvFile.GetEnumLabel()}") :
-                    new DataImportError($"{DataFileMustBeCsvFile.GetEnumLabel()}"));
-            }
-            
             _logger.LogDebug("Determining if CSV file {FileName} is correct shape", file.Filename);
 
             var columnHeaders = await CsvUtil.GetCsvHeaders(fileStreamProvider);
@@ -141,34 +163,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var totalRows = 0;
             var errors = new List<DataImportError>();
             
-            await CsvUtil.ForEachRow(fileStreamProvider, (cells, index) =>
-            {
-                totalRows++;
-                
-                if (cells.Count != columnHeaders.Count)
-                {
-                    var errorCode = isMetaFile ? MetaFileHasInvalidNumberOfColumns : DataFileHasInvalidNumberOfColumns;
-                    errors.Add(new DataImportError($"error at row {index + 1}: {errorCode.GetEnumLabel()}"));
-                    return false;
-                }
-
-                return true;
-            });
-
-            if (errors.Count > 0)
-            {
-                _logger.LogDebug("CSV file {FileName} is not the correct shape - {Errors}", file.Filename, errors.JoinToString());
-                return errors;
-            }
-            
-            _logger.LogDebug("CSV file {FileName} is correct shape", file.Filename);
-            
-            return (columnHeaders, totalRows);
-        }
-
-        private static async Task<Either<List<DataImportError>, Unit>> ValidateMetaHeader(List<string> columnHeaders)
-        {
-            var errors = new List<DataImportError>();
             // Check for unexpected column names
             Array.ForEach(Enum.GetNames(typeof(MetaColumns)), col =>
             {
@@ -183,17 +177,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return errors;
             }
 
-            return Unit.Instance;
-        }
-
-        private static async Task<Either<List<DataImportError>, Unit>> ValidateMetaRows(
-            List<string> columnHeaders, 
-            Func<Task<Stream>> metaStreamProvider)
-        {
-            var errors = new List<DataImportError>();
-
-            await CsvUtil.ForEachRow(metaStreamProvider, (cells, index) =>
+            await CsvUtil.ForEachRow(fileStreamProvider, (cells, index) =>
             {
+                totalRows++;
+                
+                if (cells.Count != columnHeaders.Count)
+                {
+                    var errorCode = isMetaFile ? MetaFileHasInvalidNumberOfColumns : DataFileHasInvalidNumberOfColumns;
+                    errors.Add(new DataImportError($"error at row {index + 1}: {errorCode.GetEnumLabel()}"));
+                }
+                
                 try
                 {
                     ImporterMetaService.GetMetaRow(columnHeaders, cells);
@@ -206,10 +199,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             if (errors.Count > 0)
             {
+                _logger.LogDebug("CSV metadata file {FileName} is invalid - {Errors}", file.Filename, errors.JoinToString());
                 return errors;
             }
-
-            return Unit.Instance;
+            
+            _logger.LogDebug("CSV metadata file {FileName} is valid", file.Filename);
+            
+            return (columnHeaders, totalRows);
         }
 
         private static async Task<Either<List<DataImportError>, Unit>> ValidateObservationHeaders(List<string> cols)
@@ -256,6 +252,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     errors.Add(new DataImportError(FirstOneHundredErrors.GetEnumLabel()));
                     return false;
+                }
+                
+                if (cells.Count != columnHeaders.Count)
+                {
+                    errors.Add(new DataImportError($"error at row {index + 1}: cell count {cells.Count} " +
+                                                   $"does not match column header count of {columnHeaders.Count}"));
+                    return true;
+                }
+                
+                if (index % Stage1RowCheck == 0)
+                {
+                    var currentStatus = await _dataImportService.GetImportStatus(importId);
+                    
+                    if (currentStatus.IsFinishedOrAborting())
+                    {
+                        _logger.LogInformation(
+                            $"Import for {import.File.Filename} has finished or is being aborted, " +
+                            "so finishing importing Filters and Locations early");
+                        return false;
+                    }
                 }
 
                 try
@@ -320,14 +336,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .Build();
         }
 
-        private async Task<bool> IsCsvFile(File file)
+        private async Task<bool> IsCsvFile(string filename, Func<Task<Stream>> fileStreamProvider)
         {
-            _logger.LogDebug("Validating that {FileName} has a CSV mime type", file.Filename);
-            
-            var mimeTypeStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, file.Path());
+            _logger.LogDebug("Validating that {FileName} has a CSV mime type", filename);
 
+            await using var sampleLinesStream = await GetSampleLinesStream(fileStreamProvider, CsvMimeTypeSampleLineCount);
+            
             var hasMatchingMimeType = await _fileTypeService.HasMatchingMimeType(
-                mimeTypeStream,
+                sampleLinesStream,
                 AllowedMimeTypesByFileType[FileType.Data]
             );
 
@@ -336,20 +352,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return false;
             }
 
-            _logger.LogDebug("{FileName} has a valid CSV mime type", file.Filename);
+            _logger.LogDebug("{FileName} has a valid CSV mime type", filename);
 
-            _logger.LogDebug("Validating that {FileName} has a valid CSV character encoding", file.Filename);
+            _logger.LogDebug("Validating that {FileName} has a valid CSV character encoding", filename);
 
-            var encodingStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, file.Path());
+            await using var encodingStream = await fileStreamProvider.Invoke();
+
             var hasMatchingEncodingType = _fileTypeService.HasMatchingEncodingType(encodingStream, CsvEncodingTypes);
 
             if (hasMatchingEncodingType)
             {
-                _logger.LogDebug("{FileName} has a valid CSV content encoding", file.Filename);
+                _logger.LogDebug("{FileName} has a valid CSV content encoding", filename);
             }
             else
             {
-                _logger.LogDebug("{FileName} does not have a valid CSV content encoding", file.Filename);
+                _logger.LogDebug("{FileName} does not have a valid CSV content encoding", filename);
             }
 
             return hasMatchingEncodingType;
@@ -372,6 +389,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             // Exclude the counts of any 'solo' levels.
             // Those rows will be ignored since they are not being imported exclusively.
             return rowCountByGeographicLevel.Sum(pair => pair.Key.IsSoloImportableLevel() ? 0 : pair.Value);
+        }
+        
+        /// <summary>
+        /// Obtain a set of sample lines of the given file, for the purposes of checking the file's mime type and
+        /// content encoding.
+        /// </summary>
+        private async Task<Stream?> GetSampleLinesStream(Func<Task<Stream>> fileStreamProvider, int sampleLineCount)
+        {
+            using var streamReader = new StreamReader(await fileStreamProvider.Invoke());
+
+            var lines = new List<string>();
+            
+            try
+            {
+                var linesRead = 0;
+
+                while (linesRead < sampleLineCount && !streamReader.EndOfStream)
+                {
+                    var nextLine = await streamReader.ReadLineAsync();
+
+                    if (nextLine == null)
+                    {
+                        _logger.LogError($"Unable to read next sample line {linesRead + 1} from CSV");
+                        break;
+                    }
+                    
+                    lines.Add(nextLine);
+                    linesRead++;
+                }
+                
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Unable to read sample lines from CSV - {e.Message}");
+                _logger.LogError(e.StackTrace);
+                return null;
+            }
+
+            var lineStream = new MemoryStream();
+            var writer = new StreamWriter(lineStream);
+            await writer.WriteAsync(lines.JoinToString('\n'));
+            await writer.FlushAsync();
+            lineStream.Position = 0;
+
+            return lineStream;
         }
     }
 }

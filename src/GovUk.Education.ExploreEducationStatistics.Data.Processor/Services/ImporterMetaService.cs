@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -12,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public enum MetaColumns {
         col_name,
         col_type,
@@ -32,9 +34,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _guidGenerator = guidGenerator;
         }
 
-        public SubjectMeta Import(DataColumnCollection cols, DataRowCollection rows, Subject subject, StatisticsDbContext context)
+        public SubjectMeta Import(
+            List<string> metaFileCsvHeaders,
+            List<List<string>> metaFileRows, 
+            Subject subject,
+            StatisticsDbContext context)
         {
-            var metaRows = GetMetaRows(CsvUtil.GetColumnValues(cols), rows);
+            var metaRows = GetMetaRows(metaFileCsvHeaders, metaFileRows);
             var filters = ImportFilters(metaRows, subject, context).ToList();
             var indicators = ImportIndicators(metaRows, subject, context).ToList();
             
@@ -45,9 +51,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             };
         }
 
-        public SubjectMeta Get(DataColumnCollection cols, DataRowCollection rows, Subject subject, StatisticsDbContext context)
+        public SubjectMeta Get(
+            List<string> metaFileCsvHeaders,
+            List<List<string>> metaFileRows, 
+            Subject subject,
+            StatisticsDbContext context)
         {
-            var metaRows = GetMetaRows(CsvUtil.GetColumnValues(cols), rows);
+            var metaRows = GetMetaRows(metaFileCsvHeaders, metaFileRows);
             var filters = GetFilters(metaRows, subject, context).ToList();
             var indicators = GetIndicators(metaRows, subject, context).ToList();
             
@@ -58,33 +68,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             };
         }
 
-        private static IEnumerable<MetaRow> GetMetaRows(
+        private static List<MetaRow> GetMetaRows(
             List<string> cols,
-            DataRowCollection rows)
+            List<List<string>> metaFileRows)
         {
-            List<MetaRow> metaRows = new List<MetaRow>();
-            foreach (DataRow row in rows)
-            {
-                metaRows.Add(GetMetaRow(cols, row));
-            }
-
-            return metaRows;
-        }
-
-        public static MetaRow GetMetaRow(List<string> cols, DataRow row)
-        {
-            return CsvUtil.BuildType(CsvUtil.GetRowValues(row), 
-                cols, Enum.GetNames(typeof(MetaColumns)), values => new MetaRow
-            {
-                ColumnName = values[0],
-                ColumnType = (ColumnType) Enum.Parse(typeof(ColumnType), values[1]),
-                Label = values[2],
-                FilterGroupingColumn = values[3],
-                FilterHint = values[4],
-                IndicatorGrouping = values[5],
-                IndicatorUnit = EnumUtil.GetFromString<Unit>(values[6] ?? ""),
-                DecimalPlaces = values[7] == null ? (int?) null : int.Parse(values[7])
-            });
+            return metaFileRows.Select(row => GetMetaRow(cols, row)).ToList();
         }
 
         public static MetaRow GetMetaRow(List<string> cols, List<string> cells)
@@ -102,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     FilterHint = values[4],
                     IndicatorGrouping = values[5],
                     IndicatorUnit = EnumUtil.GetFromString<Unit>(values[6] ?? ""),
-                    DecimalPlaces = values[7] == null ? (int?) null : int.Parse(values[7])
+                    DecimalPlaces = values[7] == null ? null : int.Parse(values[7])
                 });
         }
 

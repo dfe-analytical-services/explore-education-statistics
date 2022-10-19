@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -25,23 +24,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
             return csvReader.Context.Record.ToList();
         }
         
+        public static async Task<List<List<string>>> GetCsvRows(
+            Func<Task<Stream>> streamProvider,
+            bool skipHeaderRow = true)
+        {
+            return (await Select(streamProvider, (cells, _) => cells, skipHeaderRow)).ToList();
+        }
+        
         public static async Task<int> GetTotalRows(
             Func<Task<Stream>> streamProvider,
             bool skipHeaderRow = true)
         {
-            using var dataFileReader = new StreamReader(await streamProvider.Invoke());
-            using var csvReader = new CsvReader(dataFileReader, CultureInfo.InvariantCulture);
-            
+            using var streamReader = new StreamReader(await streamProvider.Invoke());
+
             var totalRows = 0;
 
-            while (await csvReader.ReadAsync())
+            while (!streamReader.EndOfStream)
             {
+                await streamReader.ReadLineAsync();
                 totalRows++;
             }
 
-            return totalRows + (skipHeaderRow ? -1 : 0);
+            return skipHeaderRow ? totalRows - 1 : totalRows;
         }
 
+        // TODO EES-3798 - CancellationToken?
         public static async Task ForEachRow(
             Func<Task<Stream>> streamProvider,
             Func<List<string>, int, Task<bool>> action,
@@ -107,6 +114,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
                 return Task.FromResult(true);
             }, skipHeaderRow);
         }
+
+        public static async Task<List<TResult>> Select<TResult>(
+            Func<Task<Stream>> streamProvider,
+            Func<List<string>, int, Task<TResult>> action,
+            bool skipHeaderRow = true)
+        {
+            var list = new List<TResult>();
+
+            await ForEachRow(streamProvider, async (cells, index) =>
+            {
+                list.Add(await action.Invoke(cells, index));
+            }, skipHeaderRow);
+
+            return list;
+        }
+        
+        public static Task<List<TResult>> Select<TResult>(
+            Func<Task<Stream>> streamProvider,
+            Func<List<string>, int, TResult> action,
+            bool skipHeaderRow = true)
+        {
+            return Select(streamProvider, (cells, index) =>
+            {
+                var result = action.Invoke(cells, index);
+                return Task.FromResult(result);
+            }, skipHeaderRow);
+        }
             
         public static T BuildType<T>(IReadOnlyList<string> rowValues, List<string> colValues, string column,
             Func<string, T> func)
@@ -130,16 +164,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
         public static string Value(IReadOnlyList<string> rowValues, List<string> colValues, string column)
         {
             return colValues.Contains(column) ? rowValues[colValues.FindIndex(h => h.Equals(column))].Trim().NullIfWhiteSpace() : null;
-        }
-
-        public static List<string> GetColumnValues(DataColumnCollection cols)
-        {
-            return cols.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
-        }
-
-        public static List<string> GetRowValues(DataRow row)
-        {
-            return row.ItemArray.Select(x => x?.ToString()).ToList();
         }
 
         public static GeographicLevel GetGeographicLevel(IReadOnlyList<string> rowValues, List<string> colValues)
