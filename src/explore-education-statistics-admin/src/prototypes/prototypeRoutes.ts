@@ -26,6 +26,7 @@ import PrototypeFindStats4 from './PrototypeFindStats4';
 import PrototypeFindStats5 from './PrototypeFindStats5';
 import PrototypeFindStats6 from './PrototypeFindStats6';
 import PrototypeTableTool from './PrototypeTableToolPage';
+import PrototypeTableHighlightsV2 from './PrototypeTableHighlightsUpdateV2';
 
 interface PrototypeRoute extends RouteProps {
   name: string;
@@ -167,6 +168,11 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'Table tool',
     path: '/prototypes/table-tool',
     component: PrototypeTableTool,
+  },
+  {
+    name: 'Table tool highlights V2',
+    path: '/prototypes/table-highlights-2',
+    component: PrototypeTableHighlightsV2,
   },
 ];
 
