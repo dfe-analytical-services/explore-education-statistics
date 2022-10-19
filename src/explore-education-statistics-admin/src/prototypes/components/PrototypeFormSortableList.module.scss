@@ -1,0 +1,118 @@
+@import '~govuk-frontend/govuk/base';
+
+.focusContainer {
+  outline: 0;
+}
+
+.list {
+  max-height: 40vh;
+  outline: $govuk-focus-width solid $govuk-focus-colour;
+  outline-offset: 0;
+  overflow: auto;
+}
+
+.isDraggingOver {
+  background: govuk-colour('yellow');
+}
+
+.option {
+  background: govuk-colour('white');
+  border-bottom: 1px solid govuk-colour('mid-grey');
+  padding: govuk-spacing(2);
+  user-select: none;
+
+  &:hover {
+    background: govuk-colour('light-grey');
+    // Fallback if grab is unsupported
+    cursor: move;
+    cursor: grab;
+  }
+
+  &:focus {
+    outline: $govuk-focus-colour solid $govuk-focus-width;
+    outline-offset: $govuk-focus-width * -1;
+  }
+
+  .isDraggingOver & {
+    background: transparent;
+  }
+
+  &.isDragging,
+  &.isSelected {
+    background: govuk-colour('white');
+    border-bottom: transparent;
+    outline: govuk-colour('blue') solid $govuk-focus-width;
+  }
+
+  &.isSelected:not(.isDragging) {
+    background: govuk-colour('blue');
+    color: govuk-colour('white');
+  }
+}
+
+.isGhosted {
+  opacity: 0.5;
+}
+
+.isDraggedOutside {
+  border: 0;
+  opacity: 0.2;
+  outline: none;
+}
+
+.dragIcon {
+  display: block;
+  fill: currentColor;
+  flex-shrink: 0;
+  height: 1rem;
+  margin-top: 0.2rem;
+  width: 1rem;
+}
+
+.optionLabel {
+  display: flex;
+  justify-content: space-between;
+  word-break: break-word;
+}
+
+.selectedCount {
+  align-items: center;
+  background: govuk-colour('yellow');
+  border: $govuk-focus-width solid govuk-colour('black');
+  color: govuk-colour('black');
+  display: flex;
+  justify-content: center;
+  padding: govuk-spacing(1) govuk-spacing(2);
+  position: absolute;
+  right: -#{govuk-spacing(5)};
+  top: -#{govuk-spacing(5)};
+}
+
+.readOnlyHeading {
+  display: flex;
+  justify-content: space-between;
+}
+
+.readOnlyList {
+  padding: 0;
+
+  &.noLastItem {
+    padding-bottom: 24px;
+  }
+}
+
+.readOnlyItem {
+  border-bottom: 1px solid govuk-colour('mid-grey');
+  list-style: none;
+  margin: 0;
+  overflow: hidden;
+  padding: govuk-spacing(2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.readOnlyLastItem {
+  border: 0;
+  padding: govuk-spacing(1) 0 0;
+  text-align: center;
+}

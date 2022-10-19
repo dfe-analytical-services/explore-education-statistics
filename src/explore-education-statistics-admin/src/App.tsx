@@ -89,6 +89,8 @@ function App() {
                         <ProtectedRoute key={key} {...route} />
                       ))}
 
+                      {/* Prototype pages are protected by default. To open them up change the ProtectedRoute to: */}
+                      {/* <Route path="/prototypes" component={PrototypesEntry} /> */}
                       <ProtectedRoute
                         path="/prototypes"
                         protectionAction={user =>
