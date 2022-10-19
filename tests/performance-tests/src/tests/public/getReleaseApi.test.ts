@@ -40,7 +40,7 @@ const performTest = () => {
   let response;
   try {
     response = http.get(
-      `${environmentAndUsers.environment.contentApiUrl}/publications/release-cache-blob-test-3-publication/releases/2001-02`,
+      `${environmentAndUsers.environment.contentApiUrl}/publications/pupil-absence-in-schools-in-england/releases/2016-17`,
       {
         timeout: '120s',
       },
@@ -59,7 +59,7 @@ const performTest = () => {
     }) &&
     check(response, {
       'response contains expected text': res =>
-        res.html().text().includes('Release cache blob test 3 publication'),
+        res.html().text().includes('Pupil absence in schools in England'),
     })
   ) {
     console.log('SUCCESS!');
