@@ -1,0 +1,118 @@
+@import '~govuk-frontend/govuk/base';
+
+$group-width: 320px;
+
+.container {
+  background-color: govuk-colour('white');
+  border: 2px solid govuk-colour('mid-grey');
+  overflow-x: auto;
+  padding: govuk-spacing(2);
+  position: relative;
+  width: 100%;
+
+  + .container {
+    border-top: 0;
+  }
+
+  &.dragActive {
+    background-color: $govuk-focus-colour;
+    border-color: govuk-colour('dark-grey');
+  }
+}
+
+.groupsContainer {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+
+  @include govuk-media-query($from: desktop) {
+    flex-direction: row;
+  }
+}
+
+.groupContainer {
+  padding: govuk-spacing(1);
+}
+
+.group {
+  background: govuk-colour('light-grey');
+  border: 2px solid govuk-colour('mid-grey');
+  border-bottom: 0;
+  box-sizing: border-box;
+  display: block;
+  padding: govuk-spacing(2);
+  position: relative;
+
+  @include govuk-media-query($from: desktop) {
+    width: $group-width;
+  }
+
+  legend {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+.dragActive .group {
+  border-bottom: 2px solid govuk-colour('mid-grey');
+}
+
+.dragIcon {
+  display: none;
+}
+
+.groupIsActive {
+  &:focus-visible {
+    outline: $govuk-focus-colour solid $govuk-focus-width;
+  }
+
+  &:hover {
+    background: govuk-colour('light-grey');
+    // Fallback if grab is unsupported
+    cursor: move;
+    cursor: grab;
+  }
+
+  &.isDragging {
+    background: govuk-colour('white');
+    border-color: govuk-colour('black');
+    outline: $govuk-focus-width solid govuk-colour('blue');
+  }
+
+  .dragIcon {
+    display: block;
+    fill: currentColor;
+    flex-shrink: 0;
+    height: 1rem;
+    margin-top: 0.2rem;
+    width: 1rem;
+  }
+}
+
+.isDraggedOutside {
+  opacity: 0.4;
+  outline: none;
+}
+
+.buttonsContainer {
+  background: govuk-colour('light-grey');
+  border: 2px solid govuk-colour('mid-grey');
+  border-top: 0;
+  box-sizing: border-box;
+  display: flex;
+  padding: govuk-spacing(2);
+
+  @include govuk-media-query($from: desktop) {
+    width: $group-width;
+  }
+
+  button {
+    flex-grow: 1;
+    margin-bottom: 0;
+  }
+}
+
+.moveButton {
+  margin-left: govuk-spacing(2);
+}
