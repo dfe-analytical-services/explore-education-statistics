@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     public class UpdateContactAuthorizationHandlerTests
     {
         [Fact]
-        public async Task CanUpdateAllPublicationsContactAuthorizationHandler_SucceedsWithClaim()
+        public async Task CanUpdateAllContactAuthorizationHandler_SucceedsWithClaim()
         {
             await AssertHandlerSucceedsWithCorrectClaims<Publication, UpdateContactRequirement>(
                 CreateHandler,
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         [Fact]
-        public async Task CanUpdateAllPublicationsContactAuthorizationHandler_SucceedsWithPublicationOwner()
+        public async Task CanUpdateAllContactAuthorizationHandler_SucceedsWithPublicationOwner()
         {
             await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdateContactRequirement>(
                 CreateHandler, Owner);

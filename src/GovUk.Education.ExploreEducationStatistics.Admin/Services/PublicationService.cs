@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return await publications
                         .ToAsyncEnumerable()
-                        .SelectAwait(async publication => await GeneratePublicationViewModel(publication, false))
+                        .SelectAwait(async publication => await GeneratePublicationViewModel(publication))
                         .OrderBy(publicationViewModel => publicationViewModel.Title)
                         .ToListAsync();
                 });
@@ -469,7 +469,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ThenInclude(topic => topic.Theme);
         }
 
-        private async Task<PublicationViewModel> GeneratePublicationViewModel(Publication publication, bool includePermissions)
+        private async Task<PublicationViewModel> GeneratePublicationViewModel(Publication publication,
+            bool includePermissions = false)
         {
             var publicationViewModel = _mapper.Map<PublicationViewModel>(publication);
 

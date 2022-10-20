@@ -9,7 +9,6 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
@@ -30,26 +29,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userPublicationRoles = new List<UserPublicationRole>();
 
             // Set up a publication and releases related to the topic that will be granted via different release roles
-
             var relatedPublication1 = new Publication
             {
                 Title = "Related publication 1",
                 Topic = topic,
             };
-
             userReleaseRoles.AddRange(new List<UserReleaseRole>
             {
-                new()
-                {
-                    Release = new Release
-                    {
-                        ReleaseName = "2011",
-                        TimePeriodCoverage = AcademicYear,
-                        Publication = relatedPublication1
-                    },
-                    User = user,
-                    Role = Contributor
-                },
                 new()
                 {
                     Release = new Release
@@ -61,40 +47,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     User = user,
                     Role = Viewer
                 },
-                new()
-                {
-                    Release = new Release
-                    {
-                        ReleaseName = "2013",
-                        TimePeriodCoverage = AcademicYear,
-                        Publication = relatedPublication1
-                    },
-                    User = user,
-                    Role = PrereleaseViewer
-                }
             });
 
             // Set up a publication and releases related to the topic that will be granted via the Publication
             // Owner role
-
             userPublicationRoles.Add(new UserPublicationRole
             {
                 Publication = new Publication
                 {
                     Title = "Related publication 2",
-                    Releases = new List<Release>
-                    {
-                        new()
-                        {
-                            ReleaseName = "2015",
-                            TimePeriodCoverage = AcademicYear
-                        },
-                        new()
-                        {
-                            ReleaseName = "2016",
-                            TimePeriodCoverage = AcademicYear
-                        }
-                    },
                     Topic = topic,
                 },
                 User = user,
@@ -103,115 +64,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             // Set up a publication and releases related to the topic that will be granted via the Publication
             // ReleaseApprover role
-
             userPublicationRoles.Add(new UserPublicationRole
             {
                 Publication = new Publication
                 {
                     Title = "Related publication 3",
-                    Releases = new List<Release>
-                    {
-                        new()
-                        {
-                            ReleaseName = "2015",
-                            TimePeriodCoverage = AcademicYear
-                        },
-                        new()
-                        {
-                            ReleaseName = "2016",
-                            TimePeriodCoverage = AcademicYear
-                        }
-                    },
                     Topic = topic,
-                },
-                User = user,
-                Role = ReleaseApprover
-            });
-
-            // Set up a publication and release related to the topic that will be granted solely via the PrereleaseViewer role
-
-            userReleaseRoles.Add(new UserReleaseRole
-            {
-                Release = new Release
-                {
-                    ReleaseName = "2014",
-                    TimePeriodCoverage = AcademicYear,
-                    Publication = new Publication
-                    {
-                        Title = "Related publication 4",
-                        Topic = topic,
-                    }
-                },
-                User = user,
-                Role = PrereleaseViewer
-            });
-
-            // Set up a publication and release unrelated to the topic that will be granted via a release role
-
-            userReleaseRoles.Add(new UserReleaseRole
-            {
-                Release = new Release
-                {
-                    ReleaseName = "2011",
-                    TimePeriodCoverage = AcademicYear,
-                    Publication = new Publication
-                    {
-                        Title = "Unrelated publication 1",
-                        Topic = new Topic
-                        {
-                            Theme = new Theme(),
-                        },
-                    }
-                },
-                User = user,
-                Role = Contributor
-            });
-
-            // Set up publication and release unrelated to the topic that will be granted via the Publication
-            // Owner role
-
-            userPublicationRoles.Add(new UserPublicationRole
-            {
-                Publication = new Publication
-                {
-                    Title = "Unrelated publication 2",
-                    Releases = new List<Release>
-                    {
-                        new()
-                        {
-                            ReleaseName = "2012",
-                            TimePeriodCoverage = AcademicYear
-                        }
-                    },
-                    Topic = new Topic
-                    {
-                        Theme = new Theme(),
-                    },
-                },
-                User = user,
-                Role = Owner
-            });
-
-            // Set up publication and release unrelated to the topic that will be granted via the Publication
-            // ReleaseApprover role
-
-            userPublicationRoles.Add(new UserPublicationRole
-            {
-                Publication = new Publication
-                {
-                    Title = "Unrelated publication 3",
-                    Releases = new List<Release>
-                    {
-                        new()
-                        {
-                            ReleaseName = "2012",
-                            TimePeriodCoverage = AcademicYear
-                        }
-                    },
-                    Topic = new Topic
-                    {
-                        Theme = new Theme(),
-                    },
                 },
                 User = user,
                 Role = ReleaseApprover
@@ -241,17 +99,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("Related publication 2", result[0].Title);
                 Assert.Empty(result[0].Releases);  // ListPublicationsForUser doesn't hydrate releases
+                Assert.Empty(result[0].Methodologies); // ListPublicationsForUser doesn't hydrate methodologies
 
                 Assert.Equal("Related publication 3", result[1].Title);
-                Assert.Empty(result[1].Releases);  // ListPublicationsForUser doesn't hydrate releases
+                Assert.Empty(result[1].Releases);
+                Assert.Empty(result[1].Methodologies);
 
                 Assert.Equal("Related publication 1", result[2].Title);
-                Assert.Empty(result[2].Releases);  // ListPublicationsForUser doesn't hydrate releases
+                Assert.Empty(result[2].Releases);
+                Assert.Empty(result[2].Methodologies);
             }
         }
 
         [Fact]
-        public async Task ListPublicationsForUser_NoTopic()
+        public async Task ListPublicationsForUser_NoTopicIdProvided()
         {
             var user = new User();
 
@@ -262,19 +123,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Publication = new Publication
                     {
                         Title = "Publication Owner publication",
-                        Releases = new List<Release>
-                        {
-                            new()
-                            {
-                                ReleaseName = "2015",
-                                TimePeriodCoverage = AcademicYear,
-                            },
-                            new()
-                            {
-                                ReleaseName = "2016",
-                                TimePeriodCoverage = AcademicYear,
-                            }
-                        },
                         Topic = new Topic { Theme = new Theme(), },
                     },
                     User = user,
@@ -285,19 +133,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Publication = new Publication
                     {
                         Title = "Publication ReleaseApprover publication",
-                        Releases = new List<Release>
-                        {
-                            new()
-                            {
-                                ReleaseName = "2015",
-                                TimePeriodCoverage = AcademicYear,
-                            },
-                            new()
-                            {
-                                ReleaseName = "2016",
-                                TimePeriodCoverage = AcademicYear,
-                            }
-                        },
                         Topic = new Topic { Theme = new Theme(), },
                     },
                     User = user,
@@ -308,14 +143,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Publication = new Publication
                     {
                         Title = "Publication Owner publication 2",
-                        Releases = new List<Release>
-                        {
-                            new()
-                            {
-                                ReleaseName = "2012",
-                                TimePeriodCoverage = AcademicYear,
-                            }
-                        },
                         Topic = new Topic
                         {
                             Theme = new Theme(),
@@ -405,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = new PublicationRepository(contentDbContext);
-                var result = await service.ListPublicationsForUser(user.Id);
+                var result = await service.ListPublicationsForUser(user.Id, topicId: null);
 
                 // Result should contain all publications except the one associated with the
                 // Release.PrereleaseViewer role
@@ -430,119 +257,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("Release Contributor publication 2", result[5].Title);
                 Assert.Empty(result[5].Releases);
-            }
-        }
-
-        [Fact]
-        public async Task ListPublicationsForUser_MethodologiesNotHydrated()
-        {
-            var user = new User();
-            var topic = new Topic
-            {
-                Theme = new Theme(),
-            };
-
-            var methodology1Id = Guid.NewGuid();
-            var methodology2Id = Guid.NewGuid();
-            var methodology3Version0Id = Guid.NewGuid();
-            var methodology3Version1Id = Guid.NewGuid();
-
-            // Set up a publication related to the topic granted via a publication role
-            // Include a mix of owned and adopted methodologies that are deliberately not in any title order
-            var userPublicationRoles = new List<UserPublicationRole>
-            {
-                new()
-                {
-                    Publication = new Publication
-                    {
-                        Title = "Related publication",
-                        Methodologies = new List<PublicationMethodology>
-                        {
-                            new()
-                            {
-                                Owner = false,
-                                Methodology = new Methodology
-                                {
-                                    Versions = new List<MethodologyVersion>
-                                    {
-                                        new()
-                                        {
-                                            Id = methodology2Id,
-                                            AlternativeTitle = "Methodology 2",
-                                            Version = 0,
-                                            Status = Draft
-                                        }
-                                    }
-                                }
-                            },
-                            new()
-                            {
-                                Owner = true,
-                                Methodology = new Methodology
-                                {
-                                    Versions = new List<MethodologyVersion>
-                                    {
-                                        new()
-                                        {
-                                            Id = methodology1Id,
-                                            AlternativeTitle = "Methodology 1",
-                                            Version = 0,
-                                            Status = Draft
-                                        }
-                                    }
-                                }
-                            },
-                            new()
-                            {
-                                Owner = false,
-                                Methodology = new Methodology
-                                {
-                                    Versions = new List<MethodologyVersion>
-                                    {
-                                        new()
-                                        {
-                                            Id = methodology3Version0Id,
-                                            AlternativeTitle = "Methodology 3 Version 0",
-                                            Version = 0,
-                                            Status = Approved
-                                        },
-                                        new()
-                                        {
-                                            Id = methodology3Version1Id,
-                                            AlternativeTitle = "Methodology 3 Version 1",
-                                            Version = 1,
-                                            Status = Approved,
-                                            PreviousVersionId = methodology3Version0Id
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        Topic = topic
-                    },
-                    User = user,
-                    Role = Owner
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
-            {
-                await contentDbContext.Users.AddAsync(user);
-                await contentDbContext.Topics.AddAsync(topic);
-                await contentDbContext.UserPublicationRoles.AddRangeAsync(userPublicationRoles);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
-            {
-                var service = new PublicationRepository(contentDbContext);
-                var result = await service.ListPublicationsForUser(user.Id, topic.Id);
-
-                var publication = Assert.Single(result);
-                Assert.NotNull(publication);
-                Assert.Empty(publication.Methodologies);  // ListPublicationsForUser doesn't hydrate methodologies
             }
         }
 
@@ -673,70 +387,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.ListPublicationsForUser(user.Id, topic.Id);
 
                 Assert.Empty(result);
-            }
-        }
-
-        [Fact]
-        public async Task ListPublicationsForUser_PublicationHasNoReleases()
-        {
-            var user = new User();
-            var topic = new Topic
-            {
-                Theme = new Theme(),
-            };
-
-
-            // Check publications granted via the owner role are still returned when they contain no releases
-            // Set up publications without any releases, one for this topic and one for a different topic
-
-            var userPublicationRoles = new List<UserPublicationRole>
-            {
-                new()
-                {
-                    Publication = new Publication
-                    {
-                        Title = "Related publication 1",
-                        Releases = new List<Release>(),
-                        Topic = topic,
-                    },
-                    User = user,
-                    Role = Owner
-                },
-                new()
-                {
-                    Publication = new Publication
-                    {
-                        Title = "Unrelated publication 1",
-                        Releases = new List<Release>(),
-                        Topic = new Topic
-                        {
-                            Theme = new Theme(),
-                        },
-                    },
-                    User = user,
-                    Role = Owner
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
-            {
-                await contentDbContext.Users.AddAsync(user);
-                await contentDbContext.Topics.AddAsync(topic);
-                await contentDbContext.UserPublicationRoles.AddRangeAsync(userPublicationRoles);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
-            {
-                var service = new PublicationRepository(contentDbContext);
-                var result = await service.ListPublicationsForUser(user.Id, topic.Id);
-
-                // Result should contain the publication related to this topic
-                var publication = Assert.Single(result);
-                Assert.Equal("Related publication 1", publication.Title);
-                Assert.Empty(publication.Releases);
             }
         }
 

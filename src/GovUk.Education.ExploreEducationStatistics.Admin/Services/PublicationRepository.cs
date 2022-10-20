@@ -75,7 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // Add publication view models for the Publications granted directly via Publication roles
             publications.AddRange(await publicationsGrantedByPublicationRole
                 .SelectAsync(async publication =>
-                    // Include all Releases of the Publication unconditionally
                     await HydratePublication(_context.Publications)
                         .FirstAsync(p => p.Id == publication.Id)));
 

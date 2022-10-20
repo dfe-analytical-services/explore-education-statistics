@@ -1,3 +1,4 @@
+#nullable enable
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -30,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 context.Succeed(summaryRequirement);
                 return;
             }
-                        
+
             if (await _authorizationHandlerResourceRoleService
                     .HasRolesOnPublication(
                         context.User.GetUserId(),

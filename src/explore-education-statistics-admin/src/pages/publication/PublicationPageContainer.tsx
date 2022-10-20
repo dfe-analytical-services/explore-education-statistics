@@ -64,26 +64,21 @@ const PublicationPageContainer = ({
   );
 
   const getNavRoutes = () => {
-    let finalNavRoutes = navRoutes;
-    if (
-      !publication?.permissions?.canUpdatePublication &&
-      !publication?.permissions?.canUpdatePublicationSummary
-    ) {
-      finalNavRoutes = finalNavRoutes.filter(
-        route => route !== publicationDetailsRoute,
-      );
-    }
-    if (!publication?.permissions?.canUpdateContact) {
-      finalNavRoutes = finalNavRoutes.filter(
-        route => route !== publicationContactRoute,
-      );
-    }
-    if (!publication?.permissions?.canUpdateContributorReleaseRole) {
-      finalNavRoutes = finalNavRoutes.filter(
-        route => route !== publicationTeamAccessRoute,
-      );
-    }
-    return finalNavRoutes;
+    return navRoutes.filter(route => {
+      switch (route) {
+        case publicationDetailsRoute:
+          return (
+            publication?.permissions?.canUpdatePublication ||
+            publication?.permissions?.canUpdatePublicationSummary
+          );
+        case publicationContactRoute:
+          return publication?.permissions?.canUpdateContact;
+        case publicationTeamAccessRoute:
+          return publication?.permissions?.canUpdateContributorReleaseRole;
+        default:
+          return true;
+      }
+    });
   };
 
   return (
