@@ -1,8 +1,12 @@
 import classNames from 'classnames';
+import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
+import Details from '@common/components/Details';
 import PageTitle from '@admin/components/PageTitle';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
-import React from 'react';
+import PrototypeGridView from '@admin/prototypes/components/PrototypeGridView';
+import PrototypeChevronCard from '@admin/prototypes/components/PrototypeChevronCard';
+import React, { useState } from 'react';
 import stylesWiz from '@common/modules/table-tool/components/Wizard.module.scss';
 import stylesStep from '@common/modules/table-tool/components/WizardStep.module.scss';
 import stylesWizSummary from '@common/modules/table-tool/components/WizardStepSummary.module.scss';
@@ -12,14 +16,17 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import stylesPublicView from './PrototypePublicPage.module.scss';
 
 const styles = {
-  ...stylesWizSummary,
   ...stylesPublicView,
   ...stylesWiz,
   ...stylesStep,
   ...stylesStepHeading,
+  ...stylesWizSummary,
 };
 
 const PrototypeTableHighlights = () => {
+  const [dataset, setDataset] = useState('');
+  const [datasetValue, setDatasetValue] = useState('');
+
   return (
     <div
       className={classNames(
@@ -50,7 +57,10 @@ const PrototypeTableHighlights = () => {
               tabIndex={-1}
             >
               <div className={classNames(styles.content, styles.contentSmall)}>
-                <div className={styles.container}>
+                <div
+                  className={styles.container}
+                  style={{ borderBottom: '2px solid #f3f2f1' }}
+                >
                   <div className={styles.content}>
                     <h2 className={styles.stepEnabled}>
                       <span className="govuk-tag govuk-tag govuk-tag--grey">
@@ -66,12 +76,20 @@ const PrototypeTableHighlights = () => {
                       </SummaryListItem>
                     </SummaryList>
                   </div>
+                  <div className={styles.goToContainer}>
+                    <ButtonText
+                      className={classNames(
+                        styles.goToButton,
+                        'govuk-!-margin-right-6',
+                      )}
+                    >
+                      View
+                    </ButtonText>
+                    <ButtonText className={styles.goToButton}>
+                      Change
+                    </ButtonText>
+                  </div>
                 </div>
-              </div>
-              <div className={styles.goToContainer}>
-                <ButtonText className={styles.goToButton}>
-                  Change publication
-                </ButtonText>
               </div>
             </li>
             <li
@@ -84,17 +102,19 @@ const PrototypeTableHighlights = () => {
               <div className={classNames(styles.content, styles.contentSmall)}>
                 <div className={styles.container} style={{ flexWrap: 'wrap' }}>
                   <div className={styles.content}>
-                    <h2 className="govuk-heading-l dfe-flex dfe-align-items--center govuk-fieldset__heading">
+                    <h2 className={styles.stepEnabled}>
                       <span className="govuk-tag govuk-tag govuk-tag--turquoise govuk-!-margin-right-2">
                         Step 2
                       </span>
-                      <span className="govuk-heading-m govuk-!-margin-0">
-                        Choose a dataset
-                      </span>
                     </h2>
+                    <SummaryList noBorder>
+                      <SummaryListItem term="Datasets">
+                        <h3>{datasetValue || 'Please select a dataset'}</h3>
+                      </SummaryListItem>
+                    </SummaryList>
                   </div>
                   <form
-                    className="govuk-!-margin-top-3"
+                    className="govuk-!-margin-4"
                     style={{ flex: '0 0 100%' }}
                   >
                     <div className="govuk-grid-row">
@@ -104,20 +124,25 @@ const PrototypeTableHighlights = () => {
                             <legend
                               className={classNames(
                                 'govuk-fieldset__legend',
-                                'govuk-fieldset__legend--m',
+                                'govuk-fieldset__legend--s',
                                 'govuk-!-margin-bottom-6',
-                                'govuk-visually-hidden',
                               )}
                             >
-                              Choose a dataset
+                              Select a dataset
                             </legend>
-                            <div className="govuk-radios">
+                            <div className="govuk-radios govuk-radios--small">
                               <div className="govuk-radios__item">
                                 <input
                                   type="radio"
                                   className="govuk-radios__input"
                                   name="subject"
                                   id="subject-1"
+                                  onClick={() => {
+                                    setDatasetValue(
+                                      'Annual Headlines - detailed series',
+                                    );
+                                    setDataset('subject-1');
+                                  }}
                                 />
                                 <label
                                   className={classNames(
@@ -135,6 +160,12 @@ const PrototypeTableHighlights = () => {
                                   className="govuk-radios__input"
                                   name="subject"
                                   id="subject-2"
+                                  onClick={() => {
+                                    setDatasetValue(
+                                      'Apprenticeship Achievement Rates Demographics',
+                                    );
+                                    setDataset('subject-2');
+                                  }}
                                 />
                                 <label
                                   className={classNames(
@@ -152,6 +183,12 @@ const PrototypeTableHighlights = () => {
                                   className="govuk-radios__input"
                                   name="subject"
                                   id="subject-3"
+                                  onClick={() => {
+                                    setDatasetValue(
+                                      'Apprenticeship Achievement Rates  DetailedSeries',
+                                    );
+                                    setDataset('subject-3');
+                                  }}
                                 />
                                 <label
                                   className={classNames(
@@ -181,15 +218,248 @@ const PrototypeTableHighlights = () => {
                                   Apprenticeship Achievement Rates Headlines
                                 </label>
                               </div>
+                              <div className="govuk-radios__item">
+                                <input
+                                  type="radio"
+                                  className="govuk-radios__input"
+                                  name="subject"
+                                  id="subject-5"
+                                />
+                                <label
+                                  className={classNames(
+                                    'govuk-label',
+                                    'govuk-radios__label',
+                                  )}
+                                  htmlFor="subject-5"
+                                >
+                                  Apprenticeship Service - incentives
+                                </label>
+                              </div>
+                              <div className="govuk-radios__item">
+                                <input
+                                  type="radio"
+                                  className="govuk-radios__input"
+                                  name="subject"
+                                  id="subject-6"
+                                />
+                                <label
+                                  className={classNames(
+                                    'govuk-label',
+                                    'govuk-radios__label',
+                                  )}
+                                  htmlFor="subject-6"
+                                >
+                                  Charts data
+                                </label>
+                              </div>
+                              <div className="govuk-radios__item">
+                                <input
+                                  type="radio"
+                                  className="govuk-radios__input"
+                                  name="subject"
+                                  id="subject-7"
+                                />
+                                <label
+                                  className={classNames(
+                                    'govuk-label',
+                                    'govuk-radios__label',
+                                  )}
+                                  htmlFor="subject-7"
+                                >
+                                  Duration, planned length of stay and length of
+                                  employment
+                                </label>
+                              </div>
+                              <div className="govuk-radios__item">
+                                <input
+                                  type="radio"
+                                  className="govuk-radios__input"
+                                  name="subject"
+                                  id="subject-8"
+                                />
+                                <label
+                                  className={classNames(
+                                    'govuk-label',
+                                    'govuk-radios__label',
+                                  )}
+                                  htmlFor="subject-8"
+                                >
+                                  Find an apprenticeship adverts and vacancies
+                                </label>
+                              </div>
+                              <div className="govuk-radios__item">
+                                <input
+                                  type="radio"
+                                  className="govuk-radios__input"
+                                  name="subject"
+                                  id="subject-9"
+                                />
+                                <label
+                                  className={classNames(
+                                    'govuk-label',
+                                    'govuk-radios__label',
+                                  )}
+                                  htmlFor="subject-9"
+                                >
+                                  Geographical breakdowns - detailed (reported
+                                  to date)
+                                </label>
+                              </div>
                             </div>
                           </fieldset>
                         </div>
                       </div>
                       <div className="govuk-grid-column-three-quarters">
-                        <h3>
-                          Dataset: Apprenticeship Achievement Rates Detailed
-                          Series
-                        </h3>
+                        {dataset === 'subject-1' && (
+                          <div className="govuk-!-margin-3">
+                            <SummaryList
+                              noBorder
+                              className="govuk-!-margin-2 govuk-!-margin-bottom-9"
+                            >
+                              <SummaryListItem term="Geographic levels">
+                                National
+                              </SummaryListItem>
+                              <SummaryListItem term="Time period">
+                                2014/15 to 2020/21
+                              </SummaryListItem>
+                              <SummaryListItem term="Content">
+                                <p>
+                                  Time series of headline apprenticeship figures
+                                </p>
+                                <p>
+                                  Indicators: Starts, Achievements, Learner
+                                  participation, Percentage Starts, Percentage
+                                  Achievements, Percentage Learner participation
+                                </p>
+                              </SummaryListItem>
+                              <SummaryListItem term="Options">
+                                <Button className="govuk-!-margin-right-6">
+                                  Download full dataset (.zip 100mb)
+                                </Button>
+                                <Button>Create your own table</Button>
+                              </SummaryListItem>
+                            </SummaryList>
+
+                            <h3 className="govuk-!-margin-left-3">
+                              Featured tables
+                            </h3>
+                            <PrototypeGridView>
+                              <PrototypeChevronCard
+                                title="Rates by sector subject area and Ethnicity group learners"
+                                description="Apprenticeship achievement rates by sector subject area and Ethnicity group learners"
+                              />
+                            </PrototypeGridView>
+                          </div>
+                        )}
+                        {dataset === 'subject-2' && (
+                          <div className="govuk-!-margin-3">
+                            <SummaryList
+                              noBorder
+                              className="govuk-!-margin-2 govuk-!-margin-bottom-9"
+                            >
+                              <SummaryListItem term="Geographic levels">
+                                National
+                              </SummaryListItem>
+                              <SummaryListItem term="Time period">
+                                2018/19 to 2020/21
+                              </SummaryListItem>
+                              <SummaryListItem term="Content">
+                                <p>
+                                  Apprenticeship national achievement rate
+                                  tables
+                                </p>
+                                <p>
+                                  Indicators: Achievement rate, Achievers,
+                                  Completers, Leavers, Pass rate, Retention rate
+                                </p>
+                                <p>
+                                  Filters: Age, Level, demographic - ethnicity,
+                                  gender and lldd, Standard /Framework
+                                  flag&nbsp;
+                                </p>
+                              </SummaryListItem>
+                              <SummaryListItem term="Options">
+                                <Button className="govuk-!-margin-right-6">
+                                  Download full dataset (.zip 100mb)
+                                </Button>
+                                <Button>Create your own table</Button>
+                              </SummaryListItem>
+                            </SummaryList>
+
+                            <h3 className="govuk-!-margin-left-3">
+                              Featured tables
+                            </h3>
+                            <PrototypeGridView>
+                              <PrototypeChevronCard
+                                title="Rates by sector subject area and Ethnicity group learners"
+                                description="Apprenticeship achievement rates by sector subject area and Ethnicity group learners"
+                              />
+                            </PrototypeGridView>
+                          </div>
+                        )}
+                        {dataset === 'subject-3' && (
+                          <div className="govuk-!-margin-3">
+                            <SummaryList
+                              noBorder
+                              className="govuk-!-margin-2 govuk-!-margin-bottom-9"
+                            >
+                              <SummaryListItem term="Geographic levels">
+                                National
+                              </SummaryListItem>
+                              <SummaryListItem term="Time period">
+                                2018/19 to 2020/21
+                              </SummaryListItem>
+                              <SummaryListItem term="Content">
+                                <p>
+                                  Apprenticeship national achievement rate
+                                  tables
+                                </p>
+                                <p>Academic year: 2018/19 to 2020/21</p>
+                                <p>
+                                  Indicators: Achievement rate, Achievers,
+                                  Completers, Leavers, Pass rate, Retention rate
+                                </p>
+                                <p>
+                                  Filters: Age, Level, demographic - ethnicity,
+                                  gender and lldd, Sector Subject Area, Standard
+                                  /Framework flag
+                                </p>
+                              </SummaryListItem>
+                              <SummaryListItem term="Options">
+                                <Button className="govuk-!-margin-right-6">
+                                  Download full dataset (.zip 100mb)
+                                </Button>
+                                <Button>Create your own table</Button>
+                              </SummaryListItem>
+                            </SummaryList>
+
+                            <h3 className="govuk-!-margin-left-3">
+                              Featured tables
+                            </h3>
+                            <PrototypeGridView>
+                              <PrototypeChevronCard
+                                title="Rates by sector subject area and Ethnicity group learners"
+                                description="Apprenticeship achievement rates by sector subject area and Ethnicity group learners"
+                              />
+                              <PrototypeChevronCard
+                                title="Rates by sector subject area and learners with learning difficulty and or disability"
+                                description="Apprenticeship achievement rates by sector subject area and learners with learning difficulty and or disability"
+                              />
+                              <PrototypeChevronCard
+                                title="Rates demographic summary"
+                                description="All age apprenticeships overall achievement rates demographic summary"
+                              />
+                              <PrototypeChevronCard
+                                title="Rates by level, 2015/16 to 2020/21"
+                                description="Apprenticeship achievements by level, 2015/16 to 2020/21"
+                              />
+                              <PrototypeChevronCard
+                                title="Participation and achievements by age and level"
+                                description="Apprenticeship participation and achievements by age and level, reported to date for 2021/22 with equivalent figures for 2018/19 to 2020/21"
+                              />
+                            </PrototypeGridView>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </form>
