@@ -83,7 +83,7 @@ const PrototypeTableHighlights = () => {
                         'govuk-!-margin-right-6',
                       )}
                     >
-                      View
+                      View publication
                     </ButtonText>
                     <ButtonText className={styles.goToButton}>
                       Change
@@ -109,7 +109,7 @@ const PrototypeTableHighlights = () => {
                     </h2>
                     <SummaryList noBorder>
                       <SummaryListItem term="Datasets">
-                        <h3>{datasetValue || 'Please select a dataset'}</h3>
+                        <h3>{datasetValue || 'No dataset selected'}</h3>
                       </SummaryListItem>
                     </SummaryList>
                   </div>
@@ -131,6 +131,27 @@ const PrototypeTableHighlights = () => {
                               Select a dataset
                             </legend>
                             <div className="govuk-radios govuk-radios--small">
+                              <div className="govuk-radios__item">
+                                <input
+                                  type="radio"
+                                  className="govuk-radios__input"
+                                  name="subject"
+                                  id="subject-all"
+                                  onClick={() => {
+                                    setDatasetValue('All featured tables');
+                                    setDataset('subject-all');
+                                  }}
+                                />
+                                <label
+                                  className={classNames(
+                                    'govuk-label',
+                                    'govuk-radios__label',
+                                  )}
+                                  htmlFor="subject-all"
+                                >
+                                  All featured tables
+                                </label>
+                              </div>
                               <div className="govuk-radios__item">
                                 <input
                                   type="radio"
@@ -345,8 +366,8 @@ const PrototypeTableHighlights = () => {
                             </h3>
                             <PrototypeGridView>
                               <PrototypeChevronCard
-                                title="Rates by sector subject area and Ethnicity group learners"
-                                description="Apprenticeship achievement rates by sector subject area and Ethnicity group learners"
+                                title="Starts by age and level"
+                                description="Annual apprenticeship starts by age and level"
                               />
                             </PrototypeGridView>
                           </div>
@@ -374,8 +395,7 @@ const PrototypeTableHighlights = () => {
                                 </p>
                                 <p>
                                   Filters: Age, Level, demographic - ethnicity,
-                                  gender and lldd, Standard /Framework
-                                  flag&nbsp;
+                                  gender and lldd, Standard /Framework flag;
                                 </p>
                               </SummaryListItem>
                               <SummaryListItem term="Options">
@@ -393,6 +413,18 @@ const PrototypeTableHighlights = () => {
                               <PrototypeChevronCard
                                 title="Rates by sector subject area and Ethnicity group learners"
                                 description="Apprenticeship achievement rates by sector subject area and Ethnicity group learners"
+                              />
+                              <PrototypeChevronCard
+                                title="Rates by sector subject area and gender"
+                                description="All age apprenticeships overall achievement rates demographic summary"
+                              />
+                              <PrototypeChevronCard
+                                title="Rates by sector subject area and learners with learning difficulty and or disability"
+                                description="Apprenticeship achievement rates by sector subject area and learners with learning difficulty and or disability"
+                              />
+                              <PrototypeChevronCard
+                                title="Rates demographic summary"
+                                description="All age apprenticeships overall achievement rates demographic summary"
                               />
                             </PrototypeGridView>
                           </div>
@@ -414,7 +446,6 @@ const PrototypeTableHighlights = () => {
                                   Apprenticeship national achievement rate
                                   tables
                                 </p>
-                                <p>Academic year: 2018/19 to 2020/21</p>
                                 <p>
                                   Indicators: Achievement rate, Achievers,
                                   Completers, Leavers, Pass rate, Retention rate
@@ -438,8 +469,34 @@ const PrototypeTableHighlights = () => {
                             </h3>
                             <PrototypeGridView>
                               <PrototypeChevronCard
+                                title="Achievements by level"
+                                description="Apprenticeship achievements by level, 2015/16 to 2020/21"
+                              />
+                              <PrototypeChevronCard
+                                title="Rates demographic summary"
+                                description="All age apprenticeships overall achievement rates demographic summary"
+                              />
+                              <PrototypeChevronCard
+                                title="Participation and achievements by age and level"
+                                description="Apprenticeship participation and achievements by age and level, reported to date for 2021/22 with equivalent figures for 2018/19 to 2020/21"
+                              />
+                            </PrototypeGridView>
+                          </div>
+                        )}
+                        {dataset === 'subject-all' && (
+                          <div className="govuk-!-margin-3">
+                            <PrototypeGridView>
+                              <PrototypeChevronCard
+                                title="Starts by age and level"
+                                description="Annual apprenticeship starts by age and level"
+                              />
+                              <PrototypeChevronCard
                                 title="Rates by sector subject area and Ethnicity group learners"
                                 description="Apprenticeship achievement rates by sector subject area and Ethnicity group learners"
+                              />
+                              <PrototypeChevronCard
+                                title="Rates by sector subject area and gender"
+                                description="All age apprenticeships overall achievement rates demographic summary"
                               />
                               <PrototypeChevronCard
                                 title="Rates by sector subject area and learners with learning difficulty and or disability"
@@ -450,14 +507,25 @@ const PrototypeTableHighlights = () => {
                                 description="All age apprenticeships overall achievement rates demographic summary"
                               />
                               <PrototypeChevronCard
-                                title="Rates by level, 2015/16 to 2020/21"
+                                title="Achievements by level"
                                 description="Apprenticeship achievements by level, 2015/16 to 2020/21"
+                              />
+                              <PrototypeChevronCard
+                                title="Rates demographic summary"
+                                description="All age apprenticeships overall achievement rates demographic summary"
                               />
                               <PrototypeChevronCard
                                 title="Participation and achievements by age and level"
                                 description="Apprenticeship participation and achievements by age and level, reported to date for 2021/22 with equivalent figures for 2018/19 to 2020/21"
                               />
                             </PrototypeGridView>
+                            <hr />
+                            <div className="govuk-!-margin-3">
+                              <Button>Create your own table</Button>
+                              <Button className="govuk-!-margin-left-6">
+                                Download all data (.zip, 300mb)
+                              </Button>
+                            </div>
                           </div>
                         )}
                       </div>
