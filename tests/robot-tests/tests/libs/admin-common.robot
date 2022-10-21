@@ -432,6 +432,7 @@ user creates public prerelease access list
     user presses keys    ${content}
     user clicks button    Save access list
     user waits until element contains    css:[data-testid="publicPreReleaseAccessListPreview"]    ${content}
+    ...    %{WAIT_SMALL}
 
 user updates public prerelease access list
     [Arguments]    ${content}
