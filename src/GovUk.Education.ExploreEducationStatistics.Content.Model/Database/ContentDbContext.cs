@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public ContentDbContext(DbContextOptions<ContentDbContext> options) : this(options, true)
         {
         }
-        
+
         public ContentDbContext(DbContextOptions<ContentDbContext> options, bool updateTimestamps = true) : base(options)
         {
             Configure(updateTimestamps);
@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<MethodologyVersionContent>().ToTable("MethodologyVersions");
             modelBuilder.Entity<MethodologyVersionContent>().Property<Guid>("MethodologyVersionId");
             modelBuilder.Entity<MethodologyVersionContent>().HasKey("MethodologyVersionId");
-            
+
             modelBuilder.Entity<MethodologyVersionContent>()
                 .Property(m => m.Content)
                 .HasConversion(
@@ -221,6 +221,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+
+            modelBuilder.Entity<Publication>()
+                .HasOne(p => p.Contact)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<PublicationMethodology>()
                 .HasKey(pm => new {pm.PublicationId, pm.MethodologyId});
@@ -416,7 +421,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<MarkDownBlock>()
                 .Property(block => block.Body)
                 .HasColumnName("Body");
-            
+
             modelBuilder.Entity<Permalink>()
                 .Property(permalink => permalink.Created)
                 .HasConversion(
@@ -451,7 +456,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<UserPublicationRole>()
                 .Property(r => r.Role)
                 .HasConversion(new EnumToStringConverter<PublicationRole>());
-            
+
             modelBuilder.Entity<UserPublicationRole>()
                 .HasQueryFilter(p => p.Deleted == null);
 
@@ -464,12 +469,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<UserReleaseRole>()
                 .Property(r => r.Role)
                 .HasConversion(new EnumToStringConverter<ReleaseRole>());
-            
+
             modelBuilder.Entity<UserReleaseRole>()
                 .HasQueryFilter(r =>
                     !r.SoftDeleted
                     && r.Deleted == null);
-            
+
             modelBuilder.Entity<UserReleaseInvite>()
                 .Property(r => r.Role)
                 .HasConversion(new EnumToStringConverter<ReleaseRole>());
