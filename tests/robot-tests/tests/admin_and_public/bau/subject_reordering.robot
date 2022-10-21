@@ -21,9 +21,9 @@ Create new publication and release via API
     user create test release via api    ${PUBLICATION_ID}    CY    2000
 
 Navigate to release
-    user navigates to editable release summary from admin dashboard
+    user navigates to draft release page from dashboard
     ...    ${PUBLICATION_NAME}
-    ...    ${RELEASE_NAME} (not Live)
+    ...    ${RELEASE_NAME}
 
 Upload subjects to release
     user uploads subject

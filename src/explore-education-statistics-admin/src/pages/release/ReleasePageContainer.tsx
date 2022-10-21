@@ -31,6 +31,8 @@ import Tag from '@common/components/Tag';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
+import { publicationReleasesRoute } from '@admin/routes/publicationRoutes';
+import { PublicationRouteParams } from '@admin/routes/routes';
 
 const navRoutes = [
   releaseSummaryRoute,
@@ -115,7 +117,19 @@ const ReleasePageContainer = ({
   return (
     <LoadingSpinner loading={loadingRelease}>
       {release && (
-        <Page wide breadcrumbs={[{ name: 'Edit release' }]}>
+        <Page
+          wide
+          breadcrumbs={[
+            {
+              name: 'Publication',
+              link: `${generatePath<PublicationRouteParams>(
+                publicationReleasesRoute.path,
+                { publicationId: release.publicationId },
+              )}`,
+            },
+            { name: 'Edit release' },
+          ]}
+        >
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
               <PageTitle
@@ -142,15 +156,11 @@ const ReleasePageContainer = ({
               </RelatedInformation>
             </div> */}
           </div>
-
           <Tag>{getReleaseApprovalStatusLabel(release.approvalStatus)}</Tag>
-
           {release.amendment && (
             <Tag className="govuk-!-margin-left-2">Amendment</Tag>
           )}
-
           {release.live && <Tag className="govuk-!-margin-left-2">Live</Tag>}
-
           <NavBar
             routes={navRoutes.map(route => ({
               title: route.title,
@@ -161,7 +171,6 @@ const ReleasePageContainer = ({
             }))}
             label="Release"
           />
-
           <ReleaseContextProvider
             release={release}
             onReleaseChange={nextRelease => {
@@ -174,7 +183,6 @@ const ReleasePageContainer = ({
               ))}
             </Switch>
           </ReleaseContextProvider>
-
           {currentRouteIndex > -1 && (
             <PreviousNextLinks
               previousSection={previousSection}

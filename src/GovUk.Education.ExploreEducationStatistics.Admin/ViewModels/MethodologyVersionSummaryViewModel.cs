@@ -12,9 +12,6 @@ public record MethodologyVersionSummaryViewModel
 
     public bool Amendment { get; set; }
 
-    // TODO EES-3576 Remove InternalReleaseNote added to support the old Admin dashboard
-    public string? InternalReleaseNote { get; set; }
-
     public DateTime? Published { get; set; }
 
     [JsonConverter(typeof(StringEnumConverter))]

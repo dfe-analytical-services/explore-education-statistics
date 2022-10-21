@@ -15,22 +15,15 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { generatePath } from 'react-router-dom';
 
 interface Props {
-  addUserPath?: string; // TODO EES-3217 remove when pages go live
-  heading?: ReactNode; // TODO EES-3217 remove when pages go live
   publicationId: string;
   release: ReleaseSummary;
 }
 
-const PublicationManageTeamAccess = ({
-  addUserPath,
-  heading,
-  publicationId,
-  release,
-}: Props) => {
+const PublicationManageTeamAccess = ({ publicationId, release }: Props) => {
   const {
     value,
     isLoading,
@@ -77,17 +70,15 @@ const PublicationManageTeamAccess = ({
 
   return (
     <>
-      {heading ?? (
-        <h3>
-          {`${release.title}${!release.live ? ' (Not live)' : ''}`}
-          <Tag
-            className="govuk-!-margin-left-2"
-            colour={release.approvalStatus === 'Approved' ? 'green' : undefined}
-          >
-            {getReleaseApprovalStatusLabel(release.approvalStatus)}
-          </Tag>
-        </h3>
-      )}
+      <h3>
+        {`${release.title}${!release.live ? ' (Not live)' : ''}`}
+        <Tag
+          className="govuk-!-margin-left-2"
+          colour={release.approvalStatus === 'Approved' ? 'green' : undefined}
+        >
+          {getReleaseApprovalStatusLabel(release.approvalStatus)}
+        </Tag>
+      </h3>
 
       {contributors.length === 0 && invites.length === 0 ? (
         <WarningMessage>
@@ -103,16 +94,13 @@ const PublicationManageTeamAccess = ({
         />
       )}
       <ButtonLink
-        to={
-          addUserPath ??
-          generatePath<PublicationTeamRouteParams>(
-            publicationManageReleaseContributorsPageRoute.path,
-            {
-              publicationId,
-              releaseId: release.id,
-            },
-          )
-        }
+        to={generatePath<PublicationTeamRouteParams>(
+          publicationManageReleaseContributorsPageRoute.path,
+          {
+            publicationId,
+            releaseId: release.id,
+          },
+        )}
       >
         Add or remove users
       </ButtonLink>

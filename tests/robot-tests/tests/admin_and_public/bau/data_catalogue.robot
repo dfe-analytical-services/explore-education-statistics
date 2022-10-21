@@ -22,15 +22,14 @@ ${SUBJECT_NAME_4}=      UI test subject 4
 
 *** Test Cases ***
 Create publication
-    user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
+    user selects dashboard theme and topic if possible
     user clicks link    Create new publication
     user waits until h1 is visible    Create new publication
     user creates publication    ${PUBLICATION_NAME}
 
 Create new release with data files
-    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
-    user clicks link    Create new release
-    user creates release for publication    ${PUBLICATION_NAME}    ${RELEASE_NAME}    2020
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user creates release from publication page    ${PUBLICATION_NAME}    ${RELEASE_NAME}    2020
     user uploads subject    ${SUBJECT_NAME_1}    seven_filters.csv    seven_filters.meta.csv
     user uploads subject    ${SUBJECT_NAME_2}    tiny-two-filters.csv    tiny-two-filters.meta.csv
 
@@ -58,9 +57,8 @@ Approve first release
     user approves release for immediate publication
 
 User creates second release
-    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
-    user clicks link    Create new release
-    user creates release for publication    ${PUBLICATION_NAME}    ${RELEASE_NAME}    2021
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user creates release from publication page    ${PUBLICATION_NAME}    ${RELEASE_NAME}    2021
     user uploads subject    ${SUBJECT_NAME_3}    dates.csv    dates.meta.csv
     user uploads subject    ${SUBJECT_NAME_4}    upload-file-test-with-filter.csv
     ...    upload-file-test-with-filter.meta.csv

@@ -10,15 +10,17 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
+
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - create methodology amendment publication %{RUN_IDENTIFIER}
+
 
 *** Test Cases ***
 Create publicly accessible Publication
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user create test release via api    ${PUBLICATION_ID}    AY    2021
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
-    ...    Academic Year 2021/22 (not Live)
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    Academic Year 2021/22
     user approves original release for immediate publication
 
 Create Methodology with some content and images
@@ -95,10 +97,12 @@ Approve the Methodology
 
 Verify the summary for the original Methodology is as expected
     ${expected_published_date}=    get current datetime    %-d %B %Y
-    user views methodology for publication
+    user navigates to methodologies on publication page
     ...    ${PUBLICATION_NAME}
-    ...    ${PUBLICATION_NAME} - first methodology version
-    ...    View methodology
+
+    ${ROW}=    user gets table row    ${PUBLICATION_NAME} - first methodology version    testid:methodologies
+    user clicks element    xpath://*[text()="View"]    ${ROW}
+
     user verifies methodology summary details
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - first methodology version
@@ -111,6 +115,7 @@ Verify the readonly content for the original Methodology is as expected
 
 Create a Methodology Amendment
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_NAME} - first methodology version
     user checks page contains tag    Draft
     user checks page contains tag    Amendment
 
@@ -119,7 +124,6 @@ Edit the Amendment's summary to return the Methodology's title to the same as it
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - first methodology version
     ...    ${PUBLICATION_NAME}
-    ...    Edit amendment
     user verifies methodology summary details
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME}
@@ -171,25 +175,33 @@ Verify all is as expected on the Amendment after the Amendment content changes
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
 Revisit the original Methodology and check that its content remains unaffected by the changes to the Amendment
-    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
-    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user clicks link    View existing version    ${accordion}
+    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
+
+    ${ROW}=    user gets table row    ${PUBLICATION_NAME}    testid:methodologies
+    user clicks element    xpath://*[text()="View existing version"]    ${ROW}
+    user waits until h2 is visible    Methodology summary
+
     user clicks link    Manage content
     user verifies original Methodology readonly content
 
 Approve the Methodology Amendment
     user approves methodology amendment for publication    ${PUBLICATION_NAME}
 
-Revisit the Publication on the dashboard and check that the new Amendment is now the live Methodology
-    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
-    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user checks element contains link    ${accordion}    View methodology
-    user checks element does not contain link    ${accordion}    Edit methodology
-    user checks element contains button    ${accordion}    Amend methodology
-    user checks element does not contain link    ${accordion}    Edit amendment
+Revisit the Publication methodologies page and check that the new Amendment is now the live Methodology
+    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
+
+    ${ROW}=    user gets table row    ${PUBLICATION_NAME}    testid:methodologies
+
+    user checks element contains link    ${ROW}    View
+    user checks element does not contain link    ${ROW}    Edit
+    user checks element contains button    ${ROW}    Amend
+    user checks element does not contain link    ${ROW}    View existing version
 
 Visit the approved Amendment and check that its summary is as expected
-    user clicks link    View methodology
+    ${ROW}=    user gets table row    ${PUBLICATION_NAME}    testid:methodologies
+    user clicks element    xpath://*[text()="View"]    ${ROW}
+    user waits until h2 is visible    Methodology summary
+
     ${date}=    get current datetime    %-d %B %Y
     user verifies methodology summary details
     ...    ${PUBLICATION_NAME}
@@ -205,17 +217,20 @@ Create and cancel an Amendment
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
     user cancels methodology amendment for publication    ${PUBLICATION_NAME}
 
-    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
-    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user checks element contains link    ${accordion}    View methodology
-    user checks element does not contain link    ${accordion}    Edit methodology
-    user checks element contains button    ${accordion}    Amend methodology
-    user checks element does not contain link    ${accordion}    Edit amendment
+    ${ROW}=    user gets table row    ${PUBLICATION_NAME}    testid:methodologies
+
+    user checks element contains link    ${ROW}    View
+    user checks element does not contain link    ${ROW}    Edit
+    user checks element contains button    ${ROW}    Amend
 
 Revisit the live Amendment after the cancellation to double check it remains unaffected
-    user clicks link    View methodology
+    ${ROW}=    user gets table row    ${PUBLICATION_NAME}    testid:methodologies
+    user clicks element    xpath://*[text()="View"]    ${ROW}
+    user waits until h2 is visible    Methodology summary
+
     user clicks link    Manage content
     user verifies amended Methodology readonly content
+
 
 *** Keywords ***
 user verifies original Methodology readonly content

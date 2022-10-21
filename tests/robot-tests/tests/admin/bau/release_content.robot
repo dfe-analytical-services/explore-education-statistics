@@ -12,7 +12,6 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${TOPIC_NAME}                       %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}                 UI tests - release content %{RUN_IDENTIFIER}
 ${SECONDARY_STATS_TABLE_TAB_ID}     releaseHeadlines-dataBlock-tables-tab
 
@@ -21,10 +20,11 @@ ${SECONDARY_STATS_TABLE_TAB_ID}     releaseHeadlines-dataBlock-tables-tab
 Create test publication and release via API
     ${PUBLICATION_ID}    user creates test publication via api    ${PUBLICATION_NAME}
     user create test release via api    ${PUBLICATION_ID}    AY    2025
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
-    ...    Academic Year 2025/26 (not Live)
 
 Upload a subject
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    Academic Year 2025/26
+
     user uploads subject    Dates test subject    dates.csv    dates.meta.csv
 
 Create 4 data blocks
@@ -50,8 +50,8 @@ Create 4 data blocks
     ...    22,900
 
 Navigate to 'Content' page
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
-    ...    Academic Year 2025/26 (not Live)
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    Academic Year 2025/26
     user clicks link    Content
     user waits until h1 is visible    ${PUBLICATION_NAME}
     user waits until h2 is visible    ${PUBLICATION_NAME}

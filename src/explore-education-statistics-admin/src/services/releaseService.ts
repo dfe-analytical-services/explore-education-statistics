@@ -7,6 +7,7 @@ import { PartialDate } from '@common/utils/date/partialDate';
 
 export interface ReleasePermissions {
   canAddPrereleaseUsers: boolean;
+  canViewRelease: boolean;
   canUpdateRelease: boolean;
   canDeleteRelease: boolean;
   canMakeAmendmentOfRelease: boolean;

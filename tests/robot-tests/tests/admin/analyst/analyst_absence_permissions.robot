@@ -10,33 +10,35 @@ Force Tags          Admin    Local    Dev
 
 *** Test Cases ***
 Validate Analyst1 can see correct themes and topics
-    user selects theme and topic from admin dashboard    Pupils and schools    Pupil absence
-    user waits until page contains accordion section    Pupil absence in schools in England    %{WAIT_SMALL}
+    user waits until h3 is visible    Pupils and schools / Pupil absence
+    ${ABSENCE_PUBLICATIONS}=    get webelement
+    ...    xpath://*[@data-testid="topic-publications-Pupils and schools-Pupil absence"]
+    user waits until parent contains element    ${ABSENCE_PUBLICATIONS}    link:Pupil absence in schools in England
 
-    user checks select contains option    id:publicationsReleases-themeTopic-themeId    Pupils and schools
-    user checks select contains x options    id:publicationsReleases-themeTopic-topicId    2
-    user checks select contains option    id:publicationsReleases-themeTopic-topicId    Exclusions
-    user checks select contains option    id:publicationsReleases-themeTopic-topicId    Pupil absence
+    user waits until h3 is visible    Pupils and schools / Exclusions
+    ${EXCLUSION_PUBLICATIONS}=    get webelement
+    ...    xpath://*[@data-testid="topic-publications-Pupils and schools-Exclusions"]
+    user waits until parent contains element    ${EXCLUSION_PUBLICATIONS}
+    ...    link:Permanent and fixed-period exclusions in England
 
 Validate Analyst1 can see correct draft and scheduled releases tabs
-    user checks element should contain    id:draft-releases-tab    View draft releases
-    user checks element should contain    id:scheduled-releases-tab    View scheduled releases
+    user checks element should contain    id:draft-releases-tab    Draft releases
+    user checks element should contain    id:scheduled-releases-tab    Approved scheduled releases
 
-Validate Analyst1 cannot create a publication for Pupils absence topic
-    user clicks element    id:publicationsReleases
-    user waits until page contains element    id:publicationsReleases-themeTopic-themeId
-    user waits until h3 is visible    Pupil absence
+Validate Analyst1 cannot create a publication
     user checks page does not contain element    link:Create new publication
 
+Navigate to Pupil absence Publication page
+    user clicks link    Pupil absence in schools in England
+    user waits until h1 is visible    Pupil absence in schools in England
+
 Validate Analyst1 cannot create a release for Pupil absence topic
-    user waits until page contains accordion section    Pupil absence in schools in England
-    user opens accordion section    Pupil absence in schools in England
-    user checks page does not contain element    testid:Create new release link for Pupil absence in schools in England
+    user checks page does not contain    link:Create new release
 
 Navigate to Absence release
-    user opens details dropdown    Academic Year 2016/17 (Live - Latest release)
-    user clicks element
-    ...    testid:Edit release link for Pupil absence in schools in England, Academic Year 2016/17 (Live - Latest release)
+    ${ROW}=    user gets table row    Academic Year 2016/17    testid:publication-published-releases
+    user clicks element    xpath://*[text()="View"]    ${ROW}
+
     user waits until h1 is visible    Pupil absence in schools in England
     user waits until h2 is visible    Release summary
 

@@ -125,7 +125,7 @@ const PublicationMethodologiesPage = () => {
 
       {methodologyVersions.length > 0 || externalMethodology ? (
         <>
-          <table className="dfe-hide-empty-cells">
+          <table className="dfe-hide-empty-cells" data-testid="methodologies">
             <caption className="govuk-table__caption--m">
               Methodologies associated to this publication
             </caption>
@@ -187,6 +187,7 @@ const PublicationMethodologiesPage = () => {
                     <td>
                       <Link
                         className="govuk-!-margin-right-4"
+                        data-testid={canEdit ? 'edit' : 'view'}
                         to={generatePath<MethodologyRouteParams>(
                           methodologySummaryRoute.path,
                           {
@@ -207,6 +208,7 @@ const PublicationMethodologiesPage = () => {
                             methodology.previousVersionId && (
                               <Link
                                 className="govuk-!-margin-right-4"
+                                data-testid="view-existing-version"
                                 to={generatePath<MethodologyRouteParams>(
                                   methodologySummaryRoute.path,
                                   {
@@ -228,6 +230,7 @@ const PublicationMethodologiesPage = () => {
                               .canMakeAmendmentOfMethodology && (
                               <ButtonText
                                 className="govuk-!-margin-right-4"
+                                data-testid="amend"
                                 onClick={() =>
                                   setAmendMethodologyId(methodology.id)
                                 }
@@ -242,6 +245,11 @@ const PublicationMethodologiesPage = () => {
                           {methodology.permissions.canDeleteMethodology && (
                             <ButtonText
                               className="govuk-!-margin-right-4"
+                              data-testid={
+                                methodology.amendment
+                                  ? 'cancel-amendment'
+                                  : 'delete-draft'
+                              }
                               variant="warning"
                               onClick={() =>
                                 setDeleteMethodologyDetails({

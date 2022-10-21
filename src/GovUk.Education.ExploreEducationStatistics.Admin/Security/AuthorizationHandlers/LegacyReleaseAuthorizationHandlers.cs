@@ -10,22 +10,22 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Publicatio
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
     // Create
-    public class CreateLegacyReleaseRequirement : IAuthorizationRequirement
+    public class ManageLegacyReleasesRequirement : IAuthorizationRequirement
     {}
 
-    public class CreateLegacyReleaseAuthorizationHandler 
-        : AuthorizationHandler<CreateLegacyReleaseRequirement, Publication>
+    public class ManageLegacyReleasesAuthorizationHandler 
+        : AuthorizationHandler<ManageLegacyReleasesRequirement, Publication>
     {
         private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
-        public CreateLegacyReleaseAuthorizationHandler(
+        public ManageLegacyReleasesAuthorizationHandler(
             AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
         {
             _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
-            CreateLegacyReleaseRequirement requirement,
+            ManageLegacyReleasesRequirement requirement,
             Publication publication)
         {
             if (SecurityUtils.HasClaim(context.User, CreateAnyRelease))

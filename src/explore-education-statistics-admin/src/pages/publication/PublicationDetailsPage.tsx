@@ -62,7 +62,8 @@ const PublicationDetailsPage = () => {
                 : 'This publication is not archived'}
             </SummaryListItem>
           </SummaryList>
-          {permissions.canUpdatePublication && (
+          {(permissions.canUpdatePublication ||
+            permissions.canUpdatePublicationSummary) && (
             <Button variant="secondary" onClick={toggleReadOnly.off}>
               Edit publication details
             </Button>
@@ -70,10 +71,8 @@ const PublicationDetailsPage = () => {
         </>
       ) : (
         <PublicationDetailsForm
-          canUpdatePublicationSupersededBy={
-            permissions.canUpdatePublicationSupersededBy
-          }
-          canUpdatePublicationTitle={permissions.canUpdatePublicationTitle}
+          canUpdatePublication={permissions.canUpdatePublication}
+          canUpdatePublicationSummary={permissions.canUpdatePublicationSummary}
           initialValues={{
             supersededById,
             title,

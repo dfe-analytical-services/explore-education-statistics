@@ -145,7 +145,7 @@ describe('ReleaseStatusChecklist', () => {
         name:
           'An in-EES methodology page has not been linked to this publication',
       }),
-    ).toHaveAttribute('href', '/publication/publication-1/edit');
+    ).toHaveAttribute('href', '/publication/publication-1/methodologies');
 
     expect(
       screen.getAllByRole('link', {

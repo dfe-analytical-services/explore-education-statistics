@@ -93,8 +93,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OrderBy(model => model.Email)
                         .ToList();
                 });
-
         }
+
         public async Task<Either<ActionResult, List<ContributorViewModel>>>
             ListPublicationContributors(Guid publicationId)
         {

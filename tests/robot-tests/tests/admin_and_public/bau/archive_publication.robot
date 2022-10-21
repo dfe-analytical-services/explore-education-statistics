@@ -26,8 +26,8 @@ Create new publication to be archived and release via API
     user create test release via api    ${PUBLICATION_ID_ARCHIVE}    FY    3000
 
 Navigate to archive-publication release
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME_ARCHIVE}
-    ...    ${RELEASE_NAME_ARCHIVE} (not Live)
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME_ARCHIVE}
+    ...    ${RELEASE_NAME_ARCHIVE}
 
 Import archive-publication subject to release
     user uploads subject    ${SUBJECT_NAME_ARCHIVE}    upload-file-test.csv    upload-file-test.meta.csv
@@ -53,24 +53,25 @@ Create new publication to supersede other publication and release via API
     user create test release via api    ${PUBLICATION_ID_SUPERSEDE}    FY    2000
 
 Set archive-publication to be superseded by superseding-publication
-    user navigates to admin dashboard
-    user opens accordion section    ${PUBLICATION_NAME_ARCHIVE}
-    ${ARCHIVE_ACCORDION}=    user gets accordion section content element    ${PUBLICATION_NAME_ARCHIVE}
-    user clicks link    Manage publication    ${ARCHIVE_ACCORDION}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME_ARCHIVE}
 
-    user waits until h1 is visible    Manage publication
-    user waits until page contains element    id:publicationForm-supersede
+    user clicks link    Details
+    user waits until h2 is visible    Publication details
 
-    user chooses select option    id:publicationForm-supersededById    ${PUBLICATION_NAME_SUPERSEDE}
+    user clicks button    Edit publication details
 
-    user clicks button    Save publication
-    user waits until modal is visible    Confirm publication changes
-    user clicks button    Confirm
+    user waits until page contains element    id:publicationDetailsForm-supersede
+
+    user chooses select option    id:publicationDetailsForm-supersededById    ${PUBLICATION_NAME_SUPERSEDE}
+
+    user clicks button    Update publication details
+    ${modal}=    user waits until modal is visible    Confirm publication changes
+    user clicks button    Confirm    ${modal}
     user waits until modal is not visible    Confirm publication changes
 
 Validate archive warning is on Admin dashboard for archive-publication release
-    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME_ARCHIVE}
-    user checks element should contain    ${accordion}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME_ARCHIVE}
+    user waits until page contains
     ...    This publication will be archived when its superseding publication has a live release published.
 
 Validate that archive-publication appears correctly on Find stats page
@@ -150,8 +151,8 @@ Check that archive-publication subject appears correctly on Data catalogue page
     user checks page contains    This is the latest data
 
 Navigate to superseding-publication release on Admin site
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME_SUPERSEDE}
-    ...    ${RELEASE_NAME_SUPERSEDE} (not Live)
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME_SUPERSEDE}
+    ...    ${RELEASE_NAME_SUPERSEDE}
 
 Import superseding-publication subject to release
     user uploads subject    ${SUBJECT_NAME_SUPERSEDE}    upload-file-test.csv    upload-file-test.meta.csv
@@ -263,23 +264,19 @@ Check archive-publication permalink has out-of-date warning
     ...    WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.
 
 Set archive-publication to be no longer be superseded
-    user navigates to admin dashboard
-    user opens accordion section    ${PUBLICATION_NAME_ARCHIVE}
-    ${ARCHIVE_ACCORDION}=    user gets accordion section content element    ${PUBLICATION_NAME_ARCHIVE}
-    user clicks link    Manage publication    ${ARCHIVE_ACCORDION}
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME_ARCHIVE}
 
-    user waits until h1 is visible    Manage publication
-    user waits until page contains element    id:publicationForm-supersede
+    user clicks link    Details
+    user waits until h2 is visible    Publication details
 
-    user chooses select option    id:publicationForm-supersededById    None selected
+    user clicks button    Edit publication details
+    user waits until page contains element    id:publicationDetailsForm-supersede
+    user chooses select option    id:publicationDetailsForm-supersededById    None selected
+    user clicks button    Update publication details
 
-    user clicks button    Save publication
-    user waits until modal is visible    Confirm publication changes
-    user clicks button    Confirm
+    ${modal}=    user waits until modal is visible    Confirm publication changes
+    user clicks button    Confirm    ${modal}
     user waits until modal is not visible    Confirm publication changes
-
-    # Otherwise gets to Find Stats page before cache is invalidated
-    user waits until h1 is visible    Dashboard
 
     sleep    %{WAIT_MEMORY_CACHE_EXPIRY}
 

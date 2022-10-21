@@ -1,6 +1,8 @@
 from robot.libraries.BuiltIn import BuiltIn
 import time
 import os
+
+from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from tests.libs.setup_auth_variables import setup_auth_variables
 from tests.libs.utilities import set_to_local_storage
@@ -89,3 +91,13 @@ def user_waits_for_release_process_status_to_be(status, timeout):
             sl.reload_page()  # Necessary if release previously scheduled
             time.sleep(3)
     raise_assertion_error(f'Release process status wasn\'t {status} after {timeout} seconds!')
+
+
+def user_checks_dashboard_theme_topic_dropdowns_exist():
+    try:
+        sl.driver.find_element(By.CSS_SELECTOR, '#publicationsReleases-themeTopic-themeId')
+        sl.driver.find_element(By.CSS_SELECTOR, '#publicationsReleases-themeTopic-topicId')
+    except NoSuchElementException:
+        return False
+
+    return True

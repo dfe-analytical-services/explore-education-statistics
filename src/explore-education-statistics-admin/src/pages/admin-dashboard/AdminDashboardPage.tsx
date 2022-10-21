@@ -1,5 +1,3 @@
-import useQueryParams from '@admin/hooks/useQueryParams';
-import { ThemeTopicParams } from '@admin/routes/routes';
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
@@ -14,10 +12,8 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import React, { useState } from 'react';
-import ManagePublicationsAndReleasesTab from './components/ManagePublicationsAndReleasesTab';
 
 const AdminDashboardPage = () => {
-  const { showNewDashboard } = useQueryParams<ThemeTopicParams>(); // TODO EES-3217 - remove when ready to go live
   const { user } = useAuthContext();
   const isBauUser = user?.permissions.canAccessUserAdministrationPages ?? false;
 
@@ -59,36 +55,19 @@ const AdminDashboardPage = () => {
             </Link>
           </p>
 
-          {showNewDashboard ? (
-            <>
-              <p>
-                This is your administration dashboard, here you can manage
-                publications, releases and methodologies.
-              </p>
-              {isBauUser && (
-                <ul className="govuk-!-margin-bottom-6">
-                  <li>
-                    <Link to="/themes">manage themes and topics</Link>
-                  </li>
-                </ul>
-              )}
-            </>
-          ) : (
-            <>
-              <p>This is your administration dashboard - here you can:</p>
-
+          <>
+            <p>
+              This is your administration dashboard, here you can manage
+              publications, releases and methodologies.
+            </p>
+            {isBauUser && (
               <ul className="govuk-!-margin-bottom-6">
                 <li>
-                  <Link to="/dashboard">manage publications and releases</Link>
+                  <Link to="/themes">manage themes and topics</Link>
                 </li>
-                {user?.permissions.canManageAllTaxonomy && (
-                  <li>
-                    <Link to="/themes">manage themes and topics</Link>
-                  </li>
-                )}
               </ul>
-            </>
-          )}
+            )}
+          </>
         </div>
 
         <div className="govuk-grid-column-one-third">
@@ -107,55 +86,34 @@ const AdminDashboardPage = () => {
       <Tabs
         id="dashboardTabs"
         onToggle={section => {
-          if (showNewDashboard && section.id === 'draft-releases') {
+          if (section.id === 'draft-releases') {
             reloadDraftReleases();
           }
         }}
       >
-        <TabsSection
-          id={showNewDashboard ? 'publications' : 'publicationsReleases'}
-          title={
-            showNewDashboard
-              ? 'Your publications'
-              : 'Manage publications and releases'
-          }
-        >
-          {showNewDashboard ? (
-            <PublicationsTab isBauUser={isBauUser} />
-          ) : (
-            <ManagePublicationsAndReleasesTab />
-          )}
+        <TabsSection id="publications" title="Your publications">
+          <PublicationsTab isBauUser={isBauUser} />
         </TabsSection>
         <TabsSection
           lazy
           id="draft-releases"
-          title={
-            showNewDashboard
-              ? `Draft releases (${totalDraftReleases})`
-              : `View draft releases (${totalDraftReleases})`
-          }
+          title={`Draft releases (${totalDraftReleases})`}
         >
           <DraftReleasesTab
             isBauUser={isBauUser}
             isLoading={isLoadingDraftReleases}
             releases={draftReleases}
-            showNewDashboard={!!showNewDashboard}
             onChangeRelease={reloadDraftReleases}
           />
         </TabsSection>
         <TabsSection
           lazy
           id="scheduled-releases"
-          title={
-            showNewDashboard
-              ? `Approved scheduled releases (${scheduledReleases?.length})`
-              : `View scheduled releases (${scheduledReleases?.length})`
-          }
+          title={`Approved scheduled releases (${scheduledReleases?.length})`}
         >
           <ScheduledReleasesTab
             isLoading={isLoadingScheduledReleases}
             releases={scheduledReleases}
-            showNewDashboard={!!showNewDashboard}
           />
         </TabsSection>
       </Tabs>

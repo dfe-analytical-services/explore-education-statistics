@@ -105,6 +105,7 @@ Give the user prerelease access to a release
     user checks table column heading contains    1    2    Release    testid:releaseAccessTable
     user checks table column heading contains    1    3    Role    testid:releaseAccessTable
     user checks table column heading contains    1    4    Actions    testid:releaseAccessTable
+
     user checks results table cell contains    1    1    ${PUBLICATION_NAME}    testid:releaseAccessTable
     user checks results table cell contains    1    2    ${RELEASE_NAME}    testid:releaseAccessTable
     user checks results table cell contains    1    3    PrereleaseViewer    testid:releaseAccessTable
@@ -116,6 +117,7 @@ Give the user approver access to a release
     user chooses select option    name:selectedReleaseRole    Approver
     user clicks button    Add release access
     user checks table body has x rows    2    testid:releaseAccessTable
+
     user checks results table cell contains    1    1    ${PUBLICATION_NAME}    testid:releaseAccessTable
     user checks results table cell contains    1    2    ${RELEASE_NAME}    testid:releaseAccessTable
     user checks results table cell contains    1    3    PrereleaseViewer    testid:releaseAccessTable

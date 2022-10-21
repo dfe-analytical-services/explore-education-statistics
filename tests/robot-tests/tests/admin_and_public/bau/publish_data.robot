@@ -11,7 +11,6 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${TOPIC_NAME}=                          %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}=                    UI tests - publish data %{RUN_IDENTIFIER}
 ${RELEASE_1_NAME}=                      Financial Year 3000-01
 ${RELEASE_2_NAME}=                      Financial Year 3001-02
@@ -35,8 +34,8 @@ Create new publication and release via API
     user create test release via api    ${PUBLICATION_ID}    FY    3000
 
 Navigate to release
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
-    ...    ${RELEASE_1_NAME} (not Live)
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    ${RELEASE_1_NAME}
 
 Add public prerelease access list
     user clicks link    Pre-release access
@@ -56,16 +55,16 @@ Go to "Sign off" page and approve release
     user approves original release for immediate publication
 
 Create another release for the same publication
-    user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    ${TOPIC_NAME}
-    user waits until page contains link    Create new publication
-    user opens accordion section    ${PUBLICATION_NAME}
-    user clicks element    testid:Create new release link for ${PUBLICATION_NAME}
-    user creates release for publication    ${PUBLICATION_NAME}    Financial Year    3001
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user creates release from publication page    ${PUBLICATION_NAME}    Financial Year    3001
 
 Verify new release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible    Release summary
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
+    user checks summary list contains    Time period    Financial Year
+    user checks summary list contains    Release period    3001-02
+    user checks summary list contains    Release type    National statistics
 
 Upload subjects to release
     user uploads subject    ${SUBJECT_1_NAME}    tiny-two-filters.csv    tiny-two-filters.meta.csv

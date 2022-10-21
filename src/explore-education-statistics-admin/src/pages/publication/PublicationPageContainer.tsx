@@ -63,6 +63,24 @@ const PublicationPageContainer = ({
     ),
   );
 
+  const getNavRoutes = () => {
+    return navRoutes.filter(route => {
+      switch (route) {
+        case publicationDetailsRoute:
+          return (
+            publication?.permissions?.canUpdatePublication ||
+            publication?.permissions?.canUpdatePublicationSummary
+          );
+        case publicationContactRoute:
+          return publication?.permissions?.canUpdateContact;
+        case publicationTeamAccessRoute:
+          return publication?.permissions?.canUpdateContributorReleaseRole;
+        default:
+          return true;
+      }
+    });
+  };
+
   return (
     <LoadingSpinner loading={loadingPublication}>
       {publication ? (
@@ -100,7 +118,7 @@ const PublicationPageContainer = ({
           </div>
 
           <NavBar
-            routes={navRoutes.map(route => ({
+            routes={getNavRoutes().map(route => ({
               title: route.title,
               to: generatePath<PublicationRouteParams>(route.path, {
                 publicationId,

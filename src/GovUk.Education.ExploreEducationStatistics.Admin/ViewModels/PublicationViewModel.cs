@@ -29,13 +29,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public record PublicationPermissions
         {
             public bool CanUpdatePublication { get; set; }
-            public bool CanUpdatePublicationTitle { get; set; }
-            public bool CanUpdatePublicationSupersededBy { get; set; }
+            public bool CanUpdatePublicationSummary { get; set; }
             public bool CanCreateReleases { get; set; }
             public bool CanAdoptMethodologies { get; set; }
             public bool CanCreateMethodologies { get; set; }
             public bool CanManageExternalMethodology { get; set; }
             public bool CanUpdateContact { get; set; }
+            public bool CanUpdateContributorReleaseRole { get; set; }
         }
     }
 }

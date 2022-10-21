@@ -14,12 +14,12 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
-    public class UpdatePublicationAuthorizationHandlerTests
+    public class UpdateContactAuthorizationHandlerTests
     {
         [Fact]
-        public async Task CanUpdateAllPublicationsAuthorizationHandler_SucceedsWithClaim()
+        public async Task CanUpdateAllContactAuthorizationHandler_SucceedsWithClaim()
         {
-            await AssertHandlerSucceedsWithCorrectClaims<Publication, UpdatePublicationRequirement>(
+            await AssertHandlerSucceedsWithCorrectClaims<Publication, UpdateContactRequirement>(
                 CreateHandler,
                 new Publication(),
                 UpdateAllPublications
@@ -27,15 +27,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         [Fact]
-        public async Task CanUpdateAllPublicationsAuthorizationHandler_SucceedsWithPublicationOwner()
+        public async Task CanUpdateAllContactAuthorizationHandler_SucceedsWithPublicationOwner()
         {
-            await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdatePublicationRequirement>(
+            await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdateContactRequirement>(
                 CreateHandler, Owner);
         }
 
-        private static UpdatePublicationAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+        private static UpdateContactAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
         {
-            return new UpdatePublicationAuthorizationHandler(
+            return new UpdateContactAuthorizationHandler(
                 new AuthorizationHandlerResourceRoleService(
                     Mock.Of<IUserReleaseRoleRepository>(Strict),
                     new UserPublicationRoleRepository(contentDbContext),

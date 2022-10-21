@@ -20,15 +20,14 @@ ${THIRD_SUBJECT}        upload file test with filter subject
 
 *** Test Cases ***
 Create publication
-    user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
+    user selects dashboard theme and topic if possible
     user clicks link    Create new publication
     user waits until h1 is visible    Create new publication
     user creates publication    ${PUBLICATION_NAME}
 
 Create new release
-    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
-    user clicks link    Create new release
-    user creates release for publication    ${PUBLICATION_NAME}    Academic Year Q1    2020
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user creates release from publication page    ${PUBLICATION_NAME}    Academic Year Q1    2020
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Upload another subject (for deletion later)
@@ -244,7 +243,7 @@ Return to Admin
 
 Create release amendment
     user clicks link    Home
-    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}    (Live - Latest release)
+    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
 Replace subject data
     user clicks link    Data and files
@@ -385,7 +384,7 @@ Check amended release doesn't contain deleted subject
 
 Create amendment to modify release
     user navigates to admin dashboard    Bau1
-    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}    (Live - Latest release)
+    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
 Add subject to release
     user uploads subject    ${THIRD_SUBJECT}    upload-file-test-with-filter.csv
