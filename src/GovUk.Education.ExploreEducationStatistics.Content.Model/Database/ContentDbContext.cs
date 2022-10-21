@@ -58,6 +58,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<File> Files { get; set; }
         public virtual DbSet<ContentSection> ContentSections { get; set; }
         public virtual DbSet<ContentBlock> ContentBlocks { get; set; }
+        public virtual DbSet<KeyStatistic> KeyStatistics { get; set; }
+        public virtual DbSet<KeyStatisticDataBlock> KeyStatisticsDataBlock { get; set; }
+        public virtual DbSet<KeyStatisticText> KeyStatisticsText { get; set; }
         public virtual DbSet<DataBlock> DataBlocks { get; set; }
         public virtual DbSet<DataImport> DataImports { get; set; }
         public virtual DbSet<DataImportError> DataImportErrors { get; set; }
@@ -529,6 +532,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(rs => rs.CreatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<KeyStatisticDataBlock>()
+                .ToTable("KeyStatisticsDataBlock");
+            modelBuilder.Entity<KeyStatisticText>()
+                .ToTable("KeyStatisticsText");
         }
     }
 }
