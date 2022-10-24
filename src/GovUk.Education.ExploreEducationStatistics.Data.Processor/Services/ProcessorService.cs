@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     await _dataImportService.FailImport(importId, errors);
 
-                    _logger.LogError($"Import {importId} FAILED ...check log");
+                    _logger.LogError("Import {ImportId} FAILED ...check log", importId);
                 });
         }
 

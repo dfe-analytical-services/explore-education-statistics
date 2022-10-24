@@ -160,8 +160,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     if (currentStatus.IsFinishedOrAborting())
                     {
                         _logger.LogInformation(
-                            $"Import for {dataImport.File.Filename} has finished or is being aborted, " +
-                            "so finishing importing Filters and Locations early");
+                            "Import for {FileName} has finished or is being aborted, " +
+                            "so finishing importing Filters and Locations early", dataImport.File.Filename);
                         return false;
                     }
 

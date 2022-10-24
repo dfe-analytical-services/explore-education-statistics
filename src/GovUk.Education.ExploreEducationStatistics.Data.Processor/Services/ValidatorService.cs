@@ -184,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 if (cells.Count != columnHeaders.Count)
                 {
                     var errorCode = isMetaFile ? MetaFileHasInvalidNumberOfColumns : DataFileHasInvalidNumberOfColumns;
-                    errors.Add(new DataImportError($"error at row {index + 1}: {errorCode.GetEnumLabel()}"));
+                    errors.Add(new DataImportError($"Error at row {index + 1}: {errorCode.GetEnumLabel()}"));
                 }
                 
                 try
@@ -268,8 +268,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     if (currentStatus.IsFinishedOrAborting())
                     {
                         _logger.LogInformation(
-                            $"Import for {import.File.Filename} has finished or is being aborted, " +
-                            "so finishing importing Filters and Locations early");
+                            "Import for {FileName} has finished or is being aborted, " +
+                            "so finishing importing Filters and Locations early", import.File.Filename);
                         return false;
                     }
                 }
@@ -411,7 +411,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                     if (nextLine == null)
                     {
-                        _logger.LogError($"Unable to read next sample line {linesRead + 1} from CSV");
+                        _logger.LogError("Unable to read next sample line {LineNumber} from CSV", linesRead + 1);
                         break;
                     }
                     
@@ -422,7 +422,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
             catch (Exception e)
             {
-                _logger.LogError($"Unable to read sample lines from CSV - {e.Message}");
+                _logger.LogError("Unable to read sample lines from CSV - {ErrorMessage}", e.Message);
                 _logger.LogError(e.StackTrace);
                 return null;
             }

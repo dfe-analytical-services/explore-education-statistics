@@ -17,13 +17,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class FileImportService : IFileImportService
     {
-        private readonly ILogger<IFileImportService> _logger;
+        private readonly ILogger<FileImportService> _logger;
         private readonly IBatchService _batchService;
         private readonly IBlobStorageService _blobStorageService;
         private readonly IDataImportService _dataImportService;
         private readonly IImporterService _importerService;
 
-        public FileImportService(ILogger<IFileImportService> logger,
+        public FileImportService(
+            ILogger<FileImportService> logger,
             IBatchService batchService,
             IBlobStorageService blobStorageService,
             IDataImportService dataImportService,

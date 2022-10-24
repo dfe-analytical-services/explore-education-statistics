@@ -1,11 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CsvHelper;
-using CsvHelper.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -16,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
-using File = System.IO.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -24,13 +19,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     {
         private readonly IBatchService _batchService;
         private readonly IBlobStorageService _blobStorageService;
-        private readonly ILogger<ISplitFileService> _logger;
+        private readonly ILogger<SplitFileService> _logger;
         private readonly IDataImportService _dataImportService;
 
         public SplitFileService(
             IBatchService batchService,
             IBlobStorageService blobStorageService,
-            ILogger<ISplitFileService> logger,
+            ILogger<SplitFileService> logger,
             IDataImportService dataImportService
             )
         {

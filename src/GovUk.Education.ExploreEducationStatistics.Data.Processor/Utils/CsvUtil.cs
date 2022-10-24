@@ -14,6 +14,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
 {
     public static class CsvUtil
     {
+        /// <summary>
+        /// Gets the header values of the first line of the provided CSV.
+        /// </summary>
+        /// <remarks>
+        ///This method uses and closes the provided Stream.
+        /// </remarks>
         public static async Task<List<string>> GetCsvHeaders(
             Func<Task<Stream>> streamProvider)
         {
@@ -24,6 +30,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
             return csvReader.Context.Record.ToList();
         }
         
+        /// <summary>
+        /// Gets the lines of the provided CSV as lists of cell values.
+        /// </summary>
+        /// <remarks>
+        /// This is best used with CSVs that are of known small values.
+        /// This method uses and closes the provided Stream.
+        /// </remarks>
         public static async Task<List<List<string>>> GetCsvRows(
             Func<Task<Stream>> streamProvider,
             bool skipHeaderRow = true)
@@ -31,6 +44,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
             return (await Select(streamProvider, (cells, _) => cells, skipHeaderRow)).ToList();
         }
         
+        /// <summary>
+        /// Counts the total rows on the provided CSV.
+        /// </summary>
+        /// <remarks>
+        /// This method uses and closes the provided Stream.
+        /// </remarks>
+        /// <param name="streamProvider">The Stream of the CSV.</param>
+        /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the count.</param>
         public static async Task<int> GetTotalRows(
             Func<Task<Stream>> streamProvider,
             bool skipHeaderRow = true)
@@ -48,10 +69,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
             return skipHeaderRow ? totalRows - 1 : totalRows;
         }
 
-        // TODO EES-3798 - CancellationToken?
+        /// <summary>
+        /// Execute a given function against each row of the provided CSV.  The cells of the current row and the index
+        /// of the row in the CSV are provided to the function. 
+        /// </summary>
+        /// <remarks>
+        /// This method uses and closes the provided Stream.
+        /// </remarks>
+        /// <param name="streamProvider">The Stream of the CSV.</param>
+        /// <param name="func">The function to execute against each row of the CSV. The function takes the cells and
+        /// the index of the current row, and returns "true" to continue iterating, or "false" to finish looping early.
+        /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
+        /// </param>
+        /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
         public static async Task ForEachRow(
             Func<Task<Stream>> streamProvider,
-            Func<List<string>, int, Task<bool>> action,
+            Func<List<string>, int, Task<bool>> func,
             bool skipHeaderRow = true)
         {
             using var dataFileReader = new StreamReader(await streamProvider.Invoke());
@@ -65,12 +98,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
             while (await csvReader.ReadAsync())
             {
                 var cellCount = csvDataReader.FieldCount;
+                
                 var cells = Enumerable
                     .Range(0, cellCount)
                     .Select(csvReader.GetField<string>)
                     .ToList();
+                
+                var currentRowIndex = csvReader.Context.Row + (skipHeaderRow ? -1 : 0);
 
-                var result = await action.Invoke(cells, csvReader.Context.Row);
+                var result = await func.Invoke(cells, currentRowIndex);
 
                 if (!result)
                 {
@@ -79,18 +115,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
             }
         }
         
+        /// <summary>
+        /// Execute a given function against each row of the provided CSV.  The cells of the current row and the index
+        /// of the row in the CSV are provided to the function. 
+        /// </summary>
+        /// <remarks>
+        /// This method uses and closes the provided Stream.
+        /// </remarks>
+        /// <param name="streamProvider">The Stream of the CSV.</param>
+        /// <param name="func">The function to execute against each row of the CSV. The function takes the cells and
+        /// the index of the current row.
+        /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
+        /// </param>
+        /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
         public static Task ForEachRow(
             Func<Task<Stream>> streamProvider,
-            Func<List<string>, int, Task> action,
+            Func<List<string>, int, Task> func,
             bool skipHeaderRow = true)
         {
             return ForEachRow(streamProvider, async (cells, index) =>
             {
-                await action.Invoke(cells, index);
+                await func.Invoke(cells, index);
                 return true;
             }, skipHeaderRow);
         }
         
+        /// <summary>
+        /// Execute a given function against each row of the provided CSV.  The cells of the current row and the index
+        /// of the row in the CSV are provided to the function. 
+        /// </summary>
+        /// <remarks>
+        /// This method uses and closes the provided Stream.
+        /// </remarks>
+        /// <param name="streamProvider">The Stream of the CSV.</param>
+        /// <param name="action">The action to execute against each row of the CSV. The function takes the cells and
+        /// the index of the current row, and returns "true" to continue iterating, or "false" to finish looping early.
+        /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
+        /// </param>
+        /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
         public static Task ForEachRow(
             Func<Task<Stream>> streamProvider,
             Func<List<string>, int, bool> action,
@@ -103,6 +165,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
             }, skipHeaderRow);
         }
         
+        /// <summary>
+        /// Execute a given function against each row of the provided CSV.  The cells of the current row and the index
+        /// of the row in the CSV are provided to the function. 
+        /// </summary>
+        /// <remarks>
+        /// This method uses and closes the provided Stream.
+        /// </remarks>
+        /// <param name="streamProvider">The Stream of the CSV.</param>
+        /// <param name="action">The action to execute against each row of the CSV. The function takes the cells and
+        /// the index of the current row.
+        /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
+        /// </param>
+        /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
         public static Task ForEachRow(
             Func<Task<Stream>> streamProvider,
             Action<List<string>, int> action,
@@ -115,29 +190,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
             }, skipHeaderRow);
         }
 
+        /// <summary>
+        /// Execute a given function against each row of the provided CSV and uses the return value to build a new
+        /// List of results of type <typeparam name="TResult" />.  The cells of the current row and the index
+        /// of the row in the CSV are provided to the function. 
+        /// </summary>
+        /// <remarks>
+        /// This method uses and closes the provided Stream.
+        /// </remarks>
+        /// <param name="streamProvider">The Stream of the CSV.</param>
+        /// <param name="func">The function to execute against each row of the CSV. The function takes the cells and
+        /// the index of the current row, and returns a new value per line of the CSV to generate a new List.
+        /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
+        /// </param>
+        /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
         public static async Task<List<TResult>> Select<TResult>(
             Func<Task<Stream>> streamProvider,
-            Func<List<string>, int, Task<TResult>> action,
+            Func<List<string>, int, Task<TResult>> func,
             bool skipHeaderRow = true)
         {
             var list = new List<TResult>();
 
             await ForEachRow(streamProvider, async (cells, index) =>
             {
-                list.Add(await action.Invoke(cells, index));
+                list.Add(await func.Invoke(cells, index));
             }, skipHeaderRow);
 
             return list;
         }
         
+        /// <summary>
+        /// Execute a given function against each row of the provided CSV and uses the return value to build a new
+        /// List of results of type <typeparam name="TResult" />.  The cells of the current row and the index
+        /// of the row in the CSV are provided to the function. 
+        /// </summary>
+        /// <remarks>
+        /// This method uses and closes the provided Stream.
+        /// </remarks>
+        /// <param name="streamProvider">The Stream of the CSV.</param>
+        /// <param name="func">The function to execute against each row of the CSV. The function takes the cells and
+        /// the index of the current row, and returns a new value per line of the CSV to generate a new List.
+        /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
+        /// </param>
+        /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
         public static Task<List<TResult>> Select<TResult>(
             Func<Task<Stream>> streamProvider,
-            Func<List<string>, int, TResult> action,
+            Func<List<string>, int, TResult> func,
             bool skipHeaderRow = true)
         {
             return Select(streamProvider, (cells, index) =>
             {
-                var result = action.Invoke(cells, index);
+                var result = func.Invoke(cells, index);
                 return Task.FromResult(result);
             }, skipHeaderRow);
         }
