@@ -20,8 +20,11 @@ from robot import rebot_cli as robot_rebot_cli
 from robot import run_cli as robot_run_cli
 from scripts.get_webdriver import get_webdriver
 from tests.libs.create_emulator_release_files import ReleaseFilesGenerator
+from tests.libs.logger import get_logger
 from tests.libs.setup_auth_variables import setup_auth_variables
 from tests.libs.slack import send_slack_report
+
+logger = get_logger(__name__)
 
 current_dir = Path(__file__).absolute().parent
 os.chdir(current_dir)
@@ -239,9 +242,9 @@ def admin_request(method, endpoint, body=None):
     )
 
     if response.status_code in {401, 403}:
-        print("Attempting re-authentication...", flush=True)
+        logger.info("Attempting re-authentication...")
 
-        # Delete identify files and re-attempt to fetch them
+        # Delete identify files and re-≈attempt to fetch them
         setup_authentication(clear_existing=True)
         jwt_token = json.loads(os.environ["IDENTITY_LOCAL_STORAGE_ADMIN"])["access_token"]
         response = session.request(
@@ -316,7 +319,7 @@ if args.tests and "general_public" not in args.tests:
         runIdentifier = datetime.datetime.utcnow().strftime("%Y%m%d-%H%M%S")
 
         os.environ["RUN_IDENTIFIER"] = runIdentifier
-        print(f"Starting tests with RUN_IDENTIFIER: {runIdentifier}")
+        logger.info(f"Starting tests with RUN_IDENTIFIER: {runIdentifier}")
 
         get_themes_resp = get_test_themes()
         test_theme_id = None
@@ -384,16 +387,15 @@ try:
     elif args.interp == "pabot":
         if args.processes:
             robotArgs = ["--processes", int(args.processes)] + robotArgs
-        else:
             pabot_run_cli(robotArgs)
 
 finally:
     if not args.disable_teardown:
-        print("Tearing down tests...", flush=True)
+        logger.info("Tearing down tests...")
         delete_test_topic()
 
     if args.rerun_failed_tests or args.rerun_failed_suites:
-        print("Combining rerun test results with original test results")
+        logger.info("Combining rerun test results with original test results")
         merge_options = [
             "--outputdir",
             "test-results/",
@@ -407,8 +409,8 @@ finally:
         ]
         robot_rebot_cli(merge_options, exit=False)
 
-    print(f"\nLog available at: file://{os.getcwd()}{os.sep}test-results{os.sep}log.html")
-    print(f"Report available at: file://{os.getcwd()}{os.sep}test-results{os.sep}report.html")
-    print("\nTests finished!")
+    logger.info(f"\nLog available at: file://{os.getcwd()}{os.sep}test-results{os.sep}log.html")
+    logger.info(f"Report available at: file://{os.getcwd()}{os.sep}test-results{os.sep}report.html")
+    logger.info("\nTests finished!")
     if args.enable_slack:
         send_slack_report(args.env, args.tests)

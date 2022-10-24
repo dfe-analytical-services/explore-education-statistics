@@ -6,8 +6,11 @@ import requests
 from bs4 import BeautifulSoup
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
+from tests.libs.logger import get_logger
 
 PATH = f"{os.getcwd()}{os.sep}test-results"
+
+logger = get_logger(__name__)
 
 
 def _generate_slack_attachments(env: str, suite: str):
@@ -60,8 +63,8 @@ def send_slack_report(env: str, suite: str):
     webhook_url = os.getenv("SLACK_TEST_REPORT_WEBHOOK_URL")
     slack_bot_token = os.getenv("SLACK_BOT_TOKEN")
 
-    assert webhook_url, print("SLACK_TEST_REPORT_WEBHOOK_URL env variable needs to be set")
-    assert slack_bot_token, print("SLACK_BOT_TOKEN env variable needs to be set")
+    assert webhook_url, logger.warn("SLACK_TEST_REPORT_WEBHOOK_URL env variable needs to be set")
+    assert slack_bot_token, logger.warn("SLACK_BOT_TOKEN env variable needs to be set")
 
     if "hooks.slack.com" not in webhook_url:
         raise Exception(
@@ -76,9 +79,9 @@ def send_slack_report(env: str, suite: str):
     response = requests.post(
         url=webhook_url, data=json.dumps({"attachments": attachments}), headers={"Content-Type": "application/json"}
     )
-    assert response.status_code == 200, print(f"Response wasn't 200, it was {response}")
+    assert response.status_code == 200, logger.error(f"Response wasn't 200, it was {response}")
 
-    print("Sent UI test statistics to #build")
+    logger.info("Sent UI test statistics to #build")
 
     if _tests_failed():
         client = WebClient(token=slack_bot_token)
@@ -91,6 +94,6 @@ def send_slack_report(env: str, suite: str):
                 title="test-report.zip",
             )
         except SlackApiError as e:
-            print(f"Error uploading test report: {e}")
+            logger.error(f"Error uploading test report: {e}")
         os.remove("UI-test-report.zip")
-        print("Sent UI test report to #build")
+        logger.info("Sent UI test report to #build")
