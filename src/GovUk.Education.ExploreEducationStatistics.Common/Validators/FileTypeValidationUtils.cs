@@ -7,16 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Validators
 {
     public static class FileTypeValidationUtils
     {
-        public static readonly Regex[] AllowedCsvMimeTypes = {
-            new Regex(@"^(application|text)/csv$"),
-            new Regex(@"text/plain$")
-        };
-
-        public static readonly string[] CsvEncodingTypes = {
-            "us-ascii",
-            "utf-8"
-        };
-            
         public static readonly string[] ZipEncodingTypes = {
             "binary",
         };
@@ -49,11 +39,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Validators
         };
         
         public static readonly Dictionary<FileType, IEnumerable<Regex>> AllowedMimeTypesByFileType = 
-            new Dictionary<FileType, IEnumerable<Regex>>
+            new()
             {
                 { Ancillary, AllowedAncillaryFileTypes },
                 { Chart, AllowedChartFileTypes },
-                { Data, AllowedCsvMimeTypes },
                 { DataZip, AllowedArchiveMimeTypes },
                 { Image, AllowedImageMimeTypes }
             };

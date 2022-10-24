@@ -125,19 +125,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var dataFile = CreateFormFileMock("test.csv").Object;
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
-
+                
                 fileTypeService
-                    .Setup(s => s.HasMatchingMimeType(dataFile, AllowedCsvMimeTypes))
+                    .Setup(s => s.IsValidCsvDataOrMetaFile(dataFile))
                     .ReturnsAsync(() => true);
                 fileTypeService
-                    .Setup(s => s.HasMatchingMimeType(metaFile, AllowedCsvMimeTypes))
+                    .Setup(s => s.IsValidCsvDataOrMetaFile(metaFile))
                     .ReturnsAsync(() => true);
-                fileTypeService
-                    .Setup(s => s.HasMatchingEncodingType(dataFile, CsvEncodingTypes))
-                    .Returns(() => true);
-                fileTypeService
-                    .Setup(s => s.HasMatchingEncodingType(metaFile, CsvEncodingTypes))
-                    .Returns(() => true);
 
                 var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
                 VerifyAllMocks(fileTypeService);
@@ -189,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
                 fileTypeService
-                    .Setup(s => s.HasMatchingMimeType(dataFile, AllowedCsvMimeTypes))
+                    .Setup(s => s.IsValidCsvDataOrMetaFile(dataFile))
                     .ReturnsAsync(() => false);
 
                 var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
@@ -210,13 +204,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
                 fileTypeService
-                    .Setup(s => s.HasMatchingMimeType(dataFile, AllowedCsvMimeTypes))
+                    .Setup(s => s.IsValidCsvDataOrMetaFile(dataFile))
                     .ReturnsAsync(() => true);
                 fileTypeService
-                    .Setup(s => s.HasMatchingEncodingType(dataFile, CsvEncodingTypes))
-                    .Returns(() => true);
-                fileTypeService
-                    .Setup(s => s.HasMatchingMimeType(metaFile, AllowedCsvMimeTypes))
+                    .Setup(s => s.IsValidCsvDataOrMetaFile(metaFile))
                     .ReturnsAsync(() => false);
 
                 var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
@@ -298,17 +289,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 };
 
                 fileTypeService
-                    .Setup(s => s.HasMatchingMimeType(dataFile, AllowedCsvMimeTypes))
+                    .Setup(s => s.IsValidCsvDataOrMetaFile(dataFile))
                     .ReturnsAsync(() => true);
                 fileTypeService
-                    .Setup(s => s.HasMatchingMimeType(metaFile, AllowedCsvMimeTypes))
+                    .Setup(s => s.IsValidCsvDataOrMetaFile(metaFile))
                     .ReturnsAsync(() => true);
-                fileTypeService
-                    .Setup(s => s.HasMatchingEncodingType(dataFile, CsvEncodingTypes))
-                    .Returns(() => true);
-                fileTypeService
-                    .Setup(s => s.HasMatchingEncodingType(metaFile, CsvEncodingTypes))
-                    .Returns(() => true);
 
                 var result = await service.ValidateDataFilesForUpload(
                     releaseId, dataFile, metaFile, fileBeingReplaced);
@@ -411,17 +396,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
                 fileTypeService
-                    .Setup(s => s.HasMatchingMimeType(dataFile, AllowedCsvMimeTypes))
+                    .Setup(s => s.IsValidCsvDataOrMetaFile(dataFile))
                     .ReturnsAsync(() => true);
                 fileTypeService
-                    .Setup(s => s.HasMatchingMimeType(metaFile, AllowedCsvMimeTypes))
+                    .Setup(s => s.IsValidCsvDataOrMetaFile(metaFile))
                     .ReturnsAsync(() => true);
-                fileTypeService
-                    .Setup(s => s.HasMatchingEncodingType(dataFile, CsvEncodingTypes))
-                    .Returns(() => true);
-                fileTypeService
-                    .Setup(s => s.HasMatchingEncodingType(metaFile, CsvEncodingTypes))
-                    .Returns(() => true);
 
                 var result = await service.ValidateDataFilesForUpload(releaseId, dataFile, metaFile);
                 VerifyAllMocks(fileTypeService);

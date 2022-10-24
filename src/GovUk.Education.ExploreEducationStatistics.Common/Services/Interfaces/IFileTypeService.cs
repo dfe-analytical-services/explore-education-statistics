@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -19,5 +20,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         Task<bool> HasMatchingMimeType(Stream stream, IEnumerable<Regex> mimeTypes);
 
         bool HasMatchingEncodingType(Stream stream, IEnumerable<string> encodingTypes);
+
+        Task<bool> IsValidCsvDataOrMetaFile(
+            Func<Task<Stream>> streamProvider,
+            string filename);
+        
+        Task<bool> IsValidCsvDataOrMetaFile(IFormFile file);
     }
 }

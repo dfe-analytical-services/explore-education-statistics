@@ -79,15 +79,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         /// </summary>
         private const int Stage1RowCheck = 1000;
         
-        /// <summary>
-        /// Number of lines to use as a content sample when validating a CSV file's Mime type.
-        /// </summary>
-        /// <remarks>
-        /// Without limiting this, the entire file contents is used in determining whether or not the given file is
-        /// of type application/csv by the Mime library.
-        ///</remarks>
-        private const int CsvMimeTypeSampleLineCount = 1000;
-
         private static readonly List<string> MandatoryObservationColumns = new()
         {
             "time_identifier",
@@ -140,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Func<Task<Stream>> fileStreamProvider,
             bool isMetaFile)
         {
-            if (!await IsCsvFile(file.Filename, fileStreamProvider))
+            if (!await _fileTypeService.IsValidCsvDataOrMetaFile(fileStreamProvider, file.Filename))
             {
                 return ListOf(isMetaFile
                     ? new DataImportError($"{MetaFileMustBeCsvFile.GetEnumLabel()}")
@@ -336,42 +327,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .Build();
         }
 
-        private async Task<bool> IsCsvFile(string filename, Func<Task<Stream>> fileStreamProvider)
-        {
-            _logger.LogDebug("Validating that {FileName} has a CSV mime type", filename);
-
-            await using var sampleLinesStream = await GetSampleLinesStream(fileStreamProvider, CsvMimeTypeSampleLineCount);
-            
-            var hasMatchingMimeType = await _fileTypeService.HasMatchingMimeType(
-                sampleLinesStream,
-                AllowedMimeTypesByFileType[FileType.Data]
-            );
-
-            if (!hasMatchingMimeType)
-            {
-                return false;
-            }
-
-            _logger.LogDebug("{FileName} has a valid CSV mime type", filename);
-
-            _logger.LogDebug("Validating that {FileName} has a valid CSV character encoding", filename);
-
-            await using var encodingStream = await fileStreamProvider.Invoke();
-
-            var hasMatchingEncodingType = _fileTypeService.HasMatchingEncodingType(encodingStream, CsvEncodingTypes);
-
-            if (hasMatchingEncodingType)
-            {
-                _logger.LogDebug("{FileName} has a valid CSV content encoding", filename);
-            }
-            else
-            {
-                _logger.LogDebug("{FileName} does not have a valid CSV content encoding", filename);
-            }
-
-            return hasMatchingEncodingType;
-        }
-
         private static int GetNumBatches(int rows, int rowsPerBatch)
         {
             return (int) Math.Ceiling(rows / (double) rowsPerBatch);
@@ -389,51 +344,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             // Exclude the counts of any 'solo' levels.
             // Those rows will be ignored since they are not being imported exclusively.
             return rowCountByGeographicLevel.Sum(pair => pair.Key.IsSoloImportableLevel() ? 0 : pair.Value);
-        }
-        
-        /// <summary>
-        /// Obtain a set of sample lines of the given file, for the purposes of checking the file's mime type and
-        /// content encoding.
-        /// </summary>
-        private async Task<Stream?> GetSampleLinesStream(Func<Task<Stream>> fileStreamProvider, int sampleLineCount)
-        {
-            using var streamReader = new StreamReader(await fileStreamProvider.Invoke());
-
-            var lines = new List<string>();
-            
-            try
-            {
-                var linesRead = 0;
-
-                while (linesRead < sampleLineCount && !streamReader.EndOfStream)
-                {
-                    var nextLine = await streamReader.ReadLineAsync();
-
-                    if (nextLine == null)
-                    {
-                        _logger.LogError("Unable to read next sample line {LineNumber} from CSV", linesRead + 1);
-                        break;
-                    }
-                    
-                    lines.Add(nextLine);
-                    linesRead++;
-                }
-                
-            }
-            catch (Exception e)
-            {
-                _logger.LogError("Unable to read sample lines from CSV - {ErrorMessage}", e.Message);
-                _logger.LogError(e.StackTrace);
-                return null;
-            }
-
-            var lineStream = new MemoryStream();
-            var writer = new StreamWriter(lineStream);
-            await writer.WriteAsync(lines.JoinToString('\n'));
-            await writer.FlushAsync();
-            lineStream.Position = 0;
-
-            return lineStream;
         }
     }
 }

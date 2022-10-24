@@ -105,13 +105,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await Task.FromResult(Unit.Instance);
         }
 
-        private async Task<bool> IsCsvFile(IFormFile file)
-        {
-            // TODO use special checker for sample lines
-            return await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[FileType.Data])
-                   && _fileTypeService.HasMatchingEncodingType(file, CsvEncodingTypes);
-        }
-
         private static bool FileContainsSpacesOrSpecialChars(string filename)
         {
             return filename.IndexOf(" ", Ordinal) > -1 ||
@@ -198,12 +191,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Unit>> ValidateDataFileTypes(IFormFile dataFile, IFormFile metaFile)
         {
-            if (!await IsCsvFile(dataFile))
+            if (!await _fileTypeService.IsValidCsvDataOrMetaFile(dataFile))
             {
                 return ValidationActionResult(DataFileMustBeCsvFile);
             }
 
-            if (!await IsCsvFile(metaFile))
+            if (!await _fileTypeService.IsValidCsvDataOrMetaFile(metaFile))
             {
                 return ValidationActionResult(MetaFileMustBeCsvFile);
             }
