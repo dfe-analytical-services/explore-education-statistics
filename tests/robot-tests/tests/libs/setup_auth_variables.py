@@ -5,6 +5,7 @@ from typing import Tuple
 
 import requests
 from scripts.get_auth_tokens import get_identity_info
+from tests.libs.logger import get_logger
 
 
 def setup_auth_variables(
@@ -13,6 +14,8 @@ def setup_auth_variables(
     assert user, "user param must be set"
     assert email, "email param must be set"
     assert password, "password param must be set"
+
+    logger = get_logger(__name__)
 
     local_storage_name = f"IDENTITY_LOCAL_STORAGE_{user}"
     cookie_name = f"IDENTITY_COOKIE_{user}"
@@ -57,10 +60,10 @@ def setup_auth_variables(
             authenticated = True
         else:
             authenticated = False
-            print("Found invalid authentication information in local files!", flush=True)
+            logger.warn("Found invalid authentication information in local files!")
 
     if not authenticated:
-        print(f"Logging in to obtain {user} authentication information...", flush=True)
+        logger.info(f"Logging in to obtain {user} authentication information...")
 
         os.environ[local_storage_name], os.environ[cookie_name] = get_identity_info(
             url=admin_url, email=email, password=password, driver=driver, identity_provider=identity_provider
@@ -70,7 +73,7 @@ def setup_auth_variables(
         local_storage_file.write_text(os.environ[local_storage_name])
         cookie_file.write_text(os.environ[cookie_name])
 
-        print("Done!", flush=True)
+        logger.info("Done!")
 
     local_storage_token = os.getenv(local_storage_name)
     cookie_token = os.getenv(cookie_name)

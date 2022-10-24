@@ -1,6 +1,8 @@
 import argparse
 import subprocess
 
+from tests.libs.logger import get_logger
+
 # NOTE(mark): The slack webhook url, and admin and analyst passwords to access to Admin app are
 # stored in the CI pipeline as secret variables, which means they cannot be accessed as normal
 # environment variables, and instead must be passed as an argument to this script.
@@ -22,7 +24,9 @@ def run_tests_pipeline():
     if args.env not in valid_environments:
         raise Exception(f"Invalid environment provided: {args.env}. Valid environments: {valid_environments}")
 
-    print("Installing dependencies")
+    logger = get_logger(__name__)
+
+    logger.info("Installing dependencies")
     subprocess.check_call(["google-chrome-stable", "--version"])
     subprocess.check_call("python -m pip install --upgrade pip", shell=True)
     subprocess.check_call("pip install pipenv", shell=True)
