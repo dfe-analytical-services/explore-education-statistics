@@ -1,31 +1,33 @@
 import base64
-import json
-import pytz
-import time
 import datetime
-from logging import warning
-from SeleniumLibrary.utils import is_noney
-from robot.libraries.BuiltIn import BuiltIn
-from SeleniumLibrary.keywords.waiting import WaitingKeywords
-from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.common.by import By
-from typing import Union
-import utilities_init
+import json
 import os
 import re
+import time
+from logging import warning
+from typing import Union
 from urllib.parse import urlparse
-import visual
 
-sl = BuiltIn().get_library_instance('SeleniumLibrary')
+import pytz
+import utilities_init
+import visual
+from robot.libraries.BuiltIn import BuiltIn
+from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
+from SeleniumLibrary.keywords.waiting import WaitingKeywords
+from SeleniumLibrary.utils import is_noney
+
+sl = BuiltIn().get_library_instance("SeleniumLibrary")
 element_finder = sl._element_finder
 waiting = WaitingKeywords(sl)
 
 # Should only initialise some parts once e.g. registration
 # of custom locators onto the framework's ElementFinder
 if not utilities_init.initialised:
+
     def _normalize_parent_locator(parent_locator: object) -> Union[str, WebElement]:
         if not isinstance(parent_locator, str) and not isinstance(parent_locator, WebElement):
-            return 'css:body'
+            return "css:body"
 
         return parent_locator
 
@@ -37,8 +39,8 @@ if not utilities_init.initialised:
         if len(labels) == 0:
             return []
 
-        for_id = labels[0].get_attribute('for')
-        return get_child_elements(parent_locator, f'id:{for_id}')
+        for_id = labels[0].get_attribute("for")
+        return get_child_elements(parent_locator, f"id:{for_id}")
 
     def _find_by_testid(parent_locator: object, criteria: str, tag: str, constraints: dict) -> list:
         parent_locator = _normalize_parent_locator(parent_locator)
@@ -47,31 +49,29 @@ if not utilities_init.initialised:
 
     # Register locator strategies
 
-    element_finder.register('label', _find_by_label, persist=True)
-    element_finder.register('testid', _find_by_testid, persist=True)
+    element_finder.register("label", _find_by_label, persist=True)
+    element_finder.register("testid", _find_by_testid, persist=True)
 
     utilities_init.initialised = True
 
 
 def enable_basic_auth_headers():
     # Setup basic auth headers for public frontend
-    public_auth_user = os.getenv('PUBLIC_AUTH_USER')
-    public_auth_password = os.getenv('PUBLIC_AUTH_PASSWORD')
+    public_auth_user = os.getenv("PUBLIC_AUTH_USER")
+    public_auth_password = os.getenv("PUBLIC_AUTH_PASSWORD")
 
     if public_auth_user and public_auth_password:
-        token = base64.b64encode(f'{public_auth_user}:{public_auth_password}'.encode())
+        token = base64.b64encode(f"{public_auth_user}:{public_auth_password}".encode())
 
-        sl.driver.execute_cdp_cmd('Network.enable', {})
-        sl.driver.execute_cdp_cmd('Network.setExtraHTTPHeaders', {
-            'headers': {
-                'Authorization': f'Basic {token.decode()}'
-            }
-        })
+        sl.driver.execute_cdp_cmd("Network.enable", {})
+        sl.driver.execute_cdp_cmd(
+            "Network.setExtraHTTPHeaders", {"headers": {"Authorization": f"Basic {token.decode()}"}}
+        )
 
 
 def disable_basic_auth_headers():
     # Must be disabled to visit admin frontend
-    sl.driver.execute_cdp_cmd('Network.disable', {})
+    sl.driver.execute_cdp_cmd("Network.disable", {})
 
 
 def raise_assertion_error(err_msg):
@@ -79,9 +79,9 @@ def raise_assertion_error(err_msg):
     raise AssertionError(err_msg)
 
 
-def user_waits_until_parent_contains_element(parent_locator: object, child_locator: str,
-                                             timeout: int = None, error: str = None,
-                                             count: int = None):
+def user_waits_until_parent_contains_element(
+    parent_locator: object, child_locator: str, timeout: int = None, error: str = None, count: int = None
+):
     try:
         child_locator = _normalise_child_locator(child_locator)
 
@@ -93,7 +93,8 @@ def user_waits_until_parent_contains_element(parent_locator: object, child_locat
             return waiting._wait_until(
                 parent_contains_matching_element,
                 "Parent '%s' did not contain '%s' in <TIMEOUT>." % (parent_locator, child_locator),
-                timeout, error
+                timeout,
+                error,
             )
 
         count = int(count)
@@ -104,19 +105,21 @@ def user_waits_until_parent_contains_element(parent_locator: object, child_locat
 
         waiting._wait_until(
             parent_contains_matching_elements,
-            "Parent '%s' did not contain %s '%s' element(s) within <TIMEOUT>." % (
-                parent_locator, count, child_locator),
-            timeout, error
+            "Parent '%s' did not contain %s '%s' element(s) within <TIMEOUT>." % (parent_locator, count, child_locator),
+            timeout,
+            error,
         )
     except Exception as err:
-        warning(f"Error whilst executing utilities.py user_waits_until_parent_contains_element() "
-                f"with parent {parent_locator} and child locator {child_locator} - {err}")
+        warning(
+            f"Error whilst executing utilities.py user_waits_until_parent_contains_element() "
+            f"with parent {parent_locator} and child locator {child_locator} - {err}"
+        )
         raise_assertion_error(err)
 
 
-def user_waits_until_parent_does_not_contain_element(parent_locator: object, child_locator: str,
-                                                     timeout: int = None, error: str = None,
-                                                     count: int = None):
+def user_waits_until_parent_does_not_contain_element(
+    parent_locator: object, child_locator: str, timeout: int = None, error: str = None, count: int = None
+):
     try:
         child_locator = _normalise_child_locator(child_locator)
 
@@ -127,9 +130,9 @@ def user_waits_until_parent_does_not_contain_element(parent_locator: object, chi
         if is_noney(count):
             return waiting._wait_until(
                 parent_does_not_contain_matching_element,
-                "Parent '%s' should not have contained '%s' in <TIMEOUT>." % (
-                    parent_locator, child_locator),
-                timeout, error
+                "Parent '%s' should not have contained '%s' in <TIMEOUT>." % (parent_locator, child_locator),
+                timeout,
+                error,
             )
 
         count = int(count)
@@ -140,14 +143,17 @@ def user_waits_until_parent_does_not_contain_element(parent_locator: object, chi
 
         waiting._wait_until(
             parent_does_not_contain_matching_elements,
-            "Parent '%s' should not have contained %s '%s' element(s) within <TIMEOUT>." % (
-                parent_locator, count, child_locator),
-            timeout, error
+            "Parent '%s' should not have contained %s '%s' element(s) within <TIMEOUT>."
+            % (parent_locator, count, child_locator),
+            timeout,
+            error,
         )
     except Exception as err:
-        warning(f"Error whilst executing utilities.py "
-                f"user_waits_until_parent_does_not_contain_element() with parent {parent_locator} "
-                f"and child locator {child_locator} - {err}")
+        warning(
+            f"Error whilst executing utilities.py "
+            f"user_waits_until_parent_does_not_contain_element() with parent {parent_locator} "
+            f"and child locator {child_locator} - {err}"
+        )
         raise_assertion_error(err)
 
 
@@ -156,19 +162,25 @@ def get_child_element(parent_locator: object, child_locator: str):
         children = get_child_elements(parent_locator, child_locator)
 
         if len(children) == 0:
-            raise_assertion_error(f"Found no elements matching child locator {child_locator} under parent "
-                                  f"locator {parent_locator} in utilities.py#get_child_element()")
+            raise_assertion_error(
+                f"Found no elements matching child locator {child_locator} under parent "
+                f"locator {parent_locator} in utilities.py#get_child_element()"
+            )
 
         if len(children) > 1:
-            warning(f"Found {len(children)} child elements matching child locator {child_locator} "
-                    f"under parent locator {parent_locator} in utilities.py#get_child_element() - "
-                    f"was expecting only one. Consider making the parent selector more specific. "
-                    f"Returning the first element found.")
+            warning(
+                f"Found {len(children)} child elements matching child locator {child_locator} "
+                f"under parent locator {parent_locator} in utilities.py#get_child_element() - "
+                f"was expecting only one. Consider making the parent selector more specific. "
+                f"Returning the first element found."
+            )
 
         return children[0]
     except Exception as err:
-        warning(f"Error whilst executing utilities.py get_child_element() with parent {parent_locator} and child "
-                f"locator {child_locator} - {err}")
+        warning(
+            f"Error whilst executing utilities.py get_child_element() with parent {parent_locator} and child "
+            f"locator {child_locator} - {err}"
+        )
         raise_assertion_error(err)
 
 
@@ -201,26 +213,25 @@ def set_to_local_storage(key: str, value: str):
 
 def set_cookie_from_json(cookie_json):
     cookie_dict = json.loads(cookie_json)
-    del cookie_dict['domain']
+    del cookie_dict["domain"]
 
     sl.driver.add_cookie(cookie_dict)
 
 
 def format_uk_to_local_datetime(uk_local_datetime: str, strf: str) -> str:
-    if os.name == 'nt':
-        strf = strf.replace('%-', '%#')
+    if os.name == "nt":
+        strf = strf.replace("%-", "%#")
 
-    tz = pytz.timezone('Europe/London')
+    tz = pytz.timezone("Europe/London")
 
-    return tz.localize(datetime.datetime.fromisoformat(uk_local_datetime)) \
-        .astimezone().strftime(strf)
+    return tz.localize(datetime.datetime.fromisoformat(uk_local_datetime)).astimezone().strftime(strf)
 
 
 def get_current_datetime(strf: str, offset_days: int = 0) -> str:
     now = datetime.datetime.now() + datetime.timedelta(days=offset_days)
 
-    if os.name == 'nt':
-        strf = strf.replace('%-', '%#')
+    if os.name == "nt":
+        strf = strf.replace("%-", "%#")
 
     return now.strftime(strf)
 
@@ -234,8 +245,8 @@ def user_should_be_at_top_of_page():
 def prompt_to_continue():
     warning("Continue? (Y/n)")
     choice = input()
-    if (choice.lower().startswith("n")):
-        raise_assertion_error('Tests stopped!')
+    if choice.lower().startswith("n"):
+        raise_assertion_error("Tests stopped!")
 
 
 def capture_large_screenshot_and_prompt_to_continue():
@@ -257,17 +268,18 @@ def capture_html():
     warning(f"Captured HTML of {sl.get_location()}      HTML saved to file://{os.path.realpath(html_file.name)}")
 
 
-def user_gets_row_number_with_heading(heading: str, table_locator: str = 'css:table'):
+def user_gets_row_number_with_heading(heading: str, table_locator: str = "css:table"):
     elem = get_child_element(table_locator, f'xpath:.//tbody/tr/th[text()="{heading}"]/..')
-    rows = get_child_elements(table_locator, 'css:tbody tr')
+    rows = get_child_elements(table_locator, "css:tbody tr")
     return rows.index(elem) + 1
 
 
-def user_gets_row_with_group_and_indicator(group: str, indicator: str,
-                                           table_selector: str = 'css:table'):
+def user_gets_row_with_group_and_indicator(group: str, indicator: str, table_selector: str = "css:table"):
     table_elem = sl.get_webelement(table_selector)
     elems = table_elem.find_elements(
-        By.XPATH, f'.//tbody/tr/th[text()="{group}"]/../self::tr | .//tbody/tr/th[text()="{group}"]/../following-sibling::tr')
+        By.XPATH,
+        f'.//tbody/tr/th[text()="{group}"]/../self::tr | .//tbody/tr/th[text()="{group}"]/../following-sibling::tr',
+    )
     for elem in elems:
         try:
             elem.find_element(By.XPATH, f'.//th[text()="{indicator}"]/..')
@@ -279,19 +291,20 @@ def user_gets_row_with_group_and_indicator(group: str, indicator: str,
 
 def user_checks_row_cell_contains_text(row_elem, cell_num, expected_text):
     try:
-        elem = get_child_element(row_elem, f'xpath:.//td[{cell_num}]')
+        elem = get_child_element(row_elem, f"xpath:.//td[{cell_num}]")
     except BaseException:
         raise_assertion_error(f'Couldn\'t find TD tag num "{cell_num}" for provided row element')
 
     if expected_text not in elem.text:
         raise_assertion_error(
             f'TD tag num "{cell_num}" for row element didn\'t contain text "{expected_text}".'
-            f'Found text "{elem.text}"')
+            f'Found text "{elem.text}"'
+        )
 
 
 def remove_substring_from_right_of_string(string, substring):
     if string.endswith(substring):
-        return string[:-len(substring)]
+        return string[: -len(substring)]
     else:
         raise_assertion_error(f'String "{string}" doesn\'t end with substring "{substring}"')
 
@@ -305,7 +318,7 @@ def user_is_on_admin_dashboard(admin_url: str) -> bool:
     current_url = sl.get_location()
     url_parts = urlparse(current_url)
     left_part = f"{url_parts.scheme}://{url_parts.netloc}{url_parts.path}"
-    if left_part.endswith('/'):
+    if left_part.endswith("/"):
         left_part = left_part[:-1]
     return left_part == admin_url or left_part == f"{admin_url}/dashboard"
 
@@ -313,10 +326,10 @@ def user_is_on_admin_dashboard(admin_url: str) -> bool:
 def user_is_on_admin_dashboard_with_theme_and_topic_selected(admin_url: str, theme: str, topic: str) -> bool:
     if not user_is_on_admin_dashboard(admin_url):
         return False
-    selected_theme = sl.get_selected_list_label('id:publicationsReleases-themeTopic-themeId')
+    selected_theme = sl.get_selected_list_label("id:publicationsReleases-themeTopic-themeId")
     if selected_theme != theme:
         return False
-    selected_topic = sl.get_selected_list_label('id:publicationsReleases-themeTopic-topicId')
+    selected_topic = sl.get_selected_list_label("id:publicationsReleases-themeTopic-topicId")
     return selected_topic == topic
 
 
@@ -339,12 +352,12 @@ def _normalise_child_locator(child_locator: str) -> str:
         # to the root of the DOM, leading to false positives or incorrectly found DOM elements.  The below
         # substitution covers both child selectors beginning with "xpath://" and "//", as the double forward
         # slashes without the "xpath:" prefix are inferred as being xpath expressions.
-        return re.sub(r'^(xpath:)?//', "xpath:.//", child_locator)
+        return re.sub(r"^(xpath:)?//", "xpath:.//", child_locator)
 
     raise_assertion_error(f"Child locator was not a str - {child_locator}")
 
 
-def _get_parent_webelement_from_locator(parent_locator: object, timeout: int = None, error: str = '') -> WebElement:
+def _get_parent_webelement_from_locator(parent_locator: object, timeout: int = None, error: str = "") -> WebElement:
     if isinstance(parent_locator, str):
         sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)
         return sl.find_element(parent_locator)

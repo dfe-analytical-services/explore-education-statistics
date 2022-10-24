@@ -1,10 +1,11 @@
-from selenium.webdriver.remote.webelement import WebElement
-from os import getcwd, path, pardir, makedirs
-from robot.libraries.BuiltIn import BuiltIn
-from logging import warning
 import os
+from logging import warning
+from os import getcwd, makedirs, pardir, path
 
-sl = BuiltIn().get_library_instance('SeleniumLibrary')
+from robot.libraries.BuiltIn import BuiltIn
+from selenium.webdriver.remote.webelement import WebElement
+
+sl = BuiltIn().get_library_instance("SeleniumLibrary")
 
 
 def with_no_overflow(func):
@@ -16,16 +17,15 @@ def with_no_overflow(func):
             return func(*args, **kwargs)
         finally:
             sl.driver.execute_script("document.head.innerHTML = arguments[0];", head_html)
+
     return wrapper
 
 
 def with_maximised_browser(func):
     def wrapper(*args, **kwargs):
         currentWindow = sl.get_window_size()
-        page_width = sl.driver.execute_script(
-            "return document.documentElement.scrollWidth;") + 100
-        page_height = sl.driver.execute_script(
-            "return document.documentElement.scrollHeight;") + 100
+        page_width = sl.driver.execute_script("return document.documentElement.scrollWidth;") + 100
+        page_height = sl.driver.execute_script("return document.documentElement.scrollHeight;") + 100
 
         original_width = currentWindow[0]
         original_height = currentWindow[1]
@@ -36,14 +36,13 @@ def with_maximised_browser(func):
             return func(*args, **kwargs)
         finally:
             sl.set_window_size(original_width, original_height)
+
     return wrapper
 
 
 def highlight_element(element: WebElement):
-    sl.driver.execute_script(
-        "arguments[0].scrollIntoView();", element)
-    sl.driver.execute_script(
-        "arguments[0].style.border = 'red 4px solid';", element)
+    sl.driver.execute_script("arguments[0].scrollIntoView();", element)
+    sl.driver.execute_script("arguments[0].style.border = 'red 4px solid';", element)
 
 
 @with_maximised_browser
@@ -56,22 +55,22 @@ def capture_large_screenshot():
 @with_maximised_browser
 def take_screenshot_of_element(element: WebElement, filename: str):
     try:
-        filepath = f'{getcwd()}{os.sep}{filename}'
+        filepath = f"{getcwd()}{os.sep}{filename}"
         folder = path.abspath(path.join(filepath, pardir))
         makedirs(folder, exist_ok=True)
         element.screenshot(filepath)
-        return f'file://{filepath}'
+        return f"file://{filepath}"
     except BaseException:
-        warning(f'Unable to take a screenshot of element for file {filename}')
-        return ''
+        warning(f"Unable to take a screenshot of element for file {filename}")
+        return ""
 
 
 def take_html_snapshot_of_element(element: WebElement, filename: str):
-    filepath = f'{getcwd()}{os.sep}{filename}'
+    filepath = f"{getcwd()}{os.sep}{filename}"
     folder = path.abspath(path.join(filepath, pardir))
     makedirs(folder, exist_ok=True)
-    html = element.get_attribute('innerHTML')
+    html = element.get_attribute("innerHTML")
     with open(filepath, "w", encoding="utf-8") as html_file:
         html_file.write(html)
         html_file.close()
-    return f'file://{filepath}'
+    return f"file://{filepath}"
