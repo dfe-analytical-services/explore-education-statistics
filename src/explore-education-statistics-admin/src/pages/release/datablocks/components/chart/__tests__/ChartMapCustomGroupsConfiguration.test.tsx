@@ -1,13 +1,4 @@
-import { testFullTable } from '@admin/pages/release/datablocks/components/chart/__tests__/__data__/testTableData';
-import ChartMapCustomGroupsConfiguration, {
-  ChartMapCustomGroupsConfigurationProps,
-} from '@admin/pages/release/datablocks/components/chart/ChartMapCustomGroupsConfiguration';
-import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
-import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
-import {
-  AxisConfiguration,
-  ChartDefinitionAxis,
-} from '@common/modules/charts/types/chart';
+import ChartMapCustomGroupsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartMapCustomGroupsConfiguration';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -236,6 +227,33 @@ describe('ChartMapCustomGroupsConfiguration', () => {
     await waitFor(() => {
       expect(
         within(maxCell).getByText('Groups cannot overlap'),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('shows a validation error when groups with negative values overlap', async () => {
+    render(
+      <ChartMapCustomGroupsConfiguration
+        groups={[{ min: -2, max: 2 }]}
+        id="testId"
+        onAddGroup={noop}
+        onRemoveGroup={noop}
+      />,
+    );
+
+    userEvent.type(screen.getByLabelText('Min'), '-3');
+
+    const minCell = within(screen.getAllByRole('row')[2]).getAllByRole(
+      'cell',
+    )[0];
+
+    userEvent.type(screen.getByLabelText('Max'), '3');
+
+    userEvent.tab();
+
+    await waitFor(() => {
+      expect(
+        within(minCell).getByText('Groups cannot overlap'),
       ).toBeInTheDocument();
     });
   });

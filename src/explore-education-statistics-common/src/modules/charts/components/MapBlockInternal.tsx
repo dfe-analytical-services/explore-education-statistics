@@ -555,6 +555,11 @@ function generateFeaturesAndDataGroups({
     unit,
   });
 
+  // Default to white for areas not covered by custom data sets
+  // to make it clearer which aren't covered by the groups.
+  const defaultColour =
+    classification === 'Custom' ? 'rgb(255, 255, 255)' : 'rgba(0,0,0,0)';
+
   const features: MapFeatureCollection = {
     type: 'FeatureCollection',
     features: dataSetCategories.reduce<MapFeature[]>(
@@ -573,7 +578,7 @@ function generateFeaturesAndDataGroups({
               ...geoJson.properties,
               dataSets,
               // Default to transparent if no match
-              colour: matchingDataGroup?.colour ?? 'rgba(0, 0, 0, 0)',
+              colour: matchingDataGroup?.colour ?? defaultColour,
               data: value,
             },
           });

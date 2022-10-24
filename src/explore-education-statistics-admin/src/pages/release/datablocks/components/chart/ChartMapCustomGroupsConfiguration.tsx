@@ -75,7 +75,11 @@ export default function ChartMapCustomGroupsConfiguration({
                   return !(
                     groups.length &&
                     groups.some(group => {
-                      return value >= group.min && value <= group.max;
+                      return (
+                        (value >= group.min && value <= group.max) ||
+                        // eslint-disable-next-line react/no-this-in-sfc
+                        (value <= group.max && group.min <= this.parent.max)
+                      );
                     })
                   );
                 }),
@@ -88,7 +92,11 @@ export default function ChartMapCustomGroupsConfiguration({
                   return !(
                     groups.length &&
                     groups.some(group => {
-                      return value >= group.min && value <= group.max;
+                      return (
+                        (value >= group.min && value <= group.max) ||
+                        // eslint-disable-next-line react/no-this-in-sfc
+                        (value <= group.min && group.max <= this.parent.min)
+                      );
                     })
                   );
                 }),
