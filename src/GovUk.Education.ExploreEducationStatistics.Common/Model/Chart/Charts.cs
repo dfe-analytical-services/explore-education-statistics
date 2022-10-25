@@ -11,13 +11,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
   [JsonConverter(typeof(StringEnumConverter))]
   public enum BarChartDataLabelPosition
   {
-    inside, outside
+    Inside, Outside
   }
 
   [JsonConverter(typeof(StringEnumConverter))]
   public enum LineChartDataLabelPosition
   {
-    above, below
+    Above, Below
   }
 
   [JsonConverter(typeof(ContentBlockChartConverter))]
@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
   public class LineChart : Chart
   {
     public override ChartType Type => Line;
-    public bool showDataLabels { get; set; }
+    public bool ShowDataLabels { get; set; }
     public LineChartDataLabelPosition? DataLabelPosition { get; set; }
   }
 
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
     public int? BarThickness { get; set; }
     public bool Stacked;
-    public bool showDataLabels { get; set; }
+    public bool ShowDataLabels { get; set; }
     public BarChartDataLabelPosition? DataLabelPosition { get; set; }
   }
 
@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
     public int? BarThickness { get; set; }
     public bool Stacked;
-    public bool showDataLabels { get; set; }
+    public bool ShowDataLabels { get; set; }
     public BarChartDataLabelPosition? DataLabelPosition { get; set; }
   }
 
