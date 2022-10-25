@@ -12,12 +12,13 @@ const ChevronCard = ({ className, title, description }: Props) => {
   return (
     <li className={styles.card}>
       <div className={styles.wrapper}>
-        <h3>
-          <a href="#" className={styles.cardLink}>
-            {title}
-          </a>
-        </h3>
-        <p>{description}</p>
+        <a
+          href="#"
+          className={classNames(styles.cardLink, 'govuk-!-margin-bottom-3')}
+        >
+          {title}
+        </a>
+        <p className="govuk-hint">{description}</p>
       </div>
     </li>
   );
