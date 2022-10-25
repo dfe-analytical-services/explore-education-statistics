@@ -32,12 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class SubjectMetaService : ISubjectMetaService
     {
-        private enum SubjectMetaQueryStep
-        {
-            GetTimePeriods,
-            GetFilterItems
-        }
-
         private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IBlobCacheService _cacheService;
@@ -168,21 +162,111 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ReleaseSubject releaseSubject,
             CancellationToken cancellationToken)
         {
+            if (query.IncludeInResponse != null)
+            {
+                switch (query.IncludeInResponse.Step)
+                {
+                    case SubjectMetaQueryStep.Locations:
+                        if (query.Filters != null || query.TimePeriod != null || !query.LocationIds.IsNullOrEmpty())
+                        {
+                            throw new ArgumentException("Request shouldn't contain criteria for filters, time periods, or locations when requesting location meta data for a subject"); // @MarkFix
+                        }
+
+                        var locations = await GetLocations(query.SubjectId);
+
+                        return new SubjectMetaViewModel
+                        {
+                            Locations = locations,
+                        };
+                    case SubjectMetaQueryStep.TimePeriods:
+                    {
+                        if (query.Filters != null)
+                        {
+                            throw new ArgumentException("When fetching TimePeriods, shouldn\'t provide filters in request"); // @MarkFix
+                        }
+
+                        if (query.TimePeriod != null)
+                        {
+                            throw new ArgumentException("When fetching TimePeriods, shouldn't provide time periods in request"); // @MarkFix
+                        }
+
+                        var stopwatch = Stopwatch.StartNew();
+
+                        var observations = _statisticsDbContext
+                            .Observation
+                            .AsNoTracking()
+                            .Where(o => o.SubjectId == query.SubjectId);
+
+                        if (!query.LocationIds.IsNullOrEmpty())
+                        {
+                            observations = observations.Where(o => query.LocationIds.Contains(o.LocationId));
+                        }
+
+                        var timePeriods = GetTimePeriods(observations);
+
+                        _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+
+                        return new SubjectMetaViewModel
+                        {
+                            TimePeriod = timePeriods,
+                        };
+                    }
+                    case SubjectMetaQueryStep.FilterItems:
+                    {
+                        var stopwatch = Stopwatch.StartNew();
+
+                        var observations =
+                            await _observationService.GetMatchedObservations(query, cancellationToken);
+                        _logger.LogTrace("Got Observations in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                        stopwatch.Restart();
+
+                        var filterItems = await
+                            _filterItemRepository.GetFilterItemsFromMatchedObservationIds(query.SubjectId,
+                                observations);
+                        var filters =
+                            FiltersViewModelBuilder.BuildFiltersFromFilterItems(filterItems,
+                                releaseSubject.FilterSequence);
+                        _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                        stopwatch.Restart();
+
+                        return new SubjectMetaViewModel
+                        {
+                            Filters = filters,
+                        };
+                    }
+                    case SubjectMetaQueryStep.Indicators:
+                    {
+                        var stopwatch = Stopwatch.StartNew();
+
+                        var indicators = await GetIndicators(releaseSubject);
+                        _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+
+                        return new SubjectMetaViewModel
+                        {
+                            Indicators = indicators,
+                        };
+                    }
+                };
+
+            }
+
+            // NOTE: If IncludeInResponse not set, revert to previous behaviour...
+            // Can be removed after EES-3833 is completed
             SubjectMetaQueryStep? subjectMetaStep = null;
             if (!query.LocationIds.IsNullOrEmpty() && query.TimePeriod == null)
             {
-                subjectMetaStep = SubjectMetaQueryStep.GetTimePeriods;
+                subjectMetaStep = SubjectMetaQueryStep.TimePeriods;
             }
             else if (query.TimePeriod != null && query.Filters == null)
             {
-                subjectMetaStep = SubjectMetaQueryStep.GetFilterItems;
+                subjectMetaStep = SubjectMetaQueryStep.FilterItems;
             }
 
             // Only data relevant to the step being executed in the table tool needs to be returned, so only the
             // minimum requisite DB calls for the task are performed.
             switch (subjectMetaStep)
             {
-                case SubjectMetaQueryStep.GetTimePeriods:
+                case SubjectMetaQueryStep.TimePeriods:
                 {
                     var stopwatch = Stopwatch.StartNew();
 
@@ -201,7 +285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     };
                 }
 
-                case SubjectMetaQueryStep.GetFilterItems:
+                case SubjectMetaQueryStep.FilterItems:
                 {
                     var stopwatch = Stopwatch.StartNew();
 

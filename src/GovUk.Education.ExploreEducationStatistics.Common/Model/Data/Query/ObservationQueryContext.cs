@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -7,15 +8,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
     public class ObservationQueryContext
     {
         public Guid SubjectId { get; set; }
-        public TimePeriodQuery TimePeriod { get; set; }
-        public IEnumerable<Guid> Filters { get; set; }
+        public TimePeriodQuery? TimePeriod { get; set; }
+
+        public IEnumerable<Guid>? Filters { get; set; }
         // TODO EES-3328 - remove BoundaryLevel from ObservationQueryContext as we now store it on
         // MapChart configuration instead
         public long? BoundaryLevel { get; set; }
-        public IEnumerable<Guid> Indicators { get; set; }
+        public IEnumerable<Guid>? Indicators { get; set; }
         public List<Guid> LocationIds { get; set; } = new();
         [Obsolete("Legacy Location field that exists in queries of historical Permalinks", false)]
-        public LocationQuery Locations { get; set; }
+        public LocationQuery? Locations { get; set; }
+
+        public IncludeInResponseQuery? IncludeInResponse { get; set; }
 
         public override string ToString()
         {
@@ -25,7 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
                 $"{nameof(Filters)}: [{(Filters == null ? string.Empty : Filters.JoinToString(", "))}], " +
                 $"{nameof(BoundaryLevel)}: {BoundaryLevel}, " +
                 $"{nameof(Indicators)}: [{(Indicators == null ? string.Empty : Indicators.JoinToString(", "))}], " +
-                $"{nameof(LocationIds)}: [{LocationIds.JoinToString(", ")}]";
+                $"{nameof(LocationIds)}: [{LocationIds.JoinToString(", ")}], " +
+                $"{nameof(IncludeInResponse)}: [{IncludeInResponse}]"; // @MarkFix works?
         }
     }
 }

@@ -169,15 +169,17 @@ const TableToolWizard = ({
   const handleSubjectFormSubmit: SubjectFormSubmitHandler = async ({
     subjectId: selectedSubjectId,
   }) => {
-    const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
-      selectedSubjectId,
-      state.query.releaseId,
-    );
+    // @MarkFix why does this want TimePeriods to be returned for TimePeriodForm?
+    const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
+      releaseId: state.query.releaseId,
+      subjectId: selectedSubjectId,
+      includeInResponse: { step: 'Locations' },
+    });
 
     setReorderedTableHeaders(undefined);
 
     updateState(draft => {
-      draft.subjectMeta = nextSubjectMeta;
+      draft.subjectMeta.locations = nextSubjectMeta.locations;
       draft.query.subjectId = selectedSubjectId;
       draft.query.indicators = [];
       draft.query.filters = [];
@@ -189,13 +191,14 @@ const TableToolWizard = ({
   const handleLocationStepBack = async () => {
     const { releaseId, subjectId } = state.query;
 
-    const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
-      subjectId,
+    const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
       releaseId,
-    );
+      subjectId,
+      includeInResponse: { step: 'Locations' },
+    });
 
     updateState(draft => {
-      draft.subjectMeta = nextSubjectMeta;
+      draft.subjectMeta.locations = nextSubjectMeta.locations;
     });
   };
 
@@ -206,6 +209,7 @@ const TableToolWizard = ({
       releaseId: state.query.releaseId,
       locationIds,
       subjectId: state.query.subjectId,
+      includeInResponse: { step: 'TimePeriods' },
     });
 
     const { timePeriod } = state.query;
@@ -247,6 +251,7 @@ const TableToolWizard = ({
       releaseId,
       subjectId,
       locationIds,
+      includeInResponse: { step: 'TimePeriods' },
     });
 
     updateState(draft => {
@@ -259,7 +264,7 @@ const TableToolWizard = ({
     const [startYear, startCode] = parseYearCodeTuple(values.start);
     const [endYear, endCode] = parseYearCodeTuple(values.end);
 
-    const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
+    const nextSubjectMetaFilters = await tableBuilderService.filterSubjectMeta({
       releaseId,
       subjectId,
       locationIds,
@@ -269,10 +274,26 @@ const TableToolWizard = ({
         endYear,
         endCode,
       },
+      includeInResponse: { step: 'FilterItems' },
     });
 
+    const nextSubjectMetaIndicators = await tableBuilderService.filterSubjectMeta(
+      {
+        releaseId,
+        subjectId,
+        locationIds,
+        timePeriod: {
+          startYear,
+          startCode,
+          endYear,
+          endCode,
+        },
+        includeInResponse: { step: 'Indicators' },
+      },
+    );
+
     const indicatorValues = new Set(
-      Object.values(nextSubjectMeta.indicators).flatMap(indicator =>
+      Object.values(nextSubjectMetaIndicators.indicators).flatMap(indicator =>
         indicator.options.map(option => option.value),
       ),
     );
@@ -281,7 +302,7 @@ const TableToolWizard = ({
     );
 
     const filterValues = new Set(
-      Object.values(nextSubjectMeta.filters).flatMap(filterGroup =>
+      Object.values(nextSubjectMetaFilters.filters).flatMap(filterGroup =>
         Object.values(filterGroup.options).flatMap(filter =>
           filter.options.map(option => option.value),
         ),
@@ -292,8 +313,8 @@ const TableToolWizard = ({
     );
 
     updateState(draft => {
-      draft.subjectMeta.indicators = nextSubjectMeta.indicators;
-      draft.subjectMeta.filters = nextSubjectMeta.filters;
+      draft.subjectMeta.indicators = nextSubjectMetaIndicators.indicators;
+      draft.subjectMeta.filters = nextSubjectMetaFilters.filters;
       draft.query.indicators = filteredIndicators;
       draft.query.filters = filteredFilters;
       draft.query.timePeriod = {
@@ -308,16 +329,27 @@ const TableToolWizard = ({
   const handleFiltersStepBack = async () => {
     const { releaseId, subjectId, locationIds, timePeriod } = state.query;
 
-    const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
+    const nextSubjectMetaIndicators = await tableBuilderService.filterSubjectMeta(
+      {
+        releaseId,
+        subjectId,
+        locationIds,
+        timePeriod,
+        includeInResponse: { step: 'Indicators' },
+      },
+    );
+
+    const nextSubjectMetaFilters = await tableBuilderService.filterSubjectMeta({
       releaseId,
       subjectId,
       locationIds,
       timePeriod,
+      includeInResponse: { step: 'FilterItems' },
     });
 
     updateState(draft => {
-      draft.subjectMeta.indicators = nextSubjectMeta.indicators;
-      draft.subjectMeta.filters = nextSubjectMeta.filters;
+      draft.subjectMeta.indicators = nextSubjectMetaIndicators.indicators;
+      draft.subjectMeta.filters = nextSubjectMetaFilters.filters;
     });
   };
 

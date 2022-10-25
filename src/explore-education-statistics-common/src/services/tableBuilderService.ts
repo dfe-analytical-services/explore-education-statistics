@@ -140,11 +140,22 @@ export interface ReleaseTableDataQuery extends TableDataQuery {
   releaseId?: string;
 }
 
+type SubjectMetaQueryStep =
+  | 'Locations'
+  | 'TimePeriods'
+  | 'FilterItems'
+  | 'Indicators';
+
+interface IncludeInResponseQuery {
+  step: SubjectMetaQueryStep;
+}
+
 export interface ReleaseSubjectMetaQuery {
   releaseId?: string;
   subjectId: string;
   timePeriod?: TimePeriodQuery;
   locationIds?: string[];
+  includeInResponse?: IncludeInResponseQuery;
 }
 
 export interface TableDataSubjectMeta {
