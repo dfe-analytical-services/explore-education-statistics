@@ -1,5 +1,6 @@
+from logging import warning
+
 from robot.running.context import EXECUTION_CONTEXTS
-from tests.libs.logger import get_logger
 
 
 class KeywordListener:
@@ -8,8 +9,6 @@ class KeywordListener:
     TEST_SUITE_KEYWORD_COLOUR = "\n\033[93m"
 
     COMMON_KEYWORD_COLOUR = "\033[94m\t"
-
-    logger = get_logger(__name__)
 
     def start_keyword(self, name, attributes):
 
@@ -26,14 +25,14 @@ class KeywordListener:
                 if "/libs/" in source
                 else KeywordListener.TEST_SUITE_KEYWORD_COLOUR
             )
-            self.logger.info(
+            print(
                 f'{logging_colour}\t{attributes["kwname"]}\t\t{args_and_value_string}\t\t\t(from file://{attributes["source"]} line {attributes["lineno"]})'
             )
 
     def end_keyword(self, name, attributes):
         if attributes["status"] == "FAIL":
             args_and_value_string = self.get_args_and_values_string(attributes)
-            self.logger.warn(
+            warning(
                 f'\tFAILED KEYWORD: {attributes["kwname"]}\t\t{args_and_value_string}\t\tfile://{attributes["source"]} line {attributes["lineno"]}'
             )
 

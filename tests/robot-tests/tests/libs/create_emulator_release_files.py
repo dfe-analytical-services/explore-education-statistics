@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 
 from azure.core.exceptions import ResourceExistsError
 from azure.storage.blob import BlobServiceClient
-from tests.libs.logger import get_logger
 
 
 class File(ABC):
@@ -39,7 +38,6 @@ class Release:
 
 class ReleaseFilesGenerator(object):
     def __init__(self):
-        self.logger = get_logger(__name__)
 
         # Instantiate a new ContainerClient for the emulator
         self.blob_service_client = BlobServiceClient.from_connection_string(
@@ -94,11 +92,11 @@ class ReleaseFilesGenerator(object):
         except ResourceExistsError:
             container_client = self.blob_service_client.get_container_client("downloads")
         except Exception as e:
-            self.logger.error('Unexpected exception creating "downloads" container: ', e)
+            print('Unexpected exception creating "downloads" container: ', e)
 
         assert container_client is not None
 
-        self.upload_files(container_client, self.data_files, self.logger)
+        self.upload_files(container_client, self.data_files)
 
     def create_private_release_files(self):
         try:
@@ -106,15 +104,15 @@ class ReleaseFilesGenerator(object):
         except ResourceExistsError:
             container_client = self.blob_service_client.get_container_client("releases")
         except Exception as e:
-            self.logger.error('Unexpected exception creating "releases" container: ', e)
+            print('Unexpected exception creating "releases" container: ', e)
 
         assert container_client is not None
 
-        self.upload_files(container_client, self.data_files, self.logger)
-        self.upload_files(container_client, self.metadata_files, self.logger)
+        self.upload_files(container_client, self.data_files)
+        self.upload_files(container_client, self.metadata_files)
 
     @staticmethod
-    def upload_files(container_client, files, logger):
+    def upload_files(container_client, files):
         data = b"abcd" * 128
         for file in files:
             path = file.path()
@@ -125,7 +123,7 @@ class ReleaseFilesGenerator(object):
             except ResourceExistsError:
                 pass  # file already exists, so no action required
             except Exception as e:
-                logger.info("Unexpected exception when uploading file: ", e)
+                print("Unexpected exception when uploading file: ", e)
 
 
 if __name__ == "__main__":
