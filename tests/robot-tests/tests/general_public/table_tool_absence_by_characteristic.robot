@@ -7,7 +7,6 @@ Test Setup          fail test fast if required
 
 Force Tags          GeneralPublic    Local    Dev    Preprod
 
-
 *** Test Cases ***
 Go to Table Tool page
     user navigates to data tables page on public frontend
@@ -137,7 +136,7 @@ Move Gender to be first column group
     user presses keys    ARROW_LEFT
     user presses keys    ${SPACE}
 
-Reorder Gender male to be first
+Reorder Gender male to be first 
     user clicks button    Reorder    testId:columnGroups-0
     # The /../.. to get to a focusable element
     user sets focus to element    xpath://*[text()="Gender male"]/../..    testId:columnGroups-0
