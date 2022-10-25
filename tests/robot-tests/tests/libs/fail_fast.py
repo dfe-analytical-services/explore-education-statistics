@@ -5,10 +5,10 @@ scripts, firstly to record that a test suite is failing, and then again on subse
 should continue to run or if they should fail immediately and therefore fail the test suite immediately.
 """
 from logging import warning
-
 from robot.libraries.BuiltIn import BuiltIn
 
-sl = BuiltIn().get_library_instance("SeleniumLibrary")
+
+sl = BuiltIn().get_library_instance('SeleniumLibrary')
 FAILING_SUITES = set()
 
 
