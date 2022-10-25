@@ -228,6 +228,12 @@ const PrototypeTableHighlights = () => {
                                   className="govuk-radios__input"
                                   name="subject"
                                   id="subject-4"
+                                  onClick={() => {
+                                    setDatasetValue(
+                                      'Apprenticeship Achievement Rates Headliness',
+                                    );
+                                    setDataset('subject-4');
+                                  }}
                                 />
                                 <label
                                   className={classNames(
@@ -353,16 +359,16 @@ const PrototypeTableHighlights = () => {
                                   Achievements, Percentage Learner participation
                                 </p>
                               </SummaryListItem>
-                              <SummaryListItem term="Options">
+                              <SummaryListItem term="Download">
                                 <Button className="govuk-!-margin-right-6">
-                                  Download full dataset (.zip 100mb)
+                                  Download full dataset (.zip, 100mb)
                                 </Button>
-                                <Button>Create your own table</Button>
                               </SummaryListItem>
                             </SummaryList>
 
                             <h3 className="govuk-!-margin-left-3">
-                              Featured tables
+                              View featured tables or{' '}
+                              <a href="#">create your own table</a>
                             </h3>
                             <PrototypeGridView>
                               <PrototypeChevronCard
@@ -398,16 +404,16 @@ const PrototypeTableHighlights = () => {
                                   gender and lldd, Standard /Framework flag;
                                 </p>
                               </SummaryListItem>
-                              <SummaryListItem term="Options">
+                              <SummaryListItem term="Download">
                                 <Button className="govuk-!-margin-right-6">
-                                  Download full dataset (.zip 100mb)
+                                  Download full dataset (.zip, 100mb)
                                 </Button>
-                                <Button>Create your own table</Button>
                               </SummaryListItem>
                             </SummaryList>
 
                             <h3 className="govuk-!-margin-left-3">
-                              Featured tables
+                              View featured tables or{' '}
+                              <a href="#">create your own table</a>
                             </h3>
                             <PrototypeGridView>
                               <PrototypeChevronCard
@@ -456,16 +462,16 @@ const PrototypeTableHighlights = () => {
                                   /Framework flag
                                 </p>
                               </SummaryListItem>
-                              <SummaryListItem term="Options">
+                              <SummaryListItem term="Downloads">
                                 <Button className="govuk-!-margin-right-6">
-                                  Download full dataset (.zip 100mb)
+                                  Download full dataset (.zip, 100mb)
                                 </Button>
-                                <Button>Create your own table</Button>
                               </SummaryListItem>
                             </SummaryList>
 
                             <h3 className="govuk-!-margin-left-3">
-                              Featured tables
+                              View featured tables or{' '}
+                              <a href="#">create your own table</a>
                             </h3>
                             <PrototypeGridView>
                               <PrototypeChevronCard
@@ -483,8 +489,48 @@ const PrototypeTableHighlights = () => {
                             </PrototypeGridView>
                           </div>
                         )}
+                        {dataset === 'subject-4' && (
+                          <div className="govuk-!-margin-3">
+                            <SummaryList
+                              noBorder
+                              className="govuk-!-margin-2 govuk-!-margin-bottom-9"
+                            >
+                              <SummaryListItem term="Geographic levels">
+                                National
+                              </SummaryListItem>
+                              <SummaryListItem term="Time period">
+                                2018/19 to 2020/21
+                              </SummaryListItem>
+                              <SummaryListItem term="Content">
+                                <p>
+                                  Apprenticeship national achievement rate
+                                  tables
+                                </p>
+                                <p>Academic year: 2018/19 to 2020/21</p>
+                                <p>
+                                  Indicators: Achievement rate, &nbsp;Leavers,
+                                  Pass rate, Retention rate
+                                </p>
+                                <p>
+                                  Filters: Level, Detailed Level, Sector Subject
+                                  Area, &nbsp;Standard /Framework flag&nbsp;
+                                </p>
+                              </SummaryListItem>
+                              <SummaryListItem term="Download">
+                                <Button className="govuk-!-margin-right-6">
+                                  Download full dataset (.zip 100mb)
+                                </Button>
+                                <Button>Create your own table</Button>
+                              </SummaryListItem>
+                            </SummaryList>
+                          </div>
+                        )}
                         {dataset === 'subject-all' && (
                           <div className="govuk-!-margin-3">
+                            <p className="govuk-!-margin-left-3">
+                              View featured tables from all available datasets
+                              or <a href="#">create your own table</a>
+                            </p>
                             <PrototypeGridView>
                               <PrototypeChevronCard
                                 title="Starts by age and level"
