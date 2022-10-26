@@ -59,7 +59,7 @@ const FormFieldset = ({
             'govuk-fieldset__legend',
             `govuk-fieldset__legend--${legendSize}`,
             {
-              'govuk-visually-hidden': legendHidden,
+              'govuk-visually-hidden govuk-!-font-size-14': legendHidden,
               'govuk-!-font-weight-regular': legendWeight === 'regular',
             },
           )}
