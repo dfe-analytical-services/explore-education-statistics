@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import Details from '@common/components/Details';
+import PageSearchForm from '@common/components/PageSearchForm';
 import PageTitle from '@admin/components/PageTitle';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import PrototypeGridView from '@admin/prototypes/components/PrototypeGridView';
@@ -367,7 +367,10 @@ const PrototypeTableHighlights = () => {
                             </SummaryList>
 
                             <h3 className="govuk-!-margin-left-3">
-                              View featured tables or{' '}
+                              View featured tables{' '}
+                              <span className="govuk-!-margin-left-2 govuk-!-margin-right-2">
+                                or
+                              </span>{' '}
                               <a href="#">create your own table</a>
                             </h3>
                             <PrototypeGridView>
@@ -412,7 +415,10 @@ const PrototypeTableHighlights = () => {
                             </SummaryList>
 
                             <h3 className="govuk-!-margin-left-3">
-                              View featured tables or{' '}
+                              View featured tables{' '}
+                              <span className="govuk-!-margin-left-2 govuk-!-margin-right-2">
+                                or
+                              </span>{' '}
                               <a href="#">create your own table</a>
                             </h3>
                             <PrototypeGridView>
@@ -470,7 +476,10 @@ const PrototypeTableHighlights = () => {
                             </SummaryList>
 
                             <h3 className="govuk-!-margin-left-3">
-                              View featured tables or{' '}
+                              View featured tables{' '}
+                              <span className="govuk-!-margin-left-2 govuk-!-margin-right-2">
+                                or
+                              </span>{' '}
                               <a href="#">create your own table</a>
                             </h3>
                             <PrototypeGridView>
@@ -527,10 +536,16 @@ const PrototypeTableHighlights = () => {
                         )}
                         {dataset === 'subject-all' && (
                           <div className="govuk-!-margin-3">
-                            <p className="govuk-!-margin-left-3">
-                              View featured tables from all available datasets
-                              or <a href="#">create your own table</a>
+                            <p className="govuk-body-l govuk-!-margin-left-3">
+                              View featured tables from across all our datasets
+                              for this publication. If you can't find what you
+                              are looking for please select a specific dataset,
+                              and then you can create your own table.
                             </p>
+                            <PageSearchForm
+                              inputLabel="Search featured tables"
+                              className="govuk-!-width-one-half govuk-!-margin-left-3"
+                            />
                             <PrototypeGridView>
                               <PrototypeChevronCard
                                 title="Starts by age and level"
@@ -565,13 +580,6 @@ const PrototypeTableHighlights = () => {
                                 description="Apprenticeship participation and achievements by age and level, reported to date for 2021/22 with equivalent figures for 2018/19 to 2020/21"
                               />
                             </PrototypeGridView>
-                            <hr />
-                            <div className="govuk-!-margin-3">
-                              <Button>Create your own table</Button>
-                              <Button className="govuk-!-margin-left-6">
-                                Download all data (.zip, 300mb)
-                              </Button>
-                            </div>
                           </div>
                         )}
                       </div>
