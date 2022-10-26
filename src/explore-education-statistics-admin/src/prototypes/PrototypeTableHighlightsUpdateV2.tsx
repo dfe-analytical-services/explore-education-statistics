@@ -67,6 +67,7 @@ const PrototypeTableHighlights = () => {
                         Step 1
                       </span>
                       <span className="govuk-visually-hidden">
+                        {' '}
                         Choose a publication
                       </span>
                     </h2>
@@ -104,7 +105,11 @@ const PrototypeTableHighlights = () => {
                   <div className={styles.content}>
                     <h2 className={styles.stepEnabled}>
                       <span className="govuk-tag govuk-tag govuk-tag--turquoise govuk-!-margin-right-2">
-                        Step 2
+                        Step 2{' '}
+                        <span className="govuk-visually-hidden">
+                          {' '}
+                          Select a dataset
+                        </span>
                       </span>
                     </h2>
                     <SummaryList noBorder>
@@ -366,13 +371,13 @@ const PrototypeTableHighlights = () => {
                               </SummaryListItem>
                             </SummaryList>
 
-                            <h3 className="govuk-!-margin-left-3">
+                            <h4 className="govuk-!-margin-left-2 govuk-heading-m">
                               View featured tables{' '}
                               <span className="govuk-!-margin-left-2 govuk-!-margin-right-2">
                                 or
                               </span>{' '}
                               <a href="#">create your own table</a>
-                            </h3>
+                            </h4>
                             <PrototypeGridView>
                               <PrototypeChevronCard
                                 title="Starts by age and level"
@@ -414,13 +419,13 @@ const PrototypeTableHighlights = () => {
                               </SummaryListItem>
                             </SummaryList>
 
-                            <h3 className="govuk-!-margin-left-3">
+                            <h4 className="govuk-!-margin-left-2 govuk-heading-m">
                               View featured tables{' '}
                               <span className="govuk-!-margin-left-2 govuk-!-margin-right-2">
                                 or
                               </span>{' '}
                               <a href="#">create your own table</a>
-                            </h3>
+                            </h4>
                             <PrototypeGridView>
                               <PrototypeChevronCard
                                 title="Rates by sector subject area and Ethnicity group learners"
@@ -475,13 +480,13 @@ const PrototypeTableHighlights = () => {
                               </SummaryListItem>
                             </SummaryList>
 
-                            <h3 className="govuk-!-margin-left-3">
+                            <h4 className="govuk-!-margin-left-2 govuk-heading-m">
                               View featured tables{' '}
                               <span className="govuk-!-margin-left-2 govuk-!-margin-right-2">
                                 or
                               </span>{' '}
                               <a href="#">create your own table</a>
-                            </h3>
+                            </h4>
                             <PrototypeGridView>
                               <PrototypeChevronCard
                                 title="Achievements by level"
@@ -529,9 +534,11 @@ const PrototypeTableHighlights = () => {
                                 <Button className="govuk-!-margin-right-6">
                                   Download full dataset (.zip 100mb)
                                 </Button>
-                                <Button>Create your own table</Button>
                               </SummaryListItem>
                             </SummaryList>
+                            <h4 className="govuk-!-margin-left-2 govuk-heading-m">
+                              <a href="#">Create your own table</a>
+                            </h4>
                           </div>
                         )}
                         {dataset === 'subject-all' && (
