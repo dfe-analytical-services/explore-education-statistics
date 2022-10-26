@@ -342,6 +342,16 @@ const PrototypeTableHighlights = () => {
                         </div>
                       </div>
                       <div className="govuk-grid-column-three-quarters">
+                        {!dataset && (
+                          <div className="govuk-!-margin-5">
+                            <p className="govuk-body-l govuk-!-width-three-quarters">
+                              Please select a dataset, you will then be able to
+                              see a summary of the data, create your own tables,
+                              view featured tables, or download the entire
+                              datafile.
+                            </p>
+                          </div>
+                        )}
                         {dataset === 'subject-1' && (
                           <div className="govuk-!-margin-3">
                             <SummaryList
@@ -473,7 +483,7 @@ const PrototypeTableHighlights = () => {
                                   /Framework flag
                                 </p>
                               </SummaryListItem>
-                              <SummaryListItem term="Downloads">
+                              <SummaryListItem term="Download">
                                 <Button className="govuk-!-margin-right-6">
                                   Download full dataset (.zip, 100mb)
                                 </Button>
