@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
-//import styles from './SummaryList.module.scss';
+import styles from './PrototypeGridView.module.scss';
 
 interface Props {
   children: ReactNode;
@@ -9,10 +9,7 @@ interface Props {
 
 const GridView = ({ children, className }: Props) => {
   return (
-    <ul
-      className={classNames(className, 'govuk-list')}
-      style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}
-    >
+    <ul className={classNames(className, 'govuk-list', styles.grid)}>
       {children}
     </ul>
   );
