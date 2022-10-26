@@ -133,10 +133,12 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
           />
         </div>
 
-        <FigureFootnotes
-          footnotes={footnotes}
-          headingHiddenText={footnotesHeadingHiddenText}
-        />
+        <div className="govuk-!-width-two-thirds">
+          <FigureFootnotes
+            footnotes={footnotes}
+            headingHiddenText={footnotesHeadingHiddenText}
+          />
+        </div>
 
         {source && <p className="govuk-body-s">Source: {source}</p>}
       </figure>
