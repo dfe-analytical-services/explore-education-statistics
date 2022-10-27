@@ -558,7 +558,7 @@ function generateFeaturesAndDataGroups({
   // Default to white for areas not covered by custom data sets
   // to make it clearer which aren't covered by the groups.
   const defaultColour =
-    classification === 'Custom' ? 'rgb(255, 255, 255)' : 'rgba(0,0,0,0)';
+    classification === 'Custom' ? 'rgba(255, 255, 255, 1)' : 'rgba(0,0,0,0)';
 
   const features: MapFeatureCollection = {
     type: 'FeatureCollection',

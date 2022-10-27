@@ -72,16 +72,25 @@ export default function ChartMapCustomGroupsConfiguration({
                 .test('noOverlap', 'Groups cannot overlap', function noOverlap(
                   value: number,
                 ) {
-                  return !(
-                    groups.length &&
-                    groups.some(group => {
-                      return (
-                        (value >= group.min && value <= group.max) ||
-                        // eslint-disable-next-line react/no-this-in-sfc
-                        (value <= group.max && group.min <= this.parent.max)
-                      );
-                    })
+                  // show an error when:
+                  // - the min is in an existing group, or
+                  // - this new group overlaps with another group and the max isn't in a group
+                  // (if the max is in a group and the min isn't then we only want to show the
+                  // error on the max field as it's the one that requires action)
+                  /* eslint-disable react/no-this-in-sfc */
+                  const minIsInAGroup = groups.some(
+                    group => value >= group.min && value <= group.max,
                   );
+                  const maxIsInAGroup = groups.some(
+                    group =>
+                      this.parent.max >= group.min &&
+                      this.parent.max <= group.max,
+                  );
+                  const overlaps = groups.some(
+                    group => value <= group.max && group.min <= this.parent.max,
+                  );
+                  return !minIsInAGroup && !(overlaps && !maxIsInAGroup);
+                  /* eslint-enable react/no-this-in-sfc */
                 }),
               max: Yup.number()
                 .required('Enter a maximum value')
@@ -89,16 +98,25 @@ export default function ChartMapCustomGroupsConfiguration({
                 .test('noOverlap', 'Groups cannot overlap', function noOverlap(
                   value: number,
                 ) {
-                  return !(
-                    groups.length &&
-                    groups.some(group => {
-                      return (
-                        (value >= group.min && value <= group.max) ||
-                        // eslint-disable-next-line react/no-this-in-sfc
-                        (value <= group.min && group.max <= this.parent.min)
-                      );
-                    })
+                  // show an error when:
+                  // - the max is in an existing group, or
+                  // - this new group overlaps with another group and the min isn't in a group
+                  // (if the min is in a group and the min isn't then we only want to show the
+                  // error on the min field as it's the one that requires action)
+                  /* eslint-disable react/no-this-in-sfc */
+                  const minIsInAGroup = groups.some(
+                    group =>
+                      this.parent.min >= group.min &&
+                      this.parent.min <= group.max,
                   );
+                  const maxIsInAGroup = groups.some(
+                    group => value >= group.min && value <= group.max,
+                  );
+                  const overlaps = groups.some(
+                    group => this.parent.min <= group.max && group.min <= value,
+                  );
+                  return !maxIsInAGroup && !(overlaps && !minIsInAGroup);
+                  /* eslint-enable react/no-this-in-sfc */
                 }),
             })}
             onSubmit={(values, helpers) => {
