@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces
 {
-    public interface IFilterItemRepository : IRepository<FilterItem, Guid>
+    public interface IFilterItemRepository
     {
         Task<Dictionary<Guid, int>> CountFilterItemsByFilter(IEnumerable<Guid> filterItemIds);
 

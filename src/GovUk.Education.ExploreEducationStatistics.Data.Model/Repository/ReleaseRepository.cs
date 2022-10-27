@@ -6,17 +6,21 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
-    public class ReleaseRepository : AbstractRepository<Release, Guid>, IReleaseRepository
+    public class ReleaseRepository : IReleaseRepository
     {
-        public ReleaseRepository(StatisticsDbContext context) : base(context)
+        private readonly StatisticsDbContext _context;
+
+        public ReleaseRepository(StatisticsDbContext context)
         {
+            _context = context;
         }
 
         public Release? GetLatestPublishedRelease(Guid publicationId)
         {
             // NOTE: This method won't get the latest release if it has no subject attached, as no
             // Statistics DB Release table entry will be created
-            return DbSet()
+
+            return _context.Release
                 .Where(release => release.PublicationId == publicationId)
                 .ToList()
                 .Where(release => release.Live && IsLatestVersionOfRelease(release.PublicationId, release.Id))

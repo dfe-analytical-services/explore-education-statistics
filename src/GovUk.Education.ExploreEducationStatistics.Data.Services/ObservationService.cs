@@ -8,9 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -21,18 +19,19 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
-    public class ObservationService : AbstractRepository<Observation, long>, IObservationService
+    public class ObservationService : IObservationService
     {
+        private readonly StatisticsDbContext _context;
         private readonly ILogger<ObservationService> _logger;
 
         public IMatchingObservationsQueryGenerator QueryGenerator = new MatchingObservationsQueryGenerator();
 
         public IRawSqlExecutor SqlExecutor = new RawSqlExecutor();
 
-        public ObservationService(
-            StatisticsDbContext context,
-            ILogger<ObservationService> logger) : base(context)
+        public ObservationService(StatisticsDbContext context,
+            ILogger<ObservationService> logger)
         {
+            _context = context;
             _logger = logger;
         }
 
