@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -88,8 +89,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             {
                 Errors = new List<DataImportError>
                 {
-                    new DataImportError("error 1"),
-                    new DataImportError("error 2")
+                    new("error 1"),
+                    new("error 2")
                 },
                 File = new File(),
                 MetaFile = new File(),
@@ -161,12 +162,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             }
         }
 
-        private static DataImportService BuildDataImportService(string? contentDbContextId = null)
+        private static DataImportService BuildDataImportService(
+            string? contentDbContextId = null)
         {
             return new DataImportService(
-                contentDbContextId == null
-                    ? InMemoryContentDbContextOptions()
-                    : InMemoryContentDbContextOptions(contentDbContextId),
+                new InMemoryDbContextSupplier(contentDbContextId ?? Guid.NewGuid().ToString()),
                 new Mock<ILogger<DataImportService>>().Object
             );
         }
