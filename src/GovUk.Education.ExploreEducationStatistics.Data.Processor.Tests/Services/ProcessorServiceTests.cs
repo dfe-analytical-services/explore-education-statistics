@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -19,7 +18,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
@@ -29,157 +27,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
 public class ProcessorServiceTests
 {
-    // TODO DW - test restarting after meta is in place
+    private readonly string _contentDbContextId = Guid.NewGuid().ToString();
+    private readonly string _statisticsDbContextId = Guid.NewGuid().ToString();
+
     [Fact]
     public async Task ProcessStage2()
     {
-        const string fileUnderTest = "ordering-test-4.csv";
+        await AssertStage2ItemsImportedCorrectly(new OrderingCsvScenario());
+    }
+    
+    [Fact]
+    public async Task ProcessStage2_SubjectMetaAlreadyImported()
+    {
+        var subjectId = Guid.NewGuid();
+        var scenario = new OrderingCsvScenario(subjectId);
         
-        var expectedFilters = ListOf(
-            new Filter
-            {
-                Label = "Filter one",
-                FilterGroups = ListOf(
-                    new FilterGroup
-                    {
-                        Label = "Default",
-                        FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "Total"
-                            })
-                    })
-            },
-            new Filter
-            {
-                Label = "Filter two",
-                FilterGroups = ListOf(
-                    new FilterGroup
-                    {
-                        Label = "One group",
-                        FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "One"
-                            })
-                    },
-                    new FilterGroup
-                    {
-                        Label = "Two group",
-                        FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "Two"
-                            })
-                    }
-                )
-            },
-            new Filter
-            {
-                Label = "Filter three",
-                FilterGroups = ListOf(
-                    new FilterGroup
-                    {
-                        Label = "Default",
-                        FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "Total"
-                            })
-                    }
-                )
-            },
-            new Filter
-            {
-                Label = "Filter four",
-                FilterGroups = ListOf(
-                    new FilterGroup
-                    {
-                        Label = "One group",
-                        FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "One"
-                            },
-                            new FilterItem
-                            {
-                                Label = "Two"
-                            })
-                    },
-                    new FilterGroup
-                    {
-                        Label = "Two group",
-                        FilterItems = ListOf(
-                            new FilterItem
-                            {
-                                Label = "One"
-                            },
-                            new FilterItem
-                            {
-                                Label = "Two"
-                            })
-                    }
-                )
-            });
-
-        var expectedIndicatorGroups = ListOf(
-            new IndicatorGroup
-            {
-                Label = "Default",
-                Indicators = ListOf(
-                    new Indicator
-                    {
-                        Label = "Indicator one"
-                    })
-            });
-
-        var expectedLocations = ListOf(
-            new Location
-            {
-                GeographicLevel = GeographicLevel.LocalAuthority,
-                Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E08000025", "330", "Birmingham")
-            },
-            new Location
-            {
-                GeographicLevel = GeographicLevel.LocalAuthority,
-                Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E08000016", "370", "Barnsley")
-            },
-            new Location
-            {
-                GeographicLevel = GeographicLevel.LocalAuthority,
-                Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E09000011", "203", "Greenwich")
-            },
-            new Location
-            {
-                GeographicLevel = GeographicLevel.LocalAuthority,
-                Country = new Country("E92000001", "England"),
-                LocalAuthority = new LocalAuthority("E09000007", "202", "Camden")
-            });
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+        {
+            // Save the Filters without any FilterGroups attached - the FilterGroups are added later as part of the 
+            // CSV row-by-row scanning.
+            var filtersWithoutGroups = scenario.GetExpectedFilters();
+            filtersWithoutGroups.ForEach(filter => filter.FilterGroups = new List<FilterGroup>());
+            await statisticsDbContext.Filter.AddRangeAsync(filtersWithoutGroups);
+            
+            // Save the IndicatorGroups too. This completes the data that is saved when atomically saving the
+            // Subject Meta as the first step of Stage 2 import.
+            await statisticsDbContext.IndicatorGroup.AddRangeAsync(scenario.GetExpectedIndicatorGroups());
+            await statisticsDbContext.SaveChangesAsync();
+        }
         
-        await AssertStage2ItemsImportedCorrectly(
-            fileUnderTest, 
-            expectedFilters, 
-            expectedIndicatorGroups,
-            expectedLocations);
+        // Now assert that the Stage 2 import completes successfully when the Subject Meta is already pre-existing. 
+        await AssertStage2ItemsImportedCorrectly(scenario);
     }
 
-    private static async Task AssertStage2ItemsImportedCorrectly(
-        string fileUnderTest,
-        List<Filter> expectedFilters,
-        List<IndicatorGroup> expectedIndicatorGroups, 
-        List<Location> expectedLocations)
+    private async Task AssertStage2ItemsImportedCorrectly(IProcessorServiceTestScenario scenario)
     {
-        var metaFileUnderTest = fileUnderTest.Replace(".csv", ".meta.csv");
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        var statisticsDbContextId = Guid.NewGuid().ToString();
+        var metaFileUnderTest = scenario.GetFilenameUnderTest().Replace(".csv", ".meta.csv");
 
         var subject = new Subject
         {
-            Id = Guid.NewGuid()
+            Id = scenario.GetSubjectId()
         };
 
         var import = new DataImport
@@ -189,7 +76,7 @@ public class ProcessorServiceTests
             File = new File
             {
                 Id = Guid.NewGuid(),
-                Filename = fileUnderTest
+                Filename = scenario.GetFilenameUnderTest()
             },
             MetaFile = new File
             {
@@ -198,13 +85,13 @@ public class ProcessorServiceTests
             }
         };
 
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         {
             await contentDbContext.DataImports.AddAsync(import);
             await contentDbContext.SaveChangesAsync();
         }
 
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
             await statisticsDbContext.Subject.AddAsync(subject);
             await statisticsDbContext.SaveChangesAsync();
@@ -213,7 +100,7 @@ public class ProcessorServiceTests
         var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
         var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            "Resources" + Path.DirectorySeparatorChar + fileUnderTest);
+            "Resources" + Path.DirectorySeparatorChar + scenario.GetFilenameUnderTest());
 
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + metaFileUnderTest);
@@ -227,13 +114,14 @@ public class ProcessorServiceTests
             .ReturnsAsync(() => System.IO.File.OpenRead(metaFilePath));
 
         var dbContextSupplier = new InMemoryDbContextSupplier(
-            contentDbContextId: contentDbContextId,
-            statisticsDbContextId: statisticsDbContextId);
+            contentDbContextId: _contentDbContextId,
+            statisticsDbContextId: _statisticsDbContextId);
         
         var dataImportService = new DataImportService(
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
 
+        // TODO DW - verify this
         var importerMemoryCache = new Mock<ImporterMemoryCache>(Strict);
 
         var guidGenerator = new SequentialGuidGenerator();
@@ -266,7 +154,7 @@ public class ProcessorServiceTests
 
         await service.ProcessStage2(import.Id);
 
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
             var filters = await statisticsDbContext
                 .Filter
@@ -274,11 +162,35 @@ public class ProcessorServiceTests
                 .ThenInclude(fg => fg.FilterItems)
                 .ToListAsync();
 
-            var filterLabels = filters.Select(f => f.Label).OrderBy(label => label);
-            var expectedFilterLabels = expectedFilters.Select(f => f.Label).OrderBy(label => label);
-            Assert.Equal(expectedFilterLabels, filterLabels);
+            var filterLabels = filters
+                .Select(f => f.Label)
+                .OrderBy(label => label)
+                .JoinToString(",");
 
-            expectedFilters.ForEach(expectedFilter =>
+            var expectedFilterLabels = scenario
+                .GetExpectedFilters()
+                .Select(f => f.Label)
+                .OrderBy(label => label)
+                .JoinToString(",");
+            
+            Assert.Equal(expectedFilterLabels, filterLabels);
+            
+            var filterNames = filters
+                .Select(f => f.Name)
+                .OrderBy(name => name)
+                .JoinToString(",");
+
+            var expectedFilterNames = scenario
+                .GetExpectedFilters()
+                .Select(f => f.Name)
+                .OrderBy(name => name)
+                .JoinToString(",");
+            
+            Assert.Equal(expectedFilterNames, filterNames);
+            
+            filters.ForEach(filter => Assert.Equal(subject.Id, filter.SubjectId));
+
+            scenario.GetExpectedFilters().ForEach(expectedFilter =>
             {
                 var matchingFilter = filters.Single(f => f.Label == expectedFilter.Label);
 
@@ -327,10 +239,12 @@ public class ProcessorServiceTests
                 .ToListAsync();
             
             var indicatorGroupLabels = indicatorGroups.Select(ig => ig.Label).OrderBy(label => label);
-            var expectedIndicatorGroupLabels = expectedIndicatorGroups.Select(ig => ig.Label).OrderBy(label => label);
+            var expectedIndicatorGroupLabels = scenario.GetExpectedIndicatorGroups().Select(ig => ig.Label).OrderBy(label => label);
             Assert.Equal(expectedIndicatorGroupLabels, indicatorGroupLabels);
 
-            expectedIndicatorGroups.ForEach(expectedIndicatorGroup =>
+            indicatorGroups.ForEach(indicatorGroup => Assert.Equal(subject.Id, indicatorGroup.SubjectId));
+            
+            scenario.GetExpectedIndicatorGroups().ForEach(expectedIndicatorGroup =>
             {
                 var matchingIndicatorGroup = indicatorGroups.Single(ig => ig.Label == expectedIndicatorGroup.Label);
 
@@ -349,6 +263,7 @@ public class ProcessorServiceTests
                     .JoinToString(",");
 
                 Assert.Equal(indicatorPrefix + expectedIndicatorLabels, indicatorPrefix + indicatorLabels);
+                
             });
 
             var locations = await statisticsDbContext.Location.ToListAsync();
@@ -356,8 +271,8 @@ public class ProcessorServiceTests
             // Blank out the ids from the stored Locations to make testing equality easier with our list of expected
             // Locations
             locations.ForEach(location => location.Id = Guid.Empty);
-            Assert.Equal(expectedLocations.Count, locations.Count);
-            expectedLocations.ForEach(expectedLocation => Assert.Contains(expectedLocation, locations));
+            Assert.Equal(scenario.GetExpectedLocations().Count, locations.Count);
+            scenario.GetExpectedLocations().ForEach(expectedLocation => Assert.Contains(expectedLocation, locations));
         }
     }
 

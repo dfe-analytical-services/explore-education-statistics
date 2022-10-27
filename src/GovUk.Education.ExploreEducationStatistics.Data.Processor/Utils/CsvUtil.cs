@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
         /// Gets the header values of the first line of the provided CSV.
         /// </summary>
         /// <remarks>
-        ///This method uses and closes the provided Stream.
+        /// This method uses and closes the provided Stream.
         /// </remarks>
         public static async Task<List<string>> GetCsvHeaders(
             Func<Task<Stream>> streamProvider)
