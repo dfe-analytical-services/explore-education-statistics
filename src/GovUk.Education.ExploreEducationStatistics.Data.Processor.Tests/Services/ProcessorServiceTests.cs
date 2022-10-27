@@ -29,6 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
 public class ProcessorServiceTests
 {
+    // TODO DW - test restarting after meta is in place
     [Fact]
     public async Task ProcessStage2()
     {
@@ -225,7 +226,9 @@ public class ProcessorServiceTests
             .Setup(s => s.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path(), null))
             .ReturnsAsync(() => System.IO.File.OpenRead(metaFilePath));
 
-        var dbContextSupplier = new InMemoryDbContextSupplier(contentDbContextId);
+        var dbContextSupplier = new InMemoryDbContextSupplier(
+            contentDbContextId: contentDbContextId,
+            statisticsDbContextId: statisticsDbContextId);
         
         var dataImportService = new DataImportService(
             dbContextSupplier,

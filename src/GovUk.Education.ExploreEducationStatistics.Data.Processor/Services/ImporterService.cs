@@ -140,10 +140,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return _importerMetaService.Get(metaFileCsvHeaders, metaFileRows, subject, context);
         }
 
-        record FilterItemMeta(string FilterLabel, string FilterGroupLabel, string FilterItemLabel);
+        private record FilterItemMeta(string FilterLabel, string FilterGroupLabel, string FilterItemLabel);
         
         [SuppressMessage("ReSharper", "NotAccessedPositionalProperty.Local")]
-        record FilterGroupMeta(string FilterLabel, string FilterGroupLabel);
+        private record FilterGroupMeta(string FilterLabel, string FilterGroupLabel);
 
         public async Task ImportFiltersAndLocations(
             DataImport dataImport,
@@ -155,8 +155,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var totalRows = await CsvUtil.GetTotalRows(dataFileStreamProvider);
             var soleGeographicLevel = dataImport.HasSoleGeographicLevel();
 
-            var filterItems = new HashSet<FilterItemMeta>();
-            var filterGroups = new Dictionary<FilterGroupMeta, FilterGroup>();
+            var filterItemsFromCsv = new HashSet<FilterItemMeta>();
+            var filterGroupsFromCsv = new HashSet<FilterGroupMeta>();
             var locations = new HashSet<Location>();
             
             await CsvUtil.ForEachRow(dataFileStreamProvider, async (rowValues, index) =>
@@ -194,14 +194,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                             filterMeta.FilterGroupingColumn,
                             defaultValue: CsvUtil.DefaultFilterGroupLabel)!;
 
-                        var filterGroupMeta = new FilterGroupMeta(filterMeta.Filter.Label, filterGroupLabel);
-                        
-                        if (!filterGroups.ContainsKey(filterGroupMeta))
-                        {
-                            filterGroups.Add(filterGroupMeta, new FilterGroup(filterMeta.Filter, filterGroupLabel));
-                        }
-
-                        filterItems.Add(new FilterItemMeta(filterMeta.Filter.Label, filterGroupLabel, filterItemLabel));
+                        filterGroupsFromCsv.Add(new FilterGroupMeta(filterMeta.Filter.Label, filterGroupLabel));
+                        filterItemsFromCsv.Add(new FilterItemMeta(filterMeta.Filter.Label, filterGroupLabel, filterItemLabel));
                     }
 
                     locations.Add(
@@ -230,21 +224,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return true;
             });
 
-            var filterItemEntities = filterItems
-                .Select(filterItem =>
-                    new FilterItem(
-                        filterItem.FilterItemLabel, 
-                        filterGroups[new FilterGroupMeta(filterItem.FilterLabel, filterItem.FilterGroupLabel)]))
-                    .ToList();
+            var filterGroups = filterGroupsFromCsv
+                .Select(filterGroupMeta =>
+                {
+                    var (filterLabel, filterGroupLabel) = filterGroupMeta;
+                    
+                    var filter = subjectMeta
+                        .Filters
+                        .Single(f => f.Filter.Label == filterLabel)
+                        .Filter;
 
+                    return new FilterGroup(filter, filterGroupLabel);
+                })
+                .ToList();
+
+            var filterItems = filterItemsFromCsv
+                .Select(filterItemMeta =>
+                {
+                    var (filterLabel, filterGroupLabel, filterItemLabel) = filterItemMeta;
+                    
+                    var filterGroup = filterGroups.Single(fg =>
+                        fg.Filter.Label == filterLabel
+                        && fg.Label == filterGroupLabel);
+
+                    return new FilterItem(filterItemLabel, filterGroup);
+                })
+                .ToList();
+                    
             var newLocations = locations.Where(
                 location => _importerLocationService.Find(context, location) == null)
                 .ToList();
             
             await _transactionHelper.DoInTransaction(context, async () =>
             {
-                await context.FilterGroup.AddRangeAsync(filterGroups.Values);
-                await context.FilterItem.AddRangeAsync(filterItemEntities);
+                await context.FilterGroup.AddRangeAsync(filterGroups);
+                await context.FilterItem.AddRangeAsync(filterItems);
                 await context.SaveChangesAsync();
             });
             

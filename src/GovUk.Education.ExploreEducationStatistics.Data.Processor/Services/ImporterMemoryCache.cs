@@ -13,18 +13,19 @@ public class ImporterMemoryCache
     private MemoryCache Cache { get; set; } = new(new MemoryCacheOptions
     {
         SizeLimit = 50000,
-        ExpirationScanFrequency = TimeSpan.FromMinutes(10)
+        ExpirationScanFrequency = TimeSpan.FromMinutes(5)
     });
     
-    private MemoryCacheEntryOptions CacheEntryOptions = new()
+    private readonly MemoryCacheEntryOptions _cacheEntryOptions = new()
     {
         Size = 1,
         SlidingExpiration = TimeSpan.FromMinutes(1)
     };
 
+    // TODO DW - we're not actually using this for anything other than Locations
     public TItem Set<TItem>(object cacheKey, TItem cacheItem)
     {
-        return Cache.Set(cacheKey, cacheItem, CacheEntryOptions);
+        return Cache.Set(cacheKey, cacheItem, _cacheEntryOptions);
     }
     
     public TItem GetOrCreate<TItem>(object cacheKey, Func<TItem> defaultItemProvider)
@@ -32,7 +33,7 @@ public class ImporterMemoryCache
         return Cache.GetOrCreate(cacheKey, entry =>
         {
             var defaultItem = defaultItemProvider.Invoke();
-            entry.SetOptions(CacheEntryOptions);
+            entry.SetOptions(_cacheEntryOptions);
             entry.Value = defaultItem;
             return defaultItem;
         });
