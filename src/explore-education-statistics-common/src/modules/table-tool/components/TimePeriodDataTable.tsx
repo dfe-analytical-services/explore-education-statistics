@@ -221,6 +221,7 @@ interface Props {
   captionTitle?: string;
   dataBlockId?: string;
   fullTable: FullTable;
+  isInDataBlock?: boolean;
   query?: ReleaseTableDataQuery;
   source?: string;
   tableHeadersConfig: TableHeadersConfig;
@@ -233,6 +234,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       captionTitle,
       dataBlockId,
       fullTable,
+      isInDataBlock = false,
       query,
       source,
       tableHeadersConfig,
@@ -403,6 +405,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
             }
             captionId={captionId}
             columnHeaders={columnHeaders}
+            isInDataBlock={isInDataBlock}
             rowHeaders={rowHeaders}
             rows={rows}
             ref={dataTableRef}
