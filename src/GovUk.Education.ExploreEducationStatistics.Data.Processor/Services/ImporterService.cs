@@ -32,6 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IDataImportService _dataImportService;
         private readonly ILogger<ImporterService> _logger;
         private readonly ITransactionHelper _transactionHelper;
+        private readonly ImporterMemoryCache _importerMemoryCache;
 
         private const int Stage2RowCheck = 1000;
 
@@ -111,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             IImporterMetaService importerMetaService,
             IDataImportService dataImportService, 
             ILogger<ImporterService> logger, 
-            ITransactionHelper transactionHelper)
+            ITransactionHelper transactionHelper, ImporterMemoryCache importerMemoryCache)
         {
             _guidGenerator = guidGenerator;
             _importerFilterService = importerFilterService;
@@ -120,6 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _dataImportService = dataImportService;
             _logger = logger;
             _transactionHelper = transactionHelper;
+            _importerMemoryCache = importerMemoryCache;
         }
 
         public Task<SubjectMeta> ImportMeta(
@@ -260,6 +262,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await context.FilterGroup.AddRangeAsync(filterGroups);
                 await context.FilterItem.AddRangeAsync(filterItems);
                 await context.SaveChangesAsync();
+            });
+            
+            filterGroups.ForEach(filterGroup =>
+            {
+                var cacheKey = ImporterFilterService
+                    .GetFilterGroupCacheKey(filterGroup.Filter, filterGroup.Label, context);
+                
+                _importerMemoryCache.Set(cacheKey, filterGroup);
+            });
+            
+            filterItems.ForEach(filterItem =>
+            {
+                var cacheKey = ImporterFilterService
+                    .GetFilterItemCacheKey(filterItem.FilterGroup, filterItem.Label, context);
+                
+                _importerMemoryCache.Set(cacheKey, filterItem);
             });
             
             await _importerLocationService.CreateAndCache(context, newLocations);

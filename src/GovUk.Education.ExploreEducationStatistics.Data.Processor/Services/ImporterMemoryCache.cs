@@ -22,7 +22,6 @@ public class ImporterMemoryCache
         SlidingExpiration = TimeSpan.FromMinutes(1)
     };
 
-    // TODO DW - we're not actually using this for anything other than Locations
     public TItem Set<TItem>(object cacheKey, TItem cacheItem)
     {
         return Cache.Set(cacheKey, cacheItem, _cacheEntryOptions);
@@ -44,7 +43,7 @@ public class ImporterMemoryCache
         return Cache.Get<TItem>(cacheKey);
     }
 
-    public static string GetCacheKey(
+    public static string GetLocationCacheKey(
         GeographicLevel geographicLevel,
         Country? country,
         EnglishDevolvedArea? englishDevolvedArea,
@@ -94,9 +93,9 @@ public class ImporterMemoryCache
         return $"{geographicLevel}{separator}{tokens.JoinToString(separator)}";
     }
 
-    public static string GetCacheKey(Location location)
+    public static string GetLocationCacheKey(Location location)
     {
-        return GetCacheKey(
+        return GetLocationCacheKey(
             location.GeographicLevel,
             location.Country,
             location.EnglishDevolvedArea,
@@ -115,5 +114,5 @@ public class ImporterMemoryCache
             location.School,
             location.Sponsor,
             location.Ward);
-    } 
+    }
 }

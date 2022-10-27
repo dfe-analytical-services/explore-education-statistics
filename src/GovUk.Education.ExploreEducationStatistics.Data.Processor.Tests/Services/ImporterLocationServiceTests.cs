@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal(_england.Code, result.Country!.Code);
                 Assert.Equal(_england.Name, result.Country!.Name);
                 
-                Assert.Same(result, _importerMemoryCache.Get<Location>(GetCacheKey(result)));
+                Assert.Same(result, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result)));
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -173,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal("820", result.LocalAuthority!.OldCode);
                 Assert.Equal("Bedfordshire", result.LocalAuthority!.Name);
                 
-                Assert.Same(result, _importerMemoryCache.Get<Location>(GetCacheKey(result)));
+                Assert.Same(result, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result)));
             }
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -249,8 +249,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal("1", result2.Region!.Code);
                 Assert.Equal("North West", result2.Region!.Name);
                 
-                Assert.Same(result1, _importerMemoryCache.Get<Location>(GetCacheKey(result1)));
-                Assert.Same(result2, _importerMemoryCache.Get<Location>(GetCacheKey(result2)));
+                Assert.Same(result1, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result1)));
+                Assert.Same(result2, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result2)));
             }
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -335,8 +335,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal("2", result2.Region!.Code);
                 Assert.Equal("North East", result2.Region!.Name);
                 
-                Assert.Same(result1, _importerMemoryCache.Get<Location>(GetCacheKey(result1)));
-                Assert.Same(result2, _importerMemoryCache.Get<Location>(GetCacheKey(result2)));
+                Assert.Same(result1, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result1)));
+                Assert.Same(result2, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result2)));
             }
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -423,8 +423,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal("101", result2.LocalAuthority!.OldCode);
                 Assert.Equal("Westminster", result2.LocalAuthority!.Name);
                 
-                Assert.Same(result1, _importerMemoryCache.Get<Location>(GetCacheKey(result1)));
-                Assert.Same(result2, _importerMemoryCache.Get<Location>(GetCacheKey(result2)));
+                Assert.Same(result1, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result1)));
+                Assert.Same(result2, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result2)));
             }
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -524,8 +524,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal(localAuthorityDistrict.Code, result2.LocalAuthorityDistrict!.Code);
                 Assert.Equal(localAuthorityDistrict.Name, result2.LocalAuthorityDistrict!.Name);
                 
-                Assert.Same(result1, _importerMemoryCache.Get<Location>(GetCacheKey(result1)));
-                Assert.Same(result2, _importerMemoryCache.Get<Location>(GetCacheKey(result2)));
+                Assert.Same(result1, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result1)));
+                Assert.Same(result2, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result2)));
             }
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -618,8 +618,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal(provider.Code, result2.Provider!.Code);
                 Assert.Equal(provider.Name, result2.Provider!.Name);
                 
-                Assert.Same(result1, _importerMemoryCache.Get<Location>(GetCacheKey(result1)));
-                Assert.Same(result2, _importerMemoryCache.Get<Location>(GetCacheKey(result2)));
+                Assert.Same(result1, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result1)));
+                Assert.Same(result2, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result2)));
             }
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -678,7 +678,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal(result1Id, result1.Id);
                 Assert.Equal("Sheffield City Region", result1.EnglishDevolvedArea_Name);
                 
-                Assert.Same(result1, _importerMemoryCache.Get<Location>(GetCacheKey(result1)));
+                Assert.Same(result1, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result1)));
             }
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -699,7 +699,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 // MsSQL DBs are case insensitive by default: https://github.com/dotnet/efcore/issues/6153
                 Assert.Equal("SHEFFIELD CITY REGION", result2.EnglishDevolvedArea_Name);
                 
-                Assert.Same(result2, _importerMemoryCache.Get<Location>(GetCacheKey(result2)));
+                Assert.Same(result2, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result2)));
             }
         
             MockUtils.VerifyAllMocks(guidGenerator);

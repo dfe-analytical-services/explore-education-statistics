@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -18,6 +19,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
@@ -58,6 +60,30 @@ public class ProcessorServiceTests
         
         // Now assert that the Stage 2 import completes successfully when the Subject Meta is already pre-existing. 
         await AssertStage2ItemsImportedCorrectly(scenario);
+    }
+    
+    [Fact]
+    public async Task ProcessStage2_AnotherImportOfSimilarData()
+    {
+        // Firstly import a CSV.
+        var subjectId1 = Guid.NewGuid();
+        var scenario1 = new OrderingCsvScenario(subjectId1);
+        await AssertStage2ItemsImportedCorrectly(scenario1);
+        
+        // Then import a very similar CSV.
+        //
+        // We would expect though that the import would result in new Filters, FilterGroups and FilterItems,
+        // IndicatorGroups and Indicators specifically for this new Subject.
+        //
+        // We would not however expect to have additional Locations imported, as these should be shared between
+        // different Subjects. This is tested implicitly as a result of this second call to
+        // `AssertStage2ItemsImportedCorrectly` which tests that the same list of Locations is available
+        // as in the first call to `AssertStage2ItemsImportedCorrectly`, thus showing that no additional Locations
+        // were added as part of the second import.
+        
+        var subjectId2 = Guid.NewGuid();
+        var scenario2 = new OrderingCsvScenario(subjectId2);
+        await AssertStage2ItemsImportedCorrectly(scenario2);
     }
 
     private async Task AssertStage2ItemsImportedCorrectly(IProcessorServiceTestScenario scenario)
@@ -121,21 +147,21 @@ public class ProcessorServiceTests
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
 
-        // TODO DW - verify this
-        var importerMemoryCache = new Mock<ImporterMemoryCache>(Strict);
-
+        var importerMemoryCache = new ImporterMemoryCache();
+        
         var guidGenerator = new SequentialGuidGenerator();
 
         var transactionHelper = new InMemoryTransactionHelper();
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(importerMemoryCache.Object),
-            new ImporterLocationService(importerMemoryCache.Object, guidGenerator),
+            new ImporterFilterService(importerMemoryCache),
+            new ImporterLocationService(importerMemoryCache, guidGenerator),
             new ImporterMetaService(guidGenerator, transactionHelper),
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
-            transactionHelper);
+            transactionHelper,
+            importerMemoryCache);
 
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
@@ -153,6 +179,8 @@ public class ProcessorServiceTests
             fileImportService: fileImportService);
 
         await service.ProcessStage2(import.Id);
+        
+        VerifyAllMocks(blobStorageService);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
@@ -160,6 +188,7 @@ public class ProcessorServiceTests
                 .Filter
                 .Include(f => f.FilterGroups)
                 .ThenInclude(fg => fg.FilterItems)
+                .Where(f => f.SubjectId == scenario.GetSubjectId())
                 .ToListAsync();
 
             var filterLabels = filters
@@ -230,12 +259,36 @@ public class ProcessorServiceTests
                         .JoinToString(",");
 
                     Assert.Equal(filterIndexPrefix + expectedFilterItemLabels, filterIndexPrefix + filterItemLabels);
+
+                    var filterGroupCacheKey = ImporterFilterService.GetFilterGroupCacheKey(
+                        matchingFilter, 
+                        matchingFilterGroup.Label, 
+                        statisticsDbContext);
+
+                    var cachedFilterGroup = importerMemoryCache.Get<FilterGroup>(filterGroupCacheKey);
+                    Assert.Equal(matchingFilterGroup.Id, cachedFilterGroup.Id);
+                    
+                    expectedFilterGroup.FilterItems.ForEach(expectedFilterItem =>
+                    {
+                        var matchingFilterItem = matchingFilterGroup
+                            .FilterItems
+                            .Single(f => f.Label == expectedFilterItem.Label);
+
+                        var filterItemCacheKey = ImporterFilterService.GetFilterItemCacheKey(
+                            matchingFilterGroup, 
+                            matchingFilterItem.Label, 
+                            statisticsDbContext);
+
+                        var cachedFilterItem = importerMemoryCache.Get<FilterItem>(filterItemCacheKey);
+                        Assert.Equal(matchingFilterItem.Id, cachedFilterItem.Id);
+                    });
                 });
             });
 
             var indicatorGroups = await statisticsDbContext
                 .IndicatorGroup
                 .Include(ig => ig.Indicators)
+                .Where(ig => ig.SubjectId == scenario.GetSubjectId())
                 .ToListAsync();
             
             var indicatorGroupLabels = indicatorGroups.Select(ig => ig.Label).OrderBy(label => label);
@@ -268,10 +321,19 @@ public class ProcessorServiceTests
 
             var locations = await statisticsDbContext.Location.ToListAsync();
             
+            Assert.Equal(scenario.GetExpectedLocations().Count, locations.Count);
+            
+            locations.ForEach(location =>
+            {
+                var locationCacheKey = ImporterMemoryCache.GetLocationCacheKey(location);
+                
+                var cachedLocation = importerMemoryCache.Get<Location>(locationCacheKey);
+                Assert.Equal(location.Id, cachedLocation.Id);
+            });
+            
             // Blank out the ids from the stored Locations to make testing equality easier with our list of expected
             // Locations
             locations.ForEach(location => location.Id = Guid.Empty);
-            Assert.Equal(scenario.GetExpectedLocations().Count, locations.Count);
             scenario.GetExpectedLocations().ForEach(expectedLocation => Assert.Contains(expectedLocation, locations));
         }
     }

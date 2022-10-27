@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public Location? Find(StatisticsDbContext context, Location location)
         {
             return _memoryCache.GetOrCreate(
-                GetCacheKey(location), 
+                GetLocationCacheKey(location), 
                 () => Lookup(context, location));
         }
 
@@ -159,9 +159,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     // imports.  Therefore it is best to store it in the database as soon as possible so as to avoid 
                     // interfering with parallel imports of other Subjects using the same Locations.
                     location.Id = _guidGenerator.NewGuid();
-                    await context.AddRangeAsync(locations);
+                    await context.AddAsync(location);
                     await context.SaveChangesAsync();
-                    _memoryCache.Set(GetCacheKey(location), location);
+                    _memoryCache.Set(GetLocationCacheKey(location), location);
                 }
             });
             

@@ -44,14 +44,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     .First(fg => fg.FilterId == filter.Id && fg.Label == label));
         }
 
-        private static string GetFilterGroupCacheKey(Filter filter, string filterGroupLabel, StatisticsDbContext context)
+        public static string GetFilterGroupCacheKey(Filter filter, string filterGroupLabel, StatisticsDbContext context)
         {
             return nameof(FilterGroup) + "_" +
                    (filter.Id == null ? context.Entry(filter).Property(e => e.Id).CurrentValue : filter.Id) + "_" +
                    filterGroupLabel.ToLower().Replace(" ", "_");            
         } 
 
-        private static string GetFilterItemCacheKey(FilterGroup filterGroup, string filterItemLabel, StatisticsDbContext context)
+        public static string GetFilterItemCacheKey(FilterGroup filterGroup, string filterItemLabel, StatisticsDbContext context)
         {
             return nameof(FilterItem) + "_" +
                    (filterGroup.Id == null ? context.Entry(filterGroup).Property(e => e.Id).CurrentValue : filterGroup.Id) + "_" +
