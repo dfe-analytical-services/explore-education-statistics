@@ -39,43 +39,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _transactionHelper = transactionHelper;
         }
 
-        public Task<SubjectMeta> Import(
+        public async Task<SubjectMeta> Import(
             List<string> metaFileCsvHeaders,
             List<List<string>> metaFileRows, 
             Subject subject,
             StatisticsDbContext context)
         {
-            return _transactionHelper.DoInTransaction(context, async () =>
+            var metaRows = GetMetaRows(metaFileCsvHeaders, metaFileRows);
+            var filtersAndMeta = ReadFiltersFromCsv(metaRows, subject);
+            var indicatorsAndMeta = ReadIndicatorsFromCsv(metaRows, subject);
+
+            var filtersAlreadyImported = filtersAndMeta.Count > 0 &&
+                                          await context.Filter.AnyAsync(filter => filter.SubjectId == subject.Id);
+            
+            var indicatorsAlreadyImported = indicatorsAndMeta.Count > 0 && 
+                                            await context.IndicatorGroup.AnyAsync(indicator => indicator.SubjectId == subject.Id);
+
+            if (!filtersAlreadyImported || !indicatorsAlreadyImported)
             {
-                var metaRows = GetMetaRows(metaFileCsvHeaders, metaFileRows);
-                var filtersAndMeta = ReadFiltersFromCsv(metaRows, subject);
-                var indicatorsAndMeta = ReadIndicatorsFromCsv(metaRows, subject);
+                var filters = filtersAndMeta.Select(f => f.Filter).ToList();
+                filters.ForEach(filter => filter.Id = _guidGenerator.NewGuid());
 
-                var filtersAlreadyImported = filtersAndMeta.Count > 0 &&
-                                              await context.Filter.AnyAsync(filter => filter.SubjectId == subject.Id);
-                
-                var indicatorsAlreadyImported = indicatorsAndMeta.Count > 0 && 
-                                                await context.IndicatorGroup.AnyAsync(indicator => indicator.SubjectId == subject.Id);
+                var indicators = indicatorsAndMeta.Select(i => i.Indicator).ToList();
+                indicators.ForEach(indicator => indicator.Id = _guidGenerator.NewGuid());
 
-                if (!filtersAlreadyImported || !indicatorsAlreadyImported)
+                await _transactionHelper.DoInTransaction(context, async () =>
                 {
-                    var filters = filtersAndMeta.Select(f => f.Filter).ToList();
-                    filters.ForEach(filter => filter.Id = _guidGenerator.NewGuid());
-
-                    var indicators = indicatorsAndMeta.Select(i => i.Indicator).ToList();
-                    indicators.ForEach(indicator => indicator.Id = _guidGenerator.NewGuid());
-
                     await context.Filter.AddRangeAsync(filters);
                     await context.Indicator.AddRangeAsync(indicators);
-                    await context.SaveChangesAsync();                    
-                }
-                
-                return new SubjectMeta
-                {
-                    Filters = filtersAndMeta,
-                    Indicators = indicatorsAndMeta
-                };
-            });
+                    await context.SaveChangesAsync();
+                });
+            }
+            
+            return new SubjectMeta
+            {
+                Filters = filtersAndMeta,
+                Indicators = indicatorsAndMeta
+            };
         }
 
         public SubjectMeta Get(
@@ -102,10 +102,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return metaFileRows.Select(row => GetMetaRow(cols, row)).ToList();
         }
 
-        public static MetaRow GetMetaRow(List<string> cols, List<string> cells)
+        public static MetaRow GetMetaRow(List<string> cols, List<string> rowValues)
         {
             return CsvUtil.BuildType(
-                cells, 
+                rowValues, 
                 cols, 
                 Enum.GetNames(typeof(MetaColumns)), 
                 values => new MetaRow

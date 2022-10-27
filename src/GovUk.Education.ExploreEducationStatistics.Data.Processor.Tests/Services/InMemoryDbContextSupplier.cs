@@ -7,6 +7,9 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
 
+/// <summary>
+/// Component for supplying services with DbContexts when testing with InMemory DbContexts.
+/// </summary>
 public class InMemoryDbContextSupplier : IDbContextSupplier
 {
     private readonly string? _contentDbContextId;

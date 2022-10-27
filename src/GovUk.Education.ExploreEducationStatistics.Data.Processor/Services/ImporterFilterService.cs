@@ -22,11 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public FilterItem LookupFilterItem(FilterGroup filterGroup, string label, StatisticsDbContext context)
         {
-            if (string.IsNullOrWhiteSpace(label))
-            {
-                label = "Not specified";
-            }
-
             var cacheKey = GetFilterItemCacheKey( filterGroup, label, context);
             
             return _memoryCache.GetOrCreate(
@@ -39,11 +34,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public FilterGroup LookupFilterGroup(Filter filter, string label, StatisticsDbContext context)
         {
-            if (string.IsNullOrWhiteSpace(label))
-            {
-                label = "Default";
-            }
-
             var cacheKey = GetFilterGroupCacheKey(filter, label, context);
 
             return _memoryCache.GetOrCreate(

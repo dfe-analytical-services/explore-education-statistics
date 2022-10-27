@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,6 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
 {
     public static class CsvUtil
     {
+        public const string DefaultFilterGroupLabel = "Default";
+        public const string DefaultFilterItemLabel = "Not specified";
+
         /// <summary>
         /// Gets the header values of the first line of the provided CSV.
         /// </summary>
@@ -245,33 +249,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
             }, skipHeaderRow);
         }
             
-        public static T BuildType<T>(IReadOnlyList<string> rowValues, List<string> colValues, string column,
+        public static T? BuildType<T>(IReadOnlyList<string> rowValues, List<string> colValues, string column,
             Func<string, T> func)
         {
             var value = Value(rowValues, colValues, column);
-            return value == null ? default(T) : func(value);
+            return value == null ? default : func(value);
         }
 
-        public static T BuildType<T>(IReadOnlyList<string> rowValues, List<string> colValues, IEnumerable<string> columns,
+        public static T? BuildType<T>(IReadOnlyList<string> rowValues, List<string> colValues, IEnumerable<string> columns,
             Func<string[], T> func)
         {
             var values = Values(rowValues, colValues, columns);
-            return values.All(value => value == null) ? default(T) : func(values);
+            return values.All(value => value == null) ? default : func(values!);
         }
 
-        public static string[] Values(IReadOnlyList<string> rowValues, List<string> colValues, IEnumerable<string> columns)
+        public static string?[] Values(IReadOnlyList<string> rowValues, List<string> colValues, IEnumerable<string> columns)
         {
             return columns.Select(c => Value(rowValues, colValues, c)).ToArray();
         }
 
-        public static string Value(IReadOnlyList<string> rowValues, List<string> colValues, string column)
+        public static string? Value(
+            IReadOnlyList<string> rowValues, 
+            List<string> colValues, 
+            string column, 
+            string? defaultValue = null)
         {
-            return colValues.Contains(column) ? rowValues[colValues.FindIndex(h => h.Equals(column))].Trim().NullIfWhiteSpace() : null;
+            if (!colValues.Contains(column))
+            {
+                return defaultValue;
+            }
+
+            var cellValue = rowValues[colValues.FindIndex(h => h.Equals(column))].Trim().NullIfWhiteSpace();
+
+            return cellValue ?? defaultValue;
         }
 
         public static GeographicLevel GetGeographicLevel(IReadOnlyList<string> rowValues, List<string> colValues)
         {
             var value = Value(rowValues, colValues, "geographic_level");
+
+            if (value == null)
+            {
+                throw new InvalidGeographicLevelException(value);
+            }
+            
             foreach (var val in (GeographicLevel[]) Enum.GetValues(typeof(GeographicLevel)))
             {
                 if (val.GetEnumLabel().ToLower().Equals(value.ToLower()))
