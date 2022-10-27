@@ -10,10 +10,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -92,7 +92,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                         .Include(block => block.ContentBlock)
                         .Where(block => block.ContentBlockId == dataBlockId))
                 .OnSuccessCombineWith(block => GetDataBlockTableResult(new CacheableDataBlock(block)))
-                .OnSuccess(BuildFastTrackViewModel)
+                .OnSuccessCombineWith(tuple =>
+                {
+                    var release = tuple.Item1.Release;
+                    return _releaseRepository.GetLatestPublishedRelease(release.PublicationId);
+                })
+                .OnSuccess(tuple =>
+                {
+                    var (releaseContentBlock, tableResult, latestRelease) = tuple;
+                    return BuildFastTrackViewModel(releaseContentBlock, tableResult, latestRelease);
+                })
                 .HandleFailuresOrOk();
         }
 
@@ -108,11 +117,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 dataBlockId: cacheable.DataBlockId);
         }
 
-        private FastTrackViewModel BuildFastTrackViewModel(
-            Tuple<ReleaseContentBlock, TableBuilderResultViewModel> blockAndTableResult)
+        private static FastTrackViewModel BuildFastTrackViewModel(
+            ReleaseContentBlock releaseContentBlock,
+            TableBuilderResultViewModel tableResult,
+            Release latestRelease)
         {
-            var (releaseContentBlock, tableResult) = blockAndTableResult;
-
             if (releaseContentBlock.ContentBlock is not DataBlock dataBlock)
             {
                 throw new ArgumentException(
@@ -120,8 +129,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             }
 
             var release = releaseContentBlock.Release;
-            var latestRelease = _releaseRepository.GetLatestPublishedRelease(release.PublicationId) ??
-                                throw new InvalidOperationException("Latest Release not found for Publication");
 
             return new FastTrackViewModel
             {

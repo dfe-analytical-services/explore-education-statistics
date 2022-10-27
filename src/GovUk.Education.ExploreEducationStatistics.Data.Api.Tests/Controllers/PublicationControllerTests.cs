@@ -6,10 +6,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Moq;
@@ -38,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var (controller, mocks) = BuildControllerAndMocks();
 
             var cacheKey = new ReleaseSubjectsCacheKey("publication", "release", release.Id);
-            
+
             mocks
                 .cacheKeyService
                 .Setup(s => s.CreateCacheKeyForReleaseSubjects(release.Id))
@@ -47,12 +48,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             mocks.cacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(List<SubjectViewModel>)))
                 .ReturnsAsync(null);
-            
+
             mocks
-                .publicationService
-                .Setup(s => s.GetLatestRelease(publicationId))
-                .Returns(release);
-            
+                .releaseRepository
+                .Setup(s => s.GetLatestPublishedRelease(publicationId))
+                .ReturnsAsync(release);
+
             mocks
                 .releaseService
                 .Setup(s => s.ListSubjects(release.Id))
@@ -61,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             mocks.cacheService
                 .Setup(s => s.SetItem<object>(cacheKey, subjects))
                 .Returns(Task.CompletedTask);
-            
+
             var result = await controller.ListLatestReleaseSubjects(publicationId);
             VerifyAllMocks(mocks);
 
@@ -77,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             {
                 Id = Guid.NewGuid()
             };
-            
+
             var featuredTables = new List<FeaturedTableViewModel>
             {
                 new(Guid.NewGuid(), "name", "description")
@@ -85,9 +86,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var (controller, mocks) = BuildControllerAndMocks();
 
-            mocks.publicationService
-                .Setup(s => s.GetLatestRelease(publicationId))
-                .Returns(release);
+            mocks.releaseRepository
+                .Setup(s => s.GetLatestPublishedRelease(publicationId))
+                .ReturnsAsync(release);
 
             mocks.releaseService
                 .Setup(s => s.ListFeaturedTables(release.Id))
@@ -100,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public void SubjectViewModel_SerialiseAndDeserialise()
+        public void SubjectViewModel_SerializeAndDeserialize()
         {
             var original = new SubjectViewModel(
                 Guid.NewGuid(),
@@ -116,7 +117,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 {
                     "level1"
                 },
-                new FileInfo {
+                new FileInfo
+                {
                     Created = DateTime.Now,
                     Id = Guid.NewGuid(),
                     Name = "Name",
@@ -130,23 +132,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var converted = DeserializeObject<SubjectViewModel>(SerializeObject(original));
             converted.AssertDeepEqualTo(original);
         }
-        
+
         private (PublicationController controller,
             (
-                Mock<IPublicationService> publicationService,
-                Mock<IReleaseService> releaseService,
-                Mock<ICacheKeyService> cacheKeyService,
-                Mock<IBlobCacheService> cacheService
+            Mock<IReleaseRepository> releaseRepository,
+            Mock<IReleaseService> releaseService,
+            Mock<ICacheKeyService> cacheKeyService,
+            Mock<IBlobCacheService> cacheService
             ) mocks
             ) BuildControllerAndMocks()
         {
-            var publicationService = new Mock<IPublicationService>(Strict);
+            var releaseRepository = new Mock<IReleaseRepository>(Strict);
             var releaseService = new Mock<IReleaseService>(Strict);
             var cacheKeyService = new Mock<ICacheKeyService>(Strict);
             var controller = new PublicationController(
-                publicationService.Object, releaseService.Object, cacheKeyService.Object);
-            
-            return (controller, (publicationService, releaseService, cacheKeyService, BlobCacheService));
+                releaseRepository.Object, releaseService.Object, cacheKeyService.Object);
+
+            return (controller, (releaseRepository, releaseService, cacheKeyService, BlobCacheService));
         }
     }
 }

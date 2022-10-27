@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
@@ -69,14 +70,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Create(PermalinkCreateViewModel request)
         {
             var publicationId = await _subjectRepository.GetPublicationIdForSubject(request.Query.SubjectId);
-            var release = _releaseRepository.GetLatestPublishedRelease(publicationId);
-
-            if (release == null)
-            {
-                return new NotFoundResult();
-            }
-
-            return await Create(release.Id, request);
+            return await _releaseRepository.GetLatestPublishedRelease(publicationId)
+                .OnSuccess(release => Create(release.Id, request));
         }
 
         public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Create(Guid releaseId,
@@ -176,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     .Include(p => p.Publication)
                     .Where(r => r.PublicationId == publication.SupersededById)
                     .ToListAsync())
-                    .Any(r => r.IsLatestPublishedVersionOfRelease()))
+                .Any(r => r.IsLatestPublishedVersionOfRelease()))
             {
                 return PermalinkStatus.PublicationSuperseded;
             }

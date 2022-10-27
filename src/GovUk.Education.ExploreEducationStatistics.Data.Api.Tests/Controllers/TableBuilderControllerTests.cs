@@ -11,10 +11,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Http;
@@ -304,12 +304,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForFastTrack()
         {
-            var latestRelease = new Data.Model.Release
+            var latestRelease = new Release
             {
                 Id = ReleaseId,
-                Year = 2020,
-                Slug = "2020-21",
-                TimeIdentifier = AcademicYear
+                ReleaseName = "2020",
+                TimePeriodCoverage = AcademicYear
             };
 
             var cacheKey = new DataBlockTableResultCacheKey(Release.Publication.Slug, Release.Slug, DataBlockId);
@@ -332,7 +331,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             mocks.releaseRepository
                 .Setup(s => s.GetLatestPublishedRelease(PublicationId))
-                .Returns(latestRelease);
+                .ReturnsAsync(latestRelease);
 
             var result = await controller.QueryForFastTrack(DataBlockId);
 
@@ -360,12 +359,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForFastTrack_NotLatestRelease()
         {
-            var latestRelease = new Data.Model.Release
+            var latestRelease = new Release
             {
                 Id = Guid.NewGuid(),
-                Slug = "2021-22",
-                Year = 2021,
-                TimeIdentifier = AcademicYear
+                ReleaseName = "2021",
+                TimePeriodCoverage = AcademicYear
             };
 
             var cacheKey = new DataBlockTableResultCacheKey(Release.Publication.Slug, Release.Slug, DataBlockId);
@@ -388,7 +386,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             mocks.releaseRepository
                 .Setup(s => s.GetLatestPublishedRelease(PublicationId))
-                .Returns(latestRelease);
+                .ReturnsAsync(latestRelease);
 
             var result = await controller.QueryForFastTrack(DataBlockId);
 
