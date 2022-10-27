@@ -140,7 +140,6 @@ const DataBlockTabs = ({
                   captionTitle={dataBlock?.heading}
                   dataBlockId={dataBlock.id}
                   fullTable={fullTable}
-                  isInDataBlock
                   source={dataBlock?.source}
                   tableHeadersConfig={
                     dataBlock.table.tableHeaders

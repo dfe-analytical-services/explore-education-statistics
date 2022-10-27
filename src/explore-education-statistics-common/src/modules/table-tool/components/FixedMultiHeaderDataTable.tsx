@@ -12,8 +12,8 @@ interface Props extends OmitStrict<MultiHeaderTableProps, 'ariaLabelledBy'> {
   caption: ReactNode;
   captionId: string;
   innerRef?: Ref<HTMLElement>;
-  isInDataBlock?: boolean;
   footnotes?: FullTableMeta['footnotes'];
+  footnotesClassName?: string;
   source?: string;
   footnotesHeadingHiddenText?: string;
 }
@@ -24,7 +24,7 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
       caption,
       captionId,
       footnotes = [],
-      isInDataBlock = false,
+      footnotesClassName,
       source,
       footnotesHeadingHiddenText,
     } = props;
@@ -135,7 +135,7 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
           />
         </div>
 
-        <div className={isInDataBlock ? undefined : 'govuk-!-width-two-thirds'}>
+        <div className={footnotesClassName}>
           <FigureFootnotes
             footnotes={footnotes}
             headingHiddenText={footnotesHeadingHiddenText}

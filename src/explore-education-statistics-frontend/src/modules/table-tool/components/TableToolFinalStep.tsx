@@ -118,6 +118,7 @@ const TableToolFinalStep = ({
 
           <TimePeriodDataTable
             ref={dataTableRef}
+            footnotesClassName="govuk-!-width-two-thirds"
             fullTable={table}
             query={query}
             tableHeadersConfig={tableHeaders}

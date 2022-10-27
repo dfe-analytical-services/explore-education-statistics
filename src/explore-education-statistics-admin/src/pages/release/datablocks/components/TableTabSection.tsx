@@ -43,6 +43,7 @@ const TableTabSection = ({
       )}
 
       <TimePeriodDataTable
+        footnotesClassName="govuk-!-width-two-thirds"
         fullTable={table}
         tableHeadersConfig={tableHeaders}
         captionTitle={dataBlock.heading}
