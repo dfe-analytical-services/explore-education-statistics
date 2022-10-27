@@ -106,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 ValidateCsvFileType(import.MetaFile, metaFileStreamProvider, true)
                     .OnSuccess(() => ValidateCsvFileType(import.File, dataFileStreamProvider, false))
                     .OnSuccess(() => ValidateMetadataFile(import.MetaFile, metaFileStreamProvider, true))
-                    .OnSuccess(async metaFileDetails =>
+                    .OnSuccess(async _ =>
                     {
                         var dataFileColumnHeaders = await CsvUtil.GetCsvHeaders(dataFileStreamProvider);
                         var dataFileTotalRows = await CsvUtil.GetTotalRows(dataFileStreamProvider);
@@ -247,7 +247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 
                 if (cells.Count != columnHeaders.Count)
                 {
-                    errors.Add(new DataImportError($"error at row {index + 1}: cell count {cells.Count} " +
+                    errors.Add(new DataImportError($"Error at row {index + 1}: cell count {cells.Count} " +
                                                    $"does not match column header count of {columnHeaders.Count}"));
                     return true;
                 }
@@ -282,7 +282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
                 catch (Exception e)
                 {
-                    errors.Add(new DataImportError($"error at row {index + 1}: {e.Message}"));
+                    errors.Add(new DataImportError($"Error at row {index + 1}: {e.Message}"));
                 }
 
                 if (index % Stage1RowCheck == 0)

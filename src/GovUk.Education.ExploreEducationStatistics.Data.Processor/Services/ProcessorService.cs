@@ -1,13 +1,16 @@
 #nullable enable
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 
@@ -15,7 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class ProcessorService : IProcessorService
     {
-        private readonly ILogger<ProcessorService> _logger;
         private readonly IBlobStorageService _blobStorageService;
         private readonly IFileImportService _fileImportService;
         private readonly IImporterService _importerService;
@@ -23,7 +25,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly ISplitFileService _splitFileService;
         private readonly IValidatorService _validatorService;
         private readonly IDataArchiveService _dataArchiveService;
-
+        private readonly IDbContextSupplier _dbContextSupplier;
+        private readonly ILogger<ProcessorService> _logger;
+        
         public ProcessorService(
             ILogger<ProcessorService> logger,
             IBlobStorageService blobStorageService,
@@ -32,7 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             IImporterService importerService,
             IDataImportService dataImportService,
             IValidatorService validatorService,
-            IDataArchiveService dataArchiveService)
+            IDataArchiveService dataArchiveService,
+            IDbContextSupplier dbContextSupplier)
         {
             _logger = logger;
             _blobStorageService = blobStorageService;
@@ -42,6 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _dataImportService = dataImportService;
             _validatorService = validatorService;
             _dataArchiveService = dataArchiveService;
+            _dbContextSupplier = dbContextSupplier;
         }
 
         public async Task ProcessUnpackingArchive(Guid importId)
@@ -72,22 +78,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task ProcessStage2(Guid importId)
         {
-            var statisticsDbContext = DbUtils.CreateStatisticsDbContext();
+            var statisticsDbContext = _dbContextSupplier.CreateStatisticsDbContext();
 
             var import = await _dataImportService.GetImport(importId);
 
-            var subject = await statisticsDbContext.Subject.FindAsync(import.SubjectId);
+            var subject = await statisticsDbContext.Subject.SingleAsync(subject => subject.Id == import.SubjectId);
 
             var metaFileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
 
             var metaFileCsvHeaders = await CsvUtil.GetCsvHeaders(metaFileStreamProvider);
             var metaFileCsvRows = await CsvUtil.GetCsvRows(metaFileStreamProvider);
 
-            _importerService.ImportMeta(metaFileCsvHeaders, metaFileCsvRows, subject, statisticsDbContext);
-            await statisticsDbContext.SaveChangesAsync();
-
+            await _importerService.ImportMeta(metaFileCsvHeaders, metaFileCsvRows, subject, statisticsDbContext);
             await _fileImportService.ImportFiltersAndLocations(import.Id, statisticsDbContext);
-            await statisticsDbContext.SaveChangesAsync();
         }
 
         public async Task ProcessStage3(Guid importId)

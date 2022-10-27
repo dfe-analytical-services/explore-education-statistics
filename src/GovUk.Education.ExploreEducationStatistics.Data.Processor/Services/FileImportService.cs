@@ -22,19 +22,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IBlobStorageService _blobStorageService;
         private readonly IDataImportService _dataImportService;
         private readonly IImporterService _importerService;
+        private readonly ITransactionHelper _transactionHelper;
 
         public FileImportService(
             ILogger<FileImportService> logger,
             IBatchService batchService,
             IBlobStorageService blobStorageService,
             IDataImportService dataImportService,
-            IImporterService importerService)
+            IImporterService importerService, 
+            ITransactionHelper transactionHelper)
         {
             _logger = logger;
             _batchService = batchService;
             _blobStorageService = blobStorageService;
             _dataImportService = dataImportService;
             _importerService = importerService;
+            _transactionHelper = transactionHelper;
         }
 
         public async Task ImportObservations(ImportObservationsMessage message, StatisticsDbContext context)
@@ -68,10 +71,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var metaFileCsvHeaders = await CsvUtil.GetCsvHeaders(metaFileStreamProvider);
             var metaFileCsvRows = await CsvUtil.GetCsvRows(metaFileStreamProvider);
 
-            await context.Database.CreateExecutionStrategy().Execute(async () =>
+            await _transactionHelper.DoInTransaction(context, async () =>
             {
-                await using var transaction = await context.Database.BeginTransactionAsync();
-
                 await _importerService.ImportObservations(
                     import,
                     datafileStreamProvider,
@@ -80,9 +81,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     message.BatchNo,
                     context
                 );
-
-                await transaction.CommitAsync();
-                await context.Database.CloseConnectionAsync();
             });
 
             if (import.NumBatches > 1)

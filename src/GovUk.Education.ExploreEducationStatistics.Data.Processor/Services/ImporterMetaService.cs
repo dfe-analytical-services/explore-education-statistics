@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -9,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -27,27 +29,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     public class ImporterMetaService : IImporterMetaService
     {
         private readonly IGuidGenerator _guidGenerator;
+        private readonly ITransactionHelper _transactionHelper;
         
-        public ImporterMetaService(IGuidGenerator guidGenerator)
+        public ImporterMetaService(
+            IGuidGenerator guidGenerator, 
+            ITransactionHelper transactionHelper)
         {
             _guidGenerator = guidGenerator;
+            _transactionHelper = transactionHelper;
         }
 
-        public SubjectMeta Import(
+        public Task<SubjectMeta> Import(
             List<string> metaFileCsvHeaders,
             List<List<string>> metaFileRows, 
             Subject subject,
             StatisticsDbContext context)
         {
-            var metaRows = GetMetaRows(metaFileCsvHeaders, metaFileRows);
-            var filters = ImportFilters(metaRows, subject, context).ToList();
-            var indicators = ImportIndicators(metaRows, subject, context).ToList();
-            
-            return new SubjectMeta
+            return _transactionHelper.DoInTransaction(context, async () =>
             {
-                Filters = filters,
-                Indicators = indicators
-            };
+                var metaRows = GetMetaRows(metaFileCsvHeaders, metaFileRows);
+                var filtersAndMeta = ReadFiltersFromCsv(metaRows, subject);
+                var indicatorsAndMeta = ReadIndicatorsFromCsv(metaRows, subject);
+
+                var filtersAlreadyImported = filtersAndMeta.Count > 0 &&
+                                              await context.Filter.AnyAsync(filter => filter.SubjectId == subject.Id);
+                
+                var indicatorsAlreadyImported = indicatorsAndMeta.Count > 0 && 
+                                                await context.IndicatorGroup.AnyAsync(indicator => indicator.SubjectId == subject.Id);
+
+                if (!filtersAlreadyImported || !indicatorsAlreadyImported)
+                {
+                    var filters = filtersAndMeta.Select(f => f.Filter).ToList();
+                    filters.ForEach(filter => filter.Id = _guidGenerator.NewGuid());
+
+                    var indicators = indicatorsAndMeta.Select(i => i.Indicator).ToList();
+                    indicators.ForEach(indicator => indicator.Id = _guidGenerator.NewGuid());
+
+                    await context.Filter.AddRangeAsync(filters);
+                    await context.Indicator.AddRangeAsync(indicators);
+                    await context.SaveChangesAsync();                    
+                }
+                
+                return new SubjectMeta
+                {
+                    Filters = filtersAndMeta,
+                    Indicators = indicatorsAndMeta
+                };
+            });
         }
 
         public SubjectMeta Get(
@@ -93,23 +121,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 });
         }
 
-        private IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> ImportFilters(
-            IEnumerable<MetaRow> metaRows, Subject subject, StatisticsDbContext context)
+        public List<(Filter Filter, string Column, string FilterGroupingColumn)> ReadFiltersFromCsv(
+            IEnumerable<MetaRow> metaRows, 
+            Subject subject)
         {
-            var filters = GetFilters(metaRows, subject, context).ToList();
-            context.Filter.AddRange(filters.Select(triple => triple.Filter));
-
-            return filters;
-        }
-
-        private IEnumerable<(Indicator Indicator, string Column)> ImportIndicators(IEnumerable<MetaRow> metaRows,
-            Subject subject, StatisticsDbContext context)
-        {
-            var indicators = GetIndicators(metaRows, subject, context).ToList();
-
-            context.Indicator.AddRange(indicators.Select(tuple => tuple.Indicator));
-
-            return indicators;
+            return metaRows
+                .Where(row => row.ColumnType == ColumnType.Filter)
+                .Select(filter => (
+                    filter: new Filter(filter.FilterHint, filter.Label, filter.ColumnName, subject),
+                    column: filter.ColumnName,
+                    filterGroupingColumn: filter.FilterGroupingColumn))
+                .ToList();
         }
 
         private IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> GetFilters(
@@ -118,15 +140,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return metaRows
                 .Where(row => row.ColumnType == ColumnType.Filter)
                 .Select(filter => (
-                    filter: 
-                        context.Filter.FirstOrDefault(f => f.SubjectId == subject.Id && f.Name == filter.ColumnName) ??
-                        new Filter(filter.FilterHint, filter.Label, filter.ColumnName, subject),
+                    filter: context.Filter.Single(f => f.SubjectId == subject.Id && f.Name == filter.ColumnName),
                     column: filter.ColumnName,
-                    filterGroupingColumn: filter.FilterGroupingColumn));
+                    filterGroupingColumn: filter.FilterGroupingColumn))
+                .ToList();
         }
 
-        private IEnumerable<(Indicator Indicator, string Column)> GetIndicators(IEnumerable<MetaRow> metaRows,
-            Subject subject, StatisticsDbContext context)
+        private List<(Indicator Indicator, string Column)> ReadIndicatorsFromCsv(
+            IEnumerable<MetaRow> metaRows,
+            Subject subject)
         {
             var indicatorRows = metaRows.Where(row => row.ColumnType == ColumnType.Indicator).ToList();
 
@@ -140,28 +162,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var indicatorGroups = indicatorRows
                 .GroupBy(row => row.IndicatorGrouping)
-                .ToDictionary(rows => rows.Key, rows =>
-                    context.IndicatorGroup.FirstOrDefault(ig => ig.SubjectId == subject.Id && ig.Label == rows.Key) ??
-                    new IndicatorGroup(rows.Key, subject)
-                );
+                .ToDictionary(
+                    rows => rows.Key, 
+                    rows => new IndicatorGroup(rows.Key, subject));
 
             return indicatorRows
                 .Select(row =>
                 {
-                    indicatorGroups.TryGetValue(row.IndicatorGrouping, out var indicatorGroup);
+                    var indicatorGroup = indicatorGroups.GetValueOrDefault(row.IndicatorGrouping)!;
+                    
                     return (
                         indicator:
-                        context.Indicator.FirstOrDefault(i =>
-                            i.IndicatorGroupId == indicatorGroup.Id && i.Label == row.Label &&
-                            i.Unit == row.IndicatorUnit) ?? new Indicator
+                        new Indicator
                         {
-                            Id = _guidGenerator.NewGuid(),
                             IndicatorGroup = indicatorGroup,
                             Label = row.Label,
                             Name = row.ColumnName,
                             Unit = row.IndicatorUnit,
                             DecimalPlaces = row.DecimalPlaces
                         },
+                        column: row.ColumnName
+                    );
+                })
+                .ToList();
+        }
+
+        private IEnumerable<(Indicator Indicator, string Column)> GetIndicators(IEnumerable<MetaRow> metaRows,
+            Subject subject, StatisticsDbContext context)
+        {
+            var indicatorRows = metaRows.Where(row => row.ColumnType == ColumnType.Indicator).ToList();
+            
+            indicatorRows.ForEach(row =>
+            {
+                if (string.IsNullOrWhiteSpace(row.IndicatorGrouping))
+                {
+                    row.IndicatorGrouping = "Default";
+                }
+            });
+            
+            var indicatorGroups = indicatorRows
+                .GroupBy(row => row.IndicatorGrouping)
+                .ToDictionary(
+                    rows => rows.Key, 
+                    rows => context.IndicatorGroup.Single(ig => 
+                        ig.SubjectId == subject.Id && ig.Label == rows.Key));
+            
+            return indicatorRows
+                .Select(row =>
+                {
+                    var indicatorGroup = indicatorGroups.GetValueOrDefault(row.IndicatorGrouping)!;
+                    
+                    return (
+                        indicator:
+                        context.Indicator.Single(i =>
+                            i.IndicatorGroupId == indicatorGroup.Id && i.Label == row.Label &&
+                            i.Unit == row.IndicatorUnit),
                         column: row.ColumnName
                     );
                 });
