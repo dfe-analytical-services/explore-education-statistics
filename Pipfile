@@ -3,9 +3,6 @@ name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
 
-[dev-packages]
-docker = "==4.1.0"
-
 [packages]
 robotframework = "~=6.0"
 robotframework-seleniumlibrary = "~=6.0.0"
@@ -19,7 +16,13 @@ robotframework-tidy = "~=2.2"
 slack-sdk = "~=3.18.3"
 lxml = "~=4.9.1"
 azure-storage-blob = "~=12.9.0"
-autopep8 = "~=1.7.0"
+scikit-image = "~=0.19.2"
+imutils = "~=0.5.4"
+opencv-python = "~=4.5.5.64"
+numpy = "~=1.22.0"
+flake8 = "~=5.0.4"
+isort = "~=5.10.1"
+black = "~=22.10.0"
 
 [requires]
 python_version = "3.10.5"

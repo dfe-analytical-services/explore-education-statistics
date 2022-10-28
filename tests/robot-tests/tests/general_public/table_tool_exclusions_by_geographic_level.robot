@@ -7,6 +7,7 @@ Test Setup          fail test fast if required
 
 Force Tags          GeneralPublic    Local    Dev
 
+
 *** Test Cases ***
 Go to Table Tool page
     user navigates to data tables page on public frontend

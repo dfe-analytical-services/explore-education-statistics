@@ -5,31 +5,32 @@ releases_by_url = {}
 
 
 class DataBlockType(Enum):
-    CONTENT_BLOCK = 1,
-    FAST_TRACK = 2,
-    SECONDARY_STATS = 3,
+    CONTENT_BLOCK = 1
+    FAST_TRACK = 2
+    SECONDARY_STATS = 3
     KEY_STATS = 4
 
 
 class DataBlockRow:
     def __init__(
-            self,
-            content_block_id,
-            release_id,
-            release_slug,
-            publication_id,
-            publication_slug,
-            content_section_id,
-            content_section_heading,
-            content_section_type,
-            content_section_position,
-            min_content_section_position,
-            content_block_position,
-            min_content_block_position,
-            highlight_name,
-            subject_id,
-            chart_title,
-            chart_type):
+        self,
+        content_block_id,
+        release_id,
+        release_slug,
+        publication_id,
+        publication_slug,
+        content_section_id,
+        content_section_heading,
+        content_section_type,
+        content_section_position,
+        min_content_section_position,
+        content_block_position,
+        min_content_block_position,
+        highlight_name,
+        subject_id,
+        chart_title,
+        chart_type,
+    ):
 
         self.publication_id = publication_id.lower()
         self.chart_type = chart_type
@@ -37,13 +38,16 @@ class DataBlockRow:
         self.subject_id = subject_id.lower()
         self.highlight_name = highlight_name
         self.content_section_type = content_section_type
-        self.content_section_position = \
-            int(content_section_position) + 1 - int(min_content_section_position) \
-            if content_section_position is not None \
+        self.content_section_position = (
+            int(content_section_position) + 1 - int(min_content_section_position)
+            if content_section_position is not None
             else None
-        self.content_block_position = int(content_block_position) + 1 - int(min_content_block_position) \
-            if min_content_block_position is not None \
+        )
+        self.content_block_position = (
+            int(content_block_position) + 1 - int(min_content_block_position)
+            if min_content_block_position is not None
             else None
+        )
         self.content_section_id = None if content_section_id is None else content_section_id.lower()
         self.publication_slug = publication_slug
         self.release_slug = release_slug
@@ -55,33 +59,34 @@ class DataBlockRow:
 
         if self.content_section_type is None:
             self.type = DataBlockType.FAST_TRACK
-        elif self.content_section_type == 'KeyStatisticsSecondary':
+        elif self.content_section_type == "KeyStatisticsSecondary":
             self.type = DataBlockType.SECONDARY_STATS
-        elif self.content_section_type == 'Generic':
+        elif self.content_section_type == "Generic":
             self.type = DataBlockType.CONTENT_BLOCK
-        elif self.content_section_type == 'KeyStatistics':
+        elif self.content_section_type == "KeyStatistics":
             self.type = DataBlockType.KEY_STATS
         else:
-            raise AttributeError(f'Unhandled Content Section Type {self.content_section_type}')
+            raise AttributeError(f"Unhandled Content Section Type {self.content_section_type}")
 
         if self.type == DataBlockType.FAST_TRACK:
-            self.content_url = f'/data-tables/fast-track/{self.content_block_id}'
+            self.content_url = f"/data-tables/fast-track/{self.content_block_id}"
         else:
-            self.content_url = f'/find-statistics/{self.publication_slug}/{self.release_slug}'
+            self.content_url = f"/find-statistics/{self.publication_slug}/{self.release_slug}"
 
 
 class Release:
     def __init__(
-            self,
-            publication_id,
-            publication_slug,
-            release_id,
-            release_slug,
-            key_stat_blocks,
-            secondary_stat_blocks,
-            content_section_blocks,
-            fast_track_blocks,
-            permalink_blocks):
+        self,
+        publication_id,
+        publication_slug,
+        release_id,
+        release_slug,
+        key_stat_blocks,
+        secondary_stat_blocks,
+        content_section_blocks,
+        fast_track_blocks,
+        permalink_blocks,
+    ):
         self.publication_id = publication_id
         self.publication_slug = publication_slug
         self.release_slug = release_slug
@@ -91,7 +96,7 @@ class Release:
         self.content_section_blocks = content_section_blocks
         self.fast_track_blocks = fast_track_blocks
         self.permalink_blocks = permalink_blocks
-        self.url = f'/find-statistics/{self.publication_slug}/{self.release_slug}'
+        self.url = f"/find-statistics/{self.publication_slug}/{self.release_slug}"
         self.has_key_stat_blocks = bool(key_stat_blocks)
         self.has_secondary_stat_blocks = bool(secondary_stat_blocks)
         self.has_content_section_blocks = bool(content_section_blocks)
@@ -104,31 +109,34 @@ def generate_releases(data_blocks_csv_filepath):
     content_blocks = []
 
     def read_cell(cell_value):
-        if cell_value == 'NULL':
+        if cell_value == "NULL":
             return None
         return cell_value
 
-    with open(data_blocks_csv_filepath, 'r', encoding='utf-8-sig') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
+    with open(data_blocks_csv_filepath, "r", encoding="utf-8-sig") as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=",")
         next(csv_reader)
         for row in csv_reader:
-            content_blocks.append(DataBlockRow(
-                read_cell(row[0]),
-                read_cell(row[1]),
-                read_cell(row[2]),
-                read_cell(row[3]),
-                read_cell(row[4]),
-                read_cell(row[5]),
-                read_cell(row[6]),
-                read_cell(row[7]),
-                read_cell(row[8]),
-                read_cell(row[9]),
-                read_cell(row[10]),
-                read_cell(row[11]),
-                read_cell(row[12]),
-                read_cell(row[13]),
-                read_cell(row[14]),
-                read_cell(row[15])))
+            content_blocks.append(
+                DataBlockRow(
+                    read_cell(row[0]),
+                    read_cell(row[1]),
+                    read_cell(row[2]),
+                    read_cell(row[3]),
+                    read_cell(row[4]),
+                    read_cell(row[5]),
+                    read_cell(row[6]),
+                    read_cell(row[7]),
+                    read_cell(row[8]),
+                    read_cell(row[9]),
+                    read_cell(row[10]),
+                    read_cell(row[11]),
+                    read_cell(row[12]),
+                    read_cell(row[13]),
+                    read_cell(row[14]),
+                    read_cell(row[15]),
+                )
+            )
 
     release_ids = sorted(set(map(lambda block: block.release_id, content_blocks)))
 
@@ -148,7 +156,8 @@ def generate_releases(data_blocks_csv_filepath):
             secondary_stats,
             content_section_blocks,
             fast_tracks,
-            permalinks)
+            permalinks,
+        )
 
     releases = map(create_release, release_ids)
 

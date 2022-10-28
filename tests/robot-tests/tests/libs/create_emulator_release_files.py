@@ -1,6 +1,10 @@
 from abc import ABC, abstractmethod
+
 from azure.core.exceptions import ResourceExistsError
 from azure.storage.blob import BlobServiceClient
+from tests.libs.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class File(ABC):
@@ -36,15 +40,14 @@ class Release:
 
 
 class ReleaseFilesGenerator(object):
-
     def __init__(self):
 
         # Instantiate a new ContainerClient for the emulator
         self.blob_service_client = BlobServiceClient.from_connection_string(
-            "DefaultEndpointsProtocol=http;" +
-            "AccountName=devstoreaccount1;" +
-            "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;" +
-            "BlobEndpoint=http://data-storage:10000/devstoreaccount1"
+            "DefaultEndpointsProtocol=http;"
+            + "AccountName=devstoreaccount1;"
+            + "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
+            + "BlobEndpoint=http://data-storage:10000/devstoreaccount1"
         )
 
         exclusions_release = Release("e7774a74-1f62-4b76-b9b5-84f14dac7278")
@@ -58,7 +61,6 @@ class ReleaseFilesGenerator(object):
             DataFile(exclusions_release, "25b691c9-4d07-437f-6a93-08d7ec2d8168"),
             DataFile(exclusions_release, "f5c56849-f634-4fda-6a92-08d7ec2d8168"),
             DataFile(exclusions_release, "f0538c07-fc64-423b-6a94-08d7ec2d8168"),
-
             # Pupil absence
             DataFile(pupil_absence_release, "15c05193-1b4a-4acb-6a81-08d7ec2d8168"),
             DataFile(pupil_absence_release, "cf0e3cb5-ea9c-45b1-6a83-08d7ec2d8168"),
@@ -66,7 +68,7 @@ class ReleaseFilesGenerator(object):
             DataFile(pupil_absence_release, "bcf86eb2-4244-41aa-6a84-08d7ec2d8168"),
             DataFile(pupil_absence_release, "c1239606-300a-4782-6a85-08d7ec2d8168"),
             DataFile(pupil_absence_release, "c8141534-d706-49d0-6a86-08d7ec2d8168"),
-            DataFile(pupil_absence_release, "28199189-f0b9-44f2-6a87-08d7ec2d8168")
+            DataFile(pupil_absence_release, "28199189-f0b9-44f2-6a87-08d7ec2d8168"),
         ]
 
         self.metadata_files = [
@@ -77,7 +79,6 @@ class ReleaseFilesGenerator(object):
             MetadataFile(exclusions_release, "8a7d0775-8b51-47e3-6a99-08d7ec2d8168"),
             MetadataFile(exclusions_release, "5a22f935-6d50-4d76-6a97-08d7ec2d8168"),
             MetadataFile(exclusions_release, "9a917320-891c-4a00-6a9a-08d7ec2d8168"),
-
             # Pupil absence
             MetadataFile(pupil_absence_release, "be141b27-0143-41b0-6a88-08d7ec2d8168"),
             MetadataFile(pupil_absence_release, "c2a67d23-b135-4d84-6a8a-08d7ec2d8168"),
@@ -90,13 +91,11 @@ class ReleaseFilesGenerator(object):
 
     def create_public_release_files(self):
         try:
-            container_client = self.blob_service_client.create_container(
-                "downloads")
+            container_client = self.blob_service_client.create_container("downloads")
         except ResourceExistsError:
-            container_client = self.blob_service_client.get_container_client(
-                "downloads")
+            container_client = self.blob_service_client.get_container_client("downloads")
         except Exception as e:
-            print('Unexpected exception creating "downloads" container: ', e)
+            logger.error('Unexpected exception creating "downloads" container: ', e)
 
         assert container_client is not None
 
@@ -104,13 +103,11 @@ class ReleaseFilesGenerator(object):
 
     def create_private_release_files(self):
         try:
-            container_client = self.blob_service_client.create_container(
-                "releases")
+            container_client = self.blob_service_client.create_container("releases")
         except ResourceExistsError:
-            container_client = self.blob_service_client.get_container_client(
-                "releases")
+            container_client = self.blob_service_client.get_container_client("releases")
         except Exception as e:
-            print('Unexpected exception creating "releases" container: ', e)
+            logger.error('Unexpected exception creating "releases" container: ', e)
 
         assert container_client is not None
 
@@ -119,7 +116,7 @@ class ReleaseFilesGenerator(object):
 
     @staticmethod
     def upload_files(container_client, files):
-        data = b'abcd' * 128
+        data = b"abcd" * 128
         for file in files:
             path = file.path()
 
@@ -129,10 +126,10 @@ class ReleaseFilesGenerator(object):
             except ResourceExistsError:
                 pass  # file already exists, so no action required
             except Exception as e:
-                print('Unexpected exception when uploading file: ', e)
+                logger.error("Unexpected exception when uploading file: ", e)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     generator = ReleaseFilesGenerator()
     generator.create_public_release_files()
     generator.create_private_release_files()

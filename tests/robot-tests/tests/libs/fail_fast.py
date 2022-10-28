@@ -4,12 +4,12 @@ their Tests fails.  If the "fail tests suites fast" option is enabled, this file
 scripts, firstly to record that a test suite is failing, and then again on subsequent Tests starting to see if they
 should continue to run or if they should fail immediately and therefore fail the test suite immediately.
 """
-from logging import warning
 from robot.libraries.BuiltIn import BuiltIn
+from tests.libs.logger import get_logger
 
-
-sl = BuiltIn().get_library_instance('SeleniumLibrary')
+sl = BuiltIn().get_library_instance("SeleniumLibrary")
 FAILING_SUITES = set()
+logger = get_logger(__name__)
 
 
 def current_test_suite_failing_fast() -> bool:
@@ -19,7 +19,9 @@ def current_test_suite_failing_fast() -> bool:
 
 def record_failing_test_suite():
     test_suite = _get_current_test_suite()
-    warning(f"Recording test suite '{test_suite}' as failing - subsequent tests will automatically fail in this suite")
+    logger.warn(
+        f"Recording test suite '{test_suite}' as failing - subsequent tests will automatically fail in this suite"
+    )
     FAILING_SUITES.add(test_suite)
 
 
