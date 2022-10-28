@@ -2,13 +2,15 @@
 # comparison.
 # Thanks to https://stackoverflow.com/questions/44720580/resize-image-canvas-to-maintain-square-aspect-ratio-in-python-opencv
 # for the sample code for image resizing.
-from skimage.metrics import structural_similarity as compare_ssim
-import argparse
-import imutils
-import cv2
 import os
+
+import cv2
+import imutils
 import numpy as np
-from logging import warning
+from skimage.metrics import structural_similarity as compare_ssim
+from tests.libs.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def resize_and_pad(img, size, padColor=0):
@@ -44,26 +46,24 @@ def resize_and_pad(img, size, padColor=0):
 
     # set pad color
     if len(img.shape) == 3 and not isinstance(
-            padColor, (list, tuple, np.ndarray)):  # color image but only one color provided
+        padColor, (list, tuple, np.ndarray)
+    ):  # color image but only one color provided
         padColor = [padColor] * 3
 
-    warning(f'Resizing: {pad_top}, {pad_bot}, {pad_left}, {pad_right}')
+    logger.warn(f"Resizing: {pad_top}, {pad_bot}, {pad_left}, {pad_right}")
 
     # scale and pad
     scaled_img = cv2.resize(img, (new_w, new_h), interpolation=interp)
-    scaled_img = cv2.copyMakeBorder(scaled_img, pad_top, pad_bot, pad_left, pad_right,
-                                    borderType=cv2.BORDER_CONSTANT, value=padColor)
+    scaled_img = cv2.copyMakeBorder(
+        scaled_img, pad_top, pad_bot, pad_left, pad_right, borderType=cv2.BORDER_CONSTANT, value=padColor
+    )
 
     return scaled_img
 
 
 def compare_images(
-        first_filepath,
-        second_filepath,
-        diff_folder,
-        original_filename,
-        diff_threshold=0,
-        visual_diff=False):
+    first_filepath, second_filepath, diff_folder, original_filename, diff_threshold=0, visual_diff=False
+):
 
     try:
         # load the two input images
@@ -91,15 +91,14 @@ def compare_images(
         diff_image = (diff_image * 255).astype("uint8")
 
         if score < (1 - diff_threshold):
-            print(
-                f"Visual difference detected in snapshot {os.path.basename(first_filepath)} - similarity : {format(score)}")
+            logger.info(
+                f"Visual difference detected in snapshot {os.path.basename(first_filepath)} - similarity : {format(score)}"
+            )
 
             # threshold the difference image, followed by finding contours to
             # obtain the regions of the two input images that differ
-            thresh = cv2.threshold(diff_image, 0, 255,
-                                   cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
-            contours = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
-                                        cv2.CHAIN_APPROX_SIMPLE)
+            thresh = cv2.threshold(diff_image, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+            contours = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             contours = imutils.grab_contours(contours)
 
             # loop over the contours
@@ -112,9 +111,9 @@ def compare_images(
                 cv2.rectangle(image2_resized, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
                 os.makedirs(diff_folder, exist_ok=True)
-                cv2.imwrite(f'{diff_folder}/first-{original_filename}', image1)
-                cv2.imwrite(f'{diff_folder}/second-{original_filename}', image2)
-                cv2.imwrite(f'{diff_folder}/diff-{original_filename}', image2_resized)
+                cv2.imwrite(f"{diff_folder}/first-{original_filename}", image1)
+                cv2.imwrite(f"{diff_folder}/second-{original_filename}", image2)
+                cv2.imwrite(f"{diff_folder}/diff-{original_filename}", image2_resized)
 
                 if visual_diff:
                     # show the output images
@@ -126,4 +125,4 @@ def compare_images(
                     cv2.destroyAllWindows()
 
     except BaseException:
-        warning(f'Could not compare image {first_filepath}')
+        logger.warn(f"Could not compare image {first_filepath}")
