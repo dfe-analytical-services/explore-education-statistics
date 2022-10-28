@@ -50,6 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         // The date that the release is scheduled to be published - when this time is reached then the release should
         // be published and the Published date set.
         public DateTime? PublishScheduled { get; set; }
+        
 
         [NotMapped] public bool Live => Published.HasValue && UtcNow >= Published.Value;
 
@@ -77,6 +78,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                        && status.NotifiedOn == null;
             }
         }
+        
+        public bool NotifyReleaseApprovers { get; init; }
 
         public string LatestInternalReleaseNote
         {

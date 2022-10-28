@@ -23,5 +23,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             string email,
             Release release,
             ReleaseRole role);
+
+        public Either<ActionResult, Unit> SendReleaseApproverEmail(
+            string email,
+            Release release);
     }
 }

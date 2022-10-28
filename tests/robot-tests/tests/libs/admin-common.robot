@@ -547,7 +547,7 @@ user puts release into higher level review
     user waits until h2 is visible    Sign off
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
-    user clicks radio    Ready for higher review
+    user clicks radio    Ready for higher review (this will notify release approvers)
     user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    Ready for higher review
     user clicks button    Update status
     user waits until element is visible    id:CurrentReleaseStatus-Awaiting higher review

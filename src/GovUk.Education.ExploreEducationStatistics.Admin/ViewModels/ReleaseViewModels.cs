@@ -154,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public string LatestInternalReleaseNote { get; init; } = string.Empty;
 
         public bool? NotifySubscribers { get; init; }
-
+        
         [JsonConverter(typeof(StringEnumConverter))]
         public PublishMethod? PublishMethod { get; init; }
 

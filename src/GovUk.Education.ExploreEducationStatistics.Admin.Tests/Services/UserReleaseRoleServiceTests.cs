@@ -113,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static UserReleaseRoleService SetupUserReleaseRoleService(
             ContentDbContext contentDbContext)
         {
-            return new(
+            return new UserReleaseRoleService(
                 contentDbContext,
                 new PublicationRepository(contentDbContext));
         }
