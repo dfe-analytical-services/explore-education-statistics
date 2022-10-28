@@ -137,9 +137,9 @@ const DataBlockTabs = ({
               <ErrorBoundary fallback={errorMessage}>
                 <TimePeriodDataTable
                   key={dataBlock.id}
+                  captionTitle={dataBlock?.heading}
                   dataBlockId={dataBlock.id}
                   fullTable={fullTable}
-                  captionTitle={dataBlock?.heading}
                   source={dataBlock?.source}
                   tableHeadersConfig={
                     dataBlock.table.tableHeaders
