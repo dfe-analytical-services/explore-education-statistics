@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -988,13 +989,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private FootnoteService SetupFootnoteService(
             StatisticsDbContext statisticsDbContext,
-            ContentDbContext contentDbContext = null,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IUserService userService = null,
-            IDataBlockService dataBlockService = null,
-            IFootnoteRepository footnoteRepository = null,
-            IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper = null,
-            IGuidGenerator guidGenerator = null)
+            ContentDbContext? contentDbContext = null,
+            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+            IUserService? userService = null,
+            IDataBlockService? dataBlockService = null,
+            IFootnoteRepository? footnoteRepository = null,
+            IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
+            IGuidGenerator? guidGenerator = null)
         {
             var contentContext = contentDbContext ?? new Mock<ContentDbContext>().Object;
 

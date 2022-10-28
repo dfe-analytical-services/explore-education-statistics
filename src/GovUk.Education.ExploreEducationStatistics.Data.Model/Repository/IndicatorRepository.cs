@@ -7,15 +7,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
-    public class IndicatorRepository : AbstractRepository<Indicator, Guid>, IIndicatorRepository
+    public class IndicatorRepository : IIndicatorRepository
     {
-        public IndicatorRepository(StatisticsDbContext context) : base(context)
+        private readonly StatisticsDbContext _context;
+
+        public IndicatorRepository(StatisticsDbContext context)
         {
+            _context = context;
         }
 
         public IEnumerable<Indicator> GetIndicators(Guid subjectId)
         {
-            return DbSet()
+            return _context.Indicator
                 .AsNoTracking()
                 .Join(_context.IndicatorGroup, indicator => indicator.IndicatorGroupId,
                     indicatorGroup => indicatorGroup.Id,
@@ -31,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 return GetIndicators(subjectId);
             }
 
-            return DbSet()
+            return _context.Indicator
                 .AsNoTracking()
                 .Join(_context.IndicatorGroup, indicator => indicator.IndicatorGroupId,
                     indicatorGroup => indicatorGroup.Id,

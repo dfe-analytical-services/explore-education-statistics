@@ -10,10 +10,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
-    public class FilterItemRepository : AbstractRepository<FilterItem, Guid>, IFilterItemRepository
+    public class FilterItemRepository : IFilterItemRepository
     {
-        public FilterItemRepository(StatisticsDbContext context) : base(context)
+        private readonly StatisticsDbContext _context;
+
+        public FilterItemRepository(StatisticsDbContext context)
         {
+            _context = context;
         }
 
         public async Task<Dictionary<Guid, int>> CountFilterItemsByFilter(IEnumerable<Guid> filterItemIds)
@@ -38,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
         }
 
         public async Task<IEnumerable<FilterItem>> GetFilterItemsFromMatchedObservationIds(
-            Guid subjectId, 
+            Guid subjectId,
             IQueryable<MatchedObservation> matchedObservations)
         {
             var matchedObservationIds = matchedObservations.Select(o => o.Id);
@@ -66,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             var filterGroupsById = filtersForSubject
                 .SelectMany(filter => filter.FilterGroups)
                 .ToDictionary(filterGroup => filterGroup.Id);
-            
+
             filterItems.ForEach(filterItem => filterItem.FilterGroup = filterGroupsById[filterItem.FilterGroupId]);
 
             return filterItems;
@@ -80,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                     .Select(ofi => ofi.FilterItemId)
                     .Distinct()
                     .ToList();
-            
+
             return _context
                 .FilterItem
                 .AsNoTracking()
