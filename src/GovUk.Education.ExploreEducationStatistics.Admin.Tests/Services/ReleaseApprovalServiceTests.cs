@@ -1926,13 +1926,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 preReleaseUserService.Setup(mock =>
                         mock.SendPreReleaseUserInviteEmails(release.Id))
                     .ReturnsAsync(Unit.Instance);
-                
+
                 userReleaseRoleService.Setup(mock =>
                         mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, release.Publication.Id))
-                    .ReturnsAsync(new List<UserReleaseRole>());
+                    .ReturnsAsync(new List<UserReleaseRole>
+                    {
+                        userReleaseRole1,
+                        userReleaseRole2
+                    });
 
                 emailTemplateService.Setup(mock => mock.SendReleaseApproverEmail("test@test.com", release)).Returns(Unit.Instance);
-
+                
                 var releaseService = BuildService(
                     contentDbContext: context,
                     releaseChecklistService: releaseChecklistService.Object,
