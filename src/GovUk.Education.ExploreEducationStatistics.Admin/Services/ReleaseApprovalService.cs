@@ -134,12 +134,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var notifySubscribers = request.ApprovalStatus == ReleaseApprovalStatus.Approved &&
                                             (!release.Amendment || request.NotifySubscribers.HasValue &&
                                                 request.NotifySubscribers.Value);
-
+                    
+                    
                     // Notify release approvers when a release is moved into 'Ready for higher review'
                     var urr = await _userReleaseRoleService.ListUserReleaseRolesByPublication(
-                                        ReleaseRole.Approver, release.Publication.Id);
+                      ReleaseRole.Approver, release.Publication.Id);
 
-                    var notifyReleaseApprovers = request.ApprovalStatus == ReleaseApprovalStatus.HigherLevelReview && urr.Any();
+                    
+                    var notifyReleaseApprovers = urr.Any() && request.ApprovalStatus == ReleaseApprovalStatus.HigherLevelReview;
                     
                     var releaseStatus = new ReleaseStatus
                     {
@@ -188,7 +190,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                 userReleaseRole.User.Email, release);
                                         }
                                     }
-
                                     break;
                             }
                         });
