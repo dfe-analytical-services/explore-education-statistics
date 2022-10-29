@@ -79,15 +79,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             }
         }
 
-        public bool NotifyReleaseApprovers
-        {
-          get
-          {
-            var status = ReleaseStatuses.MaxBy(rs => rs.Created);
-            return status is { NotifyReleaseApprovers: true };
-          }
-        }
-
         public string LatestInternalReleaseNote
         {
             get
