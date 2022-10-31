@@ -29,14 +29,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     public class ImporterMetaService : IImporterMetaService
     {
         private readonly IGuidGenerator _guidGenerator;
-        private readonly ITransactionHelper _transactionHelper;
+        private readonly IDatabaseHelper _databaseHelper;
         
         public ImporterMetaService(
             IGuidGenerator guidGenerator, 
-            ITransactionHelper transactionHelper)
+            IDatabaseHelper databaseHelper)
         {
             _guidGenerator = guidGenerator;
-            _transactionHelper = transactionHelper;
+            _databaseHelper = databaseHelper;
         }
 
         public async Task<SubjectMeta> Import(
@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 var indicators = indicatorsAndMeta.Select(i => i.Indicator).ToList();
                 indicators.ForEach(indicator => indicator.Id = _guidGenerator.NewGuid());
 
-                await _transactionHelper.DoInTransaction(context, async () =>
+                await _databaseHelper.DoInTransaction(context, async () =>
                 {
                     await context.Filter.AddRangeAsync(filters);
                     await context.Indicator.AddRangeAsync(indicators);

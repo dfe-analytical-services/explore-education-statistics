@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IBlobStorageService _blobStorageService;
         private readonly IDataImportService _dataImportService;
         private readonly IImporterService _importerService;
-        private readonly ITransactionHelper _transactionHelper;
+        private readonly IDatabaseHelper _databaseHelper;
 
         public FileImportService(
             ILogger<FileImportService> logger,
@@ -30,14 +30,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             IBlobStorageService blobStorageService,
             IDataImportService dataImportService,
             IImporterService importerService, 
-            ITransactionHelper transactionHelper)
+            IDatabaseHelper databaseHelper)
         {
             _logger = logger;
             _batchService = batchService;
             _blobStorageService = blobStorageService;
             _dataImportService = dataImportService;
             _importerService = importerService;
-            _transactionHelper = transactionHelper;
+            _databaseHelper = databaseHelper;
         }
 
         public async Task ImportObservations(ImportObservationsMessage message, StatisticsDbContext context)
@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var metaFileCsvHeaders = await CsvUtil.GetCsvHeaders(metaFileStreamProvider);
             var metaFileCsvRows = await CsvUtil.GetCsvRows(metaFileStreamProvider);
 
-            await _transactionHelper.DoInTransaction(context, async () =>
+            await _databaseHelper.DoInTransaction(context, async () =>
             {
                 await _importerService.ImportObservations(
                     import,

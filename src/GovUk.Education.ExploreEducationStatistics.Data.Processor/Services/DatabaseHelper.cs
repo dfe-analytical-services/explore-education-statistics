@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 
-public class TransactionHelper : ITransactionHelper
+public class DatabaseHelper : IDatabaseHelper
 {
     public async Task DoInTransaction(DbContext context, Func<Task> transactionalUnit)
     {
@@ -40,5 +40,29 @@ public class TransactionHelper : ITransactionHelper
     public Task<TResult> DoInTransaction<TResult>(DbContext context, Func<TResult> transactionalUnit)
     {
         return DoInTransaction(context, () => Task.FromResult(transactionalUnit.Invoke()));
+    }
+    
+    public Task ExecuteWithExclusiveLock<TDbContext>(
+        TDbContext dbContext,
+        string lockName,
+        Func<TDbContext, Task> action)
+        where TDbContext : DbContext
+    {
+        return dbContext.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
+        {
+            await using var transaction = await dbContext.Database.BeginTransactionAsync();
+            await dbContext.Database.ExecuteSqlRawAsync($"exec sp_getapplock '{lockName}', 'exclusive'");
+
+            try
+            {
+                await action(dbContext);
+                await transaction.CommitAsync();
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        });
     }
 }

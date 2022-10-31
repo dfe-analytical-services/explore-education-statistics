@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
 
 /// <summary>
-/// This helper allows us to bypass transactional units of work when testing with In-Memory databases, which do not
-/// support transactions.
+/// This helper allows us to bypass units of work that are incompatible with In-Memory databases, which do not
+/// support transactions, exclusive locks etc.
 /// </summary>
-public class InMemoryTransactionHelper : ITransactionHelper
+public class InMemoryDatabaseHelper : IDatabaseHelper
 {
     public Task DoInTransaction(DbContext context, Func<Task> transactionalUnit)
     {
@@ -29,5 +29,14 @@ public class InMemoryTransactionHelper : ITransactionHelper
     public Task<TResult> DoInTransaction<TResult>(DbContext context, Func<TResult> transactionalUnit)
     {
         return Task.FromResult(transactionalUnit.Invoke());
+    }
+
+    public Task ExecuteWithExclusiveLock<TDbContext>(
+        TDbContext dbContext, 
+        string lockName, 
+        Func<TDbContext, Task> action) 
+        where TDbContext : DbContext
+    {
+        return action.Invoke(dbContext);
     }
 }

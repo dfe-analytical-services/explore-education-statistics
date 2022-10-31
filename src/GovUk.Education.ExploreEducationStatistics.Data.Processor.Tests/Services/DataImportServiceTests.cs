@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services
 {
@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             Assert.Equal(import.MetaFile.Id, result.MetaFile.Id);
 
             Assert.NotNull(import.ZipFile);
-            Assert.Equal(import.ZipFile.Id, result.ZipFile.Id);
+            Assert.Equal(import.ZipFile.Id, result.ZipFile!.Id);
         }
 
         [Fact]
@@ -167,7 +167,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
         {
             return new DataImportService(
                 new InMemoryDbContextSupplier(contentDbContextId ?? Guid.NewGuid().ToString()),
-                new Mock<ILogger<DataImportService>>().Object
+                Mock.Of<ILogger<DataImportService>>(Strict),
+                new InMemoryDatabaseHelper()
             );
         }
     }

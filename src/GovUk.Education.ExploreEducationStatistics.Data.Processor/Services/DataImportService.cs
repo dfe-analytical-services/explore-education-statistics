@@ -17,14 +17,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     public class DataImportService : IDataImportService
     {
         private readonly IDbContextSupplier _dbContextSupplier;
+        private readonly IDatabaseHelper _databaseHelper;
         private readonly ILogger<DataImportService> _logger;
 
         public DataImportService(
             IDbContextSupplier dbContextSupplier,
-            ILogger<DataImportService> logger)
+            ILogger<DataImportService> logger, 
+            IDatabaseHelper databaseHelper)
         {
             _dbContextSupplier = dbContextSupplier;
             _logger = logger;
+            _databaseHelper = databaseHelper;
         }
 
         public async Task FailImport(Guid id, List<DataImportError> errors)
@@ -100,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task UpdateStatus(Guid id, DataImportStatus newStatus, double percentageComplete)
         {
             await using var contentDbContext = _dbContextSupplier.CreateContentDbContext();
-            await ExecuteWithExclusiveLock(
+            await _databaseHelper.ExecuteWithExclusiveLock(
                 contentDbContext,
                 $"LockForImport-{id}",
                 async context =>

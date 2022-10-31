@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -27,7 +26,7 @@ using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
 
-public class ProcessorServiceTests
+public class ProcessorServiceStage2Tests
 {
     private readonly string _contentDbContextId = Guid.NewGuid().ToString();
     private readonly string _statisticsDbContextId = Guid.NewGuid().ToString();
@@ -142,16 +141,17 @@ public class ProcessorServiceTests
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
+
+        var transactionHelper = new InMemoryDatabaseHelper();
         
         var dataImportService = new DataImportService(
             dbContextSupplier,
-            Mock.Of<ILogger<DataImportService>>());
+            Mock.Of<ILogger<DataImportService>>(),
+            transactionHelper);
 
         var importerMemoryCache = new ImporterMemoryCache();
         
         var guidGenerator = new SequentialGuidGenerator();
-
-        var transactionHelper = new InMemoryTransactionHelper();
         
         var importerService = new ImporterService(
             guidGenerator,

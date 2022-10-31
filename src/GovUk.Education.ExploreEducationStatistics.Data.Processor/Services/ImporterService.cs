@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IImporterMetaService _importerMetaService;
         private readonly IDataImportService _dataImportService;
         private readonly ILogger<ImporterService> _logger;
-        private readonly ITransactionHelper _transactionHelper;
+        private readonly IDatabaseHelper _databaseHelper;
         private readonly ImporterMemoryCache _importerMemoryCache;
 
         private const int Stage2RowCheck = 1000;
@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             IImporterMetaService importerMetaService,
             IDataImportService dataImportService, 
             ILogger<ImporterService> logger, 
-            ITransactionHelper transactionHelper, ImporterMemoryCache importerMemoryCache)
+            IDatabaseHelper databaseHelper, ImporterMemoryCache importerMemoryCache)
         {
             _guidGenerator = guidGenerator;
             _importerFilterService = importerFilterService;
@@ -120,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _importerMetaService = importerMetaService;
             _dataImportService = dataImportService;
             _logger = logger;
-            _transactionHelper = transactionHelper;
+            _databaseHelper = databaseHelper;
             _importerMemoryCache = importerMemoryCache;
         }
 
@@ -257,7 +257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 location => _importerLocationService.Find(context, location) == null)
                 .ToList();
             
-            await _transactionHelper.DoInTransaction(context, async () =>
+            await _databaseHelper.DoInTransaction(context, async () =>
             {
                 await context.FilterGroup.AddRangeAsync(filterGroups);
                 await context.FilterItem.AddRangeAsync(filterItems);

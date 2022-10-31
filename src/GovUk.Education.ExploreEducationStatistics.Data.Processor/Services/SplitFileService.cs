@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 
                 var currentRowNumberInBatch = 1;
 
-                while (!streamReader.EndOfStream && currentRowNumberInBatch < dataImport.RowsPerBatch)
+                while (!streamReader.EndOfStream && currentRowNumberInBatch <= dataImport.RowsPerBatch)
                 {
                     var nextLine = await streamReader.ReadLineAsync();
                     await writer.WriteLineAsync(nextLine);
@@ -165,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var currentRowNumberInBatch = 1;
 
-            while (!streamReader.EndOfStream && currentRowNumberInBatch < dataImport.RowsPerBatch)
+            while (!streamReader.EndOfStream && currentRowNumberInBatch <= dataImport.RowsPerBatch)
             {
                 await streamReader.ReadLineAsync();
                 currentRowNumberInBatch++;
