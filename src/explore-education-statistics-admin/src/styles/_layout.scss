@@ -1,0 +1,15 @@
+@import './variables';
+
+.dfe-width-container--wide {
+  margin: 0 $dfe-page-width-wide-gutter;
+  max-width: $dfe-page-width-wide;
+
+  @include govuk-media-query($from: desktop-xl) {
+    margin: 0 auto;
+    width: calc(100% - (#{$dfe-page-width-wide-gutter} * 2));
+  }
+
+  @media print {
+    max-width: none;
+  }
+}
