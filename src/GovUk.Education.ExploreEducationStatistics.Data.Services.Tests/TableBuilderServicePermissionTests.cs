@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -15,23 +16,19 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
     public class TableBuilderServicePermissionTests
     {
-        private static readonly Guid SubjectId = Guid.NewGuid();
+        private static readonly Guid PublicationId = Guid.NewGuid();
         private static readonly Guid ReleaseId = Guid.NewGuid();
+        private static readonly Guid SubjectId = Guid.NewGuid();
 
         private readonly Subject _subject = new()
         {
             Id = Guid.NewGuid(),
-        };
-
-        private readonly Release _release = new()
-        {
-            Id = Guid.NewGuid(),
-            PublicationId = Guid.NewGuid()
         };
 
         private readonly ReleaseSubject _releaseSubject = new()
@@ -56,13 +53,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                         subjectRepository
                             .Setup(s => s.GetPublicationIdForSubject(_subject.Id))
-                            .ReturnsAsync(_release.PublicationId);
+                            .ReturnsAsync(PublicationId);
 
                         var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
 
                         releaseRepository
-                            .Setup(s => s.GetLatestPublishedRelease(_release.PublicationId))
-                            .Returns(_release);
+                            .Setup(s => s.GetLatestPublishedRelease(PublicationId))
+                            .ReturnsAsync(new Release
+                            {
+                                Id = ReleaseId
+                            });
 
                         var service = BuildTableBuilderService(
                             userService: userService.Object,
@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                             statisticsPersistenceHelper: statisticsPersistenceHelper.Object
                         );
                         return await service.Query(
-                            _release.Id,
+                            ReleaseId,
                             new ObservationQueryContext
                             {
                                 SubjectId = _subject.Id

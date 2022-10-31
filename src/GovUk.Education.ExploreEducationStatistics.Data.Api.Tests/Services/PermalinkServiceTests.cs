@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
@@ -22,6 +23,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -29,7 +31,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using MapperUtils = GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
-using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 {
@@ -53,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             releaseRepository
                 .Setup(s => s.GetLatestPublishedRelease(_publicationId))
-                .Returns((Release?) null);
+                .ReturnsAsync(new NotFoundResult());
 
             subjectRepository
                 .Setup(s => s.GetPublicationIdForSubject(request.Query.SubjectId))
@@ -87,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var contentRelease = new Content.Model.Release
+            var contentRelease = new Release
             {
                 Id = Guid.NewGuid(),
                 Publication = new Publication
@@ -130,12 +132,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             releaseRepository
                 .Setup(s => s.GetLatestPublishedRelease(_publicationId))
-                .Returns(new Release
+                .ReturnsAsync(new Release
                 {
                     Id = contentRelease.Id,
                     PublicationId = _publicationId,
-                    TimeIdentifier = TimeIdentifier.AcademicYear,
-                    Year = 2000,
+                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                    ReleaseName = "2000"
                 });
 
             subjectRepository
@@ -219,7 +221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var release = new Content.Model.Release
+            var release = new Release
             {
                 Id = Guid.NewGuid(),
                 Publication = new Publication
@@ -303,7 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task Get()
         {
-            var release = new Content.Model.Release
+            var release = new Release
             {
                 Id = Guid.NewGuid(),
                 Publication = new Publication
@@ -438,7 +440,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(
-                    new Content.Model.Release
+                    new Release
                     {
                         Id = releaseId,
                         Publication = new Publication
@@ -564,7 +566,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = _publicationId
             };
 
-            var previousVersion = new Content.Model.Release
+            var previousVersion = new Release
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
@@ -574,7 +576,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 PreviousVersionId = null
             };
 
-            var latestVersion = new Content.Model.Release
+            var latestVersion = new Release
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
@@ -655,7 +657,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 Id = _publicationId
             };
-            var release = new Content.Model.Release
+            var release = new Release
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
@@ -664,7 +666,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Published = DateTime.UtcNow,
             };
 
-            var latestRelease = new Content.Model.Release
+            var latestRelease = new Release
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
@@ -735,7 +737,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 Id = _publicationId
             };
-            var release = new Content.Model.Release
+            var release = new Release
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
@@ -744,7 +746,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Published = DateTime.UtcNow,
             };
 
-            var latestRelease = new Content.Model.Release
+            var latestRelease = new Release
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
@@ -816,7 +818,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = _publicationId
             };
 
-            var previousVersion = new Content.Model.Release
+            var previousVersion = new Release
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
@@ -826,7 +828,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 PreviousVersionId = null
             };
 
-            var latestVersion = new Content.Model.Release
+            var latestVersion = new Release
             {
                 Id = Guid.NewGuid(),
                 Publication = publication,
@@ -924,7 +926,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(
-                    new Content.Model.Release
+                    new Release
                     {
                         Id = releaseId,
                         Publication = new Publication
@@ -948,7 +950,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     new Publication
                     {
                         Id = supersededPublicationId,
-                        Releases = new List<Content.Model.Release>
+                        Releases = new List<Release>
                         {
                             new()
                             {
