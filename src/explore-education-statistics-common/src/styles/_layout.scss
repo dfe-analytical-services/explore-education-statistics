@@ -1,12 +1,7 @@
 @import './variables';
 
 .dfe-width-container--wide {
-  margin: 0 15px;
-  max-width: none;
-  @include govuk-media-query($from: 1330px) {
-    margin: 0 auto;
-    max-width: $dfe-page-width-wide;
-  }
+  max-width: $dfe-page-width-wide;
 
   @media print {
     max-width: none;
