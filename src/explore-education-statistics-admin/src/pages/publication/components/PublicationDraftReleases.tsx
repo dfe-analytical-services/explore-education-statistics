@@ -48,9 +48,9 @@ const PublicationDraftReleases = ({
           <tr>
             <th className="govuk-!-width-one-third">Release period</th>
             <th>
-              State{' '}
+              Status{' '}
               <ButtonText onClick={toggleDraftStatusGuidance.on}>
-                <InfoIcon description="Guidance on draft states" />
+                <InfoIcon description="Guidance on draft statuses" />
               </ButtonText>
             </th>
             <th>
