@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         
         public static readonly Regex[] AllowedCsvMimeTypes = {
             new Regex(@"^(application|text)/csv$"),
-            new Regex(@"text/plain$")
+            new Regex(@"^text/plain$")
         };
 
         public static readonly string[] AllowedCsvEncodingTypes = {
@@ -95,9 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return encodingTypes.Any(pattern => pattern.Equals(encodingType));
         }
 
-        public async Task<bool> IsValidCsvDataOrMetaFile(
-            Func<Task<Stream>> streamProvider, 
-            string filename)
+        public async Task<bool> IsValidCsvFile(Func<Task<Stream>> streamProvider, string filename)
         {
             _logger.LogDebug("Validating that {FileName} has a CSV mime type", filename);
 
@@ -132,9 +130,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return true;
         }
 
-        public Task<bool> IsValidCsvDataOrMetaFile(IFormFile file)
+        public Task<bool> IsValidCsvFile(IFormFile file)
         {
-            return IsValidCsvDataOrMetaFile(() => Task.FromResult(file.OpenReadStream()), file.FileName);
+            return IsValidCsvFile(() => Task.FromResult(file.OpenReadStream()), file.FileName);
         }
 
         /// <summary>
@@ -168,8 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
             catch (Exception e)
             {
-                _logger.LogError("Unable to read sample lines from CSV - {ErrorMessage}", e.Message);
-                _logger.LogError(e.StackTrace);
+                _logger.LogError(e, "Unable to read sample lines from CSV - {ErrorMessage}", e.Message);
                 return null;
             }
 

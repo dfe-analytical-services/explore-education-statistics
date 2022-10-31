@@ -127,10 +127,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
                 
                 fileTypeService
-                    .Setup(s => s.IsValidCsvDataOrMetaFile(dataFile))
+                    .Setup(s => s.IsValidCsvFile(dataFile))
                     .ReturnsAsync(() => true);
                 fileTypeService
-                    .Setup(s => s.IsValidCsvDataOrMetaFile(metaFile))
+                    .Setup(s => s.IsValidCsvFile(metaFile))
                     .ReturnsAsync(() => true);
 
                 var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
@@ -183,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
                 fileTypeService
-                    .Setup(s => s.IsValidCsvDataOrMetaFile(dataFile))
+                    .Setup(s => s.IsValidCsvFile(dataFile))
                     .ReturnsAsync(() => false);
 
                 var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
@@ -204,10 +204,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
                 fileTypeService
-                    .Setup(s => s.IsValidCsvDataOrMetaFile(dataFile))
+                    .Setup(s => s.IsValidCsvFile(dataFile))
                     .ReturnsAsync(() => true);
                 fileTypeService
-                    .Setup(s => s.IsValidCsvDataOrMetaFile(metaFile))
+                    .Setup(s => s.IsValidCsvFile(metaFile))
                     .ReturnsAsync(() => false);
 
                 var result = await service.ValidateDataFilesForUpload(Guid.NewGuid(), dataFile, metaFile);
@@ -289,10 +289,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 };
 
                 fileTypeService
-                    .Setup(s => s.IsValidCsvDataOrMetaFile(dataFile))
+                    .Setup(s => s.IsValidCsvFile(dataFile))
                     .ReturnsAsync(() => true);
                 fileTypeService
-                    .Setup(s => s.IsValidCsvDataOrMetaFile(metaFile))
+                    .Setup(s => s.IsValidCsvFile(metaFile))
                     .ReturnsAsync(() => true);
 
                 var result = await service.ValidateDataFilesForUpload(
@@ -396,10 +396,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = CreateFormFileMock("test.meta.csv").Object;
 
                 fileTypeService
-                    .Setup(s => s.IsValidCsvDataOrMetaFile(dataFile))
+                    .Setup(s => s.IsValidCsvFile(dataFile))
                     .ReturnsAsync(() => true);
                 fileTypeService
-                    .Setup(s => s.IsValidCsvDataOrMetaFile(metaFile))
+                    .Setup(s => s.IsValidCsvFile(metaFile))
                     .ReturnsAsync(() => true);
 
                 var result = await service.ValidateDataFilesForUpload(releaseId, dataFile, metaFile);

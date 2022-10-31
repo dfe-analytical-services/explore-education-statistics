@@ -250,7 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 return null;
             }))
-                .Where(observation => observation != null);
+                .WhereNotNull();
         }
 
         private Observation ObservationFromCsv(
