@@ -1,31 +1,31 @@
 import { LineChartDataLabelPosition } from '@common/modules/charts/types/chart';
 import { LegendInlinePosition } from '@common/modules/charts/types/legend';
 import formatPretty from '@common/utils/number/formatPretty';
-import { LabelProps } from 'recharts';
 import React from 'react';
 
-interface Props extends LabelProps {
+interface Props {
   colour: string;
-  dataLabelPosition?: LineChartDataLabelPosition;
   decimalPlaces?: number;
   index: number;
+  isDataLabel?: boolean;
+  isLegendLabel?: boolean;
   name: string;
-  legendLabelPosition: LegendInlinePosition;
-  showDataLabels?: boolean;
-  showLegendAsLabel?: boolean;
+  position?: LineChartDataLabelPosition | LegendInlinePosition;
   totalDataPoints: number;
   unit?: string;
+  value: string;
+  x: number;
+  y: number;
 }
 
 export default function LineChartLabel({
   colour,
-  dataLabelPosition,
   decimalPlaces,
   index,
-  legendLabelPosition,
+  isDataLabel = false,
+  isLegendLabel = false,
   name,
-  showDataLabels = false,
-  showLegendAsLabel = false,
+  position,
   totalDataPoints,
   unit,
   value,
@@ -43,10 +43,10 @@ export default function LineChartLabel({
   };
 
   // Labels on each data point
-  if (showDataLabels) {
+  if (isDataLabel) {
     return (
       <text
-        dy={dataLabelPosition === 'above' ? '-10' : '20'}
+        dy={position === 'above' ? '-10' : '20'}
         fill={colour}
         fontSize={14}
         textAnchor={getTextAnchor()}
@@ -54,17 +54,18 @@ export default function LineChartLabel({
         y={y}
       >
         <tspan>
-          {value && formatPretty(value.toString(), unit, decimalPlaces)}
+          {typeof value !== 'undefined' &&
+            formatPretty(value, unit, decimalPlaces)}
         </tspan>
       </text>
     );
   }
 
   // Legend as the label - only render for the last data point in the line.
-  if (showLegendAsLabel && index === totalDataPoints - 1) {
+  if (isLegendLabel && index === totalDataPoints - 1) {
     return (
       <text
-        dy={legendLabelPosition === 'above' ? '-6' : '16'}
+        dy={position === 'above' ? '-6' : '16'}
         fill={colour}
         fontSize={14}
         textAnchor="end"

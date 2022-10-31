@@ -111,10 +111,14 @@ describe('ChartConfiguration', () => {
   };
 
   const testDefaultChartOptions: ChartOptions = {
+    alt: '',
     height: 300,
     title: '',
     titleType: 'default',
-    alt: '',
+  };
+  const testChartOptionsWithAltText: ChartOptions = {
+    ...testDefaultChartOptions,
+    alt: 'This is the alt text',
   };
 
   const testInitialChartOptions: ChartOptions = {
@@ -353,7 +357,7 @@ describe('ChartConfiguration', () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartConfiguration
-          chartOptions={testDefaultChartOptions}
+          chartOptions={testChartOptionsWithAltText}
           definition={testLineChartDefinition}
           onChange={noop}
           onSubmit={handleSubmit}
@@ -363,8 +367,6 @@ describe('ChartConfiguration', () => {
 
     userEvent.click(screen.getByLabelText('Set an alternative title'));
     userEvent.type(screen.getByLabelText('Enter chart title'), 'The title');
-
-    userEvent.type(screen.getByLabelText('Alt text'), 'This is the alt text');
 
     userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
 
@@ -385,15 +387,13 @@ describe('ChartConfiguration', () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartConfiguration
-          chartOptions={testDefaultChartOptions}
+          chartOptions={testChartOptionsWithAltText}
           definition={testLineChartDefinition}
           onChange={noop}
           onSubmit={handleSubmit}
         />
       </ChartBuilderFormsContextProvider>,
     );
-
-    userEvent.type(screen.getByLabelText('Alt text'), 'This is the alt text');
 
     userEvent.click(screen.getByLabelText('Show data labels'));
 
@@ -416,11 +416,11 @@ describe('ChartConfiguration', () => {
     });
   });
 
-  test('shows a warning when `showDataLabels` is true and legend position is inline', async () => {
+  test('shows a validation error when `showDataLabels` is true and legend position is inline', async () => {
     render(
       <ChartBuilderFormsContextProvider initialForms={testFormState}>
         <ChartConfiguration
-          chartOptions={testDefaultChartOptions}
+          chartOptions={testChartOptionsWithAltText}
           definition={testLineChartDefinition}
           legendPosition="inline"
           onChange={noop}
@@ -429,18 +429,20 @@ describe('ChartConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.type(screen.getByLabelText('Alt text'), 'This is the alt text');
-
     userEvent.click(screen.getByLabelText('Show data labels'));
 
     userEvent.selectOptions(screen.getByLabelText('Data label position'), [
       'below',
     ]);
 
-    expect(
-      screen.getByText(
-        'Data labels cannot be used with inline legends, please select a different legend position or turn off data labels.',
-      ),
-    ).toBeInTheDocument();
+    userEvent.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('link', {
+          name: 'Data labels cannot be used with inline legends',
+        }),
+      ).toHaveAttribute('href', '#chartConfigurationForm-showDataLabels');
+    });
   });
 });

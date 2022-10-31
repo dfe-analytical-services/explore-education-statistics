@@ -241,10 +241,18 @@ const ChartLegendConfiguration = ({
 
     if (capabilities.hasLegendPosition) {
       baseSchema = baseSchema.shape({
-        position: Yup.string().oneOf<LegendPosition>(
-          ['none', 'bottom', 'top', 'inline'],
-          'Select a valid legend position',
-        ),
+        position: Yup.string()
+          .oneOf<LegendPosition>(
+            ['none', 'bottom', 'top', 'inline'],
+            'Select a valid legend position',
+          )
+          .test({
+            name: 'noInlineWithDataLabels',
+            message: 'Inline legends cannot be used with data labels',
+            test(value) {
+              return !(showDataLabels && value === 'inline');
+            },
+          }),
       });
     }
 
@@ -254,6 +262,7 @@ const ChartLegendConfiguration = ({
     capabilities.hasLegendPosition,
     capabilities.hasLineStyle,
     capabilities.hasSymbols,
+    showDataLabels,
   ]);
 
   const handleChange = useCallback(
@@ -305,6 +314,11 @@ const ChartLegendConfiguration = ({
             <>
               <FormFieldSelect<FormValues>
                 name="position"
+                hint={
+                  capabilities.canPositionLegendInline && showDataLabels
+                    ? 'The legend cannot be positioned inline when data labels are used.'
+                    : undefined
+                }
                 label="Legend position"
                 options={
                   capabilities.canPositionLegendInline
@@ -315,12 +329,6 @@ const ChartLegendConfiguration = ({
                 }
                 order={FormSelect.unordered}
               />
-              {showDataLabels && form.values.position === 'inline' && (
-                <WarningMessage>
-                  Data labels cannot be used with inline legends, please select
-                  a different legend position or turn off data labels.
-                </WarningMessage>
-              )}
             </>
           )}
 

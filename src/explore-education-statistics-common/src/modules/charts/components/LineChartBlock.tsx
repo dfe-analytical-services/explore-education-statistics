@@ -7,6 +7,7 @@ import {
   ChartDefinition,
   ChartProps,
   ChartSymbol,
+  LineChartDataLabelPosition,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
@@ -69,6 +70,7 @@ const getLegendType = (
 };
 
 export interface LineChartProps extends ChartProps {
+  dataLabelPosition?: LineChartDataLabelPosition;
   legend: LegendConfiguration;
   axes: {
     major: AxisConfiguration;
@@ -204,16 +206,20 @@ const LineChartBlock = ({
               strokeDasharray={lineStyles[config.lineStyle ?? 'solid']}
               label={props => (
                 <LineChartLabel
-                  {...props}
-                  name={config.label}
                   colour={config.colour}
-                  totalDataPoints={chartData.length}
-                  legendLabelPosition={config.inlinePosition}
-                  showDataLabels={showDataLabels}
-                  dataLabelPosition={dataLabelPosition}
-                  showLegendAsLabel={legend.position === 'inline'}
-                  unit={dataSet.indicator.unit}
                   decimalPlaces={dataSet.indicator.decimalPlaces}
+                  index={props.index}
+                  isDataLabel={showDataLabels}
+                  isLegendLabel={legend.position === 'inline'}
+                  name={config.label}
+                  position={
+                    showDataLabels ? dataLabelPosition : config.inlinePosition
+                  }
+                  totalDataPoints={chartData.length}
+                  unit={dataSet.indicator.unit}
+                  value={props.value}
+                  x={props.x}
+                  y={props.y}
                 />
               )}
             />

@@ -87,13 +87,14 @@ const ChartConfiguration = ({
   } = useChartBuilderFormsContext();
 
   const dataLabelPositionOptions = useMemo(() => {
-    return definition.type === 'line'
-      ? lineChartDataLabelPositions.map(position => {
-          return { label: capitalize(position), value: position };
-        })
-      : barChartDataLabelPositions.map(position => {
-          return { label: capitalize(position), value: position };
-        });
+    const options =
+      definition.type === 'line'
+        ? lineChartDataLabelPositions
+        : barChartDataLabelPositions;
+
+    return options.map(position => {
+      return { label: capitalize(position), value: position };
+    });
   }, [definition.type]);
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
@@ -163,16 +164,25 @@ const ChartConfiguration = ({
       definition.type === 'line'
     ) {
       schema = schema.shape({
-        showDataLabels: Yup.boolean(),
+        showDataLabels: Yup.boolean().test({
+          name: 'noInlineWithDataLabels',
+          message: 'Data labels cannot be used with inline legends',
+          test(value) {
+            return !(value && legendPosition === 'inline');
+          },
+        }),
         dataLabelPosition:
           definition.type === 'line'
-            ? Yup.string<LineChartDataLabelPosition>()
-            : Yup.string<BarChartDataLabelPosition>(),
+            ? Yup.string().oneOf<LineChartDataLabelPosition>(['above', 'below'])
+            : Yup.string().oneOf<BarChartDataLabelPosition>([
+                'inside',
+                'outside',
+              ]),
       });
     }
 
     return schema;
-  }, [definition.capabilities.stackable, definition.type]);
+  }, [definition.capabilities.stackable, definition.type, legendPosition]);
 
   const initialValues = useMemo<FormValues>(() => {
     const getInitialDataLabelPosition = () => {
@@ -345,24 +355,20 @@ const ChartConfiguration = ({
             {validationSchema.fields.showDataLabels && (
               <FormFieldCheckbox<FormValues>
                 name="showDataLabels"
+                hint={
+                  legendPosition === 'inline'
+                    ? 'Data labels cannot be shown when the legend is positioned inline.'
+                    : undefined
+                }
                 label="Show data labels"
+                showError={!!form.errors.showDataLabels}
                 conditional={
-                  <>
-                    {definition.type === 'line' &&
-                      legendPosition === 'inline' && (
-                        <WarningMessage>
-                          Data labels cannot be used with inline legends, please
-                          select a different legend position or turn off data
-                          labels.
-                        </WarningMessage>
-                      )}
-                    <FormFieldSelect<FormValues>
-                      label="Data label position"
-                      name="dataLabelPosition"
-                      order={[]}
-                      options={dataLabelPositionOptions}
-                    />
-                  </>
+                  <FormFieldSelect<FormValues>
+                    label="Data label position"
+                    name="dataLabelPosition"
+                    order={[]}
+                    options={dataLabelPositionOptions}
+                  />
                 }
               />
             )}

@@ -89,11 +89,11 @@ export interface ChartProps {
   legend?: LegendConfiguration;
   includeNonNumericData?: boolean;
   showDataLabels?: boolean;
-  dataLabelPosition?: BarChartDataLabelPosition | LineChartDataLabelPosition;
 }
 
 export interface StackedBarProps extends ChartProps {
   barThickness?: number;
+  dataLabelPosition?: BarChartDataLabelPosition;
   stacked?: boolean;
 }
 
