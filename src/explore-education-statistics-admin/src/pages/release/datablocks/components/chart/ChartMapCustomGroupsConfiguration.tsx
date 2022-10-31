@@ -69,55 +69,77 @@ export default function ChartMapCustomGroupsConfiguration({
             validationSchema={Yup.object<FormValues>({
               min: Yup.number()
                 .required('Enter a minimum value')
-                .test('noOverlap', 'Groups cannot overlap', function noOverlap(
-                  value: number,
-                ) {
-                  // show an error when:
-                  // - the min is in an existing group, or
-                  // - this new group overlaps with another group and the max isn't in a group
-                  // (if the max is in a group and the min isn't then we only want to show the
-                  // error on the max field as it's the one that requires action)
-                  /* eslint-disable react/no-this-in-sfc */
-                  const minIsInAGroup = groups.some(
-                    group => value >= group.min && value <= group.max,
-                  );
-                  const maxIsInAGroup = groups.some(
-                    group =>
-                      this.parent.max >= group.min &&
-                      this.parent.max <= group.max,
-                  );
-                  const overlaps = groups.some(
-                    group => value <= group.max && group.min <= this.parent.max,
-                  );
-                  return !minIsInAGroup && !(overlaps && !maxIsInAGroup);
-                  /* eslint-enable react/no-this-in-sfc */
-                }),
+                .test(
+                  'noOverlap',
+                  'Min cannot overlap another group',
+                  function noOverlap(value: number) {
+                    // Show error when the min is in an existing group
+                    if (
+                      groups.some(
+                        group => value >= group.min && value <= group.max,
+                      )
+                    ) {
+                      return false;
+                    }
+
+                    /* eslint-disable react/no-this-in-sfc */
+                    // This group overlaps with an existing group
+                    const overlaps = groups.some(
+                      group =>
+                        value <= group.max && group.min <= this.parent.max,
+                    );
+
+                    if (overlaps) {
+                      // Check if the max is in an existing group,
+                      // don't show the error here if it is as only want
+                      // to show the error on the field(s) that require action.
+                      return groups.some(
+                        group =>
+                          this.parent.max >= group.min &&
+                          this.parent.max <= group.max,
+                      );
+                    }
+                    /* eslint-enable react/no-this-in-sfc */
+                    return true;
+                  },
+                ),
               max: Yup.number()
                 .required('Enter a maximum value')
                 .moreThan(Yup.ref('min'), 'Must be greater than min')
-                .test('noOverlap', 'Groups cannot overlap', function noOverlap(
-                  value: number,
-                ) {
-                  // show an error when:
-                  // - the max is in an existing group, or
-                  // - this new group overlaps with another group and the min isn't in a group
-                  // (if the min is in a group and the min isn't then we only want to show the
-                  // error on the min field as it's the one that requires action)
-                  /* eslint-disable react/no-this-in-sfc */
-                  const minIsInAGroup = groups.some(
-                    group =>
-                      this.parent.min >= group.min &&
-                      this.parent.min <= group.max,
-                  );
-                  const maxIsInAGroup = groups.some(
-                    group => value >= group.min && value <= group.max,
-                  );
-                  const overlaps = groups.some(
-                    group => this.parent.min <= group.max && group.min <= value,
-                  );
-                  return !maxIsInAGroup && !(overlaps && !minIsInAGroup);
-                  /* eslint-enable react/no-this-in-sfc */
-                }),
+                .test(
+                  'noOverlap',
+                  'Max cannot overlap another group',
+                  function noOverlap(value: number) {
+                    // Show error when the max is in an existing group
+                    if (
+                      groups.some(
+                        group => value >= group.min && value <= group.max,
+                      )
+                    ) {
+                      return false;
+                    }
+
+                    /* eslint-disable react/no-this-in-sfc */
+                    // This group overlaps with an existing group
+                    const overlaps = groups.some(
+                      group =>
+                        this.parent.min <= group.max && group.min <= value,
+                    );
+
+                    if (overlaps) {
+                      // Check if the min is in an existing group,
+                      // don't show the error here if it is as only want
+                      // to show the error on the field(s) that require action.
+                      return groups.some(
+                        group =>
+                          this.parent.min >= group.min &&
+                          this.parent.min <= group.max,
+                      );
+                    }
+                    /* eslint-enable react/no-this-in-sfc */
+                    return true;
+                  },
+                ),
             })}
             onSubmit={(values, helpers) => {
               onAddGroup(values as CustomDataGroup);

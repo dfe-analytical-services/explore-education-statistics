@@ -215,7 +215,7 @@ describe('ChartMapCustomGroupsConfiguration', () => {
 
     await waitFor(() => {
       expect(
-        within(minCell).getByText('Groups cannot overlap'),
+        within(minCell).getByText('Min cannot overlap another group'),
       ).toBeInTheDocument();
       expect(
         within(maxCell).queryByText('Groups cannot overlap'),
@@ -246,11 +246,11 @@ describe('ChartMapCustomGroupsConfiguration', () => {
 
     await waitFor(() => {
       expect(
-        within(minCell).queryByText('Groups cannot overlap'),
+        within(minCell).queryByText('Min cannot overlap another group'),
       ).not.toBeInTheDocument();
 
       expect(
-        within(maxCell).getByText('Groups cannot overlap'),
+        within(maxCell).getByText('Max cannot overlap another group'),
       ).toBeInTheDocument();
     });
   });
@@ -278,10 +278,10 @@ describe('ChartMapCustomGroupsConfiguration', () => {
 
     await waitFor(() => {
       expect(
-        within(minCell).getByText('Groups cannot overlap'),
+        within(minCell).getByText('Min cannot overlap another group'),
       ).toBeInTheDocument();
       expect(
-        within(maxCell).getByText('Groups cannot overlap'),
+        within(maxCell).getByText('Max cannot overlap another group'),
       ).toBeInTheDocument();
     });
   });
@@ -309,10 +309,10 @@ describe('ChartMapCustomGroupsConfiguration', () => {
 
     await waitFor(() => {
       expect(
-        within(minCell).getByText('Groups cannot overlap'),
+        within(minCell).getByText('Min cannot overlap another group'),
       ).toBeInTheDocument();
       expect(
-        within(maxCell).getByText('Groups cannot overlap'),
+        within(maxCell).getByText('Max cannot overlap another group'),
       ).toBeInTheDocument();
     });
   });
@@ -339,7 +339,7 @@ describe('ChartMapCustomGroupsConfiguration', () => {
 
     await waitFor(() => {
       expect(
-        within(minCell).getByText('Groups cannot overlap'),
+        within(minCell).getByText('Min cannot overlap another group'),
       ).toBeInTheDocument();
     });
   });
