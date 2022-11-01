@@ -11,8 +11,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
+using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -24,9 +27,9 @@ using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.S
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functions;
 
-public class ProcessorServiceStage2Tests
+public class ProcessorStage2Tests
 {
     private readonly string _contentDbContextId = Guid.NewGuid().ToString();
     private readonly string _statisticsDbContextId = Guid.NewGuid().ToString();
@@ -107,7 +110,9 @@ public class ProcessorServiceStage2Tests
             {
                 Id = Guid.NewGuid(),
                 Filename = metaFileUnderTest
-            }
+            },
+            TotalRows = 16,
+            Status = DataImportStatus.STAGE_2
         };
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
@@ -171,16 +176,29 @@ public class ProcessorServiceStage2Tests
             importerService,
             transactionHelper);
 
-        var service = BuildService(
+        var processorService = BuildProcessorService(
             dbContextSupplier,
             dataImportService: dataImportService,
             blobStorageService: blobStorageService.Object,
             importerService: importerService,
             fileImportService: fileImportService);
-
-        await service.ProcessStage2(import.Id);
         
-        VerifyAllMocks(blobStorageService);
+        var importMessage = new ImportMessage(import.Id);
+
+        var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>(Strict);
+
+        importStagesMessageQueue
+            .Setup(s => s.Add(importMessage));
+
+        var function = BuildFunction(processorService, dataImportService);
+        
+        await function.ProcessUploads(
+            importMessage, 
+            null,
+            importStagesMessageQueue.Object,
+            Mock.Of<ICollector<ImportObservationsMessage>>(Strict));
+        
+        VerifyAllMocks(blobStorageService, importStagesMessageQueue);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
@@ -336,9 +354,19 @@ public class ProcessorServiceStage2Tests
             locations.ForEach(location => location.Id = Guid.Empty);
             scenario.GetExpectedLocations().ForEach(expectedLocation => Assert.Contains(expectedLocation, locations));
         }
+        
+        await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
+        {
+            var dataImports = await contentDbContext
+                .DataImports
+                .ToListAsync();
+            
+            // Verify that the import status has moved onto Stage 3.
+            dataImports.ForEach(dataImport => Assert.Equal(DataImportStatus.STAGE_3, dataImport.Status));
+        }
     }
 
-    private static ProcessorService BuildService(
+    private static ProcessorService BuildProcessorService(
         IDbContextSupplier dbContextSupplier,
         IDataImportService? dataImportService = null,
         IBlobStorageService? blobStorageService = null,
@@ -355,5 +383,18 @@ public class ProcessorServiceStage2Tests
             Mock.Of<IValidatorService>(Strict),
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
+    }
+    
+    
+
+    private static Processor.Functions.Processor BuildFunction(
+        IProcessorService? processorService = null,
+        IDataImportService? dataImportService = null)
+    {
+        return new Processor.Functions.Processor(
+            Mock.Of<IFileImportService>(Strict),
+            dataImportService ?? Mock.Of<IDataImportService>(Strict),
+            processorService ?? Mock.Of<IProcessorService>(Strict),
+            Mock.Of<ILogger<Processor.Functions.Processor>>());
     }
 }

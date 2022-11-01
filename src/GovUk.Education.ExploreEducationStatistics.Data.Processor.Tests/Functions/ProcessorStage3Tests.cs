@@ -62,7 +62,9 @@ public class ProcessorStage3Tests
                 Id = Guid.NewGuid(),
                 Filename = dataFileUnderTest
             },
+            TotalRows = 16,
             RowsPerBatch = 16,
+            NumBatches = 1,
             Status = DataImportStatus.STAGE_3
         };
 
@@ -78,15 +80,6 @@ public class ProcessorStage3Tests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
-
-        var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            "Resources" + Path.DirectorySeparatorChar + dataFileUnderTest);
-
-        blobStorageService
-            .Setup(s => s.StreamBlob(PrivateReleaseFiles, import.File.Path(), null))
-            .ReturnsAsync(() => System.IO.File.OpenRead(dataFilePath));
-
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
@@ -97,14 +90,14 @@ public class ProcessorStage3Tests
             new InMemoryDatabaseHelper());
 
         var splitFileService = new SplitFileService(
-            new BatchService(blobStorageService.Object),
-            blobStorageService.Object,
+            new BatchService(Mock.Of<IBlobStorageService>(Strict)),
+            Mock.Of<IBlobStorageService>(Strict),
             Mock.Of<ILogger<SplitFileService>>(),
             dataImportService);
 
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
-            blobStorageService.Object,
+            Mock.Of<IBlobStorageService>(Strict),
             Mock.Of<IFileImportService>(Strict),
             splitFileService,
             Mock.Of<IImporterService>(Strict),
@@ -113,21 +106,25 @@ public class ProcessorStage3Tests
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
         
-        var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
-        var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>();
+        var importMessage = new ImportMessage(import.Id);
 
+        var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>(Strict);
+
+        importStagesMessageQueue
+            .Setup(s => s.Add(importMessage));
+        
         var function = BuildFunction(
             processorService: processorService, 
             dataImportService: dataImportService);
 
         await function.ProcessUploads(
-            new ImportMessage(import.Id), 
+            importMessage, 
             null,
             importStagesMessageQueue.Object,
-            datafileProcessingMessageQueue.Object);
+            Mock.Of<ICollector<ImportObservationsMessage>>(Strict));
         
         // Verify that the only interaction with blob storage was to stream it rather than upload any batch files.
-        VerifyAllMocks(blobStorageService);
+        VerifyAllMocks(importStagesMessageQueue);
 
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         {
@@ -167,7 +164,9 @@ public class ProcessorStage3Tests
                 Id = Guid.NewGuid(),
                 Filename = dataFileUnderTest
             },
+            TotalRows = 16,
             RowsPerBatch = 5,
+            NumBatches = 4,
             Status = DataImportStatus.STAGE_3
         };
 
@@ -239,21 +238,25 @@ public class ProcessorStage3Tests
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
         
-        var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
-        var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>();
+        var importMessage = new ImportMessage(import.Id);
 
+        var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>(Strict);
+
+        importStagesMessageQueue
+            .Setup(s => s.Add(importMessage));
+            
         var function = BuildFunction(
             processorService: processorService, 
             dataImportService: dataImportService);
 
         await function.ProcessUploads(
-            new ImportMessage(import.Id), 
+            importMessage, 
             null,
             importStagesMessageQueue.Object,
-            datafileProcessingMessageQueue.Object);
+            Mock.Of<ICollector<ImportObservationsMessage>>(Strict));
         
         // Verify all of the streaming an uploading interactions with blob storage.
-        VerifyAllMocks(blobStorageService);
+        VerifyAllMocks(blobStorageService, importStagesMessageQueue);
         
         // Verify the contents of the streams in each of the batch files.
         Assert.Equal(4, uploadedFileContents.Count);
@@ -314,7 +317,9 @@ public class ProcessorStage3Tests
                 Id = Guid.NewGuid(),
                 Filename = dataFileUnderTest
             },
+            TotalRows = 16,
             RowsPerBatch = 5,
+            NumBatches = 4,
             Status = DataImportStatus.STAGE_3
         };
 
@@ -391,21 +396,25 @@ public class ProcessorStage3Tests
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
         
-        var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
-        var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>();
+        var importMessage = new ImportMessage(import.Id);
 
+        var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>(Strict);
+
+        importStagesMessageQueue
+            .Setup(s => s.Add(importMessage));
+        
         var function = BuildFunction(
             processorService: processorService, 
             dataImportService: dataImportService);
 
         await function.ProcessUploads(
-            new ImportMessage(import.Id), 
+            importMessage, 
             null,
             importStagesMessageQueue.Object,
-            datafileProcessingMessageQueue.Object);
+            Mock.Of<ICollector<ImportObservationsMessage>>(Strict));
         
         // Verify all of the streaming an uploading interactions with blob storage.
-        VerifyAllMocks(blobStorageService);
+        VerifyAllMocks(blobStorageService, importStagesMessageQueue);
         
         // Verify the contents of the streams in each of the batch files.
         Assert.Equal(2, uploadedFileContents.Count);
@@ -464,7 +473,9 @@ public class ProcessorStage3Tests
                 Id = Guid.NewGuid(),
                 Filename = dataFileUnderTest
             },
+            TotalRows = 16,
             RowsPerBatch = 5,
+            NumBatches = 4,
             Status = DataImportStatus.STAGE_3
         };
 
@@ -528,22 +539,26 @@ public class ProcessorStage3Tests
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
         
-        var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
-        var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>();
+        var importMessage = new ImportMessage(import.Id);
+
+        var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>(Strict);
+
+        importStagesMessageQueue
+            .Setup(s => s.Add(importMessage));
 
         var function = BuildFunction(
             processorService: processorService, 
             dataImportService: dataImportService);
 
         await function.ProcessUploads(
-            new ImportMessage(import.Id), 
+            importMessage, 
             null,
             importStagesMessageQueue.Object,
-            datafileProcessingMessageQueue.Object);
+            Mock.Of<ICollector<ImportObservationsMessage>>(Strict));
         
         // Verify the streaming interaction with blob storage but with no uploads, as all batch files are already
         // created.
-        VerifyAllMocks(blobStorageService);
+        VerifyAllMocks(blobStorageService, importStagesMessageQueue);
         
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         {

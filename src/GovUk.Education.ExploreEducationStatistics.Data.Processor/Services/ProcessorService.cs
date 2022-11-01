@@ -1,11 +1,9 @@
 #nullable enable
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
@@ -95,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task ProcessStage3(Guid importId)
         {
-            await _splitFileService.SplitDataFile(importId);
+            await _splitFileService.SplitDataFileIfRequired(importId);
         }
 
         public async Task ProcessStage4Messages(Guid importId, ICollector<ImportObservationsMessage> collector)

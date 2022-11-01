@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functions;
 
 public class OrderingCsvScenario : IProcessorServiceTestScenario
 {
@@ -23,6 +23,11 @@ public class OrderingCsvScenario : IProcessorServiceTestScenario
     public Guid GetSubjectId()
     {
         return _subjectId;
+    }
+
+    public int GetExpectedTotalRows()
+    {
+        return 16;
     }
 
     public List<Filter> GetExpectedFilters()
@@ -179,4 +184,6 @@ public interface IProcessorServiceTestScenario
     List<IndicatorGroup> GetExpectedIndicatorGroups();
 
     List<Location> GetExpectedLocations();
+
+    int GetExpectedTotalRows();
 }

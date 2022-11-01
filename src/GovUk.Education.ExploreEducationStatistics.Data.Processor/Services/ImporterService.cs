@@ -154,7 +154,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             StatisticsDbContext context)
         {
             var colValues = await CsvUtil.GetCsvHeaders(dataFileStreamProvider);
-            var totalRows = await CsvUtil.GetTotalRows(dataFileStreamProvider);
             var soleGeographicLevel = dataImport.HasSoleGeographicLevel();
 
             var filterItemsFromCsv = new HashSet<FilterItemMeta>();
@@ -177,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                     await _dataImportService.UpdateStatus(dataImport.Id,
                         DataImportStatus.STAGE_2,
-                        (double) (index + 1) / totalRows * 100);
+                        (double) (index + 1) / dataImport.TotalRows!.Value * 100);
                 }
 
                 if (CsvUtil.IsRowAllowed(soleGeographicLevel, rowValues, colValues))

@@ -86,6 +86,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             return GeographicLevels is {Count: 1};
         }
 
+        public bool BatchingRequired()
+        {
+            return NumBatches > 1;
+        }
+
         public override string ToString()
         {
             return $"{Status} {StagePercentageComplete}%, overall {PercentageComplete()}%";
