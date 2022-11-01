@@ -33,7 +33,7 @@
       "value": true
     },
     "autoscalePublicApplication": {
-      "value": true
+      "value": false
     },
     "devopsSPN": {
       "value": "702e692e-8bdf-4283-9799-9630cb781e33"
