@@ -39,7 +39,7 @@ public class ProcessorStage3Tests
     [Fact]
     public async Task ProcessStage3_NoBatchingRequired()
     {
-        var dataFileUnderTest = "stage3-batching-test.csv";
+        var dataFileUnderTest = "small-csv.csv";
 
         var subject = new Subject
         {
@@ -55,12 +55,14 @@ public class ProcessorStage3Tests
             File = new File
             {
                 Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest
+                Filename = dataFileUnderTest,
+                Type = FileType.Data
             },
             MetaFile = new File
             {
                 Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest
+                Filename = dataFileUnderTest.Replace(".csv", ".meta.csv"),
+                Type = FileType.Metadata
             },
             TotalRows = 16,
             RowsPerBatch = 16,
@@ -140,7 +142,7 @@ public class ProcessorStage3Tests
     [Fact]
     public async Task ProcessStage3_BatchingRequired()
     {
-        var dataFileUnderTest = "stage3-batching-test.csv";
+        var dataFileUnderTest = "small-csv.csv";
 
         var subject = new Subject
         {
@@ -157,12 +159,14 @@ public class ProcessorStage3Tests
             File = new File
             {
                 Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest
+                Filename = dataFileUnderTest,
+                Type = FileType.Data
             },
             MetaFile = new File
             {
                 Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest
+                Filename = dataFileUnderTest.Replace(".csv", ".meta.csv"),
+                Type = FileType.Metadata
             },
             TotalRows = 16,
             RowsPerBatch = 5,
@@ -293,7 +297,7 @@ public class ProcessorStage3Tests
     [Fact]
     public async Task ProcessStage3_BatchingRequired_SomeBatchesAlreadyCreated()
     {
-        var dataFileUnderTest = "stage3-batching-test.csv";
+        var dataFileUnderTest = "small-csv.csv";
 
         var subject = new Subject
         {
@@ -310,12 +314,14 @@ public class ProcessorStage3Tests
             File = new File
             {
                 Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest
+                Filename = dataFileUnderTest,
+                Type = FileType.Data
             },
             MetaFile = new File
             {
                 Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest
+                Filename = dataFileUnderTest.Replace(".csv", ".meta.csv"),
+                Type = FileType.Metadata
             },
             TotalRows = 16,
             RowsPerBatch = 5,
@@ -449,7 +455,7 @@ public class ProcessorStage3Tests
     [Fact]
     public async Task ProcessStage3_BatchingRequired_AllBatchesAlreadyCreated()
     {
-        var dataFileUnderTest = "stage3-batching-test.csv";
+        var dataFileUnderTest = "small-csv.csv";
 
         var subject = new Subject
         {
@@ -466,12 +472,14 @@ public class ProcessorStage3Tests
             File = new File
             {
                 Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest
+                Filename = dataFileUnderTest,
+                Type = FileType.Data
             },
             MetaFile = new File
             {
                 Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest
+                Filename = dataFileUnderTest.Replace(".csv", ".meta.csv"),
+                Type = FileType.Metadata
             },
             TotalRows = 16,
             RowsPerBatch = 5,

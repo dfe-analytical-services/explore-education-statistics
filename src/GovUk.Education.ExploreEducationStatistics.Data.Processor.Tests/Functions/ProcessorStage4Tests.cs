@@ -50,12 +50,14 @@ public class ProcessorStage4Tests
             File = new File
             {
                 Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest
+                Filename = dataFileUnderTest,
+                Type = FileType.Data
             },
             MetaFile = new File
             {
                 Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest
+                Filename = dataFileUnderTest.Replace(".csv", ".meta.csv"),
+                Type = FileType.Metadata
             },
             Status = DataImportStatus.STAGE_4,
             RowsPerBatch = 10,
@@ -160,12 +162,14 @@ public class ProcessorStage4Tests
             File = new File
             {
                 Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest
+                Filename = dataFileUnderTest,
+                Type = FileType.Data
             },
             MetaFile = new File
             {
                 Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest
+                Filename = dataFileUnderTest.Replace(".csv", ".meta.csv"),
+                Type = FileType.Metadata
             },
             Status = DataImportStatus.STAGE_4,
             RowsPerBatch = 10,
@@ -289,12 +293,14 @@ public class ProcessorStage4Tests
             File = new File
             {
                 Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest
+                Filename = dataFileUnderTest,
+                Type = FileType.Data
             },
             MetaFile = new File
             {
                 Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest
+                Filename = dataFileUnderTest.Replace(".csv", ".meta.csv"),
+                Type = FileType.Metadata
             },
             Status = DataImportStatus.STAGE_4,
             RowsPerBatch = 10,

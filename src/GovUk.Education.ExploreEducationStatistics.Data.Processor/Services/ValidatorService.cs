@@ -19,7 +19,6 @@ using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Models.SoloImportableLevels;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
@@ -59,19 +58,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IFileTypeService _fileTypeService;
         private readonly IDataImportService _dataImportService;
         private readonly IImporterService _importerService;
+        private readonly int? _overrideRowsPerBatch;
         
         public ValidatorService(
             ILogger<ValidatorService> logger,
             IBlobStorageService blobStorageService,
             IFileTypeService fileTypeService,
             IDataImportService dataImportService, 
-            IImporterService importerService)
+            IImporterService importerService, 
+            int? overrideRowsPerBatch = null)
         {
             _logger = logger;
             _blobStorageService = blobStorageService;
             _fileTypeService = fileTypeService;
             _dataImportService = dataImportService;
             _importerService = importerService;
+            _overrideRowsPerBatch = overrideRowsPerBatch;
         }
 
         /// <summary>
@@ -306,7 +308,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 DataImportStatus.STAGE_1,
                 100);
 
-            var rowsPerBatch = Convert.ToInt32(LoadAppSettings(executionContext).GetValue<string>("RowsPerBatch"));
+            var rowsPerBatch = GetRowsPerBatch(executionContext);
 
             return new ProcessorStatistics
             (
@@ -316,6 +318,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 NumBatches: GetNumBatches(totalRows, rowsPerBatch),
                 GeographicLevels: rowCountByGeographicLevel.Keys.ToHashSet()
             );
+        }
+
+        private int GetRowsPerBatch(ExecutionContext executionContext)
+        {
+            return _overrideRowsPerBatch ?? Convert.ToInt32(LoadAppSettings(executionContext).GetValue<string>("RowsPerBatch"));
         }
 
         private static IConfigurationRoot LoadAppSettings(ExecutionContext context)

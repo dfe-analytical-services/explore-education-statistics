@@ -6,11 +6,11 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functions;
 
-public class OrderingCsvScenario : IProcessorServiceTestScenario
+public class OrderingCsvStage2Scenario : IProcessorStage2TestScenario
 {
     private readonly Guid _subjectId;
 
-    public OrderingCsvScenario(Guid? subjectId = null)
+    public OrderingCsvStage2Scenario(Guid? subjectId = null)
     {
         _subjectId = subjectId ?? Guid.NewGuid();
     }
@@ -23,11 +23,6 @@ public class OrderingCsvScenario : IProcessorServiceTestScenario
     public Guid GetSubjectId()
     {
         return _subjectId;
-    }
-
-    public int GetExpectedTotalRows()
-    {
-        return 16;
     }
 
     public List<Filter> GetExpectedFilters()
@@ -173,7 +168,7 @@ public class OrderingCsvScenario : IProcessorServiceTestScenario
     }
 }
 
-public interface IProcessorServiceTestScenario
+public interface IProcessorStage2TestScenario
 {
     string GetFilenameUnderTest();
 
@@ -184,6 +179,4 @@ public interface IProcessorServiceTestScenario
     List<IndicatorGroup> GetExpectedIndicatorGroups();
 
     List<Location> GetExpectedLocations();
-
-    int GetExpectedTotalRows();
 }

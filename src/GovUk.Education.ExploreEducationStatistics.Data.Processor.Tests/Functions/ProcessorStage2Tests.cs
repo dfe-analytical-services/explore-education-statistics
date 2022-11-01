@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -37,14 +38,14 @@ public class ProcessorStage2Tests
     [Fact]
     public async Task ProcessStage2()
     {
-        await AssertStage2ItemsImportedCorrectly(new OrderingCsvScenario());
+        await AssertStage2ItemsImportedCorrectly(new OrderingCsvStage2Scenario());
     }
     
     [Fact]
     public async Task ProcessStage2_SubjectMetaAlreadyImported()
     {
         var subjectId = Guid.NewGuid();
-        var scenario = new OrderingCsvScenario(subjectId);
+        var scenario = new OrderingCsvStage2Scenario(subjectId);
         
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
@@ -69,7 +70,7 @@ public class ProcessorStage2Tests
     {
         // Firstly import a CSV.
         var subjectId1 = Guid.NewGuid();
-        var scenario1 = new OrderingCsvScenario(subjectId1);
+        var scenario1 = new OrderingCsvStage2Scenario(subjectId1);
         await AssertStage2ItemsImportedCorrectly(scenario1);
         
         // Then import a very similar CSV.
@@ -84,11 +85,11 @@ public class ProcessorStage2Tests
         // were added as part of the second import.
         
         var subjectId2 = Guid.NewGuid();
-        var scenario2 = new OrderingCsvScenario(subjectId2);
+        var scenario2 = new OrderingCsvStage2Scenario(subjectId2);
         await AssertStage2ItemsImportedCorrectly(scenario2);
     }
 
-    private async Task AssertStage2ItemsImportedCorrectly(IProcessorServiceTestScenario scenario)
+    private async Task AssertStage2ItemsImportedCorrectly(IProcessorStage2TestScenario scenario)
     {
         var metaFileUnderTest = scenario.GetFilenameUnderTest().Replace(".csv", ".meta.csv");
 
@@ -104,12 +105,14 @@ public class ProcessorStage2Tests
             File = new File
             {
                 Id = Guid.NewGuid(),
-                Filename = scenario.GetFilenameUnderTest()
+                Filename = scenario.GetFilenameUnderTest(),
+                Type = FileType.Data
             },
             MetaFile = new File
             {
                 Id = Guid.NewGuid(),
-                Filename = metaFileUnderTest
+                Filename = metaFileUnderTest,
+                Type = FileType.Metadata
             },
             TotalRows = 16,
             Status = DataImportStatus.STAGE_2
