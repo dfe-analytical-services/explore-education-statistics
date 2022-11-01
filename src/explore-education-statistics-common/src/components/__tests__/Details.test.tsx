@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import Details from '../Details';
 
@@ -54,6 +55,8 @@ describe('Details', () => {
       'false',
     );
 
+    expect(screen.getByText('Test content')).toBeVisible();
+
     expect(container.innerHTML).toMatchSnapshot();
   });
 
@@ -71,11 +74,13 @@ describe('Details', () => {
 
     expect(summary).toHaveAttribute('aria-expanded', 'false');
     expect(content).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByText('Test content')).not.toBeVisible();
 
-    fireEvent.click(summary);
+    userEvent.click(summary);
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
     expect(content).toHaveAttribute('aria-hidden', 'false');
+    expect(screen.getByText('Test content')).toBeVisible();
   });
 
   test('clicking the summary collapses the content when `open` is true', () => {
@@ -92,11 +97,13 @@ describe('Details', () => {
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
     expect(content).toHaveAttribute('aria-hidden', 'false');
+    expect(screen.getByText('Test content')).toBeVisible();
 
-    fireEvent.click(summary);
+    userEvent.click(summary);
 
     expect(summary).toHaveAttribute('aria-expanded', 'false');
     expect(content).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByText('Test content')).not.toBeVisible();
   });
 
   test('changing `open` prop from false to true reveals the content', async () => {
@@ -113,6 +120,7 @@ describe('Details', () => {
 
     expect(summary).toHaveAttribute('aria-expanded', 'false');
     expect(content).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByText('Test content')).not.toBeVisible();
 
     rerender(
       <Details summary="Test summary" id="test-details" open>
@@ -122,6 +130,7 @@ describe('Details', () => {
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
     expect(content).toHaveAttribute('aria-hidden', 'false');
+    expect(screen.getByText('Test content')).toBeVisible();
   });
 
   test('changing `open` prop from true to false hides the content', () => {
@@ -138,6 +147,7 @@ describe('Details', () => {
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
     expect(content).toHaveAttribute('aria-hidden', 'false');
+    expect(screen.getByText('Test content')).toBeVisible();
 
     rerender(
       <Details summary="Test summary" id="test-details">
@@ -147,6 +157,7 @@ describe('Details', () => {
 
     expect(summary).toHaveAttribute('aria-expanded', 'false');
     expect(content).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByText('Test content')).not.toBeVisible();
   });
 
   test('onToggle handler returns true when expanded', () => {
@@ -164,13 +175,10 @@ describe('Details', () => {
 
     expect(summary).toHaveAttribute('aria-expanded', 'false');
 
-    fireEvent.click(summary);
+    userEvent.click(summary);
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
-    expect(handleToggle).toHaveBeenCalledWith(
-      true,
-      expect.objectContaining({ target: summary }),
-    );
+    expect(handleToggle).toHaveBeenCalledWith(true);
   });
 
   test('onToggle handler returns false when collapsed', () => {
@@ -186,19 +194,11 @@ describe('Details', () => {
       name: 'Test summary',
     });
 
-    fireEvent.click(summary);
-    fireEvent.click(summary);
+    userEvent.click(summary);
+    userEvent.click(summary);
 
-    expect(handleToggle).toHaveBeenNthCalledWith(
-      1,
-      true,
-      expect.objectContaining({ target: summary }),
-    );
-    expect(handleToggle).toHaveBeenNthCalledWith(
-      2,
-      false,
-      expect.objectContaining({ target: summary }),
-    );
+    expect(handleToggle).toHaveBeenNthCalledWith(1, true);
+    expect(handleToggle).toHaveBeenNthCalledWith(2, false);
   });
 
   test('passing a hiddenText prop displays visually hidden text', () => {

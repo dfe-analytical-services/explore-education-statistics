@@ -3,23 +3,14 @@ import useToggle from '@common/hooks/useToggle';
 import findAllParents from '@common/utils/dom/findAllParents';
 import { formatTestId } from '@common/utils/test-utils';
 import classNames from 'classnames';
-import React, {
-  MouseEvent,
-  ReactNode,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import styles from './Details.module.scss';
 import VisuallyHidden from './VisuallyHidden';
 
 let hasNativeDetails: boolean;
 let idCounter = 0;
 
-export type DetailsToggleHandler = (
-  isOpen: boolean,
-  event: MouseEvent<HTMLElement>,
-) => void;
+export type DetailsToggleHandler = (isOpen: boolean) => void;
 
 export interface DetailsProps {
   className?: string;
@@ -43,6 +34,7 @@ export interface DetailsProps {
   summary: string;
   summaryAfter?: ReactNode;
   hiddenText?: string;
+  preventToggle?: boolean;
 }
 
 const Details = ({
@@ -51,17 +43,18 @@ const Details = ({
   id: propId = `details-content-${(idCounter += 1)}`,
   detailsId,
   jsRequired = false,
-  open = false,
+  open: defaultOpen = false,
   onToggle,
   summary,
   summaryAfter,
   hiddenText,
+  preventToggle = false,
 }: DetailsProps) => {
   const [id] = useState(propId);
   const ref = useRef<HTMLElement>(null);
 
   const { onMounted } = useMounted(undefined, jsRequired);
-  const [isOpened, setOpened] = useToggle(open);
+  const [open, toggleOpen] = useToggle(defaultOpen);
 
   useEffect(() => {
     if (typeof hasNativeDetails === 'undefined') {
@@ -71,8 +64,14 @@ const Details = ({
   }, []);
 
   useEffect(() => {
-    setOpened(open);
-  }, [open, setOpened]);
+    toggleOpen(defaultOpen);
+  }, [defaultOpen, toggleOpen]);
+
+  useEffect(() => {
+    if (preventToggle) {
+      toggleOpen(true);
+    }
+  }, [preventToggle, toggleOpen]);
 
   useEffect(() => {
     if (hasNativeDetails) {
@@ -82,13 +81,13 @@ const Details = ({
     if (ref.current) {
       // Don't really need to include this, but just
       // polyfills DOM behaviour for IE/Edge
-      if (isOpened) {
+      if (open) {
         ref.current.setAttribute('open', '');
       } else {
         ref.current.removeAttribute('open');
       }
     }
-  }, [isOpened]);
+  }, [open]);
 
   return (
     <details
@@ -98,25 +97,20 @@ const Details = ({
       ref={ref}
       role={onMounted('group')}
     >
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
       <summary
         aria-controls={onMounted(id)}
-        aria-expanded={onMounted(isOpened)}
+        aria-expanded={onMounted(open)}
         className="govuk-details__summary"
         role={onMounted('button')}
         tabIndex={onMounted(0)}
         onClick={event => {
-          event.persist();
-
-          if (onToggle) {
-            onToggle(!isOpened, event);
-
-            if (event.isDefaultPrevented()) {
-              return;
-            }
+          // preventDefault here to allow the open state to be controlled,
+          // see https://github.com/facebook/react/issues/15486
+          event.preventDefault();
+          if (!preventToggle) {
+            onToggle?.(!open);
+            toggleOpen(!open);
           }
-
-          setOpened(!isOpened);
         }}
         onKeyPress={event => {
           if (event.key === 'Enter' || event.key === ' ') {
@@ -146,13 +140,13 @@ const Details = ({
         {summaryAfter}
       </summary>
       <div
-        aria-hidden={onMounted(!isOpened)}
+        aria-hidden={onMounted(!open)}
         className="govuk-details__text"
         id={onMounted(id)}
         style={onMounted(
           !hasNativeDetails
             ? {
-                display: !isOpened ? 'none' : undefined,
+                display: !open ? 'none' : undefined,
               }
             : undefined,
         )}
