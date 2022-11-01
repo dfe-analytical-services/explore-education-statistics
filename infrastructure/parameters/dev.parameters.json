@@ -6,16 +6,22 @@
       "value": "B1 Basic"
     },
     "skuData": {
-      "value": "S1 Standard"
+      "value": "P1V2 PremiumV2"
     },
     "skuContent": {
-      "value": "S1 Standard"
+      "value": "P1V2 PremiumV2"
     },
     "skuAdmin": {
-      "value": "S2 Standard"
+      "value": "P1V2 PremiumV2"
     },
     "skuImporter": {
-      "value": "S3 Standard"
+      "value": "P2V2 PremiumV2"
+    },
+    "skuNotifier": {
+      "value": "B1 Basic"
+    },
+    "skuPublisher": {
+      "value": "B1 Basic"
     },
     "publishReleasesCronSchedule": {
       "value": "0 0 * * * *"
