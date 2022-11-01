@@ -1421,7 +1421,7 @@
         "Name": "[first(split(parameters('skuData'), ' '))]"
       },
       "name": "[variables('dataPlanName')]",
-      "apiVersion": "2015-08-01",
+      "apiVersion": "2022-03-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1643,7 +1643,7 @@
         "Name": "[first(split(parameters('skuContent'), ' '))]"
       },
       "name": "[variables('contentPlanName')]",
-      "apiVersion": "2015-08-01",
+      "apiVersion": "2022-03-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1896,7 +1896,7 @@
         "Name": "[first(split(parameters('skuAdmin'), ' '))]"
       },
       "name": "[variables('adminPlanName')]",
-      "apiVersion": "2015-08-01",
+      "apiVersion": "2022-03-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -2086,7 +2086,7 @@
         "Name": "[first(split(parameters('skuPublic'), ' '))]"
       },
       "name": "[variables('publicPlanName')]",
-      "apiVersion": "2015-08-01",
+      "apiVersion": "2022-03-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -2842,7 +2842,7 @@
     },
     {
       "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2015-04-01",
+      "apiVersion": "2022-03-01",
       "name": "[variables('notificationsPlanName')]",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -2994,7 +2994,7 @@
         "Name": "[first(split(parameters('skuImporter'), ' '))]"
       },
       "name": "[variables('importerPlanName')]",
-      "apiVersion": "2018-11-01",
+      "apiVersion": "2022-03-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -3143,7 +3143,7 @@
     },
     {
       "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2018-11-01",
+      "apiVersion": "2022-03-01",
       "name": "[variables('publisherPlanName')]",
       "location": "[resourceGroup().location]",
       "tags": {
