@@ -91,16 +91,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                         .ThenInclude(release => release.Publication)
                         .Include(block => block.ContentBlock)
                         .Where(block => block.ContentBlockId == dataBlockId))
-                .OnSuccessCombineWith(block => GetDataBlockTableResult(new CacheableDataBlock(block)))
+                .OnSuccess(async block =>
+                    // Check the data block is for the latest published version of the release
+                    await _releaseRepository.IsLatestPublishedVersionOfRelease(block.ReleaseId)
+                        ? block
+                        : new Either<ActionResult, ReleaseContentBlock>(new NotFoundResult()))
+                .OnSuccessCombineWith(
+                    block => _releaseRepository.GetLatestPublishedRelease(block.Release.PublicationId))
                 .OnSuccessCombineWith(tuple =>
                 {
-                    var release = tuple.Item1.Release;
-                    return _releaseRepository.GetLatestPublishedRelease(release.PublicationId);
+                    var block = tuple.Item1;
+                    return GetDataBlockTableResult(new CacheableDataBlock(block));
                 })
                 .OnSuccess(tuple =>
                 {
-                    var (releaseContentBlock, tableResult, latestRelease) = tuple;
-                    return BuildFastTrackViewModel(releaseContentBlock, tableResult, latestRelease);
+                    var (block, latestRelease, tableResult) = tuple;
+                    return BuildFastTrackViewModel(block, tableResult, latestRelease);
                 })
                 .HandleFailuresOrOk();
         }

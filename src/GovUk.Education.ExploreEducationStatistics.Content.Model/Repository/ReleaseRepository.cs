@@ -18,6 +18,18 @@ public class ReleaseRepository : IReleaseRepository
         _contentDbContext = contentDbContext;
     }
 
+    public async Task<bool> IsLatestPublishedVersionOfRelease(Guid releaseId)
+    {
+        var release = await _contentDbContext.Releases
+            .SingleAsync(r => r.Id == releaseId);
+
+        var publication = await _contentDbContext.Publications
+            .Include(p => p.Releases)
+            .SingleAsync(p => p.Id == release.PublicationId);
+
+        return publication.IsLatestPublishedVersionOfRelease(release);
+    }
+
     public async Task<Either<ActionResult, Release>> GetLatestPublishedRelease(Guid publicationId)
     {
         var publication = await _contentDbContext.Publications
