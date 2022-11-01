@@ -17,18 +17,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         private readonly IFileImportService _fileImportService;
         private readonly IDataImportService _dataImportService;
         private readonly IProcessorService _processorService;
+        private readonly IDbContextSupplier _dbContextSupplier;
         private readonly ILogger<Processor> _logger;
 
         public Processor(
             IFileImportService fileImportService,
             IDataImportService dataImportService,
             IProcessorService processorService,
-            ILogger<Processor> logger
-        )
+            IDbContextSupplier dbContextSupplier,
+            ILogger<Processor> logger)
         {
             _fileImportService = fileImportService;
             _dataImportService = dataImportService;
             _processorService = processorService;
+            _dbContextSupplier = dbContextSupplier;
             _logger = logger;
         }
 
@@ -110,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         {
             try
             {
-                await _fileImportService.ImportObservations(message, DbUtils.CreateStatisticsDbContext());
+                await _fileImportService.ImportObservations(message, _dbContextSupplier.CreateStatisticsDbContext());
             }
             catch (Exception e)
             {

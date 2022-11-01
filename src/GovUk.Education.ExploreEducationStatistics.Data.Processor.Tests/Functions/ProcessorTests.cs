@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functions
 {
@@ -42,6 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 fileImportService.Object,
                 importService.Object,
                 processorService.Object,
+                Mock.Of<IDbContextSupplier>(Strict),
                 new Mock<ILogger<Processor.Functions.Processor>>().Object);
 
             processorService
@@ -94,6 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 fileImportService.Object,
                 importService.Object,
                 processorService.Object,
+                Mock.Of<IDbContextSupplier>(Strict),
                 new Mock<ILogger<Processor.Functions.Processor>>().Object);
 
             importService
@@ -149,6 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                     fileImportService.Object,
                     importService.Object,
                     processorService.Object,
+                    Mock.Of<IDbContextSupplier>(Strict),
                     new Mock<ILogger<Processor.Functions.Processor>>().Object);
 
                 importService
@@ -193,6 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 fileImportService.Object,
                 importService.Object,
                 processorService.Object,
+                Mock.Of<IDbContextSupplier>(Strict),
                 new Mock<ILogger<Processor.Functions.Processor>>().Object);
 
             importService
@@ -242,6 +247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 fileImportService.Object,
                 importService.Object,
                 processorService.Object,
+                Mock.Of<IDbContextSupplier>(Strict),
                 new Mock<ILogger<Processor.Functions.Processor>>().Object);
 
             importService
@@ -294,6 +300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 fileImportService.Object,
                 importService.Object,
                 processorService.Object,
+                Mock.Of<IDbContextSupplier>(Strict),
                 new Mock<ILogger<Processor.Functions.Processor>>().Object);
 
             importService
@@ -346,6 +353,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 fileImportService.Object,
                 importService.Object,
                 processorService.Object,
+                Mock.Of<IDbContextSupplier>(Strict),
                 new Mock<ILogger<Processor.Functions.Processor>>().Object);
 
             importService
@@ -398,6 +406,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 fileImportService.Object,
                 importService.Object,
                 processorService.Object,
+                Mock.Of<IDbContextSupplier>(Strict),
                 new Mock<ILogger<Processor.Functions.Processor>>().Object);
 
             importService
@@ -431,6 +440,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 fileImportService.Object,
                 importService.Object,
                 processorService.Object,
+                Mock.Of<IDbContextSupplier>(Strict),
                 new Mock<ILogger<Processor.Functions.Processor>>().Object);
             
             var message = new CancelImportMessage(Guid.NewGuid());

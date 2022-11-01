@@ -156,10 +156,7 @@ public class ProcessorStage1Tests
         
         await function.ProcessUploads(
             importMessage, 
-            new ExecutionContext
-            {
-                FunctionAppDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
-            },
+            null,
             importStagesMessageQueue.Object,
             Mock.Of<ICollector<ImportObservationsMessage>>(Strict));
         
@@ -213,6 +210,7 @@ public class ProcessorStage1Tests
             Mock.Of<IFileImportService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             processorService ?? Mock.Of<IProcessorService>(Strict),
+            Mock.Of<IDbContextSupplier>(),
             Mock.Of<ILogger<Processor.Functions.Processor>>());
     }
 }

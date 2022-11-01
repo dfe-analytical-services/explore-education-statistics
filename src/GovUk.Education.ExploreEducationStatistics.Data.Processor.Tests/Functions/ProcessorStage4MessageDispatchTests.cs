@@ -26,7 +26,7 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functions;
 
-public class ProcessorStage4Tests
+public class ProcessorStage4MessageDispatchTests
 {
     private readonly string _contentDbContextId = Guid.NewGuid().ToString();
     private readonly string _statisticsDbContextId = Guid.NewGuid().ToString();
@@ -77,9 +77,6 @@ public class ProcessorStage4Tests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        // There should be no interactions with BlobStorage if no batching is required.
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
-
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
@@ -90,14 +87,14 @@ public class ProcessorStage4Tests
             new InMemoryDatabaseHelper());
 
         var splitFileService = new SplitFileService(
-            new BatchService(blobStorageService.Object),
-            blobStorageService.Object,
+            new BatchService(Mock.Of<IBlobStorageService>(Strict)),
+            Mock.Of<IBlobStorageService>(Strict),
             Mock.Of<ILogger<SplitFileService>>(),
             dataImportService);
 
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
-            blobStorageService.Object,
+            Mock.Of<IBlobStorageService>(Strict),
             Mock.Of<IFileImportService>(Strict),
             splitFileService,
             Mock.Of<IImporterService>(Strict),
@@ -387,6 +384,7 @@ public class ProcessorStage4Tests
             Mock.Of<IFileImportService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             processorService ?? Mock.Of<IProcessorService>(Strict),
+            Mock.Of<IDbContextSupplier>(),
             Mock.Of<ILogger<Processor.Functions.Processor>>());
     }
 }

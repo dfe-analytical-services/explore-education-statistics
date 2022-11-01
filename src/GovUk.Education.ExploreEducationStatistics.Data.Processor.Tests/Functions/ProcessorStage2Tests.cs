@@ -398,6 +398,7 @@ public class ProcessorStage2Tests
             Mock.Of<IFileImportService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             processorService ?? Mock.Of<IProcessorService>(Strict),
+            Mock.Of<IDbContextSupplier>(),
             Mock.Of<ILogger<Processor.Functions.Processor>>());
     }
 }
