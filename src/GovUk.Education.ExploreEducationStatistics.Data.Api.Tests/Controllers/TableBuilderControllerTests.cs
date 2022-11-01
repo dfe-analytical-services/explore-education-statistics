@@ -330,6 +330,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .ReturnsAsync(_tableBuilderResults);
 
             mocks.releaseRepository
+                .Setup(s => s.IsLatestPublishedVersionOfRelease(ReleaseId))
+                .ReturnsAsync(true);
+
+            mocks.releaseRepository
                 .Setup(s => s.GetLatestPublishedRelease(PublicationId))
                 .ReturnsAsync(latestRelease);
 
@@ -354,6 +358,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             Assert.Equal(ObservationQueryContext.Filters, viewModel.Query.Filters);
             Assert.Equal(ObservationQueryContext.Indicators, viewModel.Query.Indicators);
             Assert.Equal(ObservationQueryContext.LocationIds, viewModel.Query.LocationIds);
+        }
+
+        [Fact]
+        public async Task QueryForFastTrack_NotForLatestPublishedVersionOfRelease()
+        {
+            var (controller, mocks) = BuildControllerAndDependencies();
+
+            SetupCall(mocks.persistenceHelper, ReleaseContentBlock);
+
+            mocks.releaseRepository
+                .Setup(s => s.IsLatestPublishedVersionOfRelease(ReleaseId))
+                .ReturnsAsync(false);
+
+            var result = await controller.QueryForFastTrack(DataBlockId);
+
+            VerifyAllMocks(mocks);
+
+            result.AssertNotFoundResult();
         }
 
         [Fact]
@@ -383,6 +405,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             mocks.dataBlockService
                 .Setup(s => s.GetDataBlockTableResult(ReleaseId, DataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
+
+            mocks.releaseRepository
+                .Setup(s => s.IsLatestPublishedVersionOfRelease(ReleaseId))
+                .ReturnsAsync(true);
 
             mocks.releaseRepository
                 .Setup(s => s.GetLatestPublishedRelease(PublicationId))
