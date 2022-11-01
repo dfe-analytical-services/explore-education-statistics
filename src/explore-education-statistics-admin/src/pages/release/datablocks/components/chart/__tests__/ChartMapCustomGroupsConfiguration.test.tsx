@@ -1,13 +1,4 @@
-import { testFullTable } from '@admin/pages/release/datablocks/components/chart/__tests__/__data__/testTableData';
-import ChartMapCustomGroupsConfiguration, {
-  ChartMapCustomGroupsConfigurationProps,
-} from '@admin/pages/release/datablocks/components/chart/ChartMapCustomGroupsConfiguration';
-import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
-import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
-import {
-  AxisConfiguration,
-  ChartDefinitionAxis,
-} from '@common/modules/charts/types/chart';
+import ChartMapCustomGroupsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartMapCustomGroupsConfiguration';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -194,7 +185,6 @@ describe('ChartMapCustomGroupsConfiguration', () => {
 
     userEvent.type(screen.getByLabelText('Min'), '10');
     userEvent.type(screen.getByLabelText('Max'), '9');
-
     userEvent.tab();
 
     await waitFor(() => {
@@ -202,7 +192,7 @@ describe('ChartMapCustomGroupsConfiguration', () => {
     });
   });
 
-  test('shows a validation error when the value overlaps an existing group', async () => {
+  test('shows a validation error when the minimum value is in an existing group', async () => {
     render(
       <ChartMapCustomGroupsConfiguration
         groups={testGroups}
@@ -213,6 +203,8 @@ describe('ChartMapCustomGroupsConfiguration', () => {
     );
 
     userEvent.type(screen.getByLabelText('Min'), '10');
+    userEvent.type(screen.getByLabelText('Max'), '200');
+    userEvent.tab();
 
     const minCell = within(screen.getAllByRole('row')[3]).getAllByRole(
       'cell',
@@ -221,21 +213,133 @@ describe('ChartMapCustomGroupsConfiguration', () => {
       'cell',
     )[1];
 
+    await waitFor(() => {
+      expect(
+        within(minCell).getByText('Min cannot overlap another group'),
+      ).toBeInTheDocument();
+      expect(
+        within(maxCell).queryByText('Groups cannot overlap'),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  test('shows a validation error when the maximum value is in an existing group', async () => {
+    render(
+      <ChartMapCustomGroupsConfiguration
+        groups={testGroups}
+        id="testId"
+        onAddGroup={noop}
+        onRemoveGroup={noop}
+      />,
+    );
+
+    userEvent.type(screen.getByLabelText('Min'), '-10');
+    userEvent.type(screen.getByLabelText('Max'), '75');
     userEvent.tab();
+
+    const minCell = within(screen.getAllByRole('row')[3]).getAllByRole(
+      'cell',
+    )[0];
+    const maxCell = within(screen.getAllByRole('row')[3]).getAllByRole(
+      'cell',
+    )[1];
 
     await waitFor(() => {
       expect(
-        within(minCell).getByText('Groups cannot overlap'),
+        within(minCell).queryByText('Min cannot overlap another group'),
+      ).not.toBeInTheDocument();
+
+      expect(
+        within(maxCell).getByText('Max cannot overlap another group'),
       ).toBeInTheDocument();
     });
+  });
 
-    userEvent.type(screen.getByLabelText('Max'), '50');
+  test('shows validation errors when both values are in an existing group', async () => {
+    render(
+      <ChartMapCustomGroupsConfiguration
+        groups={testGroups}
+        id="testId"
+        onAddGroup={noop}
+        onRemoveGroup={noop}
+      />,
+    );
+
+    userEvent.type(screen.getByLabelText('Min'), '10');
+    userEvent.type(screen.getByLabelText('Max'), '75');
+    userEvent.tab();
+
+    const minCell = within(screen.getAllByRole('row')[3]).getAllByRole(
+      'cell',
+    )[0];
+    const maxCell = within(screen.getAllByRole('row')[3]).getAllByRole(
+      'cell',
+    )[1];
+
+    await waitFor(() => {
+      expect(
+        within(minCell).getByText('Min cannot overlap another group'),
+      ).toBeInTheDocument();
+      expect(
+        within(maxCell).getByText('Max cannot overlap another group'),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('shows validation errors when the new group contains an existing group', async () => {
+    render(
+      <ChartMapCustomGroupsConfiguration
+        groups={testGroups}
+        id="testId"
+        onAddGroup={noop}
+        onRemoveGroup={noop}
+      />,
+    );
+
+    userEvent.type(screen.getByLabelText('Min'), '-10');
+    userEvent.type(screen.getByLabelText('Max'), '150');
+    userEvent.tab();
+
+    const minCell = within(screen.getAllByRole('row')[3]).getAllByRole(
+      'cell',
+    )[0];
+    const maxCell = within(screen.getAllByRole('row')[3]).getAllByRole(
+      'cell',
+    )[1];
+
+    await waitFor(() => {
+      expect(
+        within(minCell).getByText('Min cannot overlap another group'),
+      ).toBeInTheDocument();
+      expect(
+        within(maxCell).getByText('Max cannot overlap another group'),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('shows a validation error when groups with negative values overlap', async () => {
+    render(
+      <ChartMapCustomGroupsConfiguration
+        groups={[{ min: -2, max: 2 }]}
+        id="testId"
+        onAddGroup={noop}
+        onRemoveGroup={noop}
+      />,
+    );
+
+    userEvent.type(screen.getByLabelText('Min'), '-3');
+
+    const minCell = within(screen.getAllByRole('row')[2]).getAllByRole(
+      'cell',
+    )[0];
+
+    userEvent.type(screen.getByLabelText('Max'), '3');
 
     userEvent.tab();
 
     await waitFor(() => {
       expect(
-        within(maxCell).getByText('Groups cannot overlap'),
+        within(minCell).getByText('Min cannot overlap another group'),
       ).toBeInTheDocument();
     });
   });

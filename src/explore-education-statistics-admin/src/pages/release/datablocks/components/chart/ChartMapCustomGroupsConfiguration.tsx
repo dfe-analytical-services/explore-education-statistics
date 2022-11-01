@@ -69,29 +69,77 @@ export default function ChartMapCustomGroupsConfiguration({
             validationSchema={Yup.object<FormValues>({
               min: Yup.number()
                 .required('Enter a minimum value')
-                .test('noOverlap', 'Groups cannot overlap', function noOverlap(
-                  value: number,
-                ) {
-                  return !(
-                    groups.length &&
-                    groups.some(group => {
-                      return value >= group.min && value <= group.max;
-                    })
-                  );
-                }),
+                .test(
+                  'noOverlap',
+                  'Min cannot overlap another group',
+                  function noOverlap(value: number) {
+                    // Show error when the min is in an existing group
+                    if (
+                      groups.some(
+                        group => value >= group.min && value <= group.max,
+                      )
+                    ) {
+                      return false;
+                    }
+
+                    /* eslint-disable react/no-this-in-sfc */
+                    // This group overlaps with an existing group
+                    const overlaps = groups.some(
+                      group =>
+                        value <= group.max && group.min <= this.parent.max,
+                    );
+
+                    if (overlaps) {
+                      // Check if the max is in an existing group,
+                      // don't show the error here if it is as only want
+                      // to show the error on the field(s) that require action.
+                      return groups.some(
+                        group =>
+                          this.parent.max >= group.min &&
+                          this.parent.max <= group.max,
+                      );
+                    }
+                    /* eslint-enable react/no-this-in-sfc */
+                    return true;
+                  },
+                ),
               max: Yup.number()
                 .required('Enter a maximum value')
                 .moreThan(Yup.ref('min'), 'Must be greater than min')
-                .test('noOverlap', 'Groups cannot overlap', function noOverlap(
-                  value: number,
-                ) {
-                  return !(
-                    groups.length &&
-                    groups.some(group => {
-                      return value >= group.min && value <= group.max;
-                    })
-                  );
-                }),
+                .test(
+                  'noOverlap',
+                  'Max cannot overlap another group',
+                  function noOverlap(value: number) {
+                    // Show error when the max is in an existing group
+                    if (
+                      groups.some(
+                        group => value >= group.min && value <= group.max,
+                      )
+                    ) {
+                      return false;
+                    }
+
+                    /* eslint-disable react/no-this-in-sfc */
+                    // This group overlaps with an existing group
+                    const overlaps = groups.some(
+                      group =>
+                        this.parent.min <= group.max && group.min <= value,
+                    );
+
+                    if (overlaps) {
+                      // Check if the min is in an existing group,
+                      // don't show the error here if it is as only want
+                      // to show the error on the field(s) that require action.
+                      return groups.some(
+                        group =>
+                          this.parent.min >= group.min &&
+                          this.parent.min <= group.max,
+                      );
+                    }
+                    /* eslint-enable react/no-this-in-sfc */
+                    return true;
+                  },
+                ),
             })}
             onSubmit={(values, helpers) => {
               onAddGroup(values as CustomDataGroup);
