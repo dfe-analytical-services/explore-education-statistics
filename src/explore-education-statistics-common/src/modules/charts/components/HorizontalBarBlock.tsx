@@ -187,8 +187,12 @@ const HorizontalBarBlock = ({
 
           {axes.major.referenceLines?.map(referenceLine =>
             createReferenceLine({
+              axis: 'y',
+              axisType: 'major',
               chartData,
               label: referenceLine.label,
+              otherAxisDomain: minorDomainTicks.domain,
+              otherAxisPosition: referenceLine.otherAxisPosition,
               position: referenceLine.position,
               style: referenceLine.style,
               y: referenceLine.position,
@@ -197,8 +201,12 @@ const HorizontalBarBlock = ({
 
           {axes.minor.referenceLines?.map(referenceLine =>
             createReferenceLine({
+              axis: 'x',
+              axisType: 'minor',
               chartData,
               label: referenceLine.label,
+              otherAxisDomain: majorDomainTicks.domain,
+              otherAxisPosition: referenceLine.otherAxisPosition,
               position: referenceLine.position,
               style: referenceLine.style,
               x: referenceLine.position,
@@ -238,6 +246,7 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
   },
   axes: {
     major: {
+      axis: 'y',
       id: 'major',
       title: 'Y Axis (major axis)',
       type: 'major',
@@ -260,6 +269,7 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
       },
     },
     minor: {
+      axis: 'x',
       id: 'minor',
       title: 'X Axis (minor axis)',
       type: 'minor',

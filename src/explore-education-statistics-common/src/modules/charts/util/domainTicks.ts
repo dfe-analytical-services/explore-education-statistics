@@ -8,7 +8,7 @@ import parseNumber from '@common/utils/number/parseNumber';
 import omit from 'lodash/omit';
 import { AxisDomain } from 'recharts';
 
-interface DomainTicks {
+export interface DomainTicks {
   domain?: [AxisDomain, AxisDomain];
   ticks?: (string | number)[];
 }

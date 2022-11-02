@@ -71,6 +71,8 @@ const ChartAxisConfiguration = ({
     submitForms,
   } = useChartBuilderFormsContext();
 
+  const axisDefinition = definition.axes[type];
+
   const dataSetCategories = useMemo<DataSetCategory[]>(() => {
     if (type === 'minor') {
       return [];
@@ -192,8 +194,6 @@ const ChartAxisConfiguration = ({
   );
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
-    const axisDefinition = definition.axes[type];
-
     let schema: ObjectSchema<FormValues> = Yup.object({
       size: Yup.number().positive('Size of axis must be positive'),
       tickConfig: Yup.string().oneOf<TickConfig>(
@@ -259,10 +259,11 @@ const ChartAxisConfiguration = ({
 
     return schema;
   }, [
+    axisDefinition,
     capabilities.canSort,
     capabilities.hasGridLines,
     capabilities.hasReferenceLines,
-    definition.axes,
+    definition.axes.major,
     type,
   ]);
 
@@ -509,9 +510,8 @@ const ChartAxisConfiguration = ({
 
           {validationSchema.fields.referenceLines && (
             <ChartReferenceLinesConfiguration
-              axisType={type}
+              axisDefinition={axisDefinition}
               dataSetCategories={dataSetCategories}
-              definition={definition}
               id={id}
               lines={form.values.referenceLines ?? []}
               onAddLine={line => {

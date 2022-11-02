@@ -3,7 +3,6 @@ import ChartReferenceLinesConfiguration, {
   ChartReferenceLinesConfigurationProps,
 } from '@admin/pages/release/datablocks/components/chart/ChartReferenceLinesConfiguration';
 import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
-import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
 import {
   AxisConfiguration,
   ChartDefinitionAxis,
@@ -66,6 +65,25 @@ describe('ChartReferenceLinesConfiguration', () => {
     },
   };
 
+  const testMajorAxisDefinition: ChartDefinitionAxis = {
+    axis: 'x',
+    id: 'xaxis',
+    title: 'X Axis (major axis)',
+    type: 'major',
+    capabilities: {
+      canRotateLabel: false,
+    },
+  };
+  const testMinorAxisDefinition: ChartDefinitionAxis = {
+    axis: 'y',
+    id: 'yaxis',
+    title: 'Y Axis (minor axis)',
+    type: 'minor',
+    capabilities: {
+      canRotateLabel: true,
+    },
+  };
+
   const testTable = testFullTable;
   const testTimePeriodDataSetCategories = createDataSetCategories(
     {
@@ -79,9 +97,8 @@ describe('ChartReferenceLinesConfiguration', () => {
   test('renders correctly with existing lines when grouped by time periods', () => {
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={testTimePeriodDataSetCategories}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMajorAxisDefinition}
         id="test-form"
         lines={[{ position: '2014_AY', label: 'Test label 1' }]}
         onAddLine={noop}
@@ -111,7 +128,6 @@ describe('ChartReferenceLinesConfiguration', () => {
   test('renders correctly with existing lines when grouped by filters', () => {
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={createDataSetCategories(
           {
             ...testAxisConfiguration,
@@ -120,7 +136,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.results,
           testTable.subjectMeta,
         )}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMajorAxisDefinition}
         id="test-form"
         lines={[
           { position: 'ethnicity-major-chinese', label: 'Test label 1' },
@@ -162,7 +178,6 @@ describe('ChartReferenceLinesConfiguration', () => {
   test('renders correctly with existing lines when grouped by locations', () => {
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={createDataSetCategories(
           {
             ...testAxisConfiguration,
@@ -171,7 +186,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.results,
           testTable.subjectMeta,
         )}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMajorAxisDefinition}
         id="test-form"
         lines={[{ position: 'barnet', label: 'Test label 1' }]}
         onAddLine={noop}
@@ -202,7 +217,6 @@ describe('ChartReferenceLinesConfiguration', () => {
   test('renders correctly with existing lines when grouped by indicators', () => {
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={createDataSetCategories(
           {
             ...testAxisConfiguration,
@@ -211,7 +225,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.results,
           testTable.subjectMeta,
         )}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMajorAxisDefinition}
         id="test-form"
         lines={[
           { position: 'overall-absence-sessions', label: 'Test label 1' },
@@ -248,9 +262,8 @@ describe('ChartReferenceLinesConfiguration', () => {
   test('renders correctly with existing lines for minor axis', () => {
     render(
       <ChartReferenceLinesConfiguration
-        axisType="minor"
         dataSetCategories={[]}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMinorAxisDefinition}
         id="test-form"
         lines={[
           { position: 2000, label: 'Test label 1' },
@@ -277,9 +290,8 @@ describe('ChartReferenceLinesConfiguration', () => {
   test('shows validation error when `Position` is empty', async () => {
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={testTimePeriodDataSetCategories}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMajorAxisDefinition}
         id="test-form"
         lines={[]}
         onAddLine={noop}
@@ -306,9 +318,8 @@ describe('ChartReferenceLinesConfiguration', () => {
   test('shows validation error when `Label` is empty', async () => {
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={testTimePeriodDataSetCategories}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMajorAxisDefinition}
         id="test-form"
         lines={[]}
         onAddLine={noop}
@@ -333,9 +344,8 @@ describe('ChartReferenceLinesConfiguration', () => {
   test('shows error messages when adding reference line with invalid values', async () => {
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={testTimePeriodDataSetCategories}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMajorAxisDefinition}
         id="test-form"
         lines={[]}
         onAddLine={noop}
@@ -367,9 +377,8 @@ describe('ChartReferenceLinesConfiguration', () => {
   test('default value for `Style` field is dashed', async () => {
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={testTimePeriodDataSetCategories}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMajorAxisDefinition}
         id="test-form"
         lines={[]}
         onAddLine={noop}
@@ -388,18 +397,11 @@ describe('ChartReferenceLinesConfiguration', () => {
   test('can set default value for reference line `Style` field via chart definition', async () => {
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={testTimePeriodDataSetCategories}
-        definition={{
-          ...lineChartBlockDefinition,
-          axes: {
-            major: {
-              ...lineChartBlockDefinition.axes?.major,
-              referenceLineDefaults: {
-                style: 'none',
-              },
-            } as ChartDefinitionAxis,
-            minor: lineChartBlockDefinition.axes.minor,
+        axisDefinition={{
+          ...testMajorAxisDefinition,
+          referenceLineDefaults: {
+            style: 'none',
           },
         }}
         id="test-form"
@@ -422,9 +424,8 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={testTimePeriodDataSetCategories}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMajorAxisDefinition}
         id="test-form"
         lines={[]}
         onAddLine={handleAddLine}
@@ -464,7 +465,6 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={createDataSetCategories(
           {
             ...testAxisConfiguration,
@@ -473,7 +473,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.results,
           testTable.subjectMeta,
         )}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMajorAxisDefinition}
         id="test-form"
         lines={[]}
         onAddLine={handleAddLine}
@@ -511,7 +511,6 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={createDataSetCategories(
           {
             ...testAxisConfiguration,
@@ -520,7 +519,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.results,
           testTable.subjectMeta,
         )}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMajorAxisDefinition}
         id="test-form"
         lines={[]}
         onAddLine={handleAddLine}
@@ -558,7 +557,6 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={createDataSetCategories(
           {
             ...testAxisConfiguration,
@@ -567,7 +565,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.results,
           testTable.subjectMeta,
         )}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMajorAxisDefinition}
         id="test-form"
         lines={[]}
         onAddLine={handleAddLine}
@@ -605,9 +603,8 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     render(
       <ChartReferenceLinesConfiguration
-        axisType="minor"
         dataSetCategories={[]}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMinorAxisDefinition}
         id="test-form"
         lines={[]}
         onAddLine={handleAddLine}
@@ -642,9 +639,8 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={testTimePeriodDataSetCategories}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMajorAxisDefinition}
         id="test-form"
         lines={[]}
         onAddLine={handleAddLine}
@@ -687,9 +683,8 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={testTimePeriodDataSetCategories}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMajorAxisDefinition}
         id="test-form"
         lines={[
           { position: '2014_AY', label: 'Test label 1' },
@@ -717,9 +712,8 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={testTimePeriodDataSetCategories}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMajorAxisDefinition}
         id="test-form"
         lines={[
           { position: '2014_AY', label: 'Test label 1' },
@@ -756,7 +750,6 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={createDataSetCategories(
           {
             ...testAxisConfiguration,
@@ -765,7 +758,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.results,
           testTable.subjectMeta,
         )}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMajorAxisDefinition}
         id="test-form"
         lines={[
           { position: 'state-funded-primary', label: 'Test label 1' },
@@ -803,7 +796,6 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={createDataSetCategories(
           {
             ...testAxisConfiguration,
@@ -812,7 +804,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.results,
           testTable.subjectMeta,
         )}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMajorAxisDefinition}
         id="test-form"
         lines={[
           { position: 'barnet', label: 'Test label 1' },
@@ -849,7 +841,6 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     render(
       <ChartReferenceLinesConfiguration
-        axisType="major"
         dataSetCategories={createDataSetCategories(
           {
             ...testAxisConfiguration,
@@ -858,7 +849,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.results,
           testTable.subjectMeta,
         )}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMajorAxisDefinition}
         id="test-form"
         lines={[
           { position: 'authorised-absence-sessions', label: 'Test label 1' },
@@ -895,9 +886,8 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     render(
       <ChartReferenceLinesConfiguration
-        axisType="minor"
         dataSetCategories={[]}
-        definition={lineChartBlockDefinition}
+        axisDefinition={testMinorAxisDefinition}
         id="test-form"
         lines={[
           { position: 1000, label: 'Test label 1' },
@@ -926,6 +916,76 @@ describe('ChartReferenceLinesConfiguration', () => {
       >({
         label: 'Test label 2',
         position: 2000,
+      });
+    });
+  });
+
+  test('setting the other axis position on a major axis reference line', async () => {
+    const handleAddLine = jest.fn();
+
+    render(
+      <ChartReferenceLinesConfiguration
+        dataSetCategories={testTimePeriodDataSetCategories}
+        axisDefinition={testMajorAxisDefinition}
+        id="test-form"
+        lines={[]}
+        onAddLine={handleAddLine}
+        onRemoveLine={noop}
+      />,
+    );
+
+    userEvent.selectOptions(screen.getByLabelText('Position'), '2015_AY');
+    userEvent.type(screen.getByLabelText('Label'), 'Test label');
+    userEvent.type(screen.getByLabelText('Y axis position'), '20000');
+
+    expect(handleAddLine).not.toHaveBeenCalled();
+
+    userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+
+    await waitFor(() => {
+      expect(handleAddLine).toHaveBeenCalledTimes(1);
+      expect(handleAddLine).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onAddLine']>
+      >({
+        label: 'Test label',
+        otherAxisPosition: 20000,
+        position: '2015_AY',
+        style: 'dashed',
+      });
+    });
+  });
+
+  test('setting the other axis position on a minor axis reference line', async () => {
+    const handleAddLine = jest.fn();
+
+    render(
+      <ChartReferenceLinesConfiguration
+        dataSetCategories={[]}
+        axisDefinition={testMinorAxisDefinition}
+        id="test-form"
+        lines={[]}
+        onAddLine={handleAddLine}
+        onRemoveLine={noop}
+      />,
+    );
+
+    userEvent.type(screen.getByLabelText('Position'), '40000');
+    userEvent.type(screen.getByLabelText('Label'), 'Test label');
+    userEvent.type(screen.getByLabelText('X axis position'), '75');
+
+    expect(handleAddLine).not.toHaveBeenCalled();
+
+    userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+
+    await waitFor(() => {
+      expect(handleAddLine).toHaveBeenCalledTimes(1);
+      expect(handleAddLine).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onAddLine']>
+      >({
+        label: 'Test label',
+        otherAxisPosition: 75,
+        position: 40000,
+        style: 'dashed',
       });
     });
   });

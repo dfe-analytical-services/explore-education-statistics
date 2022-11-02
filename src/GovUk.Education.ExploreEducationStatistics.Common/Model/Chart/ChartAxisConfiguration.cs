@@ -71,6 +71,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         
         [JsonConverter(typeof(StringEnumConverter))]
         public AxisReferenceLineStyle? Style;
+
+        public int? OtherAxisPosition;
     }
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]

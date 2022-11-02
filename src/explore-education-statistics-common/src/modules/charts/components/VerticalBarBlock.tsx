@@ -186,8 +186,12 @@ const VerticalBarBlock = ({
 
           {axes.major.referenceLines?.map(referenceLine =>
             createReferenceLine({
+              axis: 'x',
+              axisType: 'major',
               chartData,
               label: referenceLine.label,
+              otherAxisDomain: minorDomainTicks.domain,
+              otherAxisPosition: referenceLine.otherAxisPosition,
               position: referenceLine.position,
               style: referenceLine.style,
               x: referenceLine.position,
@@ -196,8 +200,12 @@ const VerticalBarBlock = ({
 
           {axes.minor.referenceLines?.map(referenceLine =>
             createReferenceLine({
+              axis: 'y',
+              axisType: 'minor',
               chartData,
               label: referenceLine.label,
+              otherAxisDomain: majorDomainTicks.domain,
+              otherAxisPosition: referenceLine.otherAxisPosition,
               position: referenceLine.position,
               style: referenceLine.style,
               y: referenceLine.position,
@@ -237,6 +245,7 @@ export const verticalBarBlockDefinition: ChartDefinition = {
   },
   axes: {
     major: {
+      axis: 'x',
       id: 'major',
       title: 'X Axis (major axis)',
       type: 'major',
@@ -259,6 +268,7 @@ export const verticalBarBlockDefinition: ChartDefinition = {
       },
     },
     minor: {
+      axis: 'y',
       id: 'minor',
       title: 'Y Axis (minor axis)',
       type: 'minor',

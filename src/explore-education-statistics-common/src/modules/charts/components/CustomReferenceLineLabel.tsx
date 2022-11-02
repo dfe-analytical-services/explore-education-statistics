@@ -1,22 +1,38 @@
+import { Axis, AxisType } from '@common/modules/charts/types/chart';
 import { ChartData } from '@common/modules/charts/types/dataSet';
+import getReferenceLineLabelPosition from '@common/modules/charts/components/utils/getReferenceLineLabelPosition';
 import React, { memo } from 'react';
-import { ViewBox } from 'recharts';
+import { AxisDomain, ViewBox } from 'recharts';
 
-interface Props extends ViewBox {
+interface Props {
+  axis: Axis;
+  axisType: AxisType;
   chartData: ChartData[];
   label: string;
+  otherAxisDomain?: [AxisDomain, AxisDomain];
+  otherAxisPosition?: number;
   position: string | number;
+  viewBox?: ViewBox;
 }
 
 const CustomReferenceLineLabel = ({
+  axis,
+  axisType,
   chartData,
   label,
+  otherAxisDomain,
+  otherAxisPosition,
   position,
-  height = 0,
-  width = 0,
-  x = 0,
-  y = 0,
+  viewBox,
 }: Props) => {
+  const labelPosition = getReferenceLineLabelPosition({
+    axis,
+    axisType,
+    otherAxisDomain,
+    otherAxisPosition,
+    viewBox,
+  });
+
   const getTextAnchor = () => {
     if (position === chartData[0].name) {
       return 'start';
@@ -32,8 +48,9 @@ const CustomReferenceLineLabel = ({
   return (
     <text
       className="govuk-!-font-size-16"
-      x={width / 2 + x}
-      y={height / 2 + y}
+      dy={0}
+      x={labelPosition.xPosition}
+      y={labelPosition.yPosition}
       textAnchor={getTextAnchor()}
     >
       <tspan>{label}</tspan>
