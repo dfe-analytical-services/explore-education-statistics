@@ -10,6 +10,7 @@ import {
 } from '@common/components/form';
 import FormFieldColourInput from '@common/components/form/FormFieldColourInput';
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
+import WarningMessage from '@common/components/WarningMessage';
 import {
   AxisConfiguration,
   ChartDefinition,
@@ -83,6 +84,7 @@ interface Props {
   definition: ChartDefinition;
   legend: LegendConfiguration;
   meta: FullTableMeta;
+  showDataLabels?: boolean;
   onChange: (legend: LegendConfiguration) => void;
   onSubmit: (legend: LegendConfiguration) => void;
 }
@@ -94,6 +96,7 @@ const ChartLegendConfiguration = ({
   definition,
   legend,
   meta,
+  showDataLabels,
   onChange,
   onSubmit,
 }: Props) => {
@@ -238,10 +241,18 @@ const ChartLegendConfiguration = ({
 
     if (capabilities.hasLegendPosition) {
       baseSchema = baseSchema.shape({
-        position: Yup.string().oneOf<LegendPosition>(
-          ['none', 'bottom', 'top', 'inline'],
-          'Select a valid legend position',
-        ),
+        position: Yup.string()
+          .oneOf<LegendPosition>(
+            ['none', 'bottom', 'top', 'inline'],
+            'Select a valid legend position',
+          )
+          .test({
+            name: 'noInlineWithDataLabels',
+            message: 'Inline legends cannot be used with data labels',
+            test(value) {
+              return !(showDataLabels && value === 'inline');
+            },
+          }),
       });
     }
 
@@ -251,6 +262,7 @@ const ChartLegendConfiguration = ({
     capabilities.hasLegendPosition,
     capabilities.hasLineStyle,
     capabilities.hasSymbols,
+    showDataLabels,
   ]);
 
   const handleChange = useCallback(
@@ -299,16 +311,25 @@ const ChartLegendConfiguration = ({
           />
 
           {validationSchema.fields.position && (
-            <FormFieldSelect<FormValues>
-              name="position"
-              label="Legend position"
-              options={
-                capabilities.canPositionLegendInline
-                  ? positionOptions
-                  : positionOptions.filter(option => option.value !== 'inline')
-              }
-              order={FormSelect.unordered}
-            />
+            <>
+              <FormFieldSelect<FormValues>
+                name="position"
+                hint={
+                  capabilities.canPositionLegendInline && showDataLabels
+                    ? 'The legend cannot be positioned inline when data labels are used.'
+                    : undefined
+                }
+                label="Legend position"
+                options={
+                  capabilities.canPositionLegendInline
+                    ? positionOptions
+                    : positionOptions.filter(
+                        option => option.value !== 'inline',
+                      )
+                }
+                order={FormSelect.unordered}
+              />
+            </>
           )}
 
           <div className="govuk-!-margin-bottom-6">

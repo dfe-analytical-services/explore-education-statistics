@@ -32,6 +32,8 @@ export type AxisGroupBy = 'timePeriod' | 'locations' | 'filters' | 'indicators';
 export type AxisType = 'major' | 'minor';
 export type TickConfig = 'default' | 'startEnd' | 'custom';
 export type ReferenceLineStyle = 'dashed' | 'solid' | 'none';
+export type LineChartDataLabelPosition = 'above' | 'below';
+export type BarChartDataLabelPosition = 'inside' | 'outside';
 
 export interface ReferenceLine {
   label: string;
@@ -86,10 +88,12 @@ export interface ChartProps {
   axes: AxesConfiguration;
   legend?: LegendConfiguration;
   includeNonNumericData?: boolean;
+  showDataLabels?: boolean;
 }
 
 export interface StackedBarProps extends ChartProps {
   barThickness?: number;
+  dataLabelPosition?: BarChartDataLabelPosition;
   stacked?: boolean;
 }
 
@@ -116,6 +120,8 @@ export interface ChartDefinitionOptions {
   titleType: 'default' | 'alternative';
   alt: string;
   includeNonNumericData?: boolean;
+  showDataLabels?: boolean;
+  dataLabelPosition?: BarChartDataLabelPosition | LineChartDataLabelPosition;
   // Map options
   boundaryLevel?: number;
   dataClassification?: DataClassification;

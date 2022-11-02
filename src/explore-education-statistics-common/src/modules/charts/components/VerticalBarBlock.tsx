@@ -54,6 +54,8 @@ const VerticalBarBlock = ({
   stacked,
   legend,
   includeNonNumericData,
+  showDataLabels,
+  dataLabelPosition,
 }: VerticalBarProps) => {
   const [legendProps, renderLegend] = useLegend();
   if (
@@ -164,6 +166,21 @@ const VerticalBarBlock = ({
               unit={dataSet.indicator.unit}
               stackId={stacked ? 'a' : undefined}
               maxBarSize={barThickness}
+              label={
+                showDataLabels
+                  ? {
+                      fontSize: 14,
+                      position:
+                        dataLabelPosition === 'inside' ? 'insideTop' : 'top',
+                      formatter: value =>
+                        formatPretty(
+                          value.toString(),
+                          dataSet.indicator.unit,
+                          dataSet.indicator.decimalPlaces,
+                        ),
+                    }
+                  : undefined
+              }
             />
           ))}
 
