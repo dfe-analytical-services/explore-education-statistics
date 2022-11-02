@@ -376,6 +376,13 @@
       "type": "securestring",
       "defaultValue": "change-me"
     },
+    "notifyReleaseApproversTemplateId": {
+      "type": "securestring",
+      "defaultValue": "change-me",
+      "metadata": {
+        "description": "Gov UK Notify service template ID for release approver notifications"
+      }
+    },
     "teamEmailAddresses": {
       "type": "array",
       "defaultValue": [

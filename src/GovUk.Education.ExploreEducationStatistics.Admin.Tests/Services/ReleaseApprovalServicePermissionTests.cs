@@ -129,7 +129,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Mock.Of<IReleaseFileRepository>(),
                 Mock.Of<IReleaseFileService>(),
                 Mock.Of<IReleaseRepository>(),
-                Options.Create(new ReleaseApprovalOptions())
+                Options.Create(new ReleaseApprovalOptions()), 
+                Mock.Of<IUserReleaseRoleService>(),
+                Mock.Of<IEmailTemplateService>()
             );
         }
 
