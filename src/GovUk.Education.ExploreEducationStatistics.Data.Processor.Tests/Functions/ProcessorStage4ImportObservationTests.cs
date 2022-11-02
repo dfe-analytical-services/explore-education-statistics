@@ -1,10 +1,12 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -12,17 +14,18 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
-using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.Data.GeographicLevel;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functions;
 
@@ -34,7 +37,8 @@ public class ProcessorStage4ImportObservationTests
     [Fact]
     public async Task ProcessStage4_ImportObservation()
     {
-        var dataFileUnderTest = "stage4.csv";
+        var dataFileUnderTest = "small-csv.csv";
+        var metaFileUnderTest = dataFileUnderTest.Replace(".csv", ".meta.csv");
 
         var subject = new Subject
         {
@@ -56,7 +60,7 @@ public class ProcessorStage4ImportObservationTests
             MetaFile = new File
             {
                 Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest.Replace(".csv", ".meta.csv"),
+                Filename = metaFileUnderTest,
                 Type = FileType.Metadata
             },
             Status = DataImportStatus.STAGE_4,
@@ -71,38 +75,111 @@ public class ProcessorStage4ImportObservationTests
             await contentDbContext.SaveChangesAsync();
         }
 
+        var filter = new Filter("", "Filter one", "filter_one", subject);
+        var filterGroup = new FilterGroup(filter, "Default");
+        filterGroup.FilterItems.Add(new FilterItem("Total", filterGroup));
+        filter.FilterGroups.Add(filterGroup);
+
+        var indicatorGroup = new IndicatorGroup("Default", subject);
+        indicatorGroup.Indicators.Add(new Indicator
+        {
+            Label = "Indicator one",
+            Name = "ind_one"
+        });
+        
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
             await statisticsDbContext.Subject.AddAsync(subject);
+            await statisticsDbContext.Filter.AddAsync(filter);
+            await statisticsDbContext.IndicatorGroup.AddAsync(indicatorGroup);
+            await statisticsDbContext.Location.AddRangeAsync(ListOf(
+                new Location
+                {
+                    GeographicLevel = GeographicLevel.LocalAuthority,
+                    Country = new Country("E92000001", "England"),
+                    LocalAuthority = new LocalAuthority("E08000025", "330", "Birmingham")
+                },
+                new Location
+                {
+                    GeographicLevel = GeographicLevel.LocalAuthority,
+                    Country = new Country("E92000001", "England"),
+                    LocalAuthority = new LocalAuthority("E08000016", "370", "Barnsley")
+                },
+                new Location
+                {
+                    GeographicLevel = GeographicLevel.LocalAuthority,
+                    Country = new Country("E92000001", "England"),
+                    LocalAuthority = new LocalAuthority("E09000011", "203", "Greenwich")
+                },
+                new Location
+                {
+                    GeographicLevel = GeographicLevel.LocalAuthority,
+                    Country = new Country("E92000001", "England"),
+                    LocalAuthority = new LocalAuthority("E09000007", "202", "Camden")
+                }));
             await statisticsDbContext.SaveChangesAsync();
         }
 
         // There should be no interactions with BlobStorage if no batching is required.
         var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
+        var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+            "Resources" + Path.DirectorySeparatorChar + dataFileUnderTest);
+
+        var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+            "Resources" + Path.DirectorySeparatorChar + metaFileUnderTest);
+
+        blobStorageService
+            .Setup(s => s.StreamBlob(PrivateReleaseFiles, import.File.Path(), null))
+            .ReturnsAsync(() => System.IO.File.OpenRead(dataFilePath));
+
+        blobStorageService
+            .Setup(s => s.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path(), null))
+            .ReturnsAsync(() => System.IO.File.OpenRead(metaFilePath));
+
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
+
+        var databaseHelper = new InMemoryDatabaseHelper();
         
         var dataImportService = new DataImportService(
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>(),
-            new InMemoryDatabaseHelper());
+            databaseHelper);
+
+        var memoryCache = new ImporterMemoryCache();
+
+        var guidGenerator = new SequentialGuidGenerator();
+
+        var importerMetaService = new ImporterMetaService(
+            guidGenerator, 
+            databaseHelper);
+        
+        var importerService = new ImporterService(
+            guidGenerator,
+            new ImporterFilterService(memoryCache),
+            new ImporterLocationService(memoryCache, guidGenerator),
+            importerMetaService,
+            Mock.Of<IDataImportService>(Strict),
+            Mock.Of<ILogger<ImporterService>>(),
+            databaseHelper,
+            memoryCache);
 
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             Mock.Of<IBatchService>(Strict),
             blobStorageService.Object,
             dataImportService,
-            Mock.Of<IImporterService>(Strict),
-            new InMemoryDatabaseHelper());
+            importerService,
+            databaseHelper);
         
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
             blobStorageService.Object,
             fileImportService,
             Mock.Of<ISplitFileService>(Strict),
-            Mock.Of<IImporterService>(Strict),
+            importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             Mock.Of<IDataArchiveService>(Strict),
@@ -132,242 +209,6 @@ public class ProcessorStage4ImportObservationTests
             // Verify that the import status has stayed at Stage 4 for the actual import of Observations that will
             // come next.
             Assert.Equal(DataImportStatus.STAGE_4, dataImport.Status);
-        }
-    }
-    
-    [Fact]
-    public async Task ProcessStage4_BatchingWasRequiredAtStage3()
-    {
-        var dataFileUnderTest = "stage4.csv";
-
-        var subject = new Subject
-        {
-            Id = Guid.NewGuid()
-        };
-
-        // The total rows to attempt to import is larger than the RowsPerBatch, and therefore the file required
-        // batching at Stage 3.
-        var import = new DataImport
-        {
-            Id = Guid.NewGuid(),
-            SubjectId = subject.Id,
-            File = new File
-            {
-                Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest,
-                Type = FileType.Data
-            },
-            MetaFile = new File
-            {
-                Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest.Replace(".csv", ".meta.csv"),
-                Type = FileType.Metadata
-            },
-            Status = DataImportStatus.STAGE_4,
-            RowsPerBatch = 10,
-            TotalRows = 11,
-            NumBatches = 2
-        };
-
-        await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
-        {
-            await contentDbContext.DataImports.AddAsync(import);
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
-        {
-            await statisticsDbContext.Subject.AddAsync(subject);
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        // Expect a call to Blob Storage to list the available batch files which have not yet been imported.
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
-
-        var availableBatchFiles = ListOf(
-            new BlobInfo($"{import.File.BatchesPath()}{import.File.Id}_000001", "text/csv", 0),
-            new BlobInfo($"{import.File.BatchesPath()}{import.File.Id}_000002", "text/csv", 0)
-        );
-        
-        blobStorageService
-            .Setup(s => s.ListBlobs(PrivateReleaseFiles, import.File.BatchesPath()))
-            .ReturnsAsync(() => availableBatchFiles);
-
-        var dbContextSupplier = new InMemoryDbContextSupplier(
-            contentDbContextId: _contentDbContextId,
-            statisticsDbContextId: _statisticsDbContextId);
-        
-        var dataImportService = new DataImportService(
-            dbContextSupplier,
-            Mock.Of<ILogger<DataImportService>>(),
-            new InMemoryDatabaseHelper());
-
-        var splitFileService = new SplitFileService(
-            new BatchService(blobStorageService.Object),
-            blobStorageService.Object,
-            Mock.Of<ILogger<SplitFileService>>(),
-            dataImportService);
-
-        var processorService = new ProcessorService(
-            Mock.Of<ILogger<ProcessorService>>(Strict),
-            blobStorageService.Object,
-            Mock.Of<IFileImportService>(Strict),
-            splitFileService,
-            Mock.Of<IImporterService>(Strict),
-            dataImportService,
-            Mock.Of<IValidatorService>(Strict),
-            Mock.Of<IDataArchiveService>(Strict),
-            dbContextSupplier);
-        
-        // Expect one import message per batch file that was found to be available.
-        var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>(Strict);
-
-        var batchFile1ProcessingMessage = new ImportObservationsMessage
-        {
-            Id = import.Id,
-            BatchNo = 1,
-            ObservationsFilePath = availableBatchFiles[0].Path
-        };
-        
-        var batchFile2ProcessingMessage = new ImportObservationsMessage
-        {
-            Id = import.Id,
-            BatchNo = 2,
-            ObservationsFilePath = availableBatchFiles[1].Path
-        };
-        
-        datafileProcessingMessageQueue
-            .Setup(s => s.Add(ItIs.DeepEqualTo(batchFile1ProcessingMessage)));
-        
-        datafileProcessingMessageQueue
-            .Setup(s => s.Add(ItIs.DeepEqualTo(batchFile2ProcessingMessage)));
-
-        var function = BuildFunction(
-            processorService: processorService, 
-            dataImportService: dataImportService);
-
-        await function.ProcessUploads(
-            new ImportMessage(import.Id), 
-            null,
-            Mock.Of<ICollector<ImportMessage>>(Strict),
-            datafileProcessingMessageQueue.Object);
-        
-        VerifyAllMocks(blobStorageService, datafileProcessingMessageQueue);
-        
-        await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
-        {
-            var dataImport = await contentDbContext
-                .DataImports
-                .SingleAsync();
-            
-            // Verify that the import status has stayed at Stage 4 for the actual import of Observations that will
-            // come next.
-            Assert.Equal(DataImportStatus.STAGE_4, dataImport.Status);
-        }
-    }
-    
-    [Fact]
-    public async Task ProcessStage4_BatchingWasRequiredAtStage3_ButAllBatchFilesImported()
-    {
-        var dataFileUnderTest = "stage4.csv";
-
-        var subject = new Subject
-        {
-            Id = Guid.NewGuid()
-        };
-
-        // The total rows to attempt to import is larger than the RowsPerBatch, and therefore the file required
-        // batching at Stage 3.
-        var import = new DataImport
-        {
-            Id = Guid.NewGuid(),
-            SubjectId = subject.Id,
-            File = new File
-            {
-                Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest,
-                Type = FileType.Data
-            },
-            MetaFile = new File
-            {
-                Id = Guid.NewGuid(),
-                Filename = dataFileUnderTest.Replace(".csv", ".meta.csv"),
-                Type = FileType.Metadata
-            },
-            Status = DataImportStatus.STAGE_4,
-            RowsPerBatch = 10,
-            TotalRows = 11,
-            NumBatches = 2
-        };
-
-        await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
-        {
-            await contentDbContext.DataImports.AddAsync(import);
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
-        {
-            await statisticsDbContext.Subject.AddAsync(subject);
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        // Expect a call to Blob Storage to list the available batch files which have not yet been imported.  However,
-        // no batch files remain to be processed.  This would likely happen only if the importer process was killed 
-        // right at the end of its Stage 4 import run. 
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
-
-        blobStorageService
-            .Setup(s => s.ListBlobs(PrivateReleaseFiles, import.File.BatchesPath()))
-            .ReturnsAsync(() => new List<BlobInfo>());
-
-        var dbContextSupplier = new InMemoryDbContextSupplier(
-            contentDbContextId: _contentDbContextId,
-            statisticsDbContextId: _statisticsDbContextId);
-        
-        var dataImportService = new DataImportService(
-            dbContextSupplier,
-            Mock.Of<ILogger<DataImportService>>(),
-            new InMemoryDatabaseHelper());
-
-        var splitFileService = new SplitFileService(
-            new BatchService(blobStorageService.Object),
-            blobStorageService.Object,
-            Mock.Of<ILogger<SplitFileService>>(),
-            dataImportService);
-
-        var processorService = new ProcessorService(
-            Mock.Of<ILogger<ProcessorService>>(Strict),
-            blobStorageService.Object,
-            Mock.Of<IFileImportService>(Strict),
-            splitFileService,
-            Mock.Of<IImporterService>(Strict),
-            dataImportService,
-            Mock.Of<IValidatorService>(Strict),
-            Mock.Of<IDataArchiveService>(Strict),
-            dbContextSupplier);
-        
-        var function = BuildFunction(
-            processorService: processorService, 
-            dataImportService: dataImportService);
-
-        await function.ProcessUploads(
-            new ImportMessage(import.Id), 
-            null,
-            Mock.Of<ICollector<ImportMessage>>(Strict),
-            Mock.Of<ICollector<ImportObservationsMessage>>(Strict));
-        
-        VerifyAllMocks(blobStorageService);
-        
-        await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
-        {
-            var dataImport = await contentDbContext
-                .DataImports
-                .SingleAsync();
-            
-            // Verify that the import status has been marked as COMPLETED, as there are no batch files remaining
-            // to import.
-            Assert.Equal(DataImportStatus.COMPLETE, dataImport.Status);
         }
     }
     
