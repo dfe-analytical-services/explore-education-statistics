@@ -36,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly ILogger<ImporterService> _logger;
         private readonly IDatabaseHelper _databaseHelper;
         private readonly ImporterMemoryCache _importerMemoryCache;
+        private readonly IObservationBatchImporter _observationBatchImporter;
 
         private const int Stage2RowCheck = 1000;
 
@@ -115,7 +116,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             IImporterMetaService importerMetaService,
             IDataImportService dataImportService, 
             ILogger<ImporterService> logger, 
-            IDatabaseHelper databaseHelper, ImporterMemoryCache importerMemoryCache)
+            IDatabaseHelper databaseHelper, 
+            ImporterMemoryCache importerMemoryCache, 
+            IObservationBatchImporter? observationBatchImporter = null)
         {
             _guidGenerator = guidGenerator;
             _importerFilterService = importerFilterService;
@@ -125,6 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _logger = logger;
             _databaseHelper = databaseHelper;
             _importerMemoryCache = importerMemoryCache;
+            _observationBatchImporter = observationBatchImporter ?? new StoredProcedureObservationBatchImporter();
         }
 
         public Task<SubjectMeta> ImportMeta(
@@ -300,7 +304,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 subjectMeta,
                 batchNo)).ToList();
 
-            await InsertObservations(context, observations);
+            await _observationBatchImporter.ImportObservationBatch(context, observations);
         }
 
         public TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> rowValues, List<string> colValues)
@@ -598,8 +602,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 Ward = ward
             };
         }
+    }
 
-        private static async Task InsertObservations(DbContext context, IEnumerable<Observation> observations)
+    public class StoredProcedureObservationBatchImporter : IObservationBatchImporter
+    {
+        public async Task ImportObservationBatch(StatisticsDbContext context, IEnumerable<Observation> observations)
         {
             var observationsTable = new DataTable();
             observationsTable.Columns.Add("Id", typeof(Guid));
@@ -652,5 +659,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await context.Database.ExecuteSqlRawAsync(
                 "EXEC [dbo].[InsertObservationFilterItems] @ObservationFilterItems", parameter);
         }
+    }
+
+    public interface IObservationBatchImporter
+    {
+        Task ImportObservationBatch(StatisticsDbContext context, IEnumerable<Observation> observations);
     }
 }
