@@ -255,10 +255,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 })
                 .ToList();
                     
-            var newLocations = locations.Where(
-                location => _importerLocationService.Find(context, location) == null)
-                .ToList();
-            
             await _databaseHelper.DoInTransaction(context, async () =>
             {
                 await context.FilterGroup.AddRangeAsync(filterGroups);
@@ -281,6 +277,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 
                 _importerMemoryCache.Set(cacheKey, filterItem);
             });
+            
+            var newLocations = locations.Where(
+                    location => _importerLocationService.Find(context, location) == null)
+                .ToList();
             
             await _importerLocationService.CreateAndCache(context, newLocations);
         }
