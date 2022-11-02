@@ -26,14 +26,17 @@
     },
     "skuPublic": {
       "type": "string",
-      "defaultValue": "B1 Basic",
+      "defaultValue": "S1 Standard",
       "allowedValues": [
         "B1 Basic",
         "B2 Basic",
         "B3 Basic",
         "S1 Standard",
         "S2 Standard",
-        "S3 Standard"
+        "S3 Standard",
+        "P1V2 PremiumV2",
+        "P2V2 PremiumV2",
+        "P3V2 PremiumV2"
       ]
     },
     "skuData": {
@@ -45,7 +48,10 @@
         "B3 Basic",
         "S1 Standard",
         "S2 Standard",
-        "S3 Standard"
+        "S3 Standard",
+        "P1V2 PremiumV2",
+        "P2V2 PremiumV2",
+        "P3V2 PremiumV2"
       ]
     },
     "skuContent": {
@@ -57,7 +63,10 @@
         "B3 Basic",
         "S1 Standard",
         "S2 Standard",
-        "S3 Standard"
+        "S3 Standard",
+        "P1V2 PremiumV2",
+        "P2V2 PremiumV2",
+        "P3V2 PremiumV2"
       ]
     },
     "skuAdmin": {
@@ -69,16 +78,55 @@
         "B3 Basic",
         "S1 Standard",
         "S2 Standard",
-        "S3 Standard"
+        "S3 Standard",
+        "P1V2 PremiumV2",
+        "P2V2 PremiumV2",
+        "P3V2 PremiumV2"
       ]
     },
     "skuImporter": {
       "type": "string",
       "defaultValue": "S1 Standard",
       "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
         "S1 Standard",
         "S2 Standard",
-        "S3 Standard"
+        "S3 Standard",
+        "P1V2 PremiumV2",
+        "P2V2 PremiumV2",
+        "P3V2 PremiumV2"
+      ]
+    },
+    "skuNotifier": {
+      "type": "string",
+      "defaultValue": "S1 Standard",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard",
+        "P1V2 PremiumV2",
+        "P2V2 PremiumV2",
+        "P3V2 PremiumV2"
+      ]
+    },
+    "skuPublisher": {
+      "type": "string",
+      "defaultValue": "S1 Standard",
+      "allowedValues": [
+        "B1 Basic",
+        "B2 Basic",
+        "B3 Basic",
+        "S1 Standard",
+        "S2 Standard",
+        "S3 Standard",
+        "P1V2 PremiumV2",
+        "P2V2 PremiumV2",
+        "P3V2 PremiumV2"
       ]
     },
     "skuAdminSignalR": {
@@ -1373,7 +1421,7 @@
         "Name": "[first(split(parameters('skuData'), ' '))]"
       },
       "name": "[variables('dataPlanName')]",
-      "apiVersion": "2015-08-01",
+      "apiVersion": "2022-03-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1595,7 +1643,7 @@
         "Name": "[first(split(parameters('skuContent'), ' '))]"
       },
       "name": "[variables('contentPlanName')]",
-      "apiVersion": "2015-08-01",
+      "apiVersion": "2022-03-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -1848,7 +1896,7 @@
         "Name": "[first(split(parameters('skuAdmin'), ' '))]"
       },
       "name": "[variables('adminPlanName')]",
-      "apiVersion": "2015-08-01",
+      "apiVersion": "2022-03-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -2038,7 +2086,7 @@
         "Name": "[first(split(parameters('skuPublic'), ' '))]"
       },
       "name": "[variables('publicPlanName')]",
-      "apiVersion": "2015-08-01",
+      "apiVersion": "2022-03-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -2794,7 +2842,7 @@
     },
     {
       "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2015-04-01",
+      "apiVersion": "2022-03-01",
       "name": "[variables('notificationsPlanName')]",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -2811,8 +2859,8 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "sku": {
-        "Tier": "Standard",
-        "Name": "S1"
+        "Tier": "[first(skip(split(parameters('skuNotifier'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuNotifier'), ' '))]"
       },
       "properties": {
         "name": "[variables('notificationsPlanName')]",
@@ -2946,7 +2994,7 @@
         "Name": "[first(split(parameters('skuImporter'), ' '))]"
       },
       "name": "[variables('importerPlanName')]",
-      "apiVersion": "2018-11-01",
+      "apiVersion": "2022-03-01",
       "location": "[resourceGroup().location]",
       "tags": {
         "Department": "[parameters('departmentName')]",
@@ -3095,7 +3143,7 @@
     },
     {
       "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2018-11-01",
+      "apiVersion": "2022-03-01",
       "name": "[variables('publisherPlanName')]",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -3112,8 +3160,8 @@
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
       "sku": {
-        "Tier": "Standard",
-        "Name": "S1"
+        "Tier": "[first(skip(split(parameters('skuPublisher'), ' '), 1))]",
+        "Name": "[first(split(parameters('skuPublisher'), ' '))]"
       },
       "properties": {
         "name": "[variables('publisherPlanName')]",

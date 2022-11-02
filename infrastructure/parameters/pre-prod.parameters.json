@@ -3,22 +3,28 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "skuPublic": {
-      "value": "S1 Standard"
+      "value": "P1V2 PremiumV2"
     },
     "skuData": {
-      "value": "S2 Standard"
+      "value": "P1V2 PremiumV2"
     },
     "skuContent": {
-      "value": "S1 Standard"
+      "value": "P1V2 PremiumV2"
     },
     "skuAdmin": {
-      "value": "S2 Standard"
+      "value": "P1V2 PremiumV2"
     },
     "skuAdminSignalR": {
       "value": "Standard_S1"
     },
     "skuImporter": {
-      "value": "S2 Standard"
+      "value": "P1V2 PremiumV2"
+    },
+    "skuNotifier": {
+      "value": "S1 Standard"
+    },
+    "skuPublisher": {
+      "value": "S1 Standard"
     },
     "useSubnets": {
       "value": true
@@ -27,7 +33,7 @@
       "value": true
     },
     "autoscalePublicApplication": {
-      "value": true
+      "value": false
     },
     "devopsSPN": {
       "value": "702e692e-8bdf-4283-9799-9630cb781e33"

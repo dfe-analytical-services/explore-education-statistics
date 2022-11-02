@@ -165,7 +165,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                                 Published = latestVersion.Published,
                                 Status = latestVersion.Status,
                                 Title = latestVersion.Title,
-                                InternalReleaseNote = latestVersion.InternalReleaseNote,
                                 MethodologyId = latestVersion.MethodologyId,
                                 PreviousVersionId = latestVersion.PreviousVersionId,
                                 Permissions = permissions,

@@ -23,7 +23,7 @@ interface Props {
 const TopicPublications = ({ topic, themeTitle }: Props) => {
   const { value, isLoading } = useAsyncHandledRetry(async () => {
     const [publications, canCreatePublication] = await Promise.all([
-      publicationService.getMyPublicationsByTopic(topic.id),
+      publicationService.listPublications(topic.id),
       permissionService.canCreatePublicationForTopic(topic.id),
     ]);
     return { publications, canCreatePublication };
@@ -33,10 +33,8 @@ const TopicPublications = ({ topic, themeTitle }: Props) => {
 
   return (
     <div className={styles.publication} data-testid="topic-publications">
-      <div>
-        <h3>
-          {themeTitle} / {topic.title}
-        </h3>
+      <div data-testid={`topic-publications-${themeTitle}-${topic.title}`}>
+        <h3>{`${themeTitle} / ${topic.title}`}</h3>
         <LoadingSpinner
           hideText
           inline

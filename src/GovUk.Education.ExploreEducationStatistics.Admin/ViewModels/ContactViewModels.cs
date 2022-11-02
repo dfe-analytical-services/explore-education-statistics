@@ -12,13 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public string ContactName { get; set; } = string.Empty;
 
         public string ContactTelNo { get; set; } = string.Empty;
-
-        public ContactPermissions? Permissions { get; set; } // @MarkFix remove
-
-        public record ContactPermissions // @MarkFix remove
-        {
-            public bool CanUpdateContact { get; set; }
-        }
     }
 
     public class ContactSaveViewModel

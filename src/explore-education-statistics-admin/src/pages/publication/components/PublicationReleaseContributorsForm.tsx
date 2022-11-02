@@ -24,7 +24,6 @@ interface Props {
   publicationId: string;
   releaseContributors: ContributorViewModel[];
   releaseId: string;
-  returnRoute?: string; // TODO EES-3217 remove when pages go live
 }
 
 const PublicationReleaseContributorsForm = ({
@@ -32,7 +31,6 @@ const PublicationReleaseContributorsForm = ({
   publicationId,
   releaseContributors,
   releaseId,
-  returnRoute,
 }: Props) => {
   const history = useHistory();
 
@@ -43,14 +41,13 @@ const PublicationReleaseContributorsForm = ({
         values.userIds,
       );
       history.push(
-        returnRoute ??
-          generatePath<PublicationTeamRouteParams>(
-            publicationTeamAccessRoute.path,
-            {
-              publicationId,
-              releaseId,
-            },
-          ),
+        generatePath<PublicationTeamRouteParams>(
+          publicationTeamAccessRoute.path,
+          {
+            publicationId,
+            releaseId,
+          },
+        ),
       );
     },
     [],
@@ -65,14 +62,13 @@ const PublicationReleaseContributorsForm = ({
         <ButtonText
           onClick={() => {
             history.push(
-              returnRoute ??
-                generatePath<PublicationTeamRouteParams>(
-                  publicationTeamAccessRoute.path,
-                  {
-                    publicationId,
-                    releaseId,
-                  },
-                ),
+              generatePath<PublicationTeamRouteParams>(
+                publicationTeamAccessRoute.path,
+                {
+                  publicationId,
+                  releaseId,
+                },
+              ),
             );
           }}
         >
@@ -118,14 +114,13 @@ const PublicationReleaseContributorsForm = ({
               <ButtonText
                 onClick={() => {
                   history.push(
-                    returnRoute ??
-                      generatePath<PublicationTeamRouteParams>(
-                        publicationTeamAccessRoute.path,
-                        {
-                          publicationId,
-                          releaseId,
-                        },
-                      ),
+                    generatePath<PublicationTeamRouteParams>(
+                      publicationTeamAccessRoute.path,
+                      {
+                        publicationId,
+                        releaseId,
+                      },
+                    ),
                   );
                 }}
               >

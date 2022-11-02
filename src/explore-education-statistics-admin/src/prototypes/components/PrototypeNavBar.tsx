@@ -13,7 +13,9 @@ const PrototypeNavBar = () => {
     >
       <ul className={classNames(styles.list, 'govuk-!-margin-bottom-0')}>
         <li>
-          <NavLink to="/prototypes1">Release summary</NavLink>
+          <NavLink to="/prototypes/admin-release-summary">
+            Release summary
+          </NavLink>
         </li>
         <li>
           <NavLink to="metadata#test-4">Manage data</NavLink>

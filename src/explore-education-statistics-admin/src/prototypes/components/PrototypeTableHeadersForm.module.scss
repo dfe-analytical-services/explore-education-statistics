@@ -1,0 +1,11 @@
+@import '~govuk-frontend/govuk/base';
+
+.formContainer {
+  background: govuk-colour('light-grey');
+  margin-bottom: govuk-spacing(4);
+  padding: govuk-spacing(2);
+}
+
+.hide {
+  display: none;
+}

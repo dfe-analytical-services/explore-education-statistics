@@ -27,7 +27,7 @@ const PublicationScheduledReleases = ({ publicationId, releases }: Props) => {
   ] = useToggle(false);
 
   if (releases.length === 0) {
-    return <InsetText>There are no scheduled releases.</InsetText>;
+    return <InsetText>You have no scheduled releases.</InsetText>;
   }
 
   return (
@@ -37,9 +37,9 @@ const PublicationScheduledReleases = ({ publicationId, releases }: Props) => {
           <tr>
             <th className="govuk-!-width-one-third">Release period</th>
             <th className={styles.statusColumn}>
-              State{' '}
+              Status{' '}
               <ButtonText onClick={toggleScheduledStatusGuidance.on}>
-                <InfoIcon description="Guidance on scheduled states" />
+                <InfoIcon description="Guidance on scheduled statuses" />
               </ButtonText>
             </th>
             <th className="govuk-!-width-one-quarter">

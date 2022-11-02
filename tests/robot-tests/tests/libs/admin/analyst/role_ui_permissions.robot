@@ -4,21 +4,22 @@ Resource    ../../admin-common.robot
 
 
 *** Keywords ***
-user navigates to publication on admin dashboard
-    [Arguments]    ${publication}    ${theme}    ${topic}
-    ${publication_accordion}=    user opens publication on the admin dashboard    ${publication}    ${theme}
-    ...    ${topic}
-    set suite variable    ${publication_accordion}
+user goes to methodologies and checks cannot create methodologies for publication
+    [Arguments]    ${PUBLICATION_NAME}
+    ...    ${THEME_NAME}
+    ...    ${TOPIC_NAME}
+    user navigates to methodologies on publication page    ${PUBLICATION_NAME}
+    ...    ${THEME_NAME}
+    ...    ${TOPIC_NAME}
 
-user cannot see the create methodologies controls for publication
-    [Arguments]    ${PUBLICATION_ACCORDION}
-    user checks element does not contain button    ${PUBLICATION_ACCORDION}    Create methodology
-    user checks element does not contain link    ${PUBLICATION_ACCORDION}    Use an external methodology
+    user checks page does not contain button    Create new methodology
+    user checks page does not contain link    Add external methodology
+    user checks page does not contain link    Adopt an existing methodology
 
 user cannot see the create amendment controls for release
-    [Arguments]    ${RELEASE_DETAILS_SECTION}
-    user waits until element contains link    ${RELEASE_DETAILS_SECTION}    View release    %{WAIT_SMALL}
-    user checks element does not contain button    ${RELEASE_DETAILS_SECTION}    Amend release
+    [Arguments]    ${RELEASE_NAME}
+    ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
+    user checks element does not contain button    ${ROW}    Amend
 
 user cannot see edit controls for release content
     [Arguments]    ${publication}
@@ -45,15 +46,10 @@ user cannot see the enabled approve release controls for release
     user scrolls to element    id:releaseStatusForm-approvalStatus-Approved
     user checks element is disabled    id:releaseStatusForm-approvalStatus-Approved
 
-user can see the create methodologies controls for publication
-    [Arguments]    ${PUBLICATION_ACCORDION}
-    user checks element contains button    ${PUBLICATION_ACCORDION}    Create methodology
-    user checks element contains link    ${PUBLICATION_ACCORDION}    Use an external methodology
-
 user can see the create amendment controls for release
-    [Arguments]    ${RELEASE_DETAILS_SECTION}
-    user waits until element contains link    ${RELEASE_DETAILS_SECTION}    View release    %{WAIT_SMALL}
-    user checks element contains button    ${RELEASE_DETAILS_SECTION}    Amend release
+    [Arguments]    ${RELEASE_NAME}
+    ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
+    user checks element contains button    ${ROW}    Amend
 
 user cannot see the edit status controls for methodology
     user clicks link    Sign off
@@ -61,11 +57,11 @@ user cannot see the edit status controls for methodology
     user checks page does not contain    Edit status
 
 user cannot see the remove controls for methodology
-    [Arguments]    ${DETAILS_SECTION}
-    user checks element contains link    ${DETAILS_SECTION}    View methodology
-    user checks element does not contain button    ${DETAILS_SECTION}    Remove
+    user waits until h2 is visible    Manage methodologies
+    user checks page does not contain button    Delete draft
+    user checks page does not contain button    Remove
 
 user cannot see the cancel amendment controls for methodology
-    [Arguments]    ${DETAILS_SECTION}
-    user checks element contains link    ${DETAILS_SECTION}    View amendment
-    user checks element does not contain button    ${DETAILS_SECTION}    Cancel amendment
+    user waits until page contains element    testid:view
+    user waits until page contains element    testid:view-existing-version
+    user checks page does not contain element    testid:cancel-amendment

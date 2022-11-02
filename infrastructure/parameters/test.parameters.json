@@ -12,10 +12,16 @@
       "value": "S1 Standard"
     },
     "skuAdmin": {
-      "value": "S2 Standard"
+      "value": "S1 Standard"
     },
     "skuImporter": {
-      "value": "S2 Standard"
+      "value": "B1 Basic"
+    },
+    "skuNotifier": {
+      "value": "B1 Basic"
+    },
+    "skuPublisher": {
+      "value": "B1 Basic"
     },
     "publishReleasesCronSchedule": {
       "value": "0 0 * * * *"

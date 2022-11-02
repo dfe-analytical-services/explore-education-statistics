@@ -220,6 +220,7 @@ interface TableCell {
 interface Props {
   captionTitle?: string;
   dataBlockId?: string;
+  footnotesClassName?: string;
   fullTable: FullTable;
   query?: ReleaseTableDataQuery;
   source?: string;
@@ -232,6 +233,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
     {
       captionTitle,
       dataBlockId,
+      footnotesClassName,
       fullTable,
       query,
       source,
@@ -403,6 +405,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
             }
             captionId={captionId}
             columnHeaders={columnHeaders}
+            footnotesClassName={footnotesClassName}
             rowHeaders={rowHeaders}
             rows={rows}
             ref={dataTableRef}

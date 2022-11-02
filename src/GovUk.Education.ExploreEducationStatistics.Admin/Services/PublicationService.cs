@@ -59,7 +59,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(
-            bool includePermissions = false,
             Guid? topicId = null)
         {
             return await _userService
@@ -81,54 +80,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return await publications
                         .ToAsyncEnumerable()
-                        .SelectAwait(async publication => await GeneratePublicationViewModel(publication, includePermissions))
+                        .SelectAwait(async publication => await GeneratePublicationViewModel(publication))
                         .OrderBy(publicationViewModel => publicationViewModel.Title)
                         .ToListAsync();
                 });
-        }
-
-        public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(
-            Guid topicId)
-        {
-            return await _userService
-                .CheckCanAccessSystem()
-                .OnSuccess(_ => _userService.CheckCanViewAllReleases()
-                    .OnSuccess(async () =>
-                    {
-                        var hydratedPublication = HydratePublication(
-                            _publicationRepository.QueryPublicationsForTopic(topicId));
-                        return await hydratedPublication.ToListAsync();
-                    })
-                    .OrElse(() =>
-                    {
-                        var userId = _userService.GetUserId();
-                        return _publicationRepository.ListPublicationsForUser(userId, topicId);
-                    })
-                )
-                .OnSuccess(async publicationViewModels =>
-                {
-                    return (await HydrateMyPublicationsViewModels(publicationViewModels))
-                        .OrderBy(publicationViewModel => publicationViewModel.Title)
-                        .ToList();
-                });
-        }
-
-        public async Task<Either<ActionResult, MyPublicationViewModel>> GetMyPublication(Guid publicationId)
-        {
-            var userId = _userService.GetUserId();
-
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId)
-                .OnSuccess(_userService.CheckCanAccessSystem)
-                .OnSuccess(_ => _userService.CheckCanViewAllReleases()
-                    .OnSuccess(_ => _publicationRepository.GetPublicationWithAllReleases(publicationId))
-                    .OrElse(async () =>
-                    {
-                        var publication = _context.Find<Publication>(publicationId);
-                        return await _userService.CheckCanViewPublication(publication!)
-                            .OnSuccess(_ => _publicationRepository.GetPublicationForUser(publicationId, userId));
-                    })
-                ).OnSuccess(HydrateMyPublicationViewModel);
         }
 
         public async Task<Either<ActionResult, List<PublicationSummaryViewModel>>> ListPublicationSummaries()
@@ -189,14 +144,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             PublicationSaveRequest updatedPublication)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Publication>(publicationId, query =>
-                    query.Include(p => p.Contact))
-                .OnSuccess(_userService.CheckCanUpdatePublication)
+                .CheckEntityExists<Publication>(publicationId)
+                .OnSuccess(_userService.CheckCanUpdatePublicationSummary)
                 .OnSuccessDo(async publication =>
                 {
                     if (publication.Title != updatedPublication.Title)
                     {
-                        return await _userService.CheckCanUpdatePublicationTitle();
+                        return await _userService.CheckCanUpdatePublication();
                     }
 
                     return Unit.Instance;
@@ -205,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     if (publication.SupersededById != updatedPublication.SupersededById)
                     {
-                        return await _userService.CheckCanUpdatePublicationSupersededBy();
+                        return await _userService.CheckCanUpdatePublication();
                     }
 
                     return Unit.Instance;
@@ -215,6 +169,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     if (publication.TopicId != updatedPublication.TopicId)
                     {
                         return await ValidateSelectedTopic(updatedPublication.TopicId);
+                    }
+
+                    return Unit.Instance;
+                })
+                .OnSuccessDo(async publication =>
+                {
+                    if (publication.TopicId != updatedPublication.TopicId)
+                    {
+                        return await _userService.CheckCanUpdatePublication();
                     }
 
                     return Unit.Instance;
@@ -322,7 +285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
-                .OnSuccessDo(_userService.CheckCanUpdatePublication)
+                .OnSuccessDo(_userService.CheckCanManageExternalMethodologyForPublication)
                 .OnSuccess(async publication =>
                 {
                     _context.Update(publication);
@@ -343,7 +306,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
-                .OnSuccessDo(_userService.CheckCanUpdatePublication)
+                .OnSuccessDo(_userService.CheckCanManageExternalMethodologyForPublication)
                 .OnSuccess(async publication =>
                 {
                     _context.Update(publication);
@@ -376,7 +339,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, query =>
                     query.Include(p => p.Contact))
-                .OnSuccessDo(_userService.CheckCanUpdatePublication)
+                .OnSuccessDo(_userService.CheckCanUpdateContact)
                 .OnSuccess(async publication =>
                 {
                     // Replace existing contact that is shared with another publication with a new
@@ -453,7 +416,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     publicationId,
                     publication => publication.Include(p => p.LegacyReleases)
                 )
-                .OnSuccess(_userService.CheckCanUpdatePublication)
+                .OnSuccess(_userService.CheckCanManageLegacyReleases)
                 .OnSuccess(async publication =>
                 {
                     publication.LegacyReleases.ForEach(legacyRelease =>
@@ -502,18 +465,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public static IQueryable<Publication> HydratePublication(IQueryable<Publication> values)
         {
             return values
-                .AsSplitQuery()
-                .Include(p => p.Contact) // EES-3576 remove when MyPublicationViewModel is gone
-                .Include(p => p.Releases) // EES-3576 remove when MyPublicationViewModel is gone
-                .ThenInclude(r => r.ReleaseStatuses)
                 .Include(p => p.Topic)
-                .ThenInclude(topic => topic.Theme)
-                .Include(p => p.Methodologies) // EES-3576 remove when MyPublicationViewModel is gone
-                .ThenInclude(p => p.Methodology) // EES-3576 remove when MyPublicationViewModel is gone
-                .ThenInclude(p => p.Versions);
+                .ThenInclude(topic => topic.Theme);
         }
 
-        private async Task<PublicationViewModel> GeneratePublicationViewModel(Publication publication, bool includePermissions)
+        private async Task<PublicationViewModel> GeneratePublicationViewModel(Publication publication,
+            bool includePermissions = false)
         {
             var publicationViewModel = _mapper.Map<PublicationViewModel>(publication);
 
@@ -537,35 +494,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return publicationCreateViewModel;
         }
 
-        private async Task<List<MyPublicationViewModel>> HydrateMyPublicationsViewModels(List<Publication> publications)
-        {
-            return await publications
-                .ToAsyncEnumerable()
-                .SelectAwait(async publication => await HydrateMyPublicationViewModel(publication))
-                .ToListAsync();
-        }
-
-        private async Task<MyPublicationViewModel> HydrateMyPublicationViewModel(Publication publication)
-        {
-            var publicationViewModel = _mapper.Map<MyPublicationViewModel>(publication);
-
-            publicationViewModel.IsSuperseded = _publicationRepository.IsSuperseded(publication);
-
-            await publicationViewModel.Releases
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async releaseViewModel =>
-            {
-                var release = publication.Releases.Single(release => release.Id == releaseViewModel.Id);
-                releaseViewModel.Permissions = await PermissionsUtils.GetReleasePermissions(_userService, release);
-            });
-
-            publicationViewModel.Methodologies = (await HydrateMethodologyVersionViewModels(publication))
-                .OrderBy(viewModel => viewModel.Title)
-                .ToList();
-
-            return publicationViewModel;
-        }
-
         private async Task<ReleaseSummaryViewModel> HydrateReleaseListItemViewModel(Release release, bool includePermissions)
         {
             var viewModel = _mapper.Map<ReleaseSummaryViewModel>(release);
@@ -576,35 +504,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return viewModel;
-        }
-
-        private async Task<List<MethodologyVersionSummaryViewModel>> HydrateMethodologyVersionViewModels(
-            Publication publication)
-        {
-            return await publication.Methodologies
-                .ToAsyncEnumerable()
-                .SelectAwait(async publicationMethodology =>
-                {
-                    var latestVersion = publicationMethodology.Methodology.LatestVersion();
-                    var permissions = await PermissionsUtils.GetMethodologyVersionPermissions(_userService,
-                        latestVersion,
-                        publicationMethodology);
-
-                    return new MethodologyVersionSummaryViewModel
-                    {
-                        Id = latestVersion.Id,
-                        Amendment = latestVersion.Amendment,
-                        Owned = publicationMethodology.Owner,
-                        Published = latestVersion.Published,
-                        Status = latestVersion.Status,
-                        Title = latestVersion.Title,
-                        InternalReleaseNote = latestVersion.InternalReleaseNote,
-                        MethodologyId = latestVersion.MethodologyId,
-                        PreviousVersionId = latestVersion.PreviousVersionId,
-                        Permissions = permissions,
-                    };
-                })
-                .ToListAsync();
         }
     }
 }

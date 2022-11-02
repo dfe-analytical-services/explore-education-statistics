@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -65,14 +66,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             CancellationToken cancellationToken = default)
         {
             var publicationId = await _subjectRepository.GetPublicationIdForSubject(queryContext.SubjectId);
-            var release = _releaseRepository.GetLatestPublishedRelease(publicationId);
 
-            if (release == null)
-            {
-                return new NotFoundResult();
-            }
-
-            return await Query(release.Id, queryContext, cancellationToken);
+            return await _releaseRepository.GetLatestPublishedRelease(publicationId)
+                .OnSuccess(release => Query(release.Id, queryContext, cancellationToken));
         }
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(

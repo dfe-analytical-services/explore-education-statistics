@@ -44,7 +44,8 @@
     "format:check": "prettier --list-different \"src/**/*.{js,jsx,ts,tsx,css,scss,html}\"",
     "format:robot": "python3 -m pipenv run robotidy --config tests/robot-tests/robotidy.toml tests/robot-tests",
     "format:robot:check": "npm run format:robot -- --check --diff",
-    "format:python": "python3 -m pipenv run autopep8 tests",
+    "format:python": "python3 -m pipenv run flake8 tests && python3 -m pipenv run black tests && python3 -m pipenv run isort tests",
+    "format:python:check": "python3 -m pipenv run flake8 tests --diff && python3 -m pipenv run black tests --diff && python3 -m pipenv run isort tests --diff",
     "lint": "npm run lint:js && npm run lint:style",
     "lint:js": "eslint --ext .ts,.tsx,.js,.jsx src",
     "lint:style": "stylelint src/**/*.{scss,css}",
@@ -75,7 +76,9 @@
       "pipenv run robotidy --config tests/robot-tests/robotidy.toml"
     ],
     "*.py": [
-      "pipenv run autopep8"
+      "pipenv run flake8",
+      "pipenv run black",
+      "pipenv run isort"
     ]
   }
 }

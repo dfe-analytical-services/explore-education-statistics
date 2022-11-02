@@ -8,15 +8,6 @@
 }
 
 .listContainer {
-  @include govuk-media-query($from: desktop) {
-    :global(.dfe-width-container--wide) & {
-      max-width: 66.6%;
-      @media print {
-        max-width: 100%;
-      }
-    }
-  }
-
   :global(.govuk-visually-hidden) {
     @media print {
       clip: unset !important;

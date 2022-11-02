@@ -1,5 +1,5 @@
 // Load app styles first to ensure correct style ordering
-import './App.scss';
+import './styles/_all.scss';
 
 import apiAuthorizationRouteList from '@admin/components/api-authorization/ApiAuthorizationRoutes';
 import PageErrorBoundary from '@admin/components/PageErrorBoundary';
@@ -89,6 +89,8 @@ function App() {
                         <ProtectedRoute key={key} {...route} />
                       ))}
 
+                      {/* Prototype pages are protected by default. To open them up change the ProtectedRoute to: */}
+                      {/* <Route path="/prototypes" component={PrototypesEntry} /> */}
                       <ProtectedRoute
                         path="/prototypes"
                         protectionAction={user =>

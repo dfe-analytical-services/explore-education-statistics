@@ -11,8 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Acco
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;
-using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
-using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -111,18 +109,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
     {
         private const string OpenIdConnectSpaClientId = "GovUk.Education.ExploreEducationStatistics.Admin";
 
-        private static readonly List<string> DevelopmentAdminUrlAliases = ListOf("https://ees.local:5021"); 
+        private static readonly List<string> DevelopmentAdminUrlAliases = ListOf("https://ees.local:5021");
 
         private IConfiguration Configuration { get; }
         private IHostEnvironment HostEnvironment { get; }
 
-        private readonly List<string> _adminUrlAndAliases; 
+        private readonly List<string> _adminUrlAndAliases;
 
         public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
         {
             Configuration = configuration;
             HostEnvironment = hostEnvironment;
-            
+
             _adminUrlAndAliases = ListOf($"https://{Configuration.GetValue<string>("AdminUri")}");
             if (hostEnvironment.IsDevelopment())
             {
@@ -248,7 +246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     {
                         return;
                     }
-                    
+
                     var allowRefreshTokens = clientConfig.GetValue("AllowOfflineAccess", false);
 
                     if (allowRefreshTokens)
@@ -260,24 +258,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                             .AllowedScopes
                             .Append(OpenIdConnectScope.OfflineAccess)
                             .ToList();
-                        
+
                         spaClient.UpdateAccessTokenClaimsOnRefresh = true;
-                        
+
                         var tokenUsage = clientConfig.GetValue<string>("RefreshTokenUsage");
-                        
-                        spaClient.RefreshTokenUsage = tokenUsage != null 
-                            ? EnumUtil.GetFromString<TokenUsage>(tokenUsage) 
+
+                        spaClient.RefreshTokenUsage = tokenUsage != null
+                            ? EnumUtil.GetFromString<TokenUsage>(tokenUsage)
                             : TokenUsage.OneTimeOnly;
 
                         var tokenExpiration = clientConfig.GetValue<string>("RefreshTokenExpiration");
-                        
-                        spaClient.RefreshTokenExpiration = tokenExpiration != null 
+
+                        spaClient.RefreshTokenExpiration = tokenExpiration != null
                             ? EnumUtil.GetFromString<TokenExpiration>(tokenExpiration)
                             : TokenExpiration.Absolute;
                     }
                 })
                 .AddProfileService<ApplicationUserProfileService>();
-                
+
             if (HostEnvironment.IsDevelopment())
             {
                 identityServerConfig.AddDeveloperSigningCredential();
@@ -307,8 +305,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         //
                         // However, by default Identity Server will set its "TokenValidationParameters.ValidIssuer"
                         // property to the "applicationUrl" value in "launchSettings.json" - locally for instance,
-                        // this would be "https://0.0.0.0:5021".  This complicates matters further as access tokens 
-                        // that it issues would otherwise be immediately invalidated by this setting, regardless of what 
+                        // this would be "https://0.0.0.0:5021".  This complicates matters further as access tokens
+                        // that it issues would otherwise be immediately invalidated by this setting, regardless of what
                         // URL the user was hitting the site on.  The answer is to manually let Identity Server know
                         // which URLs are appropriate for each environment.
                         //
@@ -319,7 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         ValidIssuers = _adminUrlAndAliases
                     };
                 });
-            
+
             services
                 .AddAuthentication()
                 .AddOpenIdConnect(options => Configuration.GetSection("OpenIdConnect").Bind(options))
@@ -339,7 +337,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         {
                             return;
                         }
-                        
+
                         // Allows requests with `access_token` query parameter to authenticate.
                         // Only really needed for websockets as we unfortunately can't set any
                         // headers in the browser for the initial handshake.
@@ -406,7 +404,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              */
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            
+
             // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
             // EES-3528 plans to send a request to the Content API to update its cached resources instead of this
             // being done from Admin directly, and so these DI dependencies should eventually be removed.
@@ -418,9 +416,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
             services.AddTransient<IThemeCacheService, ThemeCacheService>();
             services.AddTransient<IPublicationCacheService, PublicationCacheService>();
-
-            services.AddTransient<IMyPublicationPermissionsResolver,
-                MyPublicationPermissionsResolver>();
 
             services.AddTransient<IFileRepository, FileRepository>();
             services.AddTransient<IDataImportRepository, DataImportRepository>();
@@ -566,9 +561,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseContentSectionRepository, ReleaseContentSectionRepository>();
             services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
-            services
-                .AddTransient<Data.Model.Repository.Interfaces.IReleaseRepository,
-                    Data.Model.Repository.ReleaseRepository>();
+            services.AddTransient<Content.Model.Repository.Interfaces.IReleaseRepository,
+                Content.Model.Repository.ReleaseRepository>();
             services.AddTransient<ISubjectRepository, SubjectRepository>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();

@@ -16,6 +16,7 @@ describe('ChartMapConfiguration', () => {
     alt: '',
     height: 600,
     titleType: 'default',
+    customDataGroups: [],
   };
 
   const testMeta: FullTableMeta = {
@@ -90,6 +91,7 @@ describe('ChartMapConfiguration', () => {
     // Data classification
     expect(screen.getByLabelText('Equal intervals')).not.toBeChecked();
     expect(screen.getByLabelText('Quantiles')).not.toBeChecked();
+    expect(screen.getByLabelText('Custom')).not.toBeChecked();
 
     expect(screen.getByLabelText('Number of data groups')).not.toHaveValue();
   });
@@ -115,6 +117,7 @@ describe('ChartMapConfiguration', () => {
     // Data classification
     expect(screen.getByLabelText('Equal intervals')).toBeChecked();
     expect(screen.getByLabelText('Quantiles')).not.toBeChecked();
+    expect(screen.getByLabelText('Custom')).not.toBeChecked();
 
     expect(screen.getByLabelText('Number of data groups')).toHaveValue(6);
   });
@@ -156,6 +159,7 @@ describe('ChartMapConfiguration', () => {
     expect(handleChange).toHaveBeenCalledWith<[ChartOptions]>({
       ...testDefaultChartOptions,
       boundaryLevel: 2,
+      customDataGroups: [],
     });
   });
 
@@ -264,6 +268,7 @@ describe('ChartMapConfiguration', () => {
       expect(handleSubmit).toHaveBeenCalledWith<[ChartOptions]>({
         ...testDefaultChartOptions,
         boundaryLevel: 2,
+        customDataGroups: [],
         dataClassification: 'Quantiles',
         dataGroups: 7,
       });
@@ -296,8 +301,192 @@ describe('ChartMapConfiguration', () => {
       expect(handleSubmit).toHaveBeenCalledWith<[ChartOptions]>({
         ...testDefaultChartOptions,
         boundaryLevel: 3,
+        customDataGroups: [],
         dataClassification: 'EqualIntervals',
         dataGroups: 5,
+      });
+    });
+  });
+
+  describe('custom data groups', () => {
+    test('adding groups', async () => {
+      render(
+        <ChartMapConfiguration
+          meta={testMeta}
+          options={testDefaultChartOptions}
+          onChange={noop}
+          onSubmit={noop}
+        />,
+        { wrapper },
+      );
+
+      userEvent.click(screen.getByLabelText('Custom'));
+
+      const table = within(
+        screen.getByRole('table', { name: 'Custom groups' }),
+      );
+      expect(table.getAllByRole('row')).toHaveLength(2);
+
+      userEvent.type(screen.getByLabelText('Min'), '0');
+      userEvent.type(screen.getByLabelText('Max'), '10');
+
+      userEvent.click(screen.getByRole('button', { name: 'Add group' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('Remove group')).toBeInTheDocument();
+      });
+
+      expect(table.getAllByRole('row')).toHaveLength(3);
+      const newRow1 = within(table.getAllByRole('row')[1]);
+      expect(newRow1.getAllByRole('cell')[0]).toHaveTextContent('0');
+      expect(newRow1.getAllByRole('cell')[1]).toHaveTextContent('10');
+      expect(
+        newRow1.getByRole('button', {
+          name: 'Remove group',
+        }),
+      );
+
+      userEvent.type(screen.getByLabelText('Min'), '11');
+      userEvent.type(screen.getByLabelText('Max'), '20');
+
+      userEvent.click(screen.getByRole('button', { name: 'Add group' }));
+
+      await waitFor(() => {
+        expect(screen.getAllByText('Remove group')).toHaveLength(2);
+      });
+
+      expect(table.getAllByRole('row')).toHaveLength(4);
+      const newRow2 = within(table.getAllByRole('row')[2]);
+      expect(newRow2.getAllByRole('cell')[0]).toHaveTextContent('11');
+      expect(newRow2.getAllByRole('cell')[1]).toHaveTextContent('20');
+      expect(
+        newRow2.getByRole('button', {
+          name: 'Remove group',
+        }),
+      );
+    });
+
+    test('removing groups', async () => {
+      render(
+        <ChartMapConfiguration
+          meta={testMeta}
+          options={{
+            ...testDefaultChartOptions,
+            customDataGroups: [
+              { min: 0, max: 10 },
+              { min: 11, max: 20 },
+              { min: 21, max: 30 },
+            ],
+          }}
+          onChange={noop}
+          onSubmit={noop}
+        />,
+        { wrapper },
+      );
+
+      userEvent.click(screen.getByLabelText('Custom'));
+
+      const table = within(
+        screen.getByRole('table', { name: 'Custom groups' }),
+      );
+      expect(table.getAllByRole('row')).toHaveLength(5);
+
+      expect(table.getByText('11')).toBeInTheDocument();
+      expect(table.getByText('20')).toBeInTheDocument();
+
+      userEvent.click(
+        within(table.getAllByRole('row')[2]).getByRole('button', {
+          name: 'Remove group',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(screen.getAllByText('Remove group')).toHaveLength(2);
+      });
+
+      expect(table.getAllByRole('row')).toHaveLength(4);
+      expect(table.queryByText('11')).not.toBeInTheDocument();
+      expect(table.queryByText('20')).not.toBeInTheDocument();
+    });
+
+    test('submitting fails with validation errors when custom grouping is selected and no groups are added', async () => {
+      render(
+        <ChartMapConfiguration
+          meta={testMeta}
+          options={testDefaultChartOptions}
+          onChange={noop}
+          onSubmit={noop}
+        />,
+        { wrapper },
+      );
+
+      userEvent.click(screen.getByLabelText('Custom'));
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Save chart options' }),
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText('There is a problem')).toBeInTheDocument();
+      });
+
+      expect(
+        screen.getByRole('link', {
+          name: 'There must be at least 1 data group',
+        }),
+      ).toHaveAttribute('href', '#chartMapConfigurationForm-customDataGroups');
+    });
+
+    test('submitting succeeds with custom data groups', async () => {
+      const handleSubmit = jest.fn();
+
+      render(
+        <ChartMapConfiguration
+          meta={testMeta}
+          options={testDefaultChartOptions}
+          onChange={noop}
+          onSubmit={handleSubmit}
+        />,
+        { wrapper },
+      );
+
+      userEvent.selectOptions(screen.getByLabelText('Boundary level'), ['2']);
+
+      userEvent.type(screen.getByLabelText('Number of data groups'), '5');
+
+      userEvent.click(screen.getByLabelText('Custom'));
+
+      userEvent.type(screen.getByLabelText('Min'), '0');
+      userEvent.type(screen.getByLabelText('Max'), '10');
+
+      userEvent.click(screen.getByRole('button', { name: 'Add group' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('Remove group')).toBeInTheDocument();
+      });
+
+      userEvent.type(screen.getByLabelText('Min'), '11');
+      userEvent.type(screen.getByLabelText('Max'), '20');
+
+      userEvent.click(screen.getByRole('button', { name: 'Add group' }));
+
+      expect(handleSubmit).not.toHaveBeenCalled();
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Save chart options' }),
+      );
+
+      await waitFor(() => {
+        expect(handleSubmit).toHaveBeenCalledWith<[ChartOptions]>({
+          ...testDefaultChartOptions,
+          boundaryLevel: 2,
+          customDataGroups: [
+            { min: 0, max: 10 },
+            { min: 11, max: 20 },
+          ],
+          dataClassification: 'Custom',
+          dataGroups: 5,
+        });
       });
     });
   });

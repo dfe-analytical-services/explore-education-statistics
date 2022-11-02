@@ -220,6 +220,10 @@ user waits until page does not contain link
     [Arguments]    ${link_text}    ${wait}=${timeout}
     wait until page does not contain element    xpath://a[.="${link_text}"]    timeout=${wait}
 
+user checks page does not contain link
+    [Arguments]    ${link_text}
+    user checks page does not contain element    xpath://a[.="${link_text}"]
+
 user waits until element contains link
     [Arguments]    ${element}    ${link_text}    ${wait}=${timeout}
     user waits until parent contains element    ${element}    link:${link_text}    timeout=${wait}
@@ -670,7 +674,8 @@ user checks page contains link with text and url
     ...    ${text}
     ...    ${href}
     ...    ${parent}=css:body
-    user waits until parent contains element    ${parent}    xpath:.//a[@href="${href}" and .="${text}"]
+    user waits until parent contains element    ${parent}
+    ...    xpath:.//a[@href="${href}" and contains(text(), "${text}")]
 
 user opens details dropdown
     [Arguments]    ${text}    ${parent}=css:body

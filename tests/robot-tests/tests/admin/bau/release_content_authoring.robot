@@ -18,30 +18,22 @@ ${BLOCK_2_CONTENT}=     Block 2 content
 
 *** Test Cases ***
 Create publication
-    user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}
-    ...    UI test topic %{RUN_IDENTIFIER}
+    user selects dashboard theme and topic if possible
     user clicks link    Create new publication
     user waits until h1 is visible    Create new publication
     user creates publication    ${PUBLICATION_NAME}
 
 Create new release
-    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
-    user clicks link    Create new release
-    user creates release for publication    ${PUBLICATION_NAME}    Academic Year Q1    2020
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user creates release from publication page    ${PUBLICATION_NAME}    Academic Year Q1    2020
 
 Give analyst1 publication owner permissions to work on release
     user gives analyst publication owner access    ${PUBLICATION_NAME}
 
 Switch to analyst1 to work on release content blocks
     user signs in as analyst1
-    user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
-    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
-    ${accordion}=    user gets accordion section content element    ${PUBLICATION_NAME}
-
-    user opens details dropdown    ${RELEASE_NAME}    ${accordion}
-    ${details}=    user gets details content element    ${RELEASE_NAME} (not Live)    ${accordion}
-    user waits until parent contains element    ${details}    link:Edit release
-    user clicks link    Edit release
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    ${RELEASE_NAME}
 
 Navigate to content section as analyst1
     user clicks link    Content
@@ -67,13 +59,8 @@ Add second text block
 
 Switch to bau1 to view release
     user switches to bau1 browser
-    user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
-    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
-    ${accordion}=    user gets accordion section content element    ${PUBLICATION_NAME}
-    user opens details dropdown    ${RELEASE_NAME}    ${accordion}
-    ${details}=    user gets details content element    ${RELEASE_NAME} (not Live)    ${accordion}
-    user waits until parent contains element    ${details}    link:Edit release
-    user clicks link    Edit release
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    ${RELEASE_NAME}
 
     user clicks link    Content
     user closes Set Page View box

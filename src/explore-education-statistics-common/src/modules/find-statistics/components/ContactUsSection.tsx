@@ -44,6 +44,10 @@ const ContactUsSection = ({
         Telephone <br />
         037 0000 2288
       </p>
+      <p>
+        Opening times: <br />
+        Monday to Friday from 9.30am to 5pm (excluding bank holidays)
+      </p>
     </>
   );
 };

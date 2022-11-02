@@ -35,7 +35,7 @@ const PublicationDraftReleases = ({
   const [showIssuesGuidance, toggleIssuesGuidance] = useToggle(false);
 
   if (releases.length === 0) {
-    return <InsetText>There are no draft releases.</InsetText>;
+    return <InsetText>You have no draft releases.</InsetText>;
   }
 
   return (
@@ -48,9 +48,9 @@ const PublicationDraftReleases = ({
           <tr>
             <th className="govuk-!-width-one-third">Release period</th>
             <th>
-              State{' '}
+              Status{' '}
               <ButtonText onClick={toggleDraftStatusGuidance.on}>
-                <InfoIcon description="Guidance on draft states" />
+                <InfoIcon description="Guidance on draft statuses" />
               </ButtonText>
             </th>
             <th>

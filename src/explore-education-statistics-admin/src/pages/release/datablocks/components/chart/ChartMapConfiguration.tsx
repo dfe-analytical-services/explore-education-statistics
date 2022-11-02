@@ -1,4 +1,5 @@
 import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/chart/ChartBuilderSaveActions';
+import ChartMapCustomGroupsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartMapCustomGroupsConfiguration';
 import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import Effect from '@common/components/Effect';
@@ -8,13 +9,18 @@ import {
   FormFieldSelect,
 } from '@common/components/form';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
-import { DataClassification } from '@common/modules/charts/types/chart';
+import {
+  CustomDataGroup,
+  DataClassification,
+} from '@common/modules/charts/types/chart';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import mapValues from 'lodash/mapValues';
 import merge from 'lodash/merge';
+import omit from 'lodash/omit';
+import orderBy from 'lodash/orderBy';
 import pick from 'lodash/pick';
 import React, { ReactNode, useCallback, useMemo } from 'react';
 import { StringSchema } from 'yup';
@@ -23,12 +29,14 @@ const formId = 'chartMapConfigurationForm';
 
 interface FormValues {
   boundaryLevel?: number;
+  customDataGroups: CustomDataGroup[];
   dataClassification: DataClassification;
   dataGroups: number;
 }
 
 interface Props {
   buttons?: ReactNode;
+  dataSetsUnits?: string[];
   meta: FullTableMeta;
   options: ChartOptions;
   onBoundaryLevelChange?: (boundaryLevel: string) => void;
@@ -38,6 +46,7 @@ interface Props {
 
 export default function ChartMapConfiguration({
   buttons,
+  dataSetsUnits = [],
   meta,
   options,
   onBoundaryLevelChange,
@@ -46,15 +55,30 @@ export default function ChartMapConfiguration({
 }: Props) {
   const {
     hasSubmitted,
+    isValid,
     updateForm,
     submitForms,
   } = useChartBuilderFormsContext();
 
+  const hasMixedUnits = !dataSetsUnits.every(unit => unit === dataSetsUnits[0]);
+
   const validationSchema = useMemo(() => {
     let schema = Yup.object<FormValues>({
+      customDataGroups: Yup.array()
+        .of(
+          Yup.object({
+            max: Yup.number(),
+            min: Yup.number(),
+          }),
+        )
+        .max(100, 'The number of data groups cannot be greater than 100')
+        .when('dataClassification', {
+          is: 'Custom',
+          then: Yup.array().required('There must be at least 1 data group'),
+        }),
       dataClassification: Yup.string()
         .required('Choose a data classification')
-        .oneOf(['EqualIntervals', 'Quantiles']) as StringSchema<
+        .oneOf(['EqualIntervals', 'Quantiles', 'Custom']) as StringSchema<
         DataClassification
       >,
       dataGroups: Yup.number()
@@ -82,11 +106,14 @@ export default function ChartMapConfiguration({
     (values: FormValues): ChartOptions => {
       // Use `merge` as we want to avoid potential undefined
       // values from overwriting existing values
-      return merge({}, options, values, {
+      const result = merge({}, options, values, {
         boundaryLevel: values.boundaryLevel
           ? parseNumber(values.boundaryLevel)
           : undefined,
       });
+      // customDataGroups are removable, so don't merge - update instead
+      result.customDataGroups = [...(values.customDataGroups ?? [])];
+      return result;
     },
     [options],
   );
@@ -104,7 +131,13 @@ export default function ChartMapConfiguration({
       initialValues={initialValues}
       initialTouched={
         hasSubmitted
-          ? mapValues(validationSchema.fields, () => true)
+          ? {
+              ...mapValues(
+                omit(validationSchema.fields, 'customDataGroups'),
+                () => true,
+              ),
+              customDataGroups: [],
+            }
           : undefined
       }
       validateOnMount
@@ -171,15 +204,51 @@ export default function ChartMapConfiguration({
                 hint:
                   'Data is classified so that each group roughly has the same quantity of features.',
               },
+              {
+                label: 'Custom',
+                value: 'Custom',
+                hint: 'Define custom groups.',
+              },
             ]}
+            order={[]}
           />
 
-          <FormFieldNumberInput<FormValues>
-            name="dataGroups"
-            label="Number of data groups"
-            hint="The number of groups that the data will be classified into."
-            width={3}
-          />
+          {form.values.dataClassification !== 'Custom' && (
+            <FormFieldNumberInput<FormValues>
+              name="dataGroups"
+              label="Number of data groups"
+              hint="The number of groups that the data will be classified into."
+              width={3}
+            />
+          )}
+
+          {form.values.dataClassification === 'Custom' && (
+            <ChartMapCustomGroupsConfiguration
+              groups={form.values.customDataGroups ?? []}
+              id={`${formId}-customDataGroups`}
+              showError={
+                hasSubmitted &&
+                !isValid &&
+                form.values.dataClassification === 'Custom' &&
+                !form.values.customDataGroups.length
+              }
+              unit={!hasMixedUnits ? dataSetsUnits[0] : undefined}
+              onAddGroup={group =>
+                form.setFieldValue(
+                  'customDataGroups',
+                  orderBy([...form.values.customDataGroups, group], g => g.min),
+                )
+              }
+              onRemoveGroup={group =>
+                form.setFieldValue(
+                  'customDataGroups',
+                  form.values.customDataGroups?.filter(
+                    g => !(g.min === group.min && g.max === group.max),
+                  ),
+                )
+              }
+            />
+          )}
 
           <ChartBuilderSaveActions
             formId={formId}

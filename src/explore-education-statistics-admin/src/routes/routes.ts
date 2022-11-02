@@ -1,12 +1,10 @@
 import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
 import AdminDashboardPage from '@admin/pages/admin-dashboard/AdminDashboardPage';
 import ContactUsPage from '@admin/pages/ContactUsPage';
-import LegacyReleasesPageContainer from '@admin/pages/legacy-releases/LegacyReleasesPageContainer';
 import MethodologyPage from '@admin/pages/methodology/edit-methodology/MethodologyPage';
 import AdoptMethodologyPage from '@admin/pages/methodology/adopt-methodology/AdoptMethodologyPage';
 import ExternalMethodologyPage from '@admin/pages/methodology/external-methodology/ExternalMethodologyPage';
 import PublicationCreatePage from '@admin/pages/publication/PublicationCreatePage';
-import PublicationEditPage from '@admin/pages/publication/PublicationEditPage';
 import PublicationPageContainer from '@admin/pages/publication/PublicationPageContainer';
 import PreReleaseAccessListPage from '@admin/pages/release/pre-release/PreReleaseAccessListPage';
 import PreReleasePageContainer from '@admin/pages/release/pre-release/PreReleasePageContainer';
@@ -39,12 +37,7 @@ export type TopicParams = {
   topicId: string;
 };
 
-// TODO EES-3217 - feature flag to show new dashboard, remove when ready to go live
-export type NewDashBoardParams = {
-  showNewDashboard?: string;
-};
-
-export type ThemeTopicParams = ThemeParams & TopicParams & NewDashBoardParams;
+export type ThemeTopicParams = ThemeParams & TopicParams;
 
 export const homeRoute: ProtectedRouteProps = {
   path: '/',
@@ -114,13 +107,6 @@ export const publicationRoute: ProtectedRouteProps = {
   component: PublicationPageContainer,
 };
 
-export const publicationEditRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId/edit',
-  component: PublicationEditPage,
-  protectionAction: user => user.permissions.canAccessAnalystPages,
-  exact: true,
-};
-
 export const publicationManageTeamAccessRoute: ProtectedRouteProps = {
   path: '/publication/:publicationId/manage-team',
   component: PublicationManageTeamAccessPage,
@@ -173,12 +159,6 @@ export const releaseCreateRoute: ProtectedRouteProps = {
   exact: true,
 };
 
-export const legacyReleasesRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId/legacy-releases',
-  component: LegacyReleasesPageContainer,
-  protectionAction: user => user.permissions.canAccessAnalystPages,
-};
-
 export const preReleaseRoute: ProtectedRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/prerelease',
   component: PreReleasePageContainer,
@@ -211,7 +191,6 @@ const routes = {
   topicCreateRoute,
   topicEditRoute,
   publicationCreateRoute,
-  publicationEditRoute,
   publicationManageTeamAccessRoute,
   publicationManageTeamAccessReleaseRoute,
   publicationReleaseContributorsRoute,
@@ -225,7 +204,6 @@ const routes = {
   releaseDataGuidanceRoute,
   releaseRoute,
   releaseCreateRoute,
-  legacyReleasesRoute,
   publicationRoute,
 };
 

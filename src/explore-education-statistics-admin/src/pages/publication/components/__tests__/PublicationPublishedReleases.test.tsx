@@ -34,6 +34,7 @@ describe('PublicationPublishedReleases', () => {
       canUpdateRelease: false,
       canDeleteRelease: false,
       canMakeAmendmentOfRelease: true,
+      canViewRelease: true,
     },
     published: '2022-01-01T00:00:00',
     slug: 'release-1-slug',

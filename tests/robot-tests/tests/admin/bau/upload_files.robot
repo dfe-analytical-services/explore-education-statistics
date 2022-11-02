@@ -9,9 +9,11 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${TOPIC_NAME}=          %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}=    UI tests - upload files %{RUN_IDENTIFIER}
+
 
 *** Test Cases ***
 Create test publication and release via api
@@ -19,8 +21,8 @@ Create test publication and release via api
     user create test release via api    ${PUBLICATION_ID}    AY    2025
 
 Navigate to 'Data and files' page
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
-    ...    Academic Year 2025/26 (not Live)
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    Academic Year 2025/26
 
     user clicks link    Data and files
     user waits until h1 is visible    ${PUBLICATION_NAME}

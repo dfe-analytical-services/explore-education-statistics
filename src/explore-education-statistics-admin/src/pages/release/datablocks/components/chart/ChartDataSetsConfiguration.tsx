@@ -38,6 +38,7 @@ export interface FormValues {
 interface Props {
   buttons?: ReactNode;
   dataSets?: DataSet[];
+  dataSetsUnits?: string[];
   meta: FullTableMeta;
   onChange: (dataSets: DataSet[]) => void;
 }
@@ -46,6 +47,7 @@ const ChartDataSetsConfiguration = ({
   buttons,
   meta,
   dataSets = [],
+  dataSetsUnits = [],
   onChange,
 }: Props) => {
   const { forms, updateForm, submitForms } = useChartBuilderFormsContext();
@@ -64,18 +66,7 @@ const ChartDataSetsConfiguration = ({
     [meta.locations],
   );
 
-  const hasMixedUnits = useMemo(() => {
-    const units: string[] = [];
-    dataSets.forEach(dataSet => {
-      const foundIndicator = meta.indicators.find(
-        indicator => indicator.value === dataSet.indicator,
-      );
-      if (foundIndicator) {
-        units.push(foundIndicator.unit);
-      }
-    });
-    return !units.every(unit => unit === units[0]);
-  }, [dataSets, meta.indicators]);
+  const hasMixedUnits = !dataSetsUnits.every(unit => unit === dataSetsUnits[0]);
 
   useEffect(() => {
     updateForm({
@@ -249,7 +240,7 @@ const ChartDataSetsConfiguration = ({
       >
         <Droppable droppableId="dataSets" isDropDisabled={!isReordering}>
           {(droppableProvided, droppableSnapshot) => (
-            <table data-testId="chart-data-sets">
+            <table data-testid="chart-data-sets">
               <thead>
                 <tr>
                   <th>Data set</th>

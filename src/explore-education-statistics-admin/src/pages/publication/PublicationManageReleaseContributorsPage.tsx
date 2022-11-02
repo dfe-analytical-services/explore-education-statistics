@@ -45,7 +45,7 @@ const PublicationManageReleaseContributorsPage = ({
 
   return (
     <LoadingSpinner loading={isLoading}>
-      <h2>Manage release contributors ({release?.title})</h2>
+      <h2>{`Manage release contributors (${release?.title})`}</h2>
 
       <PublicationReleaseContributorsForm
         publicationId={publicationId}

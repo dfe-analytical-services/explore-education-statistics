@@ -1,4 +1,7 @@
-import { DataClassification } from '@common/modules/charts/types/chart';
+import {
+  CustomDataGroup,
+  DataClassification,
+} from '@common/modules/charts/types/chart';
 import subtract from '@common/utils/math/subtract';
 import countDecimalPlaces from '@common/utils/number/countDecimalPlaces';
 import formatPretty, {
@@ -23,6 +26,7 @@ export interface LegendDataGroup {
 interface Options {
   colour: string;
   classification?: DataClassification;
+  customDataGroups?: CustomDataGroup[];
   decimalPlaces?: number;
   groups: number;
   values: number[];
@@ -39,6 +43,7 @@ interface Options {
 export default function generateLegendDataGroups({
   colour,
   classification = 'EqualIntervals',
+  customDataGroups,
   decimalPlaces: explicitDecimalPlaces,
   groups,
   values: initialValues,
@@ -50,7 +55,7 @@ export default function generateLegendDataGroups({
     // Figure out the highest number of decimal places in the values if
     // no explicit decimal places have been set. We do this whilst ordering
     // to avoid having to loop over everything again (as an optimisation).
-    if (typeof explicitDecimalPlaces !== 'number' && Number.isFinite(value)) {
+    if (Number.isFinite(value)) {
       const dp = countDecimalPlaces(value) ?? 0;
 
       if (dp > implicitDecimalPlaces) {
@@ -163,6 +168,50 @@ export default function generateLegendDataGroups({
         return acc;
       }, []);
     }
+    case 'Custom':
+      return (
+        customDataGroups?.map((group, index) => {
+          const groupDecimals = Math.max(
+            countDecimalPlaces(group.min) ?? 0,
+            countDecimalPlaces(group.max) ?? 0,
+          );
+          const groupValueIncrement = 1 / 10 ** groupDecimals;
+
+          // Adjust the raw values when there are decimals involved so values aren't missed out of the groups.
+          // eg. if there's two groups: 40 - 50% and 51% - 60%
+          // 50.1% should go in the 40 - 50% group
+          // 50.6% should go in the 51 - 60% group
+          // To ensure this happens we adjust the raw values to 49.5 - 50.4% and 50.5 - 60.4%
+          const minRaw =
+            implicitDecimalPlaces !== groupDecimals
+              ? Number(
+                  (group.min - groupValueIncrement / 2).toFixed(
+                    groupDecimals + 1,
+                  ),
+                )
+              : group.min;
+
+          const maxRaw =
+            implicitDecimalPlaces !== groupDecimals
+              ? Number(
+                  (
+                    group.max +
+                    groupValueIncrement / 2 -
+                    groupValueIncrement / 10
+                  ).toFixed(groupDecimals + 1),
+                )
+              : group.max;
+
+          return {
+            colour: colourScale((index + 1) * (1 / customDataGroups.length)),
+            min: formatPretty(group.min, unit, countDecimalPlaces(group.min)),
+            max: formatPretty(group.max, unit, countDecimalPlaces(group.max)),
+            minRaw,
+            maxRaw,
+          };
+        }) ?? []
+      );
+
     default:
       throw new Error('Invalid data classification');
   }

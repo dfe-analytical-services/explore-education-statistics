@@ -10,6 +10,11 @@ import WarningMessage from '@common/components/WarningMessage';
 import { useMethodologyContext } from '@admin/pages/methodology/contexts/MethodologyContext';
 import React from 'react';
 import { generatePath } from 'react-router';
+import {
+  publicationReleasesRoute,
+  PublicationRouteParams,
+} from '@admin/routes/publicationRoutes';
+import Link from '@admin/components/Link';
 
 const MethodologySummaryPage = () => {
   const { methodologyId, methodology } = useMethodologyContext();
@@ -30,7 +35,14 @@ const MethodologySummaryPage = () => {
               )}
             </SummaryListItem>
             <SummaryListItem term="Owning publication">
-              {methodology.owningPublication.title}
+              <Link
+                to={generatePath<PublicationRouteParams>(
+                  publicationReleasesRoute.path,
+                  { publicationId: methodology.owningPublication.id },
+                )}
+              >
+                {methodology.owningPublication.title}
+              </Link>
             </SummaryListItem>
             {methodology.otherPublications &&
               methodology.otherPublications.length > 0 && (
@@ -41,7 +53,14 @@ const MethodologySummaryPage = () => {
                         key={publication.id}
                         data-testid="other-publication-item"
                       >
-                        {publication.title}
+                        <Link
+                          to={`${generatePath<PublicationRouteParams>(
+                            publicationReleasesRoute.path,
+                            { publicationId: publication.id },
+                          )}`}
+                        >
+                          {publication.title}
+                        </Link>
                       </li>
                     ))}
                   </ul>

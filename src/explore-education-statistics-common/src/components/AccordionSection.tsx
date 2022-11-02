@@ -1,3 +1,4 @@
+import CopyLinkButton from '@common/components/CopyLinkButton';
 import useMounted from '@common/hooks/useMounted';
 import findAllParents from '@common/utils/dom/findAllParents';
 import classNames from 'classnames';
@@ -17,6 +18,7 @@ export interface AccordionSectionProps {
         contentId: string;
       }) => ReactNode);
   className?: string;
+  anchorLinkUrl?: string;
   goToTop?: boolean;
   header?: ReactNode;
   heading: string;
@@ -42,6 +44,7 @@ const classes = {
 export const accordionSectionClasses = classes;
 
 const AccordionSection = ({
+  anchorLinkUrl,
   caption,
   className,
   children,
@@ -67,11 +70,18 @@ const AccordionSection = ({
       id={id}
     >
       <div className="govuk-accordion__section-header">
+        {anchorLinkUrl && (
+          <CopyLinkButton
+            className={styles.copyLinkButton}
+            url={anchorLinkUrl}
+          />
+        )}
         {header ??
           createElement(
             headingTag,
             {
               className: classes.sectionHeading,
+              id: heading.toLowerCase().split(' ').join('-'),
             },
             isMounted ? (
               <button

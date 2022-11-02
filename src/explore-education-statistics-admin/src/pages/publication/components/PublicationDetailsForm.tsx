@@ -40,8 +40,8 @@ export interface PublicationDetailsFormValues {
 }
 
 interface Props {
-  canUpdatePublicationSupersededBy?: boolean;
-  canUpdatePublicationTitle?: boolean;
+  canUpdatePublication?: boolean;
+  canUpdatePublicationSummary?: boolean;
   initialValues: PublicationDetailsFormValues;
   publicationId: string;
   onCancel: () => void;
@@ -49,8 +49,8 @@ interface Props {
 }
 
 const PublicationDetailsForm = ({
-  canUpdatePublicationSupersededBy = false,
-  canUpdatePublicationTitle = false,
+  canUpdatePublication = false,
+  canUpdatePublicationSummary = false,
   initialValues,
   publicationId,
   onCancel,
@@ -60,7 +60,7 @@ const PublicationDetailsForm = ({
 
   const { value, isLoading } = useAsyncHandledRetry(async () => {
     const themes = await themeService.getThemes();
-    if (!canUpdatePublicationSupersededBy) {
+    if (!canUpdatePublication) {
       return { themes };
     }
 
@@ -101,33 +101,35 @@ const PublicationDetailsForm = ({
         {form => (
           <>
             <Form id={id}>
-              {canUpdatePublicationTitle && (
-                <FormFieldset id="details" legend="Publication details">
+              <FormFieldset id="details" legend="Publication details">
+                {canUpdatePublication && (
                   <FormFieldTextInput<PublicationDetailsFormValues>
                     name="title"
                     label="Publication title"
                     className="govuk-!-width-one-half"
                   />
+                )}
 
+                {canUpdatePublicationSummary && (
                   <FormFieldTextArea<PublicationDetailsFormValues>
                     name="summary"
                     label="Publication summary"
                     className="govuk-!-width-one-half"
                     maxLength={160}
                   />
-                  {themes && initialValues?.topicId && (
-                    <FormFieldThemeTopicSelect<PublicationDetailsFormValues>
-                      id={id}
-                      inline={false}
-                      legend="Choose a topic for this publication"
-                      legendHidden
-                      name="topicId"
-                      themes={themes}
-                    />
-                  )}
-                </FormFieldset>
-              )}
-              {canUpdatePublicationSupersededBy && (
+                )}
+                {canUpdatePublication && themes && initialValues?.topicId && (
+                  <FormFieldThemeTopicSelect<PublicationDetailsFormValues>
+                    id={id}
+                    inline={false}
+                    legend="Choose a topic for this publication"
+                    legendHidden
+                    name="topicId"
+                    themes={themes}
+                  />
+                )}
+              </FormFieldset>
+              {canUpdatePublication && (
                 <FormFieldset
                   id="supersede"
                   legend="Archive this publication"

@@ -12,6 +12,7 @@ import generateLegendDataGroups, {
 import {
   AxisConfiguration,
   ChartProps,
+  CustomDataGroup,
   DataClassification,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
@@ -59,6 +60,7 @@ export interface MapBlockProps extends ChartProps {
     major: AxisConfiguration;
   };
   boundaryLevel?: number;
+  customDataGroups?: CustomDataGroup[];
   dataGroups?: number;
   dataClassification?: DataClassification;
   id: string;
@@ -69,6 +71,7 @@ export interface MapBlockProps extends ChartProps {
 
 export default function MapBlockInternal({
   id,
+  customDataGroups = [],
   data,
   dataGroups = 5,
   dataClassification = 'EqualIntervals',
@@ -228,12 +231,15 @@ export default function MapBlockInternal({
         dataSetCategories,
         dataGroups,
         classification: dataClassification,
+        customDataGroups,
       });
 
       setFeatures(newFeatures);
       setLegendDataGroups(newDataGroups);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    customDataGroups.length,
     dataGroups,
     dataClassification,
     dataSetCategories,
@@ -507,11 +513,13 @@ export default function MapBlockInternal({
 
 function generateFeaturesAndDataGroups({
   classification,
+  customDataGroups,
   dataSetCategories,
   dataGroups: groups,
   selectedDataSetConfig,
 }: {
   classification: DataClassification;
+  customDataGroups: CustomDataGroup[];
   dataSetCategories: MapDataSetCategory[];
   dataGroups: number;
   selectedDataSetConfig: DataSetCategoryConfig;
@@ -540,11 +548,17 @@ function generateFeaturesAndDataGroups({
   const dataGroups = generateLegendDataGroups({
     colour,
     classification,
+    customDataGroups,
     decimalPlaces,
     groups,
     values,
     unit,
   });
+
+  // Default to white for areas not covered by custom data sets
+  // to make it clearer which aren't covered by the groups.
+  const defaultColour =
+    classification === 'Custom' ? 'rgba(255, 255, 255, 1)' : 'rgba(0,0,0,0)';
 
   const features: MapFeatureCollection = {
     type: 'FeatureCollection',
@@ -564,7 +578,7 @@ function generateFeaturesAndDataGroups({
               ...geoJson.properties,
               dataSets,
               // Default to transparent if no match
-              colour: matchingDataGroup?.colour ?? 'rgba(0, 0, 0, 0)',
+              colour: matchingDataGroup?.colour ?? defaultColour,
               data: value,
             },
           });

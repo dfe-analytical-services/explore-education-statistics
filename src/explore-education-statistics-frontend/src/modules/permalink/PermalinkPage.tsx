@@ -84,6 +84,7 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
 
       <div ref={tableRef}>
         <TimePeriodDataTable
+          footnotesClassName="govuk-!-width-two-thirds"
           fullTable={fullTable}
           source={`${publicationName}, ${subjectName}`}
           tableHeadersConfig={tableHeadersConfig}

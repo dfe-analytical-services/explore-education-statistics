@@ -18,9 +18,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
          */
         CanViewAllPublications,
         CanViewSpecificPublication,
-        CanUpdatePublicationTitles,
-        CanUpdatePublicationSupersededBy,
-        CanUpdateSpecificPublication,
+        CanUpdatePublication,
+        CanUpdateContact,
+        CanUpdateSpecificPublicationSummary,
         CanUpdateSpecificReleaseRole,
         CanCreatePublicationForSpecificTopic,
 
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         /**
          * Legacy release management
          */
-        CanCreateLegacyRelease,
+        CanManageLegacyReleases,
         CanViewLegacyRelease,
         CanUpdateLegacyRelease,
         CanDeleteLegacyRelease,

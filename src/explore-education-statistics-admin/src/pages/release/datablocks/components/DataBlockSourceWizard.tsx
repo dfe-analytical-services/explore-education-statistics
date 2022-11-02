@@ -78,6 +78,7 @@ const DataBlockSourceWizardFinalStep = ({
 
         <TimePeriodDataTable
           ref={dataTableRef}
+          footnotesClassName="govuk-!-width-two-thirds"
           fullTable={table}
           captionTitle={captionTitle}
           query={query}

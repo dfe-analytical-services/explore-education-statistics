@@ -13,10 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<List<Publication>> ListPublicationsForUser(Guid userId, Guid? topicId = null);
 
-        Task<Publication> GetPublicationForUser(Guid publicationId, Guid userId);
-
-        Task<Publication> GetPublicationWithAllReleases(Guid publicationId);
-
         Task<List<Release>> ListActiveReleases(Guid publicationId);
 
         Task<Release?> GetLatestReleaseForPublication(Guid publicationId);

@@ -10,6 +10,22 @@ import PrototypeTableHighlights from './PrototypeTableHighlights';
 import PrototypeHomepage from './PrototypeHomepage';
 import PrototypeHomepage2 from './PrototypeHomepage2';
 import PrototypeRelease from './PrototypeRelease';
+import PrototypeManageUsers from './PrototypeManageUsers';
+import PrototypeAdminDashboard from './PrototypeAdminDashboard';
+import PrototypeAdminPublication from './PrototypeAdminPublication';
+import PrototypeAdminMethodology from './PrototypeAdminMethodology';
+import PrototypeAdminContact from './PrototypeAdminContact';
+import PrototypeAdminDetails from './PrototypeAdminDetails';
+import PrototypeAdminAccess from './PrototypeAdminAccess';
+import PrototypeAdminLegacy from './PrototypeAdminLegacy';
+import PrototypeReleaseSummary from './PrototypeReleaseSummary';
+import PrototypeFindStats from './PrototypeFindStats';
+import PrototypeFindStats2 from './PrototypeFindStats2';
+import PrototypeFindStats3 from './PrototypeFindStats3';
+import PrototypeFindStats4 from './PrototypeFindStats4';
+import PrototypeFindStats5 from './PrototypeFindStats5';
+import PrototypeFindStats6 from './PrototypeFindStats6';
+import PrototypeTableTool from './PrototypeTableToolPage';
 
 interface PrototypeRoute extends RouteProps {
   name: string;
@@ -71,6 +87,86 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'Release',
     path: '/prototypes/release',
     component: PrototypeRelease,
+  },
+  {
+    name: 'Manage users',
+    path: '/prototypes/manage-users',
+    component: PrototypeManageUsers,
+  },
+  {
+    name: 'Admin dashboard',
+    path: '/prototypes/admin-dashboard',
+    component: PrototypeAdminDashboard,
+  },
+  {
+    name: 'Admin publication',
+    path: '/prototypes/admin-publication',
+    component: PrototypeAdminPublication,
+  },
+  {
+    name: 'Admin methodology',
+    path: '/prototypes/admin-methodology',
+    component: PrototypeAdminMethodology,
+  },
+  {
+    name: 'Admin contact',
+    path: '/prototypes/admin-contact',
+    component: PrototypeAdminContact,
+  },
+  {
+    name: 'Admin publication details',
+    path: '/prototypes/admin-details',
+    component: PrototypeAdminDetails,
+  },
+  {
+    name: 'Admin manage access',
+    path: '/prototypes/admin-access',
+    component: PrototypeAdminAccess,
+  },
+  {
+    name: 'Admin legacy releases',
+    path: '/prototypes/admin-legacy',
+    component: PrototypeAdminLegacy,
+  },
+  {
+    name: 'Admin release summary',
+    path: '/prototypes/admin-release-summary',
+    component: PrototypeReleaseSummary,
+  },
+  {
+    name: 'Find statistics and data',
+    path: '/prototypes/find-statistics',
+    component: PrototypeFindStats,
+  },
+  {
+    name: 'Find statistics and data v2',
+    path: '/prototypes/find-statistics2',
+    component: PrototypeFindStats2,
+  },
+  {
+    name: 'Find statistics and data v3',
+    path: '/prototypes/find-statistics3',
+    component: PrototypeFindStats3,
+  },
+  {
+    name: 'Find statistics and data v4',
+    path: '/prototypes/find-statistics4',
+    component: PrototypeFindStats4,
+  },
+  {
+    name: 'Find statistics and data v5',
+    path: '/prototypes/find-statistics5',
+    component: PrototypeFindStats5,
+  },
+  {
+    name: 'Find statistics and data v6',
+    path: '/prototypes/find-statistics6',
+    component: PrototypeFindStats6,
+  },
+  {
+    name: 'Table tool',
+    path: '/prototypes/table-tool',
+    component: PrototypeTableTool,
   },
 ];
 

@@ -36,7 +36,7 @@ export default function PublicationPublishedReleasesTable({
   }, [focusReleaseId]);
 
   if (releases.length === 0) {
-    return <InsetText>There are no published releases.</InsetText>;
+    return <InsetText>You have no published releases.</InsetText>;
   }
 
   return (
@@ -48,9 +48,9 @@ export default function PublicationPublishedReleasesTable({
         <tr>
           <th className="govuk-!-width-one-third">Release period</th>
           <th className={styles.statusColumn}>
-            State{' '}
+            Status{' '}
             <ButtonText onClick={onGuidanceClick}>
-              <InfoIcon description="Guidance on states" />
+              <InfoIcon description="Guidance on statuses" />
             </ButtonText>
           </th>
           <th>Published date</th>
@@ -78,17 +78,24 @@ export default function PublicationPublishedReleasesTable({
                 )}
               </td>
               <td>
-                <Link
-                  to={generatePath<ReleaseRouteParams>(
-                    releaseSummaryRoute.path,
-                    {
-                      publicationId,
-                      releaseId: release.id,
-                    },
-                  )}
-                >
-                  View<VisuallyHidden> {release.title}</VisuallyHidden>
-                </Link>
+                {release.permissions.canViewRelease ? (
+                  <Link
+                    to={generatePath<ReleaseRouteParams>(
+                      releaseSummaryRoute.path,
+                      {
+                        publicationId,
+                        releaseId: release.id,
+                      },
+                    )}
+                  >
+                    View<VisuallyHidden> {release.title}</VisuallyHidden>
+                  </Link>
+                ) : (
+                  <>
+                    No permission
+                    <VisuallyHidden> {release.title}</VisuallyHidden>
+                  </>
+                )}
                 {release.permissions.canMakeAmendmentOfRelease && (
                   <ButtonText
                     className="govuk-!-margin-left-4"

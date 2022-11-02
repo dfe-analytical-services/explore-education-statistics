@@ -28,20 +28,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpGet("api/publications")]
         public async Task<ActionResult<List<PublicationViewModel>>> ListPublications(
-            [FromQuery] bool includePermissions,
             [FromQuery] Guid? topicId)
         {
             return await _publicationService
-                .ListPublications(includePermissions, topicId)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpGet("api/me/publications")]
-        public async Task<ActionResult<List<MyPublicationViewModel>>> GetMyPublications(
-            [FromQuery(Name = "topicId"), Required] Guid topicId)
-        {
-            return await _publicationService
-                .GetMyPublicationsAndReleasesByTopic(topicId)
+                .ListPublications(topicId)
                 .HandleFailuresOrOk();
         }
 
@@ -50,15 +40,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _publicationService
                 .ListPublicationSummaries()
-                .HandleFailuresOrOk();
-        }
-
-        [HttpGet("api/me/publication/{publicationId}")]
-        public async Task<ActionResult<MyPublicationViewModel>> GetMyPublication(
-            [FromRoute(Name = "publicationId"), Required] Guid publicationId)
-        {
-            return await _publicationService
-                .GetMyPublication(publicationId)
                 .HandleFailuresOrOk();
         }
 

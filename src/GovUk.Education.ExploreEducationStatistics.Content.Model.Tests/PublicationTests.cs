@@ -28,7 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                         Published = DateTime.UtcNow.AddDays(-2),
                         PreviousVersion = null,
                         ApprovalStatus = Approved,
-
                     },
                     new()
                     {
@@ -76,7 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                         TimePeriodCoverage = AcademicYear,
                         Published = DateTime.UtcNow,
                         ApprovalStatus = Approved,
-
                     },
                     new()
                     {
@@ -121,7 +119,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                         Published = null,
                         PreviousVersion = null,
                         ApprovalStatus = Draft,
-
                     },
                 },
             };
@@ -149,7 +146,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                         TimePeriodCoverage = AcademicYear,
                         Published = DateTime.UtcNow,
                         ApprovalStatus = Approved,
-
                     },
                     new()
                     {
@@ -293,6 +289,114 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             Assert.False(publication.IsLatestVersionOfRelease(release2001Amendment.Id));
             Assert.True(publication.IsLatestVersionOfRelease(release2001Latest.Id));
             Assert.True(publication.IsLatestVersionOfRelease(release2002Latest.Id));
+        }
+
+        [Fact]
+        public void IsLatestPublishedVersionOfRelease_PublicationHasSingleUnpublishedRelease()
+        {
+            var publication = new Publication();
+
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = publication,
+                Published = null,
+                PreviousVersionId = null
+            };
+
+            publication.Releases = new List<Release>
+            {
+                release
+            };
+
+            Assert.False(publication.IsLatestPublishedVersionOfRelease(release));
+        }
+
+        [Fact]
+        public void IsLatestPublishedVersionOfRelease_PublicationHasSinglePublishedRelease()
+        {
+            var publication = new Publication();
+
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = publication,
+                Published = DateTime.UtcNow.AddSeconds(-1),
+                PreviousVersionId = null
+            };
+
+            publication.Releases = new List<Release>
+            {
+                release
+            };
+
+            Assert.True(publication.IsLatestPublishedVersionOfRelease(release));
+        }
+
+        [Fact]
+        public void IsLatestPublishedVersionOfRelease_PublicationHasMultipleReleases()
+        {
+            var publication = new Publication();
+
+            // (Release 1) Published but superseded by another published Release
+            var release1Version1 = new Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = publication,
+                Published = DateTime.UtcNow.AddSeconds(-1),
+                PreviousVersionId = null
+            };
+
+            // (Release 1)  Latest published version (superseded by an unpublished Release)
+            var release1Version2 = new Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = publication,
+                Published = DateTime.UtcNow.AddSeconds(-1),
+                PreviousVersionId = release1Version1.Id
+            };
+
+            // (Release 1) Unpublished
+            var release1Version3 = new Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = publication,
+                Published = null,
+                PreviousVersionId = release1Version2.Id
+            };
+
+            // (Release 2) Latest published version
+            var release2 = new Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = publication,
+                Published = DateTime.UtcNow.AddSeconds(-1),
+                PreviousVersionId = null
+            };
+
+            // (Release 3) Unpublished
+            var release3 = new Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = publication,
+                Published = null,
+                PreviousVersionId = null
+            };
+
+            publication.Releases = new List<Release>
+            {
+                release1Version1,
+                release1Version2,
+                release1Version3,
+                release2,
+                release3
+            };
+
+            Assert.False(publication.IsLatestPublishedVersionOfRelease(release1Version1));
+            Assert.True(publication.IsLatestPublishedVersionOfRelease(release1Version2));
+            Assert.False(publication.IsLatestPublishedVersionOfRelease(release1Version3));
+            Assert.True(publication.IsLatestPublishedVersionOfRelease(release2));
+            Assert.False(publication.IsLatestPublishedVersionOfRelease(release3));
         }
     }
 }

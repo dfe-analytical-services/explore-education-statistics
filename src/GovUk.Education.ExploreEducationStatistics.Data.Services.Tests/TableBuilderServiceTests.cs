@@ -9,12 +9,14 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
@@ -30,16 +32,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task Query_LatestRelease()
         {
+            var releaseId = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
-
-            var release = new Release
-            {
-                PublicationId = publicationId,
-            };
 
             var releaseSubject = new ReleaseSubject
             {
-                Release = release,
+                Release = new Release
+                {
+                    Id = releaseId,
+                    PublicationId = publicationId
+                },
                 Subject = new Subject
                 {
                     Id = Guid.NewGuid()
@@ -165,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 resultSubjectMetaService
                     .Setup(
                         s => s.GetSubjectMeta(
-                            release.Id,
+                            releaseId,
                             query,
                             It.IsAny<IList<Observation>>()
                         )
@@ -182,7 +184,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 releaseRepository
                     .Setup(s => s.GetLatestPublishedRelease(publicationId))
-                    .Returns(release);
+                    .ReturnsAsync(new Content.Model.Release
+                    {
+                        Id = releaseId
+                    });
 
                 var service = BuildTableBuilderService(
                     context,
@@ -249,7 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 releaseRepository
                     .Setup(s => s.GetLatestPublishedRelease(publicationId))
-                    .Returns((Release?) null);
+                    .ReturnsAsync(new NotFoundResult());
 
                 var service = BuildTableBuilderService(
                     statisticsDbContext,
@@ -270,11 +275,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var publicationId = Guid.NewGuid();
 
-            var release = new Release
-            {
-                PublicationId = publicationId,
-            };
-
             var query = new ObservationQueryContext
             {
                 SubjectId = Guid.NewGuid(),
@@ -293,7 +293,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             releaseRepository
                 .Setup(s => s.GetLatestPublishedRelease(publicationId))
-                .Returns(release);
+                .ReturnsAsync(new Content.Model.Release
+                {
+                    Id = Guid.NewGuid()
+                });
 
             var service = BuildTableBuilderService(
                 statisticsDbContext,
@@ -311,16 +314,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task Query_LatestRelease_PredictedTableTooBig()
         {
+            var releaseId = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
-
-            var release = new Release
-            {
-                PublicationId = publicationId
-            };
 
             var releaseSubject = new ReleaseSubject
             {
-                Release = release,
+                Release = new Release
+                {
+                    Id = releaseId,
+                    PublicationId = publicationId
+                },
                 Subject = new Subject
                 {
                     Id = Guid.NewGuid()
@@ -376,7 +379,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 releaseRepository
                     .Setup(s => s.GetLatestPublishedRelease(publicationId))
-                    .Returns(release);
+                    .ReturnsAsync(new Content.Model.Release
+                    {
+                        Id = releaseId
+                    });
 
                 var options = Options.Create(new TableBuilderOptions
                 {

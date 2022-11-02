@@ -1,15 +1,17 @@
 from robot.api import SuiteVisitor
-from logging import info
+from tests.libs.logger import get_logger
 
 
 class CheckForAtLeastOnePassingRunPrerebotModifier(SuiteVisitor):
+    logger = get_logger(__name__)
 
     def __init__(self, *args):
         pass
 
     def visit_test(self, test):
-        if 'PASS' in test.message and 'Test has been re-executed and results merged.' in test.message:
-            info(
-                f"CheckForAtLeastOnePassingRunPrerebotModifier - marking test \"{test}\" as PASS because it passed in at least one of the test runs.")
-            test.status = 'PASS'
-            test.message = f'Marking test \"{test}\" as PASS because it passed in at least one of the test runs.  Previous message is {test.message}'
+        if "PASS" in test.message and "Test has been re-executed and results merged." in test.message:
+            self.logger.info(
+                f'CheckForAtLeastOnePassingRunPrerebotModifier - marking test "{test}" as PASS because it passed in at least one of the test runs.'
+            )
+            test.status = "PASS"
+            test.message = f'Marking test "{test}" as PASS because it passed in at least one of the test runs.  Previous message is {test.message}'

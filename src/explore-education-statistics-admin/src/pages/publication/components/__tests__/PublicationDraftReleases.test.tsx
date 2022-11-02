@@ -29,6 +29,7 @@ describe('PublicationDraftReleases', () => {
       canUpdateRelease: true,
       canDeleteRelease: false,
       canMakeAmendmentOfRelease: true,
+      canViewRelease: false,
     },
     slug: 'release-1-slug',
     title: 'Release 1',
@@ -59,6 +60,7 @@ describe('PublicationDraftReleases', () => {
       canUpdateRelease: true,
       canDeleteRelease: true,
       canMakeAmendmentOfRelease: true,
+      canViewRelease: false,
     },
     previousVersionId: 'release-previous-id',
     published: '2022-01-03T00:00:00',
@@ -211,9 +213,7 @@ describe('PublicationDraftReleases', () => {
       />,
     );
 
-    expect(
-      screen.getByText('There are no draft releases.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('You have no draft releases.')).toBeInTheDocument();
   });
 
   test('shows a view instead of edit link if you do not have permission to edit the release', () => {

@@ -8,30 +8,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
-    public class SubjectRepository : AbstractRepository<Subject, Guid>, ISubjectRepository
+    public class SubjectRepository : ISubjectRepository
     {
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly StatisticsDbContext _context;
 
-        public SubjectRepository(
-            StatisticsDbContext context,
-            IReleaseRepository releaseRepository) : base(context)
+        public SubjectRepository(StatisticsDbContext context)
         {
-            _releaseRepository = releaseRepository;
-        }
-
-        public async Task<bool> IsSubjectForLatestPublishedRelease(Guid subjectId)
-        {
-            var publicationId = await GetPublicationIdForSubject(subjectId);
-            var latestRelease = _releaseRepository.GetLatestPublishedRelease(publicationId);
-
-            if (latestRelease == null)
-            {
-                return false;
-            }
-
-            return _context
-                .ReleaseSubject
-                .Any(r => r.ReleaseId == latestRelease.Id && r.SubjectId == subjectId);
+            _context = context;
         }
 
         public async Task<Subject?> Get(Guid subjectId)

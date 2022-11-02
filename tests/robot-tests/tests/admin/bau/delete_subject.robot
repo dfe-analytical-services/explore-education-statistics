@@ -20,8 +20,8 @@ Create test publication and release via API
     user create test release via api    ${PUBLICATION_ID}    TY    2020
 
 Verify Release summary
-    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
-    ...    Tax Year 2020-21 (not Live)
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    Tax Year 2020-21
     user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary    Tax Year    2020-21
     ...    UI test contact name    National statistics
 
