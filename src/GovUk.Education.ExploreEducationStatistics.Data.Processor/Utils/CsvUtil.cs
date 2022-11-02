@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CsvHelper;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Exceptions;
@@ -15,6 +16,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
 {
     public static class CsvUtil
     {
+        private static readonly EnumToEnumLabelConverter<GeographicLevel> GeographicLevelLookup = new();
+
         public const string DefaultFilterGroupLabel = "Default";
         public const string DefaultFilterItemLabel = "Not specified";
 
@@ -288,20 +291,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
         {
             var value = Value(rowValues, colValues, "geographic_level");
 
-            if (value == null)
+            try
+            {
+                return (GeographicLevel) GeographicLevelLookup.ConvertFromProvider.Invoke(value)!;
+            }
+            catch (ArgumentOutOfRangeException)
             {
                 throw new InvalidGeographicLevelException(value);
             }
-            
-            foreach (var val in (GeographicLevel[]) Enum.GetValues(typeof(GeographicLevel)))
-            {
-                if (val.GetEnumLabel().ToLower().Equals(value.ToLower()))
-                {
-                    return val;
-                }
-            }
-
-            throw new InvalidGeographicLevelException(value);
         }
 
         /// <summary>

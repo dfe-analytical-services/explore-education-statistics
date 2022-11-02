@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -25,6 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class ImporterService : IImporterService
     {
+        private static readonly EnumToEnumLabelConverter<TimeIdentifier> TimeIdentifierLookup = new();
+        
         private readonly IGuidGenerator _guidGenerator;
         private readonly ImporterLocationService _importerLocationService;
         private readonly ImporterFilterService _importerFilterService;
@@ -302,16 +305,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> rowValues, List<string> colValues)
         {
-            var timeIdentifier = CsvUtil.Value(rowValues, colValues, "time_identifier")!.ToLower();
-            foreach (var value in Enum.GetValues(typeof(TimeIdentifier)).Cast<TimeIdentifier>())
+            var value = CsvUtil.Value(rowValues, colValues, "time_identifier");
+            
+            try
             {
-                if (value.GetEnumLabel().Equals(timeIdentifier, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return value;
-                }
+                return (TimeIdentifier) TimeIdentifierLookup.ConvertFromProvider.Invoke(value)!;
             }
-
-            throw new InvalidTimeIdentifierException(timeIdentifier);
+            catch (ArgumentOutOfRangeException)
+            {
+                throw new InvalidTimeIdentifierException(value);
+            }
         }
 
         public int GetYear(IReadOnlyList<string> rowValues, List<string> colValues)
