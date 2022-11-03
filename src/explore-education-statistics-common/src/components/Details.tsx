@@ -64,14 +64,12 @@ const Details = ({
   }, []);
 
   useEffect(() => {
-    toggleOpen(defaultOpen);
-  }, [defaultOpen, toggleOpen]);
-
-  useEffect(() => {
     if (preventToggle) {
       toggleOpen(true);
+      return;
     }
-  }, [preventToggle, toggleOpen]);
+    toggleOpen(defaultOpen);
+  }, [defaultOpen, preventToggle, toggleOpen]);
 
   useEffect(() => {
     if (hasNativeDetails) {
@@ -109,7 +107,7 @@ const Details = ({
           event.preventDefault();
           if (!preventToggle) {
             onToggle?.(!open);
-            toggleOpen(!open);
+            toggleOpen();
           }
         }}
         onKeyPress={event => {
