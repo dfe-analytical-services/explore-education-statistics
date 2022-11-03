@@ -58,22 +58,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IFileTypeService _fileTypeService;
         private readonly IDataImportService _dataImportService;
         private readonly IImporterService _importerService;
-        private readonly int? _overrideRowsPerBatch;
         
         public ValidatorService(
             ILogger<ValidatorService> logger,
             IBlobStorageService blobStorageService,
             IFileTypeService fileTypeService,
             IDataImportService dataImportService, 
-            IImporterService importerService, 
-            int? overrideRowsPerBatch = null)
+            IImporterService importerService)
         {
             _logger = logger;
             _blobStorageService = blobStorageService;
             _fileTypeService = fileTypeService;
             _dataImportService = dataImportService;
             _importerService = importerService;
-            _overrideRowsPerBatch = overrideRowsPerBatch;
         }
 
         /// <summary>
@@ -308,7 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 DataImportStatus.STAGE_1,
                 100);
 
-            var rowsPerBatch = GetRowsPerBatch(executionContext);
+            var rowsPerBatch = GetRowsPerBatch();
 
             return new ProcessorStatistics
             (
@@ -320,9 +317,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             );
         }
 
-        private int GetRowsPerBatch(ExecutionContext executionContext)
+        private int GetRowsPerBatch()
         {
-            return _overrideRowsPerBatch ?? Convert.ToInt32(LoadAppSettings(executionContext).GetValue<string>("RowsPerBatch"));
+            return Int32.Parse(Environment.GetEnvironmentVariable("RowsPerBatch") 
+                               ?? throw new InvalidOperationException("RowsPerBatch variable must be specified"));
         }
 
         private static IConfigurationRoot LoadAppSettings(ExecutionContext context)

@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             // cut off prior to doing the last status update at Stage 4.  Therefore set the status to complete.
             if (!batchFilesForDataFile.Any())
             {
-                    await _dataImportService.UpdateStatus(importId, DataImportStatus.COMPLETE, 100);
+                await _dataImportService.UpdateStatus(importId, DataImportStatus.COMPLETE, 100);
             }
             
             var importBatchFileMessages = batchFilesForDataFile.Select(blobInfo =>
@@ -93,10 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 };
             }).ToList();
 
-            foreach (var importMessage in importBatchFileMessages)
-            {
-                collector.Add(importMessage);
-            }
+            importBatchFileMessages.ForEach(collector.Add);
         }
 
         private async Task SplitFiles(

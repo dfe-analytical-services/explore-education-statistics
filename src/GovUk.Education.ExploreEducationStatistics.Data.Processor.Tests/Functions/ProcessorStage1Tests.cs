@@ -129,13 +129,14 @@ public class ProcessorStage1Tests
 
         var rowsPerBatch = 5;
         
+        Environment.SetEnvironmentVariable("RowsPerBatch", rowsPerBatch.ToString());
+        
         var validatorService = new ValidatorService(
             Mock.Of<ILogger<ValidatorService>>(),
             blobStorageService.Object,
             new FileTypeService(Mock.Of<ILogger<FileTypeService>>()),
             dataImportService,
-            importerService,
-            overrideRowsPerBatch: rowsPerBatch);
+            importerService);
 
         var processorService = BuildProcessorService(
             dbContextSupplier,

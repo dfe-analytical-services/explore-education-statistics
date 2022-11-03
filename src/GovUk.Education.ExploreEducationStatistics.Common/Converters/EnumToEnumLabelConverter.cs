@@ -23,21 +23,21 @@ public class EnumToEnumLabelConverter<TEnum> : ValueConverter<TEnum, string> whe
 
     private static string ToProvider(TEnum value)
     {
-        return value.GetEnumValue();
+        return value.GetEnumLabel();
     }
 
-    private static TEnum FromProvider(string value)
+    private static TEnum FromProvider(string label)
     {
-        if (value == null)
+        if (label == null)
         {
-            throw new ArgumentOutOfRangeException($"Enum label cannot be null");
+            throw new ArgumentOutOfRangeException($"{nameof(label)} cannot be null");
         }
         
-        if (Lookup.TryGetValue(value.ToLower(), out var enumLabel))
+        if (Lookup.TryGetValue(label.ToLower(), out var enumValue))
         {
-            return enumLabel;
+            return enumValue;
         }
 
-        throw new ArgumentOutOfRangeException($"No enum label found for {value}");
+        throw new ArgumentOutOfRangeException($"No enum value found for {nameof(label)} {label}");
     }
 }

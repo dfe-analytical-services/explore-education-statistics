@@ -126,23 +126,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             // Perform case-sensitive comparison on the Name fields
             return locations.FirstOrDefault(location =>
                 location.Country_Name == locationToLookup.Country_Name
-                && location.EnglishDevolvedArea_Name == locationToLookup.EnglishDevolvedArea?.Name
-                && location.Institution_Name == locationToLookup.Institution?.Name
-                && location.LocalAuthority_Name == locationToLookup.LocalAuthority?.Name
-                && location.LocalAuthorityDistrict_Name == locationToLookup.LocalAuthorityDistrict?.Name
-                && location.LocalEnterprisePartnership_Name == locationToLookup.LocalEnterprisePartnership?.Name
-                && location.MayoralCombinedAuthority_Name == locationToLookup.MayoralCombinedAuthority?.Name
-                && location.MultiAcademyTrust_Name == locationToLookup.MultiAcademyTrust?.Name
-                && location.OpportunityArea_Name == locationToLookup.OpportunityArea?.Name
-                && location.ParliamentaryConstituency_Name == locationToLookup.ParliamentaryConstituency?.Name
-                && location.PlanningArea_Name == locationToLookup.PlanningArea?.Name
-                && location.Provider_Name == locationToLookup.Provider?.Name
-                && location.Region_Name == locationToLookup.Region?.Name
-                && location.RscRegion_Code == locationToLookup.RscRegion?.Code // RscRegion codes function as the name
-                && location.School_Name == locationToLookup.School?.Name
-                && location.Sponsor_Name == locationToLookup.Sponsor?.Name
-                && location.Ward_Name == locationToLookup.Ward?.Name
-            );
+                && location.EnglishDevolvedArea_Name == locationToLookup.EnglishDevolvedArea_Name
+                && location.Institution_Name == locationToLookup.Institution_Name
+                && location.LocalAuthority_Name == locationToLookup.LocalAuthority_Name
+                && location.LocalAuthorityDistrict_Name == locationToLookup.LocalAuthorityDistrict_Name
+                && location.LocalEnterprisePartnership_Name == locationToLookup.LocalEnterprisePartnership_Name
+                && location.MayoralCombinedAuthority_Name == locationToLookup.MayoralCombinedAuthority_Name
+                && location.MultiAcademyTrust_Name == locationToLookup.MultiAcademyTrust_Name
+                && location.OpportunityArea_Name == locationToLookup.OpportunityArea_Name
+                && location.ParliamentaryConstituency_Name == locationToLookup.ParliamentaryConstituency_Name
+                && location.PlanningArea_Name == locationToLookup.PlanningArea_Name
+                && location.Provider_Name == locationToLookup.Provider_Name
+                && location.Region_Name == locationToLookup.Region_Name
+                && location.RscRegion_Code == locationToLookup.RscRegion_Code // RscRegion codes function as the name
+                && location.School_Name == locationToLookup.School_Name
+                && location.Sponsor_Name == locationToLookup.Sponsor_Name
+                && location.Ward_Name == locationToLookup.Ward_Name);
         }
 
         public async Task<List<Location>> CreateAndCache(StatisticsDbContext context, List<Location> locations)
