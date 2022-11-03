@@ -194,9 +194,10 @@ public class ProcessorStage4MessageDispatchTests
             new BlobInfo($"{import.File.BatchesPath()}{import.File.Id}_000002", "text/csv", 0)
         );
         
-        blobStorageService
-            .Setup(s => s.ListBlobs(PrivateReleaseFiles, import.File.BatchesPath()))
-            .ReturnsAsync(() => availableBatchFiles);
+        blobStorageService.SetupListBlobs(
+            PrivateReleaseFiles, 
+            import.File.BatchesPath(), 
+            availableBatchFiles);
 
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
@@ -322,9 +323,7 @@ public class ProcessorStage4MessageDispatchTests
         // right at the end of its Stage 4 import run. 
         var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
-        blobStorageService
-            .Setup(s => s.ListBlobs(PrivateReleaseFiles, import.File.BatchesPath()))
-            .ReturnsAsync(() => new List<BlobInfo>());
+        blobStorageService.SetupListBlobs(PrivateReleaseFiles, import.File.BatchesPath());
 
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,

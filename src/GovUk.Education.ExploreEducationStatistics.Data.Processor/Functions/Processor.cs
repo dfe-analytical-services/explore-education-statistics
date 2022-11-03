@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
@@ -75,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                         break;
                     }
                     case DataImportStatus.STAGE_1:
-                        await _processorService.ProcessStage1(import.Id, executionContext);
+                        await _processorService.ProcessStage1(import.Id);
                         await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_2, 0);
                         importStagesMessageQueue.Add(message);
                         break;
@@ -98,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             {
                 var ex = GetInnerException(e);
 
-                _logger.LogError(ex, $"{GetType().Name} function FAILED for Import: " +
+                _logger.LogError(ex, $"{executionContext.FunctionName} function FAILED for Import: " +
                                      $"{message.Id} : {ex.Message}");
                 _logger.LogError(ex.StackTrace);
 

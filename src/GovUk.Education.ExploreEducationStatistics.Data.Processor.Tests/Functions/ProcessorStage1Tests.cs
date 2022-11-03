@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -86,13 +87,15 @@ public class ProcessorStage1Tests
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + metaFileUnderTest);
 
-        blobStorageService
-            .Setup(s => s.StreamBlob(PrivateReleaseFiles, import.File.Path(), null))
-            .ReturnsAsync(() => System.IO.File.OpenRead(dataFilePath));
-
-        blobStorageService
-            .Setup(s => s.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path(), null))
-            .ReturnsAsync(() => System.IO.File.OpenRead(metaFilePath));
+        blobStorageService.SetupStreamBlob(
+            PrivateReleaseFiles, 
+            import.File.Path(), 
+            dataFilePath);
+        
+        blobStorageService.SetupStreamBlob(
+            PrivateReleaseFiles, 
+            import.MetaFile.Path(), 
+            metaFilePath);
 
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,

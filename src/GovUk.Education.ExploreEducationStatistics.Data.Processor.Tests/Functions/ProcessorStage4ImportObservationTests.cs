@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -130,15 +131,17 @@ public class ProcessorStage4ImportObservationTests
 
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + metaFileUnderTest);
-
-        blobStorageService
-            .Setup(s => s.StreamBlob(PrivateReleaseFiles, import.File.Path(), null))
-            .ReturnsAsync(() => System.IO.File.OpenRead(dataFilePath));
-
-        blobStorageService
-            .Setup(s => s.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path(), null))
-            .ReturnsAsync(() => System.IO.File.OpenRead(metaFilePath));
-
+        
+        blobStorageService.SetupStreamBlob(
+            PrivateReleaseFiles, 
+            import.File.Path(), 
+            dataFilePath);
+        
+        blobStorageService.SetupStreamBlob(
+            PrivateReleaseFiles, 
+            import.MetaFile.Path(), 
+            metaFilePath);
+        
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
@@ -322,24 +325,25 @@ public class ProcessorStage4ImportObservationTests
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + metaFileUnderTest);
 
-        blobStorageService
-            .Setup(s => s.StreamBlob(PrivateReleaseFiles, import.File.Path(), null))
-            .ReturnsAsync(() => System.IO.File.OpenRead(dataFilePath));
-
-        blobStorageService
-            .Setup(s => s.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path(), null))
-            .ReturnsAsync(() => System.IO.File.OpenRead(metaFilePath));
+        blobStorageService.SetupStreamBlob(
+            PrivateReleaseFiles, 
+            import.File.Path(), 
+            dataFilePath);
+        
+        blobStorageService.SetupStreamBlob(
+            PrivateReleaseFiles, 
+            import.MetaFile.Path(), 
+            metaFilePath);
         
         blobStorageService
             .Setup(s => s.DeleteBlob(PrivateReleaseFiles, importObservationsMessage.ObservationsFilePath))
             .Returns(Task.CompletedTask);
         
-        var remainingBatchFiles = ListOf(
+        // There is one additional batch file remaining.
+        blobStorageService.SetupListBlobs(
+            PrivateReleaseFiles, 
+            import.File.BatchesPath(), 
             new BlobInfo($"{import.File.BatchesPath()}{import.File.Id}_000002", "text/csv", 0));
-        
-        blobStorageService
-            .Setup(s => s.ListBlobs(PrivateReleaseFiles, import.File.BatchesPath()))
-            .ReturnsAsync(() => remainingBatchFiles);
 
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
@@ -519,21 +523,21 @@ public class ProcessorStage4ImportObservationTests
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + metaFileUnderTest);
 
-        blobStorageService
-            .Setup(s => s.StreamBlob(PrivateReleaseFiles, import.File.Path(), null))
-            .ReturnsAsync(() => System.IO.File.OpenRead(dataFilePath));
-
-        blobStorageService
-            .Setup(s => s.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path(), null))
-            .ReturnsAsync(() => System.IO.File.OpenRead(metaFilePath));
+        blobStorageService.SetupStreamBlob(
+            PrivateReleaseFiles, 
+            import.File.Path(), 
+            dataFilePath);
+        
+        blobStorageService.SetupStreamBlob(
+            PrivateReleaseFiles, 
+            import.MetaFile.Path(), 
+            metaFilePath);
         
         blobStorageService
             .Setup(s => s.DeleteBlob(PrivateReleaseFiles, importObservationsMessage.ObservationsFilePath))
             .Returns(Task.CompletedTask);
         
-        blobStorageService
-            .Setup(s => s.ListBlobs(PrivateReleaseFiles, import.File.BatchesPath()))
-            .ReturnsAsync(() => new List<BlobInfo>());
+        blobStorageService.SetupListBlobs(PrivateReleaseFiles, import.File.BatchesPath());
 
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,

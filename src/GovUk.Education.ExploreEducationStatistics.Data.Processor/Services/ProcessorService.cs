@@ -54,9 +54,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await _dataArchiveService.ExtractDataFiles(import);
         }
 
-        public async Task ProcessStage1(Guid importId, ExecutionContext executionContext)
+        public async Task ProcessStage1(Guid importId)
         {
-            await _validatorService.Validate(importId, executionContext)
+            await _validatorService.Validate(importId)
                 .OnSuccessDo(async result =>
                 {
                     await _dataImportService.Update(importId,

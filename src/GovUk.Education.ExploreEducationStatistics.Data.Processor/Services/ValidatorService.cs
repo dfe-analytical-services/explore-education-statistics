@@ -13,8 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -85,9 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             "geographic_level"
         };
         
-        public async Task<Either<List<DataImportError>, ProcessorStatistics>> Validate(
-            Guid importId,
-            ExecutionContext executionContext)
+        public async Task<Either<List<DataImportError>, ProcessorStatistics>> Validate(Guid importId)
         {
             var import = await _dataImportService.GetImport(importId);
 
@@ -117,7 +113,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                                 dataFileColumnHeaders,
                                 dataFileTotalRows,
                                 dataFileStreamProvider,
-                                executionContext, 
                                 import.Id)
                             )
                             .OnSuccessDo(async () =>
@@ -230,7 +225,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 List<string> columnHeaders,
                 int totalRows,
                 Func<Task<Stream>> dataFileStreamProvider,
-                ExecutionContext executionContext,
                 Guid importId)
         {
             var rowCountByGeographicLevel = new Dictionary<GeographicLevel, int>();
@@ -321,15 +315,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             return Int32.Parse(Environment.GetEnvironmentVariable("RowsPerBatch") 
                                ?? throw new InvalidOperationException("RowsPerBatch variable must be specified"));
-        }
-
-        private static IConfigurationRoot LoadAppSettings(ExecutionContext context)
-        {
-            return new ConfigurationBuilder()
-                .SetBasePath(context.FunctionAppDirectory)
-                .AddJsonFile("local.settings.json", true, true)
-                .AddEnvironmentVariables()
-                .Build();
         }
 
         private static int GetNumBatches(int rows, int rowsPerBatch)

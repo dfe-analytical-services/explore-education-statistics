@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -191,15 +192,14 @@ public class ProcessorStage3Tests
         var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + dataFileUnderTest);
 
-        blobStorageService
-            .Setup(s => s.StreamBlob(PrivateReleaseFiles, import.File.Path(), null))
-            .ReturnsAsync(() => System.IO.File.OpenRead(dataFilePath));
-
+        blobStorageService.SetupStreamBlob(
+            PrivateReleaseFiles, 
+            import.File.Path(), 
+            dataFilePath);
+        
         // Expect that we'll try to find out which batch files have already been created. In this scenario, none have
         // yet been created.
-        blobStorageService
-            .Setup(s => s.ListBlobs(PrivateReleaseFiles, import.File.BatchesPath()))
-            .ReturnsAsync(() => new List<BlobInfo>());
+        blobStorageService.SetupListBlobs(PrivateReleaseFiles, import.File.BatchesPath());
 
         var uploadedFileContents = new List<string[]>();
         
@@ -346,20 +346,18 @@ public class ProcessorStage3Tests
         var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + dataFileUnderTest);
 
-        blobStorageService
-            .Setup(s => s.StreamBlob(PrivateReleaseFiles, import.File.Path(), null))
-            .ReturnsAsync(() => System.IO.File.OpenRead(dataFilePath));
-
+        blobStorageService.SetupStreamBlob(
+            PrivateReleaseFiles, 
+            import.File.Path(), 
+            dataFilePath);
+        
         // Expect that we'll try to find out which batch files have already been created. In this scenario, 2 of the 4
         // batches are already previously created, probably by the import Function being killed mid-run.
-        var preExistingBatchFiles = ListOf(
+        blobStorageService.SetupListBlobs(
+            PrivateReleaseFiles, 
+            import.File.BatchesPath(), 
             new BlobInfo($"{import.File.BatchesPath()}{import.File.Id}_000001", "text/csv", 0),
-            new BlobInfo($"{import.File.BatchesPath()}{import.File.Id}_000002", "text/csv", 0)
-        );
-        
-        blobStorageService
-            .Setup(s => s.ListBlobs(PrivateReleaseFiles, import.File.BatchesPath()))
-            .ReturnsAsync(() => preExistingBatchFiles);
+            new BlobInfo($"{import.File.BatchesPath()}{import.File.Id}_000002", "text/csv", 0));
 
         var uploadedFileContents = new List<string[]>();
         
@@ -504,10 +502,11 @@ public class ProcessorStage3Tests
         var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + dataFileUnderTest);
 
-        blobStorageService
-            .Setup(s => s.StreamBlob(PrivateReleaseFiles, import.File.Path(), null))
-            .ReturnsAsync(() => System.IO.File.OpenRead(dataFilePath));
-
+        blobStorageService.SetupStreamBlob(
+            PrivateReleaseFiles, 
+            import.File.Path(), 
+            dataFilePath);
+        
         // Expect that we'll try to find out which batch files have already been created. In this scenario, all batch
         // files are already created, probably due to the import Function being killed right at the end of Stage 3.
         var preExistingBatchFiles = Enumerable.Range(1, 4)
@@ -517,9 +516,10 @@ public class ProcessorStage3Tests
                 0))
             .ToList();
         
-        blobStorageService
-            .Setup(s => s.ListBlobs(PrivateReleaseFiles, import.File.BatchesPath()))
-            .ReturnsAsync(() => preExistingBatchFiles);
+        blobStorageService.SetupListBlobs(
+            PrivateReleaseFiles, 
+            import.File.BatchesPath(), 
+            preExistingBatchFiles);
 
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
