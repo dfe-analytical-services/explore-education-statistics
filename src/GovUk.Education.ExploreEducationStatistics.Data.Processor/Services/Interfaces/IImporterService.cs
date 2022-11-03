@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -13,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 {
     public interface IImporterService
     {
-        void ImportMeta(
+        Task<SubjectMeta> ImportMeta(
             List<string> metaFileCsvHeaders,
             List<List<string>> metaFileRows, 
             Subject subject, 

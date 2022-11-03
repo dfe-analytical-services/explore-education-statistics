@@ -22,19 +22,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IBlobStorageService _blobStorageService;
         private readonly IDataImportService _dataImportService;
         private readonly IImporterService _importerService;
+        private readonly IDatabaseHelper _databaseHelper;
 
         public FileImportService(
             ILogger<FileImportService> logger,
             IBatchService batchService,
             IBlobStorageService blobStorageService,
             IDataImportService dataImportService,
-            IImporterService importerService)
+            IImporterService importerService, 
+            IDatabaseHelper databaseHelper)
         {
             _logger = logger;
             _batchService = batchService;
             _blobStorageService = blobStorageService;
             _dataImportService = dataImportService;
             _importerService = importerService;
+            _databaseHelper = databaseHelper;
         }
 
         public async Task ImportObservations(ImportObservationsMessage message, StatisticsDbContext context)
@@ -68,10 +71,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var metaFileCsvHeaders = await CsvUtil.GetCsvHeaders(metaFileStreamProvider);
             var metaFileCsvRows = await CsvUtil.GetCsvRows(metaFileStreamProvider);
 
-            await context.Database.CreateExecutionStrategy().Execute(async () =>
+            await _databaseHelper.DoInTransaction(context, async () =>
             {
-                await using var transaction = await context.Database.BeginTransactionAsync();
-
                 await _importerService.ImportObservations(
                     import,
                     datafileStreamProvider,
@@ -80,9 +81,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     message.BatchNo,
                     context
                 );
-
-                await transaction.CommitAsync();
-                await context.Database.CloseConnectionAsync();
             });
 
             if (import.NumBatches > 1)
@@ -134,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return;
             }
 
-            if (import.NumBatches == 1 || await _batchService.GetNumBatchesRemaining(import.File) == 0)
+            if (!import.BatchingRequired() || await _batchService.GetNumBatchesRemaining(import.File) == 0)
             {
                 var observationCount = context.Observation.Count(o => o.SubjectId.Equals(import.SubjectId));
 

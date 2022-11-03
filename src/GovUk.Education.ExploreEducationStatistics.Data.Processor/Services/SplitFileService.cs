@@ -35,21 +35,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _dataImportService = dataImportService;
         }
 
-        public async Task SplitDataFile(Guid importId)
+        public async Task SplitDataFileIfRequired(Guid importId)
         {
             var import = await _dataImportService.GetImport(importId);
             var dataFileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
-            var totalRows = await CsvUtil.GetTotalRows(dataFileStreamProvider);
-            if (totalRows > import.RowsPerBatch)
-            {
-                _logger.LogInformation($"Splitting Datafile: {import.File.Filename}");
-                await SplitFiles(import, totalRows, dataFileStreamProvider);
-                _logger.LogInformation($"Split of Datafile: {import.File.Filename} complete");
-            }
-            else
+            
+            if (!import.BatchingRequired())
             {
                 _logger.LogInformation($"No splitting of datafile: {import.File.Filename} was necessary");
+                return;
             }
+
+            _logger.LogInformation($"Splitting Datafile: {import.File.Filename}");
+            await SplitFiles(import, dataFileStreamProvider);
+            _logger.LogInformation($"Split of Datafile: {import.File.Filename} complete");
         }
 
         public async Task AddBatchDataFileMessages(
@@ -58,10 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var import = await _dataImportService.GetImport(importId);
 
-            var batchFilesForDataFile = await _batchService.GetBatchFilesForDataFile(import.File);
-
             // If no batching was necessary, simply add a message to process the lone data file
-            if (!batchFilesForDataFile.Any())
+            if (!import.BatchingRequired())
             {
                 collector.Add(new ImportObservationsMessage
                 {
@@ -71,8 +68,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 });
                 return;
             }
-
+            
             // Otherwise create a message per batch file to process
+            var batchFilesForDataFile = await _batchService.GetBatchFilesForDataFile(import.File);
+
+            // If batching was required but no batch files remain to process, the import has been completed but
+            // cut off prior to doing the last status update at Stage 4.  Therefore set the status to complete.
+            if (!batchFilesForDataFile.Any())
+            {
+                await _dataImportService.UpdateStatus(importId, DataImportStatus.COMPLETE, 100);
+            }
+            
             var importBatchFileMessages = batchFilesForDataFile.Select(blobInfo =>
             {
                 var batchFileName = blobInfo.FileName;
@@ -85,21 +91,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     BatchNo = batchNo,
                     ObservationsFilePath = batchFilePath
                 };
-            });
+            }).ToList();
 
-            foreach (var importMessage in importBatchFileMessages)
-            {
-                collector.Add(importMessage);
-            }
+            importBatchFileMessages.ForEach(collector.Add);
         }
 
         private async Task SplitFiles(
             DataImport dataImport,
-            int totalRows,
             Func<Task<Stream>> dataFileStreamProvider)
         {
             var csvHeaders = await CsvUtil.GetCsvHeaders(dataFileStreamProvider);
-            var totalNumberOfBatches = (int) Math.Ceiling((double) totalRows / dataImport.RowsPerBatch);
 
             var existingBatchFiles = await _batchService.GetBatchFilesForDataFile(dataImport.File);
 
@@ -112,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             
             var currentBatchNumber = 1;
             
-            while (currentBatchNumber <= totalNumberOfBatches)
+            while (currentBatchNumber <= dataImport.NumBatches)
             {
                 var currentStatus = await _dataImportService.GetImportStatus(dataImport.Id);
 
@@ -138,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 
                 var currentRowNumberInBatch = 1;
 
-                while (!streamReader.EndOfStream && currentRowNumberInBatch < dataImport.RowsPerBatch)
+                while (!streamReader.EndOfStream && currentRowNumberInBatch <= dataImport.RowsPerBatch)
                 {
                     var nextLine = await streamReader.ReadLineAsync();
                     await writer.WriteLineAsync(nextLine);
@@ -153,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     stream: writeStream,
                     contentType: "text/csv");
                 
-                var percentageComplete = (double) currentBatchNumber / totalNumberOfBatches * 100;
+                var percentageComplete = (double) currentBatchNumber / dataImport.NumBatches * 100;
 
                 await _dataImportService.UpdateStatus(dataImport.Id, DataImportStatus.STAGE_3, percentageComplete);
 
@@ -165,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var currentRowNumberInBatch = 1;
 
-            while (!streamReader.EndOfStream && currentRowNumberInBatch < dataImport.RowsPerBatch)
+            while (!streamReader.EndOfStream && currentRowNumberInBatch <= dataImport.RowsPerBatch)
             {
                 await streamReader.ReadLineAsync();
                 currentRowNumberInBatch++;

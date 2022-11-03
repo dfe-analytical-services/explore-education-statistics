@@ -52,6 +52,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public int RowsPerBatch { get; set; }
 
+        /// <summary>
+        /// Note that this means "importable row count" rather than indicating the actual number of rows
+        /// already imported.  This is effectively a count of rows that are not excluded from import.
+        /// </summary>
         public int? ImportedRows { get; set; }
 
         public HashSet<GeographicLevel> GeographicLevels { get; set; } = new();
@@ -84,6 +88,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public bool HasSoleGeographicLevel()
         {
             return GeographicLevels is {Count: 1};
+        }
+
+        public bool BatchingRequired()
+        {
+            return NumBatches > 1;
         }
 
         public override string ToString()

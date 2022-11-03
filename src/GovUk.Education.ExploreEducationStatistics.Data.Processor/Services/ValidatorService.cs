@@ -13,8 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -85,9 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             "geographic_level"
         };
         
-        public async Task<Either<List<DataImportError>, ProcessorStatistics>> Validate(
-            Guid importId,
-            ExecutionContext executionContext)
+        public async Task<Either<List<DataImportError>, ProcessorStatistics>> Validate(Guid importId)
         {
             var import = await _dataImportService.GetImport(importId);
 
@@ -105,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 ValidateCsvFileType(import.MetaFile, metaFileStreamProvider, true)
                     .OnSuccess(() => ValidateCsvFileType(import.File, dataFileStreamProvider, false))
                     .OnSuccess(() => ValidateMetadataFile(import.MetaFile, metaFileStreamProvider, true))
-                    .OnSuccess(async metaFileDetails =>
+                    .OnSuccess(async _ =>
                     {
                         var dataFileColumnHeaders = await CsvUtil.GetCsvHeaders(dataFileStreamProvider);
                         var dataFileTotalRows = await CsvUtil.GetTotalRows(dataFileStreamProvider);
@@ -116,11 +112,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                                 import,
                                 dataFileColumnHeaders,
                                 dataFileTotalRows,
-                                dataFileStreamProvider,
-                                executionContext)
+                                dataFileStreamProvider
                             )
                             .OnSuccessDo(async () =>
-                                _logger.LogInformation("Validating: {FileName} complete", import.File.Filename));
+                                _logger.LogInformation("Validating: {FileName} complete", import.File.Filename)));
                     });
         }
 
@@ -228,8 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 DataImport import,
                 List<string> columnHeaders,
                 int totalRows,
-                Func<Task<Stream>> dataFileStreamProvider,
-                ExecutionContext executionContext)
+                Func<Task<Stream>> dataFileStreamProvider)
         {
             var rowCountByGeographicLevel = new Dictionary<GeographicLevel, int>();
             var errors = new List<DataImportError>();
@@ -244,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 
                 if (cells.Count != columnHeaders.Count)
                 {
-                    errors.Add(new DataImportError($"error at row {index + 1}: cell count {cells.Count} " +
+                    errors.Add(new DataImportError($"Error at row {index + 1}: cell count {cells.Count} " +
                                                    $"does not match column header count of {columnHeaders.Count}"));
                     return true;
                 }
@@ -279,7 +273,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
                 catch (Exception e)
                 {
-                    errors.Add(new DataImportError($"error at row {index + 1}: {e.Message}"));
+                    errors.Add(new DataImportError($"Error at row {index + 1}: {e.Message}"));
                 }
 
                 if (index % Stage1RowCheck == 0)
@@ -304,7 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 DataImportStatus.STAGE_1,
                 100);
 
-            var rowsPerBatch = Convert.ToInt32(LoadAppSettings(executionContext).GetValue<string>("RowsPerBatch"));
+            var rowsPerBatch = GetRowsPerBatch();
 
             return new ProcessorStatistics
             (
@@ -316,13 +310,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             );
         }
 
-        private static IConfigurationRoot LoadAppSettings(ExecutionContext context)
+        private int GetRowsPerBatch()
         {
-            return new ConfigurationBuilder()
-                .SetBasePath(context.FunctionAppDirectory)
-                .AddJsonFile("local.settings.json", true, true)
-                .AddEnvironmentVariables()
-                .Build();
+            return Int32.Parse(Environment.GetEnvironmentVariable("RowsPerBatch") 
+                               ?? throw new InvalidOperationException("RowsPerBatch variable must be specified"));
         }
 
         private static int GetNumBatches(int rows, int rowsPerBatch)

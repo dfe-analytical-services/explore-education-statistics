@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
     {
         Task ProcessUnpackingArchive(Guid importId);
 
-        Task ProcessStage1(Guid importId, ExecutionContext executionContext);
+        Task ProcessStage1(Guid importId);
 
         Task ProcessStage2(Guid importId);
 

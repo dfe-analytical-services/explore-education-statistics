@@ -8,6 +8,7 @@ import testData from '../../testData';
 import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
 import utils from '../../../utils/utils';
+import loggingUtils from '../../../utils/loggingUtils';
 
 const tearDownData = false;
 const publicationTitle =
@@ -122,6 +123,8 @@ export function setup(): SetupData {
   } = getOrCreateReleaseWithSubject();
 
   const { subjectMeta } = adminService.getSubjectMeta({ releaseId, subjectId });
+
+  loggingUtils.logDashboardUrls();
 
   return {
     themeId,

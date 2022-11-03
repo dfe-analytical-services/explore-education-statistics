@@ -11,6 +11,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services
 {
@@ -78,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             Assert.Equal(import.MetaFile.Id, result.MetaFile.Id);
 
             Assert.NotNull(import.ZipFile);
-            Assert.Equal(import.ZipFile.Id, result.ZipFile.Id);
+            Assert.Equal(import.ZipFile.Id, result.ZipFile!.Id);
         }
 
         [Fact]
@@ -88,8 +89,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             {
                 Errors = new List<DataImportError>
                 {
-                    new DataImportError("error 1"),
-                    new DataImportError("error 2")
+                    new("error 1"),
+                    new("error 2")
                 },
                 File = new File(),
                 MetaFile = new File(),
@@ -161,13 +162,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             }
         }
 
-        private static DataImportService BuildDataImportService(string? contentDbContextId = null)
+        private static DataImportService BuildDataImportService(
+            string? contentDbContextId = null)
         {
             return new DataImportService(
-                contentDbContextId == null
-                    ? InMemoryContentDbContextOptions()
-                    : InMemoryContentDbContextOptions(contentDbContextId),
-                new Mock<ILogger<DataImportService>>().Object
+                new InMemoryDbContextSupplier(contentDbContextId ?? Guid.NewGuid().ToString()),
+                Mock.Of<ILogger<DataImportService>>(Strict),
+                new InMemoryDatabaseHelper()
             );
         }
     }
