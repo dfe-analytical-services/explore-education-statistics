@@ -732,6 +732,48 @@ describe('ChartLegendConfiguration', () => {
     });
   });
 
+  test('shows validation error if position is inline and showDataLabels is true', async () => {
+    render(
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartLegendConfiguration
+          definition={lineChartBlockDefinition}
+          meta={testTable.subjectMeta}
+          data={testTable.results}
+          axisMajor={{
+            dataSets: [
+              {
+                filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+                indicator: 'authorised-absence-sessions',
+              },
+            ],
+            groupBy: 'timePeriod',
+            referenceLines: [],
+            type: 'major',
+            visible: true,
+          }}
+          legend={{
+            position: 'top',
+            items: [],
+          }}
+          showDataLabels
+          onSubmit={noop}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
+    );
+
+    userEvent.selectOptions(screen.getByLabelText('Legend position'), 'inline');
+    userEvent.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('link', {
+          name: 'Inline legends cannot be used with data labels',
+        }),
+      ).toHaveAttribute('href', '#chartLegendConfigurationForm-position');
+    });
+  });
+
   test('submitting fails with invalid values', async () => {
     const handleSubmit = jest.fn();
 

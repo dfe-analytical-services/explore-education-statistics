@@ -53,6 +53,8 @@ const HorizontalBarBlock = ({
   axes,
   legend,
   includeNonNumericData,
+  showDataLabels,
+  dataLabelPosition,
 }: HorizontalBarProps) => {
   const [legendProps, renderLegend] = useLegend();
 
@@ -163,6 +165,23 @@ const HorizontalBarBlock = ({
               fill={config.colour}
               unit={dataSet.indicator.unit}
               stackId={stacked ? 'a' : undefined}
+              label={
+                showDataLabels
+                  ? {
+                      fontSize: 14,
+                      position:
+                        dataLabelPosition === 'inside'
+                          ? 'insideRight'
+                          : 'right',
+                      formatter: value =>
+                        formatPretty(
+                          value.toString(),
+                          dataSet.indicator.unit,
+                          dataSet.indicator.decimalPlaces,
+                        ),
+                    }
+                  : undefined
+              }
             />
           ))}
 

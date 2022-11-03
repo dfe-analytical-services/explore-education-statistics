@@ -19,6 +19,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
+using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -128,7 +129,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Mock.Of<IReleaseFileRepository>(),
                 Mock.Of<IReleaseFileService>(),
                 Mock.Of<IReleaseRepository>(),
-                Options.Create(new ReleaseApprovalOptions())
+                Options.Create(new ReleaseApprovalOptions()), 
+                Mock.Of<IUserReleaseRoleService>(),
+                Mock.Of<IEmailTemplateService>()
             );
         }
 

@@ -767,6 +767,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<DateTime?>("NotifiedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("NotifyReleaseApprovers")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("NotifySubscribers")
                         .HasColumnType("bit");
 

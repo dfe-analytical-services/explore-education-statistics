@@ -6,13 +6,18 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
-    public class FootnoteRepository : AbstractRepository<Footnote, Guid>, IFootnoteRepository
+    public class FootnoteRepository : IFootnoteRepository
     {
-        public FootnoteRepository(StatisticsDbContext context) : base(context)
-        {}
+        private readonly StatisticsDbContext _context;
+
+        public FootnoteRepository(StatisticsDbContext context)
+        {
+            _context = context;
+        }
 
         public IEnumerable<Footnote> GetFilteredFootnotes(
             Guid releaseId,
@@ -86,7 +91,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 
                 if (canRemoveFootnote)
                 {
-                    await RemoveAsync(footnote.Id);
+                    var footnoteToRemove = await _context.Footnote.SingleAsync(f => f.Id == footnote.Id);
+                    _context.Footnote.Remove(footnoteToRemove);
                 }
             }
         }

@@ -23,6 +23,7 @@ using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.CronExpressionUtil;
+using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -40,6 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseFileService _releaseFileService;
         private readonly IReleaseRepository _releaseRepository;
         private readonly ReleaseApprovalOptions _options;
+        private readonly IUserReleaseRoleService _userReleaseRoleService;
+        private readonly IEmailTemplateService _emailTemplateService;
 
         public ReleaseApprovalService(
             ContentDbContext context,
@@ -53,7 +56,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseFileRepository releaseFileRepository,
             IReleaseFileService releaseFileService,
             IReleaseRepository releaseRepository,
-            IOptions<ReleaseApprovalOptions> options)
+            IOptions<ReleaseApprovalOptions> options,
+            IUserReleaseRoleService userReleaseRoleService,
+            IEmailTemplateService emailTemplateService)
         {
             _context = context;
             _persistenceHelper = persistenceHelper;
@@ -66,6 +71,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseFileRepository = releaseFileRepository;
             _releaseFileService = releaseFileService;
             _releaseRepository = releaseRepository;
+            _userReleaseRoleService = userReleaseRoleService;
+            _emailTemplateService = emailTemplateService;
             _options = options.Value;
         }
 
@@ -129,11 +136,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var notifySubscribers = request.ApprovalStatus == ReleaseApprovalStatus.Approved &&
                         (!release.Amendment || request.NotifySubscribers.HasValue && request.NotifySubscribers.Value);
 
+
+                    var userReleaseRoles =
+                        await _userReleaseRoleService.ListUserReleaseRolesByPublication(ReleaseRole.Approver,
+                            release.Publication.Id);
+
+                    var notifyReleaseApprovers = request.ApprovalStatus == ReleaseApprovalStatus.HigherLevelReview &&
+                                                 userReleaseRoles.Any();
+                    
                     var releaseStatus = new ReleaseStatus
                     {
                         Release = release,
                         InternalReleaseNote = request.LatestInternalReleaseNote,
                         NotifySubscribers = notifySubscribers,
+                        NotifyReleaseApprovers = notifyReleaseApprovers,
                         ApprovalStatus = request.ApprovalStatus,
                         Created = _dateTimeProvider.UtcNow,
                         CreatedById = _userService.GetUserId()
@@ -161,10 +177,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             _context.Update(release);
                             await _context.SaveChangesAsync();
 
-                            if (request.ApprovalStatus == ReleaseApprovalStatus.Approved)
+                            switch (request.ApprovalStatus)
                             {
-                                await _preReleaseUserService.SendPreReleaseUserInviteEmails(release.Id);
+                                case ReleaseApprovalStatus.Approved:
+                                    await _preReleaseUserService.SendPreReleaseUserInviteEmails(release.Id);
+                                    break;
+                                
+                                case ReleaseApprovalStatus.HigherLevelReview:
+                                    if (userReleaseRoles.Any())
+                                    {
+                                        foreach (var userReleaseRole in userReleaseRoles)
+                                        {
+                                            _emailTemplateService.SendReleaseApproverEmail(userReleaseRole.User.Email,
+                                                release);
+                                        }   
+                                    }
+                                    
+                                    break;
                             }
+                          
                         });
                 });
         }

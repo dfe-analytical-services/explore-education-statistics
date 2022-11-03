@@ -112,8 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                                 import,
                                 dataFileColumnHeaders,
                                 dataFileTotalRows,
-                                dataFileStreamProvider,
-                                import.Id)
+                                dataFileStreamProvider
                             )
                             .OnSuccessDo(async () =>
                                 _logger.LogInformation("Validating: {FileName} complete", import.File.Filename));
@@ -125,11 +124,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Func<Task<Stream>> fileStreamProvider,
             bool isMetaFile)
         {
-            if (!await _fileTypeService.IsValidCsvDataOrMetaFile(fileStreamProvider, file.Filename))
+            if (!await _fileTypeService.IsValidCsvFile(fileStreamProvider, file.Filename))
             {
                 return ListOf(isMetaFile
-                    ? new DataImportError($"{MetaFileMustBeCsvFile.GetEnumLabel()}")
-                    : new DataImportError($"{DataFileMustBeCsvFile.GetEnumLabel()}"));
+                    ? new DataImportError(MetaFileMustBeCsvFile.GetEnumLabel())
+                    : new DataImportError(DataFileMustBeCsvFile.GetEnumLabel()));
             }
 
             return Unit.Instance;
@@ -224,8 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 DataImport import,
                 List<string> columnHeaders,
                 int totalRows,
-                Func<Task<Stream>> dataFileStreamProvider,
-                Guid importId)
+                Func<Task<Stream>> dataFileStreamProvider)
         {
             var rowCountByGeographicLevel = new Dictionary<GeographicLevel, int>();
             var errors = new List<DataImportError>();
@@ -247,7 +245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 
                 if (index % Stage1RowCheck == 0)
                 {
-                    var currentStatus = await _dataImportService.GetImportStatus(importId);
+                    var currentStatus = await _dataImportService.GetImportStatus(import.Id);
                     
                     if (currentStatus.IsFinishedOrAborting())
                     {
@@ -280,7 +278,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 if (index % Stage1RowCheck == 0)
                 {
-                    await _dataImportService.UpdateStatus(importId,
+                    await _dataImportService.UpdateStatus(import.Id,
                         DataImportStatus.STAGE_1,
                         (double) index / totalRows * 100);
                 }
@@ -295,7 +293,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return errors;
             }
 
-            await _dataImportService.UpdateStatus(importId,
+            await _dataImportService.UpdateStatus(
+                import.Id,
                 DataImportStatus.STAGE_1,
                 100);
 

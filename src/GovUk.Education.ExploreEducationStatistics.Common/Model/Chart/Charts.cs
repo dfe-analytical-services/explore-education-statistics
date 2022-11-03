@@ -7,6 +7,19 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.Chart.Chart
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 {
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum BarChartDataLabelPosition
+    {
+        Inside, Outside
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum LineChartDataLabelPosition
+    {
+        Above, Below
+    }
+
     [JsonConverter(typeof(ContentBlockChartConverter))]
     public interface IChart
     {
@@ -39,6 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     public class LineChart : Chart
     {
         public override ChartType Type => Line;
+        public bool ShowDataLabels { get; set; }
+        public LineChartDataLabelPosition? DataLabelPosition { get; set; }
     }
 
     public class HorizontalBarChart : Chart
@@ -47,6 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
         public int? BarThickness { get; set; }
         public bool Stacked;
+        public bool ShowDataLabels { get; set; }
+        public BarChartDataLabelPosition? DataLabelPosition { get; set; }
     }
 
     public class VerticalBarChart : Chart
@@ -55,22 +72,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
         public int? BarThickness { get; set; }
         public bool Stacked;
+        public bool ShowDataLabels { get; set; }
+        public BarChartDataLabelPosition? DataLabelPosition { get; set; }
     }
 
     public class MapChart : Chart
     {
         public override ChartType Type => Map;
-        
+
         // TODO EES-3319 - make mandatory when all Map Charts are migrated to have a Boundary Level set
         public long? BoundaryLevel { get; set; }
-        
+
         [JsonConverter(typeof(StringEnumConverter))]
         public ChartDataClassification? DataClassification { get; set; }
-        
+
         public int? DataGroups { get; set; }
 
         public List<ChartCustomDataGroup>? CustomDataGroups { get; set; }
-    
+
     }
 
     public class InfographicChart : Chart

@@ -51,6 +51,7 @@ const DraftReleaseRow = ({ publicationId, release, onDelete }: Props) => {
       </td>
       <td>
         <Link
+          className="govuk-!-margin-right-4 dfe-inline-block"
           to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
             publicationId,
             releaseId: release.id,
@@ -59,16 +60,10 @@ const DraftReleaseRow = ({ publicationId, release, onDelete }: Props) => {
           {release.permissions?.canUpdateRelease ? 'Edit' : 'View'}
           <VisuallyHidden> {release.title}</VisuallyHidden>
         </Link>
-        {release.permissions?.canDeleteRelease && release.amendment && (
-          <ButtonText className="govuk-!-margin-left-4" onClick={onDelete}>
-            Cancel amendment
-            <VisuallyHidden> for {release.title}</VisuallyHidden>
-          </ButtonText>
-        )}
 
         {release.amendment && release.previousVersionId && (
           <Link
-            className="govuk-!-margin-left-4"
+            className="govuk-!-margin-right-4 dfe-inline-block"
             to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
               publicationId,
               releaseId: release.previousVersionId,
@@ -77,6 +72,13 @@ const DraftReleaseRow = ({ publicationId, release, onDelete }: Props) => {
             View existing version
             <VisuallyHidden> for {release.title}</VisuallyHidden>
           </Link>
+        )}
+
+        {release.permissions?.canDeleteRelease && release.amendment && (
+          <ButtonText variant="warning" onClick={onDelete}>
+            Cancel amendment
+            <VisuallyHidden> for {release.title}</VisuallyHidden>
+          </ButtonText>
         )}
       </td>
     </tr>

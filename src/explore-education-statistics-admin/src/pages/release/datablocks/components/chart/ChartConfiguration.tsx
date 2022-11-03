@@ -6,12 +6,24 @@ import {
   Form,
   FormFieldRadioGroup,
   FormFieldTextInput,
+  FormFieldSelect,
 } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
-import { ChartDefinition } from '@common/modules/charts/types/chart';
+import FormGroup from '@common/components/form/FormGroup';
+import WarningMessage from '@common/components/WarningMessage';
+import {
+  ChartDefinition,
+  BarChartDataLabelPosition,
+  LineChartDataLabelPosition,
+} from '@common/modules/charts/types/chart';
+import { LegendPosition } from '@common/modules/charts/types/legend';
+import {
+  barChartDataLabelPositions,
+  lineChartDataLabelPositions,
+} from '@common/modules/charts/util/chartUtils';
 import parseNumber from '@common/utils/number/parseNumber';
 import {
   convertServerFieldErrors,
@@ -20,12 +32,12 @@ import {
 } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
+import capitalize from 'lodash/capitalize';
 import mapValues from 'lodash/mapValues';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { ObjectSchema } from 'yup';
-import FormGroup from '@common/components/form/FormGroup';
 
 type FormValues = Partial<ChartOptions>;
 
@@ -51,6 +63,7 @@ interface Props {
   buttons?: ReactNode;
   chartOptions: ChartOptions;
   definition: ChartDefinition;
+  legendPosition?: LegendPosition;
   submitError?: ServerValidationErrorResponse;
   onChange: (chartOptions: ChartOptions) => void;
   onSubmit: (chartOptions: ChartOptions) => void;
@@ -62,6 +75,7 @@ const ChartConfiguration = ({
   buttons,
   chartOptions,
   definition,
+  legendPosition,
   submitError,
   onChange,
   onSubmit,
@@ -71,6 +85,17 @@ const ChartConfiguration = ({
     updateForm,
     submitForms,
   } = useChartBuilderFormsContext();
+
+  const dataLabelPositionOptions = useMemo(() => {
+    const options =
+      definition.type === 'line'
+        ? lineChartDataLabelPositions
+        : barChartDataLabelPositions;
+
+    return options.map(position => {
+      return { label: capitalize(position), value: position };
+    });
+  }, [definition.type]);
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     let schema: ObjectSchema<FormValues> = Yup.object<FormValues>({
@@ -133,12 +158,55 @@ const ChartConfiguration = ({
       });
     }
 
+    if (
+      definition.type === 'horizontalbar' ||
+      definition.type === 'verticalbar' ||
+      definition.type === 'line'
+    ) {
+      schema = schema.shape({
+        showDataLabels: Yup.boolean().test({
+          name: 'noInlineWithDataLabels',
+          message: 'Data labels cannot be used with inline legends',
+          test(value) {
+            return !(value && legendPosition === 'inline');
+          },
+        }),
+        dataLabelPosition:
+          definition.type === 'line'
+            ? Yup.string().oneOf<LineChartDataLabelPosition>(['above', 'below'])
+            : Yup.string().oneOf<BarChartDataLabelPosition>([
+                'inside',
+                'outside',
+              ]),
+      });
+    }
+
     return schema;
-  }, [definition.capabilities.stackable, definition.type]);
+  }, [definition.capabilities.stackable, definition.type, legendPosition]);
 
   const initialValues = useMemo<FormValues>(() => {
-    return pick(chartOptions, Object.keys(validationSchema.fields));
-  }, [chartOptions, validationSchema]);
+    const getInitialDataLabelPosition = () => {
+      if (
+        chartOptions.dataLabelPosition &&
+        dataLabelPositionOptions.find(
+          position => position.value === chartOptions.dataLabelPosition,
+        )
+      ) {
+        return chartOptions.dataLabelPosition;
+      }
+      return definition.type === 'line' ? 'above' : 'outside';
+    };
+
+    return {
+      ...pick(chartOptions, Object.keys(validationSchema.fields)),
+      dataLabelPosition: getInitialDataLabelPosition(),
+    };
+  }, [
+    chartOptions,
+    dataLabelPositionOptions,
+    definition.type,
+    validationSchema,
+  ]);
 
   const normalizeValues = useCallback(
     (values: FormValues): ChartOptions => {
@@ -282,6 +350,27 @@ const ChartConfiguration = ({
                   label="Include data sets with non-numerical values"
                 />
               </FormGroup>
+            )}
+
+            {validationSchema.fields.showDataLabels && (
+              <FormFieldCheckbox<FormValues>
+                name="showDataLabels"
+                hint={
+                  legendPosition === 'inline'
+                    ? 'Data labels cannot be shown when the legend is positioned inline.'
+                    : undefined
+                }
+                label="Show data labels"
+                showError={!!form.errors.showDataLabels}
+                conditional={
+                  <FormFieldSelect<FormValues>
+                    label="Data label position"
+                    name="dataLabelPosition"
+                    order={[]}
+                    options={dataLabelPositionOptions}
+                  />
+                }
+              />
             )}
 
             <ChartBuilderSaveActions

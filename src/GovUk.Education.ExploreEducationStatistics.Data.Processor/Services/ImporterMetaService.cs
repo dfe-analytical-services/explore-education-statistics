@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 values => new MetaRow
                 {
                     ColumnName = values[0],
-                    ColumnType = (ColumnType) Enum.Parse(typeof(ColumnType), values[1]),
+                    ColumnType = Enum.Parse<ColumnType>(values[1]),
                     Label = values[2],
                     FilterGroupingColumn = values[3],
                     FilterHint = values[4],

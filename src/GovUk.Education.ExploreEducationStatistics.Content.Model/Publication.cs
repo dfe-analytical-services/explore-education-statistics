@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 .ToList();
         }
 
-        private bool IsLatestPublishedVersionOfRelease(Release release)
+        public bool IsLatestPublishedVersionOfRelease(Release release)
         {
             if (Releases == null || !Releases.Any())
             {

@@ -66,6 +66,7 @@ const PreReleaseTableToolFinalStep = ({
         <TimePeriodDataTable
           ref={dataTableRef}
           query={query}
+          footnotesClassName="govuk-!-width-two-thirds"
           fullTable={table}
           tableHeadersConfig={tableHeaders}
         />

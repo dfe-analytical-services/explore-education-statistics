@@ -48,9 +48,9 @@ export default function PublicationPublishedReleasesTable({
         <tr>
           <th className="govuk-!-width-one-third">Release period</th>
           <th className={styles.statusColumn}>
-            State{' '}
+            Status{' '}
             <ButtonText onClick={onGuidanceClick}>
-              <InfoIcon description="Guidance on states" />
+              <InfoIcon description="Guidance on statuses" />
             </ButtonText>
           </th>
           <th>Published date</th>

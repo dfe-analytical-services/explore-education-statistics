@@ -1,5 +1,5 @@
 // Load app styles first to ensure correct style ordering
-import './App.scss';
+import './styles/_all.scss';
 
 import apiAuthorizationRouteList from '@admin/components/api-authorization/ApiAuthorizationRoutes';
 import PageErrorBoundary from '@admin/components/PageErrorBoundary';
