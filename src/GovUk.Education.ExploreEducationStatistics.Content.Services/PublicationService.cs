@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
@@ -45,12 +46,25 @@ public class PublicationService : IPublicationService
             });
     }
 
+    public async Task<Either<ActionResult, List<PublicationSearchResultViewModel>>> GetPublications(
+        ReleaseType? releaseType,
+        Guid? themeId,
+        string? search,
+        PublicationsSortBy sort,
+        SortOrder order,
+        int offset,
+        int limit)
+    {
+        return await Task.FromResult(new List<PublicationSearchResultViewModel>());
+    }
+
     private static Either<ActionResult, Release> GetLatestRelease(Publication publication)
     {
         return publication.LatestPublishedRelease() ?? new Either<ActionResult, Release>(new NotFoundResult());
     }
 
-    private async Task<PublicationCacheViewModel> BuildPublicationViewModel(Publication publication, Release latestRelease)
+    private async Task<PublicationCacheViewModel> BuildPublicationViewModel(Publication publication,
+        Release latestRelease)
     {
         return new PublicationCacheViewModel
         {
