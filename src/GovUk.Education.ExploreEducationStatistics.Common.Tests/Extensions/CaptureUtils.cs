@@ -12,7 +12,7 @@ public static class CaptureUtils
         {
             using var reader = new StreamReader(stream);
             stream.Position = 0;
-            var contents = reader.ReadToEnd().Split('\n');
+            var contents = reader.ReadToEnd().Split(Environment.NewLine);
             action.Invoke(contents);
         });
     }
