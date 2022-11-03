@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.Chart.ChartType;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 {
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]
     public enum BarChartDataLabelPosition
     {
         Inside, Outside
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]
     public enum LineChartDataLabelPosition
     {
         Above, Below
