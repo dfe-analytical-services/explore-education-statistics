@@ -8,6 +8,7 @@ import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
 import testData from '../../testData';
 import utils from '../../../utils/utils';
+import loggingUtils from '../../../utils/loggingUtils';
 
 const IMPORT_STATUS_POLLING_DELAY_SECONDS = 5;
 
@@ -110,6 +111,8 @@ export function setup(): SetupData {
   console.log(
     `Created Theme ${themeId}, Topic ${topicId}, Publication ${publicationId}`,
   );
+
+  loggingUtils.logDashboardUrls();
 
   return {
     themeId,

@@ -72,11 +72,9 @@ interface Release {
   approvalStatus: string;
 }
 
-interface PublicationAndReleases {
+interface Publication {
   id: string;
-  topicId: string;
   title: string;
-  releases: Release[];
 }
 
 export class AdminService {
@@ -177,11 +175,9 @@ export class AdminService {
     return this.client.delete(`/api/topics/${topicId}`);
   }
 
-  getPublications({ topicId }: { topicId: string }): PublicationAndReleases[] {
-    // TODO: update this to use the new endpoint once the 'me' endpoint is removed
-    // https://dfedigital.atlassian.net/browse/EES-3577
-    const { json } = this.client.get<PublicationAndReleases[]>(
-      `/api/me/publications?topicId=${encodeURI(topicId)}`,
+  getPublications({ topicId }: { topicId: string }): Publication[] {
+    const { json } = this.client.get<Publication[]>(
+      `/api/publications?topicId=${encodeURI(topicId)}`,
       applicationJsonHeaders,
     );
     return json;
@@ -193,11 +189,24 @@ export class AdminService {
   }: {
     topicId: string;
     title: string;
-  }): PublicationAndReleases | undefined {
+  }): Publication | undefined {
     return this.getPublications({ topicId }).find(
-      publication =>
-        publication.topicId === topicId && publication.title === title,
+      publication => publication.title === title,
     );
+  }
+
+  getPublicationReleases({
+    publicationId,
+    live,
+  }: {
+    publicationId: string;
+    live: boolean;
+  }): Release[] {
+    const { json } = this.client.get<{ results: Release[] }>(
+      `/api/publication/${publicationId}/releases?live=${live}&pageSize=100&includePermissions=false`,
+      applicationJsonHeaders,
+    );
+    return json.results;
   }
 
   createPublication({ topicId, title }: { topicId: string; title: string }) {
@@ -245,7 +254,26 @@ export class AdminService {
       topicId,
       title: publicationTitle,
     });
-    return publication?.releases.find(release => release.year === year);
+    if (!publication) {
+      return undefined;
+    }
+    const liveReleases = this.getPublicationReleases({
+      publicationId: publication.id,
+      live: true,
+    });
+
+    const liveRelease = liveReleases.find(release => release.year === year);
+
+    if (liveRelease) {
+      return liveRelease;
+    }
+
+    const draftReleases = this.getPublicationReleases({
+      publicationId: publication.id,
+      live: false,
+    });
+
+    return draftReleases.find(release => release.year === year);
   }
 
   createRelease({
@@ -297,6 +325,7 @@ export class AdminService {
       publicationTitle,
       year,
     });
+
     if (existingRelease) {
       return {
         id: existingRelease.id,
