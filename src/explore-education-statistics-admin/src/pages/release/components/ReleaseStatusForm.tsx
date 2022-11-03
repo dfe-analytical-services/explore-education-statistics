@@ -212,7 +212,8 @@ const ReleaseStatusForm = ({
                   disabled: !statusPermissions?.canMarkDraft,
                 },
                 {
-                  label: 'Ready for higher review',
+                  label:
+                    'Ready for higher review (this will notify release approvers)',
                   value: 'HigherLevelReview',
                   disabled: !statusPermissions?.canMarkHigherLevelReview,
                 },

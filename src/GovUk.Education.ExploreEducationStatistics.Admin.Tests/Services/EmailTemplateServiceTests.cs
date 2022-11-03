@@ -158,12 +158,63 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             result.AssertRight();
         }
 
+        [Fact]
+        public void SendReleaseApproverEmail()
+        {
+            const string expectedTemplateId = "notify-release-approvers-template-id";
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = new Publication
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Test Publication"
+                },
+                ReleaseName = "2020",
+                TimePeriodCoverage = December
+            };
+            
+            var expectedValues = new Dictionary<string, dynamic>
+            {
+                {"url", $"https://admin-uri/publication/{release.Publication.Id}/release/{release.Id}/summary"},
+                {"publication", release.Publication.Title},
+                {"release", release.Title},
+            };
+
+            var emailService = new Mock<IEmailService>(Strict);
+
+            emailService.Setup(mock =>
+                    mock.SendEmail(
+                        "test@test.com",
+                        expectedTemplateId,
+                        expectedValues
+                    ))
+                .Returns(Unit.Instance);
+
+            var service = SetupEmailTemplateService(emailService: emailService.Object);
+
+            var result = service.SendReleaseApproverEmail("test@test.com", release);
+
+            emailService.Verify(
+                s => s.SendEmail(
+                    "test@test.com",
+                    expectedTemplateId,
+                    expectedValues
+                ), Times.Once
+            );
+
+            VerifyAllMocks(emailService);
+
+            result.AssertRight();
+        }
+
         private static Mock<IConfiguration> ConfigurationMock()
         {
             return CreateMockConfiguration(
                 TupleOf("NotifyInviteWithRolesTemplateId", "invite-with-roles-template-id"),
                 TupleOf("NotifyPublicationRoleTemplateId", "publication-role-template-id"),
                 TupleOf("NotifyReleaseRoleTemplateId", "release-role-template-id"),
+                TupleOf("NotifyReleaseApproversTemplateId", "notify-release-approvers-template-id"),
                 TupleOf("AdminUri", "admin-uri"));
         }
 
@@ -171,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IEmailService? emailService = null,
             IConfiguration? configuration = null)
         {
-            return new(
+            return new (
                 emailService ?? Mock.Of<IEmailService>(Strict),
                 configuration ?? ConfigurationMock().Object);
         }
