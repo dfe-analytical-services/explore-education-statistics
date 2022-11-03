@@ -16,7 +16,7 @@ public class EnumToEnumLabelConverter<TEnum> : ValueConverter<TEnum, string> whe
     public EnumToEnumLabelConverter(
         ConverterMappingHints? mappingHints = null) :
         base(value => ToProvider(value),
-            value => FromProvider(value),
+            label => FromProvider(label),
             mappingHints)
     {
     }
