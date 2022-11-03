@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type)
         {
-            if (type != Ancillary && type != Chart && type != Image)
+            if (type is FileType.Data or Metadata)
             {
                 throw new ArgumentException("Cannot use generic function to validate data file", nameof(type));
             }
@@ -103,12 +103,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return await Task.FromResult(Unit.Instance);
-        }
-
-        private async Task<bool> IsCsvFile(IFormFile file)
-        {
-            return await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[FileType.Data])
-                   && _fileTypeService.HasMatchingEncodingType(file, CsvEncodingTypes);
         }
 
         private static bool FileContainsSpacesOrSpecialChars(string filename)
@@ -197,12 +191,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Unit>> ValidateDataFileTypes(IFormFile dataFile, IFormFile metaFile)
         {
-            if (!await IsCsvFile(dataFile))
+            if (!await _fileTypeService.IsValidCsvFile(dataFile))
             {
                 return ValidationActionResult(DataFileMustBeCsvFile);
             }
 
-            if (!await IsCsvFile(metaFile))
+            if (!await _fileTypeService.IsValidCsvFile(metaFile))
             {
                 return ValidationActionResult(MetaFileMustBeCsvFile);
             }

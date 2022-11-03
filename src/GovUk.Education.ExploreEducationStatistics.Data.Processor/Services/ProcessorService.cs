@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     await _dataImportService.FailImport(importId, errors);
 
-                    _logger.LogError($"Import {importId} FAILED ...check log");
+                    _logger.LogError("Import {ImportId} FAILED ...check log", importId);
                 });
         }
 
@@ -78,10 +78,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var subject = await statisticsDbContext.Subject.FindAsync(import.SubjectId);
 
-            var metaFileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
-            var metaFileTable = DataTableUtils.CreateFromStream(metaFileStream);
+            var metaFileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
 
-            _importerService.ImportMeta(metaFileTable, subject, statisticsDbContext);
+            var metaFileCsvHeaders = await CsvUtil.GetCsvHeaders(metaFileStreamProvider);
+            var metaFileCsvRows = await CsvUtil.GetCsvRows(metaFileStreamProvider);
+
+            _importerService.ImportMeta(metaFileCsvHeaders, metaFileCsvRows, subject, statisticsDbContext);
             await statisticsDbContext.SaveChangesAsync();
 
             await _fileImportService.ImportFiltersAndLocations(import.Id, statisticsDbContext);
