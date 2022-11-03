@@ -52,11 +52,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
             builder.Services
                 .AddMemoryCache()
                 .AddDbContext<ContentDbContext>(options =>
-                    options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb")))
+                    options.UseSqlServer(
+                        ConnectionUtils.GetAzureSqlConnectionString("ContentDb"),
+                        providerOptions => providerOptions.EnableRetryOnFailure()))
                 .AddDbContext<StatisticsDbContext>(options =>
-                    options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb")))
+                    options.UseSqlServer(
+                        ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb"),
+                        providerOptions => providerOptions.EnableRetryOnFailure()))
                 .AddDbContext<PublicStatisticsDbContext>(options =>
-                    options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("PublicStatisticsDb")))
+                    options.UseSqlServer(
+                        ConnectionUtils.GetAzureSqlConnectionString("PublicStatisticsDb"),
+                        providerOptions => providerOptions.EnableRetryOnFailure()))
                 .AddSingleton<IFileStorageService, FileStorageService>(provider =>
                     new FileStorageService(GetConfigurationValue(provider, "PublisherStorage")))
 

@@ -63,11 +63,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 var indicators = indicatorsAndMeta.Select(i => i.Indicator).ToList();
                 indicators.ForEach(indicator => indicator.Id = _guidGenerator.NewGuid());
 
-                await _databaseHelper.DoInTransaction(context, async () =>
+                await _databaseHelper.DoInTransaction(context, async ctxDelegate =>
                 {
-                    await context.Filter.AddRangeAsync(filters);
-                    await context.Indicator.AddRangeAsync(indicators);
-                    await context.SaveChangesAsync();
+                    await ctxDelegate.Filter.AddRangeAsync(filters);
+                    await ctxDelegate.Indicator.AddRangeAsync(indicators);
+                    await ctxDelegate.SaveChangesAsync();
                 });
             }
             

@@ -1,5 +1,6 @@
 ﻿using System;
 using Azure.Storage.Blobs;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -26,7 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         {
             var serviceProvider = builder.Services
                 .AddDbContext<ContentDbContext>(options =>
-                    options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb")))
+                    options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb"),
+                        providerOptions => providerOptions.EnableRetryOnFailure()))
                 .AddSingleton<IBlobStorageService, BlobStorageService>(
                     provider =>
                     {

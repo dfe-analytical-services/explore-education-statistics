@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
@@ -11,24 +11,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 /// </summary>
 public class InMemoryDatabaseHelper : IDatabaseHelper
 {
-    public Task DoInTransaction(DbContext context, Func<Task> transactionalUnit)
+    public Task DoInTransaction<TDbContext>(TDbContext context, Func<TDbContext, Task> transactionalUnit) where TDbContext : DbContext
     {
-        return transactionalUnit.Invoke();
+        return transactionalUnit.Invoke(context);
     }
 
-    public Task<TResult> DoInTransaction<TResult>(DbContext context, Func<Task<TResult>> transactionalUnit)
+    public async Task<TResult> DoInTransaction<TDbContext, TResult>(TDbContext context, Func<TDbContext, Task<TResult>> transactionalUnit) where TDbContext : DbContext
     {
-        return transactionalUnit.Invoke();
+        return await transactionalUnit.Invoke(context);
     }
 
-    public Task DoInTransaction<TResult>(DbContext context, Action transactionalUnit)
+    public Task DoInTransaction<TDbContext>(TDbContext context, Action<TDbContext> transactionalUnit) where TDbContext : DbContext
     {
         return Task.FromResult(transactionalUnit);
     }
 
-    public Task<TResult> DoInTransaction<TResult>(DbContext context, Func<TResult> transactionalUnit)
+    public Task<TResult> DoInTransaction<TDbContext, TResult>(TDbContext context, Func<TDbContext, TResult> transactionalUnit) where TDbContext : DbContext
     {
-        return Task.FromResult(transactionalUnit.Invoke());
+        return Task.FromResult(transactionalUnit.Invoke(context));
     }
 
     public Task ExecuteWithExclusiveLock<TDbContext>(

@@ -87,18 +87,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
-                        builder =>
-                        {
-                            builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model");
-                            builder.AddBulkOperationSupport();
-                        })
+                        providerOptions =>
+                            providerOptions
+                                .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
+                                .AddBulkOperationSupport()
+                        )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
             services.AddDbContext<ContentDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
+                        providerOptions => 
+                            providerOptions
+                                .MigrationsAssembly(typeof(Startup).Assembly.FullName)
+                                .EnableRetryOnFailure()
+                            )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 

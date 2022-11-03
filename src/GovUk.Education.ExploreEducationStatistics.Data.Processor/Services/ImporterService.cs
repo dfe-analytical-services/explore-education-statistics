@@ -287,11 +287,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 })
                 .ToList();
                     
-            await _databaseHelper.DoInTransaction(context, async () =>
+            await _databaseHelper.DoInTransaction(context, async ctxDelegate =>
             {
-                await context.FilterGroup.AddRangeAsync(filterGroups);
-                await context.FilterItem.AddRangeAsync(filterItems);
-                await context.SaveChangesAsync();
+                await ctxDelegate.FilterGroup.AddRangeAsync(filterGroups);
+                await ctxDelegate.FilterItem.AddRangeAsync(filterItems);
+                await ctxDelegate.SaveChangesAsync();
             });
 
             filterGroups.ForEach(filterGroup => _importerFilterCache.AddFilterGroup(filterGroup, context));
