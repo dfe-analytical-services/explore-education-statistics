@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Formik } from 'formik';
 import noop from 'lodash/noop';
 import React from 'react';
@@ -145,6 +146,7 @@ describe('FormFieldCheckboxGroupsMenu', () => {
     expect(
       screen.getByRole('button', { name: 'Choose options' }),
     ).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('group', { name: 'Choose options' })).toBeVisible();
   });
 
   test('clicking menu does not collapse it if there is a field error', async () => {
@@ -181,9 +183,11 @@ describe('FormFieldCheckboxGroupsMenu', () => {
     const summary = screen.getByRole('button', { name: 'Choose options' });
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('group', { name: 'Choose options' })).toBeVisible();
 
-    fireEvent.click(summary);
+    userEvent.click(summary);
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('group', { name: 'Choose options' })).toBeVisible();
   });
 });
