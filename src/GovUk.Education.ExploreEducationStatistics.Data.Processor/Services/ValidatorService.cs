@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                                 dataFileStreamProvider
                             )
                             .OnSuccessDo(async () =>
-                                _logger.LogInformation("Validating: {FileName} complete", import.File.Filename));
+                                _logger.LogInformation("Validating: {FileName} complete", import.File.Filename)));
                     });
         }
 

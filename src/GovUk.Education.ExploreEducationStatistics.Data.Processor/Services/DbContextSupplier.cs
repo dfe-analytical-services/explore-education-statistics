@@ -3,6 +3,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.EntityFrameworkCore;
+using DbUtils = GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 

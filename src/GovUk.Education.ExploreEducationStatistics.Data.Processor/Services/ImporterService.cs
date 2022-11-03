@@ -358,7 +358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 return null;
             }))
-                .WhereNotNull()
+                .WhereNotNull();
         }
 
         private Observation ObservationFromCsv(
