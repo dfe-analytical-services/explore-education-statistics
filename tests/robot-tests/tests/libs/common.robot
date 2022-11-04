@@ -15,7 +15,7 @@ Resource    ./table_tool.robot
 ${browser}=                             chrome
 ${headless}=                            1
 ${FILES_DIR}=                           ${EXECDIR}${/}tests${/}files${/}
-
+${DOWNLOADS_DIR}=                       ${EXECDIR}${/}test-results${/}downloads${/}
 ${timeout}=                             %{TIMEOUT}
 ${implicit_wait}=                       %{IMPLICIT_WAIT}
 ${prompt_to_continue_on_failure}=       0
@@ -94,7 +94,11 @@ user opens chrome headlessly
     Call Method    ${c_opts}    add_argument    log-level\=3
     Call Method    ${c_opts}    add_argument    disable-logging
 
+    ${prefs}=    Create Dictionary    download.default_directory=${DOWNLOADS_DIR}
+    Call Method    ${c_opts}    add_experimental_option    prefs    ${prefs}
     Create Webdriver    Chrome    ${alias}    chrome_options=${c_opts}
+
+    ${all_opts}=    Call Method    ${c_opts}    to_capabilities
 
 user opens chrome visually
     [Arguments]    ${alias}=chrome
@@ -104,7 +108,12 @@ user opens chrome visually
     Call Method    ${c_opts}    add_argument    disable-extensions
     Call Method    ${c_opts}    add_argument    window-size\=1920,1080
     Call Method    ${c_opts}    add_argument    ignore-certificate-errors
+
+    ${prefs}=    Create Dictionary    download.default_directory=${DOWNLOADS_DIR}
+    Call Method    ${c_opts}    add_experimental_option    prefs    ${prefs}
     Create Webdriver    Chrome    ${alias}    chrome_options=${c_opts}
+    ${all_opts}=    Call Method    ${c_opts}    to_capabilities
+
     maximize browser window
 
 user opens firefox headlessly
