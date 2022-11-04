@@ -57,39 +57,50 @@ const PrototypeTableHighlights = () => {
               id="1"
               tabIndex={-1}
             >
-              <div className={classNames(styles.content, styles.contentSmall)}>
+              <div
+                className={classNames(styles.content, styles.contentSmall)}
+                style={{ maxWidth: '1600px' }}
+              >
                 <div
                   className={styles.container}
                   style={{ borderBottom: '2px solid #f3f2f1' }}
                 >
-                  <div className={styles.content}>
-                    <h2 className={styles.stepEnabled}>
-                      <span className="govuk-tag govuk-tag govuk-tag--grey">
-                        Step 1
-                      </span>
-                      <span className="govuk-visually-hidden">
-                        {' '}
-                        Choose a publication
-                      </span>
-                    </h2>
-                    <SummaryList noBorder>
-                      <SummaryListItem term="Publication">
+                  <div className="govuk-grid-row govuk-!-width-full">
+                    <div className="govuk-grid-column-one-quarter">
+                      <h2 className="dfe-flex">
+                        <div className="govuk-tag govuk-tag govuk-tag--grey">
+                          Step 1
+                        </div>
+                        <div className="govuk-heading-s govuk-!-margin-bottom-0 govuk-!-margin-left-3">
+                          {' '}
+                          Choose a publication
+                        </div>
+                      </h2>
+                    </div>
+                    <div className="dfe-flex dfe-justify-content--space-between  govuk-grid-column-three-quarters">
+                      <div>
                         <a href="#">Apprenticeships and traineeships</a>
-                      </SummaryListItem>
-                    </SummaryList>
-                  </div>
-                  <div className={styles.goToContainer}>
-                    <ButtonText
-                      className={classNames(
-                        styles.goToButton,
-                        'govuk-!-margin-right-6',
-                      )}
-                    >
-                      View publication
-                    </ButtonText>
-                    <ButtonText className={styles.goToButton}>
-                      Change
-                    </ButtonText>
+                      </div>
+                      <div>
+                        <ButtonText
+                          className={classNames(
+                            styles.goToButton,
+                            'govuk-!-margin-0',
+                            'govuk-!-margin-right-6',
+                          )}
+                        >
+                          View publication
+                        </ButtonText>
+                        <ButtonText
+                          className={classNames(
+                            styles.goToButton,
+                            'govuk-!-margin-0',
+                          )}
+                        >
+                          Change
+                        </ButtonText>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -101,35 +112,40 @@ const PrototypeTableHighlights = () => {
               id="2"
               tabIndex={-1}
             >
-              <div className={classNames(styles.content, styles.contentSmall)}>
+              <div
+                className={classNames(styles.content, styles.contentSmall)}
+                style={{ maxWidth: '1600px' }}
+              >
                 <div className={styles.container} style={{ flexWrap: 'wrap' }}>
-                  <div className={styles.content}>
-                    <h2 className={styles.stepEnabled}>
-                      <span className="govuk-tag govuk-tag govuk-tag--turquoise govuk-!-margin-right-2">
-                        Step 2{' '}
-                        <span className="govuk-visually-hidden">
-                          {' '}
-                          Select a dataset
-                        </span>
-                      </span>
-                    </h2>
-                    <SummaryList noBorder>
-                      <SummaryListItem term="Select a dataset">
+                  <div
+                    className={classNames(styles.content, styles.contentSmall)}
+                    style={{ maxWidth: '1600px' }}
+                  >
+                    <div className="govuk-grid-row govuk-!-width-full">
+                      <div className="govuk-grid-column-one-quarter">
+                        <h2 className="dfe-flex">
+                          <div className="govuk-tag govuk-tag govuk-tag--turquoise">
+                            Step 2
+                          </div>
+                          <div className="govuk-heading-s govuk-!-margin-bottom-0 govuk-!-margin-left-3">
+                            {' '}
+                            Select a dataset
+                          </div>
+                        </h2>
+                      </div>
+                      <div className="dfe-flex dfe-justify-content--space-between  govuk-grid-column-three-quarters">
                         <h3>
                           {datasetValue
                             ? 'Dataset details'
                             : 'No dataset selected'}
                         </h3>
-                      </SummaryListItem>
-                    </SummaryList>
+                      </div>
+                    </div>
                   </div>
-                  <form
-                    className="govuk-!-margin-4"
-                    style={{ flex: '0 0 100%' }}
-                  >
-                    <div className="govuk-grid-row">
+                  <form>
+                    <div className="govuk-grid-row govuk-!-width-full">
                       <div className="govuk-grid-column-one-quarter">
-                        <div className="govuk-form-group">
+                        <div className="govuk-form-group govuk-!-padding-left-3 govuk-!-padding-right-5">
                           <fieldset className="govuk-fieldset">
                             <legend
                               className={classNames(
@@ -350,7 +366,7 @@ const PrototypeTableHighlights = () => {
                       </div>
                       <div className="govuk-grid-column-three-quarters">
                         {!dataset && (
-                          <div className="govuk-!-margin-5">
+                          <div className="govuk-!-margin-0">
                             <p className="govuk-body-l govuk-!-width-three-quarters">
                               Please select a dataset, you will then be able to
                               see a summary of the data, create your own tables,
@@ -360,7 +376,7 @@ const PrototypeTableHighlights = () => {
                           </div>
                         )}
                         {dataset === 'subject-1' && (
-                          <div className="govuk-!-margin-3">
+                          <div className="govuk-!-margin-0">
                             <SummaryList noBorder className="govuk-!-margin-0">
                               <SummaryListItem term="Selected dataset">
                                 <strong>{datasetValue}</strong>
@@ -419,7 +435,7 @@ const PrototypeTableHighlights = () => {
                           </div>
                         )}
                         {dataset === 'subject-2' && (
-                          <div className="govuk-!-margin-3">
+                          <div className="govuk-!-margin-0">
                             <SummaryList noBorder className="govuk-!-margin-0">
                               <SummaryListItem term="Selected dataset">
                                 <strong>{datasetValue}</strong>
@@ -490,7 +506,7 @@ const PrototypeTableHighlights = () => {
                           </div>
                         )}
                         {dataset === 'subject-3' && (
-                          <div className="govuk-!-margin-3">
+                          <div className="govuk-!-margin-0">
                             <SummaryList noBorder className="govuk-!-margin-0">
                               <SummaryListItem term="Selected dataset">
                                 <strong>{datasetValue}</strong>
@@ -557,7 +573,7 @@ const PrototypeTableHighlights = () => {
                           </div>
                         )}
                         {dataset === 'subject-4' && (
-                          <div className="govuk-!-margin-3">
+                          <div className="govuk-!-margin-0">
                             <SummaryList noBorder className="govuk-!-margin-0">
                               <SummaryListItem term="Selected dataset">
                                 <strong>{datasetValue}</strong>
