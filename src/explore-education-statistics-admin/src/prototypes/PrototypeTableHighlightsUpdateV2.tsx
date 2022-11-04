@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import Button from '@common/components/Button';
+import ButtonLink from '@common/components/ButtonLink';
 import ButtonText from '@common/components/ButtonText';
 import PageSearchForm from '@common/components/PageSearchForm';
 import PageTitle from '@admin/components/PageTitle';
@@ -73,7 +74,7 @@ const PrototypeTableHighlights = () => {
                     </h2>
                     <SummaryList noBorder>
                       <SummaryListItem term="Publication">
-                        Apprenticeships and traineeships
+                        <a href="#">Apprenticeships and traineeships</a>
                       </SummaryListItem>
                     </SummaryList>
                   </div>
@@ -113,8 +114,12 @@ const PrototypeTableHighlights = () => {
                       </span>
                     </h2>
                     <SummaryList noBorder>
-                      <SummaryListItem term="Datasets">
-                        <h3>{datasetValue || 'No dataset selected'}</h3>
+                      <SummaryListItem term="Select a dataset">
+                        <h3>
+                          {datasetValue
+                            ? 'Dataset details'
+                            : 'No dataset selected'}
+                        </h3>
                       </SummaryListItem>
                     </SummaryList>
                   </div>
@@ -131,6 +136,7 @@ const PrototypeTableHighlights = () => {
                                 'govuk-fieldset__legend',
                                 'govuk-fieldset__legend--s',
                                 'govuk-!-margin-bottom-6',
+                                'govuk-visually-hidden',
                               )}
                             >
                               Select a dataset
@@ -157,6 +163,7 @@ const PrototypeTableHighlights = () => {
                                   All featured tables
                                 </label>
                               </div>
+
                               <div className="govuk-radios__item">
                                 <input
                                   type="radio"
@@ -347,17 +354,17 @@ const PrototypeTableHighlights = () => {
                             <p className="govuk-body-l govuk-!-width-three-quarters">
                               Please select a dataset, you will then be able to
                               see a summary of the data, create your own tables,
-                              view featured tables, or download the entire
-                              datafile.
+                              view featured tables, or download the entire data
+                              file.
                             </p>
                           </div>
                         )}
                         {dataset === 'subject-1' && (
                           <div className="govuk-!-margin-3">
-                            <SummaryList
-                              noBorder
-                              className="govuk-!-margin-2 govuk-!-margin-bottom-9"
-                            >
+                            <SummaryList noBorder className="govuk-!-margin-0">
+                              <SummaryListItem term="Selected dataset">
+                                <strong>{datasetValue}</strong>
+                              </SummaryListItem>
                               <SummaryListItem term="Geographic levels">
                                 National
                               </SummaryListItem>
@@ -367,27 +374,42 @@ const PrototypeTableHighlights = () => {
                               <SummaryListItem term="Content">
                                 <p>
                                   Time series of headline apprenticeship figures
+                                  <a href="#" className="govuk-!-margin-left-2">
+                                    View more
+                                  </a>
                                 </p>
-                                <p>
-                                  Indicators: Starts, Achievements, Learner
-                                  participation, Percentage Starts, Percentage
-                                  Achievements, Percentage Learner participation
-                                </p>
-                              </SummaryListItem>
-                              <SummaryListItem term="Download">
-                                <Button className="govuk-!-margin-right-6">
-                                  Download full dataset (.zip, 100mb)
-                                </Button>
                               </SummaryListItem>
                             </SummaryList>
 
-                            <h4 className="govuk-!-margin-left-2 govuk-heading-m">
-                              View featured tables{' '}
+                            <hr />
+
+                            <h3>What would you like to do?</h3>
+
+                            <div className="dfe-flex dfe-align-items--center govuk-!-margin-bottom-9">
+                              <Button className="govuk-!-margin-0 ">
+                                Create your own table
+                              </Button>{' '}
                               <span className="govuk-!-margin-left-2 govuk-!-margin-right-2">
                                 or
                               </span>{' '}
-                              <a href="#">create your own table</a>
+                              <a href="#">
+                                Download full dataset (.zip, 100mb)
+                              </a>
+                            </div>
+
+                            <h4 className=" govuk-heading-m">
+                              View our featured tables{' '}
                             </h4>
+                            <div className="govuk-width-container govuk-!-margin-0">
+                              <p>
+                                These featured tables have been created by our
+                                publication team, highlighting popular tables
+                                built from this dataset. These tables can be
+                                viewed, shared and customised to the data that
+                                you're interested in.
+                              </p>
+                            </div>
+
                             <PrototypeGridView>
                               <PrototypeChevronCard
                                 title="Starts by age and level"
@@ -398,10 +420,10 @@ const PrototypeTableHighlights = () => {
                         )}
                         {dataset === 'subject-2' && (
                           <div className="govuk-!-margin-3">
-                            <SummaryList
-                              noBorder
-                              className="govuk-!-margin-2 govuk-!-margin-bottom-9"
-                            >
+                            <SummaryList noBorder className="govuk-!-margin-0">
+                              <SummaryListItem term="Selected dataset">
+                                <strong>{datasetValue}</strong>
+                              </SummaryListItem>
                               <SummaryListItem term="Geographic levels">
                                 National
                               </SummaryListItem>
@@ -412,30 +434,41 @@ const PrototypeTableHighlights = () => {
                                 <p>
                                   Apprenticeship national achievement rate
                                   tables
+                                  <a href="#" className="govuk-!-margin-left-2">
+                                    View more
+                                  </a>
                                 </p>
-                                <p>
-                                  Indicators: Achievement rate, Achievers,
-                                  Completers, Leavers, Pass rate, Retention rate
-                                </p>
-                                <p>
-                                  Filters: Age, Level, demographic - ethnicity,
-                                  gender and lldd, Standard /Framework flag;
-                                </p>
-                              </SummaryListItem>
-                              <SummaryListItem term="Download">
-                                <Button className="govuk-!-margin-right-6">
-                                  Download full dataset (.zip, 100mb)
-                                </Button>
                               </SummaryListItem>
                             </SummaryList>
 
-                            <h4 className="govuk-!-margin-left-2 govuk-heading-m">
-                              View featured tables{' '}
+                            <hr />
+
+                            <h3>What would you like to do?</h3>
+
+                            <div className="dfe-flex dfe-align-items--center govuk-!-margin-bottom-9">
+                              <Button className="govuk-!-margin-0 ">
+                                Create your own table
+                              </Button>{' '}
                               <span className="govuk-!-margin-left-2 govuk-!-margin-right-2">
                                 or
                               </span>{' '}
-                              <a href="#">create your own table</a>
+                              <a href="#">
+                                Download full dataset (.zip, 100mb)
+                              </a>
+                            </div>
+
+                            <h4 className=" govuk-heading-m">
+                              View our featured tables{' '}
                             </h4>
+                            <div className="govuk-width-container govuk-!-margin-0">
+                              <p>
+                                These featured tables have been created by our
+                                publication team, highlighting popular tables
+                                built from this dataset. These tables can be
+                                viewed, shared and customised to the data that
+                                you're interested in.
+                              </p>
+                            </div>
                             <PrototypeGridView>
                               <PrototypeChevronCard
                                 title="Rates by sector subject area and Ethnicity group learners"
@@ -458,10 +491,10 @@ const PrototypeTableHighlights = () => {
                         )}
                         {dataset === 'subject-3' && (
                           <div className="govuk-!-margin-3">
-                            <SummaryList
-                              noBorder
-                              className="govuk-!-margin-2 govuk-!-margin-bottom-9"
-                            >
+                            <SummaryList noBorder className="govuk-!-margin-0">
+                              <SummaryListItem term="Selected dataset">
+                                <strong>{datasetValue}</strong>
+                              </SummaryListItem>
                               <SummaryListItem term="Geographic levels">
                                 National
                               </SummaryListItem>
@@ -471,32 +504,42 @@ const PrototypeTableHighlights = () => {
                               <SummaryListItem term="Content">
                                 <p>
                                   Apprenticeship national achievement rate
-                                  tables
+                                  tables{' '}
+                                  <a href="#" className="govuk-!-margin-left-2">
+                                    View more
+                                  </a>
                                 </p>
-                                <p>
-                                  Indicators: Achievement rate, Achievers,
-                                  Completers, Leavers, Pass rate, Retention rate
-                                </p>
-                                <p>
-                                  Filters: Age, Level, demographic - ethnicity,
-                                  gender and lldd, Sector Subject Area, Standard
-                                  /Framework flag
-                                </p>
-                              </SummaryListItem>
-                              <SummaryListItem term="Download">
-                                <Button className="govuk-!-margin-right-6">
-                                  Download full dataset (.zip, 100mb)
-                                </Button>
                               </SummaryListItem>
                             </SummaryList>
 
-                            <h4 className="govuk-!-margin-left-2 govuk-heading-m">
-                              View featured tables{' '}
+                            <hr />
+
+                            <h3>What would you like to do?</h3>
+
+                            <div className="dfe-flex dfe-align-items--center govuk-!-margin-bottom-9">
+                              <Button className="govuk-!-margin-0 ">
+                                Create your own table
+                              </Button>{' '}
                               <span className="govuk-!-margin-left-2 govuk-!-margin-right-2">
                                 or
                               </span>{' '}
-                              <a href="#">create your own table</a>
+                              <a href="#">
+                                Download full dataset (.zip, 100mb)
+                              </a>
+                            </div>
+
+                            <h4 className=" govuk-heading-m">
+                              View our featured tables{' '}
                             </h4>
+                            <div className="govuk-width-container govuk-!-margin-0">
+                              <p>
+                                These featured tables have been created by our
+                                publication team, highlighting popular tables
+                                built from this dataset. These tables can be
+                                viewed, shared and customised to the data that
+                                you're interested in.
+                              </p>
+                            </div>
                             <PrototypeGridView>
                               <PrototypeChevronCard
                                 title="Achievements by level"
@@ -515,10 +558,10 @@ const PrototypeTableHighlights = () => {
                         )}
                         {dataset === 'subject-4' && (
                           <div className="govuk-!-margin-3">
-                            <SummaryList
-                              noBorder
-                              className="govuk-!-margin-2 govuk-!-margin-bottom-9"
-                            >
+                            <SummaryList noBorder className="govuk-!-margin-0">
+                              <SummaryListItem term="Selected dataset">
+                                <strong>{datasetValue}</strong>
+                              </SummaryListItem>
                               <SummaryListItem term="Geographic levels">
                                 National
                               </SummaryListItem>
@@ -529,40 +572,43 @@ const PrototypeTableHighlights = () => {
                                 <p>
                                   Apprenticeship national achievement rate
                                   tables
+                                  <a href="#" className="govuk-!-margin-left-2">
+                                    View more
+                                  </a>
                                 </p>
-                                <p>Academic year: 2018/19 to 2020/21</p>
-                                <p>
-                                  Indicators: Achievement rate, &nbsp;Leavers,
-                                  Pass rate, Retention rate
-                                </p>
-                                <p>
-                                  Filters: Level, Detailed Level, Sector Subject
-                                  Area, &nbsp;Standard /Framework flag&nbsp;
-                                </p>
-                              </SummaryListItem>
-                              <SummaryListItem term="Download">
-                                <Button className="govuk-!-margin-right-6">
-                                  Download full dataset (.zip 100mb)
-                                </Button>
                               </SummaryListItem>
                             </SummaryList>
-                            <h4 className="govuk-!-margin-left-2 govuk-heading-m">
-                              <a href="#">Create your own table</a>
-                            </h4>
+
+                            <hr />
+
+                            <h3>What would you like to do?</h3>
+
+                            <div className="dfe-flex dfe-align-items--center govuk-!-margin-bottom-9">
+                              <Button className="govuk-!-margin-0 ">
+                                Continue to create your own table
+                              </Button>{' '}
+                              <span className="govuk-!-margin-left-2 govuk-!-margin-right-2">
+                                or
+                              </span>{' '}
+                              <a href="#">
+                                Download full dataset (.zip, 100mb)
+                              </a>
+                            </div>
                           </div>
                         )}
                         {dataset === 'subject-all' && (
                           <div className="govuk-!-margin-3">
-                            <p className="govuk-body-l govuk-!-margin-left-3">
-                              View featured tables from across all our datasets
-                              for this publication. If you can't find what you
-                              are looking for please select a specific dataset,
-                              and then you can create your own table.
-                            </p>
-                            <PageSearchForm
-                              inputLabel="Search featured tables"
-                              className="govuk-!-width-one-half govuk-!-margin-left-3"
-                            />
+                            <div className="govuk-width-container govuk-!-margin-0">
+                              <p className="govuk-body-l">
+                                View featured tables from across all our
+                                datasets for this publication. If you can't find
+                                what you are looking for please select a
+                                specific dataset, and then you can create your
+                                own table.
+                              </p>
+                              <PageSearchForm inputLabel="Search featured tables" />
+                            </div>
+
                             <PrototypeGridView>
                               <PrototypeChevronCard
                                 title="Starts by age and level"

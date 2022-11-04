@@ -1,8 +1,8 @@
 @import '~govuk-frontend/govuk/base';
 
 .card {
-  border-top: 1px solid $govuk-border-colour;
-  margin: 0 15px;
+  //border-top: 1px solid $govuk-border-colour;
+  margin: 0 15px 0 0;
   padding: 5px 0 20px;
 }
 
@@ -21,8 +21,8 @@
     display: block;
     height: 7px;
     position: absolute;
-    right: 5px;
-    top: 15px;
+    right: 25px;
+    top: 20px;
     transform: translateY(0) rotate(45deg) scale(1);
     width: 7px;
   }
