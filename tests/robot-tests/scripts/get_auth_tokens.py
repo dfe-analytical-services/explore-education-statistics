@@ -142,14 +142,7 @@ def get_identity_info(
     # this is useful when testing data-guidance downloads (without this it
     # would be placed in your user's download directory)
 
-    # preferences = {
-    #     "download.default_directory": f'{Path().absolute()}/downloads',
-    #     "download.prompt_for_download": False,
-    #     "download.directory_upgrade": True
-    # }
-
     chrome_options = webdriver.ChromeOptions()
-    # chrome_options.add_experimental_option('prefs', preferences)
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--disable-gpu")
