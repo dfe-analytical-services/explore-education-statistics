@@ -380,6 +380,9 @@ robotArgs += [args.tests]
 if not args.rerun_failed_tests and not args.rerun_failed_suites and Path("test-results").exists():
     shutil.rmtree("test-results")
 
+if not os.path.exists('test-results/downloads'): 
+    os.makedirs('test-results/downloads')
+
 try:
     # Run tests
     if args.interp == "robot":
@@ -388,7 +391,7 @@ try:
         if args.processes:
             robotArgs = ["--processes", int(args.processes)] + robotArgs
 
-        pabot_run_cli(robotArgs)
+    pabot_run_cli(robotArgs)
 
 finally:
     if not args.disable_teardown:

@@ -1,9 +1,5 @@
-[tool.isort]
-line_length = 120
-multi_line_output = 3
-include_trailing_comma = true
-use_parentheses = true
-profile="black"
-
-[tool.black]
-line-length = 120
+[tool.autopep8]
+max_line_length = 120
+in-place = true
+recursive = true
+aggressive = 3

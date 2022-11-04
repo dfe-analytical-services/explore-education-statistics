@@ -114,12 +114,18 @@ Navigate to Next step
     user clicks button    Next step
 
 Check step 3 displays correctly
-    user waits until page contains    Choose files to download    10
+    user waits until page contains    Choose files to download    15
+
     user checks element contains    testid:choose-files    This is the latest data
 
 Check checkbox and download file
     user clicks checkbox    UI test subject 3 (csv, 17 Kb)
     user clicks button    Download selected files
+
+Validate zip contains correct files
+    sleep    15    # wait for file to download
+    ${list}=    create list    data/dates.csv    data-guidance/data-guidance.txt
+    zip should contain directories and files    ui-tests-data-catalogue-%{RUN_IDENTIFIER}_2021-22-q1.zip    ${list}
 
 go back to second step and check page displays correct data
     user clicks button    Previous step
@@ -135,3 +141,8 @@ Check page displays 'This is not the latest data' tag
 Select new subject and download new subject file
     user clicks checkbox    ${SUBJECT_NAME_1} (csv, 456 Kb)
     user clicks button    Download selected files
+
+Validate new zip contains correct files
+    sleep    15    # wait for file to download
+    ${list}=    create list    data/seven_filters.csv    data-guidance/data-guidance.txt
+    zip should contain directories and files    ui-tests-data-catalogue-%{RUN_IDENTIFIER}_2020-21-q1.zip    ${list}

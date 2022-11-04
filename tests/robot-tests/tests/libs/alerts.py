@@ -3,7 +3,7 @@ import os
 from slack_sdk.webhook import WebhookClient
 
 
-def send_slack_alert(err_msg):
+def send_slack_alert(err_msg: str):
     url = os.getenv("SLACK_WEBHOOK_URL")
     assert url, "SLACK_WEBHOOK_URL env variable needs to be set"
     slack_webhook = WebhookClient(url)

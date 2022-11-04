@@ -3,7 +3,6 @@
 - [Explore Education Statistics Robot Framework tests](#explore-education-statistics-robot-framework-tests)
   - [**What is this?**](#what-is-this)
   - [**What do I need to install?**](#what-do-i-need-to-install)
-  - [**Code style**](#code-style)
   - [**How do I run the tests?**](#how-do-i-run-the-tests)
   - [**Running tests on the pipeline**](#running-tests-on-the-pipeline)
   - [**Authentication**](#authentication)
@@ -76,22 +75,6 @@ If you intend to run the tests from your local machine, you will also need to cr
 You can copy and rename the `.env.example` file in the `robot-tests` directory, replacing the variable values with those for that file's specific environment. The tests rely on these environment variables being set.
 
 Variables you may want to set in a `.env` file are documented in `.env.example`.
-
-## **Code style**
-
-In order to adhear to various linting & formatting rules, we use a few formatting and static-analysis tools to keep both Python & RobotFramework code clean. These are as follows:
-
-* [Flake8](https://pypi.org/project/flake8/): 
-We use Flake8 to verify pep8, pyflakes & circular complexity rules. 
-
-* [Black](https://pypi.org/project/black/): 
-We use black to adhear to PEP8 and [the black code style](https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html)
-
-* [Isort](https://pypi.org/project/isort/):
-We use Isort to organise imports
-
-* [Robotframework-tidy](https://pypi.org/project/robotframework-tidy/):
-We use RobotFramework-tidy to format robotframework test code
 
 ## **How do I run the tests?**
 
