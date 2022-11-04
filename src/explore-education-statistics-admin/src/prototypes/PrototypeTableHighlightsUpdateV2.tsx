@@ -59,7 +59,7 @@ const PrototypeTableHighlights = () => {
             >
               <div
                 className={classNames(styles.content, styles.contentSmall)}
-                style={{ maxWidth: '1600px' }}
+                style={{ maxWidth: '1800px' }}
               >
                 <div
                   className={styles.container}
@@ -114,12 +114,12 @@ const PrototypeTableHighlights = () => {
             >
               <div
                 className={classNames(styles.content, styles.contentSmall)}
-                style={{ maxWidth: '1600px' }}
+                style={{ maxWidth: '1800px' }}
               >
                 <div className={styles.container} style={{ flexWrap: 'wrap' }}>
                   <div
                     className={classNames(styles.content, styles.contentSmall)}
-                    style={{ maxWidth: '1600px' }}
+                    style={{ maxWidth: '1800px' }}
                   >
                     <div className="govuk-grid-row govuk-!-width-full">
                       <div className="govuk-grid-column-one-quarter">
@@ -613,7 +613,7 @@ const PrototypeTableHighlights = () => {
                           </div>
                         )}
                         {dataset === 'subject-all' && (
-                          <div className="govuk-!-margin-3">
+                          <div className="govuk-!-margin-0">
                             <div className="govuk-width-container govuk-!-margin-0">
                               <p className="govuk-body-l">
                                 View featured tables from across all our
