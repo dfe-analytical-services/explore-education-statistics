@@ -16,7 +16,7 @@ def run_tests_pipeline():
     assert args.slack_webhook_url, "Please provide slack webhook URL"
     assert args.env, "Provide an environment with an '--env ENV' argument"
     assert args.file, "Provide a file/dir to run with an '--file FILE/DIR' argument"
-
+    assert args.processes, "Provide a number of processes to run with the '--processes NUM' argument"
     valid_environments = ["dev", "test", "preprod", "prod", "ci"]
 
     if args.env not in valid_environments:
@@ -29,9 +29,9 @@ def run_tests_pipeline():
 
     def get_test_command() -> str:
         if args.file == "tests/general_public/check_snapshots.robot":
-            return f"pipenv run python run_tests.py --admin-pass {args.admin_password} --analyst-pass {args.analyst_password} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes 3"
+            return f"pipenv run python run_tests.py --admin-pass {args.admin_password} --analyst-pass {args.analyst_password} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes {args.processes}"
         else:
-            return f"pipenv run python run_tests.py --admin-pass {args.admin_password} --analyst-pass {args.analyst_password} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes 3 --enable-slack"
+            return f"pipenv run python run_tests.py --admin-pass {args.admin_password} --analyst-pass {args.analyst_password} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes {args.processes} --enable-slack"
 
     subprocess.run(get_test_command(), shell=True)
 
@@ -42,17 +42,24 @@ if __name__ == "__main__":
         description="Use this script in a CI environment to run UI tests",
     )
 
-    parser.add_argument("--admin-password", dest="admin_password", help="BAU admin password")
+    parser.add_argument("--admin-password", dest="admin_password", help="BAU admin password", required=True)
 
-    parser.add_argument("--analyst-password", dest="analyst_password", help="Analyst password")
+    parser.add_argument("--analyst-password", dest="analyst_password", help="Analyst password", required=True)
 
     parser.add_argument(
-        "--slack-webhook-url", dest="slack_webhook_url", help="slack webhook URL for sending test reports"
+        "--slack-webhook-url",
+        dest="slack_webhook_url",
+        help="slack webhook URL for sending test reports",
+        required=True,
     )
 
-    parser.add_argument("--env", dest="env", help=f"environment to run tests against (dev, test, pre-prod, prod & ci)")
+    parser.add_argument(
+        "--env", dest="env", help=f"environment to run tests against (dev, test, pre-prod, prod & ci)", required=True
+    )
 
-    parser.add_argument("--file", dest="file", help="the directory or file to test")
+    parser.add_argument("--file", dest="file", help="the directory or file to test", required=True)
+
+    parser.add_argument("--processes", dest="processes", help="number of processes to run", required=True)
 
     args = parser.parse_args()
     run_tests_pipeline()
