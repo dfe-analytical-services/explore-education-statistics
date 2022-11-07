@@ -204,11 +204,12 @@ export default function ChartMapConfiguration({
                 hint:
                   'Data is classified so that each group roughly has the same quantity of features.',
               },
-              {
-                label: 'Custom',
-                value: 'Custom',
-                hint: 'Define custom groups.',
-              },
+              // EES-3858 - removed until feature is reimplemented
+              // {
+              //   label: 'Custom',
+              //   value: 'Custom',
+              //   hint: 'Define custom groups.',
+              // },
             ]}
             order={[]}
           />
@@ -222,7 +223,8 @@ export default function ChartMapConfiguration({
             />
           )}
 
-          {form.values.dataClassification === 'Custom' && (
+          {/* EES-3858 - removed until feature is reimplemented
+           {form.values.dataClassification === 'Custom' && (
             <ChartMapCustomGroupsConfiguration
               groups={form.values.customDataGroups ?? []}
               id={`${formId}-customDataGroups`}
@@ -248,7 +250,7 @@ export default function ChartMapConfiguration({
                 )
               }
             />
-          )}
+          )} */}
 
           <ChartBuilderSaveActions
             formId={formId}
