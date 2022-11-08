@@ -233,6 +233,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .WithMany()  // Ideally this would be WithOne, but we would need to fix existing data to do this
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Publication>()
+                .HasOne(p => p.LatestPublishedReleaseNew)
+                .WithOne()
+                .HasForeignKey<Publication>(p => p.LatestPublishedReleaseId)
+                .IsRequired(false);
+
             modelBuilder.Entity<PublicationMethodology>()
                 .HasKey(pm => new {pm.PublicationId, pm.MethodologyId});
 

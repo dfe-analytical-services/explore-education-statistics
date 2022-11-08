@@ -45,6 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public bool Live => Published.HasValue && DateTime.Compare(DateTime.UtcNow, Published.Value) > 0;
 
+        public Guid? LatestPublishedReleaseId { get; set; }
+
+        // TODO EES-3881 Remove once all Publications with a published release have their LatestPublishedReleaseId set
         public Release? LatestPublishedRelease()
         {
             return Releases
@@ -53,6 +56,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 .ThenBy(r => r.TimePeriodCoverage)
                 .LastOrDefault();
         }
+
+        // TODO EES-3881 Rename this LatestPublishedRelease
+        public Release? LatestPublishedReleaseNew { get; set; }
 
         public Release? LatestRelease()
         {
