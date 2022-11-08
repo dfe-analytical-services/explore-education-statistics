@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
+using DbUtils = GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -70,17 +71,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var metaFileCsvHeaders = await CsvUtil.GetCsvHeaders(metaFileStreamProvider);
             var metaFileCsvRows = await CsvUtil.GetCsvRows(metaFileStreamProvider);
 
-            await _databaseHelper.DoInTransaction(context, async ctxDelegate =>
-            {
-                await _importerService.ImportObservations(
-                    import,
-                    datafileStreamProvider,
-                    subject,
-                    _importerService.GetMeta(metaFileCsvHeaders, metaFileCsvRows, subject, ctxDelegate),
-                    message.BatchNo,
-                    ctxDelegate
-                );
-            });
+            await _databaseHelper.DoInTransaction(
+                context,
+                DbUtils.CreateStatisticsDbContext,
+                async ctxDelegate =>
+                {
+                    await _importerService.ImportObservations(
+                        import,
+                        datafileStreamProvider,
+                        subject,
+                        _importerService.GetMeta(metaFileCsvHeaders, metaFileCsvRows, subject, ctxDelegate),
+                        message.BatchNo,
+                        ctxDelegate
+                    );
+                });
 
             if (import.NumBatches > 1)
             {

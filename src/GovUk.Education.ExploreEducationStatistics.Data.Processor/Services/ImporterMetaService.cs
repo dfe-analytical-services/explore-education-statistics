@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.EntityFrameworkCore;
+using DbUtils = GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -63,12 +64,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 var indicators = indicatorsAndMeta.Select(i => i.Indicator).ToList();
                 indicators.ForEach(indicator => indicator.Id = _guidGenerator.NewGuid());
 
-                await _databaseHelper.DoInTransaction(context, async ctxDelegate =>
-                {
-                    await ctxDelegate.Filter.AddRangeAsync(filters);
-                    await ctxDelegate.Indicator.AddRangeAsync(indicators);
-                    await ctxDelegate.SaveChangesAsync();
-                });
+                await _databaseHelper.DoInTransaction(
+                    context,
+                    DbUtils.CreateStatisticsDbContext,
+                    async ctxDelegate =>
+                    {
+                        await ctxDelegate.Filter.AddRangeAsync(filters);
+                        await ctxDelegate.Indicator.AddRangeAsync(indicators);
+                        await ctxDelegate.SaveChangesAsync();
+                    });
             }
             
             return new SubjectMeta

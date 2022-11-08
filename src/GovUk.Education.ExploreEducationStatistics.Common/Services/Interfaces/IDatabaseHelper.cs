@@ -15,6 +15,7 @@ public interface IDatabaseHelper
     /// </remarks>
     Task DoInTransaction<TDbContext>(
         TDbContext context, 
+        Func<TDbContext> createDbContextDelegateFn,
         Func<TDbContext, Task> transactionalUnit) 
         where TDbContext : DbContext;
     
@@ -27,6 +28,7 @@ public interface IDatabaseHelper
     /// </remarks>
     Task<TResult> DoInTransaction<TDbContext, TResult>(
         TDbContext context, 
+        Func<TDbContext> createDbContextDelegateFn,
         Func<TDbContext, Task<TResult>> transactionalUnit)
         where TDbContext : DbContext;
     
@@ -39,6 +41,7 @@ public interface IDatabaseHelper
     /// </remarks>
     Task DoInTransaction<TDbContext>(
         TDbContext context, 
+        Func<TDbContext> createDbContextDelegateFn,
         Action<TDbContext> transactionalUnit) 
         where TDbContext : DbContext;
     
@@ -51,6 +54,7 @@ public interface IDatabaseHelper
     /// </remarks>
     Task<TResult> DoInTransaction<TDbContext, TResult>(
         TDbContext context, 
+        Func<TDbContext> createDbContextDelegateFn,
         Func<TDbContext, TResult> transactionalUnit) 
         where TDbContext : DbContext;
 
@@ -61,6 +65,7 @@ public interface IDatabaseHelper
     /// </summary>
     Task ExecuteWithExclusiveLock<TDbContext>(
         TDbContext dbContext,
+        Func<TDbContext> createDbContextDelegateFn,
         string lockName,
         Func<TDbContext, Task> action)
         where TDbContext : DbContext;

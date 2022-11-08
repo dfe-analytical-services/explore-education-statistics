@@ -104,6 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await using var contentDbContext = _dbContextSupplier.CreateContentDbContext();
             await _databaseHelper.ExecuteWithExclusiveLock(
                 contentDbContext,
+                _dbContextSupplier.CreateContentDbContext,
                 $"LockForImport-{id}",
                 async context =>
                 {
