@@ -3,8 +3,20 @@
 # This test suite is responsible for setting up various Publications and Releases for the use of the Publication
 # and Release Permissions UI tests.
 #
-# Releases are created in each approval state and a different role is assigned to Analyst1 for each.    This way,
+# Releases are created in each approval state and a different role is assigned to Analyst1 for each. This way,
 # there is a unique Release for each combination of Release approval status available and Release / Publication role.
+#
+
+#
+# When seeding data against different environments, you will need to remove the
+# BootstrapData tag from the 'Force Tags' settings as this will prevent it from
+# being run against a given enironment.
+#
+
+#
+# If you see a consistent error such as 'Parent 'css:body' did not contain 'link:UI tests - Publication and Release UI Permissions Publication Owner' in 1 minute 40 seconds.'
+# then you will need to run this test suite against the environment you are testing against in order to seed the environment so that other tests
+# that depend on this test data don't fail.
 #
 
 
