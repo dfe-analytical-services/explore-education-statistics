@@ -5,7 +5,6 @@ import {
 } from '@admin/routes/releaseRoutes';
 import _publicationService, {
   Publication,
-  Contact,
 } from '@admin/services/publicationService';
 import _tableBuilderService from '@common/services/tableBuilderService';
 import { render, screen, waitFor, within } from '@testing-library/react';
@@ -23,13 +22,6 @@ const publicationService = _publicationService as jest.Mocked<
 const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService
 >;
-
-const testContact: Contact = {
-  contactName: 'John Smith',
-  contactTelNo: '0777777777',
-  teamEmail: 'john.smith@test.com',
-  teamName: 'Team Smith',
-};
 
 const testPublication: Publication = {
   id: 'publication-1',

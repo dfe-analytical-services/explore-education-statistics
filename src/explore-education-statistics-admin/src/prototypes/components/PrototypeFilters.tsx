@@ -6,7 +6,7 @@ import ButtonText from '@common/components/ButtonText';
 import FormRadioGroup from '@admin/prototypes/components/PrototypeFormRadioGroup';
 import { releaseTypes } from '@common/services/types/releaseType';
 import { Theme } from '@common/services/themeService';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import Modal from '@common/components/Modal';
 import useToggle from '@common/hooks/useToggle';
 import ModalContent from '@admin/prototypes/components/PrototypeModalContent';

@@ -13,7 +13,6 @@ import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import FormGroup from '@common/components/form/FormGroup';
-import WarningMessage from '@common/components/WarningMessage';
 import {
   ChartDefinition,
   BarChartDataLabelPosition,

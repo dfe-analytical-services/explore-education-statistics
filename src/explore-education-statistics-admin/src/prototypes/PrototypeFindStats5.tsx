@@ -46,6 +46,7 @@ const PrototypeFindStats = () => {
       ?.topics.find(topic => topic.id === topicId);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const spliceIntoChunks = (arr: any[], chunkSize: number) => {
     const res = [];
     const arrayToChunk = [...arr];
@@ -388,7 +389,6 @@ const PrototypeFindStats = () => {
                     slug={generateSlug(publication.title)}
                     summary={publication.summary}
                     theme={publication.theme}
-                    topic={publication.topic}
                     type={publication.type}
                     published={publication.published}
                   />
