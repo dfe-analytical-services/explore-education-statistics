@@ -711,7 +711,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publication = new Publication
             {
                 Slug = "publication-slug",
-                Releases = ListOf(release1, release2)
+                LatestPublishedReleaseNew = release2,
+                Releases = ListOf(release1, release2),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -781,7 +782,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publication = new Publication
             {
                 Slug = "publication-slug",
-                Releases = ListOf(originalRelease, amendedRelease)
+                Releases = ListOf(originalRelease, amendedRelease),
+                LatestPublishedReleaseNew = amendedRelease
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -835,7 +837,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publication = new Publication
             {
                 Slug = "publication-slug",
-                Releases = ListOf(release1, release2, release2Amendment)
+                Releases = ListOf(release1, release2, release2Amendment),
+                LatestPublishedReleaseNew = release2
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -873,6 +876,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         private static ReleaseService SetupReleaseService(
             ContentDbContext contentDbContext,
             IReleaseFileRepository? releaseFileRepository = null,
+            IReleaseRepository? releaseRepository = null,
             IUserService? userService = null,
             IMapper? mapper = null)
         {
@@ -880,6 +884,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 contentDbContext,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
+                releaseRepository ?? new ReleaseRepository(contentDbContext),
                 userService ?? AlwaysTrueUserService().Object,
                 mapper ?? MapperUtils.MapperForProfile<MappingProfiles>()
             );

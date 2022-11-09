@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.EntityFrameworkCore;
@@ -16,10 +17,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
     public class ThemeService : IThemeService
     {
         private readonly ContentDbContext _contentDbContext;
+        private readonly IPublicationRepository _publicationRepository;
 
-        public ThemeService(ContentDbContext contentDbContext)
+        public ThemeService(ContentDbContext contentDbContext,
+            IPublicationRepository publicationRepository)
         {
             _contentDbContext = contentDbContext;
+            _publicationRepository = publicationRepository;
         }
 
         public async Task<IList<ThemeTree<PublicationTreeNode>>> GetPublicationTree()
@@ -60,10 +64,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         {
             var publications = await topic.Publications
                 .ToAsyncEnumerable()
-                .Where(publication => publication
-                                          .Releases
-                                          .Any(r => r.IsLatestPublishedVersionOfRelease())
-                                      || publication.LegacyPublicationUrl != null)
+                .Where(publication =>
+                    publication.LatestPublishedReleaseId != null || publication.LegacyPublicationUrl != null)
                 .SelectAwait(async publication =>
                     await BuildPublicationNode(publication))
                 .OrderBy(publication => publication.Title)
@@ -79,8 +81,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
         private async Task<PublicationTreeNode> BuildPublicationNode(Publication publication)
         {
-            var latestRelease = publication.LatestPublishedRelease();
-            var type = GetPublicationType(latestRelease?.Type);
+            var type = await GetPublicationType(publication);
+            var latestPublishedReleaseId = publication.LatestPublishedReleaseId;
 
             return new PublicationTreeNode
             {
@@ -91,44 +93,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 LegacyPublicationUrl = type == PublicationType.Legacy
                     ? publication.LegacyPublicationUrl?.ToString()
                     : null,
-                IsSuperseded = IsSuperseded(publication),
-                HasLiveRelease = latestRelease != null,
-                LatestReleaseHasData = latestRelease != null && await HasAnyDataFiles(latestRelease),
+                IsSuperseded = await _publicationRepository.IsSuperseded(publication.Id),
+                HasLiveRelease = latestPublishedReleaseId != null,
+                LatestReleaseHasData = latestPublishedReleaseId != null &&
+                                       await HasAnyDataFiles(latestPublishedReleaseId.Value),
                 AnyLiveReleaseHasData = await publication.Releases
                     .ToAsyncEnumerable()
                     .AnyAwaitAsync(async r => r.IsLatestPublishedVersionOfRelease()
-                                              && await HasAnyDataFiles(r))
+                                              && await HasAnyDataFiles(r.Id))
             };
         }
 
-        private bool IsSuperseded(Publication publication)
-        {
-            return publication.SupersededById != null
-                   && _contentDbContext.Releases
-                       .Include(r => r.Publication)
-                       .Any(r => r.PublicationId == publication.SupersededById
-                                 && r.Published.HasValue && DateTime.UtcNow >= r.Published.Value);
-        }
-
-        private async Task<bool> HasAnyDataFiles(Release release)
+        private async Task<bool> HasAnyDataFiles(Guid releaseId)
         {
             return await _contentDbContext.ReleaseFiles
                 .Include(rf => rf.File)
-                .AnyAsync(rf => rf.ReleaseId == release.Id && rf.File.Type == FileType.Data);
+                .AnyAsync(rf => rf.ReleaseId == releaseId && rf.File.Type == FileType.Data);
         }
 
-        private static PublicationType GetPublicationType(ReleaseType? releaseType)
+        private async Task<PublicationType> GetPublicationType(Publication publication)
         {
-            return releaseType switch
+            if (publication.LatestPublishedReleaseId == null)
             {
-                ReleaseType.AdHocStatistics => PublicationType.AdHoc,
-                ReleaseType.NationalStatistics => PublicationType.NationalAndOfficial,
-                ReleaseType.ExperimentalStatistics => PublicationType.Experimental,
-                ReleaseType.ManagementInformation => PublicationType.ManagementInformation,
-                ReleaseType.OfficialStatistics => PublicationType.NationalAndOfficial,
-                null => PublicationType.Legacy,
-                _ => throw new ArgumentOutOfRangeException()
-            };
+                return PublicationType.Legacy;
+            }
+
+            await _contentDbContext.Entry(publication)
+                .Reference(p => p.LatestPublishedReleaseNew)
+                .LoadAsync();
+
+            return GetPublicationType(publication.LatestPublishedReleaseNew!.Type);
         }
+
+        private static PublicationType GetPublicationType(ReleaseType releaseType) => releaseType switch
+        {
+            ReleaseType.AdHocStatistics => PublicationType.AdHoc,
+            ReleaseType.NationalStatistics => PublicationType.NationalAndOfficial,
+            ReleaseType.ExperimentalStatistics => PublicationType.Experimental,
+            ReleaseType.ManagementInformation => PublicationType.ManagementInformation,
+            ReleaseType.OfficialStatistics => PublicationType.NationalAndOfficial,
+            _ => throw new ArgumentOutOfRangeException(nameof(releaseType), releaseType, message: null)
+        };
     }
 }

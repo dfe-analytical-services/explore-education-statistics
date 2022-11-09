@@ -137,7 +137,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IIndicatorRepository, IndicatorRepository>();
             services.AddTransient<IDataGuidanceService, DataGuidanceService>();
             services.AddTransient<IPublicationCacheService, PublicationCacheService>();
-            services.AddTransient<IPublicationService, Services.PublicationService>();
+            services.AddTransient<IPublicationRepository, PublicationRepository>();
+            services.AddTransient<IPublicationService, PublicationService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IDataGuidanceSubjectService, DataGuidanceSubjectService>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();

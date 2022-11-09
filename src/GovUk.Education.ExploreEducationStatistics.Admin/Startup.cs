@@ -89,6 +89,7 @@ using IDataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Se
 using IGlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IGlossaryService;
 using IMethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
 using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyService;
+using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
 using IReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseFileService;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
@@ -466,7 +467,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     themeCacheService: provider.GetRequiredService<IThemeCacheService>()
                 )
             );
-            services.AddTransient<IPublicationRepository, PublicationRepository>();
+            services.AddTransient<IPublicationRepository, Services.PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<ILegacyReleaseService, LegacyReleaseService>(provider =>
                 new LegacyReleaseService(
@@ -561,6 +562,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
             services.AddTransient<Content.Model.Repository.Interfaces.IReleaseRepository,
                 Content.Model.Repository.ReleaseRepository>();
+            services.AddTransient<Content.Model.Repository.Interfaces.IPublicationRepository,
+                Content.Model.Repository.PublicationRepository>();
             services.AddTransient<ISubjectRepository, SubjectRepository>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();

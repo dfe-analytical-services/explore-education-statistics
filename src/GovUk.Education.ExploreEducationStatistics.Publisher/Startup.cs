@@ -35,10 +35,8 @@ using ContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.S
 using FileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.FileStorageService;
 using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IFileStorageService;
 using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
-using IPublicationService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IPublicationService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.MethodologyService;
-using PublicationService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.PublicationService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseService;
 
 [assembly: FunctionsStartup(typeof(Startup))]
@@ -80,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage"),
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
                         methodologyService: provider.GetRequiredService<IMethodologyService>(),
-                        publicationService: provider.GetRequiredService<IPublicationService>(),
+                        publicationRepository: provider.GetRequiredService<IPublicationRepository>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
                         logger: provider.GetRequiredService<ILogger<PublishingService>>()))
                 .AddScoped<IContentService, ContentService>(provider =>
@@ -90,7 +88,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         publicBlobCacheService: GetBlobCacheService(provider, "PublicStorage"),
                         releaseCacheService: provider.GetRequiredService<IReleaseCacheService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
-                        publicationService: provider.GetRequiredService<IPublicationService>(),
                         methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
                         themeCacheService: provider.GetRequiredService<IThemeCacheService>()))
                 .AddScoped<IReleaseService, ReleaseService>(provider =>
@@ -105,7 +102,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     new TableStorageService(
                         GetConfigurationValue(provider, "PublisherStorage"),
                         new StorageInstanceCreationUtil()))
-                .AddScoped<IPublicationService, PublicationService>()
                 .AddScoped<IMethodologyVersionRepository, MethodologyVersionRepository>()
                 .AddScoped<IMethodologyRepository, MethodologyRepository>()
                 .AddScoped<IMethodologyService, MethodologyService>()

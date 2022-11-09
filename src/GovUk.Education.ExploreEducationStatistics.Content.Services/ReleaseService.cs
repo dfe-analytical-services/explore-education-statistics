@@ -26,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IReleaseFileRepository _releaseFileRepository;
+        private readonly IReleaseRepository _releaseRepository;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
@@ -36,12 +37,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IReleaseFileRepository releaseFileRepository,
+            IReleaseRepository releaseRepository,
             IUserService userService,
             IMapper mapper)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _releaseFileRepository = releaseFileRepository;
+            _releaseRepository = releaseRepository;
             _userService = userService;
             _mapper = mapper;
         }
@@ -50,26 +53,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             string? releaseSlug = null)
         {
             return await _persistenceHelper.CheckEntityExists<Publication>(q =>
-                    q.Include(p => p.Releases)
-                        .Where(p => p.Slug == publicationSlug)
-                )
-                .OnSuccess(publication =>
+                    q.Where(p => p.Slug == publicationSlug))
+                .OnSuccess(async publication =>
                 {
-                    // If no release is requested get the latest published version of the latest published release.
-                    // Otherwise get the latest published version of the requested release.
-                    return releaseSlug == null
-                        ? publication.LatestPublishedRelease()
-                        : publication.Releases
-                            .SingleOrDefault(r => r.Slug == releaseSlug && r.IsLatestPublishedVersionOfRelease());
-                }).OnSuccess(async release =>
-                {
-                    if (release == null)
+                    // If no release is requested get the latest published release
+                    if (releaseSlug == null)
                     {
-                        return new NotFoundResult();
+                        return await _releaseRepository.GetLatestPublishedRelease(publication.Id);
                     }
-                    // Build the view model for the published release
-                    return await GetRelease(release.Id);
-                });
+
+                    // Otherwise get the latest published version of the requested release
+                    await _contentDbContext.Entry(publication)
+                        .Collection(p => p.Releases)
+                        .LoadAsync();
+
+                    var latestPublishedVersionOfRelease = publication.Releases.SingleOrDefault(r =>
+                        r.Slug == releaseSlug && r.IsLatestPublishedVersionOfRelease());
+
+                    return latestPublishedVersionOfRelease ?? new Either<ActionResult, Release>(new NotFoundResult());
+                }).OnSuccess(release => GetRelease(release.Id));
         }
 
         public async Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(Guid releaseId,
@@ -139,8 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         .Where(p => p.Slug == publicationSlug)
                 )
                 .OnSuccess(_userService.CheckCanViewPublication)
-                .OnSuccess(publication => publication.Releases
-                    .Where(release => release.IsLatestPublishedVersionOfRelease())
+                .OnSuccess(publication => publication.GetPublishedReleases()
                     .OrderByDescending(r => r.Year)
                     .ThenByDescending(r => r.TimePeriodCoverage)
                     .Select(release => new ReleaseSummaryViewModel(release))

@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
@@ -109,17 +108,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
         private async Task<List<PublicationSummaryViewModel>> GetPublishedPublicationsForMethodology(Guid methodologyId)
         {
-            var publications = await _contentDbContext.PublicationMethodologies
+            var publicationsWithPublishedReleases = await _contentDbContext.PublicationMethodologies
                 .Include(pm => pm.Publication)
-                .ThenInclude(p => p.Releases)
-                .Where(pm => pm.MethodologyId == methodologyId)
+                .Where(pm => pm.MethodologyId == methodologyId 
+                             && pm.Publication.LatestPublishedReleaseId != null)
                 .Select(pm => pm.Publication)
-                .ToListAsync();
-
-            var publicationsWithPublishedReleases = publications
-                .Where(p => p.Releases.Any(r => r.IsLatestPublishedVersionOfRelease()))
                 .OrderBy(p => p.Title)
-                .ToList();
+                .ToListAsync();
 
             return _mapper.Map<List<PublicationSummaryViewModel>>(publicationsWithPublishedReleases);
         }

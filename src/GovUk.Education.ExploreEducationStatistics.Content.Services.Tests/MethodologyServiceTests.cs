@@ -47,19 +47,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Slug = "publication-slug",
                 Title = "Publication title",
+                LatestPublishedReleaseId = Guid.NewGuid(),
                 Methodologies = new List<PublicationMethodology>
                 {
                     new()
                     {
                         Methodology = methodology,
                         Owner = true
-                    }
-                },
-                Releases = new List<Release>
-                {
-                    new()
-                    {
-                        Published = new DateTime(2021, 1, 1)
                     }
                 }
             };
@@ -105,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetLatestMethodologyBySlug_FiltersPublicationsWithNoPublishedReleases()
+        public async Task GetLatestMethodologyBySlug_FiltersUnpublishedPublications()
         {
             var methodology = new Methodology
             {
@@ -125,6 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Slug = "publication-a",
                 Title = "Publication A",
+                LatestPublishedReleaseId = Guid.NewGuid(),
                 Methodologies = new List<PublicationMethodology>
                 {
                     new()
@@ -132,21 +127,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Methodology = methodology,
                         Owner = true
                     }
-                },
-                Releases = new List<Release>
-                {
-                    new()
-                    {
-                        Published = new DateTime(2021, 1, 1)
-                    }
                 }
             };
 
-            // Publication has published and unpublished releases and is visible
+            // Publication has no published releases and is not visible
             var publicationB = new Publication
             {
                 Slug = "publication-b",
                 Title = "Publication B",
+                LatestPublishedReleaseId = null,
                 Methodologies = new List<PublicationMethodology>
                 {
                     new()
@@ -154,50 +143,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Methodology = methodology,
                         Owner = false
                     }
-                },
-                Releases = new List<Release>
-                {
-                    new()
-                    {
-                        Published = new DateTime(2021, 1, 1)
-                    },
-                    new()
-                }
-            };
-
-            // Publication has no releases and is not visible
-            var publicationC = new Publication
-            {
-                Slug = "publication-c",
-                Title = "Publication C",
-                Methodologies = new List<PublicationMethodology>
-                {
-                    new()
-                    {
-                        Methodology = methodology,
-                        Owner = false
-                    }
-                },
-                Releases = new List<Release>()
-            };
-
-            // Publication has no published releases and is not visible
-            var publicationD = new Publication
-            {
-                Slug = "publication-d",
-                Title = "Publication D",
-                Methodologies = new List<PublicationMethodology>
-                {
-                    new()
-                    {
-                        Methodology = methodology,
-                        Owner = false
-                    }
-                },
-                Releases = new List<Release>
-                {
-                    // Release is not published
-                    new()
                 }
             };
 
@@ -206,8 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.Methodologies.AddAsync(methodology);
-                await contentDbContext.Publications.AddRangeAsync(publicationA, publicationB, publicationC,
-                    publicationD);
+                await contentDbContext.Publications.AddRangeAsync(publicationA, publicationB);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -227,13 +171,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 VerifyAllMocks(methodologyVersionRepository);
 
-                Assert.Equal(2, result.Publications.Count);
+                Assert.Single(result.Publications);
                 Assert.Equal(publicationA.Id, result.Publications[0].Id);
                 Assert.Equal(publicationA.Slug, result.Publications[0].Slug);
                 Assert.Equal(publicationA.Title, result.Publications[0].Title);
-                Assert.Equal(publicationB.Id, result.Publications[1].Id);
-                Assert.Equal(publicationB.Slug, result.Publications[1].Slug);
-                Assert.Equal(publicationB.Title, result.Publications[1].Title);
             }
         }
 

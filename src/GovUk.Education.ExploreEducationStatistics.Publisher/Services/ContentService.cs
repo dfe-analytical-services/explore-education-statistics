@@ -22,7 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IBlobCacheService _publicBlobCacheService;
         private readonly IBlobStorageService _publicBlobStorageService;
         private readonly IReleaseService _releaseService;
-        private readonly IPublicationService _publicationService;
         private readonly IMethodologyCacheService _methodologyCacheService;
         private readonly IReleaseCacheService _releaseCacheService;
         private readonly IThemeCacheService _themeCacheService;
@@ -32,7 +31,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             IBlobCacheService publicBlobCacheService,
             IBlobStorageService publicBlobStorageService,
             IReleaseService releaseService,
-            IPublicationService publicationService,
             IMethodologyCacheService methodologyCacheService,
             IReleaseCacheService releaseCacheService,
             IThemeCacheService themeCacheService)
@@ -41,7 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _publicBlobCacheService = publicBlobCacheService;
             _publicBlobStorageService = publicBlobStorageService;
             _releaseService = releaseService;
-            _publicationService = publicationService;
             _methodologyCacheService = methodologyCacheService;
             _releaseCacheService = releaseCacheService;
             _themeCacheService = themeCacheService;
