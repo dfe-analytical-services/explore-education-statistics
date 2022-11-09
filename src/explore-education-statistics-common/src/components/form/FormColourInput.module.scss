@@ -1,0 +1,33 @@
+@import '~govuk-frontend/govuk/base';
+
+.button {
+  align-items: center;
+  background: #fff;
+  cursor: pointer;
+  display: flex;
+  height: 100%;
+  margin-left: govuk-spacing(2);
+  padding: govuk-spacing(1);
+
+  &:focus {
+    outline: $govuk-focus-colour solid $govuk-focus-width;
+  }
+}
+
+.swatch {
+  height: 100%;
+  width: govuk-spacing(8);
+}
+
+.popover {
+  position: absolute;
+  z-index: 2;
+}
+
+.cover {
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+}
