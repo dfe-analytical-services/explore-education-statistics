@@ -21,8 +21,7 @@
     "fragmentationTables": "Observation,ObservationFilterItem",
     "removeSoftDeletedSubjectsObservationLimit": "1500000",
     "removeSoftDeletedSubjectsObservationCommitBatchSize": "1000",
-    "removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize": "20000",
-    "subjectsToMigrate": "5"
+    "removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize": "20000"
   },
   "resources": [
     {
@@ -93,7 +92,7 @@
             "type": "SqlServerStoredProcedure",
             "dependsOn": [],
             "policy": {
-              "timeout": "0.04:00:00",
+              "timeout": "0.12:00:00",
               "retry": 0,
               "retryIntervalInSeconds": 30,
               "secureOutput": false,
@@ -153,7 +152,7 @@
             "type": "SqlServerStoredProcedure",
             "dependsOn": [],
             "policy": {
-              "timeout": "0.04:00:00",
+              "timeout": "0.12:00:00",
               "retry": 0,
               "retryIntervalInSeconds": 30,
               "secureOutput": false,
@@ -372,11 +371,15 @@
         "type": "ScheduleTrigger",
         "typeProperties": {
           "recurrence": {
-            "frequency": "Day",
+            "frequency": "Week",
             "interval": 1,
             "startTime": "2020-11-23T19:00:00",
             "timeZone": "GMT Standard Time",
-            "schedule": {}
+            "schedule": {
+              "hours": [19],
+              "minutes": [0],
+              "weekDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+            }
           }
         }
       },
@@ -419,9 +422,13 @@
           "recurrence": {
             "frequency": "Week",
             "interval": 1,
-            "startTime": "2020-11-29T02:00:00",
+            "startTime": "2022-11-12T19:00:00",
             "timeZone": "GMT Standard Time",
-            "schedule": {}
+            "schedule": {
+              "hours": [19],
+              "minutes": [0],
+              "weekDays": ["Saturday"]
+            }
           }
         }
       },
