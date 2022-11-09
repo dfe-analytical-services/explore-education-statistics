@@ -95,8 +95,8 @@ def user_waits_for_release_process_status_to_be(status, timeout):
 
 def user_checks_dashboard_theme_topic_dropdowns_exist():
     try:
-        sl.driver.find_element(By.CSS_SELECTOR, "#publicationsReleases-themeTopic-themeId")
-        sl.driver.find_element(By.CSS_SELECTOR, "#publicationsReleases-themeTopic-topicId")
+        sl.driver.find_element(By.ID, "publicationsReleases-themeTopic-themeId")
+        sl.driver.find_element(By.ID, "publicationsReleases-themeTopic-topicId")
     except NoSuchElementException:
         return False
 
