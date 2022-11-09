@@ -1,39 +1,24 @@
 import classNames from 'classnames';
-import Details from '@common/components/Details';
 import React, { useState } from 'react';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
-import FormEditor from '@admin/components/form/FormEditor';
-import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 import Button from '@common/components/Button';
-import styles from '../PrototypePublicPage.module.scss';
-import PrototypeDownloadAncillaryLinks from './PrototypeDownloadAncillaryLinks';
 
 interface Props {
   selectedRole?: boolean;
-  lastItem?: string;
   name?: string;
   release?: string;
-  roleId?: string;
   className?: string;
-  type?: string;
 }
-
-const roles = ['Approver', 'Contributor', 'Lead', 'Viewer', 'No access'];
 
 const PrototypeSelectedRole = ({
   selectedRole,
-  lastItem,
   name,
   release,
-  roleId,
   className,
-  type,
 }: Props) => {
   const [showRoleModal, toggleRoleModal] = useToggle(false);
   const [roleType, setRoleType] = useState(selectedRole);
-
-  //let role = '';
 
   return (
     <div
@@ -42,7 +27,7 @@ const PrototypeSelectedRole = ({
         className,
       )}
     >
-      {/*<label htmlFor={`role-${roleId}`} className="govuk-!-margin-right-3">{release}</label>
+      {/* <label htmlFor={`role-${roleId}`} className="govuk-!-margin-right-3">{release}</label>
       <select 
         className="govuk-select" 
         name="role" 
@@ -61,7 +46,7 @@ const PrototypeSelectedRole = ({
         </>
           </select>*/}
 
-      {/*<div className="govuk-checkboxes">
+      {/* <div className="govuk-checkboxes">
         <div className="govuk-checkboxes__item">
           <input type="checkbox" className="govuk-checkboxes__input" name='role' id={`role-${roleId}`} checked={selectedRole} />
           <label htmlFor={`role-${roleId}`} className="govuk-label govuk-checkboxes__label">Grant access</label>
@@ -107,7 +92,7 @@ const PrototypeSelectedRole = ({
         </Button>
       )}
 
-      {/*!type && (
+      {/* !type && (
         <button
           onClick={() => {
             toggleRoleModal(true);

@@ -1,7 +1,6 @@
 import PublicationsTab from '@admin/pages/admin-dashboard/components/PublicationsTab';
 import _permissionService from '@admin/services/permissionService';
 import _publicationService, {
-  Contact,
   Publication,
 } from '@admin/services/publicationService';
 import _themeService, { Theme } from '@admin/services/themeService';
@@ -70,13 +69,6 @@ describe('PublicationsTab', () => {
       ],
     },
   ];
-
-  const testContact: Contact = {
-    contactName: 'John Smith',
-    contactTelNo: '0777777777',
-    teamEmail: 'john.smith@test.com',
-    teamName: 'Team Smith',
-  };
 
   const testTopic1Publications: Publication[] = [
     {

@@ -1,4 +1,3 @@
-import { testContact } from '@admin/pages/publication/__data__/testPublication';
 import { testReleaseSummaries } from '@admin/pages/publication/__data__/testReleases';
 import { Publication } from '@admin/services/publicationService';
 import userService from '@admin/services/userService';

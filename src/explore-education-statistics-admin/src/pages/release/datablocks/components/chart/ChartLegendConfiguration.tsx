@@ -10,7 +10,6 @@ import {
 } from '@common/components/form';
 import FormFieldColourInput from '@common/components/form/FormFieldColourInput';
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
-import WarningMessage from '@common/components/WarningMessage';
 import {
   AxisConfiguration,
   ChartDefinition,

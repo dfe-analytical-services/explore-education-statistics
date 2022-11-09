@@ -15,7 +15,6 @@ import { publications, themes } from '@admin/prototypes/data/newThemesData';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo, useState } from 'react';
 import Button from '@common/components/Button';
-import { callbackify } from 'util';
 
 const PrototypeFindStats = () => {
   const [searchInput, setSearchInput] = useState('');
@@ -39,6 +38,7 @@ const PrototypeFindStats = () => {
     return themes.find(theme => theme.id === themeId);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const spliceIntoChunks = (arr: any[], chunkSize: number) => {
     const res = [];
     const arrayToChunk = [...arr];
@@ -359,7 +359,6 @@ const PrototypeFindStats = () => {
                     slug={generateSlug(publication.title)}
                     summary={publication.summary}
                     theme={publication.theme}
-                    topic={publication.topic}
                     type={publication.type}
                     published={publication.published}
                   />

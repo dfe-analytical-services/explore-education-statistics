@@ -2,9 +2,7 @@ import PublicationDetailsForm, {
   PublicationDetailsFormValues,
 } from '@admin/pages/publication/components/PublicationDetailsForm';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
-import publicationService, {
-  Publication,
-} from '@admin/services/publicationService';
+import publicationService from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';

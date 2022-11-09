@@ -7,8 +7,6 @@ import Link from '@admin/components/Link';
 import InfoIcon from '@common/components/InfoIcon';
 import Modal from '@common/components/Modal';
 import useToggle from '@common/hooks/useToggle';
-import SummaryList from '@common/components/SummaryList';
-import SummaryListItem from '@common/components/SummaryListItem';
 import ModalContent from '@admin/prototypes/components/PrototypeModalContent';
 
 const PrototypePublicationReleaseList = () => {
