@@ -91,7 +91,6 @@ describe('ChartMapConfiguration', () => {
     // Data classification
     expect(screen.getByLabelText('Equal intervals')).not.toBeChecked();
     expect(screen.getByLabelText('Quantiles')).not.toBeChecked();
-    expect(screen.getByLabelText('Custom')).not.toBeChecked();
 
     expect(screen.getByLabelText('Number of data groups')).not.toHaveValue();
   });
@@ -117,7 +116,6 @@ describe('ChartMapConfiguration', () => {
     // Data classification
     expect(screen.getByLabelText('Equal intervals')).toBeChecked();
     expect(screen.getByLabelText('Quantiles')).not.toBeChecked();
-    expect(screen.getByLabelText('Custom')).not.toBeChecked();
 
     expect(screen.getByLabelText('Number of data groups')).toHaveValue(6);
   });
@@ -308,7 +306,8 @@ describe('ChartMapConfiguration', () => {
     });
   });
 
-  describe('custom data groups', () => {
+  // EES-3858 - skipped until feature is reimplemented
+  describe.skip('custom data groups', () => {
     test('adding groups', async () => {
       render(
         <ChartMapConfiguration
