@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "",
   "devDependencies": {
+    "@hello-pangea/color-picker": "^3.2.2",
     "@microsoft/applicationinsights-web": "^2.5.9",
     "@popperjs/core": "^2.11.2",
     "@reach/auto-id": "^0.16.0",
