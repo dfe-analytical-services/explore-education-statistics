@@ -1,6 +1,5 @@
 import classNames from 'classnames';
 import Button from '@common/components/Button';
-import ButtonLink from '@common/components/ButtonLink';
 import ButtonText from '@common/components/ButtonText';
 import PageSearchForm from '@common/components/PageSearchForm';
 import PageTitle from '@admin/components/PageTitle';

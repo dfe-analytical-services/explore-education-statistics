@@ -1,14 +1,13 @@
 import classNames from 'classnames';
-import React, { ReactNode } from 'react';
+import React from 'react';
 import styles from './PrototypeChevronCard.module.scss';
 
 interface Props {
-  className?: string;
   title?: string;
   description?: string;
 }
 
-const ChevronCard = ({ className, title, description }: Props) => {
+const ChevronCard = ({ title, description }: Props) => {
   return (
     <li className={styles.card}>
       <div className={styles.wrapper}>
