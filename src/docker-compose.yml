@@ -11,7 +11,9 @@ services:
       - data-storage-data:/data
   db:
     container_name: ees-mssql
-    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    build:
+      context: ./mssql-server
+      dockerfile: Dockerfile-mssql-server
     ports:
       - "1433:1433"
     volumes:

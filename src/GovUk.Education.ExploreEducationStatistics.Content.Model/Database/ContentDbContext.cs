@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
@@ -76,8 +77,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<UserReleaseInvite> UserReleaseInvites { get; set; }
         public DbSet<UserPublicationInvite> UserPublicationInvites { get; set; }
 
+        public IQueryable<FreeTextRank> PublicationsFreeTextTable(string search) =>
+            FromExpression(() => PublicationsFreeTextTable(search));
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.AddFreeTextTableSupport();
+
             modelBuilder.Entity<Comment>()
                 .Property(comment => comment.Created)
                 .HasConversion(
