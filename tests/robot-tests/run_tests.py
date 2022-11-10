@@ -17,7 +17,7 @@ from pabot.pabot import main as pabot_run_cli
 from robot import rebot_cli as robot_rebot_cli
 from robot import run_cli as robot_run_cli
 from scripts.get_webdriver import get_webdriver
-from tests.libs.admin_utilities import (
+from tests.libs.run_test_utilities import (
     create_test_theme,
     create_test_topic,
     delete_test_topic,
@@ -44,20 +44,6 @@ if pythonpath:
     os.environ["PYTHONPATH"] += f":{str(current_dir)}"
 else:
     os.environ["PYTHONPATH"] = str(current_dir)
-
-assert os.getenv("TIMEOUT") is not None
-assert os.getenv("IMPLICIT_WAIT") is not None
-assert os.getenv("PUBLIC_URL") is not None
-assert os.getenv("ADMIN_URL") is not None
-assert os.getenv("PUBLIC_AUTH_USER") is not None
-assert os.getenv("PUBLIC_AUTH_PASSWORD") is not None
-assert os.getenv("RELEASE_COMPLETE_WAIT") is not None
-assert os.getenv("WAIT_MEDIUM") is not None
-assert os.getenv("WAIT_LONG") is not None
-assert os.getenv("WAIT_SMALL") is not None
-assert os.getenv("FAIL_TEST_SUITES_FAST") is not None
-assert os.getenv("IDENTITY_PROVIDER") is not None
-assert os.getenv("WAIT_MEMORY_CACHE_EXPIRY") is not None
 
 # Parse arguments
 parser = argparse.ArgumentParser(
@@ -213,6 +199,21 @@ if args.custom_env:
     load_dotenv(args.custom_env)
 else:
     load_dotenv(".env." + args.env)
+
+
+assert os.getenv("TIMEOUT") is not None
+assert os.getenv("IMPLICIT_WAIT") is not None
+assert os.getenv("PUBLIC_URL") is not None
+assert os.getenv("ADMIN_URL") is not None
+assert os.getenv("PUBLIC_AUTH_USER") is not None
+assert os.getenv("PUBLIC_AUTH_PASSWORD") is not None
+assert os.getenv("RELEASE_COMPLETE_WAIT") is not None
+assert os.getenv("WAIT_MEDIUM") is not None
+assert os.getenv("WAIT_LONG") is not None
+assert os.getenv("WAIT_SMALL") is not None
+assert os.getenv("FAIL_TEST_SUITES_FAST") is not None
+assert os.getenv("IDENTITY_PROVIDER") is not None
+assert os.getenv("WAIT_MEMORY_CACHE_EXPIRY") is not None
 
 
 if args.slack_webhook_url:
