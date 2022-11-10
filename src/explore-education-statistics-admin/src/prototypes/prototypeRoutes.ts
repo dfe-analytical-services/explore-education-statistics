@@ -27,6 +27,8 @@ import PrototypeFindStats5 from './PrototypeFindStats5';
 import PrototypeFindStats6 from './PrototypeFindStats6';
 import PrototypeTableTool from './PrototypeTableToolPage';
 import PrototypeTableHighlightsV2 from './PrototypeTableHighlightsUpdateV2';
+import PrototypeTableHighlightsV2b from './PrototypeTableHighlightsUpdateV2-b';
+import PrototypeTableHighlightsV2c from './PrototypeTableHighlightsUpdateV2-c';
 import PrototypeDataCatalog from './PrototypeDataCatalog';
 import PrototypeMethodology from './PrototypeMethodology';
 
@@ -175,6 +177,16 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'Table tool highlights V2',
     path: '/prototypes/table-highlights-2',
     component: PrototypeTableHighlightsV2,
+  },
+  {
+    name: 'Table tool highlights V2-b',
+    path: '/prototypes/table-highlights-2b',
+    component: PrototypeTableHighlightsV2b,
+  },
+  {
+    name: 'Table tool highlights V2-c',
+    path: '/prototypes/table-highlights-2c',
+    component: PrototypeTableHighlightsV2c,
   },
   {
     name: 'Data catalog',
