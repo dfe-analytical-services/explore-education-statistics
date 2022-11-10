@@ -24,7 +24,7 @@ const NotificationBanner = ({ children, heading, title }: Props) => {
       </div>
       <div className="govuk-notification-banner__content">
         <p className="govuk-notification-banner__heading">{heading}</p>
-        {children && children}
+        {children}
       </div>
     </div>
   );
