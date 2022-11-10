@@ -6,7 +6,7 @@ import _permissionService from '@admin/services/permissionService';
 import _preReleaseService, {
   PreReleaseSummary,
 } from '@admin/services/preReleaseService';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import { addHours, subHours } from 'date-fns';
 import React from 'react';
 import { generatePath, MemoryRouter } from 'react-router';
@@ -29,6 +29,7 @@ describe('PreReleasePageContainer', () => {
     releaseTitle: 'Calendar Year 2018',
     releaseSlug: '2018',
     contactEmail: 'test@test.com',
+    contactTeam: 'Test team',
   };
 
   test('renders correctly when pre-release has ended', async () => {
@@ -106,6 +107,16 @@ describe('PreReleasePageContainer', () => {
     renderPage();
 
     await waitFor(() => {
+      const banner = within(screen.getByRole('region', { name: 'Contact' }));
+      expect(
+        banner.getByText('If you have an enquiry about this release contact:'),
+      ).toBeInTheDocument();
+
+      expect(banner.getByText('Test team:')).toBeInTheDocument();
+      expect(
+        banner.getByRole('link', { name: 'test@test.com' }),
+      ).toBeInTheDocument();
+
       expect(screen.getByRole('link', { name: 'Content' })).toBeInTheDocument();
 
       expect(
