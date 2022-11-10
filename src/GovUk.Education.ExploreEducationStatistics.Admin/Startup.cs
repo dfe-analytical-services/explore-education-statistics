@@ -191,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         providerOptions =>
                             providerOptions
                                 .MigrationsAssembly(typeof(Startup).Assembly.FullName)
-                                .EnableRetryOnFailure()
+                                .EnableRetryOnFailure(6, TimeSpan.FromSeconds(30), new[] {0})
                             )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
@@ -202,7 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         providerOptions => 
                             providerOptions
                                 .MigrationsAssembly(typeof(Startup).Assembly.FullName)
-                                .EnableRetryOnFailure()
+                                .EnableRetryOnFailure(6, TimeSpan.FromSeconds(30), new[] {0})
                         )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                             providerOptions
                                 .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
                                 .AddBulkOperationSupport()
-                                .EnableRetryOnFailure()
+                                .EnableRetryOnFailure(6, TimeSpan.FromSeconds(5), new[] {0})
                             )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );

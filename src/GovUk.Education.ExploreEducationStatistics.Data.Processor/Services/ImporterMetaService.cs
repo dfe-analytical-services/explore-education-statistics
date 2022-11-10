@@ -69,6 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     DbUtils.CreateStatisticsDbContext,
                     async ctxDelegate =>
                     {
+                        ctxDelegate.Subject.Attach(subject);
                         await ctxDelegate.Filter.AddRangeAsync(filters);
                         await ctxDelegate.Indicator.AddRangeAsync(indicators);
                         await ctxDelegate.SaveChangesAsync();
