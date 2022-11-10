@@ -6,6 +6,7 @@ import PageTitle from '@admin/components/PageTitle';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import PrototypeGridView from '@admin/prototypes/components/PrototypeGridView';
 import PrototypeChevronCard from '@admin/prototypes/components/PrototypeChevronCard';
+import PrototypeStep2Options from '@admin/prototypes/components/PrototypeTableStep2Options';
 import React, { useState } from 'react';
 import stylesWiz from '@common/modules/table-tool/components/Wizard.module.scss';
 import stylesStep from '@common/modules/table-tool/components/WizardStep.module.scss';
@@ -396,34 +397,7 @@ const PrototypeTableHighlights = () => {
                               </SummaryListItem>
                             </SummaryList>
 
-                            <hr />
-
-                            <h3>What would you like to do?</h3>
-
-                            <div className="dfe-flex dfe-align-items--center govuk-!-margin-bottom-9">
-                              <Button className="govuk-!-margin-0 ">
-                                Create your own table
-                              </Button>{' '}
-                              <span className="govuk-!-margin-left-2 govuk-!-margin-right-2">
-                                or
-                              </span>{' '}
-                              <a href="#">
-                                Download full dataset (.zip, 100mb)
-                              </a>
-                            </div>
-
-                            <h4 className=" govuk-heading-m">
-                              View our featured tables{' '}
-                            </h4>
-                            <div className="govuk-width-container govuk-!-margin-0">
-                              <p>
-                                These featured tables have been created by our
-                                publication team, highlighting popular tables
-                                built from this dataset. These tables can be
-                                viewed, shared and customised to the data that
-                                you're interested in.
-                              </p>
-                            </div>
+                            <PrototypeStep2Options />
 
                             <PrototypeGridView>
                               <PrototypeChevronCard
@@ -456,34 +430,8 @@ const PrototypeTableHighlights = () => {
                               </SummaryListItem>
                             </SummaryList>
 
-                            <hr />
+                            <PrototypeStep2Options />
 
-                            <h3>What would you like to do?</h3>
-
-                            <div className="dfe-flex dfe-align-items--center govuk-!-margin-bottom-9">
-                              <Button className="govuk-!-margin-0 ">
-                                Create your own table
-                              </Button>{' '}
-                              <span className="govuk-!-margin-left-2 govuk-!-margin-right-2">
-                                or
-                              </span>{' '}
-                              <a href="#">
-                                Download full dataset (.zip, 100mb)
-                              </a>
-                            </div>
-
-                            <h4 className=" govuk-heading-m">
-                              View our featured tables{' '}
-                            </h4>
-                            <div className="govuk-width-container govuk-!-margin-0">
-                              <p>
-                                These featured tables have been created by our
-                                publication team, highlighting popular tables
-                                built from this dataset. These tables can be
-                                viewed, shared and customised to the data that
-                                you're interested in.
-                              </p>
-                            </div>
                             <PrototypeGridView>
                               <PrototypeChevronCard
                                 title="Rates by sector subject area and Ethnicity group learners"
@@ -527,34 +475,8 @@ const PrototypeTableHighlights = () => {
                               </SummaryListItem>
                             </SummaryList>
 
-                            <hr />
+                            <PrototypeStep2Options />
 
-                            <h3>What would you like to do?</h3>
-
-                            <div className="dfe-flex dfe-align-items--center govuk-!-margin-bottom-9">
-                              <Button className="govuk-!-margin-0 ">
-                                Create your own table
-                              </Button>{' '}
-                              <span className="govuk-!-margin-left-2 govuk-!-margin-right-2">
-                                or
-                              </span>{' '}
-                              <a href="#">
-                                Download full dataset (.zip, 100mb)
-                              </a>
-                            </div>
-
-                            <h4 className=" govuk-heading-m">
-                              View our featured tables{' '}
-                            </h4>
-                            <div className="govuk-width-container govuk-!-margin-0">
-                              <p>
-                                These featured tables have been created by our
-                                publication team, highlighting popular tables
-                                built from this dataset. These tables can be
-                                viewed, shared and customised to the data that
-                                you're interested in.
-                              </p>
-                            </div>
                             <PrototypeGridView>
                               <PrototypeChevronCard
                                 title="Achievements by level"
@@ -594,21 +516,7 @@ const PrototypeTableHighlights = () => {
                               </SummaryListItem>
                             </SummaryList>
 
-                            <hr />
-
-                            <h3>What would you like to do?</h3>
-
-                            <div className="dfe-flex dfe-align-items--center govuk-!-margin-bottom-9">
-                              <Button className="govuk-!-margin-0 ">
-                                Continue to create your own table
-                              </Button>{' '}
-                              <span className="govuk-!-margin-left-2 govuk-!-margin-right-2">
-                                or
-                              </span>{' '}
-                              <a href="#">
-                                Download full dataset (.zip, 100mb)
-                              </a>
-                            </div>
+                            <PrototypeStep2Options noFeatured />
                           </div>
                         )}
                         {dataset === 'subject-all' && (
