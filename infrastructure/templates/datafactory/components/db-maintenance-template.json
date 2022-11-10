@@ -19,7 +19,7 @@
     "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]",
     "fragmentationPercentage": "30",
     "fragmentationTables": "Observation,ObservationFilterItem",
-    "removeSoftDeletedSubjectsObservationLimit": "1500000",
+    "removeSoftDeletedSubjectsObservationLimit": "10000000",
     "removeSoftDeletedSubjectsObservationCommitBatchSize": "1000",
     "removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize": "20000",
     "subjectsToMigrate": "5"
@@ -213,7 +213,7 @@
             "type": "SqlServerStoredProcedure",
             "dependsOn": [],
             "policy": {
-              "timeout": "0.04:00:00",
+              "timeout": "0.12:00:00",
               "retry": 0,
               "retryIntervalInSeconds": 30,
               "secureOutput": false,
@@ -255,7 +255,7 @@
         "parameters": {
           "TotalObservationLimit": {
             "type": "int",
-            "defaultValue": 1500000
+            "defaultValue": 10000000
           },
           "ObservationCommitBatchSize": {
             "type": "int",
@@ -283,7 +283,7 @@
             "type": "SqlServerStoredProcedure",
             "dependsOn": [],
             "policy": {
-              "timeout": "0.04:00:00",
+              "timeout": "0.12:00:00",
               "retry": 0,
               "retryIntervalInSeconds": 30,
               "secureOutput": false,
@@ -325,7 +325,7 @@
         "parameters": {
           "TotalObservationLimit": {
             "type": "int",
-            "defaultValue": 1500000
+            "defaultValue": 10000000
           },
           "ObservationCommitBatchSize": {
             "type": "int",
