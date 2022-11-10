@@ -82,6 +82,7 @@ Update legacy release
     user enters text into element    id:legacyReleaseForm-description    ${UPDATED_DESCRIPTION}
     user enters text into element    id:legacyReleaseForm-url    http://test2.com
     user clicks button    Save legacy release
+    sleep    %{WAIT_MEMORY_CACHE_EXPIRY}
 
 Validate updated legacy release
     user waits until h2 is visible    Legacy releases
