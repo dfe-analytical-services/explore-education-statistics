@@ -11,6 +11,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
+import { MinorAxisDomainValues } from '@common/modules/charts/util/domainTicks';
 
 describe('ChartReferenceLinesConfiguration', () => {
   const testAxisConfiguration: AxisConfiguration = {
@@ -94,13 +95,15 @@ describe('ChartReferenceLinesConfiguration', () => {
     testTable.subjectMeta,
   );
 
+  const testMinorAxisDomain: MinorAxisDomainValues = { min: 0, max: 50000 };
+
   test('renders correctly with existing lines when grouped by time periods', () => {
     render(
       <ChartReferenceLinesConfiguration
         dataSetCategories={testTimePeriodDataSetCategories}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[{ position: '2014_AY', label: 'Test label 1' }]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={noop}
         onRemoveLine={noop}
       />,
@@ -137,11 +140,11 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.subjectMeta,
         )}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[
           { position: 'ethnicity-major-chinese', label: 'Test label 1' },
           { position: 'state-funded-secondary', label: 'Test label 2' },
         ]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={noop}
         onRemoveLine={noop}
       />,
@@ -187,8 +190,8 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.subjectMeta,
         )}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[{ position: 'barnet', label: 'Test label 1' }]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={noop}
         onRemoveLine={noop}
       />,
@@ -226,10 +229,10 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.subjectMeta,
         )}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[
           { position: 'overall-absence-sessions', label: 'Test label 1' },
         ]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={noop}
         onRemoveLine={noop}
       />,
@@ -264,11 +267,11 @@ describe('ChartReferenceLinesConfiguration', () => {
       <ChartReferenceLinesConfiguration
         dataSetCategories={[]}
         axisDefinition={testMinorAxisDefinition}
-        id="test-form"
         lines={[
           { position: 2000, label: 'Test label 1' },
           { position: 4000, label: 'Test label 2' },
         ]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={noop}
         onRemoveLine={noop}
       />,
@@ -292,8 +295,8 @@ describe('ChartReferenceLinesConfiguration', () => {
       <ChartReferenceLinesConfiguration
         dataSetCategories={testTimePeriodDataSetCategories}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={noop}
         onRemoveLine={noop}
       />,
@@ -315,13 +318,103 @@ describe('ChartReferenceLinesConfiguration', () => {
     });
   });
 
+  test('shows validation error for a minor axis line when `Position` is not valid', async () => {
+    render(
+      <ChartReferenceLinesConfiguration
+        dataSetCategories={testTimePeriodDataSetCategories}
+        axisDefinition={testMinorAxisDefinition}
+        lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
+        onAddLine={noop}
+        onRemoveLine={noop}
+      />,
+    );
+
+    const referenceLines = within(
+      screen.getByRole('table', { name: 'Reference lines' }),
+    );
+
+    expect(
+      referenceLines.queryByText('Enter a valid position'),
+    ).not.toBeInTheDocument();
+
+    userEvent.type(referenceLines.getByLabelText('Position'), '50500');
+    userEvent.tab();
+
+    await waitFor(() => {
+      expect(
+        referenceLines.getByText('Enter a valid position'),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('shows validation error for a major axis line when `otherAxisPosition` is not valid', async () => {
+    render(
+      <ChartReferenceLinesConfiguration
+        dataSetCategories={testTimePeriodDataSetCategories}
+        axisDefinition={testMajorAxisDefinition}
+        lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
+        onAddLine={noop}
+        onRemoveLine={noop}
+      />,
+    );
+
+    const referenceLines = within(
+      screen.getByRole('table', { name: 'Reference lines' }),
+    );
+
+    expect(
+      referenceLines.queryByText('Enter a valid position'),
+    ).not.toBeInTheDocument();
+
+    userEvent.type(referenceLines.getByLabelText('Y axis position'), '50500');
+    userEvent.tab();
+
+    await waitFor(() => {
+      expect(
+        referenceLines.getByText('Enter a valid position'),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('shows validation error for a minor axis line when `otherAxisPosition` is not valid', async () => {
+    render(
+      <ChartReferenceLinesConfiguration
+        dataSetCategories={testTimePeriodDataSetCategories}
+        axisDefinition={testMinorAxisDefinition}
+        lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
+        onAddLine={noop}
+        onRemoveLine={noop}
+      />,
+    );
+
+    const referenceLines = within(
+      screen.getByRole('table', { name: 'Reference lines' }),
+    );
+
+    expect(
+      referenceLines.queryByText('Enter a valid position'),
+    ).not.toBeInTheDocument();
+
+    userEvent.type(referenceLines.getByLabelText('X axis position'), '101');
+    userEvent.tab();
+
+    await waitFor(() => {
+      expect(
+        referenceLines.getByText('Enter a valid position'),
+      ).toBeInTheDocument();
+    });
+  });
+
   test('shows validation error when `Label` is empty', async () => {
     render(
       <ChartReferenceLinesConfiguration
         dataSetCategories={testTimePeriodDataSetCategories}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={noop}
         onRemoveLine={noop}
       />,
@@ -346,8 +439,8 @@ describe('ChartReferenceLinesConfiguration', () => {
       <ChartReferenceLinesConfiguration
         dataSetCategories={testTimePeriodDataSetCategories}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={noop}
         onRemoveLine={noop}
       />,
@@ -379,8 +472,8 @@ describe('ChartReferenceLinesConfiguration', () => {
       <ChartReferenceLinesConfiguration
         dataSetCategories={testTimePeriodDataSetCategories}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={noop}
         onRemoveLine={noop}
       />,
@@ -404,8 +497,8 @@ describe('ChartReferenceLinesConfiguration', () => {
             style: 'none',
           },
         }}
-        id="test-form"
         lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={noop}
         onRemoveLine={noop}
       />,
@@ -426,8 +519,8 @@ describe('ChartReferenceLinesConfiguration', () => {
       <ChartReferenceLinesConfiguration
         dataSetCategories={testTimePeriodDataSetCategories}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={handleAddLine}
         onRemoveLine={noop}
       />,
@@ -474,8 +567,8 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.subjectMeta,
         )}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={handleAddLine}
         onRemoveLine={noop}
       />,
@@ -520,8 +613,8 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.subjectMeta,
         )}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={handleAddLine}
         onRemoveLine={noop}
       />,
@@ -566,8 +659,8 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.subjectMeta,
         )}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={handleAddLine}
         onRemoveLine={noop}
       />,
@@ -605,8 +698,8 @@ describe('ChartReferenceLinesConfiguration', () => {
       <ChartReferenceLinesConfiguration
         dataSetCategories={[]}
         axisDefinition={testMinorAxisDefinition}
-        id="test-form"
         lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={handleAddLine}
         onRemoveLine={noop}
       />,
@@ -641,8 +734,8 @@ describe('ChartReferenceLinesConfiguration', () => {
       <ChartReferenceLinesConfiguration
         dataSetCategories={testTimePeriodDataSetCategories}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={handleAddLine}
         onRemoveLine={noop}
       />,
@@ -685,11 +778,11 @@ describe('ChartReferenceLinesConfiguration', () => {
       <ChartReferenceLinesConfiguration
         dataSetCategories={testTimePeriodDataSetCategories}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[
           { position: '2014_AY', label: 'Test label 1' },
           { position: '2015_AY', label: 'Test label 1' },
         ]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={handleAddLine}
         onRemoveLine={noop}
       />,
@@ -714,11 +807,11 @@ describe('ChartReferenceLinesConfiguration', () => {
       <ChartReferenceLinesConfiguration
         dataSetCategories={testTimePeriodDataSetCategories}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[
           { position: '2014_AY', label: 'Test label 1' },
           { position: '2015_AY', label: 'Test label 2' },
         ]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={noop}
         onRemoveLine={handleRemoveLine}
       />,
@@ -759,12 +852,12 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.subjectMeta,
         )}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[
           { position: 'state-funded-primary', label: 'Test label 1' },
           { position: 'state-funded-secondary', label: 'Test label 2' },
           { position: 'ethnicity-major-chinese', label: 'Test label 3' },
         ]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={noop}
         onRemoveLine={handleRemoveLine}
       />,
@@ -805,11 +898,11 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.subjectMeta,
         )}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[
           { position: 'barnet', label: 'Test label 1' },
           { position: 'barnsley', label: 'Test label 2' },
         ]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={noop}
         onRemoveLine={handleRemoveLine}
       />,
@@ -850,11 +943,11 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.subjectMeta,
         )}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[
           { position: 'authorised-absence-sessions', label: 'Test label 1' },
           { position: 'overall-absence-sessions', label: 'Test label 2' },
         ]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={noop}
         onRemoveLine={handleRemoveLine}
       />,
@@ -888,12 +981,12 @@ describe('ChartReferenceLinesConfiguration', () => {
       <ChartReferenceLinesConfiguration
         dataSetCategories={[]}
         axisDefinition={testMinorAxisDefinition}
-        id="test-form"
         lines={[
           { position: 1000, label: 'Test label 1' },
           { position: 2000, label: 'Test label 2' },
           { position: 3000, label: 'Test label 2' },
         ]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={noop}
         onRemoveLine={handleRemoveLine}
       />,
@@ -927,8 +1020,8 @@ describe('ChartReferenceLinesConfiguration', () => {
       <ChartReferenceLinesConfiguration
         dataSetCategories={testTimePeriodDataSetCategories}
         axisDefinition={testMajorAxisDefinition}
-        id="test-form"
         lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={handleAddLine}
         onRemoveLine={noop}
       />,
@@ -962,8 +1055,8 @@ describe('ChartReferenceLinesConfiguration', () => {
       <ChartReferenceLinesConfiguration
         dataSetCategories={[]}
         axisDefinition={testMinorAxisDefinition}
-        id="test-form"
         lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
         onAddLine={handleAddLine}
         onRemoveLine={noop}
       />,

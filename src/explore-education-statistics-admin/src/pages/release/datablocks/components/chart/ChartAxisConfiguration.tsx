@@ -15,6 +15,7 @@ import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
 import { SelectOption } from '@common/components/form/FormSelect';
 import {
+  AxesConfiguration,
   AxisConfiguration,
   AxisGroupBy,
   AxisType,
@@ -23,7 +24,10 @@ import {
   TickConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
-import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
+import createDataSetCategories, {
+  toChartData,
+} from '@common/modules/charts/util/createDataSetCategories';
+import { calculateMinorAxisDomainValues } from '@common/modules/charts/util/domainTicks';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
 import { OmitStrict } from '@common/types';
@@ -39,10 +43,10 @@ import { ObjectSchema } from 'yup';
 type FormValues = Partial<OmitStrict<AxisConfiguration, 'dataSets' | 'type'>>;
 
 interface Props {
+  axesConfiguration: AxesConfiguration;
   buttons?: ReactNode;
   id: string;
   type: AxisType;
-  configuration: AxisConfiguration;
   definition: ChartDefinition;
   data: TableDataResult[];
   meta: FullTableMeta;
@@ -52,8 +56,8 @@ interface Props {
 }
 
 const ChartAxisConfiguration = ({
+  axesConfiguration,
   buttons,
-  configuration,
   definition,
   id,
   data,
@@ -72,20 +76,26 @@ const ChartAxisConfiguration = ({
   } = useChartBuilderFormsContext();
 
   const axisDefinition = definition.axes[type];
+  const axisConfiguration = axesConfiguration[type];
 
   const dataSetCategories = useMemo<DataSetCategory[]>(() => {
-    if (type === 'minor') {
+    if (!axesConfiguration.major) {
       return [];
     }
 
     const config: AxisConfiguration = {
-      ...configuration,
+      ...axesConfiguration.major,
       min: 0,
       max: undefined,
     };
 
     return createDataSetCategories(config, data, meta, includeNonNumericData);
-  }, [configuration, data, meta, includeNonNumericData, type]);
+  }, [axesConfiguration.major, data, meta, includeNonNumericData]);
+
+  const chartData = dataSetCategories.map(toChartData);
+  const minorAxisDomain = axesConfiguration.minor
+    ? calculateMinorAxisDomainValues(chartData, axesConfiguration.minor)
+    : undefined;
 
   const groupByOptions = useMemo<RadioOption<AxisGroupBy>[]>(() => {
     const options: RadioOption<AxisGroupBy>[] = [
@@ -165,7 +175,7 @@ const ChartAxisConfiguration = ({
     (values: FormValues): AxisConfiguration => {
       // Use `merge` as we want to avoid potential undefined
       // values from overwriting existing values
-      const result = merge({}, configuration, values, {
+      const result = merge({}, axisConfiguration, values, {
         // `configuration.type` may be incorrectly set by
         // seeded releases, so we want to make sure this is
         // set using the `type` prop (which uses the axis key)
@@ -181,7 +191,7 @@ const ChartAxisConfiguration = ({
       result.referenceLines = [...(values.referenceLines ?? [])];
       return result;
     },
-    [configuration, type],
+    [axisConfiguration, type],
   );
 
   const handleFormChange = useCallback(
@@ -268,8 +278,8 @@ const ChartAxisConfiguration = ({
   ]);
 
   const initialValues = useMemo<FormValues>(
-    () => pick(configuration, Object.keys(validationSchema.fields)),
-    [configuration, validationSchema.fields],
+    () => pick(axisConfiguration, Object.keys(validationSchema.fields)),
+    [axisConfiguration, validationSchema.fields],
   );
 
   const handleSubmit = useCallback(
@@ -512,8 +522,8 @@ const ChartAxisConfiguration = ({
             <ChartReferenceLinesConfiguration
               axisDefinition={axisDefinition}
               dataSetCategories={dataSetCategories}
-              id={id}
               lines={form.values.referenceLines ?? []}
+              minorAxisDomain={minorAxisDomain}
               onAddLine={line => {
                 form.setFieldValue('referenceLines', [
                   ...(form.values.referenceLines ?? []),

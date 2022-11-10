@@ -9,6 +9,7 @@ import {
   ReferenceLineStyle,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
+import { MinorAxisDomainValues } from '@common/modules/charts/util/domainTicks';
 import Yup from '@common/validation/yup';
 import FormSelect, {
   SelectOption,
@@ -27,8 +28,8 @@ interface AddFormValues {
 export interface ChartReferenceLinesConfigurationProps {
   axisDefinition?: ChartDefinitionAxis;
   dataSetCategories: DataSetCategory[];
-  id: string;
   lines: ReferenceLine[];
+  minorAxisDomain?: MinorAxisDomainValues;
   onAddLine: (line: ReferenceLine) => void;
   onRemoveLine: (line: ReferenceLine) => void;
 }
@@ -36,8 +37,8 @@ export interface ChartReferenceLinesConfigurationProps {
 export default function ChartReferenceLinesConfiguration({
   axisDefinition,
   dataSetCategories,
-  id,
   lines,
+  minorAxisDomain,
   onAddLine,
   onRemoveLine,
 }: ChartReferenceLinesConfigurationProps) {
@@ -90,11 +91,9 @@ export default function ChartReferenceLinesConfiguration({
             {axis === 'x' ? 'Y axis position' : 'X axis position'}
             {type === 'minor' && (
               <>
-                {' '}
-                (%)
                 <br />
-                <span className="govuk-!-font-weight-regular">
-                  0 = start of axis
+                <span className="govuk-hint govuk-!-font-size-16 govuk-!-margin-bottom-0">
+                  0% = start of axis
                 </span>
               </>
             )}
@@ -108,7 +107,10 @@ export default function ChartReferenceLinesConfiguration({
         {referenceLines.map(line => (
           <tr key={`${line.label}_${line.position}`}>
             <td>{getPositionLabel(line.position)}</td>
-            <td>{line.otherAxisPosition}</td>
+            <td>
+              {line.otherAxisPosition &&
+                `${line.otherAxisPosition}${type === 'minor' ? '%' : ''}`}
+            </td>
             <td className="govuk-!-width-one-third">{line.label}</td>
             <td>{upperFirst(line.style)}</td>
             <td>
@@ -134,7 +136,34 @@ export default function ChartReferenceLinesConfiguration({
             }}
             validationSchema={Yup.object<AddFormValues>({
               label: Yup.string().required('Enter label'),
-              position: Yup.string().required('Enter position'),
+              otherAxisPosition: Yup.number().test({
+                name: 'otherAxisPosition',
+                message: 'Enter a valid position',
+                test: (value: number) => {
+                  if (!value) {
+                    return true;
+                  }
+                  if (type === 'minor') {
+                    return value >= 0 && value <= 100;
+                  }
+                  return minorAxisDomain
+                    ? value >= minorAxisDomain?.min &&
+                        value <= minorAxisDomain.max
+                    : true;
+                },
+              }),
+              position: Yup.string()
+                .required('Enter position')
+                .test({
+                  name: 'axisPosition',
+                  message: 'Enter a valid position',
+                  test: (value: number) => {
+                    return type === 'minor' && minorAxisDomain
+                      ? value >= minorAxisDomain?.min &&
+                          value <= minorAxisDomain.max
+                      : true;
+                  },
+                }),
               style: Yup.string()
                 .required('Enter style')
                 .oneOf<ReferenceLineStyle>(['dashed', 'solid', 'none']),
@@ -150,7 +179,7 @@ export default function ChartReferenceLinesConfiguration({
                   {type === 'major' ? (
                     <FormFieldSelect
                       name="position"
-                      id={`${id}-referenceLines-position`}
+                      id="referenceLines-position"
                       label="Position"
                       formGroup={false}
                       hideLabel
@@ -161,17 +190,17 @@ export default function ChartReferenceLinesConfiguration({
                   ) : (
                     <FormFieldNumberInput
                       name="position"
-                      id={`${id}-referenceLines-position`}
+                      id="referenceLines-position"
                       label="Position"
                       formGroup={false}
                       hideLabel
                     />
                   )}
                 </td>
-                <td>
+                <td className="dfe-vertical-align--bottom">
                   <FormFieldNumberInput
                     name="otherAxisPosition"
-                    id={`${id}-referenceLines-otherAxisPosition`}
+                    id="referenceLines-otherAxisPosition"
                     label={axis === 'x' ? 'Y axis position' : 'X axis position'}
                     formGroup={false}
                     hideLabel
@@ -185,7 +214,7 @@ export default function ChartReferenceLinesConfiguration({
                 <td className="govuk-!-width-one-third dfe-vertical-align--bottom">
                   <FormFieldTextInput
                     name="label"
-                    id={`${id}-referenceLines-label`}
+                    id="referenceLines-label"
                     label="Label"
                     formGroup={false}
                     hideLabel
@@ -194,7 +223,7 @@ export default function ChartReferenceLinesConfiguration({
                 <td className="dfe-vertical-align--bottom">
                   <FormFieldSelect
                     name="style"
-                    id={`${id}-referenceLines-style`}
+                    id="referenceLines-style"
                     label="Style"
                     formGroup={false}
                     hideLabel
