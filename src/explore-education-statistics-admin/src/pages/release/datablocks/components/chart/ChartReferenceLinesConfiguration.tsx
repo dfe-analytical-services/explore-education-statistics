@@ -1,3 +1,4 @@
+import styles from '@admin/pages/release/datablocks/components/chart/ChartReferenceLinesConfiguration.module.scss';
 import Button from '@common/components/Button';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
@@ -100,7 +101,7 @@ export default function ChartReferenceLinesConfiguration({
           </th>
           <th className="govuk-!-width-one-third">Label</th>
           <th>Style</th>
-          <th className="dfe-align--right">Actions</th>
+          <th className={`dfe-align--right ${styles.actions}`}>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -138,9 +139,14 @@ export default function ChartReferenceLinesConfiguration({
               label: Yup.string().required('Enter label'),
               otherAxisPosition: Yup.number().test({
                 name: 'otherAxisPosition',
-                message: 'Enter a valid position',
+                message:
+                  type === 'minor'
+                    ? 'Enter a percentage between 0 and 100%'
+                    : `Enter a position within the ${
+                        axis === 'x' ? 'Y' : 'X'
+                      } axis min/max range`,
                 test: (value: number) => {
-                  if (!value) {
+                  if (typeof value !== 'number') {
                     return true;
                   }
                   if (type === 'minor') {
@@ -156,7 +162,9 @@ export default function ChartReferenceLinesConfiguration({
                 .required('Enter position')
                 .test({
                   name: 'axisPosition',
-                  message: 'Enter a valid position',
+                  message: `Enter a position within the ${
+                    axis === 'x' ? 'X' : 'Y'
+                  } axis min/max range`,
                   test: (value: number) => {
                     return type === 'minor' && minorAxisDomain
                       ? value >= minorAxisDomain?.min &&

@@ -335,7 +335,9 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
 
     expect(
-      referenceLines.queryByText('Enter a valid position'),
+      referenceLines.queryByText(
+        'Enter a position within the Y axis min/max range',
+      ),
     ).not.toBeInTheDocument();
 
     userEvent.type(referenceLines.getByLabelText('Position'), '50500');
@@ -343,7 +345,9 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     await waitFor(() => {
       expect(
-        referenceLines.getByText('Enter a valid position'),
+        referenceLines.getByText(
+          'Enter a position within the Y axis min/max range',
+        ),
       ).toBeInTheDocument();
     });
   });
@@ -365,7 +369,9 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
 
     expect(
-      referenceLines.queryByText('Enter a valid position'),
+      referenceLines.queryByText(
+        'Enter a position within the Y axis min/max range',
+      ),
     ).not.toBeInTheDocument();
 
     userEvent.type(referenceLines.getByLabelText('Y axis position'), '50500');
@@ -373,7 +379,9 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     await waitFor(() => {
       expect(
-        referenceLines.getByText('Enter a valid position'),
+        referenceLines.getByText(
+          'Enter a position within the Y axis min/max range',
+        ),
       ).toBeInTheDocument();
     });
   });
@@ -395,7 +403,7 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
 
     expect(
-      referenceLines.queryByText('Enter a valid position'),
+      referenceLines.queryByText('Enter a percentage between 0 and 100%'),
     ).not.toBeInTheDocument();
 
     userEvent.type(referenceLines.getByLabelText('X axis position'), '101');
@@ -403,7 +411,7 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     await waitFor(() => {
       expect(
-        referenceLines.getByText('Enter a valid position'),
+        referenceLines.getByText('Enter a percentage between 0 and 100%'),
       ).toBeInTheDocument();
     });
   });
