@@ -17,13 +17,6 @@ from pabot.pabot import main as pabot_run_cli
 from robot import rebot_cli as robot_rebot_cli
 from robot import run_cli as robot_run_cli
 from scripts.get_webdriver import get_webdriver
-# from tests.libs.run_test_utilities import (
-#     create_test_theme,
-#     create_test_topic,
-#     delete_test_topic,
-#     get_test_themes,
-#     setup_authentication,
-# )
 from tests.libs.admin_api import (
     AdminClient,
     setup_authentication,
@@ -225,7 +218,7 @@ assert os.getenv("WAIT_MEMORY_CACHE_EXPIRY") is not None
 
 
 # ordering is important as AdminClient depends on environment variables
-# so the class should be initialised after they are loaded
+# so the class should be instantiated after they are loaded
 admin_client = AdminClient()
 
 if args.slack_webhook_url:

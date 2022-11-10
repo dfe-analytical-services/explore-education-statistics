@@ -15,6 +15,9 @@ requests.packages.urllib3.disable_warnings()
 class AdminClient:
     ROBOT_AUTO_KEYWORDS = False
 
+    def __init__(self, args):
+        self.args = args
+
     @staticmethod
     def __request(method: str, url: str, body: object = None):
         assert method and url
@@ -262,7 +265,6 @@ def setup_authentication(args, clear_existing=False):
 
 def get_themes():
     return admin_client.get("/api/themes")
-
 
 def create_test_theme():
     return admin_client.post("/api/themes", {"title": "Test theme", "summary": "Test theme summary"})
