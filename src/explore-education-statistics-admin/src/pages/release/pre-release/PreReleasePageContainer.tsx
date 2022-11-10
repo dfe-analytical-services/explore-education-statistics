@@ -144,7 +144,7 @@ const PreReleasePageContainer = ({
               {`${contactTeam}: `}
               <a
                 className='class="govuk-notification-banner__link"'
-                href={`mailto: ${contactEmail}`}
+                href={`mailto:${contactEmail}`}
               >
                 {contactEmail}
               </a>
