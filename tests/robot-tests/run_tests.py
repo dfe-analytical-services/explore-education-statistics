@@ -17,12 +17,20 @@ from pabot.pabot import main as pabot_run_cli
 from robot import rebot_cli as robot_rebot_cli
 from robot import run_cli as robot_run_cli
 from scripts.get_webdriver import get_webdriver
-from tests.libs.run_test_utilities import (
+# from tests.libs.run_test_utilities import (
+#     create_test_theme,
+#     create_test_topic,
+#     delete_test_topic,
+#     get_test_themes,
+#     setup_authentication,
+# )
+from tests.libs.admin_api import (
+    AdminClient,
+    setup_authentication,
+    get_themes,
     create_test_theme,
     create_test_topic,
-    delete_test_topic,
-    get_test_themes,
-    setup_authentication,
+    delete_test_topic
 )
 from tests.libs.create_emulator_release_files import ReleaseFilesGenerator
 from tests.libs.logger import get_logger
@@ -216,6 +224,10 @@ assert os.getenv("IDENTITY_PROVIDER") is not None
 assert os.getenv("WAIT_MEMORY_CACHE_EXPIRY") is not None
 
 
+# ordering is important as AdminClient depends on environment variables
+# so the class should be initialised after they are loaded
+admin_client = AdminClient()
+
 if args.slack_webhook_url:
     os.environ["SLACK_WEBHOOK_URL"] = args.slack_webhook_url
 
@@ -282,7 +294,7 @@ if args.tests and "general_public" not in args.tests:
         os.environ["RUN_IDENTIFIER"] = runIdentifier
         logger.info(f"Starting tests with RUN_IDENTIFIER: {runIdentifier}")
 
-        get_themes_resp = get_test_themes()
+        get_themes_resp = get_themes()
         test_theme_id = None
         test_theme_name = "Test theme"
 

@@ -1,6 +1,6 @@
 *** Settings ***
 Resource    ./common.robot
-Library     admin-utilities.py
+Library     admin_utilities.py
 
 
 *** Variables ***
