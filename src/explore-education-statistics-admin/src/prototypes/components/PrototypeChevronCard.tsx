@@ -5,15 +5,16 @@ import styles from './PrototypeChevronCard.module.scss';
 interface Props {
   title?: string;
   description?: string;
+  url?: string;
 }
 
-const ChevronCard = ({ title, description }: Props) => {
+const ChevronCard = ({ title, description, url }: Props) => {
   return (
     <li className={styles.card}>
       <div className={styles.wrapper}>
         <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
           <a
-            href="#"
+            href={url || '#'}
             className={classNames(styles.cardLink, 'govuk-!-margin-bottom-2')}
           >
             {title}

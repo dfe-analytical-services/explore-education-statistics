@@ -25,7 +25,7 @@ const styles = {
 const PrototypeTableHighlights = () => {
   const [dataset, setDataset] = useState('');
   const [datasetValue, setDatasetValue] = useState('');
-  const publication = 'pub-1';
+  const publication = 'pub-3';
 
   return (
     <div
@@ -78,13 +78,13 @@ const PrototypeTableHighlights = () => {
                     </div>
                     <div className="dfe-flex dfe-justify-content--space-between  govuk-grid-column-three-quarters">
                       <div>
-                        <a href="https://explore-education-statistics.service.gov.uk/find-statistics/apprenticeships-and-traineeships">
-                          Apprenticeships and traineeships
+                        <a href="https://explore-education-statistics.service.gov.uk/find-statistics/key-stage-4-performance-revised">
+                          Key stage 4 performance
                         </a>
                       </div>
                       <div>
                         <a
-                          href="https://explore-education-statistics.service.gov.uk/find-statistics/apprenticeships-and-traineeships"
+                          href="https://explore-education-statistics.service.gov.uk/find-statistics/key-stage-4-performance-revised"
                           className="govuk-!-margin-right-6"
                         >
                           View publication
@@ -184,9 +184,7 @@ const PrototypeTableHighlights = () => {
                                   name="subject"
                                   id="subject-1"
                                   onClick={() => {
-                                    setDatasetValue(
-                                      'Annual Headlines - detailed series',
-                                    );
+                                    setDatasetValue('KS4 national data');
                                     setDataset('subject-1');
                                   }}
                                 />
@@ -197,7 +195,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-1"
                                 >
-                                  Annual Headlines - detailed series
+                                  KS4 national data
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -208,7 +206,7 @@ const PrototypeTableHighlights = () => {
                                   id="subject-2"
                                   onClick={() => {
                                     setDatasetValue(
-                                      'Apprenticeship Achievement Rates Demographics',
+                                      'KS4 national characteristics data',
                                     );
                                     setDataset('subject-2');
                                   }}
@@ -220,7 +218,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-2"
                                 >
-                                  Apprenticeship Achievement Rates Demographics
+                                  KS4 national characteristics data
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -231,7 +229,7 @@ const PrototypeTableHighlights = () => {
                                   id="subject-3"
                                   onClick={() => {
                                     setDatasetValue(
-                                      'Apprenticeship Achievement Rates  Detailed series',
+                                      'KS4 national academies data',
                                     );
                                     setDataset('subject-3');
                                   }}
@@ -243,8 +241,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-3"
                                 >
-                                  Apprenticeship Achievement Rates Detailed
-                                  Series
+                                  KS4 national academies data
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -255,7 +252,7 @@ const PrototypeTableHighlights = () => {
                                   id="subject-4"
                                   onClick={() => {
                                     setDatasetValue(
-                                      'Apprenticeship Achievement Rates Headliness',
+                                      'KS4 disadvantage gap index data',
                                     );
                                     setDataset('subject-4');
                                   }}
@@ -267,7 +264,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-4"
                                 >
-                                  Apprenticeship Achievement Rates Headlines
+                                  KS4 disadvantage gap index data
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -284,7 +281,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-5"
                                 >
-                                  Apprenticeship Service - incentives
+                                  KS4 local authority data
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -301,7 +298,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-6"
                                 >
-                                  Charts data
+                                  KS4 local authority characteristics data
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -318,8 +315,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-7"
                                 >
-                                  Duration, planned length of stay and length of
-                                  employment
+                                  KS4 subject pupil level data
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -336,7 +332,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-8"
                                 >
-                                  Find an apprenticeship adverts and vacancies
+                                  KS4 subject entry level data
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -353,8 +349,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-9"
                                 >
-                                  Geographical breakdowns - detailed (reported
-                                  to date)
+                                  KS4 subject year of entry data
                                 </label>
                               </div>
                             </div>

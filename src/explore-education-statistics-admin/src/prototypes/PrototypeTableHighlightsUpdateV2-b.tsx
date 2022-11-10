@@ -25,7 +25,7 @@ const styles = {
 const PrototypeTableHighlights = () => {
   const [dataset, setDataset] = useState('');
   const [datasetValue, setDatasetValue] = useState('');
-  const publication = 'pub-1';
+  const publication = 'pub-2';
 
   return (
     <div
@@ -78,13 +78,13 @@ const PrototypeTableHighlights = () => {
                     </div>
                     <div className="dfe-flex dfe-justify-content--space-between  govuk-grid-column-three-quarters">
                       <div>
-                        <a href="https://explore-education-statistics.service.gov.uk/find-statistics/apprenticeships-and-traineeships">
-                          Apprenticeships and traineeships
+                        <a href="https://explore-education-statistics.service.gov.uk/find-statistics/school-workforce-in-england">
+                          School workforce in England
                         </a>
                       </div>
                       <div>
                         <a
-                          href="https://explore-education-statistics.service.gov.uk/find-statistics/apprenticeships-and-traineeships"
+                          href="https://explore-education-statistics.service.gov.uk/find-statistics/school-workforce-in-england"
                           className="govuk-!-margin-right-6"
                         >
                           View publication
@@ -160,33 +160,9 @@ const PrototypeTableHighlights = () => {
                                   type="radio"
                                   className="govuk-radios__input"
                                   name="subject"
-                                  id="subject-all"
-                                  onClick={() => {
-                                    setDatasetValue('All featured tables');
-                                    setDataset('subject-all');
-                                  }}
-                                />
-                                <label
-                                  className={classNames(
-                                    'govuk-label',
-                                    'govuk-radios__label',
-                                  )}
-                                  htmlFor="subject-all"
-                                >
-                                  All featured tables
-                                </label>
-                              </div>
-
-                              <div className="govuk-radios__item">
-                                <input
-                                  type="radio"
-                                  className="govuk-radios__input"
-                                  name="subject"
                                   id="subject-1"
                                   onClick={() => {
-                                    setDatasetValue(
-                                      'Annual Headlines - detailed series',
-                                    );
+                                    setDatasetValue('Entrants');
                                     setDataset('subject-1');
                                   }}
                                 />
@@ -197,7 +173,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-1"
                                 >
-                                  Annual Headlines - detailed series
+                                  Entrants
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -207,9 +183,7 @@ const PrototypeTableHighlights = () => {
                                   name="subject"
                                   id="subject-2"
                                   onClick={() => {
-                                    setDatasetValue(
-                                      'Apprenticeship Achievement Rates Demographics',
-                                    );
+                                    setDatasetValue('Leavers');
                                     setDataset('subject-2');
                                   }}
                                 />
@@ -220,7 +194,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-2"
                                 >
-                                  Apprenticeship Achievement Rates Demographics
+                                  Leavers
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -231,7 +205,7 @@ const PrototypeTableHighlights = () => {
                                   id="subject-3"
                                   onClick={() => {
                                     setDatasetValue(
-                                      'Apprenticeship Achievement Rates  Detailed series',
+                                      'Specialist teachers in state funded secondary schools',
                                     );
                                     setDataset('subject-3');
                                   }}
@@ -243,8 +217,8 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-3"
                                 >
-                                  Apprenticeship Achievement Rates Detailed
-                                  Series
+                                  Specialist teachers in state funded secondary
+                                  schools
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -255,7 +229,7 @@ const PrototypeTableHighlights = () => {
                                   id="subject-4"
                                   onClick={() => {
                                     setDatasetValue(
-                                      'Apprenticeship Achievement Rates Headliness',
+                                      'Subjects taught in state funded secondary schools',
                                     );
                                     setDataset('subject-4');
                                   }}
@@ -267,7 +241,8 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-4"
                                 >
-                                  Apprenticeship Achievement Rates Headlines
+                                  Subjects taught in state funded secondary
+                                  schools
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -284,7 +259,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-5"
                                 >
-                                  Apprenticeship Service - incentives
+                                  Support staff characteristics
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -301,7 +276,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-6"
                                 >
-                                  Charts data
+                                  Teacher absences
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -318,8 +293,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-7"
                                 >
-                                  Duration, planned length of stay and length of
-                                  employment
+                                  Teacher pay
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -336,7 +310,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-8"
                                 >
-                                  Find an apprenticeship adverts and vacancies
+                                  Teacher qualifications
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -353,8 +327,24 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-9"
                                 >
-                                  Geographical breakdowns - detailed (reported
-                                  to date)
+                                  Teacher retention
+                                </label>
+                              </div>
+                              <div className="govuk-radios__item">
+                                <input
+                                  type="radio"
+                                  className="govuk-radios__input"
+                                  name="subject"
+                                  id="subject-10"
+                                />
+                                <label
+                                  className={classNames(
+                                    'govuk-label',
+                                    'govuk-radios__label',
+                                  )}
+                                  htmlFor="subject-10"
+                                >
+                                  Teacher retirements
                                 </label>
                               </div>
                             </div>
@@ -382,31 +372,18 @@ const PrototypeTableHighlights = () => {
                                 National
                               </SummaryListItem>
                               <SummaryListItem term="Time period">
-                                2014/15 to 2020/21
+                                2011/12 to 2020/21
                               </SummaryListItem>
                               <SummaryListItem term="Content">
                                 <p>
-                                  Time series of headline apprenticeship figures
-                                  <Details
-                                    summary="View more details"
-                                    className="govuk-!-margin-bottom-0"
-                                  >
-                                    <p>
-                                      Indicators: Starts, Achievements, Learner
-                                      participation, Percentage Starts,
-                                      Percentage Achievements, Percentage
-                                      Learner participation
-                                    </p>
-                                    <p>
-                                      Filters: Apprenticeship level, Funding
-                                      type, Age group
-                                    </p>
-                                  </Details>
+                                  Full time equivalent (FTE) qualified teacher
+                                  entrants by category including school type,
+                                  gender, age group and type of entrant.
                                 </p>
                               </SummaryListItem>
                             </SummaryList>
 
-                            <PrototypeStep2Options />
+                            <PrototypeStep2Options noFeatured />
 
                             <PrototypeFeaturedLinks
                               dataset={dataset}
@@ -424,32 +401,18 @@ const PrototypeTableHighlights = () => {
                                 National
                               </SummaryListItem>
                               <SummaryListItem term="Time period">
-                                2018/19 to 2020/21
+                                2010/11 to 2020/21
                               </SummaryListItem>
                               <SummaryListItem term="Content">
                                 <p>
-                                  Apprenticeship national achievement rate
-                                  tables
-                                  <Details
-                                    summary="View more details"
-                                    className="govuk-!-margin-bottom-0"
-                                  >
-                                    <p>
-                                      Indicators: Achievement rate, Achievers,
-                                      Completers, Leavers, Pass rate, Retention
-                                      rate
-                                    </p>
-                                    <p>
-                                      Filters: Age, Level, demographic -
-                                      ethnicity, gender and lldd, Standard
-                                      /Framework flag
-                                    </p>
-                                  </Details>
+                                  Full time equivalent (FTE) qualified teacher
+                                  leavers by category including school type,
+                                  gender, age group and type of entrant.
                                 </p>
                               </SummaryListItem>
                             </SummaryList>
 
-                            <PrototypeStep2Options />
+                            <PrototypeStep2Options noFeatured />
 
                             <PrototypeFeaturedLinks
                               dataset={dataset}
@@ -464,35 +427,23 @@ const PrototypeTableHighlights = () => {
                                 <strong>{datasetValue}</strong>
                               </SummaryListItem>
                               <SummaryListItem term="Geographic levels">
-                                National
+                                Local Authority; National; Regional
                               </SummaryListItem>
                               <SummaryListItem term="Time period">
-                                2018/19 to 2020/21
+                                2014/15 to 2020/21
                               </SummaryListItem>
                               <SummaryListItem term="Content">
                                 <p>
-                                  Apprenticeship national achievement rate
-                                  tables{' '}
-                                  <Details
-                                    summary="View more details"
-                                    className="govuk-!-margin-bottom-0"
-                                  >
-                                    <p>
-                                      Indicators: Achievement rate, Achievers,
-                                      Completers, Leavers, Pass rate, Retention
-                                      rate
-                                    </p>
-                                    <p>
-                                      Filters: Age, Level, demographic -
-                                      ethnicity, gender and lldd, Sector Subject
-                                      Area, Standard /Framework flag
-                                    </p>
-                                  </Details>
+                                  % of hours taught by a teacher with
+                                  qualification in relevant subject and the % of
+                                  teachers holding qualification in relevant
+                                  subject by highest qualification of teacher
+                                  and subject taught.
                                 </p>
                               </SummaryListItem>
                             </SummaryList>
 
-                            <PrototypeStep2Options />
+                            <PrototypeStep2Options noFeatured />
 
                             <PrototypeFeaturedLinks
                               dataset={dataset}
@@ -510,25 +461,13 @@ const PrototypeTableHighlights = () => {
                                 National
                               </SummaryListItem>
                               <SummaryListItem term="Time period">
-                                2018/19 to 2020/21
+                                2011/12 to 2020/21
                               </SummaryListItem>
                               <SummaryListItem term="Content">
                                 <p>
-                                  Apprenticeship national achievement rate
-                                  tables
-                                  <Details
-                                    summary="View more details"
-                                    className="govuk-!-margin-bottom-0"
-                                  >
-                                    <p>
-                                      Indicators: Achievement rate, Leavers,
-                                      Pass rate, Retention rate
-                                    </p>
-                                    <p>
-                                      Filters: Level, Detailed Level, Sector
-                                      Subject Area, Standard /Framework flag
-                                    </p>
-                                  </Details>
+                                  Headcount of teachers and the number of hours
+                                  taught by subject to year groups 7-13 in all
+                                  state funded secondary schools.
                                 </p>
                               </SummaryListItem>
                             </SummaryList>
