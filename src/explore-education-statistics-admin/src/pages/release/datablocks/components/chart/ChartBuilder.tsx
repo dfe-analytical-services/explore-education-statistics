@@ -414,10 +414,10 @@ const ChartBuilder = ({
                       headingTitle={axis.title}
                     >
                       <ChartAxisConfiguration
+                        axesConfiguration={axes}
                         buttons={deleteButton}
                         id={`chartAxisConfiguration-${type}`}
                         type={type as AxisType}
-                        configuration={axisConfiguration}
                         definition={definition}
                         data={data}
                         meta={meta}

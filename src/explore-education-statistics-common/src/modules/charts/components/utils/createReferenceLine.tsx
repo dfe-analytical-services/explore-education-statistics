@@ -1,20 +1,32 @@
 import CustomReferenceLineLabel from '@common/modules/charts/components/CustomReferenceLineLabel';
-import { ReferenceLineStyle } from '@common/modules/charts/types/chart';
+import {
+  Axis,
+  AxisType,
+  ReferenceLineStyle,
+} from '@common/modules/charts/types/chart';
 import { ChartData } from '@common/modules/charts/types/dataSet';
 import React, { ReactElement } from 'react';
-import { ReferenceLine, ReferenceLineProps } from 'recharts';
+import { AxisDomain, ReferenceLine, ReferenceLineProps } from 'recharts';
 
 interface Props
   extends Omit<ReferenceLineProps, 'label' | 'position' | 'style'> {
+  axis: Axis;
+  axisType: AxisType;
   chartData: ChartData[];
   label: string;
+  otherAxisDomain?: [AxisDomain, AxisDomain];
+  otherAxisPosition?: number;
   position: string | number;
   style?: ReferenceLineStyle;
 }
 
 export default function createReferenceLine({
+  axis,
   chartData,
   label,
+  otherAxisPosition,
+  otherAxisDomain,
+  axisType,
   position,
   style = 'dashed',
   ...props
@@ -47,11 +59,16 @@ export default function createReferenceLine({
       {...styleProps()}
       {...props}
       key={`${position}_${label}`}
+      position="middle"
       label={(lineProps: ReferenceLineProps) => (
         <CustomReferenceLineLabel
-          {...lineProps.viewBox}
+          viewBox={lineProps.viewBox}
+          axis={axis}
+          axisType={axisType}
           chartData={chartData}
           label={label}
+          otherAxisDomain={otherAxisDomain}
+          otherAxisPosition={otherAxisPosition}
           position={position}
         />
       )}

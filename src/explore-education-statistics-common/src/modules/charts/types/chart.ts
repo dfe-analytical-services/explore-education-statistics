@@ -28,6 +28,7 @@ export type ChartSymbol =
 
 export type LineStyle = 'solid' | 'dashed' | 'dotted';
 
+export type Axis = 'x' | 'y';
 export type AxisGroupBy = 'timePeriod' | 'locations' | 'filters' | 'indicators';
 export type AxisType = 'major' | 'minor';
 export type TickConfig = 'default' | 'startEnd' | 'custom';
@@ -37,6 +38,7 @@ export type BarChartDataLabelPosition = 'inside' | 'outside';
 
 export interface ReferenceLine {
   label: string;
+  otherAxisPosition?: number;
   position: number | string;
   style?: ReferenceLineStyle;
 }
@@ -149,6 +151,7 @@ export interface ChartDefinitionAxisCapabilities {
 }
 
 export interface ChartDefinitionAxis {
+  axis?: Axis;
   id: string;
   title: string;
   type: AxisType;

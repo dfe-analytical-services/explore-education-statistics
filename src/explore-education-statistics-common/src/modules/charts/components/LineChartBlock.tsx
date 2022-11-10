@@ -227,8 +227,12 @@ const LineChartBlock = ({
 
           {axes.major.referenceLines?.map(referenceLine =>
             createReferenceLine({
+              axis: 'x',
+              axisType: 'major',
               chartData,
               label: referenceLine.label,
+              otherAxisDomain: minorDomainTicks.domain,
+              otherAxisPosition: referenceLine.otherAxisPosition,
               position: referenceLine.position,
               style: referenceLine.style,
               x: referenceLine.position,
@@ -237,8 +241,12 @@ const LineChartBlock = ({
 
           {axes.minor.referenceLines?.map(referenceLine =>
             createReferenceLine({
+              axis: 'y',
+              axisType: 'minor',
               chartData,
               label: referenceLine.label,
+              otherAxisDomain: majorDomainTicks.domain,
+              otherAxisPosition: referenceLine.otherAxisPosition,
               position: referenceLine.position,
               style: referenceLine.style,
               y: referenceLine.position,
@@ -278,6 +286,7 @@ export const lineChartBlockDefinition: ChartDefinition = {
   },
   axes: {
     major: {
+      axis: 'x',
       id: 'xaxis',
       title: 'X Axis (major axis)',
       type: 'major',
@@ -297,6 +306,7 @@ export const lineChartBlockDefinition: ChartDefinition = {
       },
     },
     minor: {
+      axis: 'y',
       id: 'yaxis',
       title: 'Y Axis (minor axis)',
       type: 'minor',
