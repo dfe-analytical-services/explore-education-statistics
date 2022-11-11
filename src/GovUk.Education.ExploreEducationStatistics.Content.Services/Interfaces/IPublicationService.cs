@@ -1,8 +1,8 @@
 ﻿#nullable enable
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -13,14 +13,14 @@ public interface IPublicationService
 {
     Task<Either<ActionResult, PublicationCacheViewModel>> Get(string publicationSlug);
 
-    Task<Either<ActionResult, List<PublicationSearchResultViewModel>>> GetPublications(
-        ReleaseType? releaseType,
-        Guid? themeId,
-        string? search,
-        PublicationsSortBy sort,
-        SortOrder order,
-        int offset,
-        int limit);
+    Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> GetPublications(
+        ReleaseType? releaseType = null,
+        Guid? themeId = null,
+        string? search = null,
+        PublicationsSortBy? sort = null,
+        SortOrder? order = null,
+        int page = 1,
+        int pageSize = 10);
 
     public enum PublicationsSortBy
     {
