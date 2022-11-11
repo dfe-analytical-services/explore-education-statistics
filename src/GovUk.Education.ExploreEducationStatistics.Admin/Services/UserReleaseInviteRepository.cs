@@ -66,6 +66,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _contentDbContext.SaveChangesAsync();
         }
 
+        public async Task Remove(Guid releaseId, string email, ReleaseRole role)
+        {
+            var invites = await _contentDbContext.UserReleaseInvites
+                .AsQueryable()
+                .Where(uri =>
+                    uri.ReleaseId == releaseId
+                    && uri.Role == role
+                    && uri.Email.ToLower().Equals(email.ToLower()))
+                .ToListAsync();
+            _contentDbContext.UserReleaseInvites.RemoveRange(invites);
+            await _contentDbContext.SaveChangesAsync();
+        }
+
         public async Task<bool> UserHasInvite(Guid releaseId, string email, ReleaseRole role)
         {
             return await _contentDbContext

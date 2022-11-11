@@ -196,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 });
         }
-        
+
         [Fact]
         public async Task RemoveAllUserResourceRoles()
         {
@@ -217,6 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IEmailTemplateService? emailTemplateService = null,
             IUserPublicationRoleRepository? userPublicationRoleRepository = null,
             IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+            IUserReleaseInviteRepository? userReleaseInviteRepository = null,
             UserManager<ApplicationUser>? userManager = null,
             IUserService? userService = null)
         {
@@ -232,6 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? new Mock<IUserService>().Object,
                 userPublicationRoleRepository ?? new Mock<IUserPublicationRoleRepository>().Object,
                 userReleaseRoleRepository ?? new Mock<IUserReleaseRoleRepository>().Object,
+                userReleaseInviteRepository ?? new Mock<IUserReleaseInviteRepository>().Object,
                 userManager ?? MockUserManager().Object);
         }
     }

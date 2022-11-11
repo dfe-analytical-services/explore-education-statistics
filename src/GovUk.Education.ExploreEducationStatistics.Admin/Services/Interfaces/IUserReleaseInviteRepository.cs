@@ -20,6 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             bool emailSent,
             Guid createdById);
 
+        Task Remove(Guid releaseId, string email, ReleaseRole role);
+
         Task<bool> UserHasInvite(Guid releaseId, string email, ReleaseRole role);
 
         Task<bool> UserHasInvites(List<Guid> releaseIds, string email, ReleaseRole role);

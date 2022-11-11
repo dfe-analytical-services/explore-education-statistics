@@ -34,6 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
+        private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
         private readonly UserManager<ApplicationUser> _identityUserManager;
 
         public UserRoleService(UsersAndRolesDbContext usersAndRolesDbContext,
@@ -44,6 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository,
+            IUserReleaseInviteRepository userReleaseInviteRepository,
             UserManager<ApplicationUser> identityUserManager
             )
         {
@@ -55,6 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _userPublicationRoleRepository = userPublicationRoleRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
+            _userReleaseInviteRepository = userReleaseInviteRepository;
             _identityUserManager = identityUserManager;
         }
 
@@ -89,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(async tuple =>
                         {
                             var (user, publication) = tuple;
-                            
+
                             await _userPublicationRoleRepository.Create(
                                 userId: userId,
                                 publicationId: publication.Id,
@@ -97,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 createdById: _userService.GetUserId());
 
                             await UpgradeToGlobalRoleIfRequired(GetAssociatedGlobalRoleNameForPublicationRole(role), user);
-                            
+
                             return _emailTemplateService.SendPublicationRoleEmail(user.Email, publication, role);
                         });
                 });
@@ -171,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .GetRolesAsync(user) ?? new List<string>();
 
             var userAlreadyAssignedToRole = existingRoleNames.Contains(globalRoleNameToSet);
-            
+
             var higherRoleAlreadyAssigned = !existingRoleNames
                 .Intersect(GetHigherRoles(globalRoleNameToSet))
                 .IsNullOrEmpty();
@@ -190,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 await _identityUserManager.RemoveFromRolesAsync(user, lowerRolesToRemove);
             }
         }
-        
+
         private async Task DowngradeFromGlobalRoleIfRequired(ApplicationUser user, string globalRoleNameToDowngradeFrom)
         {
             var existingGlobalRoleNames = await _identityUserManager
@@ -199,8 +202,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var higherPrecedenceExistingGlobalRoleNames = existingGlobalRoleNames
                 .Where(role => GlobalRolePrecedenceOrder.IndexOf(role) >
                     GlobalRolePrecedenceOrder.IndexOf(globalRoleNameToDowngradeFrom));
-            
-            var requiredGlobalRoleNames = 
+
+            var requiredGlobalRoleNames =
                 await GetRequiredGlobalRoleNamesForResourceRoles(user);
 
             var highestPrecedenceRoleNameToRetain = higherPrecedenceExistingGlobalRoleNames
@@ -237,8 +240,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return RoleNames.PrereleaseUser;
                 default:
                     throw new ArgumentOutOfRangeException(
-                        nameof(role), 
-                        role, 
+                        nameof(role),
+                        role,
                         "Unable to find associated Global Role for Release Role");
             }
         }
@@ -253,7 +256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 case PublicationRole.ReleaseApprover:
                     return RoleNames.Analyst;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(role), role, 
+                    throw new ArgumentOutOfRangeException(nameof(role), role,
                         "Unable to find associated Global Role for Publication Role");
             }
         }
@@ -392,7 +395,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _contentDbContext.SaveChangesAsync();
 
                     var associatedGlobalRoleName = GetAssociatedGlobalRoleNameForPublicationRole(role.Role);
-                    
+
                     await _usersAndRolesPersistenceHelper
                         .CheckEntityExists<ApplicationUser, string>(role.UserId.ToString())
                         .OnSuccessDo(user => DowngradeFromGlobalRoleIfRequired(user, associatedGlobalRoleName));
@@ -416,11 +419,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 .CheckCanUpdateReleaseRole(release.Publication, role.Role)
                                 .OnSuccessVoid(async () =>
                                 {
+                                    var user = await _contentDbContext.Users
+                                        .SingleAsync(u => u.Id == role.UserId);
+                                    if (await _userReleaseInviteRepository
+                                            .UserHasInvite(release.Id, user.Email, role.Role))
+                                    {
+                                        await _userReleaseInviteRepository.Remove(release.Id, user.Email, role.Role);
+                                    }
+
                                     await _userReleaseRoleRepository.Remove(role,
                                         deletedById: _userService.GetUserId());
 
                                     var associatedGlobalRoleName = GetAssociatedGlobalRoleNameForReleaseRole(role.Role);
-                    
+
                                     await _usersAndRolesPersistenceHelper
                                         .CheckEntityExists<ApplicationUser, string>(role.UserId.ToString())
                                         .OnSuccessDo(user => DowngradeFromGlobalRoleIfRequired(user, associatedGlobalRoleName));
@@ -430,7 +441,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, Unit>> RemoveAllUserResourceRoles(Guid userId)
-        
         {
             return await _userService.CheckCanManageAllUsers()
                 .OnSuccess(async _ =>
@@ -442,7 +452,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             var userReleaseRoles =
                                 await _contentDbContext.UserReleaseRoles.Where(urr => urr.UserId == userId)
                                     .ToListAsync();
-                            
+
                             if (userReleaseRoles.Any())
                             {
                                 await _userReleaseRoleRepository.RemoveMany(
@@ -455,7 +465,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 await _contentDbContext.UserPublicationRoles
                                     .Where(upr => upr.UserId == userId)
                                     .ToListAsync();
-                            
+
                             if (userPublicationRoles.Any())
                             {
                                 await _userPublicationRoleRepository.RemoveMany(
@@ -463,21 +473,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     deletedById: _userService.GetUserId()
                                 );
                             }
-                            
+
                             await _usersAndRolesPersistenceHelper
                                 .CheckEntityExists<ApplicationUser, string>(userId.ToString())
                                 .OnSuccessDo(async user =>
                                 {
                                     var existingRoleNames = await _identityUserManager.GetRolesAsync(user) ?? new List<string>();
-                                    
+
                                     await _identityUserManager.RemoveFromRolesAsync(user, existingRoleNames);
                                 });
-                            
+
                             return Unit.Instance;
                         });
                 });
         }
-        
+
         private async Task<Either<ActionResult, Unit>> ValidatePublicationRoleCanBeAdded(Guid userId,
             Guid publicationId,
             PublicationRole role)
