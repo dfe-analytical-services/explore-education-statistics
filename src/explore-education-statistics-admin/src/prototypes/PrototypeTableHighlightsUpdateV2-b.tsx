@@ -1,5 +1,4 @@
 import classNames from 'classnames';
-import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import PageTitle from '@admin/components/PageTitle';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
