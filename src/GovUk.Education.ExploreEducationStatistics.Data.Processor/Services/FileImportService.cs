@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
-using DbUtils = GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -73,7 +72,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             await _databaseHelper.DoInTransaction(
                 context,
-                DbUtils.CreateStatisticsDbContext,
                 async ctxDelegate =>
                 {
                     await _importerService.ImportObservations(

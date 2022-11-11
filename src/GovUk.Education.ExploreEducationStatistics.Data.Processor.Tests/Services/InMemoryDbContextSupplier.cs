@@ -1,9 +1,12 @@
 #nullable enable
+using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
 
@@ -23,13 +26,26 @@ public class InMemoryDbContextSupplier : IDbContextSupplier
         _statisticsDbContextId = statisticsDbContextId;
     }
 
-    public ContentDbContext CreateContentDbContext()
+    public TDbContext CreateDbContext<TDbContext>() where TDbContext : DbContext
     {
-        return ContentDbUtils.InMemoryContentDbContext(_contentDbContextId);
+        return typeof(TDbContext).Name switch
+        {
+            nameof(ContentDbContext) => ContentDbUtils.InMemoryContentDbContext(_contentDbContextId) as TDbContext,
+            nameof(StatisticsDbContext) =>
+                StatisticsDbUtils.InMemoryStatisticsDbContext(_statisticsDbContextId) as TDbContext,
+            _ => throw new ArgumentOutOfRangeException("Unable to provide DbContext of type " + 
+                                                       typeof(TDbContext).Name)
+        };
     }
 
-    public StatisticsDbContext CreateStatisticsDbContext()
+    public TDbContext CreateDbContextDelegate<TDbContext>() where TDbContext : DbContext
     {
-        return StatisticsDbUtils.InMemoryStatisticsDbContext(_statisticsDbContextId);
+        return typeof(TDbContext).Name switch
+        {
+            nameof(ContentDbContext) => ContentDbUtils.InMemoryContentDbContext() as TDbContext,
+            nameof(StatisticsDbContext) => StatisticsDbUtils.InMemoryStatisticsDbContext() as TDbContext,
+            _ => throw new ArgumentOutOfRangeException("Unable to provide DbContext delegate of type " +
+                                                       typeof(TDbContext).Name)
+        };
     }
 }

@@ -718,7 +718,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 blobStorageService ?? new Mock<IBlobStorageService>(Strict).Object,
                 dataImportService ?? new Mock<IDataImportService>(Strict).Object,
                 importerService ?? new Mock<IImporterService>(Strict).Object,
-                new InMemoryDatabaseHelper());
+                new InMemoryDatabaseHelper(new InMemoryDbContextSupplier()));
         }
     }
 }

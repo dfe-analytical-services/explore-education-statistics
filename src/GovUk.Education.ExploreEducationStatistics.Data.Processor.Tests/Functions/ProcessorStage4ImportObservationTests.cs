@@ -146,7 +146,7 @@ public class ProcessorStage4ImportObservationTests
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
 
-        var databaseHelper = new InMemoryDatabaseHelper();
+        var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
         
         var dataImportService = new DataImportService(
             dbContextSupplier,
@@ -361,7 +361,7 @@ public class ProcessorStage4ImportObservationTests
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
 
-        var databaseHelper = new InMemoryDatabaseHelper();
+        var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
         
         var dataImportService = new DataImportService(
             dbContextSupplier,
@@ -567,7 +567,7 @@ public class ProcessorStage4ImportObservationTests
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
 
-        var databaseHelper = new InMemoryDatabaseHelper();
+        var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
         
         var dataImportService = new DataImportService(
             dbContextSupplier,

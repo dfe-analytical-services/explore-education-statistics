@@ -1,8 +1,8 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -84,7 +84,7 @@ public class ProcessorStage4MessageDispatchTests
         var dataImportService = new DataImportService(
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>(),
-            new InMemoryDatabaseHelper());
+            new InMemoryDatabaseHelper(dbContextSupplier));
 
         var splitFileService = new SplitFileService(
             new BatchService(Mock.Of<IBlobStorageService>(Strict)),
@@ -122,7 +122,7 @@ public class ProcessorStage4MessageDispatchTests
 
         await function.ProcessUploads(
             new ImportMessage(import.Id), 
-            null,
+            new ExecutionContext(),
             Mock.Of<ICollector<ImportMessage>>(Strict),
             datafileProcessingMessageQueue.Object);
         
@@ -206,7 +206,7 @@ public class ProcessorStage4MessageDispatchTests
         var dataImportService = new DataImportService(
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>(),
-            new InMemoryDatabaseHelper());
+            new InMemoryDatabaseHelper(dbContextSupplier));
 
         var splitFileService = new SplitFileService(
             new BatchService(blobStorageService.Object),
@@ -254,7 +254,7 @@ public class ProcessorStage4MessageDispatchTests
 
         await function.ProcessUploads(
             new ImportMessage(import.Id), 
-            null,
+            new ExecutionContext(),
             Mock.Of<ICollector<ImportMessage>>(Strict),
             datafileProcessingMessageQueue.Object);
         
@@ -332,7 +332,7 @@ public class ProcessorStage4MessageDispatchTests
         var dataImportService = new DataImportService(
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>(),
-            new InMemoryDatabaseHelper());
+            new InMemoryDatabaseHelper(dbContextSupplier));
 
         var splitFileService = new SplitFileService(
             new BatchService(blobStorageService.Object),
@@ -357,7 +357,7 @@ public class ProcessorStage4MessageDispatchTests
 
         await function.ProcessUploads(
             new ImportMessage(import.Id), 
-            null,
+            new ExecutionContext(),
             Mock.Of<ICollector<ImportMessage>>(Strict),
             Mock.Of<ICollector<ImportObservationsMessage>>(Strict));
         

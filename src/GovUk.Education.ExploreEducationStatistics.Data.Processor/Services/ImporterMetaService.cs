@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.EntityFrameworkCore;
-using DbUtils = GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -66,7 +65,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 await _databaseHelper.DoInTransaction(
                     context,
-                    DbUtils.CreateStatisticsDbContext,
                     async ctxDelegate =>
                     {
                         ctxDelegate.Subject.Attach(subject);

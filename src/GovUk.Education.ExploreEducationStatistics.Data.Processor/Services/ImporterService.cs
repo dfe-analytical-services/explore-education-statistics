@@ -289,6 +289,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     
             await _databaseHelper.DoInTransaction(context, async ctxDelegate =>
             {
+                var filters = subjectMeta
+                    .Filters
+                    .Select(f => f.Filter);
+                    
                 await ctxDelegate.FilterGroup.AddRangeAsync(filterGroups);
                 await ctxDelegate.FilterItem.AddRangeAsync(filterItems);
                 await ctxDelegate.SaveChangesAsync();

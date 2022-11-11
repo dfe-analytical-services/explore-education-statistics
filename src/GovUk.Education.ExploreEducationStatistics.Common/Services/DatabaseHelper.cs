@@ -9,13 +9,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 
 public class DatabaseHelper : IDatabaseHelper
 {
+    private readonly IDbContextSupplier _dbContextSupplier;
+
+    public DatabaseHelper(IDbContextSupplier dbContextSupplier)
+    {
+        _dbContextSupplier = dbContextSupplier;
+    }
+
+    public IDbContextSupplier GetDbContextSupplier()
+    {
+        return _dbContextSupplier;
+    }
+
     public async Task DoInTransaction<TDbContext>(
         TDbContext context,
-        Func<TDbContext> createDbContextDelegateFn,
         Func<TDbContext, Task> transactionalUnit)
         where TDbContext : DbContext
     {
-        await DoInTransaction(context, createDbContextDelegateFn, async ctxDelegate =>
+        await DoInTransaction(context, async ctxDelegate =>
         {
             await transactionalUnit.Invoke(ctxDelegate);
             return Unit.Instance;
@@ -24,7 +35,6 @@ public class DatabaseHelper : IDatabaseHelper
 
     public Task<TResult> DoInTransaction<TDbContext, TResult>(
         TDbContext context,
-        Func<TDbContext> createDbContextDelegateFn,
         Func<TDbContext, Task<TResult>> transactionalUnit)
         where TDbContext : DbContext
     {
@@ -35,7 +45,7 @@ public class DatabaseHelper : IDatabaseHelper
             // We use a delegate context here to allow us to retry on failure successfully when defining our own
             // transaction boundaries manually. See
             // https://learn.microsoft.com/en-us/ef/core/miscellaneous/connection-resiliency#execution-strategies-and-transactions
-            var ctxDelegate = createDbContextDelegateFn.Invoke();
+            var ctxDelegate = GetDbContextSupplier().CreateDbContextDelegate<TDbContext>();
             await using var transaction = await ctxDelegate.Database.BeginTransactionAsync();
 
             var result = await transactionalUnit.Invoke(ctxDelegate);
@@ -49,11 +59,10 @@ public class DatabaseHelper : IDatabaseHelper
 
     public Task DoInTransaction<TDbContext>(
         TDbContext context, 
-        Func<TDbContext> createDbContextDelegateFn,
         Action<TDbContext> transactionalUnit)
         where TDbContext : DbContext
     {
-        return DoInTransaction(context, createDbContextDelegateFn, ctxDelegate =>
+        return DoInTransaction(context, ctxDelegate =>
         {
             transactionalUnit.Invoke(ctxDelegate);
             return Task.CompletedTask;
@@ -62,21 +71,19 @@ public class DatabaseHelper : IDatabaseHelper
 
     public Task<TResult> DoInTransaction<TDbContext, TResult>(
         TDbContext context, 
-        Func<TDbContext> createDbContextDelegateFn,
         Func<TDbContext, TResult> transactionalUnit)
         where TDbContext : DbContext
     {
-        return DoInTransaction(context, createDbContextDelegateFn, ctx => Task.FromResult(transactionalUnit.Invoke(ctx)));
+        return DoInTransaction(context, ctx => Task.FromResult(transactionalUnit.Invoke(ctx)));
     }
     
     public Task ExecuteWithExclusiveLock<TDbContext>(
         TDbContext dbContext,
-        Func<TDbContext> createDbContextDelegateFn,
         string lockName,
         Func<TDbContext, Task> action)
         where TDbContext : DbContext
     {
-        return DoInTransaction(dbContext, createDbContextDelegateFn, async ctx =>
+        return DoInTransaction(dbContext, async ctx =>
         {
             await ctx.Database.ExecuteSqlRawAsync($"exec sp_getapplock '{lockName}', 'exclusive'");
             await action.Invoke(ctx);
