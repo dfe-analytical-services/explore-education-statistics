@@ -79,6 +79,7 @@ user creates releases in all states for publication
     ...    ${PUBLICATION_NAME}
     user creates a fully populated draft release    ${PUBLICATION_ID}    ${PUBLICATION_NAME}    ${THEME_NAME}
     ...    ${TOPIC_NAME}
+
     user creates a fully populated higher review release    ${PUBLICATION_ID}    ${PUBLICATION_NAME}    ${THEME_NAME}
     ...    ${TOPIC_NAME}
     user creates a fully populated approved release    ${PUBLICATION_ID}    ${PUBLICATION_NAME}    ${THEME_NAME}

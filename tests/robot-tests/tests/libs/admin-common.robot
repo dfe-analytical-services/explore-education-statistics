@@ -75,9 +75,11 @@ user navigates to release page from dashboard
     ...    ${THEME_NAME}
     ...    ${TOPIC_NAME}
 
+    user waits for page to finish loading
     ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:${RELEASE_TABLE_TESTID}
-    user clicks element    xpath://a[text()="${LINK_TEXT}"]    ${ROW}    # "user clicks link" doesn't work
+    user scrolls to element    ${ROW}
 
+    user clicks element    xpath://a[text()="${LINK_TEXT}"]    ${ROW}    # "user clicks link" doesn't work
     user waits until h2 is visible    Release summary    %{WAIT_SMALL}
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
 
@@ -387,10 +389,11 @@ user creates public prerelease access list
     user clicks link    Public access list
     user waits until h2 is visible    Public pre-release access list
     user clicks button    Create public pre-release access list
-    user presses keys    CTRL+a+BACKSPACE
-    user presses keys    ${content}
+    user presses keys    CTRL+a
+    user presses keys    BACKSPACE
+    user enters text into element    id:publicPreReleaseAccessForm-preReleaseAccessList    ${content}
     user clicks button    Save access list
-    user waits until element contains    css:[data-testid="publicPreReleaseAccessListPreview"]    ${content}
+    user waits until element contains    id:publicPreReleaseAccessForm-preReleaseAccessList    ${content}
     ...    %{WAIT_SMALL}
 
 user updates public prerelease access list
@@ -399,9 +402,9 @@ user updates public prerelease access list
     user clicks button    Edit public pre-release access list
     user presses keys    CTRL+a
     user presses keys    BACKSPACE
-    user presses keys    ${content}
+    user enters text into element    id:publicPreReleaseAccessForm-preReleaseAccessList    ${content}
     user clicks button    Save access list
-    user waits until element contains    css:[data-testid="publicPreReleaseAccessListPreview"]    ${content}
+    user waits until element contains    id:publicPreReleaseAccessForm-preReleaseAccessList    ${content}
 
 user clicks footnote subject radio
     [Arguments]    ${subject_label}    ${radio_label}
@@ -544,13 +547,13 @@ user puts release into draft
 user puts release into higher level review
     user clicks link    Sign off
     user waits until page does not contain loading spinner
-    user waits until h2 is visible    Sign off
+    user waits until h2 is visible    Sign off    %{WAIT_SMALL}
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
     user clicks radio    Ready for higher review (this will notify release approvers)
     user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    Ready for higher review
     user clicks button    Update status
-    user waits until element is visible    id:CurrentReleaseStatus-Awaiting higher review
+    user waits until element is visible    id:CurrentReleaseStatus-Awaiting higher review    %{WAIT_SMALL}
 
 user approves release for scheduled release
     [Arguments]    ${DAYS_UNTIL_RELEASE}    ${NEXT_RELEASE_MONTH}=01    ${NEXT_RELEASE_YEAR}=2200
@@ -565,11 +568,11 @@ user approves release for scheduled release
 
     user clicks link    Sign off
     user waits until page does not contain loading spinner
-    user waits until h2 is visible    Sign off
-    user waits until page contains button    Edit release status
+    user waits until h2 is visible    Sign off    %{WAIT_SMALL}
+    user waits until page contains button    Edit release status    %{WAIT_SMALL}
 
     user clicks button    Edit release status
-    user waits until h2 is visible    Edit release status
+    user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
 
     user clicks radio    Approved for publication
     user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    Approved by UI tests
@@ -582,7 +585,7 @@ user approves release for scheduled release
     user enters text into element    id:releaseStatusForm-nextReleaseDate-year    ${NEXT_RELEASE_YEAR}
 
     user clicks button    Update status
-    user waits until h2 is visible    Confirm publish date
+    user waits until h2 is visible    Confirm publish date    %{WAIT_SMALL}
     user clicks button    Confirm
 
 user verifies release summary
