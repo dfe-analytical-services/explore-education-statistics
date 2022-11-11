@@ -150,10 +150,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
 
             var publication = await _contentDbContext.Publications
-                .Include(p => p.LatestPublishedReleaseNew)
+                .Include(p => p.LatestPublishedRelease)
                 .SingleAsync(p => p.Id == releasesWithSubject.First().PublicationId);
 
-            var latestPublishedRelease = publication.LatestPublishedReleaseNew;
+            var latestPublishedRelease = publication.LatestPublishedRelease;
 
             if (latestPublishedRelease != null && releasesWithSubject.All(r =>
                     r.Year != latestPublishedRelease.Year

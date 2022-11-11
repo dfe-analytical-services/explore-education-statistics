@@ -736,7 +736,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Summary = "Test summary",
                 Slug = "test-publication",
                 Contact = new Contact(),
-                LatestPublishedReleaseNew = release,
+                LatestPublishedRelease = release,
                 Releases =
                 {
                     release
@@ -789,7 +789,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Contact = new Contact(),
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     ReleaseName = "2022",
                     TimePeriodCoverage = TimeIdentifier.CalendarYear,
@@ -867,7 +867,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var publication = new Publication
             {
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     ReleaseName = "2022",
                     TimePeriodCoverage = TimeIdentifier.CalendarYear,

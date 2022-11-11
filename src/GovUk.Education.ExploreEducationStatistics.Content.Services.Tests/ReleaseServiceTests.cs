@@ -711,7 +711,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publication = new Publication
             {
                 Slug = "publication-slug",
-                LatestPublishedReleaseNew = release2,
+                LatestPublishedRelease = release2,
                 Releases = ListOf(release1, release2),
             };
 
@@ -783,7 +783,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Slug = "publication-slug",
                 Releases = ListOf(originalRelease, amendedRelease),
-                LatestPublishedReleaseNew = amendedRelease
+                LatestPublishedRelease = amendedRelease
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -838,7 +838,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Slug = "publication-slug",
                 Releases = ListOf(release1, release2, release2Amendment),
-                LatestPublishedReleaseNew = release2
+                LatestPublishedRelease = release2
             };
 
             var contextId = Guid.NewGuid().ToString();

@@ -47,8 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid? LatestPublishedReleaseId { get; set; }
 
-        // TODO EES-3881 Rename this LatestPublishedRelease
-        public Release? LatestPublishedReleaseNew { get; set; }
+        public Release? LatestPublishedRelease { get; set; }
 
         public Release? LatestRelease()
         {

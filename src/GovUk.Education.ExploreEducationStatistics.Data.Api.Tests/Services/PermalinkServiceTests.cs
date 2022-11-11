@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var publication = new Publication
             {
                 Id = _publicationId,
-                LatestPublishedReleaseNew = release
+                LatestPublishedRelease = release
             };
 
             var tableResult = new TableBuilderResultViewModel
@@ -232,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var publication = new Publication
             {
                 Id = _publicationId,
-                LatestPublishedReleaseNew = release 
+                LatestPublishedRelease = release 
             };
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
@@ -320,7 +320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var publication = new Publication
             {
                 Id = _publicationId,
-                LatestPublishedReleaseNew = release
+                LatestPublishedRelease = release
             };
 
             var subjectId = Guid.NewGuid();
@@ -580,7 +580,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var publication = new Publication
             {
                 Id = _publicationId,
-                LatestPublishedReleaseNew = latestVersion
+                LatestPublishedRelease = latestVersion
             };
 
             var subjectId = Guid.NewGuid();
@@ -672,7 +672,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var publication = new Publication
             {
                 Id = _publicationId,
-                LatestPublishedReleaseNew = latestRelease
+                LatestPublishedRelease = latestRelease
             };
 
             var subjectId = Guid.NewGuid();
@@ -755,7 +755,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var publication = new Publication
             {
                 Id = _publicationId,
-                LatestPublishedReleaseNew = latestRelease
+                LatestPublishedRelease = latestRelease
             };
 
             var subjectId = Guid.NewGuid();
@@ -840,7 +840,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var publication = new Publication
             {
                 Id = _publicationId,
-                LatestPublishedReleaseNew = latestVersion
+                LatestPublishedRelease = latestVersion
             };
 
             var subjectId = Guid.NewGuid();
@@ -914,7 +914,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var publication = new Publication
             {
                 Id = _publicationId,
-                LatestPublishedReleaseNew = release,
+                LatestPublishedRelease = release,
                 SupersededBy = new Publication
                 {
                     LatestPublishedReleaseId = Guid.NewGuid()

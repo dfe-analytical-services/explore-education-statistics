@@ -119,10 +119,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             }
 
             await _contentDbContext.Entry(publication)
-                .Reference(p => p.LatestPublishedReleaseNew)
+                .Reference(p => p.LatestPublishedRelease)
                 .LoadAsync();
 
-            return GetPublicationType(publication.LatestPublishedReleaseNew!.Type);
+            return GetPublicationType(publication.LatestPublishedRelease!.Type);
         }
 
         private static PublicationType GetPublicationType(ReleaseType releaseType) => releaseType switch

@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Title = "Publication A",
                 Slug = "publication-a",
-                LatestPublishedReleaseNew = releaseA,
+                LatestPublishedRelease = releaseA,
                 Releases = new List<Release>
                 {
                     releaseA
@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Title = "Publication B",
                 Slug = "publication-b",
-                LatestPublishedReleaseNew = releaseB,
+                LatestPublishedRelease = releaseB,
                 Releases = new List<Release>
                 {
                     releaseB
@@ -198,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                                 new()
                                 {
                                     Title = "Publication A",
-                                    LatestPublishedReleaseNew = release,
+                                    LatestPublishedRelease = release,
                                     Releases = new List<Release>
                                     {
                                         release
@@ -266,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseNew = releaseB,
+                LatestPublishedRelease = releaseB,
                 Releases = new List<Release>
                 {
                     releaseB
@@ -409,7 +409,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Title = "Publication A",
                 Slug = "publication-a",
-                LatestPublishedReleaseNew = releaseA,
+                LatestPublishedRelease = releaseA,
                 Releases = new List<Release>
                 {
                     releaseA
@@ -420,7 +420,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Title = "Publication B",
                 Slug = "publication-b",
-                LatestPublishedReleaseNew = releaseB,
+                LatestPublishedRelease = releaseB,
                 Releases = new List<Release>
                 {
                     releaseB
@@ -505,7 +505,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = releaseA,
+                LatestPublishedRelease = releaseA,
                 Releases = new List<Release>
                 {
                     releaseA
@@ -608,7 +608,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                             {
                                 Title = "Publication A",
                                 Slug = "publication-a",
-                                LatestPublishedReleaseNew = latestRelease,
+                                LatestPublishedRelease = latestRelease,
                                 Releases = new List<Release>
                                 {
                                     previousRelease,
@@ -763,7 +763,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publication = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = latestRelease,
+                LatestPublishedRelease = latestRelease,
                 Releases = new List<Release>
                 {
                     latestRelease,
@@ -858,7 +858,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publication = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = latestRelease,
+                LatestPublishedRelease = latestRelease,
                 Releases = new List<Release>
                 {
                     latestRelease,
@@ -962,7 +962,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Title = "Publication A",
                 Slug = "publication-a",
-                LatestPublishedReleaseNew = latestRelease,
+                LatestPublishedRelease = latestRelease,
                 Releases = new List<Release>
                 {
                     latestRelease,
@@ -1055,7 +1055,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Title = "Publication A",
                 Slug = "publication-a",
-                LatestPublishedReleaseNew = releaseA,
+                LatestPublishedRelease = releaseA,
                 Releases = new List<Release>
                 {
                     releaseA
@@ -1065,7 +1065,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Title = "Publication B",
                 Slug = "publication-b",
-                LatestPublishedReleaseNew = releaseB,
+                LatestPublishedRelease = releaseB,
                 Releases = new List<Release>
                 {
                     releaseB
