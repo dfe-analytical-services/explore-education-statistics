@@ -517,7 +517,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             IReleaseSubjectRepository? releaseSubjectRepository = null)
         {
             return new(
-                contentDbContext ?? Mock.Of<ContentDbContext>(Strict),
+                contentDbContext ?? Mock.Of<ContentDbContext>(),
                 statisticsDbContext ?? Mock.Of<StatisticsDbContext>(Strict),
                 publicStatisticsDbContext ?? Mock.Of<PublicStatisticsDbContext>(),
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
