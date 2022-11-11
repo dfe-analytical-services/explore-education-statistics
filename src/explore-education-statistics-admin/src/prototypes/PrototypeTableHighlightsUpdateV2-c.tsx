@@ -221,6 +221,7 @@ const PrototypeTableHighlights = () => {
                                   KS4 national characteristics data
                                 </label>
                               </div>
+
                               <div className="govuk-radios__item">
                                 <input
                                   type="radio"
@@ -228,9 +229,7 @@ const PrototypeTableHighlights = () => {
                                   name="subject"
                                   id="subject-3"
                                   onClick={() => {
-                                    setDatasetValue(
-                                      'KS4 national academies data',
-                                    );
+                                    setDatasetValue('KS4 local authority data');
                                     setDataset('subject-3');
                                   }}
                                 />
@@ -241,7 +240,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-3"
                                 >
-                                  KS4 national academies data
+                                  KS4 local authority data
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -252,7 +251,7 @@ const PrototypeTableHighlights = () => {
                                   id="subject-4"
                                   onClick={() => {
                                     setDatasetValue(
-                                      'KS4 disadvantage gap index data',
+                                      'KS4 local authority characteristics data',
                                     );
                                     setDataset('subject-4');
                                   }}
@@ -264,7 +263,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-4"
                                 >
-                                  KS4 disadvantage gap index data
+                                  KS4 local authority characteristics data
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -281,7 +280,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-5"
                                 >
-                                  KS4 local authority data
+                                  KS4 subject pupil level data
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -298,7 +297,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-6"
                                 >
-                                  KS4 local authority characteristics data
+                                  KS4 subject entry level data
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -315,7 +314,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-7"
                                 >
-                                  KS4 subject pupil level data
+                                  KS4 subject year of entry data
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -332,7 +331,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-8"
                                 >
-                                  KS4 subject entry level data
+                                  KS4 national academies data
                                 </label>
                               </div>
                               <div className="govuk-radios__item">
@@ -349,7 +348,7 @@ const PrototypeTableHighlights = () => {
                                   )}
                                   htmlFor="subject-9"
                                 >
-                                  KS4 subject year of entry data
+                                  KS4 disadvantage gap index data
                                 </label>
                               </div>
                             </div>
@@ -377,26 +376,15 @@ const PrototypeTableHighlights = () => {
                                 National
                               </SummaryListItem>
                               <SummaryListItem term="Time period">
-                                2014/15 to 2020/21
+                                2009/10 to 2020/21
                               </SummaryListItem>
                               <SummaryListItem term="Content">
                                 <p>
-                                  Time series of headline apprenticeship figures
-                                  <Details
-                                    summary="View more details"
-                                    className="govuk-!-margin-bottom-0"
-                                  >
-                                    <p>
-                                      Indicators: Starts, Achievements, Learner
-                                      participation, Percentage Starts,
-                                      Percentage Achievements, Percentage
-                                      Learner participation
-                                    </p>
-                                    <p>
-                                      Filters: Apprenticeship level, Funding
-                                      type, Age group
-                                    </p>
-                                  </Details>
+                                  National level headline entry and attainment
+                                  measures broken down by year, detailed school
+                                  type, gender, prior attainment, school
+                                  admission type and school religious
+                                  denomination.
                                 </p>
                               </SummaryListItem>
                             </SummaryList>
@@ -423,23 +411,14 @@ const PrototypeTableHighlights = () => {
                               </SummaryListItem>
                               <SummaryListItem term="Content">
                                 <p>
-                                  Apprenticeship national achievement rate
-                                  tables
-                                  <Details
-                                    summary="View more details"
-                                    className="govuk-!-margin-bottom-0"
-                                  >
-                                    <p>
-                                      Indicators: Achievement rate, Achievers,
-                                      Completers, Leavers, Pass rate, Retention
-                                      rate
-                                    </p>
-                                    <p>
-                                      Filters: Age, Level, demographic -
-                                      ethnicity, gender and lldd, Standard
-                                      /Framework flag
-                                    </p>
-                                  </Details>
+                                  National level headline entry and attainment
+                                  measures broken down by year, detailed school
+                                  type, gender, major and minor ethnicity, free
+                                  school meal eligibility, special educational
+                                  need status and description, primary need,
+                                  disadvantaged status, first language, school
+                                  admission type and school religious
+                                  denomination.
                                 </p>
                               </SummaryListItem>
                             </SummaryList>
@@ -459,30 +438,17 @@ const PrototypeTableHighlights = () => {
                                 <strong>{datasetValue}</strong>
                               </SummaryListItem>
                               <SummaryListItem term="Geographic levels">
-                                National
+                                Local Authority; National; Regional
                               </SummaryListItem>
                               <SummaryListItem term="Time period">
-                                2018/19 to 2020/21
+                                2018/19 to 2021/22
                               </SummaryListItem>
                               <SummaryListItem term="Content">
                                 <p>
-                                  Apprenticeship national achievement rate
-                                  tables{' '}
-                                  <Details
-                                    summary="View more details"
-                                    className="govuk-!-margin-bottom-0"
-                                  >
-                                    <p>
-                                      Indicators: Achievement rate, Achievers,
-                                      Completers, Leavers, Pass rate, Retention
-                                      rate
-                                    </p>
-                                    <p>
-                                      Filters: Age, Level, demographic -
-                                      ethnicity, gender and lldd, Sector Subject
-                                      Area, Standard /Framework flag
-                                    </p>
-                                  </Details>
+                                  Local authority and regional level headline
+                                  entry and attainment measures for the latest
+                                  year broken down gender. State-funded schools
+                                  only.
                                 </p>
                               </SummaryListItem>
                             </SummaryList>
@@ -502,33 +468,29 @@ const PrototypeTableHighlights = () => {
                                 <strong>{datasetValue}</strong>
                               </SummaryListItem>
                               <SummaryListItem term="Geographic levels">
-                                National
+                                Local Authority; National; Regional
                               </SummaryListItem>
                               <SummaryListItem term="Time period">
-                                2018/19 to 2020/21
+                                2018/19 to 2021/22
                               </SummaryListItem>
                               <SummaryListItem term="Content">
                                 <p>
-                                  Apprenticeship national achievement rate
-                                  tables
-                                  <Details
-                                    summary="View more details"
-                                    className="govuk-!-margin-bottom-0"
-                                  >
-                                    <p>
-                                      Indicators: Achievement rate, Leavers,
-                                      Pass rate, Retention rate
-                                    </p>
-                                    <p>
-                                      Filters: Level, Detailed Level, Sector
-                                      Subject Area, Standard /Framework flag
-                                    </p>
-                                  </Details>
+                                  Local authority and regional level headline
+                                  entry and attainment measures for the latest
+                                  year broken down by gender, major ethnicity,
+                                  free school meal eligibility, special
+                                  educational need status and description,
+                                  disadvantaged status and first language.
+                                  State-funded schools only.
                                 </p>
                               </SummaryListItem>
                             </SummaryList>
 
-                            <PrototypeStep2Options noFeatured />
+                            <PrototypeStep2Options />
+                            <PrototypeFeaturedLinks
+                              dataset={dataset}
+                              publication={publication}
+                            />
                           </div>
                         )}
                         {dataset === 'subject-all' && (
