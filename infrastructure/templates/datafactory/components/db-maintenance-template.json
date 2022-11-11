@@ -19,7 +19,7 @@
     "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]",
     "fragmentationPercentage": "30",
     "fragmentationTables": "Observation,ObservationFilterItem",
-    "removeSoftDeletedSubjectsObservationLimit": "10000000",
+    "removeSoftDeletedSubjectsObservationLimit": "20000000",
     "removeSoftDeletedSubjectsObservationCommitBatchSize": "1000",
     "removeSoftDeletedSubjectsObservationFilterItemCommitBatchSize": "20000",
     "subjectsToMigrate": "5"
@@ -255,7 +255,7 @@
         "parameters": {
           "TotalObservationLimit": {
             "type": "int",
-            "defaultValue": 10000000
+            "defaultValue": 20000000
           },
           "ObservationCommitBatchSize": {
             "type": "int",
@@ -325,7 +325,7 @@
         "parameters": {
           "TotalObservationLimit": {
             "type": "int",
-            "defaultValue": 10000000
+            "defaultValue": 20000000
           },
           "ObservationCommitBatchSize": {
             "type": "int",
