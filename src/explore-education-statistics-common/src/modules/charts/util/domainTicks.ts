@@ -134,7 +134,7 @@ export function calculateMinorAxisDomainValues(
   );
 
   return {
-    min: parseNumber(axis.min) ?? min,
+    min: parseNumber(axis.min) ?? (min >= 0 ? 0 : min),
     max: parseNumber(axis.max) ?? getNiceMaxValue(max),
   };
 }
