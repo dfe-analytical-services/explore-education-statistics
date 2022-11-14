@@ -68,7 +68,7 @@ const CustomReferenceLineLabel = ({
   return (
     <text
       className="govuk-!-font-size-16"
-      dy={0}
+      dy={axis === 'y' ? -4 : 0}
       x={labelPosition.x}
       y={labelPosition.y}
       textAnchor={getTextAnchor()}
