@@ -20,6 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     [KnownType(typeof(MarkDownBlock))]
     [KnownType(typeof(DataBlock))]
     [KnownType(typeof(HtmlBlock))]
+    [KnownType(typeof(EmbedBlockLink))]
     public abstract class ContentBlock : ICreatedUpdatedTimestamps<DateTime?, DateTime?>
     {
         /// <summary>
@@ -97,6 +98,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         }
 
         public string Body { get; set; }
+    }
+
+    public class EmbedBlockLink : ContentBlock
+    {
+        public EmbedBlockLink()
+        {
+        }
+
+        public Guid EmbedBlockId { get; set; }
+
+        public EmbedBlock? EmbedBlock { get; set; } // @MarkFix yes?
     }
 
     public class DataBlock : ContentBlock
