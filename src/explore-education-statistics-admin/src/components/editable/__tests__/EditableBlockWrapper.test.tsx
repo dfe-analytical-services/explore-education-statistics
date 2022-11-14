@@ -65,6 +65,48 @@ describe('EditableBlockWrapper', () => {
     ).not.toBeInTheDocument();
   });
 
+  test('renders the edit dashboard link button when `onEmbedBlockEdit` is provided', () => {
+    const handleEmbedBlockEdit = jest.fn();
+    render(
+      <EditableBlockWrapper onEmbedBlockEdit={handleEmbedBlockEdit}>
+        <div>Child block</div>
+      </EditableBlockWrapper>,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Edit dashboard link' }),
+    ).toBeInTheDocument();
+  });
+
+  test('calls `onEmbedBlockEdit` when the edit dashboard button is clicked', () => {
+    const handleEmbedBlockEdit = jest.fn();
+    render(
+      <EditableBlockWrapper onEmbedBlockEdit={handleEmbedBlockEdit}>
+        <div>Child block</div>
+      </EditableBlockWrapper>,
+    );
+
+    expect(handleEmbedBlockEdit).not.toHaveBeenCalled();
+
+    userEvent.click(
+      screen.getByRole('button', { name: 'Edit dashboard link' }),
+    );
+
+    expect(handleEmbedBlockEdit).toHaveBeenCalled();
+  });
+
+  test('does not render the edit dashboard link button when `onEmbedBlockEdit` is not provided', () => {
+    render(
+      <EditableBlockWrapper>
+        <div>Child block</div>
+      </EditableBlockWrapper>,
+    );
+
+    expect(
+      screen.queryByRole('button', { name: 'Edit dashboard link' }),
+    ).not.toBeInTheDocument();
+  });
+
   test('renders the remove block button when `onDelete` is provided', () => {
     const handleDelete = jest.fn();
     render(

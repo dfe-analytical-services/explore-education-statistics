@@ -96,6 +96,9 @@ describe('ReleaseContentAccordionSection', () => {
     expect(
       screen.getByRole('button', { name: 'Add data block' }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Embed dashboard' }),
+    ).toBeInTheDocument();
   });
 
   test('renders correctly in preview mode', () => {
@@ -142,6 +145,9 @@ describe('ReleaseContentAccordionSection', () => {
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Add data block' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Embed dashboard' }),
     ).not.toBeInTheDocument();
   });
 

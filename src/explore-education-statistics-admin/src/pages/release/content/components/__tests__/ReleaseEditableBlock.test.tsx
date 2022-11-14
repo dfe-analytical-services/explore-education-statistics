@@ -41,6 +41,15 @@ describe('ReleaseEditableBlock', () => {
     order: 0,
   };
 
+  const testEmbedBlock: EditableBlock = {
+    comments: [],
+    id: 'embed-block-id',
+    order: 0,
+    title: 'Dashboard title',
+    type: 'EmbedBlockLink',
+    url: 'https://department-for-education.shinyapps.io/test-dashboard',
+  };
+
   const testCurrentUser: UserDetails = {
     id: 'user-1',
     displayName: 'Jane Doe',
@@ -827,6 +836,23 @@ describe('ReleaseEditableBlock', () => {
     ).toHaveBeenCalledWith<
       Parameters<typeof releaseContentService.deleteContentSectionBlock>
     >('release-1', 'section-1', 'block-1');
+  });
+
+  test('renders Embed block', () => {
+    render(
+      <ReleaseEditableBlock
+        publicationId="publication-1"
+        releaseId="release-1"
+        sectionId="section-1"
+        sectionKey="content"
+        block={testEmbedBlock}
+      />,
+    );
+
+    expect(screen.getByTitle('Dashboard title')).toHaveAttribute(
+      'src',
+      'https://department-for-education.shinyapps.io/test-dashboard',
+    );
   });
 
   function render(

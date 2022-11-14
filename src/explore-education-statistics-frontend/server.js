@@ -90,7 +90,11 @@ async function startServer(port = process.env.PORT || 3000) {
           ],
           connectSrc:
             process.env.NODE_ENV !== 'production' ? ['*'] : cspConnectSrc,
-          frameSrc: ["'self'", 'https://vars.hotjar.com '],
+          frameSrc: [
+            "'self'",
+            'https://vars.hotjar.com ',
+            'https://department-for-education.shinyapps.io/',
+          ],
           frameAncestors: ["'self'"],
           childSrc: ["'self'", 'https://vars.hotjar.com'],
         },

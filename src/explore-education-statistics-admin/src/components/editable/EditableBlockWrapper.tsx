@@ -15,6 +15,7 @@ export interface EditableBlockProps {
   lockedBy?: UserDetails;
   onEdit?: () => void;
   onDelete?: () => void;
+  onEmbedBlockEdit?: () => void;
 }
 
 const EditableBlockWrapper = ({
@@ -24,6 +25,7 @@ const EditableBlockWrapper = ({
   lockedBy,
   onEdit,
   onDelete,
+  onEmbedBlockEdit,
 }: EditableBlockProps & { children: ReactNode }) => {
   const [showConfirmDelete, toggleConfirmDelete] = useToggle(false);
 
@@ -63,6 +65,10 @@ const EditableBlockWrapper = ({
           <ButtonLink to={dataBlockEditLink} variant="secondary">
             Edit data block
           </ButtonLink>
+        )}
+
+        {onEmbedBlockEdit && (
+          <Button onClick={onEmbedBlockEdit}>Edit dashboard link</Button>
         )}
 
         {onDelete && (

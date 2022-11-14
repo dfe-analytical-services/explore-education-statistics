@@ -1,10 +1,12 @@
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
+import EditableEmbedBlock from '@admin/components/editable/EditableEmbedBlock';
 import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import { useReleaseContentHubContext } from '@admin/contexts/ReleaseContentHubContext';
 import useBlockLock from '@admin/hooks/useBlockLock';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
+import { EditableEmbedFormValues } from '@admin/components/editable/EditableEmbedForm';
 import { ContentSectionKeys } from '@admin/pages/release/content/contexts/ReleaseContentContextActionTypes';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { useReleaseContentDispatch } from '@admin/pages/release/content/contexts/ReleaseContentContext';
@@ -60,6 +62,8 @@ const ReleaseEditableBlock = ({
     updateBlockComment,
     deleteContentSectionBlock,
     updateContentSectionBlock,
+    deleteEmbedSectionBlock,
+    updateEmbedSectionBlock,
   } = useReleaseContentActions();
   const dispatch = useReleaseContentDispatch();
 
@@ -196,6 +200,41 @@ const ReleaseEditableBlock = ({
     });
   }, [block.id, deleteContentSectionBlock, releaseId, sectionId, sectionKey]);
 
+  const handleSaveEmbedBlock = useCallback(
+    async (updatedBlock: EditableEmbedFormValues) => {
+      await updateEmbedSectionBlock({
+        releaseId,
+        sectionId,
+        sectionKey,
+        blockId: block.id,
+        request: {
+          contentBlockId: block.id,
+          title: updatedBlock.title,
+          url: updatedBlock.url,
+        },
+      });
+
+      removeUnsavedBlock(block.id);
+    },
+    [
+      block.id,
+      updateEmbedSectionBlock,
+      removeUnsavedBlock,
+      releaseId,
+      sectionId,
+      sectionKey,
+    ],
+  );
+
+  const handleDeleteEmbedBlock = useCallback(async () => {
+    await deleteEmbedSectionBlock({
+      releaseId,
+      sectionId,
+      sectionKey,
+      blockId: block.id,
+    });
+  }, [block.id, deleteEmbedSectionBlock, releaseId, sectionId, sectionKey]);
+
   const handleBlur = useCallback(
     (isDirty: boolean) => {
       if (isDirty) {
@@ -299,6 +338,17 @@ const ReleaseEditableBlock = ({
           </EditableBlockWrapper>
         </div>
       );
+    case 'EmbedBlockLink': {
+      return (
+        <EditableEmbedBlock
+          editable={editable}
+          block={block}
+          visible={visible}
+          onDelete={handleDeleteEmbedBlock}
+          onSubmit={handleSaveEmbedBlock}
+        />
+      );
+    }
     case 'HtmlBlock':
     case 'MarkDownBlock': {
       return (

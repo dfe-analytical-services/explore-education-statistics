@@ -7,7 +7,12 @@ import releaseContentCommentService, {
 import releaseContentService, {
   ContentBlockAttachRequest,
 } from '@admin/services/releaseContentService';
-import { Comment, ContentBlockPostModel } from '@admin/services/types/content';
+import {
+  Comment,
+  ContentBlockPostModel,
+  EmbedBlockCreateRequest,
+  EmbedBlockUpdateRequest,
+} from '@admin/services/types/content';
 import { Dictionary } from '@admin/types';
 import { useCallback, useMemo } from 'react';
 
@@ -234,6 +239,86 @@ export default function useReleaseContentActions() {
     [dispatch, updateAvailableDataBlocks],
   );
 
+  const addEmbedSectionBlock = useCallback(
+    async ({
+      releaseId,
+      sectionId,
+      sectionKey,
+      request,
+    }: {
+      releaseId: string;
+      sectionId: string;
+      sectionKey: ContentSectionKeys;
+      request: EmbedBlockCreateRequest;
+    }) => {
+      const newBlock = await releaseContentService.addEmbedSectionBlock(
+        releaseId,
+        request,
+      );
+
+      dispatch({
+        type: 'ADD_SECTION_BLOCK',
+        payload: { meta: { sectionId, sectionKey }, block: newBlock },
+      });
+
+      await updateAvailableDataBlocks({ releaseId }); // need this?
+    },
+    [dispatch, updateAvailableDataBlocks],
+  );
+
+  const deleteEmbedSectionBlock = useCallback(
+    async ({
+      releaseId,
+      sectionId,
+      blockId,
+      sectionKey,
+    }: {
+      releaseId: string;
+      sectionId: string;
+      blockId: string;
+      sectionKey: ContentSectionKeys;
+    }) => {
+      await releaseContentService.deleteEmbedSectionBlock(releaseId, blockId);
+      dispatch({
+        type: 'REMOVE_SECTION_BLOCK',
+        payload: { meta: { sectionId, blockId, sectionKey } },
+      });
+
+      await updateAvailableDataBlocks({ releaseId });
+    },
+    [dispatch, updateAvailableDataBlocks],
+  );
+
+  const updateEmbedSectionBlock = useCallback(
+    async ({
+      releaseId,
+      sectionId,
+      blockId,
+      sectionKey,
+      request,
+    }: {
+      releaseId: string;
+      sectionId: string;
+      blockId: string;
+      sectionKey: ContentSectionKeys;
+      request: EmbedBlockUpdateRequest;
+    }) => {
+      const updateBlock = await releaseContentService.updateEmbedSectionBlock(
+        releaseId,
+        request,
+      );
+
+      dispatch({
+        type: 'UPDATE_SECTION_BLOCK',
+        payload: {
+          meta: { sectionId, blockId, sectionKey },
+          block: updateBlock,
+        },
+      });
+    },
+    [dispatch],
+  );
+
   const attachContentSectionBlock = useCallback(
     async ({
       releaseId,
@@ -385,9 +470,11 @@ export default function useReleaseContentActions() {
       addBlockComment,
       addContentSection,
       addContentSectionBlock,
+      addEmbedSectionBlock,
       attachContentSectionBlock,
       deleteBlockComment,
       deleteContentSectionBlock,
+      deleteEmbedSectionBlock,
       removeContentSection,
       updateAvailableDataBlocks,
       updateBlockComment,
@@ -395,15 +482,18 @@ export default function useReleaseContentActions() {
       updateContentSectionDataBlock,
       updateContentSectionHeading,
       updateContentSectionsOrder,
+      updateEmbedSectionBlock,
       updateSectionBlockOrder,
     }),
     [
       addBlockComment,
       addContentSection,
       addContentSectionBlock,
+      addEmbedSectionBlock,
       attachContentSectionBlock,
       deleteBlockComment,
       deleteContentSectionBlock,
+      deleteEmbedSectionBlock,
       removeContentSection,
       updateAvailableDataBlocks,
       updateBlockComment,
@@ -411,6 +501,7 @@ export default function useReleaseContentActions() {
       updateContentSectionDataBlock,
       updateContentSectionHeading,
       updateContentSectionsOrder,
+      updateEmbedSectionBlock,
       updateSectionBlockOrder,
     ],
   );

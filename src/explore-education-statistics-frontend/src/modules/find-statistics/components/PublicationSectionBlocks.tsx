@@ -3,6 +3,7 @@ import InsetText from '@common/components/InsetText';
 import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
+import EmbedBlock from '@common/modules/find-statistics/components/EmbedBlock';
 import ExploreDataButton from '@frontend/modules/find-statistics/components/ExploreDataButton';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import { Release } from '@common/services/publicationService';
@@ -36,6 +37,14 @@ const PublicationSectionBlocks = ({
   return blocks.length > 0 ? (
     <>
       {blocks.map(block => {
+        if (block.type === 'EmbedBlockLink') {
+          return (
+            <Gate condition={!!visible} key={block.id}>
+              <EmbedBlock key={block.id} url={block.url} title={block.title} />
+            </Gate>
+          );
+        }
+
         if (block.type === 'DataBlock') {
           return (
             <Gate condition={!!visible} key={block.id}>

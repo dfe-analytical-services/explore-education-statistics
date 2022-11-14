@@ -39,7 +39,11 @@ export interface Summary {
   dataDefinition: string[];
 }
 
-export type BlockType = 'MarkDownBlock' | 'HtmlBlock' | 'DataBlock';
+export type BlockType =
+  | 'MarkDownBlock'
+  | 'HtmlBlock'
+  | 'DataBlock'
+  | 'EmbedBlockLink';
 
 export interface BaseBlock {
   id: string;
@@ -78,4 +82,10 @@ export interface DataBlock extends BaseBlock {
   summary?: Summary;
 }
 
-export type Block = ContentBlock | DataBlock;
+export interface EmbedBlock extends BaseBlock {
+  title: string;
+  type: 'EmbedBlockLink';
+  url: string;
+}
+
+export type Block = ContentBlock | DataBlock | EmbedBlock;

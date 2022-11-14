@@ -5,6 +5,9 @@ import {
   EditableBlock,
   EditableContentBlock,
   EditableDataBlock,
+  EditableEmbedBlock,
+  EmbedBlockCreateRequest,
+  EmbedBlockUpdateRequest,
 } from '@admin/services/types/content';
 import client from '@admin/services/utils/service';
 import {
@@ -18,7 +21,7 @@ import { Dictionary } from '@common/types';
 type ContentSectionViewModel = ContentSection<EditableBlock>;
 
 export interface EditableRelease
-  extends Release<EditableContentBlock, EditableDataBlock> {
+  extends Release<EditableContentBlock, EditableDataBlock, EditableEmbedBlock> {
   approvalStatus: ReleaseApprovalStatus;
   publishScheduled?: string;
   publicationId: string;
@@ -88,6 +91,30 @@ const releaseContentService = {
       `/release/${releaseId}/content/section/${sectionId}/blocks/add`,
       block,
     );
+  },
+
+  addEmbedSectionBlock(
+    releaseId: string,
+    request: EmbedBlockCreateRequest,
+  ): Promise<EditableEmbedBlock> {
+    return client.post<EditableEmbedBlock>(
+      `/release/${releaseId}/embed-blocks`,
+      request,
+    );
+  },
+
+  updateEmbedSectionBlock(
+    releaseId: string,
+    request: EmbedBlockUpdateRequest,
+  ): Promise<EditableEmbedBlock> {
+    return client.put<EditableEmbedBlock>(
+      `/release/${releaseId}/embed-blocks`,
+      request,
+    );
+  },
+
+  deleteEmbedSectionBlock(releaseId: string, blockId: string): Promise<void> {
+    return client.delete(`/release/${releaseId}/embed-blocks/${blockId}`);
   },
 
   updateContentSectionHeading(
