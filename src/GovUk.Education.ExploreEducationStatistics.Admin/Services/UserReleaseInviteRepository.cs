@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -73,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(uri =>
                     uri.ReleaseId == releaseId
                     && uri.Role == role
-                    && uri.Email.ToLower().Equals(email.ToLower()))
+                    && uri.Email == email) // DB comparison is case insensitive
                 .ToListAsync();
             _contentDbContext.UserReleaseInvites.RemoveRange(invites);
             await _contentDbContext.SaveChangesAsync();

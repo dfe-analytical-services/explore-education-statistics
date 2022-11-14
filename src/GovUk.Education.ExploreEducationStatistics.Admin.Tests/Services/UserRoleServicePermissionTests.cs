@@ -173,6 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = release,
                 Role = Contributor,
+                User = new User(),
             };
 
             await PolicyCheckBuilder<SecurityPolicies>()

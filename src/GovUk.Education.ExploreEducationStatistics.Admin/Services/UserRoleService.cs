@@ -405,37 +405,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, Unit>> RemoveUserReleaseRole(Guid userReleaseRoleId)
         {
             return await _contentPersistenceHelper
-                .CheckEntityExists<UserReleaseRole>(userReleaseRoleId)
-                .OnSuccess(async role =>
+                .CheckEntityExists<UserReleaseRole>(userReleaseRoleId, query => query
+                    .Include(userReleaseRole => userReleaseRole.User)
+                    .Include(userReleaseRole => userReleaseRole.Release)
+                    .ThenInclude(release => release.Publication))
+                .OnSuccess(async userReleaseRole =>
                 {
-                    return await _contentPersistenceHelper
-                        .CheckEntityExists<Release>(query => query
-                            .Include(r => r.Publication)
-                            .Where(r => r.Id == role.ReleaseId)
-                        )
-                        .OnSuccess(async release =>
+                    return await _userService
+                        .CheckCanUpdateReleaseRole(userReleaseRole.Release.Publication, userReleaseRole.Role)
+                        .OnSuccessVoid(async () =>
                         {
-                            return await _userService
-                                .CheckCanUpdateReleaseRole(release.Publication, role.Role)
-                                .OnSuccessVoid(async () =>
-                                {
-                                    var user = await _contentDbContext.Users
-                                        .SingleAsync(u => u.Id == role.UserId);
-                                    if (await _userReleaseInviteRepository
-                                            .UserHasInvite(release.Id, user.Email, role.Role))
-                                    {
-                                        await _userReleaseInviteRepository.Remove(release.Id, user.Email, role.Role);
-                                    }
+                            await _userReleaseInviteRepository.Remove(
+                                userReleaseRole.Release.Id, userReleaseRole.User.Email, userReleaseRole.Role);
 
-                                    await _userReleaseRoleRepository.Remove(role,
-                                        deletedById: _userService.GetUserId());
+                            await _userReleaseRoleRepository.Remove(userReleaseRole,
+                                deletedById: _userService.GetUserId());
 
-                                    var associatedGlobalRoleName = GetAssociatedGlobalRoleNameForReleaseRole(role.Role);
+                            var associatedGlobalRoleName = GetAssociatedGlobalRoleNameForReleaseRole(userReleaseRole.Role);
 
-                                    await _usersAndRolesPersistenceHelper
-                                        .CheckEntityExists<ApplicationUser, string>(role.UserId.ToString())
-                                        .OnSuccessDo(user => DowngradeFromGlobalRoleIfRequired(user, associatedGlobalRoleName));
-                                });
+                            await _usersAndRolesPersistenceHelper
+                                .CheckEntityExists<ApplicationUser, string>(userReleaseRole.UserId.ToString())
+                                .OnSuccessDo(user => DowngradeFromGlobalRoleIfRequired(user, associatedGlobalRoleName));
                         });
                 });
         }
