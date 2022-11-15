@@ -277,7 +277,6 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
         canRotateLabel: false,
       },
       defaults: {
-        min: 0,
         showGrid: true,
         size: 50,
         tickConfig: 'default',

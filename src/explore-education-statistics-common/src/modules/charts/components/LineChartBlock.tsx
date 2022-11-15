@@ -314,7 +314,6 @@ export const lineChartBlockDefinition: ChartDefinition = {
         canRotateLabel: true,
       },
       defaults: {
-        min: 0,
         showGrid: true,
         tickConfig: 'default',
         tickSpacing: 1,
