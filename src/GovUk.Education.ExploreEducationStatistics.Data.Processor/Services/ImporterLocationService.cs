@@ -144,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 && location.Ward_Name == locationToLookup.Ward_Name);
         }
 
-        public async Task<List<Location>> CreateAndCache(StatisticsDbContext context, List<Location> locations)
+        public async Task<List<Location>> CreateIfNotExistsAndCache(StatisticsDbContext context, List<Location> locations)
         {
             await locations.
                 ToAsyncEnumerable()
@@ -167,9 +167,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return locations;
         }
 
-        public async Task<Location> CreateAndCache(StatisticsDbContext context, Location location)
+        public async Task<Location> CreateIfNotExistsAndCache(StatisticsDbContext context, Location location)
         {
-            return (await CreateAndCache(context, ListOf(location)))[0];
+            return (await CreateIfNotExistsAndCache(context, ListOf(location)))[0];
         }
     }
 }

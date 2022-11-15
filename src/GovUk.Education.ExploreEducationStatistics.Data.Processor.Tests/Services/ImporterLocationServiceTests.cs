@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var result = await service.CreateAndCache(
+                var result = await service.CreateIfNotExistsAndCache(
                     statisticsDbContext,
                     new Location
                     {
@@ -151,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 // Test creating a Local Authority with no code, e.g. Bedfordshire pre LGR 2009 only has an old code
-                var result = await service.CreateAndCache(
+                var result = await service.CreateIfNotExistsAndCache(
                     statisticsDbContext,
                     new Location {
                         GeographicLevel = GeographicLevel.LocalAuthority,
@@ -211,7 +211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 // Test creating two Regions with the same code but different names
-                var result1 = await service.CreateAndCache(
+                var result1 = await service.CreateIfNotExistsAndCache(
                     statisticsDbContext,
                     new Location {
                         GeographicLevel = GeographicLevel.Region,
@@ -219,7 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                         Region = new Region("1", "North East")
                     });
         
-                var result2 = await service.CreateAndCache(
+                var result2 = await service.CreateIfNotExistsAndCache(
                     statisticsDbContext,
                     new Location {
                         GeographicLevel = GeographicLevel.Region,
@@ -297,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 // Test creating two Regions with the same name but different codes
-                var result1 = await service.CreateAndCache(
+                var result1 = await service.CreateIfNotExistsAndCache(
                     statisticsDbContext,
                     new Location {
                         GeographicLevel = GeographicLevel.Region,
@@ -305,7 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                         Region = new Region("1", "North East")
                     });
         
-                var result2 = await service.CreateAndCache(
+                var result2 = await service.CreateIfNotExistsAndCache(
                     statisticsDbContext,
                     new Location {
                         GeographicLevel = GeographicLevel.Region,
@@ -383,7 +383,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 // Test creating two Local Authorities which are identical except for different old codes
-                var result1 = await service.CreateAndCache(
+                var result1 = await service.CreateIfNotExistsAndCache(
                     statisticsDbContext,
                     new Location {
                         GeographicLevel = GeographicLevel.LocalAuthority,
@@ -391,7 +391,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                         LocalAuthority = new LocalAuthority("1", "100", "Westminster")
                     });
         
-                var result2 = await service.CreateAndCache(
+                var result2 = await service.CreateIfNotExistsAndCache(
                     statisticsDbContext,
                     new Location {
                         GeographicLevel = GeographicLevel.LocalAuthority,
@@ -478,7 +478,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 // Test creating two locations with identical attributes except for GeographicLevel.
                 // This is probably bad data if it's ever supplied but nevertheless they should be separate locations
                 // treated uniquely by geographic level.
-                var result1 = await service.CreateAndCache(
+                var result1 = await service.CreateIfNotExistsAndCache(
                     statisticsDbContext,
                     new Location {
                         GeographicLevel = GeographicLevel.LocalAuthority,
@@ -487,7 +487,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                         LocalAuthorityDistrict = localAuthorityDistrict
                     });
         
-                var result2 = await service.CreateAndCache(
+                var result2 = await service.CreateIfNotExistsAndCache(
                     statisticsDbContext,
                     new Location {
                         GeographicLevel = GeographicLevel.LocalAuthorityDistrict,
@@ -580,7 +580,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 // Test creating two Providers that are unique by some other attribute e.g. Country
-                var result1 = await service.CreateAndCache(
+                var result1 = await service.CreateIfNotExistsAndCache(
                     statisticsDbContext,
                     new Location {
                         GeographicLevel = GeographicLevel.Provider,
@@ -588,7 +588,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                         Provider = provider
                     });
         
-                var result2 = await service.CreateAndCache(
+                var result2 = await service.CreateIfNotExistsAndCache(
                     statisticsDbContext,
                     new Location {
                         GeographicLevel = GeographicLevel.Provider,
@@ -665,7 +665,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var result1 = await service.CreateAndCache(
+                var result1 = await service.CreateIfNotExistsAndCache(
                     statisticsDbContext,
                     new Location {
                         GeographicLevel = GeographicLevel.EnglishDevolvedArea,
@@ -683,7 +683,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var result2 = await service.CreateAndCache(
+                var result2 = await service.CreateIfNotExistsAndCache(
                     statisticsDbContext,
                     new Location {
                         GeographicLevel = GeographicLevel.EnglishDevolvedArea,
