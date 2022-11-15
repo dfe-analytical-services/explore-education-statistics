@@ -421,7 +421,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       onError?.(isErrorLike(error) ? error.message : 'Unknown error');
 
       return (
-        <WarningMessage>
+        <WarningMessage testId="table-error">
           There was a problem rendering the table.
         </WarningMessage>
       );
