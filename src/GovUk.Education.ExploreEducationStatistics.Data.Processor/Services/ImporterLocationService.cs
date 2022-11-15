@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -146,11 +147,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task<List<Location>> CreateIfNotExistsAndCache(StatisticsDbContext context, List<Location> locations)
         {
-            await locations.
+            return await locations.
                 ToAsyncEnumerable()
-                .ForEachAwaitAsync(async location =>
+                .SelectAwait(async location =>
             {
-                var existingLocation = Lookup(context, location);
+                // Look up an existing matching Location for the given location, either in the database or already in
+                // the cache.
+                var existingLocation = Find(context, location);
 
                 if (existingLocation == null)
                 {
@@ -158,13 +161,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     // imports.  Therefore it is best to store it in the database as soon as possible so as to avoid 
                     // interfering with parallel imports of other Subjects using the same Locations.
                     location.Id = _guidGenerator.NewGuid();
-                    await context.AddAsync(location);
+                    var newLocation = (await context.AddAsync(location)).Entity;
                     await context.SaveChangesAsync();
                     _memoryCache.Set(GetLocationCacheKey(location), location);
+                    return newLocation;
                 }
-            });
-            
-            return locations;
+                
+                // Otherwise simply return the existing Location.
+                return existingLocation;
+            }).ToListAsync();
         }
 
         public async Task<Location> CreateIfNotExistsAndCache(StatisticsDbContext context, Location location)
