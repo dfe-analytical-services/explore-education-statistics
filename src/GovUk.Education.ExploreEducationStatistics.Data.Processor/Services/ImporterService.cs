@@ -282,11 +282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 _importerMemoryCache.Set(cacheKey, filterItem);
             });
             
-            var newLocations = locations.Where(
-                    location => _importerLocationService.Find(context, location) == null)
-                .ToList();
-            
-            await _importerLocationService.CreateAndCache(context, newLocations);
+            await _importerLocationService.CreateAndCache(context, locations.ToList());
         }
 
         public async Task ImportObservations(DataImport import,
