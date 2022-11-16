@@ -59,9 +59,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddSingleton<IGuidGenerator, SequentialGuidGenerator>()
                 .AddTransient<IProcessorService, ProcessorService>()
                 .AddSingleton<IDatabaseHelper, DatabaseHelper>()
+                .AddSingleton<IImporterLocationCache, ImporterLocationCache>()
                 .AddTransient<IDbContextSupplier, DbContextSupplier>()
                 .BuildServiceProvider();
 
+            serviceProvider.GetRequiredService<IImporterLocationCache>();
             HandleRestart(serviceProvider.GetRequiredService<IStorageQueueService>());
         }
 

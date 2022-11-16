@@ -21,6 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using static System.StringComparison;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -149,10 +150,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return _importerMetaService.Get(metaFileCsvHeaders, metaFileRows, subject, context);
         }
 
-        private record FilterItemMeta(string FilterLabel, string FilterGroupLabel, string FilterItemLabel);
-        
-        [SuppressMessage("ReSharper", "NotAccessedPositionalProperty.Local")]
-        private record FilterGroupMeta(string FilterLabel, string FilterGroupLabel);
+        private record FilterItemMeta(string FilterLabel, string FilterGroupLabel, string FilterItemLabel)
+        {
+            public virtual bool Equals(FilterItemMeta? other)
+            {
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+                return string.Equals(FilterLabel, other.FilterLabel, CurrentCultureIgnoreCase) 
+                       && string.Equals(FilterGroupLabel, other.FilterGroupLabel, CurrentCultureIgnoreCase) 
+                       && string.Equals(FilterItemLabel, other.FilterItemLabel, CurrentCultureIgnoreCase);
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(FilterLabel.ToLower(), FilterGroupLabel.ToLower(), FilterItemLabel.ToLower());
+            }
+        }
+
+        private record FilterGroupMeta(string FilterLabel, string FilterGroupLabel)
+        {
+            public virtual bool Equals(FilterGroupMeta? other)
+            {
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+                return string.Equals(FilterLabel, other.FilterLabel, CurrentCultureIgnoreCase) 
+                       && string.Equals(FilterGroupLabel, other.FilterGroupLabel, CurrentCultureIgnoreCase);
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(FilterLabel.ToLower(), FilterGroupLabel.ToLower());
+            }
+        }
 
         public async Task ImportFiltersAndLocations(
             DataImport dataImport,
@@ -252,8 +281,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     var (filterLabel, filterGroupLabel, filterItemLabel) = filterItemMeta;
                     
                     var filterGroup = filterGroups.Single(fg =>
-                        fg.Filter.Label == filterLabel
-                        && fg.Label == filterGroupLabel);
+                        string.Equals(fg.Filter.Label.ToLower(), filterLabel.ToLower(), CurrentCultureIgnoreCase)
+                        && string.Equals(fg.Label, filterGroupLabel, CurrentCultureIgnoreCase));
 
                     return new FilterItem(filterItemLabel, filterGroup);
                 })
@@ -371,7 +400,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 Id = observationId,
                 FilterItems = GetFilterItems(context, rowValues, colValues, subjectMeta.Filters, observationId),
-                LocationId = GetLocationId(context, rowValues, colValues),
+                LocationId = GetLocationId(rowValues, colValues),
                 Measures = GetMeasures(rowValues, colValues, subjectMeta.Indicators),
                 SubjectId = subject.Id,
                 TimeIdentifier = GetTimeIdentifier(rowValues, colValues),
@@ -412,7 +441,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }).ToList();
         }
 
-        private Guid GetLocationId(StatisticsDbContext context, IReadOnlyList<string> rowValues, List<string> colValues)
+        private Guid GetLocationId(IReadOnlyList<string> rowValues, List<string> colValues)
         {
             var location = ReadLocationFromCsv(
                 CsvUtil.GetGeographicLevel(rowValues, colValues),
@@ -434,7 +463,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 GetSponsor(rowValues, colValues),
                 GetWard(rowValues, colValues));
                 
-            return _importerLocationService.Find(context, location)!.Id;
+            return _importerLocationService.Find(location)!.Id;
         }
 
         private static Dictionary<Guid, string> GetMeasures(IReadOnlyList<string> rowValues,

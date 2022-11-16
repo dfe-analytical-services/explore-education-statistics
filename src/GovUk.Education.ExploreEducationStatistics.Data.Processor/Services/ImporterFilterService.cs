@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public FilterItem LookupFilterItem(FilterGroup filterGroup, string label, StatisticsDbContext context)
         {
-            var cacheKey = GetFilterItemCacheKey( filterGroup, label, context);
+            var cacheKey = GetFilterItemCacheKey(filterGroup, label, context);
             
             return _memoryCache.GetOrCreate(
                 cacheKey, 
