@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,9 +23,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _importerLocationCache = importerLocationCache;
         }
         
-        public Location? Find(Location location)
+        public Location Get(Location location)
         {
-            return _importerLocationCache.Find(location);
+            return _importerLocationCache.Get(location);
         }
 
         public async Task<List<Location>> CreateIfNotExistsAndCache(
@@ -37,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .ToAsyncEnumerable()
                 .SelectAwait(async location =>
                     await _importerLocationCache
-                        .GetOrCreateAndCacheAsync(location, async () =>
+                        .GetOrCreateAndCache(location, async () =>
                         {
                             // Save and cache the new Location as soon as possible, as Locations are shareable between ongoing
                             // imports.  Therefore it is best to store it in the database as soon as possible so as to avoid 
@@ -48,15 +47,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         }))
                 .ToListAsync();
             
-            Console.WriteLine("Saving new Locations");
             await context.SaveChangesAsync();
-            Console.WriteLine("Saved new Locations");
             return results;
         }
 
         public async Task<Location> CreateIfNotExistsAndCache(StatisticsDbContext context, Location location)
         {
-            return (await CreateIfNotExistsAndCache(context, ListOf(location)))[0];
+            return (await CreateIfNotExistsAndCache(context, ListOf(location))).Single();
         }
     }
 }

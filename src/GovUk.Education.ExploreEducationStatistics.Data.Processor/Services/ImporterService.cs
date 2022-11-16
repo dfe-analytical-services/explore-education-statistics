@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -36,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IDataImportService _dataImportService;
         private readonly ILogger<ImporterService> _logger;
         private readonly IDatabaseHelper _databaseHelper;
-        private readonly ImporterMemoryCache _importerMemoryCache;
+        private readonly ImporterFilterCache _importerFilterCache;
         private readonly IObservationBatchImporter _observationBatchImporter;
 
         private const int Stage2RowCheck = 1000;
@@ -118,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             IDataImportService dataImportService, 
             ILogger<ImporterService> logger, 
             IDatabaseHelper databaseHelper, 
-            ImporterMemoryCache importerMemoryCache, 
+            ImporterFilterCache importerFilterCache, 
             IObservationBatchImporter? observationBatchImporter = null)
         {
             _guidGenerator = guidGenerator;
@@ -128,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _dataImportService = dataImportService;
             _logger = logger;
             _databaseHelper = databaseHelper;
-            _importerMemoryCache = importerMemoryCache;
+            _importerFilterCache = importerFilterCache;
             _observationBatchImporter = observationBatchImporter ?? new StoredProcedureObservationBatchImporter();
         }
 
@@ -294,23 +293,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await context.FilterItem.AddRangeAsync(filterItems);
                 await context.SaveChangesAsync();
             });
-            
-            filterGroups.ForEach(filterGroup =>
-            {
-                var cacheKey = ImporterFilterService
-                    .GetFilterGroupCacheKey(filterGroup.Filter, filterGroup.Label, context);
-                
-                _importerMemoryCache.Set(cacheKey, filterGroup);
-            });
-            
-            filterItems.ForEach(filterItem =>
-            {
-                var cacheKey = ImporterFilterService
-                    .GetFilterItemCacheKey(filterItem.FilterGroup, filterItem.Label, context);
-                
-                _importerMemoryCache.Set(cacheKey, filterItem);
-            });
-            
+
+            filterGroups.ForEach(filterGroup => _importerFilterCache.AddFilterGroup(filterGroup, context));
+            filterItems.ForEach(filterItem => _importerFilterCache.AddFilterItem(filterItem, context));
             await _importerLocationService.CreateIfNotExistsAndCache(context, locations.ToList());
         }
 
@@ -463,7 +448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 GetSponsor(rowValues, colValues),
                 GetWard(rowValues, colValues));
                 
-            return _importerLocationService.Find(location)!.Id;
+            return _importerLocationService.Get(location).Id;
         }
 
         private static Dictionary<Guid, string> GetMeasures(IReadOnlyList<string> rowValues,

@@ -69,10 +69,16 @@ public class ProcessorStage2Tests
     [Fact]
     public async Task ProcessStage2_AnotherImportOfSimilarData()
     {
+        var importerFilterCache = new ImporterFilterCache();
+        var importerLocationCache = new ImporterLocationCache();
+        
         // Firstly import a CSV.
         var subjectId1 = Guid.NewGuid();
         var scenario1 = new OrderingCsvStage2Scenario(subjectId1);
-        await AssertStage2ItemsImportedCorrectly(scenario1);
+        await AssertStage2ItemsImportedCorrectly(
+            scenario1, 
+            importerFilterCache, 
+            importerLocationCache);
         
         // Then import a very similar CSV.
         //
@@ -87,11 +93,63 @@ public class ProcessorStage2Tests
         
         var subjectId2 = Guid.NewGuid();
         var scenario2 = new OrderingCsvStage2Scenario(subjectId2);
-        await AssertStage2ItemsImportedCorrectly(scenario2);
+        await AssertStage2ItemsImportedCorrectly(
+            scenario2, 
+            importerFilterCache, 
+            importerLocationCache);
+    }
+    
+    [Fact]
+    public async Task ProcessStage2_LocationsAlreadyExist()
+    {
+        var scenario = new OrderingCsvStage2Scenario();
+
+        var importerLocationCache = new ImporterLocationCache();
+        
+        // Persist the Locations that are already in the CSV to import.
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+        {
+            await statisticsDbContext.Location.AddRangeAsync(scenario.GetExpectedLocations());
+            await statisticsDbContext.SaveChangesAsync();
+            
+            // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
+            // Note that this occurs in Startup.cs.
+            importerLocationCache.LoadLocations(statisticsDbContext);
+        }
+        
+        // Import the CSV over the top of the existing Locations.
+        await AssertStage2ItemsImportedCorrectly(
+            scenario, 
+            locationCache: importerLocationCache);
+        
+        // Check that the list of the Locations is the same as before.
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+        {
+            var locations = await statisticsDbContext.Location.ToListAsync();
+            
+            Assert.Equal(scenario.GetExpectedLocations().Count, locations.Count);
+            
+            locations.ForEach(location =>
+            {
+                var cachedLocation = importerLocationCache.Get(location);
+                Assert.Equal(location.Id, cachedLocation.Id);
+            });
+            
+            // Blank out the ids from the stored Locations to make testing equality easier with our list of expected
+            // Locations.
+            locations.ForEach(location => location.Id = Guid.Empty);
+            scenario.GetExpectedLocations().ForEach(expectedLocation => Assert.Contains(expectedLocation, locations));
+        }
     }
 
-    private async Task AssertStage2ItemsImportedCorrectly(IProcessorStage2TestScenario scenario)
+    private async Task AssertStage2ItemsImportedCorrectly(
+        IProcessorStage2TestScenario scenario,
+        ImporterFilterCache? memoryCache = null,
+        IImporterLocationCache? locationCache = null)
     {
+        var importerFilterCache = memoryCache ?? new ImporterFilterCache();
+        var importerLocationCache = locationCache ?? new ImporterLocationCache();
+        
         var metaFileUnderTest = scenario.GetFilenameUnderTest().Replace(".csv", ".meta.csv");
 
         var subject = new Subject
@@ -159,20 +217,18 @@ public class ProcessorStage2Tests
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>(),
             transactionHelper);
-
-        var importerMemoryCache = new ImporterMemoryCache();
         
         var guidGenerator = new SequentialGuidGenerator();
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(importerMemoryCache),
-            new ImporterLocationService(importerMemoryCache, guidGenerator),
+            new ImporterFilterService(importerFilterCache),
+            new ImporterLocationService(guidGenerator, importerLocationCache),
             new ImporterMetaService(guidGenerator, transactionHelper),
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
             transactionHelper,
-            importerMemoryCache);
+            importerFilterCache);
 
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
@@ -284,12 +340,12 @@ public class ProcessorStage2Tests
 
                     Assert.Equal(filterIndexPrefix + expectedFilterItemLabels, filterIndexPrefix + filterItemLabels);
 
-                    var filterGroupCacheKey = ImporterFilterService.GetFilterGroupCacheKey(
+                    var cachedFilterGroup = importerFilterCache.GetOrCacheFilterGroup(
                         matchingFilter, 
-                        matchingFilterGroup.Label, 
-                        statisticsDbContext);
-
-                    var cachedFilterGroup = importerMemoryCache.Get<FilterGroup>(filterGroupCacheKey);
+                        matchingFilterGroup.Label,
+                        statisticsDbContext,
+                        () => null!);
+                    
                     Assert.Equal(matchingFilterGroup.Id, cachedFilterGroup.Id);
                     
                     expectedFilterGroup.FilterItems.ForEach(expectedFilterItem =>
@@ -298,12 +354,12 @@ public class ProcessorStage2Tests
                             .FilterItems
                             .Single(f => f.Label == expectedFilterItem.Label);
 
-                        var filterItemCacheKey = ImporterFilterService.GetFilterItemCacheKey(
+                        var cachedFilterItem = importerFilterCache.GetOrCacheFilterItem(
                             matchingFilterGroup, 
-                            matchingFilterItem.Label, 
-                            statisticsDbContext);
-
-                        var cachedFilterItem = importerMemoryCache.Get<FilterItem>(filterItemCacheKey);
+                            matchingFilterItem.Label,
+                            statisticsDbContext,
+                            () => null!);
+                        
                         Assert.Equal(matchingFilterItem.Id, cachedFilterItem.Id);
                     });
                 });
@@ -349,9 +405,7 @@ public class ProcessorStage2Tests
             
             locations.ForEach(location =>
             {
-                var locationCacheKey = ImporterMemoryCache.GetLocationCacheKey(location);
-                
-                var cachedLocation = importerMemoryCache.Get<Location>(locationCacheKey);
+                var cachedLocation = importerLocationCache.Get(location);
                 Assert.Equal(location.Id, cachedLocation.Id);
             });
             

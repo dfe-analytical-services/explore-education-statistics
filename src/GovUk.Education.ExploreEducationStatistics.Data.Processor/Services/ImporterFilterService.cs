@@ -7,11 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class ImporterFilterService
     {
-        private readonly ImporterMemoryCache _memoryCache;
+        private readonly ImporterFilterCache _importerFilterCache;
 
-        public ImporterFilterService(ImporterMemoryCache memoryCache)
+        public ImporterFilterService(ImporterFilterCache importerFilterCache)
         {
-            _memoryCache = memoryCache;
+            _importerFilterCache = importerFilterCache;
         }
 
         public FilterItem Find(string filterItemLabel, string filterGroupLabel, Filter filter, StatisticsDbContext context)
@@ -22,10 +22,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public FilterItem LookupFilterItem(FilterGroup filterGroup, string label, StatisticsDbContext context)
         {
-            var cacheKey = GetFilterItemCacheKey(filterGroup, label, context);
-            
-            return _memoryCache.GetOrCreate(
-                cacheKey, 
+            return _importerFilterCache.GetOrCacheFilterItem(
+                filterGroup, 
+                label, 
+                context, 
                 () => context
                     .FilterItem
                     .AsNoTracking()
@@ -34,28 +34,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public FilterGroup LookupFilterGroup(Filter filter, string label, StatisticsDbContext context)
         {
-            var cacheKey = GetFilterGroupCacheKey(filter, label, context);
-
-            return _memoryCache.GetOrCreate(
-                cacheKey, 
+            return _importerFilterCache.GetOrCacheFilterGroup(
+                filter, 
+                label, 
+                context, 
                 () => context
                     .FilterGroup
                     .AsNoTracking()
                     .First(fg => fg.FilterId == filter.Id && fg.Label == label));
-        }
-
-        public static string GetFilterGroupCacheKey(Filter filter, string filterGroupLabel, StatisticsDbContext context)
-        {
-            return nameof(FilterGroup) + "_" +
-                   (filter.Id == null ? context.Entry(filter).Property(e => e.Id).CurrentValue : filter.Id) + "_" +
-                   filterGroupLabel.ToLower().Replace(" ", "_");            
-        } 
-
-        public static string GetFilterItemCacheKey(FilterGroup filterGroup, string filterItemLabel, StatisticsDbContext context)
-        {
-            return nameof(FilterItem) + "_" +
-                   (filterGroup.Id == null ? context.Entry(filterGroup).Property(e => e.Id).CurrentValue : filterGroup.Id) + "_" +
-                   filterItemLabel.ToLower().Replace(" ", "_");
         }
     }
 }

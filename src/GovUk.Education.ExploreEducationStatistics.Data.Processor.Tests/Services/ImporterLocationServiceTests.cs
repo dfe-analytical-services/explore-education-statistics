@@ -1,16 +1,18 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.ImporterMemoryCache;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services
 {
@@ -18,15 +20,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
     {
         private readonly Country _england = new("E92000001", "England");
         private readonly Country _wales = new("W92000004", "Wales");
-        private readonly ImporterMemoryCache _importerMemoryCache;
-
-        public ImporterLocationServiceTests()
-        {
-            _importerMemoryCache = new ImporterMemoryCache();
-        } 
         
         [Fact]
-        public async Task Find()
+        public async Task Get()
         {
             var location = new Location
             {
@@ -34,7 +30,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Country = _england
             };
 
-            var service = BuildService();
+            var importerLocationCache = new ImporterLocationCache();
+
+            var service = BuildService(importerLocationCache: importerLocationCache);
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -42,19 +40,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             {
                 statisticsDbContext.Add(location);
                 await statisticsDbContext.SaveChangesAsync();
+                
+                // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
+                // Note that this occurs in Startup.cs.
+                importerLocationCache.LoadLocations(statisticsDbContext);
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var result = service.Find(statisticsDbContext, location);
+            var result = service.Get(location);
 
-                Assert.NotNull(result);
-                Assert.Equal(location.Id, result!.Id);
-            }
+            Assert.NotNull(result);
+            Assert.Equal(location.Id, result!.Id);
         }
         
         [Fact]
-        public async Task Find_NonExistingLocation()
+        public async Task Get_NonExistingLocation()
         {
             var nonMatchingLocation = new Location
             {
@@ -62,7 +61,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Country = _england
             };
 
-            var service = BuildService();
+            var importerLocationCache = new ImporterLocationCache();
+
+            var service = BuildService(importerLocationCache: importerLocationCache);
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -72,18 +73,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var result = service.Find(
-                    statisticsDbContext,
-                    new Location
-                    {
-                        GeographicLevel = GeographicLevel.Country, // different level
-                        Country = nonMatchingLocation.Country   
-                    });
-
-                Assert.Null(result);
-            }
+            Assert.Throws<KeyNotFoundException>(() => service.Get(
+                new Location
+                {
+                    GeographicLevel = GeographicLevel.Country, // different level
+                    Country = nonMatchingLocation.Country   
+                }));
         }
 
         [Fact]
@@ -95,7 +90,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             guidGenerator.Setup(mock => mock.NewGuid())
                 .Returns(locationId);
 
-            var service = BuildService(guidGenerator.Object);
+            var importerLocationCache = new ImporterLocationCache();
+
+            var service = BuildService(
+                guidGenerator.Object,
+                importerLocationCache);
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -119,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal(_england.Code, result.Country!.Code);
                 Assert.Equal(_england.Name, result.Country!.Name);
                 
-                Assert.Same(result, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result)));
+                Assert.Same(result, importerLocationCache.Get(result));
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -143,8 +142,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             var guidGenerator = new Mock<IGuidGenerator>();
             guidGenerator.Setup(mock => mock.NewGuid())
                 .Returns(locationId);
-        
-            var service = BuildService(guidGenerator.Object);
+
+            var importerLocationCache = new ImporterLocationCache();
+
+            var service = BuildService(
+                guidGenerator.Object,
+                importerLocationCache);
         
             var statisticsDbContextId = Guid.NewGuid().ToString();
         
@@ -173,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal("820", result.LocalAuthority!.OldCode);
                 Assert.Equal("Bedfordshire", result.LocalAuthority!.Name);
                 
-                Assert.Same(result, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result)));
+                Assert.Same(result, importerLocationCache.Get(result));
             }
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -203,8 +206,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             guidGenerator.SetupSequence(mock => mock.NewGuid())
                 .Returns(result1Id)
                 .Returns(result2Id);
-        
-            var service = BuildService(guidGenerator.Object);
+
+            var importerLocationCache = new ImporterLocationCache();
+
+            var service = BuildService(
+                guidGenerator.Object,
+                importerLocationCache);
         
             var statisticsDbContextId = Guid.NewGuid().ToString();
         
@@ -249,8 +256,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal("1", result2.Region!.Code);
                 Assert.Equal("North West", result2.Region!.Name);
                 
-                Assert.Same(result1, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result1)));
-                Assert.Same(result2, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result2)));
+                Assert.Same(result1, importerLocationCache.Get(result1));
+                Assert.Same(result2, importerLocationCache.Get(result2));
             }
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -289,8 +296,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             guidGenerator.SetupSequence(mock => mock.NewGuid())
                 .Returns(result1Id)
                 .Returns(result2Id);
-        
-            var service = BuildService(guidGenerator.Object);
+
+            var importerLocationCache = new ImporterLocationCache();
+
+            var service = BuildService(
+                guidGenerator.Object,
+                importerLocationCache);
         
             var statisticsDbContextId = Guid.NewGuid().ToString();
         
@@ -335,8 +346,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal("2", result2.Region!.Code);
                 Assert.Equal("North East", result2.Region!.Name);
                 
-                Assert.Same(result1, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result1)));
-                Assert.Same(result2, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result2)));
+                Assert.Same(result1, importerLocationCache.Get(result1));
+                Assert.Same(result2, importerLocationCache.Get(result2));
             }
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -375,8 +386,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             guidGenerator.SetupSequence(mock => mock.NewGuid())
                 .Returns(result1Id)
                 .Returns(result2Id);
-        
-            var service = BuildService(guidGenerator.Object);
+
+            var importerLocationCache = new ImporterLocationCache();
+
+            var service = BuildService(
+                guidGenerator.Object,
+                importerLocationCache);
         
             var statisticsDbContextId = Guid.NewGuid().ToString();
         
@@ -423,8 +438,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal("101", result2.LocalAuthority!.OldCode);
                 Assert.Equal("Westminster", result2.LocalAuthority!.Name);
                 
-                Assert.Same(result1, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result1)));
-                Assert.Same(result2, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result2)));
+                Assert.Same(result1, importerLocationCache.Get(result1));
+                Assert.Same(result2, importerLocationCache.Get(result2));
             }
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -465,8 +480,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             guidGenerator.SetupSequence(mock => mock.NewGuid())
                 .Returns(result1Id)
                 .Returns(result2Id);
-        
-            var service = BuildService(guidGenerator.Object);
+
+            var importerLocationCache = new ImporterLocationCache();
+
+            var service = BuildService(
+                guidGenerator.Object,
+                importerLocationCache);
         
             var statisticsDbContextId = Guid.NewGuid().ToString();
         
@@ -524,8 +543,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal(localAuthorityDistrict.Code, result2.LocalAuthorityDistrict!.Code);
                 Assert.Equal(localAuthorityDistrict.Name, result2.LocalAuthorityDistrict!.Name);
                 
-                Assert.Same(result1, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result1)));
-                Assert.Same(result2, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result2)));
+                Assert.Same(result1, importerLocationCache.Get(result1));
+                Assert.Same(result2, importerLocationCache.Get(result2));
             }
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -570,8 +589,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             guidGenerator.SetupSequence(mock => mock.NewGuid())
                 .Returns(result1Id)
                 .Returns(result2Id);
-        
-            var service = BuildService(guidGenerator.Object);
+
+            var importerLocationCache = new ImporterLocationCache();
+
+            var service = BuildService(
+                guidGenerator.Object,
+                importerLocationCache);
         
             var statisticsDbContextId = Guid.NewGuid().ToString();
         
@@ -618,8 +641,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal(provider.Code, result2.Provider!.Code);
                 Assert.Equal(provider.Name, result2.Provider!.Name);
                 
-                Assert.Same(result1, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result1)));
-                Assert.Same(result2, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result2)));
+                Assert.Same(result1, importerLocationCache.Get(result1));
+                Assert.Same(result2, importerLocationCache.Get(result2));
             }
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -658,8 +681,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             guidGenerator.SetupSequence(mock => mock.NewGuid())
                 .Returns(result1Id)
                 .Returns(result2Id);
-        
-            var service = BuildService(guidGenerator.Object);
+
+            var importerLocationCache = new ImporterLocationCache();
+
+            var service = BuildService(
+                guidGenerator.Object,
+                importerLocationCache);
         
             var statisticsDbContextId = Guid.NewGuid().ToString();
         
@@ -678,7 +705,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal(result1Id, result1.Id);
                 Assert.Equal("Sheffield City Region", result1.EnglishDevolvedArea_Name);
                 
-                Assert.Same(result1, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result1)));
+                Assert.Same(result1, importerLocationCache.Get(result1));
             }
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -699,7 +726,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 // MsSQL DBs are case insensitive by default: https://github.com/dotnet/efcore/issues/6153
                 Assert.Equal("SHEFFIELD CITY REGION", result2.EnglishDevolvedArea_Name);
                 
-                Assert.Same(result2, _importerMemoryCache.Get<Location>(GetLocationCacheKey(result2)));
+                Assert.Same(result2, importerLocationCache.Get(result2));
             }
         
             MockUtils.VerifyAllMocks(guidGenerator);
@@ -718,9 +745,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             }
         }
 
-        private ImporterLocationService BuildService(IGuidGenerator? guidGenerator = null)
+        private ImporterLocationService BuildService(
+            IGuidGenerator? guidGenerator = null,
+            IImporterLocationCache? importerLocationCache = null)
         {
-            return new(_importerMemoryCache, guidGenerator ?? Mock.Of<IGuidGenerator>());
+            return new(
+                guidGenerator ?? Mock.Of<IGuidGenerator>(),
+                importerLocationCache ?? Mock.Of<IImporterLocationCache>(Strict));
         }
     }
 }

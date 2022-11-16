@@ -153,7 +153,16 @@ public class ProcessorStage4ImportObservationTests
             Mock.Of<ILogger<DataImportService>>(),
             databaseHelper);
 
-        var memoryCache = new ImporterMemoryCache();
+        var memoryCache = new ImporterFilterCache();
+
+        var importerLocationCache = new ImporterLocationCache();
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+        {
+            // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
+            // Note that this occurs in Startup.cs.
+            importerLocationCache.LoadLocations(statisticsDbContext);
+        }
 
         var guidGenerator = new SequentialGuidGenerator();
 
@@ -166,7 +175,7 @@ public class ProcessorStage4ImportObservationTests
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterFilterService(memoryCache),
-            new ImporterLocationService(memoryCache, guidGenerator),
+            new ImporterLocationService(guidGenerator, importerLocationCache),
             importerMetaService,
             Mock.Of<IDataImportService>(Strict),
             Mock.Of<ILogger<ImporterService>>(),
@@ -356,8 +365,17 @@ public class ProcessorStage4ImportObservationTests
             Mock.Of<ILogger<DataImportService>>(),
             databaseHelper);
 
-        var memoryCache = new ImporterMemoryCache();
+        var memoryCache = new ImporterFilterCache();
 
+        var importerLocationCache = new ImporterLocationCache();
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+        {
+            // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
+            // Note that this occurs in Startup.cs.
+            importerLocationCache.LoadLocations(statisticsDbContext);
+        }
+        
         var guidGenerator = new SequentialGuidGenerator();
 
         var importerMetaService = new ImporterMetaService(
@@ -369,7 +387,7 @@ public class ProcessorStage4ImportObservationTests
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterFilterService(memoryCache),
-            new ImporterLocationService(memoryCache, guidGenerator),
+            new ImporterLocationService(guidGenerator, importerLocationCache),
             importerMetaService,
             Mock.Of<IDataImportService>(Strict),
             Mock.Of<ILogger<ImporterService>>(),
@@ -420,7 +438,7 @@ public class ProcessorStage4ImportObservationTests
         }
     }
     
-        [Fact]
+    [Fact]
     public async Task ProcessStage4_ImportObservation_BatchingWasRequired_LastBatchImported()
     {
         var dataFileUnderTest = "small-csv.csv";
@@ -550,8 +568,17 @@ public class ProcessorStage4ImportObservationTests
             Mock.Of<ILogger<DataImportService>>(),
             databaseHelper);
 
-        var memoryCache = new ImporterMemoryCache();
+        var memoryCache = new ImporterFilterCache();
 
+        var importerLocationCache = new ImporterLocationCache();
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+        {
+            // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
+            // Note that this occurs in Startup.cs.
+            importerLocationCache.LoadLocations(statisticsDbContext);
+        }
+        
         var guidGenerator = new SequentialGuidGenerator();
 
         var importerMetaService = new ImporterMetaService(
@@ -563,7 +590,7 @@ public class ProcessorStage4ImportObservationTests
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterFilterService(memoryCache),
-            new ImporterLocationService(memoryCache, guidGenerator),
+            new ImporterLocationService(guidGenerator, importerLocationCache),
             importerMetaService,
             Mock.Of<IDataImportService>(Strict),
             Mock.Of<ILogger<ImporterService>>(),

@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -50,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddTransient<ImporterFilterService>()
                 .AddTransient<ImporterLocationService>()
                 .AddTransient<IImporterMetaService, ImporterMetaService>()
-                .AddTransient<ImporterMemoryCache>()
+                .AddTransient<ImporterFilterCache>()
                 .AddTransient<IBatchService, BatchService>()
                 .AddTransient<IDataImportService, DataImportService>()
                 .AddTransient<IValidatorService, ValidatorService>()
@@ -63,12 +64,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddTransient<IDbContextSupplier, DbContextSupplier>()
                 .BuildServiceProvider();
 
-            serviceProvider.GetRequiredService<IImporterLocationCache>();
-            HandleRestart(serviceProvider.GetRequiredService<IStorageQueueService>());
+            LoadAllLocations(serviceProvider);
+            HandleRestart(serviceProvider);
         }
 
-        private static void HandleRestart(IStorageQueueService storageQueueService)
+        private static void LoadAllLocations(IServiceProvider serviceProvider)
         {
+            var importerLocationCache = serviceProvider.GetRequiredService<IImporterLocationCache>();
+            importerLocationCache.LoadLocations(DbUtils.CreateStatisticsDbContext());
+        }
+
+        private static void HandleRestart(IServiceProvider serviceProvider)
+        {
+            var storageQueueService = serviceProvider.GetRequiredService<IStorageQueueService>();
             storageQueueService.Clear(ImportsAvailableQueue).Wait();
             storageQueueService.Clear(ImportsPendingQueue).Wait();
             storageQueueService.Clear(RestartImportsQueue).Wait();
