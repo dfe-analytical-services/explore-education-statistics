@@ -165,8 +165,9 @@ user navigates to publication page from dashboard
     ...    ${topic}=%{TEST_TOPIC_NAME}
 
     user navigates to admin dashboard if needed    %{ADMIN_URL}
-    user waits until h1 is visible    Dashboard
+    user waits until h1 is visible    Dashboard    %{WAIT_SMALL}
     user selects dashboard theme and topic if possible    ${theme}    ${topic}
+    user scrolls to element    xpath://a[text()="${publication}"]
     user clicks link    ${publication}
     user waits until h1 is visible    ${publication}
     user waits until h2 is visible    Manage releases
@@ -200,7 +201,7 @@ user navigates to methodologies on publication page
     user navigates to publication page from dashboard    ${publication}    ${theme}    ${topic}
 
     user clicks link    Methodologies
-    user waits until h2 is visible    Manage methodologies
+    user waits until h2 is visible    Manage methodologies    %{WAIT_SMALL}
 
 user navigates to methodology
     [Arguments]
