@@ -15,9 +15,6 @@
 
   :global(.govuk-summary-list) {
     margin-bottom: 0;
-    @include govuk-media-query($from: tablet) {
-      margin-left: govuk-spacing(9) + govuk-spacing(5);
-    }
   }
 }
 

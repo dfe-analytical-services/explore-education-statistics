@@ -15,7 +15,12 @@
   flex-grow: 1;
 
   @include govuk-media-query($from: tablet) {
+    display: flex;
     max-width: 75%;
+
+    :global(.govuk-summary-list__key) {
+      width: 36%;
+    }
   }
 }
 
