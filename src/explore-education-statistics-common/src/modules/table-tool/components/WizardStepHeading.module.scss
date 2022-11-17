@@ -2,10 +2,8 @@
 
 .stepEnabled {
   @include govuk-media-query($from: tablet) {
-    left: 0;
     line-height: 1;
-    margin: 0;
-    position: absolute;
-    top: -2px;
+    margin: -2px govuk-spacing(2) 0 0;
+    min-width: 75px;
   }
 }
