@@ -72,6 +72,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             {
                 statisticsDbContext.Add(nonMatchingLocation);
                 await statisticsDbContext.SaveChangesAsync();
+                
+                // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
+                // Note that this occurs in Startup.cs.
+                importerLocationCache.LoadLocations(statisticsDbContext);
             }
 
             Assert.Throws<KeyNotFoundException>(() => service.Get(
