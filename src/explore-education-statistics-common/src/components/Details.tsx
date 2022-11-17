@@ -138,7 +138,6 @@ const Details = ({
         {summaryAfter}
       </summary>
       <div
-        aria-hidden={onMounted(!open)}
         className="govuk-details__text"
         id={onMounted(id)}
         style={onMounted(

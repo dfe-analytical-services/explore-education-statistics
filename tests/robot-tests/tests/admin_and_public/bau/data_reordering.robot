@@ -564,6 +564,7 @@ Create table again
     user waits until results table appears    %{WAIT_SMALL}
 
 Validate step 5 options again
+    user clicks button    Show 2 more filters
     user checks previous table tool step contains    5    Indicators    Indicator 1
     user checks previous table tool step contains    5    Filter 2    Total
     user checks previous table tool step contains    5    Filter 1    Total

@@ -1,78 +1,80 @@
 import ButtonText from '@common/components/ButtonText';
 import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
-import React, {
-  Children,
-  cloneElement,
-  isValidElement,
-  ReactNode,
-} from 'react';
-import styles from './CollapsibleList.module.scss';
+import React, { Children, createElement, ReactNode } from 'react';
 
-interface Props {
+interface BaseProps {
   children: ReactNode;
   collapseAfter?: number;
+  id: string;
   isCollapsed?: boolean;
   listStyle?: 'none' | 'number' | 'bullet';
-  testId?: string;
 }
+
+type Props = BaseProps &
+  (
+    | {
+        itemName?: never;
+        itemNamePlural?: never;
+      }
+    | {
+        itemName: string;
+        itemNamePlural: string;
+      }
+  );
 
 const CollapsibleList = ({
   children,
   collapseAfter = 5,
+  id,
+  itemName = 'item',
+  itemNamePlural = 'items',
   isCollapsed = true,
   listStyle = 'none',
-  testId,
 }: Props) => {
   const [collapsed, toggleCollapsed] = useToggle(isCollapsed);
 
-  const listClasses = classNames('govuk-list', styles.listContainer, {
+  const listItems = Children.toArray(children);
+
+  const renderedListItems = collapsed
+    ? listItems.slice(0, collapseAfter > 0 ? collapseAfter : 0)
+    : listItems;
+
+  const listTag = listStyle === 'number' ? 'ol' : 'ul';
+
+  const listClasses = classNames('govuk-list', {
     'govuk-list--number': listStyle === 'number',
     'govuk-list--bullet': listStyle === 'bullet',
   });
 
-  const listItems = Children.map(children, (child, i) => {
-    if (i > collapseAfter - 1) {
-      if (isValidElement(child)) {
-        return cloneElement(child, {
-          ...child.props,
-          className: classNames(child.props.className, {
-            'govuk-visually-hidden': collapsed,
-          }),
-        });
-      }
-    }
-    return child;
-  });
+  const list = createElement(
+    listTag,
+    { id, className: listClasses, 'data-testid': id },
+    renderedListItems,
+  );
 
   const collapsedCount =
     Children.count(children) - (collapseAfter > -1 ? collapseAfter : 0);
 
   return (
     <>
-      {listStyle === 'number' ? (
-        <ol className={listClasses} data-testid={testId}>
-          {listItems}
-        </ol>
-      ) : (
-        <ul className={listClasses} data-testid={testId}>
-          {listItems}
-        </ul>
-      )}
+      {list}
 
       {collapsedCount > 0 && (
-        <div
-          className={classNames(styles.hidePrint, 'govuk-!-margin-bottom-4')}
-          aria-hidden="true"
+        <ButtonText
+          ariaControls={id}
+          ariaExpanded={!collapsed}
+          className="dfe-hide-print govuk-!-margin-bottom-4"
+          onClick={toggleCollapsed}
         >
-          <ButtonText onClick={toggleCollapsed}>
-            {collapsed
-              ? `Show ${collapsedCount} ${
-                  listItems && listItems.length > collapsedCount ? 'more' : ''
-                } item${collapsedCount > 1 ? 's' : ''}`
-              : 'Collapse list'}
-          </ButtonText>
-        </div>
+          {collapsed
+            ? `Show ${collapsedCount} ${collapseAfter > 0 ? 'more' : ''} ${
+                collapsedCount > 1 ? itemNamePlural : itemName
+              }`
+            : `Hide ${collapsedCount} ${
+                collapsedCount > 1 ? itemNamePlural : itemName
+              }`}
+        </ButtonText>
       )}
     </>
   );

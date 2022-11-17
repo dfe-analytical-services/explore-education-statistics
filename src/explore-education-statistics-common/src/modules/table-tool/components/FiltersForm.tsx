@@ -292,7 +292,11 @@ const FiltersForm = ({
 
             <SummaryList noBorder>
               <SummaryListItem term="Indicators">
-                <CollapsibleList>
+                <CollapsibleList
+                  id="indicatorsList"
+                  itemName="indicator"
+                  itemNamePlural="indicators"
+                >
                   {orderedIndicators
                     .flatMap(group => group.options)
                     .filter(indicator =>
@@ -311,7 +315,11 @@ const FiltersForm = ({
                     key={filterGroupKey}
                     term={filterGroup.legend}
                   >
-                    <CollapsibleList>
+                    <CollapsibleList
+                      id={`filtersList-${filterGroupKey}`}
+                      itemName="filter"
+                      itemNamePlural="filters"
+                    >
                       {orderBy(Object.values(filterGroup.options), 'order')
                         .flatMap(group => group.options)
                         .filter(option =>

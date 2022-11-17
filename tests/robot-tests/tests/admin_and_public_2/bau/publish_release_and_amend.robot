@@ -540,19 +540,19 @@ Verify amended Dates data block table has footnotes
     ${accordion}=    user opens accordion section    Dates data block    css:#releaseMainContent
     ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
 
-    user checks list has x items    testid:footnotes    3    ${data_block_table}
+    user checks list has x items    testid:footnotes    2    ${data_block_table}
     user checks list item contains    testid:footnotes    1
     ...    Applies to all data 1
     ...    ${data_block_table}
     user checks list item contains    testid:footnotes    2
     ...    Applies to all data 2
     ...    ${data_block_table}
+
+    user clicks button    Show 1 more footnote    ${data_block_table}
+    user checks list has x items    testid:footnotes    3    ${data_block_table}
     user checks list item contains    testid:footnotes    3
     ...    Applies to all data 3
     ...    ${data_block_table}
-
-    user checks element contains button    ${data_block_table}    Show 1 more item
-    user checks list item is visually hidden    testid:footnotes    3    ${data_block_table}
 
 Update second accordion section text for amendment
     user opens accordion section    Test text    css:#releaseMainContent
@@ -720,19 +720,19 @@ Verify amendment Dates data block table has footnotes
     ${accordion}=    user opens accordion section    Dates data block    id:content
     ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
 
-    user checks list has x items    testid:footnotes    3    ${data_block_table}
+    user checks list has x items    testid:footnotes    2    ${data_block_table}
     user checks list item contains    testid:footnotes    1
     ...    Applies to all data 1
     ...    ${data_block_table}
     user checks list item contains    testid:footnotes    2
     ...    Applies to all data 2
     ...    ${data_block_table}
+
+    user clicks button    Show 1 more footnote    ${data_block_table}
+    user checks list has x items    testid:footnotes    3    ${data_block_table}
     user checks list item contains    testid:footnotes    3
     ...    Applies to all data 3
     ...    ${data_block_table}
-
-    user checks element contains button    ${data_block_table}    Show 1 more item
-    user checks list item is visually hidden    testid:footnotes    3    ${data_block_table}
 
 Verify amendment Test text accordion section contains correct text
     user opens accordion section    Test text    id:content

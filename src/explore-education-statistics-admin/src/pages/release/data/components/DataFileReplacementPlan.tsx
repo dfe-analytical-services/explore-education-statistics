@@ -336,7 +336,11 @@ const DataFileReplacementPlan = ({
                                 key={indicatorGroup.id}
                                 term={indicatorGroup.label}
                               >
-                                <CollapsibleList>
+                                <CollapsibleList
+                                  id="indicatorsList"
+                                  itemName="indicator"
+                                  itemNamePlural="indicators"
+                                >
                                   {indicatorGroup.indicators.map(indicator => (
                                     <li key={indicator.id}>
                                       {indicator.label}

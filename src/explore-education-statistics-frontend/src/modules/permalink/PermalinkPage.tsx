@@ -99,7 +99,7 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
         />
       </div>
 
-      <div className={styles.hidePrint}>
+      <div className="dfe-hide-print">
         {!hasTableError && (
           <DownloadTable
             fullTable={fullTable}

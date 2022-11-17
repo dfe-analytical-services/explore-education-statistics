@@ -164,16 +164,16 @@ Validate Key Statistics data block -- Charts tab
     user checks chart tooltip item contains    ${headline_chart}    2    Authorised absence rate (England): 3.4%
     user checks chart tooltip item contains    ${headline_chart}    3    Unauthorised absence rate (England): 1.3%
 
-    user checks list has x items    testid:footnotes    3    ${headline_chart}
+    user checks list has x items    testid:footnotes    2    ${headline_chart}
     user checks list item contains    testid:footnotes    1
     ...    Absence rates are the number of absence sessions expressed    ${headline_chart}
     user checks list item contains    testid:footnotes    2
     ...    There may be discrepancies between totals and the sum of constituent parts    ${headline_chart}
+
+    user clicks button    Show 1 more footnote    ${headline_chart}
+    user checks list has x items    testid:footnotes    3    ${headline_chart}
     user checks list item contains    testid:footnotes    3
     ...    x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.    ${headline_chart}
-
-    user checks element contains button    ${headline_chart}    Show 1 more item
-    user checks list item is visually hidden    testid:footnotes    3    ${headline_chart}
 
 Validate Key Statistics data block -- Data tables tab
     user clicks element    id:releaseHeadlines-tables-tab
@@ -213,16 +213,15 @@ Validate Key Statistics data block -- Data tables tab
     user checks row cell contains text    ${row}    4    4.6
     user checks row cell contains text    ${row}    5    4.7
 
-    user checks list has x items    testid:footnotes    3    id:releaseHeadlines-tables
+    user checks list has x items    testid:footnotes    2    id:releaseHeadlines-tables
     user checks list item contains    testid:footnotes    1
     ...    Absence rates are the number of absence sessions expressed    id:releaseHeadlines-tables
     user checks list item contains    testid:footnotes    2
     ...    There may be discrepancies between totals and the sum of constituent parts    id:releaseHeadlines-tables
+    user clicks button    Show 1 more footnote    id:releaseHeadlines-tables
+    user checks list has x items    testid:footnotes    3    id:releaseHeadlines-tables
     user checks list item contains    testid:footnotes    3
     ...    x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.    id:releaseHeadlines-tables
-
-    user checks element contains button    id:releaseHeadlines-tables    Show 1 more item
-    user checks list item is visually hidden    testid:footnotes    3    id:releaseHeadlines-tables
 
 Validate accordion sections order
     user checks accordion is in position    Explore data and files    1    id:data-accordion
@@ -306,19 +305,19 @@ Check Regional and local authority (LA) breakdown table has footnotes
     user scrolls down    500
     user waits until page does not contain loading spinner
     ${data_block_table}=    user gets data block table from parent    LAD map    ${accordion}
-    user checks list has x items    testid:footnotes    3    ${data_block_table}
+    user checks list has x items    testid:footnotes    2    ${data_block_table}
     user checks list item contains    testid:footnotes    1
     ...    Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.
     ...    ${data_block_table}
     user checks list item contains    testid:footnotes    2
     ...    There may be discrepancies between totals and the sum of constituent parts as national and regional totals and totals across school types have been rounded to the nearest 5.
     ...    ${data_block_table}
+
+    user checks list has x items    testid:footnotes    2    ${data_block_table}
+    user clicks button    Show 1 more footnote    ${data_block_table}
     user checks list item contains    testid:footnotes    3
     ...    x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.
     ...    ${data_block_table}
-
-    user checks element contains button    ${data_block_table}    Show 1 more item
-    user checks list item is visually hidden    testid:footnotes    3    ${data_block_table}
 
 Validate Regional and local authority (LA) breakdown chart
     [Tags]    Failing
@@ -361,23 +360,22 @@ Check Regional and local authority (LA) breakdown chart has footnotes
     ${accordion}=    user opens accordion section    Regional and local authority (LA) breakdown    id:content
     ${data_block_chart}=    user gets data block chart from parent    LAD map    ${accordion}
 
-    user checks list has x items    testid:footnotes    4    ${data_block_chart}
+    user checks list has x items    testid:footnotes    2    ${data_block_chart}
     user checks list item contains    testid:footnotes    1
     ...    Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.
     ...    ${data_block_chart}
     user checks list item contains    testid:footnotes    2
     ...    There may be discrepancies between totals and the sum of constituent parts as national and regional totals and totals across school types have been rounded to the nearest 5.
     ...    ${data_block_chart}
+
+    user clicks button    Show 2 more footnotes    ${data_block_chart}
+    user checks list has x items    testid:footnotes    4    ${data_block_chart}
     user checks list item contains    testid:footnotes    3
     ...    x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.
     ...    ${data_block_chart}
     user checks list item contains    testid:footnotes    4
     ...    This map uses the boundary data Local Authority Districts (December 2021) UK BUC
     ...    ${data_block_chart}
-
-    user checks element contains button    ${data_block_chart}    Show 2 more items
-    user checks list item is visually hidden    testid:footnotes    3    ${data_block_chart}
-    user checks list item is visually hidden    testid:footnotes    4    ${data_block_chart}
 
 Clicking "Create tables" takes user to Table Tool page with absence publication selected
     [Documentation]    DFE-898

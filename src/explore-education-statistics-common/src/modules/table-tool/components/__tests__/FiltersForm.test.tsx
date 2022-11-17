@@ -756,7 +756,12 @@ describe('FiltersForm', () => {
       screen.getByRole('group', { name: 'Categories' }),
     ).getAllByRole('group');
     expect(within(filters[0]).getByRole('button', { name: 'Characteristic' }));
-    expect(within(filters[1]).getByRole('button', { name: 'School type' }));
+    // there are 4 groups within the characteristic group, so school type is the 6th group
+    expect(
+      within(filters[5]).getByRole('button', {
+        name: 'School type',
+      }),
+    );
 
     const characteristicGroups = within(filters[0]).getAllByRole('group', {
       hidden: true,
