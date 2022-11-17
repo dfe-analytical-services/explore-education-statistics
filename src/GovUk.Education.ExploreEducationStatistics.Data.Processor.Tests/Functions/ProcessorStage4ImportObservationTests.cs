@@ -175,7 +175,10 @@ public class ProcessorStage4ImportObservationTests
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterFilterService(memoryCache),
-            new ImporterLocationService(guidGenerator, importerLocationCache),
+            new ImporterLocationService(
+                guidGenerator, 
+                importerLocationCache,
+                Mock.Of<ILogger<ImporterLocationCache>>()),
             importerMetaService,
             Mock.Of<IDataImportService>(Strict),
             Mock.Of<ILogger<ImporterService>>(),
@@ -387,7 +390,10 @@ public class ProcessorStage4ImportObservationTests
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterFilterService(memoryCache),
-            new ImporterLocationService(guidGenerator, importerLocationCache),
+            new ImporterLocationService(
+                guidGenerator, 
+                importerLocationCache,
+                Mock.Of<ILogger<ImporterLocationCache>>()),
             importerMetaService,
             Mock.Of<IDataImportService>(Strict),
             Mock.Of<ILogger<ImporterService>>(),
@@ -590,7 +596,10 @@ public class ProcessorStage4ImportObservationTests
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterFilterService(memoryCache),
-            new ImporterLocationService(guidGenerator, importerLocationCache),
+            new ImporterLocationService(
+                guidGenerator, 
+                importerLocationCache,
+                Mock.Of<ILogger<ImporterLocationCache>>()),
             importerMetaService,
             Mock.Of<IDataImportService>(Strict),
             Mock.Of<ILogger<ImporterService>>(),

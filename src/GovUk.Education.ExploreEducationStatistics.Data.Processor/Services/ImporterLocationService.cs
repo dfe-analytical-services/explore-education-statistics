@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
@@ -14,13 +15,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     {
         private readonly IGuidGenerator _guidGenerator;
         private readonly IImporterLocationCache _importerLocationCache;
-        
+        private readonly ILogger<ImporterLocationCache> _logger;
+
         public ImporterLocationService(
             IGuidGenerator guidGenerator, 
-            IImporterLocationCache importerLocationCache)
+            IImporterLocationCache importerLocationCache, 
+            ILogger<ImporterLocationCache> logger)
         {
             _guidGenerator = guidGenerator;
             _importerLocationCache = importerLocationCache;
+            _logger = logger;
         }
         
         public Location Get(Location location)
@@ -30,9 +34,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task<List<Location>> CreateIfNotExistsAndCache(
             StatisticsDbContext context, 
-            List<Location> locations)
+            List<Location> locationsToCheck)
         {
-            var results = await locations
+            var newLocationsCount = 0;
+            
+            var cachedLocations = await locationsToCheck
                 .ToAsyncEnumerable()
                 .SelectAwait(async location =>
                     await _importerLocationCache
@@ -44,12 +50,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                             // using the same Locations.
                             location.Id = _guidGenerator.NewGuid();
                             var newLocation = (await context.AddAsync(location)).Entity;
+                            newLocationsCount++;
                             return newLocation;
                         }))
                 .ToListAsync();
+
+            if (newLocationsCount > 0)
+            {
+                await context.SaveChangesAsync();
+                _logger.LogInformation($"Added {newLocationsCount} new Locations");
+            }
             
-            await context.SaveChangesAsync();
-            return results;
+            return cachedLocations;
         }
 
         public async Task<Location> CreateIfNotExistsAndCache(StatisticsDbContext context, Location location)

@@ -117,7 +117,10 @@ public class ProcessorStage1Tests
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterFilterService(importerFilterCache),
-            new ImporterLocationService(guidGenerator, importerLocationCache),
+            new ImporterLocationService(
+                guidGenerator, 
+                importerLocationCache,
+                Mock.Of<ILogger<ImporterLocationCache>>()),
             new ImporterMetaService(guidGenerator, transactionHelper),
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),

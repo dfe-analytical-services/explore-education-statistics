@@ -756,7 +756,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
         {
             return new(
                 guidGenerator ?? Mock.Of<IGuidGenerator>(),
-                importerLocationCache ?? Mock.Of<IImporterLocationCache>(Strict));
+                importerLocationCache ?? Mock.Of<IImporterLocationCache>(Strict),
+                Mock.Of<ILogger<ImporterLocationCache>>());
         }
     }
 }

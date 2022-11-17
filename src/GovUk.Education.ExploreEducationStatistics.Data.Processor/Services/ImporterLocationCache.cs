@@ -33,9 +33,20 @@ public class ImporterLocationCache : IImporterLocationCache
             .AsNoTracking()
             .ToList();
         
-        existingLocations.ForEach(location => _locations.TryAdd(GetLocationCacheKey(location), location));
+        existingLocations.ForEach(location =>
+        {
+            var locationCacheKey = GetLocationCacheKey(location);
+            
+            var added = _locations.TryAdd(locationCacheKey, location);
+
+            if (!added)
+            {
+                _logger.LogError("Duplicate Location has already been added to the Locations cache, indicating " +
+                                 $"a duplicate Location in the environment's database - {locationCacheKey}");
+            }
+        });
         
-        _logger.LogInformation($"Loaded {existingLocations.Count} Locations into cache successfully");
+        _logger.LogInformation($"Loaded {_locations.Count} Locations into cache successfully");
     }
 
     public Location Get(Location locationFromCsv)
