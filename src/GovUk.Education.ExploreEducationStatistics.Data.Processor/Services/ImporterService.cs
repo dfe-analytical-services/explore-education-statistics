@@ -296,7 +296,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             filterGroups.ForEach(filterGroup => _importerFilterCache.AddFilterGroup(filterGroup, context));
             filterItems.ForEach(filterItem => _importerFilterCache.AddFilterItem(filterItem, context));
-            await _importerLocationService.CreateIfNotExistsAndCache(context, locations.ToList());
+
+            await _databaseHelper.ExecuteWithExclusiveLock(
+                context, 
+                "Importer_AddNewLocations", 
+                ctxDelegate => _importerLocationService.CreateIfNotExistsAndCache(ctxDelegate, locations.ToList()));
         }
 
         public async Task ImportObservations(DataImport import,

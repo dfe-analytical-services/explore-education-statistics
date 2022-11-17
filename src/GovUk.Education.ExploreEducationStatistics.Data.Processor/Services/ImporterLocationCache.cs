@@ -63,9 +63,12 @@ public class ImporterLocationCache : IImporterLocationCache
 
         var added = _locations.TryAdd(locationCacheKey, providedLocation);
 
+        // Due to the way that concurrent import processes take it in turns (via an exclusive lock) to add any new 
+        // Locations they need to add to the database (and this cache), we should never run into a scenario whereby
+        // 2 or more import processes attempt to add the same Location at any point. 
         if (!added)
         {
-            _logger.LogWarning($"Location already added to cache - {locationCacheKey}");
+            throw new ArgumentException($"Location already added to cache - {locationCacheKey}");
         }
         
         return providedLocation;
