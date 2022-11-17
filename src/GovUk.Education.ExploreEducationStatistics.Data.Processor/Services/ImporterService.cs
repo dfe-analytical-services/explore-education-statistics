@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,6 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using static System.StringComparison;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IDataImportService _dataImportService;
         private readonly ILogger<ImporterService> _logger;
         private readonly IDatabaseHelper _databaseHelper;
-        private readonly ImporterMemoryCache _importerMemoryCache;
+        private readonly ImporterFilterCache _importerFilterCache;
         private readonly IObservationBatchImporter _observationBatchImporter;
 
         private const int Stage2RowCheck = 1000;
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             IDataImportService dataImportService, 
             ILogger<ImporterService> logger, 
             IDatabaseHelper databaseHelper, 
-            ImporterMemoryCache importerMemoryCache, 
+            ImporterFilterCache importerFilterCache, 
             IObservationBatchImporter? observationBatchImporter = null)
         {
             _guidGenerator = guidGenerator;
@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _dataImportService = dataImportService;
             _logger = logger;
             _databaseHelper = databaseHelper;
-            _importerMemoryCache = importerMemoryCache;
+            _importerFilterCache = importerFilterCache;
             _observationBatchImporter = observationBatchImporter ?? new StoredProcedureObservationBatchImporter();
         }
 
@@ -149,10 +149,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return _importerMetaService.Get(metaFileCsvHeaders, metaFileRows, subject, context);
         }
 
-        private record FilterItemMeta(string FilterLabel, string FilterGroupLabel, string FilterItemLabel);
-        
-        [SuppressMessage("ReSharper", "NotAccessedPositionalProperty.Local")]
-        private record FilterGroupMeta(string FilterLabel, string FilterGroupLabel);
+        private record FilterItemMeta(string FilterLabel, string FilterGroupLabel, string FilterItemLabel)
+        {
+            public virtual bool Equals(FilterItemMeta? other)
+            {
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+                return string.Equals(FilterLabel, other.FilterLabel, CurrentCultureIgnoreCase) 
+                       && string.Equals(FilterGroupLabel, other.FilterGroupLabel, CurrentCultureIgnoreCase) 
+                       && string.Equals(FilterItemLabel, other.FilterItemLabel, CurrentCultureIgnoreCase);
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(FilterLabel.ToLower(), FilterGroupLabel.ToLower(), FilterItemLabel.ToLower());
+            }
+        }
+
+        private record FilterGroupMeta(string FilterLabel, string FilterGroupLabel)
+        {
+            public virtual bool Equals(FilterGroupMeta? other)
+            {
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+                return string.Equals(FilterLabel, other.FilterLabel, CurrentCultureIgnoreCase) 
+                       && string.Equals(FilterGroupLabel, other.FilterGroupLabel, CurrentCultureIgnoreCase);
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(FilterLabel.ToLower(), FilterGroupLabel.ToLower());
+            }
+        }
 
         public async Task ImportFiltersAndLocations(
             DataImport dataImport,
@@ -252,8 +280,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     var (filterLabel, filterGroupLabel, filterItemLabel) = filterItemMeta;
                     
                     var filterGroup = filterGroups.Single(fg =>
-                        fg.Filter.Label == filterLabel
-                        && fg.Label == filterGroupLabel);
+                        string.Equals(fg.Filter.Label.ToLower(), filterLabel.ToLower(), CurrentCultureIgnoreCase)
+                        && string.Equals(fg.Label, filterGroupLabel, CurrentCultureIgnoreCase));
 
                     return new FilterItem(filterItemLabel, filterGroup);
                 })
@@ -265,28 +293,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await context.FilterItem.AddRangeAsync(filterItems);
                 await context.SaveChangesAsync();
             });
-            
-            filterGroups.ForEach(filterGroup =>
-            {
-                var cacheKey = ImporterFilterService
-                    .GetFilterGroupCacheKey(filterGroup.Filter, filterGroup.Label, context);
-                
-                _importerMemoryCache.Set(cacheKey, filterGroup);
-            });
-            
-            filterItems.ForEach(filterItem =>
-            {
-                var cacheKey = ImporterFilterService
-                    .GetFilterItemCacheKey(filterItem.FilterGroup, filterItem.Label, context);
-                
-                _importerMemoryCache.Set(cacheKey, filterItem);
-            });
-            
-            var newLocations = locations.Where(
-                    location => _importerLocationService.Find(context, location) == null)
-                .ToList();
-            
-            await _importerLocationService.CreateAndCache(context, newLocations);
+
+            filterGroups.ForEach(filterGroup => _importerFilterCache.AddFilterGroup(filterGroup, context));
+            filterItems.ForEach(filterItem => _importerFilterCache.AddFilterItem(filterItem, context));
+
+            // Add any new Locations that are being introduced by this import process exclusively.  Other concurrent 
+            // import processes reaching this stage will wait before adding their own new Locations, if any.
+            //
+            // This ensures that we do not end up with duplicate Locations being added by separate processes, or let one 
+            // process continue on to the next stage of import before all Locations that it relies on have been
+            // persisted successfully by whichever import process introduced it first.
+            //
+            // This also lets us take advantage of the performance gains of saving new Locations in a single batch
+            // rather than in separate SaveChanges() calls, which introduces quite a penalty.
+            await _databaseHelper.ExecuteWithExclusiveLock(
+                context, 
+                "Importer_AddNewLocations", 
+                ctxDelegate => _importerLocationService.CreateIfNotExistsAndCache(ctxDelegate, locations.ToList()));
         }
 
         public async Task ImportObservations(DataImport import,
@@ -375,7 +398,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 Id = observationId,
                 FilterItems = GetFilterItems(context, rowValues, colValues, subjectMeta.Filters, observationId),
-                LocationId = GetLocationId(context, rowValues, colValues),
+                LocationId = GetLocationId(rowValues, colValues),
                 Measures = GetMeasures(rowValues, colValues, subjectMeta.Indicators),
                 SubjectId = subject.Id,
                 TimeIdentifier = GetTimeIdentifier(rowValues, colValues),
@@ -416,7 +439,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }).ToList();
         }
 
-        private Guid GetLocationId(StatisticsDbContext context, IReadOnlyList<string> rowValues, List<string> colValues)
+        private Guid GetLocationId(IReadOnlyList<string> rowValues, List<string> colValues)
         {
             var location = ReadLocationFromCsv(
                 CsvUtil.GetGeographicLevel(rowValues, colValues),
@@ -438,7 +461,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 GetSponsor(rowValues, colValues),
                 GetWard(rowValues, colValues));
                 
-            return _importerLocationService.Find(context, location)!.Id;
+            return _importerLocationService.Get(location).Id;
         }
 
         private static Dictionary<Guid, string> GetMeasures(IReadOnlyList<string> rowValues,
