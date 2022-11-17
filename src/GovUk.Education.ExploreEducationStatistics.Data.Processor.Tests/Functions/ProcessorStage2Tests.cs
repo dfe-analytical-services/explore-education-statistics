@@ -70,7 +70,7 @@ public class ProcessorStage2Tests
     public async Task ProcessStage2_AnotherImportOfSimilarData()
     {
         var importerFilterCache = new ImporterFilterCache();
-        var importerLocationCache = new ImporterLocationCache();
+        var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
         
         // Firstly import a CSV.
         var subjectId1 = Guid.NewGuid();
@@ -104,7 +104,7 @@ public class ProcessorStage2Tests
     {
         var scenario = new OrderingCsvStage2Scenario();
 
-        var importerLocationCache = new ImporterLocationCache();
+        var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
         
         // Persist the Locations that are already in the CSV to import.
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -148,7 +148,7 @@ public class ProcessorStage2Tests
         IImporterLocationCache? locationCache = null)
     {
         var importerFilterCache = memoryCache ?? new ImporterFilterCache();
-        var importerLocationCache = locationCache ?? new ImporterLocationCache();
+        var importerLocationCache = locationCache ?? new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
         
         var metaFileUnderTest = scenario.GetFilenameUnderTest().Replace(".csv", ".meta.csv");
 

@@ -155,7 +155,7 @@ public class ProcessorStage4ImportObservationTests
 
         var memoryCache = new ImporterFilterCache();
 
-        var importerLocationCache = new ImporterLocationCache();
+        var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
@@ -367,7 +367,7 @@ public class ProcessorStage4ImportObservationTests
 
         var memoryCache = new ImporterFilterCache();
 
-        var importerLocationCache = new ImporterLocationCache();
+        var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
@@ -570,7 +570,7 @@ public class ProcessorStage4ImportObservationTests
 
         var memoryCache = new ImporterFilterCache();
 
-        var importerLocationCache = new ImporterLocationCache();
+        var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {

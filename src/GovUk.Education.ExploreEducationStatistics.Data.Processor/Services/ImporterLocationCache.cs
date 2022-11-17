@@ -1,6 +1,6 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -9,21 +9,33 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 
 public class ImporterLocationCache : IImporterLocationCache
 {
-    private readonly Dictionary<string, Location> _locations = new();
+    private readonly ConcurrentDictionary<string, Location> _locations = new();
+    
+    private readonly ILogger<ImporterLocationCache> _logger;
+
+    public ImporterLocationCache(ILogger<ImporterLocationCache> logger)
+    {
+        _logger = logger;
+    }
 
     public void LoadLocations(StatisticsDbContext context)
     {
+        _logger.LogInformation("Loading all Locations into cache");
+        
         var existingLocations = context
             .Location
             .AsNoTracking()
             .ToList();
         
-        existingLocations.ForEach(location => _locations.Add(GetLocationCacheKey(location), location));
+        existingLocations.ForEach(location => _locations.TryAdd(GetLocationCacheKey(location), location));
+        
+        _logger.LogInformation($"Loaded {existingLocations.Count} Locations into cache successfully");
     }
 
     public Location Get(Location locationFromCsv)
@@ -35,13 +47,27 @@ public class ImporterLocationCache : IImporterLocationCache
     {
         var locationCacheKey = GetLocationCacheKey(locationFromCsv);
 
+        // Check for the existence of the location in the cache already. If it exists, return the cached version.
         if (_locations.ContainsKey(locationCacheKey))
         {
             return _locations[locationCacheKey];
         }
 
+        // Otherwise, get the new Location from the "locationProvider" and add it to the cache.
+        //
+        // Note that we can't use ConcurrentDictionary's GetOrAdd() method to more cleanly write all of this, as it is
+        // not thread-safe. Instead we manually invoke "locationProvider" to get a new Location and then use TryAdd()
+        // which is a thread-safe way to add to the dictionary, and ignore collisions in the rare scenario when 2
+        // import processes are trying to add the same Location at the same time.  
         var providedLocation = await locationProvider.Invoke();
-        _locations.Add(locationCacheKey, providedLocation);
+
+        var added = _locations.TryAdd(locationCacheKey, providedLocation);
+
+        if (!added)
+        {
+            _logger.LogWarning($"Location already added to cache - {locationCacheKey}");
+        }
+        
         return providedLocation;
     }
 

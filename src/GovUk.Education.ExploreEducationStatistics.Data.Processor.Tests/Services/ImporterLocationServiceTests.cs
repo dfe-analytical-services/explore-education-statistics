@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
@@ -30,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Country = _england
             };
 
-            var importerLocationCache = new ImporterLocationCache();
+            var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
             var service = BuildService(importerLocationCache: importerLocationCache);
 
@@ -61,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Country = _england
             };
 
-            var importerLocationCache = new ImporterLocationCache();
+            var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
             var service = BuildService(importerLocationCache: importerLocationCache);
 
@@ -90,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             guidGenerator.Setup(mock => mock.NewGuid())
                 .Returns(locationId);
 
-            var importerLocationCache = new ImporterLocationCache();
+            var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
             var service = BuildService(
                 guidGenerator.Object,
@@ -143,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             guidGenerator.Setup(mock => mock.NewGuid())
                 .Returns(locationId);
 
-            var importerLocationCache = new ImporterLocationCache();
+            var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
             var service = BuildService(
                 guidGenerator.Object,
@@ -207,7 +208,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 .Returns(result1Id)
                 .Returns(result2Id);
 
-            var importerLocationCache = new ImporterLocationCache();
+            var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
             var service = BuildService(
                 guidGenerator.Object,
@@ -297,7 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 .Returns(result1Id)
                 .Returns(result2Id);
 
-            var importerLocationCache = new ImporterLocationCache();
+            var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
             var service = BuildService(
                 guidGenerator.Object,
@@ -387,7 +388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 .Returns(result1Id)
                 .Returns(result2Id);
 
-            var importerLocationCache = new ImporterLocationCache();
+            var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
             var service = BuildService(
                 guidGenerator.Object,
@@ -481,7 +482,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 .Returns(result1Id)
                 .Returns(result2Id);
 
-            var importerLocationCache = new ImporterLocationCache();
+            var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
             var service = BuildService(
                 guidGenerator.Object,
@@ -590,7 +591,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 .Returns(result1Id)
                 .Returns(result2Id);
 
-            var importerLocationCache = new ImporterLocationCache();
+            var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
             var service = BuildService(
                 guidGenerator.Object,
@@ -682,7 +683,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 .Returns(result1Id)
                 .Returns(result2Id);
 
-            var importerLocationCache = new ImporterLocationCache();
+            var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
 
             var service = BuildService(
                 guidGenerator.Object,

@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -63,15 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddSingleton<IImporterLocationCache, ImporterLocationCache>()
                 .AddTransient<IDbContextSupplier, DbContextSupplier>()
                 .BuildServiceProvider();
-
-            LoadAllLocations(serviceProvider);
             HandleRestart(serviceProvider);
-        }
-
-        private static void LoadAllLocations(IServiceProvider serviceProvider)
-        {
-            var importerLocationCache = serviceProvider.GetRequiredService<IImporterLocationCache>();
-            importerLocationCache.LoadLocations(DbUtils.CreateStatisticsDbContext());
         }
 
         private static void HandleRestart(IServiceProvider serviceProvider)

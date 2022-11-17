@@ -110,7 +110,7 @@ public class ProcessorStage1Tests
 
         var importerFilterCache = new ImporterFilterCache();
 
-        var importerLocationCache = new ImporterLocationCache();
+        var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
         
         var guidGenerator = new SequentialGuidGenerator();
         

@@ -38,9 +38,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     await _importerLocationCache
                         .GetOrCreateAndCache(location, async () =>
                         {
-                            // Save and cache the new Location as soon as possible, as Locations are shareable between ongoing
-                            // imports.  Therefore it is best to store it in the database as soon as possible so as to avoid 
-                            // interfering with parallel imports of other Subjects using the same Locations.
+                            // Save and cache the new Location as soon as possible, as Locations are shareable between
+                            // ongoing imports.  Therefore it is best to track it for database entry and cache it as
+                            // soon as possible so as to avoid interfering with parallel imports of other Subjects
+                            // using the same Locations.
                             location.Id = _guidGenerator.NewGuid();
                             var newLocation = (await context.AddAsync(location)).Entity;
                             return newLocation;
