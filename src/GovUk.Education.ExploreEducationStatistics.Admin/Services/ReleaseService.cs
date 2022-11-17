@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             StatisticsDbContext statisticsDbContext,
             IDataBlockService dataBlockService,
             IReleaseSubjectRepository releaseSubjectRepository,
-            IGuidGenerator guidGenerator, 
+            IGuidGenerator guidGenerator,
             IBlobCacheService cacheService)
         {
             _context = context;
@@ -225,8 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendment(Guid releaseId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(HydrateReleaseForAmendment)
+                .CheckEntityExists<Release>(releaseId, HydrateReleaseForAmendment)
                 .OnSuccess(_userService.CheckCanMakeAmendmentOfRelease)
                 .OnSuccess(originalRelease =>
                     CreateBasicReleaseAmendment(originalRelease)
@@ -548,43 +547,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(r => r.ReleaseStatuses);
         }
 
-        private async Task<Release> HydrateReleaseForAmendment(Release release)
+        private static IQueryable<Release> HydrateReleaseForAmendment(IQueryable<Release> queryable)
         {
             // Require publication / release / contact / graph to be able to work out:
             // If the release is the latest
             // The contact
-            // TODO: EES-3164 Refactor using AsSplitQuery()
-            await _context.Entry(release)
-                .Reference(r => r.Publication)
-                .LoadAsync();
-            await _context.Entry(release)
-                .Collection(r => r.Content)
-                .LoadAsync();
-            await release.Content
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async cs =>
-                {
-                    await _context.Entry(cs)
-                        .Reference(rcs => rcs.ContentSection)
-                        .LoadAsync();
-                    await _context.Entry(cs.ContentSection)
-                        .Collection(s => s.Content)
-                        .LoadAsync();
-                });
-            await _context.Entry(release)
-                .Collection(r => r.Updates)
-                .LoadAsync();
-            await _context.Entry(release)
-                .Collection(r => r.ContentBlocks)
-                .LoadAsync();
-            await release.ContentBlocks
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async rcb =>
-                    await _context.Entry(rcb)
-                        .Reference(cb => cb.ContentBlock)
-                        .LoadAsync()
-                );
-            return release;
+            return queryable
+                .AsSplitQuery()
+                .Include(r => r.Publication)
+                .Include(r => r.Content)
+                .ThenInclude(c => c.ContentSection)
+                .ThenInclude(c => c.Content)
+                .ThenInclude(cb => (cb as EmbedBlockLink)!.EmbedBlock)
+                .Include(r => r.Updates)
+                .Include(r => r.ContentBlocks)
+                .ThenInclude(r => r.ContentBlock);
         }
 
         private IList<MethodologyVersion> GetMethodologiesScheduledWithRelease(Guid releaseId)

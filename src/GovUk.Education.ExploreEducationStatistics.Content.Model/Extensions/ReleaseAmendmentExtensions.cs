@@ -106,6 +106,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                     case MarkDownBlock block:
                         block.Body = ReplaceContent(block.Body, regex, replacements);
                         break;
+
+                    case EmbedBlockLink block:
+                        block.EmbedBlock = block.EmbedBlock.Clone();
+                        break;
                 }
             }
         }

@@ -515,6 +515,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddTransient<IManageContentPageService, ManageContentPageService>();
             services.AddTransient<IContentService, ContentService>();
+            services.AddTransient<IEmbedBlockService, EmbedBlockService>();
             services.AddTransient<IReleaseContentBlockService, ReleaseContentBlockService>();
             services.AddTransient<ICommentService, CommentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();

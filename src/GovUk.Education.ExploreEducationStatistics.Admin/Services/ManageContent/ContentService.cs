@@ -164,6 +164,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         dataBlocks.ForEach(dataBlock =>
                             RemoveContentBlockFromContentSection(sectionToRemove, dataBlock, false));
 
+                        // NOTE: Need to remove rows in EmbedBlocks table associated with any removed EmbedBlockLinks
+                        var embedBlocksToRemoveIds = sectionToRemove
+                            .Content
+                            .OfType<EmbedBlockLink>()
+                            .Select(embedBlockLink => embedBlockLink.EmbedBlockId)
+                            .ToList();
+                        var embedBlocksToRemove = _context
+                            .EmbedBlocks
+                            .Where(embedBlock => embedBlocksToRemoveIds.Contains(embedBlock.Id))
+                            .ToList();
+                        _context.EmbedBlocks.RemoveRange(embedBlocksToRemove);
+
                         release.RemoveGenericContentSection(sectionToRemove);
                         _context.ContentSections.Remove(sectionToRemove);
 

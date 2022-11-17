@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.Serialization;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
@@ -108,7 +109,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid EmbedBlockId { get; set; }
 
-        public EmbedBlock? EmbedBlock { get; set; } // @MarkFix yes?
+        [JsonIgnore, IgnoreMap]
+        public EmbedBlock EmbedBlock { get; set; }
     }
 
     public class DataBlock : ContentBlock
