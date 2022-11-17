@@ -331,9 +331,8 @@ const ChartLegendConfiguration = ({
             </>
           )}
 
-          <div className="govuk-!-margin-bottom-6">
-            <h4>Legend items</h4>
-
+          <h4>Legend items</h4>
+          <div className={`${styles.container} govuk-!-margin-bottom-6`}>
             {form.values.items?.length > 0 ? (
               <>
                 {form.values.items?.map((dataSet, index) => {

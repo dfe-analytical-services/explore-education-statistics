@@ -1,5 +1,9 @@
 @import '~govuk-frontend/govuk/base';
 
+.container {
+  overflow-x: auto;
+}
+
 .item {
   border-bottom: 1px solid govuk-colour('mid-grey');
   margin-bottom: govuk-spacing(4);
@@ -23,6 +27,7 @@
 .labelInput {
   composes: configurationInput;
   flex-grow: 1;
+  min-width: 200px;
 }
 
 .colourInput {
