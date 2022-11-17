@@ -297,6 +297,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             filterGroups.ForEach(filterGroup => _importerFilterCache.AddFilterGroup(filterGroup, context));
             filterItems.ForEach(filterItem => _importerFilterCache.AddFilterItem(filterItem, context));
 
+            // Add any new Locations that are being introduced by this import process exclusively.  Other concurrent 
+            // import processes reaching this stage will wait before adding their own new Locations, if any.
+            //
+            // This ensures that we do not end up with duplicate Locations being added by separate processes, or let one 
+            // process continue on to the next stage of import before all Locations that it relies on have been
+            // persisted successfully by whichever import process introduced it first.
+            //
+            // This also lets us take advantage of the performance gains of saving new Locations in a single batch
+            // rather than in separate SaveChanges() calls, which introduces quite a penalty.
             await _databaseHelper.ExecuteWithExclusiveLock(
                 context, 
                 "Importer_AddNewLocations", 
