@@ -26,6 +26,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
@@ -191,7 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         providerOptions =>
                             providerOptions
                                 .MigrationsAssembly(typeof(Startup).Assembly.FullName)
-                                .EnableRetryOnFailure(6, TimeSpan.FromSeconds(30), new[] {0})
+                                .EnableCustomRetryOnFailure()
                             )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
@@ -202,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         providerOptions => 
                             providerOptions
                                 .MigrationsAssembly(typeof(Startup).Assembly.FullName)
-                                .EnableRetryOnFailure(6, TimeSpan.FromSeconds(30), new[] {0})
+                                .EnableCustomRetryOnFailure()
                         )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
@@ -214,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                             providerOptions
                                 .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
                                 .AddBulkOperationSupport()
-                                .EnableRetryOnFailure(6, TimeSpan.FromSeconds(5), new[] {0})
+                                .EnableCustomRetryOnFailure()
                             )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );

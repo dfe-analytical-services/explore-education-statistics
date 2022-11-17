@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
@@ -101,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                         providerOptions => 
                             providerOptions
                                 .MigrationsAssembly(typeof(Startup).Assembly.FullName)
-                                .EnableRetryOnFailure()
+                                .EnableCustomRetryOnFailure()
                             )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );

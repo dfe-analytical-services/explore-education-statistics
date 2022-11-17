@@ -5,6 +5,7 @@ using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -85,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                         providerOptions => 
                             providerOptions
                                 .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
-                                .EnableRetryOnFailure()
+                                .EnableCustomRetryOnFailure()
                             )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
@@ -96,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                         providerOptions => 
                             providerOptions
                                 .MigrationsAssembly(typeof(Startup).Assembly.FullName)
-                                .EnableRetryOnFailure()
+                                .EnableCustomRetryOnFailure()
                             )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
