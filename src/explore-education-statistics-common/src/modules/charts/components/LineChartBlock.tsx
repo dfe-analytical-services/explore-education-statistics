@@ -7,6 +7,7 @@ import {
   ChartDefinition,
   ChartProps,
   ChartSymbol,
+  LineChartDataLabelPosition,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
@@ -23,7 +24,7 @@ import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisD
 import { Dictionary } from '@common/types';
 import formatPretty from '@common/utils/number/formatPretty';
 import parseNumber from '@common/utils/number/parseNumber';
-import LineChartLegendLabel from '@common/modules/charts/components/LineChartLegendLabel';
+import LineChartLabel from '@common/modules/charts/components/LineChartLabel';
 import getUnit from '@common/modules/charts/util/getUnit';
 import React, { memo } from 'react';
 import {
@@ -69,6 +70,7 @@ const getLegendType = (
 };
 
 export interface LineChartProps extends ChartProps {
+  dataLabelPosition?: LineChartDataLabelPosition;
   legend: LegendConfiguration;
   axes: {
     major: AxisConfiguration;
@@ -85,6 +87,8 @@ const LineChartBlock = ({
   legend,
   width,
   includeNonNumericData,
+  showDataLabels,
+  dataLabelPosition,
 }: LineChartProps) => {
   const [legendProps, renderLegend] = useLegend();
 
@@ -200,24 +204,35 @@ const LineChartBlock = ({
               dot={getDot(config.symbol)}
               strokeWidth="2"
               strokeDasharray={lineStyles[config.lineStyle ?? 'solid']}
-              label={props =>
-                legend.position === 'inline' ? (
-                  <LineChartLegendLabel
-                    {...props}
-                    name={config.label}
-                    colour={config.colour}
-                    totalDataPoints={chartData.length}
-                    labelPosition={config.inlinePosition}
-                  />
-                ) : null
-              }
+              label={props => (
+                <LineChartLabel
+                  colour={config.colour}
+                  decimalPlaces={dataSet.indicator.decimalPlaces}
+                  index={props.index}
+                  isDataLabel={showDataLabels}
+                  isLegendLabel={legend.position === 'inline'}
+                  name={config.label}
+                  position={
+                    showDataLabels ? dataLabelPosition : config.inlinePosition
+                  }
+                  totalDataPoints={chartData.length}
+                  unit={dataSet.indicator.unit}
+                  value={props.value}
+                  x={props.x}
+                  y={props.y}
+                />
+              )}
             />
           ))}
 
           {axes.major.referenceLines?.map(referenceLine =>
             createReferenceLine({
+              axis: 'x',
+              axisType: 'major',
               chartData,
               label: referenceLine.label,
+              otherAxisDomain: minorDomainTicks.domain,
+              otherAxisPosition: referenceLine.otherAxisPosition,
               position: referenceLine.position,
               style: referenceLine.style,
               x: referenceLine.position,
@@ -226,8 +241,12 @@ const LineChartBlock = ({
 
           {axes.minor.referenceLines?.map(referenceLine =>
             createReferenceLine({
+              axis: 'y',
+              axisType: 'minor',
               chartData,
               label: referenceLine.label,
+              otherAxisDomain: majorDomainTicks.domain,
+              otherAxisPosition: referenceLine.otherAxisPosition,
               position: referenceLine.position,
               style: referenceLine.style,
               y: referenceLine.position,
@@ -267,6 +286,7 @@ export const lineChartBlockDefinition: ChartDefinition = {
   },
   axes: {
     major: {
+      axis: 'x',
       id: 'xaxis',
       title: 'X Axis (major axis)',
       type: 'major',
@@ -286,6 +306,7 @@ export const lineChartBlockDefinition: ChartDefinition = {
       },
     },
     minor: {
+      axis: 'y',
       id: 'yaxis',
       title: 'Y Axis (minor axis)',
       type: 'minor',
@@ -293,7 +314,6 @@ export const lineChartBlockDefinition: ChartDefinition = {
         canRotateLabel: true,
       },
       defaults: {
-        min: 0,
         showGrid: true,
         tickConfig: 'default',
         tickSpacing: 1,

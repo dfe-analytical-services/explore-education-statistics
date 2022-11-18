@@ -376,10 +376,13 @@ if args.prompt_to_continue:
 robotArgs += ["-v", "browser:" + args.browser]
 robotArgs += [args.tests]
 
+
 # Remove any existing test results if running from scratch
 if not args.rerun_failed_tests and not args.rerun_failed_suites and Path("test-results").exists():
     shutil.rmtree("test-results")
 
+if not os.path.exists("test-results/downloads"):
+    os.makedirs("test-results/downloads")
 try:
     # Run tests
     if args.interp == "robot":

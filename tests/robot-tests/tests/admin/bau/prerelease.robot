@@ -291,6 +291,10 @@ Validate prerelease has started
     user waits until element contains    id:releaseHeadlines    Test headlines summary text for ${PUBLICATION_NAME}
     ...    %{WAIT_SMALL}
 
+Validate contact banner is shown
+    user checks testid element contains    notificationBanner    If you have an enquiry about this release contact
+    user checks testid element contains    notificationBanner    UI test team name: ui_test@test.com
+
 Validate metadata guidance page
     user opens accordion section    Explore data and files
     user waits until h3 is visible    Open data

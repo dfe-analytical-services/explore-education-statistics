@@ -7,7 +7,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 {
     public interface ISplitFileService
     {
-        Task SplitDataFile(Guid importId);
+        Task SplitDataFileIfRequired(Guid importId);
 
         Task AddBatchDataFileMessages(
             Guid importId,

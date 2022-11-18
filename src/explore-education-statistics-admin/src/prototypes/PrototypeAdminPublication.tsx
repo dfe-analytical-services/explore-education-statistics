@@ -1,7 +1,7 @@
 import PageTitle from '@admin/components/PageTitle';
 import Link from '@admin/components/Link';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
-import React, { useState } from 'react';
+import React from 'react';
 import RelatedInformation from '@common/components/RelatedInformation';
 import ReleaseList from '@admin/prototypes/components/PrototypePublicationReleaseList';
 import Nav from '@admin/prototypes/components/PrototypeNavBarPublication';

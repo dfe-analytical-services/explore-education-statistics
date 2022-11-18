@@ -23,7 +23,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -68,11 +67,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                     options.Filters.Add(new OperationCancelledExceptionFilter());
                     options.EnableEndpointRouting = false;
                 })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
-                .AddNewtonsoftJson(options => {
+                .AddNewtonsoftJson(options =>
+                {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
-
+            
             services.AddControllers(
                 options =>
                 {

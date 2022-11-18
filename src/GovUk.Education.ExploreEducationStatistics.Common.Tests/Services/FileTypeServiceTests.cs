@@ -6,8 +6,10 @@ using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileTypeService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
@@ -221,7 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         
         private static void AssertMimeTypeCorrect(FileInfo fileInfo)
         {
-            var service = new FileTypeService();
+            var service = new FileTypeService(Mock.Of<ILogger<FileTypeService>>());
 
             var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 "Resources" + Path.DirectorySeparatorChar + fileInfo.Filename);
@@ -240,7 +242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         private static void AssertHasMatchingMimeType(FileInfo fileInfo, List<Regex> availableMimeTypes, 
             bool expectedToSucceed)
         {
-            var service = new FileTypeService();
+            var service = new FileTypeService(Mock.Of<ILogger<FileTypeService>>());
 
             var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 "Resources" + Path.DirectorySeparatorChar + fileInfo.Filename);

@@ -5,7 +5,10 @@ import {
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { verticalBarBlockDefinition } from '@common/modules/charts/components/VerticalBarBlock';
-import { AxisConfiguration } from '@common/modules/charts/types/chart';
+import {
+  AxesConfiguration,
+  AxisConfiguration,
+} from '@common/modules/charts/types/chart';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -33,7 +36,7 @@ describe('ChartAxisConfiguration', () => {
     },
   };
 
-  const testAxisConfiguration: AxisConfiguration = {
+  const testMajorAxisConfiguration: AxisConfiguration = {
     dataSets: [
       {
         indicator: 'authorised-absence-sessions',
@@ -84,6 +87,17 @@ describe('ChartAxisConfiguration', () => {
       text: '',
     },
   };
+  const testMinorAxisConfiguration: AxisConfiguration = {
+    dataSets: [],
+    type: 'minor',
+    referenceLines: [],
+    visible: true,
+  };
+
+  const testAxesConfiguration: AxesConfiguration = {
+    major: testMajorAxisConfiguration,
+    minor: testMinorAxisConfiguration,
+  };
 
   const testTable = testFullTable;
 
@@ -93,7 +107,7 @@ describe('ChartAxisConfiguration', () => {
         <ChartAxisConfiguration
           id="chartBuilder-major"
           type="major"
-          configuration={testAxisConfiguration}
+          axesConfiguration={testAxesConfiguration}
           definition={verticalBarBlockDefinition}
           data={testTable.results}
           meta={testTable.subjectMeta}
@@ -193,7 +207,7 @@ describe('ChartAxisConfiguration', () => {
         <ChartAxisConfiguration
           id="chartBuilder-major"
           type="major"
-          configuration={testAxisConfiguration}
+          axesConfiguration={testAxesConfiguration}
           definition={verticalBarBlockDefinition}
           data={testTable.results}
           meta={testTable.subjectMeta}
@@ -211,7 +225,7 @@ describe('ChartAxisConfiguration', () => {
     userEvent.type(sizeInput, '20');
 
     expect(handleChange).toHaveBeenCalledWith<[AxisConfiguration]>({
-      ...testAxisConfiguration,
+      ...testMajorAxisConfiguration,
       size: 20,
     });
   });
@@ -222,7 +236,7 @@ describe('ChartAxisConfiguration', () => {
         <ChartAxisConfiguration
           id="chartBuilder-major"
           type="major"
-          configuration={testAxisConfiguration}
+          axesConfiguration={testAxesConfiguration}
           definition={verticalBarBlockDefinition}
           data={testTable.results}
           meta={testTable.subjectMeta}
@@ -262,7 +276,7 @@ describe('ChartAxisConfiguration', () => {
         <ChartAxisConfiguration
           id="chartBuilder-major"
           type="major"
-          configuration={testAxisConfiguration}
+          axesConfiguration={testAxesConfiguration}
           definition={verticalBarBlockDefinition}
           data={testTable.results}
           meta={testTable.subjectMeta}
@@ -290,7 +304,7 @@ describe('ChartAxisConfiguration', () => {
         <ChartAxisConfiguration
           id="chartBuilder-major"
           type="major"
-          configuration={testAxisConfiguration}
+          axesConfiguration={testAxesConfiguration}
           definition={verticalBarBlockDefinition}
           data={testTable.results}
           meta={testTable.subjectMeta}
@@ -320,7 +334,7 @@ describe('ChartAxisConfiguration', () => {
         <ChartAxisConfiguration
           id="chartBuilder-major"
           type="major"
-          configuration={testAxisConfiguration}
+          axesConfiguration={testAxesConfiguration}
           definition={verticalBarBlockDefinition}
           data={testTable.results}
           meta={testTable.subjectMeta}
@@ -349,7 +363,7 @@ describe('ChartAxisConfiguration', () => {
         <ChartAxisConfiguration
           id="chartBuilder-major"
           type="major"
-          configuration={testAxisConfiguration}
+          axesConfiguration={testAxesConfiguration}
           definition={verticalBarBlockDefinition}
           data={testTable.results}
           meta={testTable.subjectMeta}
@@ -368,7 +382,7 @@ describe('ChartAxisConfiguration', () => {
 
     await waitFor(() => {
       const formValues: AxisConfiguration = {
-        dataSets: testAxisConfiguration.dataSets,
+        dataSets: testMajorAxisConfiguration.dataSets,
         groupBy: 'timePeriod',
         min: 0,
         max: undefined,
@@ -399,7 +413,7 @@ describe('ChartAxisConfiguration', () => {
           <ChartAxisConfiguration
             id="chartBuilder-major"
             type="major"
-            configuration={testAxisConfiguration}
+            axesConfiguration={testAxesConfiguration}
             definition={verticalBarBlockDefinition}
             data={testTable.results}
             meta={testTable.subjectMeta}
@@ -417,7 +431,7 @@ describe('ChartAxisConfiguration', () => {
 
       await waitFor(() => {
         const formValues: AxisConfiguration = {
-          dataSets: testAxisConfiguration.dataSets,
+          dataSets: testMajorAxisConfiguration.dataSets,
           groupBy: 'locations',
           groupByFilter: '',
           min: 0,
@@ -448,7 +462,7 @@ describe('ChartAxisConfiguration', () => {
           <ChartAxisConfiguration
             id="chartBuilder-major"
             type="major"
-            configuration={testAxisConfiguration}
+            axesConfiguration={testAxesConfiguration}
             definition={verticalBarBlockDefinition}
             data={testTable.results}
             meta={testTable.subjectMeta}
@@ -470,7 +484,7 @@ describe('ChartAxisConfiguration', () => {
 
       await waitFor(() => {
         const formValues: AxisConfiguration = {
-          dataSets: testAxisConfiguration.dataSets,
+          dataSets: testMajorAxisConfiguration.dataSets,
           groupBy: 'filters',
           groupByFilter: 'school_type',
           min: 0,
@@ -501,7 +515,7 @@ describe('ChartAxisConfiguration', () => {
           <ChartAxisConfiguration
             id="chartBuilder-major"
             type="major"
-            configuration={testAxisConfiguration}
+            axesConfiguration={testAxesConfiguration}
             definition={verticalBarBlockDefinition}
             data={testTable.results}
             meta={testTable.subjectMeta}
@@ -555,11 +569,7 @@ describe('ChartAxisConfiguration', () => {
           <ChartAxisConfiguration
             id="chartBuilder-major"
             type="minor"
-            configuration={{
-              ...testAxisConfiguration,
-              type: 'minor',
-              groupBy: undefined,
-            }}
+            axesConfiguration={testAxesConfiguration}
             definition={verticalBarBlockDefinition}
             data={testTable.results}
             meta={testTable.subjectMeta}
@@ -603,7 +613,7 @@ describe('ChartAxisConfiguration', () => {
           <ChartAxisConfiguration
             id="chartBuilder-major"
             type="major"
-            configuration={testAxisConfiguration}
+            axesConfiguration={testAxesConfiguration}
             definition={verticalBarBlockDefinition}
             data={testTable.results}
             meta={testTable.subjectMeta}
@@ -640,7 +650,7 @@ describe('ChartAxisConfiguration', () => {
 
       await waitFor(() => {
         const formValues: AxisConfiguration = {
-          dataSets: testAxisConfiguration.dataSets,
+          dataSets: testMajorAxisConfiguration.dataSets,
           groupBy: 'timePeriod',
           min: 0,
           max: undefined,
@@ -676,12 +686,15 @@ describe('ChartAxisConfiguration', () => {
           <ChartAxisConfiguration
             id="chartBuilder-major"
             type="major"
-            configuration={{
-              ...testAxisConfiguration,
-              referenceLines: [
-                { position: '2014_AY', label: 'Test label 1' },
-                { position: '2015_AY', label: 'Test label 2' },
-              ],
+            axesConfiguration={{
+              major: {
+                ...testMajorAxisConfiguration,
+                referenceLines: [
+                  { position: '2014_AY', label: 'Test label 1' },
+                  { position: '2015_AY', label: 'Test label 2' },
+                ],
+              },
+              minor: testMinorAxisConfiguration,
             }}
             definition={verticalBarBlockDefinition}
             data={testTable.results}
@@ -728,12 +741,15 @@ describe('ChartAxisConfiguration', () => {
           <ChartAxisConfiguration
             id="chartBuilder-major"
             type="major"
-            configuration={{
-              ...testAxisConfiguration,
-              referenceLines: [
-                { position: '2014_AY', label: 'Test label 1' },
-                { position: '2015_AY', label: 'Test label 2' },
-              ],
+            axesConfiguration={{
+              major: {
+                ...testMajorAxisConfiguration,
+                referenceLines: [
+                  { position: '2014_AY', label: 'Test label 1' },
+                  { position: '2015_AY', label: 'Test label 2' },
+                ],
+              },
+              minor: testMinorAxisConfiguration,
             }}
             definition={verticalBarBlockDefinition}
             data={testTable.results}
@@ -761,7 +777,7 @@ describe('ChartAxisConfiguration', () => {
 
       await waitFor(() => {
         const formValues: AxisConfiguration = {
-          dataSets: testAxisConfiguration.dataSets,
+          dataSets: testMajorAxisConfiguration.dataSets,
           groupBy: 'timePeriod',
           min: 0,
           max: undefined,
@@ -791,18 +807,24 @@ describe('ChartAxisConfiguration', () => {
           <ChartAxisConfiguration
             id="chartBuilder-major"
             type="major"
-            configuration={{
-              ...testAxisConfiguration,
-              referenceLines: [
-                { position: '2014_AY', label: 'Test label 1' },
-                { position: '2015_AY', label: 'Test label 2' },
-                { position: 'barnet', label: 'Test label 3' },
-                {
-                  position: 'authorised-absence-sessions',
-                  label: 'Test label 3',
-                },
-                { position: 'ethnicity-major-chinese', label: 'Test label 4' },
-              ],
+            axesConfiguration={{
+              major: {
+                ...testMajorAxisConfiguration,
+                referenceLines: [
+                  { position: '2014_AY', label: 'Test label 1' },
+                  { position: '2015_AY', label: 'Test label 2' },
+                  { position: 'barnet', label: 'Test label 3' },
+                  {
+                    position: 'authorised-absence-sessions',
+                    label: 'Test label 3',
+                  },
+                  {
+                    position: 'ethnicity-major-chinese',
+                    label: 'Test label 4',
+                  },
+                ],
+              },
+              minor: testMinorAxisConfiguration,
             }}
             definition={verticalBarBlockDefinition}
             data={testTable.results}
@@ -819,7 +841,7 @@ describe('ChartAxisConfiguration', () => {
 
       await waitFor(() => {
         const formValues: AxisConfiguration = {
-          dataSets: testAxisConfiguration.dataSets,
+          dataSets: testMajorAxisConfiguration.dataSets,
           groupBy: 'timePeriod',
           min: 0,
           max: undefined,
@@ -853,14 +875,15 @@ describe('ChartAxisConfiguration', () => {
           <ChartAxisConfiguration
             id="chartBuilder-minor"
             type="minor"
-            configuration={{
-              ...testAxisConfiguration,
-              groupBy: undefined,
-              type: 'minor',
-              referenceLines: [
-                { position: 1000, label: 'Test label 1' },
-                { position: 2000, label: 'Test label 2' },
-              ],
+            axesConfiguration={{
+              major: testMajorAxisConfiguration,
+              minor: {
+                ...testMinorAxisConfiguration,
+                referenceLines: [
+                  { position: 1000, label: 'Test label 1' },
+                  { position: 2000, label: 'Test label 2' },
+                ],
+              },
             }}
             definition={verticalBarBlockDefinition}
             data={testTable.results}
@@ -877,26 +900,11 @@ describe('ChartAxisConfiguration', () => {
 
       await waitFor(() => {
         const formValues: AxisConfiguration = {
-          dataSets: testAxisConfiguration.dataSets,
-          groupBy: undefined,
-          min: 0,
-          max: undefined,
+          ...testMinorAxisConfiguration,
           referenceLines: [
             { position: 1000, label: 'Test label 1' },
             { position: 2000, label: 'Test label 2' },
           ],
-          showGrid: true,
-          size: 50,
-          sortAsc: true,
-          sortBy: 'name',
-          tickConfig: 'default',
-          tickSpacing: 1,
-          type: 'minor',
-          visible: true,
-          unit: '',
-          label: {
-            text: '',
-          },
         };
         expect(handleSubmit).toHaveBeenCalledWith(formValues);
       });

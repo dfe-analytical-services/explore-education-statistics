@@ -4,7 +4,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -24,7 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvcCore(options => { options.EnableEndpointRouting = false; })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddNewtonsoftJson(
                     options => { options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore; }
                 );

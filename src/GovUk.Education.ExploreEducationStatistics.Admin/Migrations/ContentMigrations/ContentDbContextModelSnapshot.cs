@@ -295,6 +295,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.ToTable("Files");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.FreeTextRank", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Rank")
+                        .HasColumnType("int");
+
+                    b.ToTable((string)null);
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.GlossaryEntry", b =>
                 {
                     b.Property<Guid>("Id")
@@ -766,6 +777,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<DateTime?>("NotifiedOn")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("NotifyReleaseApprovers")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("NotifySubscribers")
                         .HasColumnType("bit");

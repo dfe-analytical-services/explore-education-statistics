@@ -8,8 +8,8 @@ import testData from '../../testData';
 import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
 import createDataService from '../../../utils/dataService';
-import constants from '../../../utils/constants';
 import utils from '../../../utils/utils';
+import loggingUtils from '../../../utils/loggingUtils';
 
 const tearDownData = false;
 const publicationTitle =
@@ -166,12 +166,7 @@ export function setup(): SetupData {
 
   const { subjectMeta } = adminService.getSubjectMeta({ releaseId, subjectId });
 
-  console.log(
-    `\n\nEES performance results available at: ${constants.grafanaEesDashboardUrl}`,
-  );
-  console.log(
-    `generic performance results available at: ${constants.grafanaGenericDashboardUrl}\n\n`,
-  );
+  loggingUtils.logDashboardUrls();
 
   return {
     themeId,

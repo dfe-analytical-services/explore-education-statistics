@@ -8,7 +8,6 @@ interface Props {
   type: string;
   slug: string;
   theme: string;
-  topic: string;
 }
 
 const PrototypeSearchResult = ({
@@ -18,7 +17,6 @@ const PrototypeSearchResult = ({
   type,
   slug,
   theme,
-  topic,
 }: Props) => {
   return (
     <>

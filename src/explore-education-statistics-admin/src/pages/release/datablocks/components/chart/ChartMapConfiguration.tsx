@@ -1,5 +1,4 @@
 import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/chart/ChartBuilderSaveActions';
-import ChartMapCustomGroupsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartMapCustomGroupsConfiguration';
 import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { ChartOptions } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import Effect from '@common/components/Effect';
@@ -20,7 +19,6 @@ import { Formik } from 'formik';
 import mapValues from 'lodash/mapValues';
 import merge from 'lodash/merge';
 import omit from 'lodash/omit';
-import orderBy from 'lodash/orderBy';
 import pick from 'lodash/pick';
 import React, { ReactNode, useCallback, useMemo } from 'react';
 import { StringSchema } from 'yup';
@@ -46,7 +44,8 @@ interface Props {
 
 export default function ChartMapConfiguration({
   buttons,
-  dataSetsUnits = [],
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  dataSetsUnits = [], // EES-3858
   meta,
   options,
   onBoundaryLevelChange,
@@ -55,12 +54,12 @@ export default function ChartMapConfiguration({
 }: Props) {
   const {
     hasSubmitted,
-    isValid,
     updateForm,
     submitForms,
   } = useChartBuilderFormsContext();
 
-  const hasMixedUnits = !dataSetsUnits.every(unit => unit === dataSetsUnits[0]);
+  // EES-3858 - removed until feature is reimplemented
+  // const hasMixedUnits = !dataSetsUnits.every(unit => unit === dataSetsUnits[0]);
 
   const validationSchema = useMemo(() => {
     let schema = Yup.object<FormValues>({

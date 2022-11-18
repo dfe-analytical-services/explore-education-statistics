@@ -56,7 +56,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.Routing;
@@ -167,7 +166,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     options.EnableEndpointRouting = false;
                     options.AllowEmptyInputInBodyModelBinding = true;
                 })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddNewtonsoftJson(options =>
                 {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;

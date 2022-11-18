@@ -48,7 +48,7 @@ Check publication owner can upload subject file
 
 Check publication owner can add data guidance to ${SUBJECT_NAME}
     user clicks link    Data guidance
-    user waits until page does not contain loading spinner
+    user waits until h2 is visible    Public data guidance    %{WAIT_SMALL}
     user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    ${SUBJECT_NAME}
     user enters text into data guidance data file content editor    ${SUBJECT_NAME}
@@ -81,7 +81,7 @@ Go to "Sign off" page
     user clicks button    Edit release status
 
 Check publication owner can edit release status to "Ready for higher review"
-    user clicks radio    Ready for higher review
+    user clicks radio    Ready for higher review (this will notify release approvers)
     user enters text into element    id:releaseStatusForm-latestInternalReleaseNote
     ...    ready for higher review (publication owner)
     user clicks button    Update status
@@ -129,7 +129,7 @@ Check publication owner can upload subject file on new release
 
 Check publication owner can add data guidance to ${SUBJECT_NAME} on new release
     user clicks link    Data guidance
-    user waits until page does not contain loading spinner
+    user waits until h2 is visible    Public data guidance    %{WAIT_SMALL}
     user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    ${SUBJECT_NAME}
     user enters text into data guidance data file content editor    ${SUBJECT_NAME}

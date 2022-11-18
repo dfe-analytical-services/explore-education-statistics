@@ -1,15 +1,16 @@
+import styles from '@admin/pages/release/datablocks/components/chart/ChartReferenceLinesConfiguration.module.scss';
 import Button from '@common/components/Button';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import Tooltip from '@common/components/Tooltip';
 import {
-  AxisType,
-  ChartDefinition,
+  ChartDefinitionAxis,
   ReferenceLine,
   ReferenceLineStyle,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
+import { MinorAxisDomainValues } from '@common/modules/charts/util/domainTicks';
 import Yup from '@common/validation/yup';
 import FormSelect, {
   SelectOption,
@@ -20,31 +21,32 @@ import React, { useMemo } from 'react';
 
 interface AddFormValues {
   label: string;
+  otherAxisPosition?: number;
   position: string | number;
   style: ReferenceLineStyle;
 }
 
 export interface ChartReferenceLinesConfigurationProps {
-  axisType: AxisType;
+  axisDefinition?: ChartDefinitionAxis;
   dataSetCategories: DataSetCategory[];
-  definition: ChartDefinition;
-  id: string;
   lines: ReferenceLine[];
+  minorAxisDomain?: MinorAxisDomainValues;
   onAddLine: (line: ReferenceLine) => void;
   onRemoveLine: (line: ReferenceLine) => void;
 }
 
 export default function ChartReferenceLinesConfiguration({
-  axisType,
+  axisDefinition,
   dataSetCategories,
-  definition,
-  id,
   lines,
+  minorAxisDomain,
   onAddLine,
   onRemoveLine,
 }: ChartReferenceLinesConfigurationProps) {
+  const { axis, referenceLineDefaults, type } = axisDefinition || {};
+
   const options = useMemo<SelectOption[]>(() => {
-    if (axisType === 'minor') {
+    if (type === 'minor') {
       return [];
     }
 
@@ -52,7 +54,7 @@ export default function ChartReferenceLinesConfiguration({
       label: filter.label,
       value: filter.value,
     }));
-  }, [axisType, dataSetCategories]);
+  }, [type, dataSetCategories]);
 
   const filteredOptions = useMemo<SelectOption[]>(() => {
     return options.filter(option =>
@@ -61,7 +63,7 @@ export default function ChartReferenceLinesConfiguration({
   }, [lines, options]);
 
   const referenceLines = useMemo(() => {
-    if (axisType === 'major') {
+    if (type === 'major') {
       return (
         lines?.filter(line =>
           options.some(option => option.value === line.position),
@@ -70,17 +72,15 @@ export default function ChartReferenceLinesConfiguration({
     }
 
     return lines ?? [];
-  }, [axisType, lines, options]);
+  }, [type, lines, options]);
 
   const getPositionLabel = (position: string | number) => {
-    if (axisType === 'major') {
+    if (type === 'major') {
       return options.find(option => option.value === position)?.label;
     }
 
     return position;
   };
-
-  const axisDefinition = definition.axes[axisType];
 
   return (
     <table className="govuk-table">
@@ -88,16 +88,31 @@ export default function ChartReferenceLinesConfiguration({
       <thead>
         <tr>
           <th>Position</th>
-          <th>Label</th>
+          <th>
+            {axis === 'x' ? 'Y axis position' : 'X axis position'}
+            {type === 'minor' && (
+              <>
+                <br />
+                <span className="govuk-hint govuk-!-font-size-16 govuk-!-margin-bottom-0">
+                  0% = start of axis
+                </span>
+              </>
+            )}
+          </th>
+          <th className="govuk-!-width-one-third">Label</th>
           <th>Style</th>
-          <th className="dfe-align--right">Actions</th>
+          <th className={`dfe-align--right ${styles.actions}`}>Actions</th>
         </tr>
       </thead>
       <tbody>
         {referenceLines.map(line => (
           <tr key={`${line.label}_${line.position}`}>
             <td>{getPositionLabel(line.position)}</td>
-            <td>{line.label}</td>
+            <td>
+              {line.otherAxisPosition &&
+                `${line.otherAxisPosition}${type === 'minor' ? '%' : ''}`}
+            </td>
+            <td className="govuk-!-width-one-third">{line.label}</td>
             <td>{upperFirst(line.style)}</td>
             <td>
               <Button
@@ -112,17 +127,51 @@ export default function ChartReferenceLinesConfiguration({
             </td>
           </tr>
         ))}
-        {(filteredOptions.length > 0 || axisType === 'minor') && (
+        {(filteredOptions.length > 0 || type === 'minor') && (
           <Formik<AddFormValues>
             initialValues={{
               label: '',
               position: '',
               style: 'dashed',
-              ...(axisDefinition?.referenceLineDefaults ?? {}),
+              ...(referenceLineDefaults ?? {}),
             }}
             validationSchema={Yup.object<AddFormValues>({
               label: Yup.string().required('Enter label'),
-              position: Yup.string().required('Enter position'),
+              otherAxisPosition: Yup.number().test({
+                name: 'otherAxisPosition',
+                message:
+                  type === 'minor'
+                    ? 'Enter a percentage between 0 and 100%'
+                    : `Enter a position within the ${
+                        axis === 'x' ? 'Y' : 'X'
+                      } axis min/max range`,
+                test: (value: number) => {
+                  if (typeof value !== 'number') {
+                    return true;
+                  }
+                  if (type === 'minor') {
+                    return value >= 0 && value <= 100;
+                  }
+                  return minorAxisDomain
+                    ? value >= minorAxisDomain?.min &&
+                        value <= minorAxisDomain.max
+                    : true;
+                },
+              }),
+              position: Yup.string()
+                .required('Enter position')
+                .test({
+                  name: 'axisPosition',
+                  message: `Enter a position within the ${
+                    axis === 'x' ? 'X' : 'Y'
+                  } axis min/max range`,
+                  test: (value: number) => {
+                    return type === 'minor' && minorAxisDomain
+                      ? value >= minorAxisDomain?.min &&
+                          value <= minorAxisDomain.max
+                      : true;
+                  },
+                }),
               style: Yup.string()
                 .required('Enter style')
                 .oneOf<ReferenceLineStyle>(['dashed', 'solid', 'none']),
@@ -135,10 +184,10 @@ export default function ChartReferenceLinesConfiguration({
             {addForm => (
               <tr>
                 <td className="dfe-vertical-align--bottom">
-                  {axisType === 'major' ? (
+                  {type === 'major' ? (
                     <FormFieldSelect
                       name="position"
-                      id={`${id}-referenceLines-position`}
+                      id="referenceLines-position"
                       label="Position"
                       formGroup={false}
                       hideLabel
@@ -149,7 +198,7 @@ export default function ChartReferenceLinesConfiguration({
                   ) : (
                     <FormFieldNumberInput
                       name="position"
-                      id={`${id}-referenceLines-position`}
+                      id="referenceLines-position"
                       label="Position"
                       formGroup={false}
                       hideLabel
@@ -157,9 +206,23 @@ export default function ChartReferenceLinesConfiguration({
                   )}
                 </td>
                 <td className="dfe-vertical-align--bottom">
+                  <FormFieldNumberInput
+                    name="otherAxisPosition"
+                    id="referenceLines-otherAxisPosition"
+                    label={axis === 'x' ? 'Y axis position' : 'X axis position'}
+                    formGroup={false}
+                    hideLabel
+                    hint={
+                      type === 'major'
+                        ? 'Value (leave blank for default)'
+                        : 'Percent (leave blank for default)'
+                    }
+                  />
+                </td>
+                <td className="govuk-!-width-one-third dfe-vertical-align--bottom">
                   <FormFieldTextInput
                     name="label"
-                    id={`${id}-referenceLines-label`}
+                    id="referenceLines-label"
                     label="Label"
                     formGroup={false}
                     hideLabel
@@ -168,7 +231,7 @@ export default function ChartReferenceLinesConfiguration({
                 <td className="dfe-vertical-align--bottom">
                   <FormFieldSelect
                     name="style"
-                    id={`${id}-referenceLines-style`}
+                    id="referenceLines-style"
                     label="Style"
                     formGroup={false}
                     hideLabel

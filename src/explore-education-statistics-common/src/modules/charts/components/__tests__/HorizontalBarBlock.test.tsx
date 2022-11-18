@@ -24,6 +24,7 @@ describe('HorizontalBarBlock', () => {
     axes: testChartConfiguration.axes as VerticalBarProps['axes'],
     meta: fullTable.subjectMeta,
     data: fullTable.results,
+    dataLabelPosition: 'inside',
   };
 
   const { axes } = props;

@@ -12,21 +12,6 @@ import NavBar from './components/PrototypeNavBar';
 import styles from './PrototypePublicPage.module.scss';
 
 const PrototypeReleaseSummary = () => {
-  const errorTally = (
-    <div className="dfe-fle">
-      <Tag colour="red" className="govuk-!-margin-right-1">
-        2 Errors
-      </Tag>
-      <Tag colour="orange" className="govuk-!-margin-right-1">
-        3 Warnings
-      </Tag>
-      <Tag colour="grey" className="govuk-!-margin-right-2">
-        3 Unresolved comments
-      </Tag>
-      <span className="govuk-body-s ">Show more detail</span>
-    </div>
-  );
-
   return (
     <div className={styles.prototypeAdminPage}>
       <PrototypePage

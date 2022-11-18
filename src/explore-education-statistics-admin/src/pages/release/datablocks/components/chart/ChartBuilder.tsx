@@ -333,6 +333,7 @@ const ChartBuilder = ({
                     submitError={submitError}
                     definition={definition}
                     chartOptions={options}
+                    legendPosition={legend?.position}
                     onChange={handleChartConfigurationChange}
                     onSubmit={actions.updateChartOptions}
                   />
@@ -386,6 +387,7 @@ const ChartBuilder = ({
                     definition={definition}
                     legend={legend}
                     meta={meta}
+                    showDataLabels={options?.showDataLabels}
                     onChange={handleLegendConfigurationChange}
                     onSubmit={actions.updateChartLegend}
                   />
@@ -412,10 +414,10 @@ const ChartBuilder = ({
                       headingTitle={axis.title}
                     >
                       <ChartAxisConfiguration
+                        axesConfiguration={axes}
                         buttons={deleteButton}
                         id={`chartAxisConfiguration-${type}`}
                         type={type as AxisType}
-                        configuration={axisConfiguration}
                         definition={definition}
                         data={data}
                         meta={meta}

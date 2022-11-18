@@ -376,6 +376,13 @@
       "type": "securestring",
       "defaultValue": "change-me"
     },
+    "notifyReleaseApproversTemplateId": {
+      "type": "securestring",
+      "defaultValue": "change-me",
+      "metadata": {
+        "description": "Gov UK Notify service template ID for release approver notifications"
+      }
+    },
     "teamEmailAddresses": {
       "type": "array",
       "defaultValue": [
@@ -513,19 +520,6 @@
         "description": "Prerelease end time as number of minutes before a release is scheduled to be published"
       }
     },
-    "publisherClientId": {
-      "type": "string",
-      "metadata": {
-        "description": "Publisher Active Directory Application Client Id used for authentication requests"
-      }
-    },
-    "publisherClientSecret": {
-      "type": "string",
-      "metadata": {
-        "description": "Publisher Active Directory Application Client secret used to prove its identity during authentication requests"
-      }
-    },
-
     "publisherPipelineName": {
       "type": "string",
       "defaultValue": "pl_release_statistics",
@@ -1798,6 +1792,7 @@
         "NotifyReleaseRoleTemplateId": "[parameters('notifyReleaseRoleTemplateId')]",
         "NotifyPreReleaseTemplateId": "[parameters('notifyPreReleaseTemplateId')]",
         "NotifyContributorTemplateId": "[parameters('notifyContributorTemplateId')]",
+        "NotifyReleaseApproversTemplateId": "[parameters('notifyReleaseApproversTemplateId')]",
         "AdminUri": "[parameters('adminUri')]",
         "Azure:SignalR:ConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-signalr-admin-connectionstring'), '2018-02-14').secretUriWithVersion, ')')]",
         "PublicAppUrl": "[variables('publicAppUrl')]",
@@ -3271,12 +3266,12 @@
       ],
       "properties": {
         "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
-        "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",        
+        "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
         "AzureWebJobs.PublishReleaseData.Disabled": "[parameters('publishReleaseDataFunctionDisabled')]",
         "PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
         "PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
-        "ClientId": "[parameters('publisherClientId')]",
-        "ClientSecret": "[parameters('publisherClientSecret')]",
+        "ClientId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-publisher-clientid'), '2022-07-01').secretUriWithVersion, ')')]",
+        "ClientSecret": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-publisher-clientsecret'), '2022-07-01').secretUriWithVersion, ')')]",
         "DataFactoryName": "[variables('dataFactoryName')]",
         "PipelineName": "[parameters('publisherPipelineName')]",
         "ResourceGroupName": "[resourceGroup().name]",

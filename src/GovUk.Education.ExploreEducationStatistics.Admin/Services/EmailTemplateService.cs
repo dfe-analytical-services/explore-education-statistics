@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -65,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return _emailService.SendEmail(email, template, emailValues);
         }
-
+        
         public Either<ActionResult, Unit> SendPublicationRoleEmail(
             string email,
             Publication publication,
@@ -101,6 +100,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {"release", release.Title}
             };
 
+            return _emailService.SendEmail(email, template, emailValues);
+        }
+        
+        public Either<ActionResult, Unit> SendReleaseApproverEmail(string email, Release release)
+        {
+            var uri = _configuration.GetValue<string>("AdminUri");
+            var template = _configuration.GetValue<string>("NotifyReleaseApproversTemplateId");
+            
+            var emailValues = new Dictionary<string, dynamic>
+            {
+                {"url", $"https://{uri}/publication/{release.Publication.Id}/release/{release.Id}/summary"},
+                {"publication", release.Publication.Title},
+                {"release", release.Title},
+            };
+            
             return _emailService.SendEmail(email, template, emailValues);
         }
     }

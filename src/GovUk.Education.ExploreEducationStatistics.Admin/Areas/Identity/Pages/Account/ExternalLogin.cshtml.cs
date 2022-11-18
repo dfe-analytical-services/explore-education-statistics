@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
     public class ExternalLoginModel : PageModel
     {
         private const string LoginErrorMessage = "Sorry, there was a problem logging you in.";
-        
+
         private readonly ISignInManagerDelegate _signInManager;
         private readonly IUserManagerDelegate _userManager;
         private readonly ContentDbContext _contentDbContext;
@@ -68,25 +68,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             return new ChallengeResult(provider, properties);
         }
 
-        public async Task<IActionResult> OnGetCallbackAsync(string providedReturnUrl = null, string remoteError = null)
+        // NOTE: Argument names are important - e.g. if `returnUrl`'s name is changed, the returnUrl will always be null
+        public async Task<IActionResult> OnGetCallbackAsync(string returnUrl = null, string remoteError = null)
         {
-            var returnUrl = providedReturnUrl ?? Url.Content("~/");
-            
+            var returnUrlOrFallback = returnUrl ?? Url.Content("~/");
+
             if (remoteError != null)
             {
                 _logger.LogError("An error was received form the external Identity Provider. " +
                                  "Unable to log user in - {RemoteError}", remoteError);
-                return RedirectToLoginPageWithError(returnUrl);
+                return RedirectToLoginPageWithError(returnUrlOrFallback);
             }
 
             // Get the provided login information from the external Identity Provider (IdP).
             var info = await _signInManager.GetExternalLoginInfoAsync();
-            
+
             if (info == null)
             {
-                _logger.LogError("Unable to retrieve any login information from external Identity Provider." + 
+                _logger.LogError("Unable to retrieve any login information from external Identity Provider." +
                                  "Unable to log user in");
-                return RedirectToLoginPageWithError(returnUrl);
+                return RedirectToLoginPageWithError(returnUrlOrFallback);
             }
 
             // See if we have previously-recorded login details that match the details we have been provided by the
@@ -94,14 +95,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             var existingMatchingLoginDetails = await _usersAndRolesDbContext
                 .UserLogins
                 .AsQueryable()
-                .SingleOrDefaultAsync(login => login.ProviderKey == info.ProviderKey 
+                .SingleOrDefaultAsync(login => login.ProviderKey == info.ProviderKey
                                                && login.LoginProvider == info.LoginProvider);
 
             // If we've had a successful login in the past with this set of IdP credentials, log the user in using
             // these credentials.
             if (existingMatchingLoginDetails != null)
             {
-                return await HandleLoginWithRecognisedProviderDetails(returnUrl, info);
+                return await HandleLoginWithRecognisedProviderDetails(returnUrlOrFallback, info);
             }
 
             // Gather some user information from the Claims given to the service from the External IdP.
@@ -114,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                 _logger.LogError(
                     "No Email Claim was provided by the external Identity Provider in either the " +
                     "{EmailClaimType} or {NameClaimType} claims", ClaimTypes.Email, ClaimTypes.Name);
-                return RedirectToLoginPageWithError(returnUrl);
+                return RedirectToLoginPageWithError(returnUrlOrFallback);
             }
 
             // See if we have an existing AspNetUsers user with this email address already in the system.
@@ -127,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
 
             if (existingAspNetUser != null)
             {
-                return await HandleLoginExistingUser(returnUrl, existingAspNetUser, info);
+                return await HandleLoginExistingUser(returnUrlOrFallback, existingAspNetUser, info);
             }
 
             // Otherwise, the user does not yet exist in the service, and these login details from the IdP are
@@ -146,18 +147,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             if (inviteToSystem != null)
             {
                 return await HandleNewInvitedUser(
-                    inviteToSystem, 
-                    userDetails.email, 
-                    userDetails.firstName, 
-                    userDetails.lastName, 
+                    inviteToSystem,
+                    userDetails.email,
+                    userDetails.firstName,
+                    userDetails.lastName,
                     info,
-                    returnUrl);
+                    returnUrlOrFallback);
             }
 
             _logger.LogError(
                 "No existing user with a matching email address exists in the system, nor is the user invited " +
                 "to use the system.  Unable to log user in");
-            return RedirectToLoginPageWithError(returnUrl);
+            return RedirectToLoginPageWithError(returnUrlOrFallback);
         }
 
         private async Task<IActionResult> HandleLoginWithRecognisedProviderDetails(string returnUrl, ExternalLoginInfo info)
@@ -173,8 +174,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
         }
 
         private async Task<IActionResult> HandleLoginExistingUser(
-            string returnUrl, 
-            ApplicationUser existingAspNetUser, 
+            string returnUrl,
+            ApplicationUser existingAspNetUser,
             ExternalLoginInfo info)
         {
             // If this user already exists in the AspNetUsers table, then we must already had at least one
@@ -188,11 +189,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                                    "- this should not be possible - unable to log user in", existingAspNetUser.Id);
                 return RedirectToLoginPageWithError(returnUrl);
             }
-            
+
             var recordIdpLoginDetailsResult = await _userManager.AddLoginAsync(existingAspNetUser, info);
 
             // If for whatever reason we can't create the latest set of login details, we can't log the user
-            // in. 
+            // in.
             if (!recordIdpLoginDetailsResult.Succeeded)
             {
                 return HandleAddingLoginIdentityFailure(returnUrl, existingAspNetUser, recordIdpLoginDetailsResult);
@@ -203,7 +204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
         }
 
         private async Task<IActionResult> LoginUserWithProviderDetails(
-            string returnUrl, 
+            string returnUrl,
             ExternalLoginInfo info)
         {
             var loginResult = await _signInManager.ExternalLoginSignInAsync(
@@ -222,7 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                 _logger.LogError("User is locked out - unable to log in");
 
                 ErrorMessage = LoginErrorMessage;
-                
+
                 return RedirectToPage("./Lockout");
             }
 
@@ -230,10 +231,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
         }
 
         private async Task<IActionResult> HandleNewInvitedUser(
-            UserInvite inviteToSystem, 
-            string email, 
+            UserInvite inviteToSystem,
+            string email,
             string firstName,
-            string lastName, 
+            string lastName,
             ExternalLoginInfo info,
             string returnUrl)
         {
@@ -266,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             {
                 return HandleCreateIdentityFailure(returnUrl, createdIdentityUserResult);
             }
-            
+
             var addedIdentityUserRoles = await _userManager.AddToRoleAsync(newAspNetUser, inviteToSystem.Role.Name);
 
             if (!addedIdentityUserRoles.Succeeded)
@@ -275,7 +276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
 
                 return HandleIdentityResultFailure(returnUrl, addedIdentityUserRoles);
             }
-            
+
             var recordIdpLoginDetailsResult = await _userManager.AddLoginAsync(newAspNetUser, info);
 
             if (!recordIdpLoginDetailsResult.Succeeded)
@@ -285,7 +286,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
 
             // If adding the new Identity Framework user records succeeded, continue on to create internal User
             // and Role records for the application itself and sign the user in.
-            
+
             // If we didn't yet have an existing "internal" User record matching this new login in the Users
             // table, create one now, being sure to establish the one-to-one id relationship between the
             // AspNetUsers record and the Users record.
@@ -338,7 +339,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                 info.ProviderKey,
                 isPersistent: false,
                 bypassTwoFactor: true);
-            
+
             return LocalRedirect(returnUrl);
         }
 
@@ -362,11 +363,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             // if they are available.
             var givenName = info.Principal.FindFirstValue(ClaimTypes.GivenName);
             var surname = info.Principal.FindFirstValue(ClaimTypes.Surname);
-            
+
             if (givenName != null && surname != null) {
                 return (email, givenName, surname);
             }
-            
+
             // Failing finding explicit "Given Name" and "Surname" Claims on which to base
             // the user's name, next use the more generic "Name" Claim if it's available.
             var nameClaim = info.Principal.FindFirstValue(JwtClaimTypes.Name);
@@ -380,13 +381,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                     ClaimTypes.GivenName, ClaimTypes.Surname, JwtClaimTypes.Name);
                 return (email, "", "");
             }
-            
+
             var nameClaimParts = nameClaim.Trim().Split(' ');
 
             if (nameClaimParts.Length > 1) {
                 return (email, nameClaimParts.First(), nameClaimParts.Last());
             }
-            
+
             return (email, nameClaim, "");
         }
 
@@ -398,7 +399,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
         }
 
         private IActionResult HandleAddingLoginIdentityFailure(
-            string returnUrl, 
+            string returnUrl,
             ApplicationUser user,
             IdentityResult identityResult)
         {
@@ -422,7 +423,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
     public interface ISignInManagerDelegate
     {
         AuthenticationProperties ConfigureExternalAuthenticationProperties(
-            string provider, 
+            string provider,
             string redirectUrl,
             string userId = null);
 
@@ -430,8 +431,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             string expectedXsrf = null);
 
         Task<SignInResult> ExternalLoginSignInAsync(
-            string loginProvider, 
-            string providerKey, 
+            string loginProvider,
+            string providerKey,
             bool isPersistent,
             bool bypassTwoFactor);
     }

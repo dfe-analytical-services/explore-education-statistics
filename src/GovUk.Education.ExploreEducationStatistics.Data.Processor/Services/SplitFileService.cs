@@ -1,17 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CsvHelper;
-using CsvHelper.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
@@ -25,13 +19,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     {
         private readonly IBatchService _batchService;
         private readonly IBlobStorageService _blobStorageService;
-        private readonly ILogger<ISplitFileService> _logger;
+        private readonly ILogger<SplitFileService> _logger;
         private readonly IDataImportService _dataImportService;
 
         public SplitFileService(
             IBatchService batchService,
             IBlobStorageService blobStorageService,
-            ILogger<ISplitFileService> logger,
+            ILogger<SplitFileService> logger,
             IDataImportService dataImportService
             )
         {
@@ -41,23 +35,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _dataImportService = dataImportService;
         }
 
-        public async Task SplitDataFile(Guid importId)
+        public async Task SplitDataFileIfRequired(Guid importId)
         {
             var import = await _dataImportService.GetImport(importId);
-            var dataFileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
-
-            var dataFileTable = DataTableUtils.CreateFromStream(dataFileStream);
-
-            if (dataFileTable.Rows.Count > import.RowsPerBatch)
-            {
-                _logger.LogInformation($"Splitting Datafile: {import.File.Filename}");
-                await SplitFiles(import, dataFileTable);
-                _logger.LogInformation($"Split of Datafile: {import.File.Filename} complete");
-            }
-            else
+            var dataFileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
+            
+            if (!import.BatchingRequired())
             {
                 _logger.LogInformation($"No splitting of datafile: {import.File.Filename} was necessary");
+                return;
             }
+
+            _logger.LogInformation($"Splitting Datafile: {import.File.Filename}");
+            await SplitFiles(import, dataFileStreamProvider);
+            _logger.LogInformation($"Split of Datafile: {import.File.Filename} complete");
         }
 
         public async Task AddBatchDataFileMessages(
@@ -66,10 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var import = await _dataImportService.GetImport(importId);
 
-            var batchFilesForDataFile = await _batchService.GetBatchFilesForDataFile(import.File);
-
             // If no batching was necessary, simply add a message to process the lone data file
-            if (!batchFilesForDataFile.Any())
+            if (!import.BatchingRequired())
             {
                 collector.Add(new ImportObservationsMessage
                 {
@@ -79,8 +68,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 });
                 return;
             }
-
+            
             // Otherwise create a message per batch file to process
+            var batchFilesForDataFile = await _batchService.GetBatchFilesForDataFile(import.File);
+
+            // If batching was required but no batch files remain to process, the import has been completed but
+            // cut off prior to doing the last status update at Stage 4.  Therefore set the status to complete.
+            if (!batchFilesForDataFile.Any())
+            {
+                await _dataImportService.UpdateStatus(importId, DataImportStatus.COMPLETE, 100);
+            }
+            
             var importBatchFileMessages = batchFilesForDataFile.Select(blobInfo =>
             {
                 var batchFileName = blobInfo.FileName;
@@ -93,22 +91,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     BatchNo = batchNo,
                     ObservationsFilePath = batchFilePath
                 };
-            });
+            }).ToList();
 
-            foreach (var importMessage in importBatchFileMessages)
-            {
-                collector.Add(importMessage);
-            }
+            importBatchFileMessages.ForEach(collector.Add);
         }
 
         private async Task SplitFiles(
             DataImport dataImport,
-            DataTable dataFileTable)
+            Func<Task<Stream>> dataFileStreamProvider)
         {
-            var colValues = CsvUtil.GetColumnValues(dataFileTable.Columns);
-            var batches = dataFileTable.Rows.OfType<DataRow>().Batch(dataImport.RowsPerBatch);
-            var batchCount = 1;
-            var numBatches = (int)Math.Ceiling((double)dataFileTable.Rows.Count / dataImport.RowsPerBatch);
+            var csvHeaders = await CsvUtil.GetCsvHeaders(dataFileStreamProvider);
 
             var existingBatchFiles = await _batchService.GetBatchFilesForDataFile(dataImport.File);
 
@@ -116,13 +108,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .AsQueryable()
                 .Select(blobInfo => GetBatchNumberFromBatchFileName(blobInfo.FileName));
 
-            // TODO: EES-1608 - this flag keeps a track of whether any batch files have been generated to date.
-            // It is used in a legacy check to determine whether or not to generate a "no rows" batch file.
-            // EES-1608 will investigate what the circumstances are that could lead to a "no rows" batch file
-            // situation, and whether this check can actually be entirely removed or not.
-            var batchFilesExist = existingBatchFileNumbers.Any();
-
-            foreach (var batch in batches)
+            var streamReader = new StreamReader(await dataFileStreamProvider.Invoke());
+            await streamReader.ReadLineAsync();
+            
+            var currentBatchNumber = 1;
+            
+            while (currentBatchNumber <= dataImport.NumBatches)
             {
                 var currentStatus = await _dataImportService.GetImportStatus(dataImport.Id);
 
@@ -132,92 +123,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         $"Import for {dataImport.File.Filename} is finished or aborting - stopping creating batch files");
                     return;
                 }
-
-                if (existingBatchFileNumbers.Contains(batchCount))
+                
+                if (existingBatchFileNumbers.Contains(currentBatchNumber))
                 {
-                    _logger.LogInformation($"Batch {batchCount} already exists - not recreating");
-                    batchCount++;
+                    _logger.LogInformation($"Batch file ${currentBatchNumber} already exists - skipping creating it again");
+
+                    await SkipToNextBatch(dataImport, streamReader);
+                    currentBatchNumber++;
                     continue;
                 }
+                
+                await using var writeStream = new MemoryStream();
+                var writer = new StreamWriter(writeStream);
+                await writer.WriteLineAsync(csvHeaders.JoinToString(','));
+                
+                var currentRowNumberInBatch = 1;
 
-                await using var stream = new MemoryStream();
-                var writer = new StreamWriter(stream);
+                while (!streamReader.EndOfStream && currentRowNumberInBatch <= dataImport.RowsPerBatch)
+                {
+                    var nextLine = await streamReader.ReadLineAsync();
+                    await writer.WriteLineAsync(nextLine);
+                    currentRowNumberInBatch++;
+                }
+                
                 await writer.FlushAsync();
-
-                var table = new DataTable();
-                CopyColumns(dataFileTable, table);
-                CopyRows(table, batch.ToList(), colValues, dataImport.HasSoleGeographicLevel());
-
-                var percentageComplete = (double) batchCount / numBatches * 100;
+                    
+                await _blobStorageService.UploadStream(
+                    containerName: PrivateReleaseFiles,
+                    path: dataImport.File.BatchPath(currentBatchNumber),
+                    stream: writeStream,
+                    contentType: "text/csv");
+                
+                var percentageComplete = (double) currentBatchNumber / dataImport.NumBatches * 100;
 
                 await _dataImportService.UpdateStatus(dataImport.Id, DataImportStatus.STAGE_3, percentageComplete);
 
-                // If no lines then don't create a batch unless it's the last one & there are zero
-                // lines in total in which case create a zero lines batch
-                if (table.Rows.Count == 0 && (batchCount != numBatches || batchFilesExist))
-                {
-                    _logger.LogInformation($"Skipping batch file for row count {table.Rows.Count} with batchCount {batchCount} and numBatches {numBatches} and batchFilesExist {batchFilesExist} and batch {batch.Count()}");
-                    batchCount++;
-                    continue;
-                }
-
-                WriteDataTableToStream(table, writer);
-                await writer.FlushAsync();
-
-                stream.Seek(0, SeekOrigin.Begin);
-
-                await _blobStorageService.UploadStream(
-                    containerName: PrivateReleaseFiles,
-                    path: dataImport.File.BatchPath(batchCount),
-                    stream: stream,
-                    contentType: "text/csv");
-
-                batchFilesExist = true;
-                batchCount++;
+                currentBatchNumber++;
             }
         }
 
-        private static void WriteDataTableToStream(DataTable dataTable, TextWriter tw)
+        private async Task SkipToNextBatch(DataImport dataImport, StreamReader streamReader)
         {
-            var csvWriter = new CsvWriter(tw, new CsvConfiguration(CultureInfo.InvariantCulture));
-            foreach (DataColumn column in dataTable.Columns)
+            var currentRowNumberInBatch = 1;
+
+            while (!streamReader.EndOfStream && currentRowNumberInBatch <= dataImport.RowsPerBatch)
             {
-                csvWriter.WriteField(column.ColumnName);
+                await streamReader.ReadLineAsync();
+                currentRowNumberInBatch++;
             }
-
-            csvWriter.NextRecord();
-
-            foreach (DataRow row in dataTable.Rows)
-            {
-                for (var i = 0; i < dataTable.Columns.Count; i++)
-                {
-                    csvWriter.WriteField(row[i]);
-                }
-                csvWriter.NextRecord();
-            }
-        }
-
-        private static void CopyColumns(DataTable source, DataTable target)
-        {
-            foreach (DataColumn column in source.Columns)
-            {
-                column.CopyTo(target);
-            }
-        }
-
-        private static void CopyRows(DataTable target,
-            IEnumerable<DataRow> rows,
-            List<string> colValues,
-            bool hasSoleGeographicLevel)
-        {
-            rows.ForEach(row =>
-            {
-                var rowValues = CsvUtil.GetRowValues(row);
-                if (CsvUtil.IsRowAllowed(hasSoleGeographicLevel, rowValues, colValues))
-                {
-                    target.Rows.Add(row.ItemArray);
-                }
-            });
         }
 
         private static int GetBatchNumberFromBatchFileName(string batchFileName)

@@ -1,8 +1,11 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -17,18 +20,23 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using static System.StringComparison;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class ImporterService : IImporterService
     {
+        private static readonly EnumToEnumLabelConverter<TimeIdentifier> TimeIdentifierLookup = new();
+        
         private readonly IGuidGenerator _guidGenerator;
-        private readonly ImporterMemoryCache _memoryCache;
         private readonly ImporterLocationService _importerLocationService;
         private readonly ImporterFilterService _importerFilterService;
         private readonly IImporterMetaService _importerMetaService;
         private readonly IDataImportService _dataImportService;
         private readonly ILogger<ImporterService> _logger;
+        private readonly IDatabaseHelper _databaseHelper;
+        private readonly ImporterFilterCache _importerFilterCache;
+        private readonly IObservationBatchImporter _observationBatchImporter;
 
         private const int Stage2RowCheck = 1000;
 
@@ -103,110 +111,237 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public ImporterService(
             IGuidGenerator guidGenerator,
-            ImporterMemoryCache memoryCache,
             ImporterFilterService importerFilterService,
             ImporterLocationService importerLocationService,
             IImporterMetaService importerMetaService,
             IDataImportService dataImportService, 
-            ILogger<ImporterService> logger)
+            ILogger<ImporterService> logger, 
+            IDatabaseHelper databaseHelper, 
+            ImporterFilterCache importerFilterCache, 
+            IObservationBatchImporter? observationBatchImporter = null)
         {
             _guidGenerator = guidGenerator;
-            _memoryCache = memoryCache;
             _importerFilterService = importerFilterService;
             _importerLocationService = importerLocationService;
             _importerMetaService = importerMetaService;
             _dataImportService = dataImportService;
             _logger = logger;
+            _databaseHelper = databaseHelper;
+            _importerFilterCache = importerFilterCache;
+            _observationBatchImporter = observationBatchImporter ?? new StoredProcedureObservationBatchImporter();
         }
 
-        public void ImportMeta(DataTable table, Subject subject, StatisticsDbContext context)
+        public Task<SubjectMeta> ImportMeta(
+            List<string> metaFileCsvHeaders,
+            List<List<string>> metaFileRows, 
+            Subject subject,
+            StatisticsDbContext context)
         {
-            _importerMetaService.Import(table.Columns, table.Rows, subject, context);
+            return _importerMetaService.Import(metaFileCsvHeaders, metaFileRows, subject, context);
         }
 
-        public SubjectMeta GetMeta(DataTable table, Subject subject, StatisticsDbContext context)
+        public SubjectMeta GetMeta(
+            List<string> metaFileCsvHeaders,
+            List<List<string>> metaFileRows, 
+            Subject subject,
+            StatisticsDbContext context)
         {
-            return _importerMetaService.Get(table.Columns, table.Rows, subject, context);
+            return _importerMetaService.Get(metaFileCsvHeaders, metaFileRows, subject, context);
+        }
+
+        private record FilterItemMeta(string FilterLabel, string FilterGroupLabel, string FilterItemLabel)
+        {
+            public virtual bool Equals(FilterItemMeta? other)
+            {
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+                return string.Equals(FilterLabel, other.FilterLabel, CurrentCultureIgnoreCase) 
+                       && string.Equals(FilterGroupLabel, other.FilterGroupLabel, CurrentCultureIgnoreCase) 
+                       && string.Equals(FilterItemLabel, other.FilterItemLabel, CurrentCultureIgnoreCase);
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(FilterLabel.ToLower(), FilterGroupLabel.ToLower(), FilterItemLabel.ToLower());
+            }
+        }
+
+        private record FilterGroupMeta(string FilterLabel, string FilterGroupLabel)
+        {
+            public virtual bool Equals(FilterGroupMeta? other)
+            {
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+                return string.Equals(FilterLabel, other.FilterLabel, CurrentCultureIgnoreCase) 
+                       && string.Equals(FilterGroupLabel, other.FilterGroupLabel, CurrentCultureIgnoreCase);
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(FilterLabel.ToLower(), FilterGroupLabel.ToLower());
+            }
         }
 
         public async Task ImportFiltersAndLocations(
             DataImport dataImport,
-            DataColumnCollection cols,
-            DataRowCollection rows,
+            Func<Task<Stream>> dataFileStreamProvider,
             SubjectMeta subjectMeta,
             StatisticsDbContext context)
         {
-            // Clearing the caches is required here as the seeder shares the cache with all subjects
-            _memoryCache.Clear();
-
-            var colValues = CsvUtil.GetColumnValues(cols);
-            var rowCount = 1;
-            var totalRows = rows.Count;
+            var colValues = await CsvUtil.GetCsvHeaders(dataFileStreamProvider);
             var soleGeographicLevel = dataImport.HasSoleGeographicLevel();
 
-            foreach (DataRow row in rows)
+            var filterItemsFromCsv = new HashSet<FilterItemMeta>();
+            var filterGroupsFromCsv = new HashSet<FilterGroupMeta>();
+            var locations = new HashSet<Location>();
+            
+            await CsvUtil.ForEachRow(dataFileStreamProvider, async (rowValues, index) =>
             {
-                if (rowCount % Stage2RowCheck == 0)
+                if (index % Stage2RowCheck == 0)
                 {
                     var currentStatus = await _dataImportService.GetImportStatus(dataImport.Id);
 
                     if (currentStatus.IsFinishedOrAborting())
                     {
-                        _logger.LogInformation($"Import for {dataImport.File.Filename} has finished or is being aborted, " +
-                                               "so finishing importing Filters and Locations early");
-                        return;
+                        _logger.LogInformation(
+                            "Import for {FileName} has finished or is being aborted, " +
+                            "so finishing importing Filters and Locations early", dataImport.File.Filename);
+                        return false;
                     }
-                    
+
                     await _dataImportService.UpdateStatus(dataImport.Id,
                         DataImportStatus.STAGE_2,
-                        (double) rowCount / totalRows * 100);
+                        (double) (index + 1) / dataImport.TotalRows!.Value * 100);
                 }
 
-                var rowValues = CsvUtil.GetRowValues(row);
                 if (CsvUtil.IsRowAllowed(soleGeographicLevel, rowValues, colValues))
                 {
-                    CreateFiltersAndLocationsFromCsv(context, rowValues, colValues, subjectMeta.Filters);
+                    foreach (var filterMeta in subjectMeta.Filters)
+                    {
+                        var filterItemLabel = CsvUtil.Value(
+                            rowValues, 
+                            colValues, 
+                            filterMeta.Column, 
+                            defaultValue: CsvUtil.DefaultFilterItemLabel)!;
+                        
+                        var filterGroupLabel = CsvUtil.Value(
+                            rowValues, 
+                            colValues, 
+                            filterMeta.FilterGroupingColumn,
+                            defaultValue: CsvUtil.DefaultFilterGroupLabel)!;
+
+                        filterGroupsFromCsv.Add(new FilterGroupMeta(filterMeta.Filter.Label, filterGroupLabel));
+                        filterItemsFromCsv.Add(new FilterItemMeta(filterMeta.Filter.Label, filterGroupLabel, filterItemLabel));
+                    }
+
+                    locations.Add(
+                        ReadLocationFromCsv(
+                            CsvUtil.GetGeographicLevel(rowValues, colValues),
+                            GetCountry(rowValues, colValues),
+                            GetEnglishDevolvedArea(rowValues, colValues),
+                            GetInstitution(rowValues, colValues),
+                            GetLocalAuthority(rowValues, colValues),
+                            GetLocalAuthorityDistrict(rowValues, colValues),
+                            GetLocalEnterprisePartnership(rowValues, colValues),
+                            GetMayoralCombinedAuthority(rowValues, colValues),
+                            GetMultiAcademyTrust(rowValues, colValues),
+                            GetOpportunityArea(rowValues, colValues),
+                            GetParliamentaryConstituency(rowValues, colValues),
+                            GetPlanningArea(rowValues, colValues),
+                            GetProvider(rowValues, colValues),
+                            GetRegion(rowValues, colValues),
+                            GetRscRegion(rowValues, colValues),
+                            GetSchool(rowValues, colValues),
+                            GetSponsor(rowValues, colValues),
+                            GetWard(rowValues, colValues)
+                        ));
                 }
 
-                rowCount++;
-            }
+                return true;
+            });
+
+            var filterGroups = filterGroupsFromCsv
+                .Select(filterGroupMeta =>
+                {
+                    var (filterLabel, filterGroupLabel) = filterGroupMeta;
+                    
+                    var filter = subjectMeta
+                        .Filters
+                        .Single(f => f.Filter.Label == filterLabel)
+                        .Filter;
+
+                    return new FilterGroup(filter, filterGroupLabel);
+                })
+                .ToList();
+
+            var filterItems = filterItemsFromCsv
+                .Select(filterItemMeta =>
+                {
+                    var (filterLabel, filterGroupLabel, filterItemLabel) = filterItemMeta;
+                    
+                    var filterGroup = filterGroups.Single(fg =>
+                        string.Equals(fg.Filter.Label.ToLower(), filterLabel.ToLower(), CurrentCultureIgnoreCase)
+                        && string.Equals(fg.Label, filterGroupLabel, CurrentCultureIgnoreCase));
+
+                    return new FilterItem(filterItemLabel, filterGroup);
+                })
+                .ToList();
+                    
+            await _databaseHelper.DoInTransaction(context, async () =>
+            {
+                await context.FilterGroup.AddRangeAsync(filterGroups);
+                await context.FilterItem.AddRangeAsync(filterItems);
+                await context.SaveChangesAsync();
+            });
+
+            filterGroups.ForEach(filterGroup => _importerFilterCache.AddFilterGroup(filterGroup, context));
+            filterItems.ForEach(filterItem => _importerFilterCache.AddFilterItem(filterItem, context));
+
+            // Add any new Locations that are being introduced by this import process exclusively.  Other concurrent 
+            // import processes reaching this stage will wait before adding their own new Locations, if any.
+            //
+            // This ensures that we do not end up with duplicate Locations being added by separate processes, or let one 
+            // process continue on to the next stage of import before all Locations that it relies on have been
+            // persisted successfully by whichever import process introduced it first.
+            //
+            // This also lets us take advantage of the performance gains of saving new Locations in a single batch
+            // rather than in separate SaveChanges() calls, which introduces quite a penalty.
+            await _databaseHelper.ExecuteWithExclusiveLock(
+                context, 
+                "Importer_AddNewLocations", 
+                ctxDelegate => _importerLocationService.CreateIfNotExistsAndCache(ctxDelegate, locations.ToList()));
         }
 
-        public async Task ImportObservations(
-            DataImport import,
-            DataColumnCollection cols,
-            DataRowCollection rows,
+        public async Task ImportObservations(DataImport import,
+            Func<Task<Stream>> dataFileStreamProvider,
             Subject subject,
-            SubjectMeta subjectMeta, 
+            SubjectMeta subjectMeta,
             int batchNo,
             StatisticsDbContext context)
         {
-            _memoryCache.Clear();
-
-            var observations = GetObservations(
+            var observations = (await GetObservations(
                 import,
                 context,
-                rows,
-                CsvUtil.GetColumnValues(cols),
+                dataFileStreamProvider,
                 subject,
                 subjectMeta,
-                batchNo).ToList();
+                batchNo)).ToList();
 
-            await InsertObservations(context, observations);
+            await _observationBatchImporter.ImportObservationBatch(context, observations);
         }
 
         public TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> rowValues, List<string> colValues)
         {
-            var timeIdentifier = CsvUtil.Value(rowValues, colValues, "time_identifier").ToLower();
-            foreach (var value in Enum.GetValues(typeof(TimeIdentifier)).Cast<TimeIdentifier>())
+            var value = CsvUtil.Value(rowValues, colValues, "time_identifier");
+            
+            try
             {
-                if (value.GetEnumLabel().Equals(timeIdentifier, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return value;
-                }
+                return (TimeIdentifier) TimeIdentifierLookup.ConvertFromProvider.Invoke(value)!;
             }
-
-            throw new InvalidTimeIdentifierException(timeIdentifier);
+            catch (ArgumentOutOfRangeException)
+            {
+                throw new InvalidTimeIdentifierException(value);
+            }
         }
 
         public int GetYear(IReadOnlyList<string> rowValues, List<string> colValues)
@@ -220,42 +355,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return int.Parse(tp.Substring(0, 4));
         }
 
-        private IEnumerable<Observation> GetObservations(
+        private async Task<IEnumerable<Observation>> GetObservations(
             DataImport import,
             StatisticsDbContext context,
-            DataRowCollection rows,
-            List<string> colValues,
+            Func<Task<Stream>> dataFileStreamProvider,
             Subject subject,
             SubjectMeta subjectMeta,
             int batchNo)
         {
-            var observations = new List<Observation>();
-            var i = 0;
             var soleGeographicLevel = import.HasSoleGeographicLevel();
+            var csvHeaders = await CsvUtil.GetCsvHeaders(dataFileStreamProvider);
 
-            foreach (DataRow row in rows)
+            return (await CsvUtil.Select(dataFileStreamProvider, (rowValues, index) =>
             {
-                var rowValues = CsvUtil.GetRowValues(row).ToArray();
-
-                if (CsvUtil.IsRowAllowed(soleGeographicLevel, rowValues, colValues))
+                if (CsvUtil.IsRowAllowed(soleGeographicLevel, rowValues, csvHeaders))
                 {
-                    var o = ObservationFromCsv(
+                    return ObservationFromCsv(
                         context,
                         rowValues,
-                        colValues,
+                        csvHeaders,
                         subject,
                         subjectMeta,
-                        ((batchNo - 1) * import.RowsPerBatch) + i++ + 2);
-                    observations.Add(o);
+                        (batchNo - 1) * import.RowsPerBatch + index + 2);
                 }
-            }
 
-            return observations;
+                return null;
+            }))
+                .WhereNotNull();
         }
 
         private Observation ObservationFromCsv(
             StatisticsDbContext context,
-            string[] rowValues,
+            List<string> rowValues,
             List<string> colValues,
             Subject subject,
             SubjectMeta subjectMeta,
@@ -267,38 +398,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 Id = observationId,
                 FilterItems = GetFilterItems(context, rowValues, colValues, subjectMeta.Filters, observationId),
-                LocationId = GetLocationIdOrCreate(rowValues, colValues, context),
+                LocationId = GetLocationId(rowValues, colValues),
                 Measures = GetMeasures(rowValues, colValues, subjectMeta.Indicators),
                 SubjectId = subject.Id,
                 TimeIdentifier = GetTimeIdentifier(rowValues, colValues),
                 Year = GetYear(rowValues, colValues),
                 CsvRow = csvRowNum
             };
-        }
-
-        private void CreateFiltersAndLocationsFromCsv(
-            StatisticsDbContext context,
-            List<string> rowValues,
-            List<string> colValues,
-            IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
-        {
-            CreateFilterItems(context, rowValues, colValues, filtersMeta);
-            GetLocationIdOrCreate(rowValues, colValues, context);
-        }
-
-        private void CreateFilterItems(
-            StatisticsDbContext context,
-            IReadOnlyList<string> rowValues,
-            List<string> colValues,
-            IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta)
-        {
-            foreach (var filterMeta in filtersMeta)
-            {
-                var filterItemLabel = CsvUtil.Value(rowValues, colValues, filterMeta.Column);
-                var filterGroupLabel = CsvUtil.Value(rowValues, colValues, filterMeta.FilterGroupingColumn);
-
-                _importerFilterService.Find(filterItemLabel, filterGroupLabel, filterMeta.Filter, context);
-            }
         }
 
         private ICollection<ObservationFilterItem> GetFilterItems(
@@ -310,25 +416,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             return filtersMeta.Select(filterMeta =>
             {
-                var filterItemLabel = CsvUtil.Value(rowValues, colValues, filterMeta.Column);
-                var filterGroupLabel = CsvUtil.Value(rowValues, colValues, filterMeta.FilterGroupingColumn);
+                var (filter, column, filterGroupingColumn) = filterMeta;
+                
+                var filterItemLabel = CsvUtil.Value(
+                    rowValues, 
+                    colValues, 
+                    column, 
+                    CsvUtil.DefaultFilterItemLabel);
+                
+                var filterGroupLabel = CsvUtil.Value(
+                    rowValues, 
+                    colValues, 
+                    filterGroupingColumn, 
+                    CsvUtil.DefaultFilterGroupLabel);
 
                 return new ObservationFilterItem
                 {
                     ObservationId = observationId,
-                    FilterItemId = _importerFilterService
-                        .Find(filterItemLabel, filterGroupLabel, filterMeta.Filter, context).Id,
-                    FilterId = filterMeta.Filter.Id
+                    FilterItemId = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filter, context).Id,
+                    FilterId = filter.Id
                 };
             }).ToList();
         }
 
-        private Guid GetLocationIdOrCreate(IReadOnlyList<string> rowValues,
-            List<string> colValues,
-            StatisticsDbContext context)
+        private Guid GetLocationId(IReadOnlyList<string> rowValues, List<string> colValues)
         {
-            return _importerLocationService.FindOrCreate(
-                context,
+            var location = ReadLocationFromCsv(
                 CsvUtil.GetGeographicLevel(rowValues, colValues),
                 GetCountry(rowValues, colValues),
                 GetEnglishDevolvedArea(rowValues, colValues),
@@ -346,8 +459,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 GetRscRegion(rowValues, colValues),
                 GetSchool(rowValues, colValues),
                 GetSponsor(rowValues, colValues),
-                GetWard(rowValues, colValues)
-            ).Id;
+                GetWard(rowValues, colValues));
+                
+            return _importerLocationService.Get(location).Id;
         }
 
         private static Dictionary<Guid, string> GetMeasures(IReadOnlyList<string> rowValues,
@@ -359,117 +473,163 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var values = CsvUtil.Values(rowValues, colValues, columns);
 
             return valueTuples.Zip(values, (tuple, value) => new {tuple, value})
-                .ToDictionary(item => item.tuple.Indicator.Id, item => item.value);
+                .ToDictionary(item => item.tuple.Indicator.Id, item => item.value)!;
         }
 
-        private static Country GetCountry(IReadOnlyList<string> rowValues, List<string> colValues)
+        private static Country? GetCountry(IReadOnlyList<string> rowValues, List<string> colValues)
         {
             return CsvUtil.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.Country], values =>
                 new Country(values[0], values[1]));
         }
 
-        private static EnglishDevolvedArea GetEnglishDevolvedArea(IReadOnlyList<string> rowValues, List<string> colValues)
+        private static EnglishDevolvedArea? GetEnglishDevolvedArea(IReadOnlyList<string> rowValues, List<string> colValues)
         {
             return CsvUtil.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.EnglishDevolvedArea], values =>
                 new EnglishDevolvedArea(values[0], values[1]));
         }
 
-        private static Institution GetInstitution(IReadOnlyList<string> rowValues,
+        private static Institution? GetInstitution(IReadOnlyList<string> rowValues,
             List<string> colValues)
         {
             return CsvUtil.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.Institution], values =>
                 new Institution(values[0], values[1]));
         }
 
-        private static LocalAuthority GetLocalAuthority(IReadOnlyList<string> rowValues, List<string> colValues)
+        private static LocalAuthority? GetLocalAuthority(IReadOnlyList<string> rowValues, List<string> colValues)
         {
             return CsvUtil.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.LocalAuthority], values =>
                 new LocalAuthority(values[0], values[1], values[2]));
         }
 
-        private static LocalAuthorityDistrict GetLocalAuthorityDistrict(IReadOnlyList<string> rowValues,
+        private static LocalAuthorityDistrict? GetLocalAuthorityDistrict(IReadOnlyList<string> rowValues,
             List<string> colValues)
         {
             return CsvUtil.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.LocalAuthorityDistrict], values =>
                 new LocalAuthorityDistrict(values[0], values[1]));
         }
 
-        private static LocalEnterprisePartnership GetLocalEnterprisePartnership(IReadOnlyList<string> rowValues,
+        private static LocalEnterprisePartnership? GetLocalEnterprisePartnership(IReadOnlyList<string> rowValues,
             List<string> colValues)
         {
             return CsvUtil.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.LocalEnterprisePartnership], values =>
                 new LocalEnterprisePartnership(values[0], values[1]));
         }
 
-        private static MayoralCombinedAuthority GetMayoralCombinedAuthority(IReadOnlyList<string> rowValues,
+        private static MayoralCombinedAuthority? GetMayoralCombinedAuthority(IReadOnlyList<string> rowValues,
             List<string> colValues)
         {
             return CsvUtil.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.MayoralCombinedAuthority], values =>
                 new MayoralCombinedAuthority(values[0], values[1]));
         }
 
-        private static Mat GetMultiAcademyTrust(IReadOnlyList<string> rowValues, List<string> colValues)
+        private static Mat? GetMultiAcademyTrust(IReadOnlyList<string> rowValues, List<string> colValues)
         {
             return CsvUtil.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.MultiAcademyTrust], values =>
                 new Mat(values[0], values[1]));
         }
 
-        private static OpportunityArea GetOpportunityArea(IReadOnlyList<string> rowValues, List<string> colValues)
+        private static OpportunityArea? GetOpportunityArea(IReadOnlyList<string> rowValues, List<string> colValues)
         {
             return CsvUtil.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.OpportunityArea], values =>
                 new OpportunityArea(values[0], values[1]));
         }
 
-        private static ParliamentaryConstituency GetParliamentaryConstituency(IReadOnlyList<string> rowValues,
+        private static ParliamentaryConstituency? GetParliamentaryConstituency(IReadOnlyList<string> rowValues,
             List<string> colValues)
         {
             return CsvUtil.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.ParliamentaryConstituency], values =>
                 new ParliamentaryConstituency(values[0], values[1]));
         }
 
-        private static Provider GetProvider(IReadOnlyList<string> rowValues,
+        private static Provider? GetProvider(IReadOnlyList<string> rowValues,
             List<string> colValues)
         {
             return CsvUtil.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.Provider], values =>
                 new Provider(values[0], values[1]));
         }
 
-        private static Region GetRegion(IReadOnlyList<string> rowValues, List<string> colValues)
+        private static Region? GetRegion(IReadOnlyList<string> rowValues, List<string> colValues)
         {
             return CsvUtil.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.Region], values =>
                 new Region(values[0], values[1]));
         }
 
-        private static RscRegion GetRscRegion(IReadOnlyList<string> rowValues, List<string> colValues)
+        private static RscRegion? GetRscRegion(IReadOnlyList<string> rowValues, List<string> colValues)
         {
             return CsvUtil.BuildType(rowValues, colValues, "rsc_region_lead_name", value => new RscRegion(value));
         }
 
-        private static School GetSchool(IReadOnlyList<string> rowValues, List<string> colValues)
+        private static School? GetSchool(IReadOnlyList<string> rowValues, List<string> colValues)
         {
             return CsvUtil.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.School], values =>
                 new School(values[0], values[1]));
         }
 
-        private static Sponsor GetSponsor(IReadOnlyList<string> rowValues, List<string> colValues)
+        private static Sponsor? GetSponsor(IReadOnlyList<string> rowValues, List<string> colValues)
         {
             return CsvUtil.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.Sponsor], values =>
                 new Sponsor(values[0], values[1]));
         }
 
-        private static Ward GetWard(IReadOnlyList<string> rowValues, List<string> colValues)
+        private static Ward? GetWard(IReadOnlyList<string> rowValues, List<string> colValues)
         {
             return CsvUtil.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.Ward], values =>
                 new Ward(values[0], values[1]));
         }
 
-        private static PlanningArea GetPlanningArea(IReadOnlyList<string> rowValues, List<string> colValues)
+        private static PlanningArea? GetPlanningArea(IReadOnlyList<string> rowValues, List<string> colValues)
         {
             return CsvUtil.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.PlanningArea], values =>
                 new PlanningArea(values[0], values[1]));
         }
+        
+        private Location ReadLocationFromCsv(
+            GeographicLevel geographicLevel,
+            Country? country,
+            EnglishDevolvedArea? englishDevolvedArea = null,
+            Institution? institution = null,
+            LocalAuthority? localAuthority = null,
+            LocalAuthorityDistrict? localAuthorityDistrict = null,
+            LocalEnterprisePartnership? localEnterprisePartnership = null,
+            MayoralCombinedAuthority? mayoralCombinedAuthority = null,
+            Mat? multiAcademyTrust = null,
+            OpportunityArea? opportunityArea = null,
+            ParliamentaryConstituency? parliamentaryConstituency = null,
+            PlanningArea? planningArea = null,
+            Provider? provider = null,
+            Region? region = null,
+            RscRegion? rscRegion = null,
+            School? school = null,
+            Sponsor? sponsor = null,
+            Ward? ward = null)
+        {
+            return new Location
+            {
+                GeographicLevel = geographicLevel,
+                Country = country,
+                EnglishDevolvedArea = englishDevolvedArea,
+                Institution = institution,
+                LocalAuthority = localAuthority,
+                LocalAuthorityDistrict = localAuthorityDistrict,
+                LocalEnterprisePartnership = localEnterprisePartnership,
+                MayoralCombinedAuthority = mayoralCombinedAuthority,
+                MultiAcademyTrust = multiAcademyTrust,
+                OpportunityArea = opportunityArea,
+                ParliamentaryConstituency = parliamentaryConstituency,
+                PlanningArea = planningArea,
+                Provider = provider,
+                Region = region,
+                RscRegion = rscRegion,
+                School = school,
+                Sponsor = sponsor,
+                Ward = ward
+            };
+        }
+    }
 
-        private static async Task InsertObservations(DbContext context, IEnumerable<Observation> observations)
+    public class StoredProcedureObservationBatchImporter : IObservationBatchImporter
+    {
+        public async Task ImportObservationBatch(StatisticsDbContext context, IEnumerable<Observation> observations)
         {
             var observationsTable = new DataTable();
             observationsTable.Columns.Add("Id", typeof(Guid));
@@ -522,5 +682,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await context.Database.ExecuteSqlRawAsync(
                 "EXEC [dbo].[InsertObservationFilterItems] @ObservationFilterItems", parameter);
         }
+    }
+
+    public interface IObservationBatchImporter
+    {
+        Task ImportObservationBatch(StatisticsDbContext context, IEnumerable<Observation> observations);
     }
 }

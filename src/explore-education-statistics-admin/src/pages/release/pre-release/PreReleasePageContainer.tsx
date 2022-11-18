@@ -14,6 +14,7 @@ import preReleaseService, {
   PreReleaseSummary,
 } from '@admin/services/preReleaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import NotificationBanner from '@common/components/NotificationBanner';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { format } from 'date-fns';
@@ -52,7 +53,6 @@ const PreReleasePageContainer = ({
       const preReleaseSummary = await preReleaseService.getPreReleaseSummary(
         releaseId,
       );
-
       return {
         preReleaseWindowStatus,
         preReleaseSummary,
@@ -72,6 +72,7 @@ const PreReleasePageContainer = ({
       preReleaseWindowStatus: { access, start, end },
       preReleaseSummary: {
         contactEmail,
+        contactTeam,
         releaseSlug,
         releaseTitle,
         publicationSlug,
@@ -135,6 +136,20 @@ const PreReleasePageContainer = ({
     if (access === 'Within') {
       return (
         <>
+          <NotificationBanner
+            heading="If you have an enquiry about this release contact:"
+            title="Contact"
+          >
+            <p>
+              {`${contactTeam}: `}
+              <a
+                className='class="govuk-notification-banner__link"'
+                href={`mailto:${contactEmail}`}
+              >
+                {contactEmail}
+              </a>
+            </p>
+          </NotificationBanner>
           <NavBar
             className="govuk-!-margin-top-0"
             routes={preReleaseNavRoutes.map(route => ({

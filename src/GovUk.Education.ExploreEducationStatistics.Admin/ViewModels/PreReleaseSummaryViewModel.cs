@@ -12,6 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string ContactEmail { get; }
 
+        public string ContactTeam { get; }
+
         public PreReleaseSummaryViewModel()
         {
         }
@@ -21,13 +23,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
             string publicationTitle,
             string releaseSlug,
             string releaseTitle,
-            string contactEmail)
+            string contactEmail, 
+            string contactTeam)
         {
             PublicationSlug = publicationSlug;
             ReleaseSlug = releaseSlug;
             PublicationTitle = publicationTitle;
             ReleaseTitle = releaseTitle;
             ContactEmail = contactEmail;
+            ContactTeam = contactTeam;
         }
     }
 }

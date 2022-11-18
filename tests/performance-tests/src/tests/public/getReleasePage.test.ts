@@ -4,6 +4,7 @@ import { Options } from 'k6/options';
 import http from 'k6/http';
 import { check, fail } from 'k6';
 import getEnvironmentAndUsersFromFile from '../../utils/environmentAndUsers';
+import loggingUtils from '../../utils/loggingUtils';
 
 export const options: Options = {
   stages: [
@@ -31,6 +32,10 @@ export const getReleaseRequestDuration = new Trend(
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT as string,
 );
+
+export function setup() {
+  loggingUtils.logDashboardUrls();
+}
 
 const performTest = () => {
   const startTime = Date.now();

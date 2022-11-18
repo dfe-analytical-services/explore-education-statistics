@@ -38,7 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.Publication.Title,
                     release.Slug,
                     release.Title,
-                    release.Publication.Contact.TeamEmail));
+                    release.Publication.Contact.TeamEmail,
+                    release.Publication.Contact.TeamName));
         }
     }
 }

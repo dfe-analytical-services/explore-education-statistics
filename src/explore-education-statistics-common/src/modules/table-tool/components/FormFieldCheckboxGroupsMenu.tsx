@@ -3,7 +3,7 @@ import FormFieldCheckboxSearchSubGroups, {
   FormFieldCheckboxSearchSubGroupsProps,
 } from '@common/components/form/FormFieldCheckboxSearchSubGroups';
 import { useField } from 'formik';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import FormCheckboxSelectionCount from './FormCheckboxSelectedCount';
 
 interface Props<FormValues>
@@ -13,26 +13,14 @@ interface Props<FormValues>
 }
 
 function FormFieldCheckboxGroupsMenu<FormValues>(props: Props<FormValues>) {
-  const { name, legend, open: defaultOpen = false } = props;
-  const [open, setOpen] = useState(defaultOpen);
-
+  const { name, legend, open = false } = props;
   const [, meta] = useField(name);
-
-  useEffect(() => {
-    if (meta.error && meta.touched) {
-      setOpen(true);
-    }
-  }, [meta.error, meta.touched]);
 
   return (
     <DetailsMenu
       open={open}
       jsRequired
-      onToggle={(isOpen, event) => {
-        if (meta.error && meta.touched) {
-          event.preventDefault();
-        }
-      }}
+      preventToggle={!!meta.error && meta.touched}
       summary={legend}
       summaryAfter={<FormCheckboxSelectionCount name={name} />}
     >

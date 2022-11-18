@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddTransient<ImporterFilterService>()
                 .AddTransient<ImporterLocationService>()
                 .AddTransient<IImporterMetaService, ImporterMetaService>()
-                .AddTransient<ImporterMemoryCache>()
+                .AddTransient<ImporterFilterCache>()
                 .AddTransient<IBatchService, BatchService>()
                 .AddTransient<IDataImportService, DataImportService>()
                 .AddTransient<IValidatorService, ValidatorService>()
@@ -58,13 +58,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddSingleton<IFileTypeService, FileTypeService>()
                 .AddSingleton<IGuidGenerator, SequentialGuidGenerator>()
                 .AddTransient<IProcessorService, ProcessorService>()
+                .AddSingleton<IDatabaseHelper, DatabaseHelper>()
+                .AddSingleton<IImporterLocationCache, ImporterLocationCache>()
+                .AddTransient<IDbContextSupplier, DbContextSupplier>()
                 .BuildServiceProvider();
-
-            HandleRestart(serviceProvider.GetRequiredService<IStorageQueueService>());
+            HandleRestart(serviceProvider);
         }
 
-        private static void HandleRestart(IStorageQueueService storageQueueService)
+        private static void HandleRestart(IServiceProvider serviceProvider)
         {
+            var storageQueueService = serviceProvider.GetRequiredService<IStorageQueueService>();
             storageQueueService.Clear(ImportsAvailableQueue).Wait();
             storageQueueService.Clear(ImportsPendingQueue).Wait();
             storageQueueService.Clear(RestartImportsQueue).Wait();

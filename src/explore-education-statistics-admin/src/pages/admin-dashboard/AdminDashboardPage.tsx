@@ -97,6 +97,7 @@ const AdminDashboardPage = () => {
         <TabsSection
           lazy
           id="draft-releases"
+          data-testid="publication-draft-releases"
           title={`Draft releases (${totalDraftReleases})`}
         >
           <DraftReleasesTab

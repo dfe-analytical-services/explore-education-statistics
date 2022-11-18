@@ -32,7 +32,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -74,7 +73,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 options.EnableEndpointRouting = false;
 
             })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddNewtonsoftJson(options => {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });

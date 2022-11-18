@@ -54,6 +54,8 @@ const VerticalBarBlock = ({
   stacked,
   legend,
   includeNonNumericData,
+  showDataLabels,
+  dataLabelPosition,
 }: VerticalBarProps) => {
   const [legendProps, renderLegend] = useLegend();
   if (
@@ -164,13 +166,32 @@ const VerticalBarBlock = ({
               unit={dataSet.indicator.unit}
               stackId={stacked ? 'a' : undefined}
               maxBarSize={barThickness}
+              label={
+                showDataLabels
+                  ? {
+                      fontSize: 14,
+                      position:
+                        dataLabelPosition === 'inside' ? 'insideTop' : 'top',
+                      formatter: value =>
+                        formatPretty(
+                          value.toString(),
+                          dataSet.indicator.unit,
+                          dataSet.indicator.decimalPlaces,
+                        ),
+                    }
+                  : undefined
+              }
             />
           ))}
 
           {axes.major.referenceLines?.map(referenceLine =>
             createReferenceLine({
+              axis: 'x',
+              axisType: 'major',
               chartData,
               label: referenceLine.label,
+              otherAxisDomain: minorDomainTicks.domain,
+              otherAxisPosition: referenceLine.otherAxisPosition,
               position: referenceLine.position,
               style: referenceLine.style,
               x: referenceLine.position,
@@ -179,8 +200,12 @@ const VerticalBarBlock = ({
 
           {axes.minor.referenceLines?.map(referenceLine =>
             createReferenceLine({
+              axis: 'y',
+              axisType: 'minor',
               chartData,
               label: referenceLine.label,
+              otherAxisDomain: majorDomainTicks.domain,
+              otherAxisPosition: referenceLine.otherAxisPosition,
               position: referenceLine.position,
               style: referenceLine.style,
               y: referenceLine.position,
@@ -220,6 +245,7 @@ export const verticalBarBlockDefinition: ChartDefinition = {
   },
   axes: {
     major: {
+      axis: 'x',
       id: 'major',
       title: 'X Axis (major axis)',
       type: 'major',
@@ -242,6 +268,7 @@ export const verticalBarBlockDefinition: ChartDefinition = {
       },
     },
     minor: {
+      axis: 'y',
       id: 'minor',
       title: 'Y Axis (minor axis)',
       type: 'minor',
@@ -249,7 +276,6 @@ export const verticalBarBlockDefinition: ChartDefinition = {
         canRotateLabel: true,
       },
       defaults: {
-        min: 0,
         showGrid: true,
         tickConfig: 'default',
         tickSpacing: 1,

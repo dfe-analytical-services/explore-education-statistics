@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -63,6 +64,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ).ToListAsync();
 
             await _contentDbContext.AddRangeAsync(invites);
+            await _contentDbContext.SaveChangesAsync();
+        }
+
+        public async Task Remove(Guid releaseId, string email, ReleaseRole role)
+        {
+            var invites = await _contentDbContext.UserReleaseInvites
+                .AsQueryable()
+                .Where(uri =>
+                    uri.ReleaseId == releaseId
+                    && uri.Role == role
+                    && uri.Email == email) // DB comparison is case insensitive
+                .ToListAsync();
+            _contentDbContext.UserReleaseInvites.RemoveRange(invites);
             await _contentDbContext.SaveChangesAsync();
         }
 

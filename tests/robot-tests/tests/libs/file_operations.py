@@ -42,3 +42,12 @@ def zip_should_contain_file(zipfilename, filename):
     files_in_zip = zip.namelist()
     if filename not in files_in_zip:
         raise AssertionError(f'File "{filename}" not found in "{zipfilename}", which contains {str(files_in_zip)}')
+
+
+def zip_should_contain_directories_and_files(zipfilename: str, expected_files: list[str]):
+    zip = zipfile.ZipFile(f"test-results/downloads/{zipfilename}")
+    files = zip.namelist()
+    files = [file for file in files if not file.endswith(os.sep)]
+    print(files)
+    if sorted(files) != sorted(expected_files):
+        raise AssertionError(f"expected_files didn't match files: files: '{files}', expected_files: '{expected_files}'")

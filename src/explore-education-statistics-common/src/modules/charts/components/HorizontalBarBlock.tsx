@@ -53,6 +53,8 @@ const HorizontalBarBlock = ({
   axes,
   legend,
   includeNonNumericData,
+  showDataLabels,
+  dataLabelPosition,
 }: HorizontalBarProps) => {
   const [legendProps, renderLegend] = useLegend();
 
@@ -163,13 +165,34 @@ const HorizontalBarBlock = ({
               fill={config.colour}
               unit={dataSet.indicator.unit}
               stackId={stacked ? 'a' : undefined}
+              label={
+                showDataLabels
+                  ? {
+                      fontSize: 14,
+                      position:
+                        dataLabelPosition === 'inside'
+                          ? 'insideRight'
+                          : 'right',
+                      formatter: value =>
+                        formatPretty(
+                          value.toString(),
+                          dataSet.indicator.unit,
+                          dataSet.indicator.decimalPlaces,
+                        ),
+                    }
+                  : undefined
+              }
             />
           ))}
 
           {axes.major.referenceLines?.map(referenceLine =>
             createReferenceLine({
+              axis: 'y',
+              axisType: 'major',
               chartData,
               label: referenceLine.label,
+              otherAxisDomain: minorDomainTicks.domain,
+              otherAxisPosition: referenceLine.otherAxisPosition,
               position: referenceLine.position,
               style: referenceLine.style,
               y: referenceLine.position,
@@ -178,8 +201,12 @@ const HorizontalBarBlock = ({
 
           {axes.minor.referenceLines?.map(referenceLine =>
             createReferenceLine({
+              axis: 'x',
+              axisType: 'minor',
               chartData,
               label: referenceLine.label,
+              otherAxisDomain: majorDomainTicks.domain,
+              otherAxisPosition: referenceLine.otherAxisPosition,
               position: referenceLine.position,
               style: referenceLine.style,
               x: referenceLine.position,
@@ -219,6 +246,7 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
   },
   axes: {
     major: {
+      axis: 'y',
       id: 'major',
       title: 'Y Axis (major axis)',
       type: 'major',
@@ -241,6 +269,7 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
       },
     },
     minor: {
+      axis: 'x',
       id: 'minor',
       title: 'X Axis (minor axis)',
       type: 'minor',
@@ -248,7 +277,6 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
         canRotateLabel: false,
       },
       defaults: {
-        min: 0,
         showGrid: true,
         size: 50,
         tickConfig: 'default',

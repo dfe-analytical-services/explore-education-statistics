@@ -26,5 +26,12 @@
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Processor\GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="Resources\**" />
+        <Content Include="Resources\**">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
     
 </Project>

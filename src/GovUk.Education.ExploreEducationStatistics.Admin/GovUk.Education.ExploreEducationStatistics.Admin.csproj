@@ -200,12 +200,6 @@
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Publisher.Model\GovUk.Education.ExploreEducationStatistics.Publisher.Model.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Migrations\ContentMigrations" />
-    <Folder Include="Migrations\UsersAndRolesMigrations" />
-    <Folder Include="Services\Security" />
-  </ItemGroup>
-
   <PropertyGroup>
     <NoWarn>NU1605</NoWarn>
   </PropertyGroup>

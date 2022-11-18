@@ -5,10 +5,8 @@ import React, { useState } from 'react';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Button from '@common/components/Button';
 import { FormGroup, FormTextInput } from '@common/components/form';
-import FormEditor from '@admin/components/form/FormEditor';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
-import { isTemplateExpression, isThrowStatement } from 'typescript';
 import Details from '@common/components/Details';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -17,7 +15,6 @@ import WarningMessage from '@common/components/WarningMessage';
 const PrototypeManageUsers = () => {
   const [showDeleteUserModal, toggleDeleteUserModal] = useToggle(false);
   const [userName, setUserName] = useState('');
-  const [roleType, setRoleType] = useState(false);
   const [showRoleModal, toggleRoleModal] = useToggle(false);
   const [showTeamMembers, toggleTeamMembers] = useToggle(true);
 
@@ -158,10 +155,8 @@ const PrototypeManageUsers = () => {
                       <h2 className="govuk-heading-s govuk-!-margin-bottom-0 dfe-flex-basis--50">{`${item.name} ${item.surname}`}</h2>
 
                       <PrototypeChangeUserRole
-                        selectedRole={roleType}
                         name={`${item.name} ${item.surname}`}
                         release={item.releases[0].release}
-                        roleId={`${index}`}
                         className="dfe-flex-basis--30 govuk-!-margin-top-1 govuk-!-margin-bottom-1"
                       />
 
@@ -177,7 +172,7 @@ const PrototypeManageUsers = () => {
                         </a>
                       </div>
 
-                      {/*<div className="dfe-flex-basis--100">
+                      {/* <div className="dfe-flex-basis--100">
                         <Details summary="Individual releases">
                           {item.releases.map((item2, index2) =>(
                             <>
@@ -292,7 +287,6 @@ const PrototypeManageUsers = () => {
                           selectedRole={item2.releases[index + 1].role}
                           name={`${item2.name} ${item2.surname}`}
                           release={item2.releases[index + 1].release}
-                          roleId={`${index + 1}`}
                           className="dfe-flex-basis--30 govuk-!-margin-top-1 govuk-!-margin-bottom-1"
                         />
                         <div className="dfe-align--right dfe-flex-basis--10">
@@ -363,8 +357,6 @@ const PrototypeManageUsers = () => {
                             selectedRole
                             name="Invited user"
                             release={item}
-                            roleId={`invite-${index}`}
-                            type="invite"
                           />
                         </div>
                       </div>

@@ -78,7 +78,7 @@ user creates a fully populated draft release
     user create test release via api    ${PUBLICATION_ID}    ${RELEASE_TIME_PERIOD}    ${RELEASE_YEAR}
     user navigates to draft release page from dashboard
     ...    ${PUBLICATION_NAME}
-    ...    ${RELEASE_TYPE} (not Live)
+    ...    ${RELEASE_TYPE}
     ...    ${THEME_NAME}
     ...    ${TOPIC_NAME}
 

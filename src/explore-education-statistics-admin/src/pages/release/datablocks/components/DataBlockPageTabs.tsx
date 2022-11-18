@@ -191,6 +191,17 @@ const DataBlockPageTabs = ({
         }
       });
 
+      await handleDataBlockSave({
+        ...(dataBlock ?? {}),
+        ...details,
+        query,
+        charts,
+        table: {
+          tableHeaders: mapUnmappedTableHeaders(tableHeaders),
+          indicators: [],
+        },
+      });
+
       setTableState({
         value: {
           ...tableState,
@@ -200,17 +211,6 @@ const DataBlockPageTabs = ({
             table,
             tableHeaders,
           },
-        },
-      });
-
-      await handleDataBlockSave({
-        ...(dataBlock ?? {}),
-        ...details,
-        query,
-        charts,
-        table: {
-          tableHeaders: mapUnmappedTableHeaders(tableHeaders),
-          indicators: [],
         },
       });
     },

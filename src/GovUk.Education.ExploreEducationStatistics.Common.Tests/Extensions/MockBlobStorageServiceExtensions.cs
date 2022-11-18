@@ -1,5 +1,7 @@
 #nullable enable
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,6 +25,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         {
             return service.Setup(s => s.FindBlob(container, path))
                 .ReturnsAsync(blob);
+        }
+
+        public static IReturnsResult<IBlobStorageService> SetupStreamBlob(
+            this Mock<IBlobStorageService> service,
+            IBlobContainer container,
+            string expectedBlobPath,
+            string filePathToStream)
+        {
+            return service.Setup(s => s.StreamBlob(container, expectedBlobPath, null))
+                .ReturnsAsync(() => System.IO.File.OpenRead(filePathToStream));
+        }
+        
+        public static IReturnsResult<IBlobStorageService> SetupListBlobs(
+            this Mock<IBlobStorageService> service,
+            IBlobContainer container,
+            string expectedBlobPath,
+            List<BlobInfo> blobList)
+        {
+            return service.Setup(s => s.ListBlobs(container, expectedBlobPath))
+                .ReturnsAsync(blobList);
+        }
+        
+        public static IReturnsResult<IBlobStorageService> SetupListBlobs(
+            this Mock<IBlobStorageService> service,
+            IBlobContainer container,
+            string expectedBlobPath,
+            params BlobInfo[] blobs)
+        {
+            return SetupListBlobs(service, container, expectedBlobPath, blobs.ToList());
         }
 
         public static IReturnsResult<IBlobStorageService> SetupCheckBlobExists(

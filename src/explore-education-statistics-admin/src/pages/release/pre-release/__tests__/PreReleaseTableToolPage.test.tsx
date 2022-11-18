@@ -8,7 +8,6 @@ import _dataBlockService, {
 } from '@admin/services/dataBlockService';
 import _publicationService, {
   Publication,
-  Contact,
 } from '@admin/services/publicationService';
 import _tableBuilderService, {
   SubjectMeta,
