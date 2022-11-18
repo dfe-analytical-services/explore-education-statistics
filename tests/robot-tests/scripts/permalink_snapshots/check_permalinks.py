@@ -55,7 +55,7 @@ requests.sessions.HTTPAdapter(pool_connections=100, pool_maxsize=100, max_retrie
 class PermalinkChecker:
     def __init__(self):
         # change 'expected_row_length' to the number of rows in the 'prod-permalinks.csv' file
-        self.expected_row_length = 23019
+        self.expected_row_length = 23310
         self.backoff = 1.75
         self.request_timeout = 15
         self.session = requests.Session()
@@ -136,6 +136,7 @@ class PermalinkChecker:
                     ]
                 )
                 csvfile.close()
+
         else:
             # if the response is a Response object, then we know that the permalink loaded successfully
             # and can access the response object's attributes
@@ -157,9 +158,26 @@ class PermalinkChecker:
 
             page_title = soup.find("h1")
 
-            subject_name = page_title.text.split("from")[0].strip()
+            if page_title.text == "Sorry, there's a problem with the service":
+                permalink_error_message = "Sorry, there's a problem with the service"
+                has_permalink_error = True
+                has_permalink_warning_message = False
 
-            publication_name = page_title.text.split("from")[1].strip()
+                print(f"500 error for permalink {permalink_id}. Writing to invalid permalinks file")
+
+            elif page_title.text == "Page not found":
+                permalink_error_message = "Page not found"
+                has_permalink_error = True
+                has_permalink_warning_message = False
+                print(f"404 error for permalink {permalink_id}. Writing to invalid permalinks file")
+
+            try:
+                subject_name = page_title.text.split("from")[0].strip()
+                publication_name = page_title.text.split("from")[1].strip()
+
+            except IndexError:
+                subject_name = " "
+                publication_name = " "
 
             # permalink has a warning
             if soup.find("div", {"data-testid": permalink_warning_testid}):
