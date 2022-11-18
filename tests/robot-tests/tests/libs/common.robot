@@ -163,6 +163,7 @@ user scrolls up
 
 user scrolls to element
     [Arguments]    ${element}
+    user waits until page contains element    ${element}
     scroll element into view    ${element}
 
 user mouses over element

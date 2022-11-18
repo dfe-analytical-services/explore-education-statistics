@@ -16,12 +16,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         {
         }
 
-        public FilterItem(string label, FilterGroup filterGroup)
+        public FilterItem(string label, Guid filterGroupId)
         {
             Id = Guid.NewGuid();
             Label = label;
-            FilterGroup = filterGroup;
-            FilterGroupId = filterGroup.Id;
+            FilterGroupId = filterGroupId;
         }
 
         public bool Equals(FilterItem? other)

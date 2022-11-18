@@ -67,7 +67,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     context,
                     async ctxDelegate =>
                     {
-                        ctxDelegate.Subject.Attach(subject);
                         await ctxDelegate.Filter.AddRangeAsync(filters);
                         await ctxDelegate.Indicator.AddRangeAsync(indicators);
                         await ctxDelegate.SaveChangesAsync();
@@ -124,14 +123,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 });
         }
 
-        public List<(Filter Filter, string Column, string FilterGroupingColumn)> ReadFiltersFromCsv(
+        private List<(Filter Filter, string Column, string FilterGroupingColumn)> ReadFiltersFromCsv(
             IEnumerable<MetaRow> metaRows, 
             Subject subject)
         {
             return metaRows
                 .Where(row => row.ColumnType == ColumnType.Filter)
                 .Select(filter => (
-                    filter: new Filter(filter.FilterHint, filter.Label, filter.ColumnName, subject),
+                    filter: new Filter(filter.FilterHint, filter.Label, filter.ColumnName, subject.Id),
                     column: filter.ColumnName,
                     filterGroupingColumn: filter.FilterGroupingColumn))
                 .ToList();
@@ -167,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .GroupBy(row => row.IndicatorGrouping)
                 .ToDictionary(
                     rows => rows.Key, 
-                    rows => new IndicatorGroup(rows.Key, subject));
+                    rows => new IndicatorGroup(rows.Key, subject.Id));
 
             return indicatorRows
                 .Select(row =>

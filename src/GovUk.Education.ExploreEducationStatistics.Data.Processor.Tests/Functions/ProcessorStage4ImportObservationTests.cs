@@ -78,12 +78,12 @@ public class ProcessorStage4ImportObservationTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var filter = new Filter("", "Filter one", "filter_one", subject);
-        var filterGroup = new FilterGroup(filter, "Default");
-        filterGroup.FilterItems.Add(new FilterItem("Total", filterGroup));
+        var filter = new Filter("", "Filter one", "filter_one", subject.Id);
+        var filterGroup = new FilterGroup(filter.Id, "Default");
+        filterGroup.FilterItems.Add(new FilterItem("Total", filterGroup.Id));
         filter.FilterGroups.Add(filterGroup);
 
-        var indicatorGroup = new IndicatorGroup("Default", subject);
+        var indicatorGroup = new IndicatorGroup("Default", subject.Id);
         indicatorGroup.Indicators.Add(new Indicator
         {
             Label = "Indicator one",
@@ -276,12 +276,12 @@ public class ProcessorStage4ImportObservationTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var filter = new Filter("", "Filter one", "filter_one", subject);
-        var filterGroup = new FilterGroup(filter, "Default");
-        filterGroup.FilterItems.Add(new FilterItem("Total", filterGroup));
+        var filter = new Filter("", "Filter one", "filter_one", subject.Id);
+        var filterGroup = new FilterGroup(filter.Id, "Default");
+        filterGroup.FilterItems.Add(new FilterItem("Total", filterGroup.Id));
         filter.FilterGroups.Add(filterGroup);
 
-        var indicatorGroup = new IndicatorGroup("Default", subject);
+        var indicatorGroup = new IndicatorGroup("Default", subject.Id);
         indicatorGroup.Indicators.Add(new Indicator
         {
             Label = "Indicator one",
@@ -486,12 +486,12 @@ public class ProcessorStage4ImportObservationTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var filter = new Filter("", "Filter one", "filter_one", subject);
-        var filterGroup = new FilterGroup(filter, "Default");
-        filterGroup.FilterItems.Add(new FilterItem("Total", filterGroup));
+        var filter = new Filter("", "Filter one", "filter_one", subject.Id);
+        var filterGroup = new FilterGroup(filter.Id, "Default");
+        filterGroup.FilterItems.Add(new FilterItem("Total", filterGroup.Id));
         filter.FilterGroups.Add(filterGroup);
 
-        var indicatorGroup = new IndicatorGroup("Default", subject);
+        var indicatorGroup = new IndicatorGroup("Default", subject.Id);
         indicatorGroup.Indicators.Add(new Indicator
         {
             Label = "Indicator one",

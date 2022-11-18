@@ -21,13 +21,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         {
         }
 
-        public Filter(string? hint, string label, string name, Subject subject)
+        public Filter(string? hint, string label, string name, Guid subjectId)
         {
             Id = Guid.NewGuid();
             Hint = hint;
             Label = label;
             Name = name;
-            Subject = subject;
+            SubjectId = subjectId;
             FilterGroups = new List<FilterGroup>();
         }
 

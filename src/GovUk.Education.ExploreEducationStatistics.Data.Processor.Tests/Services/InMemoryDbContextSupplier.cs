@@ -28,24 +28,33 @@ public class InMemoryDbContextSupplier : IDbContextSupplier
 
     public TDbContext CreateDbContext<TDbContext>() where TDbContext : DbContext
     {
-        return typeof(TDbContext).Name switch
+        return (typeof(TDbContext).Name switch
         {
-            nameof(ContentDbContext) => ContentDbUtils.InMemoryContentDbContext(_contentDbContextId) as TDbContext,
-            nameof(StatisticsDbContext) =>
-                StatisticsDbUtils.InMemoryStatisticsDbContext(_statisticsDbContextId) as TDbContext,
+            nameof(ContentDbContext) => CreateContentDbContext() as TDbContext,
+            nameof(StatisticsDbContext) => CreateStatisticsDbContext() as TDbContext,
             _ => throw new ArgumentOutOfRangeException("Unable to provide DbContext of type " + 
                                                        typeof(TDbContext).Name)
-        };
+        })!;
     }
 
     public TDbContext CreateDbContextDelegate<TDbContext>() where TDbContext : DbContext
     {
-        return typeof(TDbContext).Name switch
+        return (typeof(TDbContext).Name switch
         {
-            nameof(ContentDbContext) => ContentDbUtils.InMemoryContentDbContext() as TDbContext,
-            nameof(StatisticsDbContext) => StatisticsDbUtils.InMemoryStatisticsDbContext() as TDbContext,
+            nameof(ContentDbContext) => CreateContentDbContext() as TDbContext,
+            nameof(StatisticsDbContext) => CreateStatisticsDbContext() as TDbContext,
             _ => throw new ArgumentOutOfRangeException("Unable to provide DbContext delegate of type " +
                                                        typeof(TDbContext).Name)
-        };
+        })!;
+    }
+
+    private StatisticsDbContext CreateStatisticsDbContext()
+    {
+        return StatisticsDbUtils.InMemoryStatisticsDbContext(_statisticsDbContextId);
+    }
+
+    private ContentDbContext CreateContentDbContext()
+    {
+        return ContentDbUtils.InMemoryContentDbContext(_contentDbContextId);
     }
 }

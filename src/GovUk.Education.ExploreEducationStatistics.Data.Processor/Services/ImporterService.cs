@@ -149,36 +149,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return _importerMetaService.Get(metaFileCsvHeaders, metaFileRows, subject, context);
         }
 
-        private record FilterItemMeta(string FilterLabel, string FilterGroupLabel, string FilterItemLabel)
+        private record FilterItemMeta(Guid FilterId, string FilterGroupLabel, string FilterItemLabel)
         {
             public virtual bool Equals(FilterItemMeta? other)
             {
                 if (ReferenceEquals(null, other)) return false;
                 if (ReferenceEquals(this, other)) return true;
-                return string.Equals(FilterLabel, other.FilterLabel, CurrentCultureIgnoreCase) 
+                return FilterId.Equals(other.FilterId) 
                        && string.Equals(FilterGroupLabel, other.FilterGroupLabel, CurrentCultureIgnoreCase) 
                        && string.Equals(FilterItemLabel, other.FilterItemLabel, CurrentCultureIgnoreCase);
             }
 
             public override int GetHashCode()
             {
-                return HashCode.Combine(FilterLabel.ToLower(), FilterGroupLabel.ToLower(), FilterItemLabel.ToLower());
+                return HashCode.Combine(FilterId, FilterGroupLabel.ToLower(), FilterItemLabel.ToLower());
             }
         }
 
-        private record FilterGroupMeta(string FilterLabel, string FilterGroupLabel)
+        private record FilterGroupMeta(Guid FilterId, string FilterGroupLabel)
         {
             public virtual bool Equals(FilterGroupMeta? other)
             {
                 if (ReferenceEquals(null, other)) return false;
                 if (ReferenceEquals(this, other)) return true;
-                return string.Equals(FilterLabel, other.FilterLabel, CurrentCultureIgnoreCase) 
+                return FilterId.Equals(other.FilterId) 
                        && string.Equals(FilterGroupLabel, other.FilterGroupLabel, CurrentCultureIgnoreCase);
             }
 
             public override int GetHashCode()
             {
-                return HashCode.Combine(FilterLabel.ToLower(), FilterGroupLabel.ToLower());
+                return HashCode.Combine(FilterId, FilterGroupLabel.ToLower());
             }
         }
 
@@ -230,8 +230,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                             filterMeta.FilterGroupingColumn,
                             defaultValue: CsvUtil.DefaultFilterGroupLabel)!;
 
-                        filterGroupsFromCsv.Add(new FilterGroupMeta(filterMeta.Filter.Label, filterGroupLabel));
-                        filterItemsFromCsv.Add(new FilterItemMeta(filterMeta.Filter.Label, filterGroupLabel, filterItemLabel));
+                        filterGroupsFromCsv.Add(new FilterGroupMeta(filterMeta.Filter.Id, filterGroupLabel));
+                        filterItemsFromCsv.Add(new FilterItemMeta(filterMeta.Filter.Id, filterGroupLabel, filterItemLabel));
                     }
 
                     locations.Add(
@@ -261,45 +261,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             });
 
             var filterGroups = filterGroupsFromCsv
-                .Select(filterGroupMeta =>
-                {
-                    var (filterLabel, filterGroupLabel) = filterGroupMeta;
-                    
-                    var filter = subjectMeta
-                        .Filters
-                        .Single(f => f.Filter.Label == filterLabel)
-                        .Filter;
-
-                    return new FilterGroup(filter, filterGroupLabel);
-                })
+                .Select(filterGroupMeta => new FilterGroup(filterGroupMeta.FilterId, filterGroupMeta.FilterGroupLabel))
                 .ToList();
 
             var filterItems = filterItemsFromCsv
                 .Select(filterItemMeta =>
                 {
-                    var (filterLabel, filterGroupLabel, filterItemLabel) = filterItemMeta;
+                    var (filterId, filterGroupLabel, filterItemLabel) = filterItemMeta;
                     
                     var filterGroup = filterGroups.Single(fg =>
-                        string.Equals(fg.Filter.Label.ToLower(), filterLabel.ToLower(), CurrentCultureIgnoreCase)
+                        fg.FilterId.Equals(filterId)
                         && string.Equals(fg.Label, filterGroupLabel, CurrentCultureIgnoreCase));
 
-                    return new FilterItem(filterItemLabel, filterGroup);
+                    return new FilterItem(filterItemLabel, filterGroup.Id);
                 })
                 .ToList();
                     
             await _databaseHelper.DoInTransaction(context, async ctxDelegate =>
             {
-                var filters = subjectMeta
-                    .Filters
-                    .Select(f => f.Filter);
-                    
                 await ctxDelegate.FilterGroup.AddRangeAsync(filterGroups);
                 await ctxDelegate.FilterItem.AddRangeAsync(filterItems);
                 await ctxDelegate.SaveChangesAsync();
             });
 
-            filterGroups.ForEach(filterGroup => _importerFilterCache.AddFilterGroup(filterGroup, context));
-            filterItems.ForEach(filterItem => _importerFilterCache.AddFilterItem(filterItem, context));
+            filterGroups.ForEach(filterGroup => _importerFilterCache.AddFilterGroup(filterGroup));
+            filterItems.ForEach(filterItem => _importerFilterCache.AddFilterItem(filterItem));
 
             // Add any new Locations that are being introduced by this import process exclusively.  Other concurrent 
             // import processes reaching this stage will wait before adding their own new Locations, if any.
