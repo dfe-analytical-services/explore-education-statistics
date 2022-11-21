@@ -653,13 +653,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task GetPublicationTree_TopicsWithNoVisiblePublications_Excluded()
         {
+            var releaseA = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                ReleaseName = "2020",
+                Type = ReleaseType.OfficialStatistics,
+                Published = new DateTime(2020, 1, 1),
+            };
+
+            // Not published
+            var releaseB = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                ReleaseName = "2020",
+                Type = ReleaseType.NationalStatistics
+            };
+
             var publicationA = new Publication
             {
                 Title = "Publication A",
+                LatestPublishedRelease = releaseA,
+                Releases = new List<Release>
+                {
+                    releaseA
+                }
             };
             var publicationB = new Publication
             {
                 Title = "Publication B",
+                LatestPublishedRelease = null,
+                Releases = new List<Release>
+                {
+                    releaseB
+                }
             };
 
             var themes = new List<Theme>
@@ -683,48 +709,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 }
             };
 
-            var releaseFiles = new List<ReleaseFile>
-            {
-                // Published with latest data
-                new()
-                {
-                    Release = new Release
-                    {
-                        Publication = publicationA,
-                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        ReleaseName = "2020",
-                        Type = ReleaseType.OfficialStatistics,
-                        Published = new DateTime(2020, 1, 1),
-                    },
-                    File = new File
-                    {
-                        Type = FileType.Data
-                    }
-                },
-                // Not published
-                new()
-                {
-                    Release = new Release
-                    {
-                        Publication = publicationB,
-                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        ReleaseName = "2020",
-                        Type = ReleaseType.NationalStatistics,
-                    },
-                    File = new File
-                    {
-                        Type = FileType.Data
-                    }
-                },
-            };
-
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(themes);
-                await context.AddRangeAsync(releaseFiles);
-
+                await context.Themes.AddRangeAsync(themes);
                 await context.SaveChangesAsync();
             }
 
