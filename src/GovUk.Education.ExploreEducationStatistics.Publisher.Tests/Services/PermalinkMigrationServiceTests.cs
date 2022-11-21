@@ -319,7 +319,7 @@ public class PermalinkMigrationServiceTests
         IStorageQueueService? storageQueueService = null)
     {
         return new PermalinkMigrationService(
-            contentDbContext ?? Mock.Of<ContentDbContext>(Strict),
+            contentDbContext ?? Mock.Of<ContentDbContext>(),
             blobServiceClient,
             storageQueueService ?? Mock.Of<IStorageQueueService>(Strict)
         );

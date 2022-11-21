@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -59,11 +60,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         }
 
         private static PublicationController BuildPublicationController(
-            IPublicationCacheService? publicationCacheService = null
+            IPublicationCacheService? publicationCacheService = null,
+            IPublicationService? publicationService = null
         )
         {
             return new PublicationController(
-                publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict)
+                publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
+                publicationService ?? Mock.Of<IPublicationService>(Strict)
             );
         }
     }
