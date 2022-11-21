@@ -2,14 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
@@ -120,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Id = new Guid("240ca03c-6c22-4b9d-9f15-40fc9017890e"),
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
-            TimePeriodCoverage = AcademicYearQ1,
+            TimePeriodCoverage = TimeIdentifier.AcademicYearQ1,
             Published = new DateTime(2019, 1, 01),
             Slug = "publication-a-release-2018-q1",
             ApprovalStatus = Approved,
@@ -133,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Id = new Guid("cf02f125-91da-4606-bf80-c2058092a653"),
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
-            TimePeriodCoverage = AcademicYearQ1,
+            TimePeriodCoverage = TimeIdentifier.AcademicYearQ1,
             Published = new DateTime(2019, 1, 01),
             Slug = "publication-a-release-2018-q1",
             ApprovalStatus = Approved,
@@ -147,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Id = new Guid("9da67d6d-a75f-424d-8b8b-975f151292a4"),
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
-            TimePeriodCoverage = AcademicYearQ1,
+            TimePeriodCoverage = TimeIdentifier.AcademicYearQ1,
             Published = new DateTime(2019, 1, 01),
             Slug = "publication-a-release-2018-q1",
             ApprovalStatus = Approved,
@@ -160,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Id = new Guid("874d4e4f-5568-482f-a5a4-d41e5bf6632a"),
             PublicationId = PublicationA.Id,
             ReleaseName = "2018",
-            TimePeriodCoverage = AcademicYearQ2,
+            TimePeriodCoverage = TimeIdentifier.AcademicYearQ2,
             Published = new DateTime(2019, 1, 01),
             Slug = "publication-a-release-2018-q2",
             ApprovalStatus = Approved,
@@ -173,7 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Id = new Guid("676ff979-9b1d-4bd2-a3f1-f126c4e2e8d4"),
             PublicationId = PublicationA.Id,
             ReleaseName = "2017",
-            TimePeriodCoverage = AcademicYearQ4,
+            TimePeriodCoverage = TimeIdentifier.AcademicYearQ4,
             Published = new DateTime(2019, 1, 01),
             Slug = "publication-a-release-2017-q4",
             ApprovalStatus = Approved,
@@ -186,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Id = new Guid("e66247d7-b350-4d81-a223-3080edc55623"),
             PublicationId = PublicationB.Id,
             ReleaseName = "2018",
-            TimePeriodCoverage = AcademicYearQ1,
+            TimePeriodCoverage = TimeIdentifier.AcademicYearQ1,
             Published = null,
             Slug = "publication-b-release-2018-q1",
             ApprovalStatus = Draft,
@@ -205,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Id = new Guid("3c7b1338-4c41-43b4-b4ae-67c21c8734fb"),
                 PublicationId = PublicationA.Id,
                 ReleaseName = "2018",
-                TimePeriodCoverage = AcademicYearQ3,
+                TimePeriodCoverage = TimeIdentifier.AcademicYearQ3,
                 Published = null,
                 Slug = "publication-a-release-2018-q3",
                 ApprovalStatus = Draft,
@@ -249,15 +250,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildPublicationService(contentDbContext);
+                var service = SetupService(contentDbContext);
 
                 Assert.True(await service.IsPublicationPublished(publication.Id));
             }
@@ -270,15 +271,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildPublicationService(contentDbContext);
+                var service = SetupService(contentDbContext);
 
                 Assert.False(await service.IsPublicationPublished(publication.Id));
             }
@@ -298,23 +299,440 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildPublicationService(contentDbContext);
+                var service = SetupService(contentDbContext);
 
                 Assert.False(await service.IsPublicationPublished(publication.Id));
             }
         }
 
-        private PublicationService BuildPublicationService(
+        [Fact]
+        public async Task UpdateLatestPublishedRelease_SetsCorrectReleaseInTimeSeries()
+        {
+            var release2021Week21 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2021",
+                TimePeriodCoverage = TimeIdentifier.Week21,
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            var release2022Week1 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.Week1,
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            var release2022Week2 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.Week2,
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            var release2022Week3 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.Week3,
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            var release2022Week10 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.Week10,
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            // Latest in time series
+            var release2022Week21 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.Week21,
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            var publication = new Publication
+            {
+                Releases = new List<Release>
+                {
+                    // Set the releases so that they are not in time series order
+
+                    // Include a range of releases to make sure they are being correctly ordered by the
+                    // time identifiers enum entry position rather than in alphanumeric order by value
+
+                    release2022Week3,
+                    release2022Week21,
+                    release2022Week10,
+                    release2021Week21,
+                    release2022Week2,
+                    release2022Week1
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                var service = SetupService(context);
+                await service.UpdateLatestPublishedRelease(publication.Id);
+            }
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                var found = await context.Publications.SingleAsync(p => p.Id == publication.Id);
+
+                // Release 2022 week 21 should be the latest published
+                Assert.Equal(release2022Week21.Id, found.LatestPublishedReleaseId);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateLatestPublishedRelease_SetsCorrectReleaseInTimeSeries_LatestInSeriesNotPublished()
+        {
+            var release2021Week21 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2021",
+                TimePeriodCoverage = TimeIdentifier.Week21,
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            var release2022Week1 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.Week1,
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            var release2022Week2 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.Week2,
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            var release2022Week3 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.Week3,
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            // Latest published in time series
+            var release2022Week10 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.Week10,
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            // Latest in time series (not published)
+            var release2022Week21 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.Week21,
+                Published = null
+            };
+
+            var publication = new Publication
+            {
+                Releases = new List<Release>
+                {
+                    // Set the releases so that they are not in time series order
+
+                    // Include a range of releases to make sure they are being correctly ordered by the
+                    // time identifiers enum entry position rather than in alphanumeric order by value
+
+                    release2022Week3,
+                    release2022Week21,
+                    release2022Week10,
+                    release2021Week21,
+                    release2022Week2,
+                    release2022Week1
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                var service = SetupService(context);
+                await service.UpdateLatestPublishedRelease(publication.Id);
+            }
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                var found = await context.Publications.SingleAsync(p => p.Id == publication.Id);
+
+                // Release 2022 week 10 should be the latest published
+                Assert.Equal(release2022Week10.Id, found.LatestPublishedReleaseId);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateLatestPublishedRelease_SetsCorrectReleaseVersion()
+        {
+            var releaseVersion0 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Version = 0,
+                PreviousVersionId = null,
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            var releaseVersion1 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Version = 1,
+                PreviousVersionId = releaseVersion0.Id,
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            var releaseVersion2 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Version = 2,
+                PreviousVersionId = releaseVersion1.Id,
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            var publication = new Publication
+            {
+                Releases = new List<Release>
+                {
+                    // Set the releases so that they are not in version order
+                    releaseVersion1,
+                    releaseVersion2,
+                    releaseVersion0
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                var service = SetupService(context);
+                await service.UpdateLatestPublishedRelease(publication.Id);
+            }
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                var found = await context.Publications.SingleAsync(p => p.Id == publication.Id);
+
+                // Release version 2 should be the latest published
+                Assert.Equal(releaseVersion2.Id, found.LatestPublishedReleaseId);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateLatestPublishedRelease_SetsCorrectReleaseVersion_LatestVersionNotPublished()
+        {
+            var releaseVersion0 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Version = 0,
+                PreviousVersionId = null,
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            var releaseVersion1 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Version = 1,
+                PreviousVersionId = releaseVersion0.Id,
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            // Latest published version
+            var releaseVersion2 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Version = 2,
+                PreviousVersionId = releaseVersion1.Id,
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            // Latest version (not published)
+            var releaseVersion3 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Version = 3,
+                PreviousVersionId = releaseVersion2.Id,
+                Published = null
+            };
+
+            var publication = new Publication
+            {
+                Releases = new List<Release>
+                {
+                    // Set the releases so that they are not in version order
+                    releaseVersion1,
+                    releaseVersion3,
+                    releaseVersion2,
+                    releaseVersion0
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                var service = SetupService(context);
+                await service.UpdateLatestPublishedRelease(publication.Id);
+            }
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                var found = await context.Publications.SingleAsync(p => p.Id == publication.Id);
+
+                // Release version 2 should be the latest published
+                Assert.Equal(releaseVersion2.Id, found.LatestPublishedReleaseId);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateLatestPublishedRelease_PublicationWithoutReleasesThrowsError()
+        {
+            // Set up a publication with no releases
+            var publication = new Publication
+            {
+                Releases = new List<Release>()
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                var service = SetupService(context);
+                var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                    service.UpdateLatestPublishedRelease(publication.Id));
+
+                Assert.Equal(
+                    $"Expected publication to have at least one published release. Publication id: {publication.Id}",
+                    exception.Message);
+            }
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                var found = await context.Publications.SingleAsync(p => p.Id == publication.Id);
+
+                // Publication shouldn't have been updated since it has no releases
+                Assert.Null(found.LatestPublishedReleaseId);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateLatestPublishedRelease_PublicationWithoutPublishedReleasesThrowsError()
+        {
+            // Set up a publication where the only release is not published
+            var publication = new Publication
+            {
+                Releases = new List<Release>
+                {
+                    new()
+                    {
+                        ReleaseName = "2022",
+                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                        Published = null
+                    }
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                var service = SetupService(context);
+                var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                    service.UpdateLatestPublishedRelease(publication.Id));
+
+                Assert.Equal(
+                    $"Expected publication to have at least one published release. Publication id: {publication.Id}",
+                    exception.Message);
+            }
+
+            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            {
+                var found = await context.Publications.SingleAsync(p => p.Id == publication.Id);
+
+                // Publication shouldn't have been updated since the only release is not published
+                Assert.Null(found.LatestPublishedReleaseId);
+            }
+        }
+
+        private static PublicationService SetupService(
             ContentDbContext contentDbContext
-        ) {
+        )
+        {
             return new(
                 contentDbContext: contentDbContext
             );

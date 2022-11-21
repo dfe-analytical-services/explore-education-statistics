@@ -37,5 +37,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             return publication.Releases.Any(release => release.IsLatestPublishedVersionOfRelease());
         }
+
+        public async Task UpdateLatestPublishedRelease(Guid publicationId)
+        {
+            var publication = await _contentDbContext.Publications
+                .Include(p => p.Releases)
+                .SingleAsync(p => p.Id == publicationId);
+
+            var publishedReleases = publication.GetPublishedReleases();
+
+            if (!publishedReleases.Any())
+            {
+                throw new InvalidOperationException(
+                    $"Expected publication to have at least one published release. Publication id: {publicationId}");
+            }
+
+            var latestPublishedRelease = publishedReleases
+                .OrderBy(r => r.Year)
+                .ThenBy(r => r.TimePeriodCoverage)
+                .Last();
+
+            publication.LatestPublishedReleaseId = latestPublishedRelease.Id;
+            _contentDbContext.Update(publication);
+            await _contentDbContext.SaveChangesAsync();
+        }
     }
 }

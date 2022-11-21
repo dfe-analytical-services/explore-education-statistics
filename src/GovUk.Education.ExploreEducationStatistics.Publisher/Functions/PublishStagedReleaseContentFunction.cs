@@ -23,6 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private readonly INotificationsService _notificationsService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
         private readonly IPublicationCacheService _publicationCacheService;
+        private readonly IPublicationService _publicationService;
         private readonly IPublishingService _publishingService;
         private readonly IReleaseService _releaseService;
 
@@ -32,6 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             INotificationsService notificationsService,
             IReleasePublishingStatusService releasePublishingStatusService,
             IPublicationCacheService publicationCacheService,
+            IPublicationService publicationService,
             IPublishingService publishingService,
             IReleaseService releaseService)
         {
@@ -40,6 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             _notificationsService = notificationsService;
             _releasePublishingStatusService = releasePublishingStatusService;
             _publicationCacheService = publicationCacheService;
+            _publicationService = publicationService;
             _publishingService = publishingService;
             _releaseService = releaseService;
         }
@@ -95,6 +98,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     var publishedPublications = publishedReleases.Select(status => status.PublicationSlug)
                         .Distinct()
                         .ToList();
+
+                    // TODO EES-3369 (Read Replica-2) This needs moving to the new PublishingCompletionService
+                    await _contentDbContext.Publications
+                        .Where(publication => publishedPublications.Contains(publication.Slug))
+                        .Select(publication => publication.Id)
+                        .ToAsyncEnumerable()
+                        .ForEachAwaitAsync(_publicationService.UpdateLatestPublishedRelease);
 
                     // Update the cached publications and any cached superseded publications.
                     // If any publications have a live release for the first time, the superseding is now enforced
