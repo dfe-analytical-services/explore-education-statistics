@@ -23,6 +23,7 @@
 .labelInput {
   composes: configurationInput;
   flex-grow: 1;
+  min-width: 200px;
 }
 
 .colourInput {
