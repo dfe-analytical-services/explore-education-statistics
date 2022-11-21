@@ -303,7 +303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Slug = "publication-a",
                 Title = "Publication A",
                 Summary = "Publication A summary",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = new DateTime(2020, 1, 1)
@@ -315,7 +315,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Slug = "publication-b",
                 Title = "Publication B",
                 Summary = "Publication B summary",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = OfficialStatistics,
                     Published = new DateTime(2021, 1, 1)
@@ -327,7 +327,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Slug = "publication-c",
                 Title = "Publication C",
                 Summary = "Publication C summary",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = AdHocStatistics,
                     Published = new DateTime(2022, 1, 1)
@@ -418,7 +418,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -429,7 +429,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseNew = null
+                LatestPublishedRelease = null
             };
 
             var themes = new List<Theme>
@@ -476,7 +476,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -487,7 +487,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -505,7 +505,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationD = new Publication
             {
                 Title = "Publication D",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -517,7 +517,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationE = new Publication
             {
                 Title = "Publication E",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -573,7 +573,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -583,7 +583,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -619,7 +619,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                                 new()
                                 {
                                     Title = "Publication C",
-                                    LatestPublishedReleaseNew = new Release
+                                    LatestPublishedRelease = new Release
                                     {
                                         Type = AdHocStatistics,
                                         Published = new DateTime(2022, 1, 1)
@@ -663,7 +663,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -673,7 +673,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = OfficialStatistics,
                     Published = DateTime.UtcNow
@@ -683,7 +683,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationC = new Publication
             {
                 Title = "Publication C",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = AdHocStatistics,
                     Published = DateTime.UtcNow
@@ -785,7 +785,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Id = Guid.NewGuid(),
                     Title = "Publication B",
                     LatestPublishedReleaseId = releaseB.Id,
-                    LatestPublishedReleaseNew = releaseB,
+                    LatestPublishedRelease = releaseB,
                     Topic = topic
                 },
                 new()
@@ -793,7 +793,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Id = Guid.NewGuid(),
                     Title = "Publication C",
                     LatestPublishedReleaseId = releaseC.Id,
-                    LatestPublishedReleaseNew = releaseC,
+                    LatestPublishedRelease = releaseC,
                     Topic = topic
                 },
                 new()
@@ -801,7 +801,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Id = Guid.NewGuid(),
                     Title = "Publication A",
                     LatestPublishedReleaseId = releaseA.Id,
-                    LatestPublishedReleaseNew = releaseA,
+                    LatestPublishedRelease = releaseA,
                     Topic = topic
                 },
             };
@@ -881,7 +881,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Id = Guid.NewGuid(),
                     Title = "Publication B",
                     LatestPublishedReleaseId = releaseB.Id,
-                    LatestPublishedReleaseNew = releaseB,
+                    LatestPublishedRelease = releaseB,
                     Topic = topic
                 },
                 new()
@@ -889,7 +889,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Id = Guid.NewGuid(),
                     Title = "Publication C",
                     LatestPublishedReleaseId = releaseC.Id,
-                    LatestPublishedReleaseNew = releaseC,
+                    LatestPublishedRelease = releaseC,
                     Topic = topic
                 },
                 new()
@@ -897,7 +897,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Id = Guid.NewGuid(),
                     Title = "Publication A",
                     LatestPublishedReleaseId = releaseA.Id,
-                    LatestPublishedReleaseNew = releaseA,
+                    LatestPublishedRelease = releaseA,
                     Topic = topic
                 },
             };
@@ -962,19 +962,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = releaseA
+                LatestPublishedRelease = releaseA
             };
 
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseNew = releaseB
+                LatestPublishedRelease = releaseB
             };
 
             var publicationC = new Publication
             {
                 Title = "Publication C",
-                LatestPublishedReleaseNew = releaseC
+                LatestPublishedRelease = releaseC
             };
 
             var themes = new List<Theme>
@@ -1053,19 +1053,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = releaseA
+                LatestPublishedRelease = releaseA
             };
 
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseNew = releaseB
+                LatestPublishedRelease = releaseB
             };
 
             var publicationC = new Publication
             {
                 Title = "Publication C",
-                LatestPublishedReleaseNew = releaseC
+                LatestPublishedRelease = releaseC
             };
 
             var themes = new List<Theme>
@@ -1126,7 +1126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -1136,7 +1136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = OfficialStatistics,
                     Published = DateTime.UtcNow
@@ -1146,7 +1146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationC = new Publication
             {
                 Title = "Publication C",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = AdHocStatistics,
                     Published = DateTime.UtcNow
@@ -1211,7 +1211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -1221,7 +1221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = OfficialStatistics,
                     Published = DateTime.UtcNow
@@ -1231,7 +1231,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationC = new Publication
             {
                 Title = "Publication C",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = AdHocStatistics,
                     Published = DateTime.UtcNow

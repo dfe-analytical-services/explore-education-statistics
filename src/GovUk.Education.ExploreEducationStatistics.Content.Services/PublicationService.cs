@@ -79,7 +79,7 @@ public class PublicationService : IPublicationService
         // Apply release type and theme filters
         if (releaseType.HasValue)
         {
-            baseQueryable = baseQueryable.Where(p => p.LatestPublishedReleaseNew!.Type == releaseType.Value);
+            baseQueryable = baseQueryable.Where(p => p.LatestPublishedRelease!.Type == releaseType.Value);
         }
 
         if (themeId.HasValue)
@@ -100,8 +100,8 @@ public class PublicationService : IPublicationService
         {
             Published =>
                 order == Asc
-                    ? queryable.OrderBy(p => p.Publication.LatestPublishedReleaseNew!.Published)
-                    : queryable.OrderByDescending(p => p.Publication.LatestPublishedReleaseNew!.Published),
+                    ? queryable.OrderBy(p => p.Publication.LatestPublishedRelease!.Published)
+                    : queryable.OrderByDescending(p => p.Publication.LatestPublishedRelease!.Published),
             Relevance =>
                 order == Asc
                     ? queryable.OrderBy(p => p.Rank)
@@ -131,8 +131,8 @@ public class PublicationService : IPublicationService
                     Summary = tuple.Publication.Summary,
                     Title = tuple.Publication.Title,
                     Theme = tuple.Publication.Topic.Theme.Title,
-                    Published = tuple.Publication.LatestPublishedReleaseNew!.Published!.Value,
-                    Type = tuple.Publication.LatestPublishedReleaseNew!.Type,
+                    Published = tuple.Publication.LatestPublishedRelease!.Published!.Value,
+                    Type = tuple.Publication.LatestPublishedRelease!.Type,
                     Rank = tuple.Rank
                 }).ToListAsync();
 

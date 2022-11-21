@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Security.ContentSecurityPolicies;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests;
@@ -36,11 +37,13 @@ public class PublicationServicePermissionTests
     }
 
     private PublicationService BuildService(
+        ContentDbContext? contentDbContext = null,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         IPublicationRepository? publicationRepository = null,
         IUserService? userService = null)
     {
         return new(
+            contentDbContext ?? InMemoryContentDbContext(),
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,
             publicationRepository ?? Mock.Of<IPublicationRepository>(MockBehavior.Strict),
             userService ?? Mock.Of<IUserService>(MockBehavior.Strict));
