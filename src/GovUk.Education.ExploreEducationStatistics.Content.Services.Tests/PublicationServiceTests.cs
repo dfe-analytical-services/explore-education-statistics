@@ -284,7 +284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublications()
+        public async Task ListPublications()
         {
             var publicationA = new Publication
             {
@@ -363,7 +363,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupPublicationService(contentDbContext);
 
-                var pagedResult = (await service.GetPublications()).AssertRight();
+                var pagedResult = (await service.ListPublications()).AssertRight();
                 var results = pagedResult.Results;
 
                 Assert.Equal(3, results.Count);
@@ -394,7 +394,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublications_ExcludesUnpublishedPublications()
+        public async Task ListPublications_ExcludesUnpublishedPublications()
         {
             // Published
             var publicationA = new Publication
@@ -444,7 +444,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupPublicationService(contentDbContext);
 
-                var pagedResult = (await service.GetPublications()).AssertRight();
+                var pagedResult = (await service.ListPublications()).AssertRight();
                 var results = pagedResult.Results;
 
                 Assert.Equal(publicationA.Id, results[0].Id);
@@ -452,7 +452,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublications_ExcludesSupersededPublications()
+        public async Task ListPublications_ExcludesSupersededPublications()
         {
             // Published
             var publicationA = new Publication
@@ -540,7 +540,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupPublicationService(contentDbContext);
 
-                var pagedResult = (await service.GetPublications()).AssertRight();
+                var pagedResult = (await service.ListPublications()).AssertRight();
                 var results = pagedResult.Results;
 
                 Assert.Equal(publicationA.Id, results[0].Id);
@@ -550,7 +550,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublications_FilterByTheme()
+        public async Task ListPublications_FilterByTheme()
         {
             var publicationA = new Publication
             {
@@ -625,7 +625,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupPublicationService(contentDbContext);
 
-                var pagedResult = (await service.GetPublications(
+                var pagedResult = (await service.ListPublications(
                     themeId: themes[0].Id
                 )).AssertRight();
                 var results = pagedResult.Results;
@@ -641,7 +641,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublications_FilterByReleaseType()
+        public async Task ListPublications_FilterByReleaseType()
         {
             var publicationA = new Publication
             {
@@ -717,7 +717,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupPublicationService(contentDbContext);
 
-                var pagedResult = (await service.GetPublications(
+                var pagedResult = (await service.ListPublications(
                     releaseType: OfficialStatistics
                 )).AssertRight();
                 var results = pagedResult.Results;
@@ -730,7 +730,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublications_Search_SortByRelevance_Desc()
+        public async Task ListPublications_Search_SortByRelevance_Desc()
         {
             var releaseA = new Release
             {
@@ -804,7 +804,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var service = SetupPublicationService(contentDbContext.Object);
 
-            var pagedResult = (await service.GetPublications(
+            var pagedResult = (await service.ListPublications(
                 search: "term",
                 sort: null, // Sort should default to relevance
                 order: null // Order should default to descending
@@ -826,7 +826,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublications_Search_SortByRelevance_Asc()
+        public async Task ListPublications_Search_SortByRelevance_Asc()
         {
             var releaseA = new Release
             {
@@ -900,7 +900,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var service = SetupPublicationService(contentDbContext.Object);
 
-            var pagedResult = (await service.GetPublications(
+            var pagedResult = (await service.ListPublications(
                 search: "term",
                 sort: null, // Sort should default to relevance
                 order: Asc
@@ -922,7 +922,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublications_SortByPublished_Desc()
+        public async Task ListPublications_SortByPublished_Desc()
         {
             var releaseA = new Release
             {
@@ -991,7 +991,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupPublicationService(contentDbContext);
 
-                var pagedResult = (await service.GetPublications(
+                var pagedResult = (await service.ListPublications(
                     sort: Published,
                     order: null // Order should default to descending
                 )).AssertRight();
@@ -1013,7 +1013,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublications_SortByPublished_Asc()
+        public async Task ListPublications_SortByPublished_Asc()
         {
             var releaseA = new Release
             {
@@ -1082,7 +1082,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupPublicationService(contentDbContext);
 
-                var pagedResult = (await service.GetPublications(
+                var pagedResult = (await service.ListPublications(
                     sort: Published,
                     order: Asc
                 )).AssertRight();
@@ -1104,7 +1104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublications_SortByTitle_Desc()
+        public async Task ListPublications_SortByTitle_Desc()
         {
             var publicationA = new Publication
             {
@@ -1167,7 +1167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupPublicationService(contentDbContext);
 
-                var pagedResult = (await service.GetPublications(
+                var pagedResult = (await service.ListPublications(
                     sort: null, // Sort should default to title
                     order: Desc
                 )).AssertRight();
@@ -1189,7 +1189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublications_SortByTitle_Asc()
+        public async Task ListPublications_SortByTitle_Asc()
         {
             var publicationA = new Publication
             {
@@ -1252,7 +1252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupPublicationService(contentDbContext);
 
-                var pagedResult = (await service.GetPublications(
+                var pagedResult = (await service.ListPublications(
                     sort: null, // Sort should default to title
                     order: null // Order should default to ascending
                 )).AssertRight();

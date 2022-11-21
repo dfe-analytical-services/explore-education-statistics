@@ -50,7 +50,7 @@ public class PublicationService : IPublicationService
             });
     }
 
-    public async Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> GetPublications(
+    public async Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
         ReleaseType? releaseType = null,
         Guid? themeId = null,
         string? search = null,
@@ -114,16 +114,16 @@ public class PublicationService : IPublicationService
         var results = await orderedQueryable
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(p =>
+            .Select(tuple =>
                 new PublicationSearchResultViewModel
                 {
-                    Id = p.Publication.Id,
-                    Summary = p.Publication.Summary,
-                    Title = p.Publication.Title,
-                    Theme = p.Publication.Topic.Theme.Title,
-                    Published = p.Publication.LatestPublishedReleaseNew!.Published!.Value,
-                    Type = p.Publication.LatestPublishedReleaseNew!.Type,
-                    Rank = p.Rank
+                    Id = tuple.Publication.Id,
+                    Summary = tuple.Publication.Summary,
+                    Title = tuple.Publication.Title,
+                    Theme = tuple.Publication.Topic.Theme.Title,
+                    Published = tuple.Publication.LatestPublishedReleaseNew!.Published!.Value,
+                    Type = tuple.Publication.LatestPublishedReleaseNew!.Type,
+                    Rank = tuple.Rank
                 }).ToListAsync();
 
         return new PaginatedListViewModel<PublicationSearchResultViewModel>(results, totalResults, page, pageSize);

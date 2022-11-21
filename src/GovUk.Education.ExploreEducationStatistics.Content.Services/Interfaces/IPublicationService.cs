@@ -13,7 +13,7 @@ public interface IPublicationService
 {
     Task<Either<ActionResult, PublicationCacheViewModel>> Get(string publicationSlug);
 
-    Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> GetPublications(
+    Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
         ReleaseType? releaseType = null,
         Guid? themeId = null,
         string? search = null,
