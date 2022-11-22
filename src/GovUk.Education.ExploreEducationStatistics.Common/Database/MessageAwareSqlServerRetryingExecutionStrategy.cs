@@ -39,10 +39,13 @@ public class MessageAwareSqlServerRetryingExecutionStrategy : SqlServerRetryingE
     private static readonly Regex[] TransientErrorMessages = {
         // This is the error message associated with Error Number 10060, but is reported with Error Number 0, and so
         // isn't handled correctly by SqlServerTransientExceptionDetector correctly.
-        new Regex(@"^A network-related or instance-specific error occurred while establishing a connection to SQL Server\."),
+        new(@"^A network-related or instance-specific error occurred while establishing a connection to SQL Server\."),
         
         // An error that can occur when the connection pool is exhausted for the target database.
-        new Regex(@"^A connection was successfully established with the server, but then an error occurred during the pre-login handshake\.")
+        new(@"^A connection was successfully established with the server, but then an error occurred during the pre-login handshake\."),
+      
+        // An error that can occur when communication is interrupted during re-establishing communication with the database.
+        new(@"^Connection Timeout Expired\.  The timeout period elapsed while attempting to consume the pre-login handshake acknowledgement\."),
     };
 
     private readonly ILogger _logger;
