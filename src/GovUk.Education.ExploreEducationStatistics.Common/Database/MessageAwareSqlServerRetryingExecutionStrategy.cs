@@ -85,8 +85,7 @@ public class MessageAwareSqlServerRetryingExecutionStrategy : SqlServerRetryingE
                 
             if (matchingRegex != null)
             {
-                _logger.LogWarning(exception, "Transient SQL error encountered and will be retried - " +
-                                              $"matches regex {matchingRegex}");
+                _logger.LogWarning($"SQL error can be retried - matches regex {matchingRegex}");
                 return true;
             }
         }
