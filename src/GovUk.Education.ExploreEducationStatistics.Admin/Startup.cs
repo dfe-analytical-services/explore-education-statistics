@@ -741,10 +741,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseIdentityServer();
             app.UseAuthorization();
 
-            // deny access to all Identity routes other than /Identity/Account/Login and
+            // Deny access to all /Identity routes other than:
+            // 
+            // /Identity/Account/Login
             // /Identity/Account/ExternalLogin
+            // /Identity/Account/InviteExpired
+            //
+            // This Regex is case insensitive.
             var options = new RewriteOptions()
-                .AddRewrite(@"^(?i)identity/(?!account/(?:external)*login$)", "/", skipRemainingRules: true);
+                .AddRewrite(
+                    @"^(?i)identity/(?!account/(login|externallogin|inviteexpired))", 
+                    replacement: "/", 
+                    skipRemainingRules: true);
             app.UseRewriter(options);
 
             app.UseEndpoints(endpoints =>

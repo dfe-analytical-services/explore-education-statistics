@@ -26,6 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
     {
         private const string LoginErrorMessage = "Sorry, there was a problem logging you in.";
 
+        private static readonly TimeSpan InviteExpirySpan = TimeSpan.FromDays(14);
+        
         private readonly ISignInManagerDelegate _signInManager;
         private readonly IUserManagerDelegate _userManager;
         private readonly ContentDbContext _contentDbContext;
@@ -68,7 +70,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             return new ChallengeResult(provider, properties);
         }
 
-        // NOTE: Argument names are important - e.g. if `returnUrl`'s name is changed, the returnUrl will always be null
+        /// <remarks>
+        /// Argument names are important - e.g. if `returnUrl`'s name is changed, the returnUrl will always be null
+        /// </remarks>
         public async Task<IActionResult> OnGetCallbackAsync(string returnUrl = null, string remoteError = null)
         {
             var returnUrlOrFallback = returnUrl ?? Url.Content("~/");
@@ -166,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             return await LoginUserWithProviderDetails(returnUrl, info);
         }
 
-        private IActionResult RedirectToLoginPageWithError(string returnUrl)
+        private IActionResult RedirectToLoginPageWithError(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
             ErrorMessage = LoginErrorMessage;
@@ -238,6 +242,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             ExternalLoginInfo info,
             string returnUrl)
         {
+            var inviteExpiryTime = inviteToSystem.Created + InviteExpirySpan;
+
+            if (DateTime.UtcNow >= inviteExpiryTime)
+            {
+                return RedirectToPage("./InviteExpired");
+            }
+            
             // Mark the invite as accepted.
             inviteToSystem.Accepted = true;
             _usersAndRolesDbContext.UserInvites.Update(inviteToSystem);
