@@ -8,13 +8,12 @@ import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
 import React from 'react';
 
-const CopyLinkButton = ({
-  className,
-  url,
-}: {
+interface Props {
   className?: string;
   url: string;
-}) => {
+}
+
+const CopyLinkButton = ({ className, url }: Props) => {
   const [copied, toggleCopied] = useToggle(false);
   const [showModal, toggleModal] = useToggle(false);
 

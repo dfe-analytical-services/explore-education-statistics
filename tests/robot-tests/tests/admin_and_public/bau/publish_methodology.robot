@@ -42,6 +42,21 @@ Add content to methodology
     user adds content to accordion section text block    Methodology content section 2    1
     ...    Content 2    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
 
+    # regression test for EES-3877
+    user creates new content section    3    3.test-title 3
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds text block to editable accordion section    3.test-title 3
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds content to accordion section text block    3.test-title 3    1
+    ...    Content 3    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+
+    user creates new content section    4    4.-test-.title 4
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds text block to editable accordion section    4.-test-.title 4
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds content to accordion section text block    4.-test-.title 4    1
+    ...    Content 4    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+
 Add annexe content to methodology
     user creates new content section    1    Methodology annexe section 1
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
@@ -130,12 +145,33 @@ Verify that the methodology is publicly accessible
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}
-    user waits until page contains title caption    Methodology
+    user waits until page contains title caption    Methodology    %{WAIT_SMALL}
+    ${METHODOLOGY_URL}=    get location
+    set suite variable    ${METHODOLOGY_URL}
+
+Verify that methodology hash links open accoridon sections correctly
+    [Documentation]    EES-3877
+    user navigates to public frontend    ${METHODOLOGY_URL}#content-section-3-test-title-3
+    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user waits until page contains title caption    Methodology    %{WAIT_SMALL}
+    user checks page contains    3.test-title 3
+    user checks page contains    Content 3
+
+    user navigates to public frontend    ${METHODOLOGY_URL}#content-section-4-test-title-4
+    user waits for page to finish loading
+
+    user checks page contains    4.-test-.title 4
+    user checks page contains    Content 4
 
 Verify that the methodology displays a link to the publication
+    user navigates to public frontend    ${METHODOLOGY_URL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user waits until page contains title caption    Methodology    %{WAIT_SMALL}
+
     user checks element contains child element
     ...    css:[aria-labelledby="related-information"]
     ...    xpath://h3[text()="Publications"]
+
     user checks page contains link with text and url
     ...    ${PUBLICATION_NAME}
     ...    /find-statistics/ui-tests-publish-methodology-%{RUN_IDENTIFIER}
@@ -148,7 +184,10 @@ Verify that the methodology content is correct
     user checks accordion is in position    Methodology content section 1    1    id:content
     user checks accordion is in position    Methodology content section 2    2    id:content
 
-    user checks there are x accordion sections    2    id:content
+    user checks accordion is in position    3.test-title 3    3    id:content
+    user checks accordion is in position    4.-test-.title 4    4    id:content
+
+    user checks there are x accordion sections    4    id:content
 
     user opens accordion section    Methodology content section 1
     ${content_section_1}=    user gets accordion section content element    Methodology content section 1
@@ -286,7 +325,10 @@ Verify that the amended methodology content is correct
     user checks accordion is in position    Methodology content section 2    1    id:content
     user checks accordion is in position    Methodology content section 1 updated    2    id:content
 
-    user checks there are x accordion sections    2    id:content
+    user checks accordion is in position    3.test-title 3    3    id:content
+    user checks accordion is in position    4.-test-.title 4    4    id:content
+
+    user checks there are x accordion sections    4    id:content
 
     user opens accordion section    Methodology content section 2
     ${content_section_2}=    user gets accordion section content element    Methodology content section 2
