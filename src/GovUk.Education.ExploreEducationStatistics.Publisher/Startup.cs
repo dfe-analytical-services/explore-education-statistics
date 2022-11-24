@@ -138,7 +138,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     ))
                 .AddScoped<IFilterRepository, FilterRepository>()
                 .AddScoped<IFootnoteRepository, FootnoteRepository>()
-                .AddScoped<IIndicatorRepository, IndicatorRepository>();
+                .AddScoped<IIndicatorRepository, IndicatorRepository>()
+                .AddScoped<IPublicationRepository, PublicationRepository>();
 
             AddPersistenceHelper<ContentDbContext>(builder.Services);
             AddPersistenceHelper<StatisticsDbContext>(builder.Services);
