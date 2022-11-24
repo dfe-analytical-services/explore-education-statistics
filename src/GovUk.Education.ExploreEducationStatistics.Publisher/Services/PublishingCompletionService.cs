@@ -16,14 +16,15 @@ public class PublishingCompletionService : IPublishingCompletionService
     private readonly IContentService _contentService;
     private readonly INotificationsService _notificationsService;
     private readonly IReleasePublishingStatusService _releasePublishingStatusService;
+    private readonly IPublicationService _publicationService;
     private readonly IPublicationCacheService _publicationCacheService;
     private readonly IReleaseService _releaseService;
 
-    public PublishingCompletionService(
-        ContentDbContext contentDbContext,
+    public PublishingCompletionService(ContentDbContext contentDbContext,
         IContentService contentService,
         INotificationsService notificationsService,
-        IReleasePublishingStatusService releasePublishingStatusService, 
+        IReleasePublishingStatusService releasePublishingStatusService,
+        IPublicationService publicationService,
         IPublicationCacheService publicationCacheService,
         IReleaseService releaseService)
     {
@@ -33,6 +34,7 @@ public class PublishingCompletionService : IPublishingCompletionService
         _releasePublishingStatusService = releasePublishingStatusService;
         _publicationCacheService = publicationCacheService;
         _releaseService = releaseService;
+        _publicationService = publicationService;
     }
 
     public async Task CompletePublishingIfAllPriorStagesComplete(
@@ -75,7 +77,7 @@ public class PublishingCompletionService : IPublishingCompletionService
         await releaseIdsToUpdate
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(releaseId => _releaseService.SetPublishedDates(releaseId, publishedDate));
-
+        
         var publicationSlugs = prePublishingStagesComplete
             .Select(status => status.PublicationSlug)
             .Distinct();
@@ -85,6 +87,10 @@ public class PublishingCompletionService : IPublishingCompletionService
             .Where(p => publicationSlugs.Contains(p.Slug))
             .Select(p => p.Id)
             .ToListAsync();
+        
+        await directlyRelatedPublicationIds
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(_publicationService.UpdateLatestPublishedRelease);
         
         // Update the cached publication and any cached superseded publications.
         // If this is the first live release of the publication, the superseding is now enforced
