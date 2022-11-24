@@ -752,4 +752,4 @@ user gets resolved comment
 
 user closes Set Page View box
     user clicks element    id:pageViewToggleButton
-    user waits until element is not visible    id:editingMode
+    user waits until element is not visible    id:editingMode    %{WAIT_SMALL}
