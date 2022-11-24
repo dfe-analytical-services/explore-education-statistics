@@ -37,7 +37,7 @@ Switch to analyst1 to work on release content blocks
 
 Navigate to content section as analyst1
     user clicks link    Content
-    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
 
 Add first content section
     user closes Set Page View box
@@ -63,6 +63,7 @@ Switch to bau1 to view release
     ...    ${RELEASE_NAME}
 
     user clicks link    Content
+    user waits until h2 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
     user closes Set Page View box
 
 Check second text block is locked as bau1
@@ -86,7 +87,7 @@ Switch to bau1 to add review comments for first text block
     ${comments}=    get comments sidebar    ${block}
 
     # ensure 'Set page view' box doesn't intercept button click
-    user scrolls down    100
+    user scrolls down    150
     user presses keys    CTRL+a
     user clicks button    Add comment    ${toolbar}
 

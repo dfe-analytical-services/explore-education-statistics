@@ -280,7 +280,7 @@ user adds content to accordion section text block
     user presses keys    BACKSPACE
     user presses keys    ${content}
     user clicks button    Save    ${block}
-    user waits until element contains    ${block}    ${content}
+    user waits until element contains    ${block}    ${content}    %{WAIT_SMALL}
 
 user adds content to autosaving accordion section text block
     [Arguments]
@@ -351,7 +351,7 @@ user removes image from accordion section text block
 user saves autosaving text block
     [Arguments]    ${parent}
     user clicks button    Save & close    ${parent}
-    user waits until parent does not contain button    ${parent}    Save & close
+    user waits until parent does not contain button    ${parent}    Save & close    %{WAIT_SMALL}
 
 user checks accordion section text block contains
     [Arguments]
@@ -394,7 +394,7 @@ user deletes editable accordion section content block
     user clicks button    Confirm
     # avoid blocks being lazy loaded
     user waits until page does not contain loading spinner
-    Sleep    0.5
+    Sleep    0.75
     user scrolls down    1
 
 user deletes editable accordion section
