@@ -11,5 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
         List<Publication> GetPublicationsWithPublishedReleases();
 
         Task<bool> IsPublicationPublished(Guid publicationId);
+
+        Task UpdateLatestPublishedRelease(Guid publicationId);
     }
 }
