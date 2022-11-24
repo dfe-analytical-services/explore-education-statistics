@@ -118,6 +118,7 @@ public class PublicationService : IPublicationService
                 new PublicationSearchResultViewModel
                 {
                     Id = tuple.Publication.Id,
+                    Slug = tuple.Publication.Slug,
                     Summary = tuple.Publication.Summary,
                     Title = tuple.Publication.Title,
                     Theme = tuple.Publication.Topic.Theme.Title,

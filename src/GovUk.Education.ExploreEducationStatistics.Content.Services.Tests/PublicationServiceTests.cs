@@ -288,6 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             var publicationA = new Publication
             {
+                Slug = "publication-a",
                 Title = "Publication A",
                 Summary = "Publication A summary",
                 LatestPublishedReleaseNew = new Release
@@ -299,6 +300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var publicationB = new Publication
             {
+                Slug = "publication-b",
                 Title = "Publication B",
                 Summary = "Publication B summary",
                 LatestPublishedReleaseNew = new Release
@@ -310,6 +312,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var publicationC = new Publication
             {
+                Slug = "publication-c",
                 Title = "Publication C",
                 Summary = "Publication C summary",
                 LatestPublishedReleaseNew = new Release
@@ -371,6 +374,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 // Expect results sorted by title in ascending order
 
                 Assert.Equal(publicationA.Id, results[0].Id);
+                Assert.Equal("publication-a", results[0].Slug);
                 Assert.Equal(new DateTime(2020, 1, 1), results[0].Published);
                 Assert.Equal("Publication A", results[0].Title);
                 Assert.Equal("Publication A summary", results[0].Summary);
@@ -378,6 +382,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(NationalStatistics, results[0].Type);
 
                 Assert.Equal(publicationB.Id, results[1].Id);
+                Assert.Equal("publication-b", results[1].Slug);
                 Assert.Equal(new DateTime(2021, 1, 1), results[1].Published);
                 Assert.Equal("Publication B", results[1].Title);
                 Assert.Equal("Publication B summary", results[1].Summary);
@@ -385,6 +390,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(OfficialStatistics, results[1].Type);
 
                 Assert.Equal(publicationC.Id, results[2].Id);
+                Assert.Equal("publication-c", results[2].Slug);
                 Assert.Equal(new DateTime(2022, 1, 1), results[2].Published);
                 Assert.Equal("Publication C", results[2].Title);
                 Assert.Equal("Publication C summary", results[2].Summary);
@@ -601,7 +607,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                                 new()
                                 {
                                     Title = "Publication C",
-                                    Summary = "Publication C summary",
                                     LatestPublishedReleaseNew = new Release
                                     {
                                         Type = AdHocStatistics,
