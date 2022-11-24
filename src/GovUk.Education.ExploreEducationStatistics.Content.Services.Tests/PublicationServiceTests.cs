@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -8,9 +9,14 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using MockQueryable.Moq;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortOrder;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseType;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService.
+    PublicationsSortBy;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
@@ -274,6 +280,1001 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var result = await service.Get(publicationSlug);
 
                 result.AssertNotFound();
+            }
+        }
+
+        [Fact]
+        public async Task ListPublications()
+        {
+            var publicationA = new Publication
+            {
+                Slug = "publication-a",
+                Title = "Publication A",
+                Summary = "Publication A summary",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = NationalStatistics,
+                    Published = new DateTime(2020, 1, 1)
+                }
+            };
+
+            var publicationB = new Publication
+            {
+                Slug = "publication-b",
+                Title = "Publication B",
+                Summary = "Publication B summary",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = OfficialStatistics,
+                    Published = new DateTime(2021, 1, 1)
+                }
+            };
+
+            var publicationC = new Publication
+            {
+                Slug = "publication-c",
+                Title = "Publication C",
+                Summary = "Publication C summary",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = AdHocStatistics,
+                    Published = new DateTime(2022, 1, 1)
+                }
+            };
+
+            var themes = new List<Theme>
+            {
+                new()
+                {
+                    Title = "Theme 1 title",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Publications = new List<Publication>
+                            {
+                                publicationA,
+                                publicationB
+                            }
+                        }
+                    },
+                },
+                new()
+                {
+                    Title = "Theme 2 title",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Publications = new List<Publication>
+                            {
+                                publicationC
+                            }
+                        }
+                    },
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Themes.AddRangeAsync(themes);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupPublicationService(contentDbContext);
+
+                var pagedResult = (await service.ListPublications()).AssertRight();
+                var results = pagedResult.Results;
+
+                Assert.Equal(3, results.Count);
+
+                // Expect results sorted by title in ascending order
+
+                Assert.Equal(publicationA.Id, results[0].Id);
+                Assert.Equal("publication-a", results[0].Slug);
+                Assert.Equal(new DateTime(2020, 1, 1), results[0].Published);
+                Assert.Equal("Publication A", results[0].Title);
+                Assert.Equal("Publication A summary", results[0].Summary);
+                Assert.Equal("Theme 1 title", results[0].Theme);
+                Assert.Equal(NationalStatistics, results[0].Type);
+
+                Assert.Equal(publicationB.Id, results[1].Id);
+                Assert.Equal("publication-b", results[1].Slug);
+                Assert.Equal(new DateTime(2021, 1, 1), results[1].Published);
+                Assert.Equal("Publication B", results[1].Title);
+                Assert.Equal("Publication B summary", results[1].Summary);
+                Assert.Equal("Theme 1 title", results[1].Theme);
+                Assert.Equal(OfficialStatistics, results[1].Type);
+
+                Assert.Equal(publicationC.Id, results[2].Id);
+                Assert.Equal("publication-c", results[2].Slug);
+                Assert.Equal(new DateTime(2022, 1, 1), results[2].Published);
+                Assert.Equal("Publication C", results[2].Title);
+                Assert.Equal("Publication C summary", results[2].Summary);
+                Assert.Equal("Theme 2 title", results[2].Theme);
+                Assert.Equal(AdHocStatistics, results[2].Type);
+            }
+        }
+
+        [Fact]
+        public async Task ListPublications_ExcludesUnpublishedPublications()
+        {
+            // Published
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = NationalStatistics,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            // Not published (no published release)
+            var publicationB = new Publication
+            {
+                Title = "Publication B",
+                LatestPublishedReleaseNew = null
+            };
+
+            var themes = new List<Theme>
+            {
+                new()
+                {
+                    Title = "Theme 1 title",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Publications = new List<Publication>
+                            {
+                                publicationA,
+                                publicationB
+                            }
+                        }
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Themes.AddRangeAsync(themes);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupPublicationService(contentDbContext);
+
+                var pagedResult = (await service.ListPublications()).AssertRight();
+                var results = pagedResult.Results;
+
+                Assert.Equal(publicationA.Id, results[0].Id);
+            }
+        }
+
+        [Fact]
+        public async Task ListPublications_ExcludesSupersededPublications()
+        {
+            // Published
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = NationalStatistics,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            // Published
+            var publicationB = new Publication
+            {
+                Title = "Publication B",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = NationalStatistics,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            // Not published (no published release)
+            var publicationC = new Publication
+            {
+                Title = "Publication C",
+                LatestPublishedReleaseId = null
+            };
+
+            // Not published (superseded by publicationB which is published)
+            var publicationD = new Publication
+            {
+                Title = "Publication D",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = NationalStatistics,
+                    Published = DateTime.UtcNow
+                },
+                SupersededBy = publicationB
+            };
+
+            // Published (superseded by publicationC but it's not published yet)
+            var publicationE = new Publication
+            {
+                Title = "Publication E",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = NationalStatistics,
+                    Published = DateTime.UtcNow
+                },
+                SupersededBy = publicationC
+            };
+
+            var themes = new List<Theme>
+            {
+                new()
+                {
+                    Title = "Theme 1 title",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Publications = new List<Publication>
+                            {
+                                publicationA,
+                                publicationB,
+                                publicationC,
+                                publicationD,
+                                publicationE
+                            }
+                        }
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Themes.AddRangeAsync(themes);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupPublicationService(contentDbContext);
+
+                var pagedResult = (await service.ListPublications()).AssertRight();
+                var results = pagedResult.Results;
+
+                Assert.Equal(publicationA.Id, results[0].Id);
+                Assert.Equal(publicationB.Id, results[1].Id);
+                Assert.Equal(publicationE.Id, results[2].Id);
+            }
+        }
+
+        [Fact]
+        public async Task ListPublications_FilterByTheme()
+        {
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = NationalStatistics,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            var publicationB = new Publication
+            {
+                Title = "Publication B",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = NationalStatistics,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            var themes = new List<Theme>
+            {
+                new()
+                {
+                    Title = "Theme 1 title",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Publications = new List<Publication>
+                            {
+                                publicationA,
+                                publicationB
+                            }
+                        }
+                    },
+                },
+                new()
+                {
+                    Title = "Theme 2 title",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Publications = new List<Publication>
+                            {
+                                new()
+                                {
+                                    Title = "Publication C",
+                                    LatestPublishedReleaseNew = new Release
+                                    {
+                                        Type = AdHocStatistics,
+                                        Published = new DateTime(2022, 1, 1)
+                                    }
+                                }
+                            }
+                        }
+                    },
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Themes.AddRangeAsync(themes);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupPublicationService(contentDbContext);
+
+                var pagedResult = (await service.ListPublications(
+                    themeId: themes[0].Id
+                )).AssertRight();
+                var results = pagedResult.Results;
+
+                Assert.Equal(2, results.Count);
+
+                Assert.Equal(publicationA.Id, results[0].Id);
+                Assert.Equal("Theme 1 title", results[0].Theme);
+
+                Assert.Equal(publicationB.Id, results[1].Id);
+                Assert.Equal("Theme 1 title", results[1].Theme);
+            }
+        }
+
+        [Fact]
+        public async Task ListPublications_FilterByReleaseType()
+        {
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = NationalStatistics,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            var publicationB = new Publication
+            {
+                Title = "Publication B",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = OfficialStatistics,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            var publicationC = new Publication
+            {
+                Title = "Publication C",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = AdHocStatistics,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            var themes = new List<Theme>
+            {
+                new()
+                {
+                    Title = "Theme 1 title",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Publications = new List<Publication>
+                            {
+                                publicationA,
+                                publicationB
+                            }
+                        }
+                    },
+                },
+                new()
+                {
+                    Title = "Theme 2 title",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Publications = new List<Publication>
+                            {
+                                publicationC
+                            }
+                        }
+                    },
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Themes.AddRangeAsync(themes);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupPublicationService(contentDbContext);
+
+                var pagedResult = (await service.ListPublications(
+                    releaseType: OfficialStatistics
+                )).AssertRight();
+                var results = pagedResult.Results;
+
+                Assert.Single(results);
+
+                Assert.Equal(publicationB.Id, results[0].Id);
+                Assert.Equal(OfficialStatistics, results[0].Type);
+            }
+        }
+
+        [Fact]
+        public async Task ListPublications_Search_SortByRelevance_Desc()
+        {
+            var releaseA = new Release
+            {
+                Id = Guid.NewGuid(),
+                Type = NationalStatistics,
+                Published = DateTime.UtcNow
+            };
+
+            var releaseB = new Release
+            {
+                Id = Guid.NewGuid(),
+                Type = NationalStatistics,
+                Published = DateTime.UtcNow
+            };
+
+            var releaseC = new Release
+            {
+                Id = Guid.NewGuid(),
+                Type = NationalStatistics,
+                Published = DateTime.UtcNow
+            };
+
+            var topic = new Topic
+            {
+                Theme = new Theme
+                {
+                    Title = "Theme title"
+                }
+            };
+
+            var publications = new List<Publication>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Publication B",
+                    LatestPublishedReleaseId = releaseB.Id,
+                    LatestPublishedReleaseNew = releaseB,
+                    Topic = topic
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Publication C",
+                    LatestPublishedReleaseId = releaseC.Id,
+                    LatestPublishedReleaseNew = releaseC,
+                    Topic = topic
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Publication A",
+                    LatestPublishedReleaseId = releaseA.Id,
+                    LatestPublishedReleaseNew = releaseA,
+                    Topic = topic
+                },
+            };
+
+            var freeTextRanks = new List<FreeTextRank>
+            {
+                new(publications[1].Id, 100),
+                new(publications[2].Id, 300),
+                new(publications[0].Id, 200)
+            };
+
+            var contentDbContext = new Mock<ContentDbContext>();
+            contentDbContext.Setup(context => context.Publications)
+                .Returns(publications.AsQueryable().BuildMockDbSet().Object);
+            contentDbContext.Setup(context => context.PublicationsFreeTextTable("term"))
+                .Returns(freeTextRanks.AsQueryable().BuildMockDbSet().Object);
+
+            var service = SetupPublicationService(contentDbContext.Object);
+
+            var pagedResult = (await service.ListPublications(
+                search: "term",
+                sort: null, // Sort should default to relevance
+                order: null // Order should default to descending
+            )).AssertRight();
+            var results = pagedResult.Results;
+
+            Assert.Equal(3, results.Count);
+
+            // Expect results sorted by relevance in descending order
+
+            Assert.Equal(publications[2].Id, results[0].Id);
+            Assert.Equal(300, results[0].Rank);
+
+            Assert.Equal(publications[0].Id, results[1].Id);
+            Assert.Equal(200, results[1].Rank);
+
+            Assert.Equal(publications[1].Id, results[2].Id);
+            Assert.Equal(100, results[2].Rank);
+        }
+
+        [Fact]
+        public async Task ListPublications_Search_SortByRelevance_Asc()
+        {
+            var releaseA = new Release
+            {
+                Id = Guid.NewGuid(),
+                Type = NationalStatistics,
+                Published = DateTime.UtcNow
+            };
+
+            var releaseB = new Release
+            {
+                Id = Guid.NewGuid(),
+                Type = NationalStatistics,
+                Published = DateTime.UtcNow
+            };
+
+            var releaseC = new Release
+            {
+                Id = Guid.NewGuid(),
+                Type = NationalStatistics,
+                Published = DateTime.UtcNow
+            };
+
+            var topic = new Topic
+            {
+                Theme = new Theme
+                {
+                    Title = "Theme title"
+                }
+            };
+
+            var publications = new List<Publication>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Publication B",
+                    LatestPublishedReleaseId = releaseB.Id,
+                    LatestPublishedReleaseNew = releaseB,
+                    Topic = topic
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Publication C",
+                    LatestPublishedReleaseId = releaseC.Id,
+                    LatestPublishedReleaseNew = releaseC,
+                    Topic = topic
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Publication A",
+                    LatestPublishedReleaseId = releaseA.Id,
+                    LatestPublishedReleaseNew = releaseA,
+                    Topic = topic
+                },
+            };
+
+            var freeTextRanks = new List<FreeTextRank>
+            {
+                new(publications[1].Id, 100),
+                new(publications[2].Id, 300),
+                new(publications[0].Id, 200)
+            };
+
+            var contentDbContext = new Mock<ContentDbContext>();
+            contentDbContext.Setup(context => context.Publications)
+                .Returns(publications.AsQueryable().BuildMockDbSet().Object);
+            contentDbContext.Setup(context => context.PublicationsFreeTextTable("term"))
+                .Returns(freeTextRanks.AsQueryable().BuildMockDbSet().Object);
+
+            var service = SetupPublicationService(contentDbContext.Object);
+
+            var pagedResult = (await service.ListPublications(
+                search: "term",
+                sort: null, // Sort should default to relevance
+                order: Asc
+            )).AssertRight();
+            var results = pagedResult.Results;
+
+            Assert.Equal(3, results.Count);
+
+            // Expect results sorted by relevance in ascending order
+
+            Assert.Equal(publications[1].Id, results[0].Id);
+            Assert.Equal(100, results[0].Rank);
+
+            Assert.Equal(publications[0].Id, results[1].Id);
+            Assert.Equal(200, results[1].Rank);
+
+            Assert.Equal(publications[2].Id, results[2].Id);
+            Assert.Equal(300, results[2].Rank);
+        }
+
+        [Fact]
+        public async Task ListPublications_SortByPublished_Desc()
+        {
+            var releaseA = new Release
+            {
+                Type = NationalStatistics,
+                Published = new DateTime(2020, 1, 1)
+            };
+
+            var releaseB = new Release
+            {
+                Type = NationalStatistics,
+                Published = new DateTime(2021, 1, 1)
+            };
+
+            var releaseC = new Release
+            {
+                Type = NationalStatistics,
+                Published = new DateTime(2022, 1, 1)
+            };
+
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+                LatestPublishedReleaseNew = releaseA
+            };
+
+            var publicationB = new Publication
+            {
+                Title = "Publication B",
+                LatestPublishedReleaseNew = releaseB
+            };
+
+            var publicationC = new Publication
+            {
+                Title = "Publication C",
+                LatestPublishedReleaseNew = releaseC
+            };
+
+            var themes = new List<Theme>
+            {
+                new()
+                {
+                    Title = "Theme 1 title",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Publications = new List<Publication>
+                            {
+                                publicationB,
+                                publicationC,
+                                publicationA
+                            }
+                        }
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Themes.AddRangeAsync(themes);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupPublicationService(contentDbContext);
+
+                var pagedResult = (await service.ListPublications(
+                    sort: Published,
+                    order: null // Order should default to descending
+                )).AssertRight();
+                var results = pagedResult.Results;
+
+                Assert.Equal(3, results.Count);
+
+                // Expect results sorted by published date in descending order
+
+                Assert.Equal(publicationC.Id, results[0].Id);
+                Assert.Equal(new DateTime(2022, 1, 1), results[0].Published);
+
+                Assert.Equal(publicationB.Id, results[1].Id);
+                Assert.Equal(new DateTime(2021, 1, 1), results[1].Published);
+
+                Assert.Equal(publicationA.Id, results[2].Id);
+                Assert.Equal(new DateTime(2020, 1, 1), results[2].Published);
+            }
+        }
+
+        [Fact]
+        public async Task ListPublications_SortByPublished_Asc()
+        {
+            var releaseA = new Release
+            {
+                Type = NationalStatistics,
+                Published = new DateTime(2020, 1, 1)
+            };
+
+            var releaseB = new Release
+            {
+                Type = NationalStatistics,
+                Published = new DateTime(2021, 1, 1)
+            };
+
+            var releaseC = new Release
+            {
+                Type = NationalStatistics,
+                Published = new DateTime(2022, 1, 1)
+            };
+
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+                LatestPublishedReleaseNew = releaseA
+            };
+
+            var publicationB = new Publication
+            {
+                Title = "Publication B",
+                LatestPublishedReleaseNew = releaseB
+            };
+
+            var publicationC = new Publication
+            {
+                Title = "Publication C",
+                LatestPublishedReleaseNew = releaseC
+            };
+
+            var themes = new List<Theme>
+            {
+                new()
+                {
+                    Title = "Theme 1 title",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Publications = new List<Publication>
+                            {
+                                publicationB,
+                                publicationC,
+                                publicationA
+                            }
+                        }
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Themes.AddRangeAsync(themes);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupPublicationService(contentDbContext);
+
+                var pagedResult = (await service.ListPublications(
+                    sort: Published,
+                    order: Asc
+                )).AssertRight();
+                var results = pagedResult.Results;
+
+                Assert.Equal(3, results.Count);
+
+                // Expect results sorted by published date in ascending order
+
+                Assert.Equal(publicationA.Id, results[0].Id);
+                Assert.Equal(new DateTime(2020, 1, 1), results[0].Published);
+
+                Assert.Equal(publicationB.Id, results[1].Id);
+                Assert.Equal(new DateTime(2021, 1, 1), results[1].Published);
+
+                Assert.Equal(publicationC.Id, results[2].Id);
+                Assert.Equal(new DateTime(2022, 1, 1), results[2].Published);
+            }
+        }
+
+        [Fact]
+        public async Task ListPublications_SortByTitle_Desc()
+        {
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = NationalStatistics,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            var publicationB = new Publication
+            {
+                Title = "Publication B",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = OfficialStatistics,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            var publicationC = new Publication
+            {
+                Title = "Publication C",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = AdHocStatistics,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            var themes = new List<Theme>
+            {
+                new()
+                {
+                    Title = "Theme 1 title",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Publications = new List<Publication>
+                            {
+                                publicationB,
+                                publicationC,
+                                publicationA
+                            }
+                        }
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Themes.AddRangeAsync(themes);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupPublicationService(contentDbContext);
+
+                var pagedResult = (await service.ListPublications(
+                    sort: null, // Sort should default to title
+                    order: Desc
+                )).AssertRight();
+                var results = pagedResult.Results;
+
+                Assert.Equal(3, results.Count);
+
+                // Expect results sorted by title in descending order
+
+                Assert.Equal(publicationC.Id, results[0].Id);
+                Assert.Equal("Publication C", results[0].Title);
+
+                Assert.Equal(publicationB.Id, results[1].Id);
+                Assert.Equal("Publication B", results[1].Title);
+
+                Assert.Equal(publicationA.Id, results[2].Id);
+                Assert.Equal("Publication A", results[2].Title);
+            }
+        }
+
+        [Fact]
+        public async Task ListPublications_SortByTitle_Asc()
+        {
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = NationalStatistics,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            var publicationB = new Publication
+            {
+                Title = "Publication B",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = OfficialStatistics,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            var publicationC = new Publication
+            {
+                Title = "Publication C",
+                LatestPublishedReleaseNew = new Release
+                {
+                    Type = AdHocStatistics,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            var themes = new List<Theme>
+            {
+                new()
+                {
+                    Title = "Theme 1 title",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Publications = new List<Publication>
+                            {
+                                publicationB,
+                                publicationC,
+                                publicationA
+                            }
+                        }
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Themes.AddRangeAsync(themes);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupPublicationService(contentDbContext);
+
+                var pagedResult = (await service.ListPublications(
+                    sort: null, // Sort should default to title
+                    order: null // Order should default to ascending
+                )).AssertRight();
+                var results = pagedResult.Results;
+
+                Assert.Equal(3, results.Count);
+
+                // Expect results sorted by title in ascending order
+
+                Assert.Equal(publicationA.Id, results[0].Id);
+                Assert.Equal("Publication A", results[0].Title);
+
+                Assert.Equal(publicationB.Id, results[1].Id);
+                Assert.Equal("Publication B", results[1].Title);
+
+                Assert.Equal(publicationC.Id, results[2].Id);
+                Assert.Equal("Publication C", results[2].Title);
             }
         }
 

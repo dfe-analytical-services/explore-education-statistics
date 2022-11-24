@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             using var context = DbUtils.InMemoryApplicationDbContext();
 
             var service = new DataBlockService(
-                contentDbContext ?? Mock.Of<ContentDbContext>(Strict),
+                contentDbContext ?? Mock.Of<ContentDbContext>(),
                 persistenceHelper ?? PersistenceHelperMock().Object,
                 releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
                 releaseContentBlockRepository ?? Mock.Of<IReleaseContentBlockRepository>(Strict),

@@ -985,7 +985,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             ISubjectRepository? subjectRepository = null)
         {
             return new(
-                contentDbContext ?? Mock.Of<ContentDbContext>(MockBehavior.Strict),
+                contentDbContext ?? Mock.Of<ContentDbContext>(),
                 tableBuilderService ?? Mock.Of<ITableBuilderService>(MockBehavior.Strict),
                 blobStorageService ?? Mock.Of<IBlobStorageService>(MockBehavior.Strict),
                 subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),

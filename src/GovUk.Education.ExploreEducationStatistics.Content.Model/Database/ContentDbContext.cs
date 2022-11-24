@@ -43,41 +43,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             }
         }
 
-        public DbSet<Methodology> Methodologies { get; set; }
-        public DbSet<MethodologyVersion> MethodologyVersions { get; set; }
-        public DbSet<MethodologyVersionContent> MethodologyContent { get; set; }
-        public DbSet<PublicationMethodology> PublicationMethodologies { get; set; }
-        public DbSet<MethodologyFile> MethodologyFiles { get; set; }
-        public DbSet<Theme> Themes { get; set; }
-        public DbSet<Topic> Topics { get; set; }
-        public DbSet<Publication> Publications { get; set; }
-        public DbSet<Release> Releases { get; set; }
-        public DbSet<ReleaseStatus> ReleaseStatus { get; set; }
-        public DbSet<LegacyRelease> LegacyReleases { get; set; }
-        public DbSet<ReleaseFile> ReleaseFiles { get; set; }
-        public DbSet<File> Files { get; set; }
-        public DbSet<ContentSection> ContentSections { get; set; }
-        public DbSet<ContentBlock> ContentBlocks { get; set; }
-        public DbSet<DataBlock> DataBlocks { get; set; }
-        public DbSet<DataImport> DataImports { get; set; }
-        public DbSet<DataImportError> DataImportErrors { get; set; }
-        public DbSet<HtmlBlock> HtmlBlocks { get; set; }
-        public DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
-        public DbSet<MethodologyNote> MethodologyNotes { get; set; }
-        public DbSet<Permalink> Permalinks { get; set; } = null!;
-        public DbSet<Contact> Contacts { get; set; }
-        public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
-        public DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
-        public DbSet<Update> Update { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<UserPublicationRole> UserPublicationRoles { get; set; }
-        public DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
-        public DbSet<GlossaryEntry> GlossaryEntries { get; set; }
-        public DbSet<Comment> Comment { get; set; }
-        public DbSet<UserReleaseInvite> UserReleaseInvites { get; set; }
-        public DbSet<UserPublicationInvite> UserPublicationInvites { get; set; }
+        public virtual DbSet<Methodology> Methodologies { get; set; }
+        public virtual DbSet<MethodologyVersion> MethodologyVersions { get; set; }
+        public virtual DbSet<MethodologyVersionContent> MethodologyContent { get; set; }
+        public virtual DbSet<PublicationMethodology> PublicationMethodologies { get; set; }
+        public virtual DbSet<MethodologyFile> MethodologyFiles { get; set; }
+        public virtual DbSet<Theme> Themes { get; set; }
+        public virtual DbSet<Topic> Topics { get; set; }
+        public virtual DbSet<Publication> Publications { get; set; }
+        public virtual DbSet<Release> Releases { get; set; }
+        public virtual DbSet<ReleaseStatus> ReleaseStatus { get; set; }
+        public virtual DbSet<LegacyRelease> LegacyReleases { get; set; }
+        public virtual DbSet<ReleaseFile> ReleaseFiles { get; set; }
+        public virtual DbSet<File> Files { get; set; }
+        public virtual DbSet<ContentSection> ContentSections { get; set; }
+        public virtual DbSet<ContentBlock> ContentBlocks { get; set; }
+        public virtual DbSet<DataBlock> DataBlocks { get; set; }
+        public virtual DbSet<DataImport> DataImports { get; set; }
+        public virtual DbSet<DataImportError> DataImportErrors { get; set; }
+        public virtual DbSet<HtmlBlock> HtmlBlocks { get; set; }
+        public virtual DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
+        public virtual DbSet<MethodologyNote> MethodologyNotes { get; set; }
+        public virtual DbSet<Permalink> Permalinks { get; set; } = null!;
+        public virtual DbSet<Contact> Contacts { get; set; }
+        public virtual DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
+        public virtual DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
+        public virtual DbSet<Update> Update { get; set; }
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<UserPublicationRole> UserPublicationRoles { get; set; }
+        public virtual DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
+        public virtual DbSet<GlossaryEntry> GlossaryEntries { get; set; }
+        public virtual DbSet<Comment> Comment { get; set; }
+        public virtual DbSet<UserReleaseInvite> UserReleaseInvites { get; set; }
+        public virtual DbSet<UserPublicationInvite> UserPublicationInvites { get; set; }
 
-        public IQueryable<FreeTextRank> PublicationsFreeTextTable(string search) =>
+        public virtual IQueryable<FreeTextRank> PublicationsFreeTextTable(string search) =>
             FromExpression(() => PublicationsFreeTextTable(search));
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -232,6 +232,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(p => p.Contact)
                 .WithMany()  // Ideally this would be WithOne, but we would need to fix existing data to do this
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Publication>()
+                .HasOne(p => p.LatestPublishedReleaseNew)
+                .WithOne()
+                .HasForeignKey<Publication>(p => p.LatestPublishedReleaseId)
+                .IsRequired(false);
 
             modelBuilder.Entity<PublicationMethodology>()
                 .HasKey(pm => new {pm.PublicationId, pm.MethodologyId});

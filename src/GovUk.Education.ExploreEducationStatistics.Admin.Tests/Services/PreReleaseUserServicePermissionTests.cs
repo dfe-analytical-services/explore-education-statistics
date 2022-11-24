@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IHttpContextAccessor? httpContextAccessor = null)
         {
             return new(
-                context ?? Mock.Of<ContentDbContext>(Strict),
+                context ?? Mock.Of<ContentDbContext>(),
                 usersAndRolesDbContext ?? InMemoryUserAndRolesDbContext(),
                 configuration ?? Mock.Of<IConfiguration>(Strict),
                 emailService ?? Mock.Of<IEmailService>(Strict),

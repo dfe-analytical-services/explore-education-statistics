@@ -46,7 +46,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(async userService =>
                 {
                     var service = BuildPublicationService(
-                        context: Mock.Of<ContentDbContext>(Strict),
                         userService: userService.Object);
                     return await service.ListPublications(Guid.NewGuid());
                 });
@@ -60,7 +59,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(async userService =>
                 {
                     var service = BuildPublicationService(
-                        context: Mock.Of<ContentDbContext>(Strict),
                         userService: userService.Object);
                     return await service.ListPublicationSummaries();
                 });
@@ -75,7 +73,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userService = AlwaysTrueUserService();
             var publicationService = BuildPublicationService(
-                context: Mock.Of<ContentDbContext>(Strict),
                 userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
@@ -100,7 +97,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userService = AlwaysTrueUserService();
             var publicationService = BuildPublicationService(
-                context: Mock.Of<ContentDbContext>(Strict),
                 userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
@@ -126,7 +122,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userService = AlwaysTrueUserService();
             var publicationService = BuildPublicationService(
-                context: Mock.Of<ContentDbContext>(Strict),
                 userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
@@ -152,7 +147,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userService = AlwaysTrueUserService();
             var publicationService = BuildPublicationService(
-                context: Mock.Of<ContentDbContext>(Strict),
                 userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
@@ -387,7 +381,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var userService = AlwaysTrueUserService();
             var publicationService = BuildPublicationService(
-                context: Mock.Of<ContentDbContext>(Strict),
                 userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
@@ -542,7 +535,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var userService = AlwaysTrueUserService();
             var publicationService = BuildPublicationService(
-                context: Mock.Of<ContentDbContext>(Strict),
                 userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
@@ -558,7 +550,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var userService = AlwaysTrueUserService();
             var publicationService = BuildPublicationService(
-                context: Mock.Of<ContentDbContext>(Strict),
                 userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
@@ -570,7 +561,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private static PublicationService BuildPublicationService(
-            ContentDbContext context,
+            ContentDbContext? context = null,
             IUserService? userService = null,
             IPublicationRepository? publicationRepository = null,
             IMethodologyVersionRepository? methodologyVersionRepository = null,
@@ -578,6 +569,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IMethodologyCacheService? methodologyCacheService = null,
             IThemeCacheService? themeCacheService = null)
         {
+            context ??= Mock.Of<ContentDbContext>();
+
             return new(
                 context,
                 AdminMapper(),
