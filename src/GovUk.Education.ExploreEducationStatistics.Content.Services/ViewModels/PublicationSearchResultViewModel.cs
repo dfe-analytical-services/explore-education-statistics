@@ -9,6 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 public record PublicationSearchResultViewModel
 {
     public Guid Id { get; init; }
+    public string Slug { get; init; }
     public string Summary { get; init; }
     public string Title { get; init; }
     public string Theme { get; init; }
