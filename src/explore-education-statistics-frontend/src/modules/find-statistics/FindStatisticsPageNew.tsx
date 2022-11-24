@@ -5,7 +5,7 @@ import RelatedInformation from '@common/components/RelatedInformation';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import {
-  PublicationSummaryWithRelease,
+  PublicationListSummary,
   PublicationSortOption,
 } from '@common/services/publicationService';
 import { Paging } from '@common/services/types/pagination';
@@ -21,7 +21,7 @@ import React from 'react';
 
 interface Props {
   paging: Paging;
-  publications: PublicationSummaryWithRelease[];
+  publications: PublicationListSummary[];
   sortBy?: PublicationSortOption;
 }
 
@@ -30,7 +30,7 @@ const FindStatisticsPageNew: NextPage<Props> = ({
   publications,
   sortBy = 'newest',
 }) => {
-  const { page = 1, totalPages, totalResults } = paging;
+  const { page, totalPages, totalResults } = paging;
 
   const router = useRouter();
   const isLoading = useRouterLoading();
@@ -42,6 +42,7 @@ const FindStatisticsPageNew: NextPage<Props> = ({
         pathname: '/find-statistics',
         query: {
           ...router.query,
+          page: 1,
           sortBy: nextSortBy,
         },
       },

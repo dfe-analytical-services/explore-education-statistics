@@ -13,7 +13,7 @@ interface Option {
 const options: Option[] = [
   { label: 'Newest', value: 'newest' },
   { label: 'Oldest', value: 'oldest' },
-  { label: 'A to Z', value: 'alphabetical' },
+  { label: 'A to Z', value: 'title' },
 ];
 
 const formId = 'sortControlsForm';

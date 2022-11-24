@@ -1,13 +1,14 @@
 import themeService, { Theme } from '@common/services/themeService';
-import {
-  PublicationSummaryWithRelease,
+import publicationService, {
+  PublicationListSummary,
+  PublicationOrderParam,
   PublicationSortOption,
   publicationSortOptions,
+  PublicationSortParam,
 } from '@common/services/publicationService';
 import { Paging } from '@common/services/types/pagination';
 import parseNumber from '@common/utils/number/parseNumber';
 import isOneOf from '@common/utils/type-guards/isOneOf';
-import { testPublications } from '@frontend/modules/find-statistics/__tests__/__data__/testPublications';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import FindStatisticsPageCurrent from './FindStatisticsPageCurrent';
@@ -16,7 +17,7 @@ import FindStatisticsPageNew from './FindStatisticsPageNew';
 interface Props {
   newDesign?: boolean; // TODO EES-3517 flag
   paging?: Paging | null; // TODO EES-3517 won't be optional or null
-  publications?: PublicationSummaryWithRelease[]; // TODO EES-3517 won't be optional
+  publications?: PublicationListSummary[]; // TODO EES-3517 won't be optional
   sortBy?: PublicationSortOption;
   themes: Theme[];
 }
@@ -45,29 +46,29 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   query,
 }) => {
   const { newDesign } = query;
-  const page = parseNumber(query.page) ?? 1;
   const sortBy = isOneOf(query.sortBy, publicationSortOptions)
     ? query.sortBy
     : 'newest';
+  const { order, sort } = getSortParams(sortBy);
 
-  // TODO EES-3517 - fetch publications here, using pagination and filters from query.
-  // const publicationsResponse = newDesign ? await publicationService.getPublications({
-  //   page,
-  //   pageSize: 10,
-  //   sortBy
-  // }) : []
-
-  // Will need to handle if the requested page doesn't exist.
-  // Fake response for now
-  const paging: Paging = {
-    page,
-    pageSize: 10,
-    totalResults: 100,
-    totalPages: 10,
+  const params = {
+    order,
+    page: parseNumber(query.page) ?? 1,
+    sort,
   };
 
-  const publications: PublicationSummaryWithRelease[] =
-    page === 1 ? testPublications : [testPublications[1]]; // faking different page to test pagination
+  // TODO EES-3517 - remove newDesign check
+  const publicationsResponse = newDesign
+    ? await publicationService.listPublications(params)
+    : {
+        results: [],
+        paging: {
+          page: 0,
+          pageSize: 0,
+          totalResults: 0,
+          totalPages: 0,
+        },
+      };
 
   // TODO EES-3517 - remove themes
   const themes = newDesign
@@ -79,8 +80,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   return {
     props: {
       newDesign: !!newDesign,
-      paging: newDesign ? paging : null,
-      publications: newDesign ? publications : [],
+      paging: newDesign ? publicationsResponse.paging : null,
+      publications: newDesign ? publicationsResponse.results : [],
       sortBy,
       themes,
     },
@@ -88,3 +89,27 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
 };
 
 export default FindStatisticsPage;
+
+function getSortParams(
+  sortBy: PublicationSortOption,
+): {
+  order?: PublicationOrderParam;
+  sort?: PublicationSortParam;
+} {
+  if (sortBy === 'title') {
+    return {
+      order: 'asc',
+      sort: 'title',
+    };
+  }
+  if (sortBy === 'oldest') {
+    return {
+      order: 'asc',
+      sort: 'published',
+    };
+  }
+  return {
+    order: 'desc',
+    sort: 'published',
+  };
+}

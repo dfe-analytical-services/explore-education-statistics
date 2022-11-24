@@ -5,6 +5,7 @@ import {
   MethodologySummary,
   ExternalMethodology,
 } from '@common/services/types/methodology';
+import { Paging } from '@common/services/types/pagination';
 import { PartialDate } from '@common/utils/date/partialDate';
 import { contentApi } from './api';
 
@@ -42,21 +43,20 @@ export interface PublicationSummary {
   title: string;
 }
 
-// TODO EES-3517 a guess at the new type for the find stats page.
-export interface PublicationSummaryWithRelease {
+export interface PublicationListSummary {
   id: string;
-  legacyPublicationUrl?: string;
-  latestRelease?: {
-    id: string;
-    published: string;
-    type: ReleaseType;
-  };
+  published: Date;
+  rank: number;
   slug: string;
   summary?: string;
-  theme: {
-    title: string;
-  };
+  theme: string;
   title: string;
+  type: ReleaseType;
+}
+
+interface PublicationsResponse {
+  results: PublicationListSummary[];
+  paging: Paging;
 }
 
 export interface Contact {
@@ -91,18 +91,22 @@ export interface ContentSection<BlockType> {
   content: BlockType[];
 }
 
-export const publicationSortOptions = [
-  'newest',
-  'oldest',
-  'alphabetical',
-] as const;
+export const publicationSortOptions = ['newest', 'oldest', 'title'] as const;
 
 export type PublicationSortOption = typeof publicationSortOptions[number];
 
-// TODO EES-3517 expand to include filters and search
-export interface ListPublicationsRequest {
+export type PublicationSortParam = 'published' | 'title' | 'relevance';
+
+export type PublicationOrderParam = 'asc' | 'desc';
+
+interface PublicationListRequest {
+  order?: PublicationOrderParam;
   page?: number;
-  sortBy?: PublicationSortOption;
+  pageSize?: number;
+  releaseType?: ReleaseType;
+  search?: string;
+  sort?: PublicationSortParam;
+  themeId?: string;
 }
 
 export interface Release<
@@ -205,5 +209,12 @@ export default {
     return contentApi.get(
       `/publications/${publicationSlug}/releases/${releaseSlug}/prerelease-access-list`,
     );
+  },
+  listPublications(
+    params: PublicationListRequest,
+  ): Promise<PublicationsResponse> {
+    return contentApi.get(`/publications`, {
+      params,
+    });
   },
 };
