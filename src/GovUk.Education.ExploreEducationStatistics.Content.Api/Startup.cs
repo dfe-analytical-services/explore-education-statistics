@@ -163,6 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
             services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
             services.AddTransient<IGlossaryService, GlossaryService>();
+            services.AddTransient<IThemeService, ThemeService>();
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
             StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);

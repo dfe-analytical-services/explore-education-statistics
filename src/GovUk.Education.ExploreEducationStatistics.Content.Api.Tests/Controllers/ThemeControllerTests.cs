@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Moq;
@@ -66,10 +67,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         }
 
         private static ThemeController BuildController(
-            IMethodologyCacheService? methodologyCacheService = null)
+            IMethodologyCacheService? methodologyCacheService = null,
+            IThemeService? themeService = null)
         {
             return new ThemeController(
-                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict));
+                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
+                themeService ?? Mock.Of<IThemeService>(Strict));
         }
     }
 }

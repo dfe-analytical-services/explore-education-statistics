@@ -145,6 +145,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     publicationViewModel.LegacyReleases[0].Description);
                 Assert.Equal(publication.LegacyReleases[0].Url, publicationViewModel.LegacyReleases[0].Url);
 
+                Assert.Equal(publication.Topic.Theme.Id, publicationViewModel.Topic.Theme.Id);
+                Assert.Equal(publication.Topic.Theme.Slug, publicationViewModel.Topic.Theme.Slug);
                 Assert.Equal(publication.Topic.Theme.Title, publicationViewModel.Topic.Theme.Title);
 
                 Assert.Equal(publication.Contact.TeamName, publicationViewModel.Contact.TeamName);
