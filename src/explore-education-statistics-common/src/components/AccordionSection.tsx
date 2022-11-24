@@ -2,6 +2,7 @@ import CopyLinkButton from '@common/components/CopyLinkButton';
 import useMounted from '@common/hooks/useMounted';
 import findAllParents from '@common/utils/dom/findAllParents';
 import classNames from 'classnames';
+import kebabCase from 'lodash/kebabCase';
 import React, { createElement, memo, ReactNode } from 'react';
 import styles from './AccordionSection.module.scss';
 import GoToTopLink from './GoToTopLink';
@@ -18,7 +19,7 @@ export interface AccordionSectionProps {
         contentId: string;
       }) => ReactNode);
   className?: string;
-  anchorLinkUrl?: string;
+  anchorLinkUrl?: (id: string) => string;
   goToTop?: boolean;
   header?: ReactNode;
   heading: string;
@@ -28,6 +29,7 @@ export interface AccordionSectionProps {
    */
   headingTag?: 'h2' | 'h3' | 'h4';
   id?: string;
+  anchorLinkIdPrefix?: string;
   open?: boolean;
   testId?: string;
   onToggle?: ToggleHandler;
@@ -53,6 +55,7 @@ const AccordionSection = ({
   heading,
   headingTag = 'h2',
   id = 'accordionSection',
+  anchorLinkIdPrefix = 'section',
   open = false,
   onToggle,
 }: AccordionSectionProps) => {
@@ -73,7 +76,7 @@ const AccordionSection = ({
         {anchorLinkUrl && (
           <CopyLinkButton
             className={styles.copyLinkButton}
-            url={anchorLinkUrl}
+            url={anchorLinkUrl(id)}
           />
         )}
         {header ??
@@ -81,7 +84,7 @@ const AccordionSection = ({
             headingTag,
             {
               className: classes.sectionHeading,
-              id: heading.toLowerCase().split(' ').join('-'),
+              id: `${anchorLinkIdPrefix}-${kebabCase(heading)}`,
             },
             isMounted ? (
               <button

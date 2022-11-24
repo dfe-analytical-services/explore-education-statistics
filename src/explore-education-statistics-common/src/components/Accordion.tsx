@@ -64,7 +64,7 @@ const Accordion = ({
   );
 
   const { isMounted } = useMounted(() => {
-    const goToHash = async () => {
+    const goToAndOpenHash = async () => {
       setTimeout(() => {
         if (!ref.current || !window.location.hash) {
           return;
@@ -74,7 +74,9 @@ const Accordion = ({
 
         try {
           locationHashEl = ref.current.querySelector(window.location.hash);
-        } catch (_) {
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error(e);
           return;
         }
 
@@ -108,10 +110,10 @@ const Accordion = ({
       }, 200);
     };
 
-    goToHash();
-    window.addEventListener('hashchange', goToHash);
+    goToAndOpenHash();
+    window.addEventListener('hashchange', goToAndOpenHash);
 
-    return () => window.removeEventListener('hashchange', goToHash);
+    return () => window.removeEventListener('hashchange', goToAndOpenHash);
   });
 
   useEffect(() => {

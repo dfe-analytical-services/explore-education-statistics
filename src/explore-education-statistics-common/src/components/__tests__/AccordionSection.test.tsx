@@ -48,13 +48,13 @@ describe('AccordionSection', () => {
     );
     expect(
       screen.getByRole('heading', { name: 'Test heading' }),
-    ).toHaveAttribute('id', 'test-heading');
+    ).toHaveAttribute('id', 'section-test-heading');
   });
 
   test('adds a copy link button when anchorLinkUrl is set', () => {
     const testUrl = 'http://test.com/1#test-heading';
     render(
-      <AccordionSection anchorLinkUrl={testUrl} heading="Test heading">
+      <AccordionSection anchorLinkUrl={() => testUrl} heading="Test heading">
         <p>Test content</p>
       </AccordionSection>,
     );
