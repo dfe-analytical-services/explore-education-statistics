@@ -4,10 +4,14 @@ import useLegend from '@common/modules/charts/components/hooks/useLegend';
 import createReferenceLine from '@common/modules/charts/components/utils/createReferenceLine';
 import {
   AxisConfiguration,
+  BarChartDataLabelPosition,
   ChartDefinition,
   StackedBarProps,
 } from '@common/modules/charts/types/chart';
-import { DataSetCategory } from '@common/modules/charts/types/dataSet';
+import {
+  ChartData,
+  DataSetCategory,
+} from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import createDataSetCategories, {
   toChartData,
@@ -27,6 +31,7 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -90,6 +95,8 @@ const HorizontalBarBlock = ({
 
   const minorAxisDecimals = getMinorAxisDecimalPlaces(dataSetCategoryConfigs);
   const minorAxisUnit = axes.minor.unit || getUnit(dataSetCategoryConfigs);
+  const chartHasNegativeValues =
+    (parseNumber(minorDomainTicks.domain?.[0]) ?? 0) < 0;
 
   return (
     <ChartContainer
@@ -134,6 +141,7 @@ const HorizontalBarBlock = ({
           <YAxis
             {...majorDomainTicks}
             type="category"
+            axisLine={!chartHasNegativeValues}
             dataKey="name"
             hide={!axes.major.visible}
             unit={axes.major.unit}
@@ -169,10 +177,12 @@ const HorizontalBarBlock = ({
                 showDataLabels
                   ? {
                       fontSize: 14,
-                      position:
-                        dataLabelPosition === 'inside'
-                          ? 'insideRight'
-                          : 'right',
+                      position: getDataLabelPosition({
+                        chartData,
+                        chartHasNegativeValues,
+                        dataKey,
+                        dataLabelPosition,
+                      }),
                       formatter: value =>
                         formatPretty(
                           value.toString(),
@@ -184,6 +194,7 @@ const HorizontalBarBlock = ({
               }
             />
           ))}
+          {chartHasNegativeValues && <ReferenceLine x={0} stroke="#666" />}
 
           {axes.major.referenceLines?.map(referenceLine =>
             createReferenceLine({
@@ -294,3 +305,22 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
 };
 
 export default memo(HorizontalBarBlock);
+
+function getDataLabelPosition({
+  chartData,
+  chartHasNegativeValues,
+  dataKey,
+  dataLabelPosition,
+}: {
+  chartData: ChartData[];
+  chartHasNegativeValues: boolean;
+  dataKey: string;
+  dataLabelPosition?: BarChartDataLabelPosition;
+}) {
+  const dataValue =
+    parseNumber(chartData.find(d => d[dataKey])?.[dataKey]) ?? 0;
+  if (!chartHasNegativeValues || !dataLabelPosition || dataValue >= 0) {
+    return dataLabelPosition === 'inside' ? 'insideRight' : 'right';
+  }
+  return dataLabelPosition === 'inside' ? 'right' : 'insideRight';
+}

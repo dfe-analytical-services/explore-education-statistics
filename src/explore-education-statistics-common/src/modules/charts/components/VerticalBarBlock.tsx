@@ -4,10 +4,14 @@ import useLegend from '@common/modules/charts/components/hooks/useLegend';
 import createReferenceLine from '@common/modules/charts/components/utils/createReferenceLine';
 import {
   AxisConfiguration,
+  BarChartDataLabelPosition,
   ChartDefinition,
   StackedBarProps,
 } from '@common/modules/charts/types/chart';
-import { DataSetCategory } from '@common/modules/charts/types/dataSet';
+import {
+  ChartData,
+  DataSetCategory,
+} from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import createDataSetCategories, {
   toChartData,
@@ -28,6 +32,7 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -92,6 +97,8 @@ const VerticalBarBlock = ({
     minorAxisUnit,
   });
   const xAxisHeight = parseNumber(axes.major.size);
+  const chartHasNegativeValues =
+    (parseNumber(minorDomainTicks.domain?.[0]) ?? 0) < 0;
 
   return (
     <ChartContainer
@@ -133,6 +140,7 @@ const VerticalBarBlock = ({
           <XAxis
             {...majorDomainTicks}
             type="category"
+            axisLine={!chartHasNegativeValues}
             dataKey="name"
             hide={!axes.major.visible}
             unit={axes.major.unit}
@@ -170,6 +178,12 @@ const VerticalBarBlock = ({
                 showDataLabels
                   ? {
                       fontSize: 14,
+                      offset: getOffset({
+                        chartData,
+                        chartHasNegativeValues,
+                        dataKey,
+                        dataLabelPosition,
+                      }),
                       position:
                         dataLabelPosition === 'inside' ? 'insideTop' : 'top',
                       formatter: value =>
@@ -183,6 +197,8 @@ const VerticalBarBlock = ({
               }
             />
           ))}
+
+          {chartHasNegativeValues && <ReferenceLine y={0} stroke="#666" />}
 
           {axes.major.referenceLines?.map(referenceLine =>
             createReferenceLine({
@@ -292,3 +308,26 @@ export const verticalBarBlockDefinition: ChartDefinition = {
 };
 
 export default memo(VerticalBarBlock);
+
+function getOffset({
+  chartData,
+  chartHasNegativeValues,
+  dataKey,
+  dataLabelPosition,
+}: {
+  chartData: ChartData[];
+  chartHasNegativeValues: boolean;
+  dataKey: string;
+  dataLabelPosition?: BarChartDataLabelPosition;
+}) {
+  if (
+    !chartHasNegativeValues ||
+    !dataLabelPosition ||
+    dataLabelPosition !== 'inside'
+  ) {
+    return 5;
+  }
+  const dataValue =
+    parseNumber(chartData.find(d => d[dataKey])?.[dataKey]) ?? 0;
+  return dataValue < 0 ? 15 : 5;
+}

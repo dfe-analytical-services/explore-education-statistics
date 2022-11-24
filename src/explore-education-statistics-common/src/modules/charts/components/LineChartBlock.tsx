@@ -33,6 +33,7 @@ import {
   LegendType,
   Line,
   LineChart,
+  ReferenceLine,
   ResponsiveContainer,
   Symbols,
   SymbolsProps,
@@ -46,27 +47,6 @@ const lineStyles: Dictionary<string> = {
   solid: '',
   dashed: '5 5',
   dotted: '2 2',
-};
-
-// eslint-disable-next-line react/display-name
-const getDot = (symbol: ChartSymbol | 'none' = 'circle') => (
-  props: SymbolsProps,
-) => {
-  if (symbol === 'none') {
-    return undefined;
-  }
-
-  return <Symbols {...props} type={symbol} />;
-};
-
-const getLegendType = (
-  symbol: LegendType | undefined = 'square',
-): LegendType | undefined => {
-  if (symbol === 'none') {
-    return undefined;
-  }
-
-  return symbol;
 };
 
 export interface LineChartProps extends ChartProps {
@@ -126,6 +106,8 @@ const LineChartBlock = ({
     minorAxisUnit,
   });
   const xAxisHeight = parseNumber(axes.major.size);
+  const chartHasNegativeValues =
+    (parseNumber(minorDomainTicks.domain?.[0]) ?? 0) < 0;
 
   return (
     <ChartContainer
@@ -181,6 +163,7 @@ const LineChartBlock = ({
           <XAxis
             {...majorDomainTicks}
             type="category"
+            axisLine={!chartHasNegativeValues}
             dataKey="name"
             hide={!axes.major.visible}
             unit={axes.major.unit}
@@ -224,6 +207,8 @@ const LineChartBlock = ({
               )}
             />
           ))}
+
+          {chartHasNegativeValues && <ReferenceLine y={0} stroke="#666" />}
 
           {axes.major.referenceLines?.map(referenceLine =>
             createReferenceLine({
@@ -327,3 +312,24 @@ export const lineChartBlockDefinition: ChartDefinition = {
 };
 
 export default memo(LineChartBlock);
+
+// eslint-disable-next-line react/display-name
+const getDot = (symbol: ChartSymbol | 'none' = 'circle') => (
+  props: SymbolsProps,
+) => {
+  if (symbol === 'none') {
+    return undefined;
+  }
+
+  return <Symbols {...props} type={symbol} />;
+};
+
+const getLegendType = (
+  symbol: LegendType | undefined = 'square',
+): LegendType | undefined => {
+  if (symbol === 'none') {
+    return undefined;
+  }
+
+  return symbol;
+};
