@@ -103,10 +103,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _emailService.SendEmail(email, template, emailValues);
         }
         
-        public Either<ActionResult, Unit> SendReleaseApproverEmail(string email, Release release)
+        public Either<ActionResult, Unit> SendHigherReviewEmail(string email, Release release)
         {
             var uri = _configuration.GetValue<string>("AdminUri");
-            var template = _configuration.GetValue<string>("NotifyReleaseApproversTemplateId");
+            var template = _configuration.GetValue<string>("NotifyHigherReviewersTemplateId");
             
             var emailValues = new Dictionary<string, dynamic>
             {

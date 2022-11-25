@@ -81,7 +81,7 @@ Go to "Sign off" page
     user clicks button    Edit release status
 
 Check publication owner can edit release status to "Ready for higher review"
-    user clicks radio    Ready for higher review (this will notify release approvers)
+    user clicks radio    Ready for higher review (this will notify approvers)
     user enters text into element    id:releaseStatusForm-latestInternalReleaseNote
     ...    ready for higher review (publication owner)
     user clicks button    Update status
