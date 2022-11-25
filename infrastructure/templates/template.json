@@ -1792,7 +1792,7 @@
         "NotifyReleaseRoleTemplateId": "[parameters('notifyReleaseRoleTemplateId')]",
         "NotifyPreReleaseTemplateId": "[parameters('notifyPreReleaseTemplateId')]",
         "NotifyContributorTemplateId": "[parameters('notifyContributorTemplateId')]",
-        "NotifyHigherReviewersTemplateId": "[parameters('NotifyHigherReviewersTemplateId')]",
+        "NotifyHigherReviewersTemplateId": "[parameters('notifyHigherReviewersTemplateId')]",
         "AdminUri": "[parameters('adminUri')]",
         "Azure:SignalR:ConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-signalr-admin-connectionstring'), '2018-02-14').secretUriWithVersion, ')')]",
         "PublicAppUrl": "[variables('publicAppUrl')]",
