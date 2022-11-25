@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Identity;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
@@ -29,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class UserManagementServiceTests
     {
-        private static readonly Guid _createdById = Guid.NewGuid();
+        private static readonly Guid CreatedById = Guid.NewGuid();
 
         [Fact]
         public async Task GetUser()
@@ -44,8 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 LastName = "Analyst"
             };
 
-            var globalRoles = new List<RoleViewModel>
-            {
+            var globalRoles = ListOf(
                 new RoleViewModel
                 {
                     Id = Guid.NewGuid().ToString(),
@@ -57,11 +57,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Id = Guid.NewGuid().ToString(),
                     Name = "Role 2",
                     NormalizedName = "ROLE 2"
-                }
-            };
+                });
 
-            var publicationRoles = new List<UserPublicationRoleViewModel>
-            {
+            var publicationRoles = ListOf(
                 new UserPublicationRoleViewModel
                 {
                     Id = Guid.NewGuid(),
@@ -73,11 +71,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Id = Guid.NewGuid(),
                     Publication = "Test Publication 2",
                     Role = Owner
-                }
-            };
+                });
 
-            var releaseRoles = new List<UserReleaseRoleViewModel>
-            {
+            var releaseRoles = ListOf(
                 new UserReleaseRoleViewModel
                 {
                     Id = Guid.NewGuid(),
@@ -91,8 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Publication = "Test Publication 2",
                     Release = "June 2021",
                     Role = Approver
-                }
-            };
+                });
 
             var userAndRolesDbContextId = Guid.NewGuid().ToString();
 
@@ -260,24 +255,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     usersAndRolesDbContext: userAndRolesDbContext,
                     emailTemplateService: emailTemplateService.Object);
 
-                var result = await service.InviteUser("test@test.com",
-                    role.Id,
-                    new List<UserReleaseRoleAddViewModel>
+                var inviteRequest = new UserInviteCreateRequest
+                {
+                    Email = "test@test.com",
+                    RoleId = role.Id,
+                    UserReleaseRoles = ListOf(new UserReleaseRoleCreateRequest
                     {
-                        new ()
-                        {
-                            ReleaseId = release.Id,
-                            ReleaseRole = Approver,
-                        },
-                    },
-                    new List<UserPublicationRoleAddViewModel>
+                        ReleaseId = release.Id,
+                        ReleaseRole = Approver,
+                    }),
+                    UserPublicationRoles = ListOf(new UserPublicationRoleCreateRequest
                     {
-                        new ()
-                        {
-                          PublicationId = publication.Id,
-                          PublicationRole = Owner,
-                        },
-                    });
+                        PublicationId = publication.Id,
+                        PublicationRole = Owner,
+                    })
+                };
+                
+                var result = await service.InviteUser(inviteRequest);
 
                 VerifyAllMocks(emailTemplateService);
 
@@ -294,7 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(userInvite.Accepted);
                 Assert.Equal(role.Id, userInvite.RoleId);
                 Assert.InRange(DateTime.UtcNow.Subtract(userInvite.Created).Milliseconds, 0, 1500);
-                Assert.Equal(_createdById.ToString(), userInvite.CreatedById);
+                Assert.Equal(CreatedById.ToString(), userInvite.CreatedById);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -307,7 +301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(Approver, userReleaseInvite.Role);
                 Assert.True(userReleaseInvite.EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvite.Created).Milliseconds, 0, 1500);
-                Assert.Equal(_createdById, userReleaseInvite.CreatedById);
+                Assert.Equal(CreatedById, userReleaseInvite.CreatedById);
 
                 var userPublicationInvites = contentDbContext.UserPublicationInvites
                     .ToList();
@@ -316,7 +310,124 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication.Id, userPublicationInvite.PublicationId);
                 Assert.Equal(Owner, userPublicationInvite.Role);
                 Assert.InRange(DateTime.UtcNow.Subtract(userPublicationInvite.Created).Milliseconds, 0, 1500);
-                Assert.Equal(_createdById, userPublicationInvite.CreatedById);
+                Assert.Equal(CreatedById, userPublicationInvite.CreatedById);
+            }
+        }
+        
+        [Fact]
+        public async Task InviteUser_OptionalCreatedDate()
+        {
+            // We are passing in an optional CreatedDate
+            var createdDate = DateTime.UtcNow.AddDays(-5);
+
+            var role = new IdentityRole
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "Role 1",
+                NormalizedName = "ROLE 1"
+            };
+
+            var usersAndRolesDbContextId = Guid.NewGuid().ToString();
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                await usersAndRolesDbContext.AddRangeAsync(role);
+                await usersAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var release = new Release
+            {
+                Publication = new Publication(),
+            };
+            var publication = new Publication();
+
+            var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
+
+            emailTemplateService.Setup(mock =>
+                    mock.SendInviteEmail(
+                        "test@test.com",
+                        It.Is<List<UserReleaseInvite>>(invites =>
+                            invites.Count == 1
+                            && invites[0].ReleaseId == release.Id
+                            && invites[0].Role == Approver),
+                        It.Is<List<UserPublicationInvite>>(invites =>
+                            invites.Count == 1
+                            && invites[0].PublicationId == publication.Id
+                            && invites[0].Role == Owner)))
+                .Returns(Unit.Instance);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddRangeAsync(release);
+                await contentDbContext.Publications.AddRangeAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserManagementService(
+                    contentDbContext: contentDbContext,
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    emailTemplateService: emailTemplateService.Object);
+
+                var inviteRequest = new UserInviteCreateRequest
+                {
+                    Email = "test@test.com",
+                    RoleId = role.Id,
+                    UserReleaseRoles = ListOf(new UserReleaseRoleCreateRequest
+                    {
+                        ReleaseId = release.Id,
+                        ReleaseRole = Approver,
+                    }),
+                    UserPublicationRoles = ListOf(new UserPublicationRoleCreateRequest
+                    {
+                        PublicationId = publication.Id,
+                        PublicationRole = Owner,
+                    }),
+                    CreatedDate = createdDate
+                };
+                
+                var result = await service.InviteUser(inviteRequest);
+
+                VerifyAllMocks(emailTemplateService);
+
+                result.AssertRight();
+            }
+
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                var userInvites = usersAndRolesDbContext.UserInvites
+                    .ToList();
+
+                var userInvite = Assert.Single(userInvites);
+                Assert.Equal("test@test.com", userInvite.Email);
+                Assert.False(userInvite.Accepted);
+                Assert.Equal(role.Id, userInvite.RoleId);
+                Assert.Equal(createdDate, userInvite.Created);
+                Assert.Equal(CreatedById.ToString(), userInvite.CreatedById);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userReleaseInvites = contentDbContext.UserReleaseInvites
+                    .ToList();
+                var userReleaseInvite = Assert.Single(userReleaseInvites);
+                Assert.Equal("test@test.com", userReleaseInvite.Email);
+                Assert.Equal(release.Id, userReleaseInvite.ReleaseId);
+                Assert.Equal(Approver, userReleaseInvite.Role);
+                Assert.True(userReleaseInvite.EmailSent);
+                Assert.Equal(createdDate, userReleaseInvite.Created);
+                Assert.Equal(CreatedById, userReleaseInvite.CreatedById);
+
+                var userPublicationInvites = contentDbContext.UserPublicationInvites
+                    .ToList();
+                var userPublicationInvite = Assert.Single(userPublicationInvites);
+                Assert.Equal("test@test.com", userPublicationInvite.Email);
+                Assert.Equal(publication.Id, userPublicationInvite.PublicationId);
+                Assert.Equal(Owner, userPublicationInvite.Role);
+                Assert.Equal(createdDate, userPublicationInvite.Created);
+                Assert.Equal(CreatedById, userPublicationInvite.CreatedById);
             }
         }
 
@@ -383,34 +494,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     usersAndRolesDbContext: userAndRolesDbContext,
                     emailTemplateService: emailTemplateService.Object);
 
-                var result = await service.InviteUser("test@test.com",
-                    role.Id,
-                    new List<UserReleaseRoleAddViewModel>
-                    {
-                        new ()
+                var inviteRequest = new UserInviteCreateRequest
+                {
+                    Email = "test@test.com",
+                    RoleId = role.Id,
+                    UserReleaseRoles = ListOf(new UserReleaseRoleCreateRequest
                         {
                             ReleaseId = release1.Id,
                             ReleaseRole = Approver,
                         },
-                        new ()
+                        new UserReleaseRoleCreateRequest
                         {
                             ReleaseId = release2.Id,
                             ReleaseRole = Contributor,
-                        }
-                    },
-                    new List<UserPublicationRoleAddViewModel>
-                    {
-                        new ()
+                        }),
+                    UserPublicationRoles = ListOf(                        
+                        new UserPublicationRoleCreateRequest
                         {
-                          PublicationId = publication1.Id,
-                          PublicationRole = Owner,
+                            PublicationId = publication1.Id,
+                            PublicationRole = Owner,
                         },
-                        new ()
+                        new UserPublicationRoleCreateRequest
                         {
-                          PublicationId = publication2.Id,
-                          PublicationRole = ReleaseApprover,
-                        },
-                    });
+                            PublicationId = publication2.Id,
+                            PublicationRole = ReleaseApprover,
+                        })
+                };
+
+                var result = await service.InviteUser(inviteRequest);
 
                 VerifyAllMocks(emailTemplateService);
 
@@ -427,7 +538,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(userInvite.Accepted);
                 Assert.Equal(role.Id, userInvite.RoleId);
                 Assert.InRange(DateTime.UtcNow.Subtract(userInvite.Created).Milliseconds, 0, 1500);
-                Assert.Equal(_createdById.ToString(), userInvite.CreatedById);
+                Assert.Equal(CreatedById.ToString(), userInvite.CreatedById);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -442,14 +553,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(Approver, userReleaseInvites[0].Role);
                 Assert.True(userReleaseInvites[0].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[0].Created).Milliseconds, 0, 1500);
-                Assert.Equal(_createdById, userReleaseInvites[0].CreatedById);
+                Assert.Equal(CreatedById, userReleaseInvites[0].CreatedById);
 
                 Assert.Equal("test@test.com", userReleaseInvites[1].Email);
                 Assert.Equal(release2.Id, userReleaseInvites[1].ReleaseId);
                 Assert.Equal(Contributor, userReleaseInvites[1].Role);
                 Assert.True(userReleaseInvites[1].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[1].Created).Milliseconds, 0, 1500);
-                Assert.Equal(_createdById, userReleaseInvites[1].CreatedById);
+                Assert.Equal(CreatedById, userReleaseInvites[1].CreatedById);
 
                 var userPublicationInvites = contentDbContext.UserPublicationInvites
                     .ToList();
@@ -459,13 +570,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(publication1.Id, userPublicationInvites[0].PublicationId);
                 Assert.Equal(Owner, userPublicationInvites[0].Role);
                 Assert.InRange(DateTime.UtcNow.Subtract(userPublicationInvites[0].Created).Milliseconds, 0, 1500);
-                Assert.Equal(_createdById, userPublicationInvites[0].CreatedById);
+                Assert.Equal(CreatedById, userPublicationInvites[0].CreatedById);
 
                 Assert.Equal("test@test.com", userPublicationInvites[1].Email);
                 Assert.Equal(publication2.Id, userPublicationInvites[1].PublicationId);
                 Assert.Equal(ReleaseApprover, userPublicationInvites[1].Role);
                 Assert.InRange(DateTime.UtcNow.Subtract(userPublicationInvites[1].Created).Milliseconds, 0, 1500);
-                Assert.Equal(_createdById, userPublicationInvites[1].CreatedById);
+                Assert.Equal(CreatedById, userPublicationInvites[1].CreatedById);
             }
         }
 
@@ -510,10 +621,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     usersAndRolesDbContext: userAndRolesDbContext,
                     emailTemplateService: emailTemplateService.Object);
 
-                var result = await service.InviteUser("test@test.com",
-                    role.Id,
-                    new List<UserReleaseRoleAddViewModel>(),
-                    new List<UserPublicationRoleAddViewModel>());
+                var inviteRequest = new UserInviteCreateRequest
+                {
+                    Email = "test@test.com",
+                    RoleId = role.Id,
+                    UserReleaseRoles = new List<UserReleaseRoleCreateRequest>(),
+                    UserPublicationRoles = new List<UserPublicationRoleCreateRequest>()
+                };
+                
+                var result = await service.InviteUser(inviteRequest);
 
                 VerifyAllMocks(emailTemplateService);
 
@@ -535,7 +651,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Empty(userReleaseInvites);
             }
         }
-
+        
         [Fact]
         public async Task InviteUser_UserAlreadyExists()
         {
@@ -556,10 +672,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserManagementService(usersAndRolesDbContext: userAndRolesDbContext);
 
-                var result = await service.InviteUser("test@test.com",
-                    Guid.NewGuid().ToString(),
-                    new List<UserReleaseRoleAddViewModel>(),
-                    new List<UserPublicationRoleAddViewModel>());
+                var inviteRequest = new UserInviteCreateRequest
+                {
+                    Email = "test@test.com",
+                    RoleId = Guid.NewGuid().ToString(),
+                    UserReleaseRoles = new List<UserReleaseRoleCreateRequest>(),
+                    UserPublicationRoles = new List<UserPublicationRoleCreateRequest>()
+                };
+
+                var result = await service.InviteUser(inviteRequest);
 
                 var actionResult = result.AssertLeft();
                 actionResult.AssertBadRequest(ValidationErrorMessages.UserAlreadyExists);
@@ -571,10 +692,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
                 var service = SetupUserManagementService();
 
-                var result = await service.InviteUser("test@test.com",
-                    Guid.NewGuid().ToString(),
-                    new List<UserReleaseRoleAddViewModel>(),
-                    new List<UserPublicationRoleAddViewModel>());
+                var inviteRequest = new UserInviteCreateRequest
+                {
+                    Email = "test@test.com",
+                    RoleId = Guid.NewGuid().ToString(),
+                    UserReleaseRoles = new List<UserReleaseRoleCreateRequest>(),
+                    UserPublicationRoles = new List<UserPublicationRoleCreateRequest>()
+                };
+                
+                var result = await service.InviteUser(inviteRequest);
 
                 var actionResult = result.AssertLeft();
                 actionResult.AssertBadRequest(ValidationErrorMessages.InvalidUserRole);
@@ -722,7 +848,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
                 emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
                 userRoleService ?? Mock.Of<IUserRoleService>(Strict),
-                userService ?? AlwaysTrueUserService(_createdById).Object,
+                userService ?? AlwaysTrueUserService(CreatedById).Object,
                 userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
                 userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
                 userPublicationInviteRepository ?? new UserPublicationInviteRepository(contentDbContext)

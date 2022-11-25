@@ -19,13 +19,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _usersAndRolesDbContext = usersAndRolesDbContext;
         }
 
-        public async Task<UserInvite> CreateIfNotExists(string email, Role role, Guid createdById)
+        public async Task<UserInvite> CreateIfNotExists(
+            string email, 
+            Role role, 
+            Guid createdById,
+            DateTime? createdDate = null)
         {
-            return await CreateIfNotExists(email, role.GetEnumValue(), createdById);
+            return await CreateIfNotExists(email, role.GetEnumValue(), createdById, createdDate);
         }
 
-        public async Task<UserInvite> CreateIfNotExists(string email, string roleId, Guid createdById)
+        public async Task<UserInvite> CreateIfNotExists(
+            string email, 
+            string roleId, 
+            Guid createdById,
+            DateTime? createdDate = null)
         {
+            if (createdDate != null && createdDate > DateTime.UtcNow)
+            {
+                throw new ArgumentException($"{nameof(UserInvite)} created date cannot be a future date");
+            }
+            
             var existingInvite = await _usersAndRolesDbContext
                 .UserInvites
                 .AsQueryable()
@@ -40,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 Email = email.ToLower(),
                 RoleId = roleId,
-                Created = DateTime.UtcNow,
+                Created = createdDate ?? DateTime.UtcNow,
                 CreatedById = createdById.ToString(),
             };
             await _usersAndRolesDbContext.AddAsync(newInvite);

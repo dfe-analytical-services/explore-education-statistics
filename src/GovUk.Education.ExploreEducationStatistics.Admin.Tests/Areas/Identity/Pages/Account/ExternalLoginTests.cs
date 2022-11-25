@@ -519,12 +519,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
             await using (var usersDbContext = InMemoryUserAndRolesDbContext(contextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
-                // Assert that the new user's expired invite has not been accepted.
+                // Assert that the new user's expired invite has been deleted.
                 var newUsersInvite = await usersDbContext
                     .UserInvites
                     .AsQueryable()
-                    .SingleAsync(invite => invite.Email == email);
-                Assert.False(newUsersInvite.Accepted);
+                    .SingleOrDefaultAsync(invite => invite.Email == email);
+                Assert.Null(newUsersInvite);
 
                 // Assert that the other user's invites have all been left alone.
                 var otherUsersInvite = await usersDbContext
@@ -533,13 +533,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                     .SingleAsync(invite => invite.Email != email);
                 Assert.False(otherUsersInvite.Accepted);
 
-                // Assert that the new user's release role invites have all been left alone.
+                // Assert that the new user's release role invites have all been deleted.
                 var newUsersReleaseRoleInvites = await contentDbContext
                     .UserReleaseInvites
                     .AsQueryable()
                     .Where(invite => invite.Email == email)
                     .ToListAsync();
-                Assert.Equal(2, newUsersReleaseRoleInvites.Count);
+                Assert.Empty(newUsersReleaseRoleInvites);
 
                 // Assert that the other user's release role invites have all been left alone.
                 var otherUsersReleaseRoleInvites = await contentDbContext
@@ -549,13 +549,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                     .ToListAsync();
                 Assert.Single(otherUsersReleaseRoleInvites);
 
-                // Assert that the new user's publication role invites have all been left alone.
+                // Assert that the new user's publication role invites have all been deleted.
                 var newUsersPublicationRoleInvites = await contentDbContext
                     .UserPublicationInvites
                     .AsQueryable()
                     .Where(invite => invite.Email == email)
                     .ToListAsync();
-                Assert.Equal(2, newUsersPublicationRoleInvites.Count);
+                Assert.Empty(newUsersPublicationRoleInvites);
 
                 // Assert that the other user's publication role invites have all been left alone.
                 var otherUsersPublicationRoleInvites = await contentDbContext

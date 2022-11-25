@@ -132,6 +132,12 @@ parser.add_argument("--fail-fast", dest="fail_fast", action="store_true", help="
 parser.add_argument(
     "--custom-env", dest="custom_env", default=None, help="load a custom .env file (must be in ~/robot-tests directory)"
 )
+parser.add_argument(
+    "--debug",
+    dest="debug",
+    action="store_true",
+    help="get debug-level logging in report.html, including Python tracebacks",
+)
 
 """
 NOTE(mark): The slack webhook url, and admin and analyst passwords to access to Admin app are
@@ -372,6 +378,9 @@ if os.getenv("FAIL_TEST_SUITES_FAST"):
 
 if args.prompt_to_continue:
     robotArgs += ["-v", "prompt_to_continue_on_failure:1"]
+
+if args.debug:
+    robotArgs += ["--loglevel", "DEBUG"]
 
 robotArgs += ["-v", "browser:" + args.browser]
 robotArgs += [args.tests]

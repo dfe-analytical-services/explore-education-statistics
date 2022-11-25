@@ -222,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     .Include(userReleaseInvite =>
                                         userReleaseInvite.Release.Publication)
                                     .Where(userReleaseInvite =>
-                                        userReleaseInvite.Email.ToLower() == invite.Email.ToLower())
+                                        userReleaseInvite.Email.ToLower().Equals(invite.Email.ToLower()))
                                     .ToListAsync();
 
                                 var userReleaseRoles = userReleaseInvites
@@ -241,7 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     .Include(userPublicationInvite =>
                                         userPublicationInvite.Publication)
                                     .Where(userPublicationInvite =>
-                                        userPublicationInvite.Email.ToLower() == invite.Email.ToLower())
+                                        userPublicationInvite.Email.ToLower().Equals(invite.Email.ToLower()))
                                     .ToListAsync();
 
                                 var userPublicationRoles = userPublicationInvites
@@ -266,13 +266,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        public async Task<Either<ActionResult, UserInvite>> InviteUser(
-            string email,
-            string roleId,
-            List<UserReleaseRoleAddViewModel> userReleaseRoles,
-            List<UserPublicationRoleAddViewModel> userPublicationRoles)
+        public async Task<Either<ActionResult, UserInvite>> InviteUser(UserInviteCreateRequest request)
         {
+            var email = request.Email;
             var sanitisedEmail = email.Trim().ToLower();
+            var roleId = request.RoleId;
 
             return await _userService
                 .CheckCanManageAllUsers()
@@ -291,33 +289,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var userInvite = await _userInviteRepository.CreateIfNotExists(
                         email: sanitisedEmail,
                         roleId: roleId,
-                        createdById: _userService.GetUserId());
+                        createdById: _userService.GetUserId(),
+                        request.CreatedDate);
 
-                    foreach (var userReleaseRole in userReleaseRoles)
+                    foreach (var userReleaseRole in request.UserReleaseRoles)
                     {
                         await _userReleaseInviteRepository.Create(
                             releaseId: userReleaseRole.ReleaseId,
                             email: sanitisedEmail,
                             releaseRole: userReleaseRole.ReleaseRole,
                             emailSent: true,
-                            createdById: _userService.GetUserId());
+                            createdById: _userService.GetUserId(),
+                            request.CreatedDate);
                     }
 
                     await _userPublicationInviteRepository.CreateManyIfNotExists(
-                        userPublicationRoles,
+                        request.UserPublicationRoles,
                         sanitisedEmail,
-                        _userService.GetUserId());
+                        _userService.GetUserId(),
+                        request.CreatedDate);
 
                     return userInvite;
                 })
                 .OnSuccess(userInvite =>
                 {
-                    var userReleaseInvites = _contentDbContext.UserReleaseInvites
+                    var userReleaseInvites = _contentDbContext
+                        .UserReleaseInvites
                         .Include(invite => invite.Release.Publication)
                         .Where(invite => invite.Email.ToLower() == sanitisedEmail)
                         .ToList();
 
-                    var userPublicationInvites = _contentDbContext.UserPublicationInvites
+                    var userPublicationInvites = _contentDbContext
+                        .UserPublicationInvites
                         .Include(invite => invite.Publication)
                         .Where(invite => invite.Email.ToLower() == sanitisedEmail)
                         .ToList();

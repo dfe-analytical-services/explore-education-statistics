@@ -234,7 +234,20 @@ The [Keycloak Admin login](http://ees.local:5030/auth/admin/) is available with 
 
 The environment variable `IdpProviderConfiguration` lets Admin know to use 
 [appsettings.Keycloak.json](src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Keycloak.json) 
-for its Open ID Connect configuration. 
+for its Open ID Connect configuration.
+
+Additional seed data users can be added to Keycloak by manually adding new entries to the "users" array in
+[keycloak-ees-realm.json](src/keycloak/keycloak-ees-realm.json), ensuring to supply unique GUIDs to the `user` and
+`credentials` ids.  If copying and pasting from an existing user record in the array, the new user password will be
+"password" also.
+
+After this, existing Keycloak Docker containers will need to be rebuilt in order to pick up the new user list. To
+do this, run:
+
+  ```bash
+  cd src/
+  docker-compose up --build --force-recreate idp
+  ```
 
 #### Using Keycloak identity provider with custom users
 

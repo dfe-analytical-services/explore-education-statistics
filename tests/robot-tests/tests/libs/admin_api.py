@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 
 import requests
 from robot.libraries.BuiltIn import BuiltIn
@@ -112,9 +113,28 @@ def user_creates_test_publication_via_api(publication_name: str, topic_id: str =
     return response.json()["id"]
 
 
+def user_adds_user_invite_via_api(user_email: str, role_name: str, created_date: str):
+
+    existing_invite = __get_user_invite(user_email)
+
+    if existing_invite is None:
+
+        response = admin_client.post(
+            f"/api/user-management/invites",
+            {
+                "email": user_email,
+                "roleId": __get_global_role_id(role_name),
+                "createdDate": created_date or datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
+            },
+        )
+        assert (
+            response.status_code < 300
+        ), f"Adding release role to user API request failed with {response.status_code} and {response.text}"
+
+
 def user_adds_release_role_to_user_via_api(user_email: str, release_id: str, role_name: str = None):
 
-    user_id = get_user_details_via_api(user_email)["id"]
+    user_id = __get_user_details_via_api(user_email)["id"]
 
     response = admin_client.post(
         f"/api/user-management/users/{user_id}/release-role",
@@ -130,7 +150,7 @@ def user_adds_release_role_to_user_via_api(user_email: str, release_id: str, rol
 
 def user_adds_publication_role_to_user_via_api(user_email: str, publication_id: str, role_name: str = None):
 
-    user_id = get_user_details_via_api(user_email)["id"]
+    user_id = __get_user_details_via_api(user_email)["id"]
 
     response = admin_client.post(
         f"/api/user-management/users/{user_id}/publication-role",
@@ -155,7 +175,6 @@ def user_resets_user_roles_via_api_if_required(user_emails: list) -> None:
     allowed_users = [
         "ees-prerelease1@education.gov.uk",
         "ees-prerelease2@education.gov.uk",
-        "ees-prerelease3@education.gov.uk",
     ]
 
     user_ids = []
@@ -164,14 +183,14 @@ def user_resets_user_roles_via_api_if_required(user_emails: list) -> None:
         if user_email not in allowed_users:
             raise AssertionError(f"`User emails` must contain only allowed users: {allowed_users}")
         try:
-            user_ids = [get_prerelease_user_details_via_api(user_email)["id"]]
+            user_ids = [__get_prerelease_user_details_via_api(user_email)["id"]]
             _ = [user_removes_all_release_and_publication_roles_from_user(user_id) for user_id in user_ids]
             BuiltIn().log(f"All userReleaseRoles & userPublicationRoles reset for user: {user_email}")
         except TypeError or IndexError:
             BuiltIn().log(f"User with email {user_email} does not exist in pre-release user list", "WARN")
 
             try:
-                user_ids = [get_user_details_via_api(user_email)["id"]]
+                user_ids = [__get_user_details_via_api(user_email)["id"]]
                 _ = [user_removes_all_release_and_publication_roles_from_user(user_id) for user_id in user_ids]
                 BuiltIn().log(f"All userReleaseRoles & userPublicationRoles reset for user: {user_email}")
             except TypeError or IndexError:
@@ -199,15 +218,48 @@ def user_create_test_release_via_api(
     ), f"Creating release API request failed with {response.status_code} and {response.text}"
 
 
-def get_user_details_via_api(user_email: str):
+def __get_user_details_via_api(user_email: str):
 
     users = admin_client.get("/api/user-management/users").json()
 
-    return list(filter(lambda user: user["email"] == user_email, users))[0]
+    matching_users = list(filter(lambda user: user["email"] == user_email, users))
+
+    assert matching_users, f"Could not find user with email {user_email}"
+
+    return matching_users[0]
 
 
-def get_prerelease_user_details_via_api(user_email: str):
+def __get_prerelease_user_details_via_api(user_email: str):
 
     users = admin_client.get("/api/user-management/pre-release").json()
 
-    return list(filter(lambda user: user["email"] == user_email, users))[0]
+    matching_users = list(filter(lambda user: user["email"] == user_email, users))
+
+    assert matching_users, f"Could not find user with email {user_email}"
+
+    return matching_users[0]
+
+
+def __get_global_role_id(role_name: str):
+
+    response = admin_client.get("/api/user-management/roles")
+    assert (
+        response.status_code < 300
+    ), f"Getting list of global roles failed with {response.status_code} and {response.text}"
+
+    roles = response.json()
+    matching_roles = list(filter(lambda role: role["name"] == role_name, roles))
+
+    assert matching_roles, f"Could not find global role matching name {role_name}"
+
+    return matching_roles[0]["id"]
+
+
+def __get_user_invite(user_email: str):
+
+    response = admin_client.get("/api/user-management/invites")
+    assert response.status_code < 300, f"Getting list of invites failed with {response.status_code} and {response.text}"
+
+    invites = response.json()
+    matching_invites = list(filter(lambda invite: invite["email"] == user_email, invites))
+    return next(iter(matching_invites), None)

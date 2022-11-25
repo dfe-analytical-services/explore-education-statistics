@@ -369,7 +369,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var template = _configuration.GetValue<string>("NotifyPreReleaseTemplateId");
 
-            var scheme = _httpContextAccessor.HttpContext.Request.Scheme;
+            var scheme = _httpContextAccessor.HttpContext!.Request.Scheme;
             var host = _httpContextAccessor.HttpContext.Request.Host;
 
             var prereleaseUrl =
