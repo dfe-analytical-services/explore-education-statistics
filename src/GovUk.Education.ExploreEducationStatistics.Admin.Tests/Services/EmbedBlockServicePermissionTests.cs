@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -53,11 +55,11 @@ public class EmbedBlockServicePermissionTests
                 {
                     var service = SetupEmbedBlockService(userService: userService.Object);
                     return service.Update(releaseId: _release.Id,
+                        contentBlockId: Guid.NewGuid(),
                         request: new EmbedBlockUpdateRequest
                         {
                             Title = "Test title",
                             Url = "http://www.test.com",
-                            ContentBlockId = Guid.NewGuid(),
                         });
                 }
             );
@@ -80,11 +82,13 @@ public class EmbedBlockServicePermissionTests
     private EmbedBlockService SetupEmbedBlockService(
         ContentDbContext contentDbContext = null,
         IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
+        IContentService contentService = null,
         IUserService userService = null)
     {
         return new EmbedBlockService(
             contentDbContext ?? Mock.Of<ContentDbContext>(),
             contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
+            contentService ?? Mock.Of<IContentService>(),
             userService ?? Mock.Of<IUserService>(),
             AdminMapper()
         );

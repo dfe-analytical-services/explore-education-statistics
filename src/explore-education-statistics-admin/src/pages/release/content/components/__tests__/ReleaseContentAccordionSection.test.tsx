@@ -97,7 +97,7 @@ describe('ReleaseContentAccordionSection', () => {
       screen.getByRole('button', { name: 'Add data block' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Embed dashboard' }),
+      screen.getByRole('button', { name: 'Add embed block' }),
     ).toBeInTheDocument();
   });
 
@@ -147,7 +147,7 @@ describe('ReleaseContentAccordionSection', () => {
       screen.queryByRole('button', { name: 'Add data block' }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Embed dashboard' }),
+      screen.queryByRole('button', { name: 'Add embed block' }),
     ).not.toBeInTheDocument();
   });
 

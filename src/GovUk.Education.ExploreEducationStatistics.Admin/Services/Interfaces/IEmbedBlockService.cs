@@ -13,7 +13,7 @@ public interface IEmbedBlockService
 {
     Task<Either<ActionResult, EmbedBlockLinkViewModel>> Create(Guid releaseId, EmbedBlockCreateRequest request);
 
-    Task<Either<ActionResult, EmbedBlockLinkViewModel>> Update(Guid releaseId, EmbedBlockUpdateRequest request);
+    Task<Either<ActionResult, EmbedBlockLinkViewModel>> Update(Guid releaseId, Guid contentBlockId, EmbedBlockUpdateRequest request);
 
     Task<Either<ActionResult, Unit>> Delete(Guid releaseId, Guid contentBlockId);
 }

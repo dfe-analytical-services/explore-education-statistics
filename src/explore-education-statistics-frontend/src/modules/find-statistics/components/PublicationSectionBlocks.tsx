@@ -40,7 +40,7 @@ const PublicationSectionBlocks = ({
         if (block.type === 'EmbedBlockLink') {
           return (
             <Gate condition={!!visible} key={block.id}>
-              <EmbedBlock key={block.id} url={block.url} title={block.title} />
+              <EmbedBlock url={block.url} title={block.title} />
             </Gate>
           );
         }

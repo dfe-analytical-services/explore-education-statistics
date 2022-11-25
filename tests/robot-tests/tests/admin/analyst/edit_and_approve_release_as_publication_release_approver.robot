@@ -86,16 +86,16 @@ Create some release content
     user changes accordion section title    1    Dates data block
 
     user adds data block to editable accordion section    Dates data block    ${DATABLOCK_NAME}
-    ...    css:#releaseMainContent
+    ...    id:releaseMainContent
     ${datablock}=    set variable    xpath://*[@data-testid="Data block - ${DATABLOCK_NAME}"]
     user waits until page contains element    ${datablock}    %{WAIT_SMALL}
     user waits until element contains infographic chart    ${datablock}
     user checks chart title contains    ${datablock}    Dates table title
     user checks infographic chart contains alt    ${datablock}    Sample alt text
 
-    user adds text block to editable accordion section    Dates data block    css:#releaseMainContent
+    user adds text block to editable accordion section    Dates data block    id:releaseMainContent
     user adds content to autosaving accordion section text block    Dates data block    2    Some test text!
-    ...    css:#releaseMainContent
+    ...    id:releaseMainContent
 
 Add public prerelease access list
     user clicks link    Pre-release access

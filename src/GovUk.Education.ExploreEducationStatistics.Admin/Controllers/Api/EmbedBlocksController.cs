@@ -32,13 +32,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("release/{releaseId:guid}/embed-blocks")]
+        [HttpPut("release/{releaseId:guid}/embed-blocks/{contentBlockId:guid}")]
         public async Task<ActionResult<EmbedBlockLinkViewModel>> UpdateEmbedBlock(
             Guid releaseId,
+            Guid contentBlockId,
             EmbedBlockUpdateRequest request)
         {
             return await _embedBlockService
-                .Update(releaseId, request)
+                .Update(releaseId, contentBlockId, request)
                 .HandleFailuresOrOk();
         }
 

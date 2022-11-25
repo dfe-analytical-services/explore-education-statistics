@@ -105,10 +105,11 @@ const releaseContentService = {
 
   updateEmbedSectionBlock(
     releaseId: string,
+    contentBlockId: string,
     request: EmbedBlockUpdateRequest,
   ): Promise<EditableEmbedBlock> {
     return client.put<EditableEmbedBlock>(
-      `/release/${releaseId}/embed-blocks`,
+      `/release/${releaseId}/embed-blocks/${contentBlockId}`,
       request,
     );
   },

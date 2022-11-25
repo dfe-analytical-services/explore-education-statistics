@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -297,11 +298,11 @@ public class EmbedBlockServiceTests
         {
             var service = BuildEmbedBlockService(context);
             var result = await service.Update(_release.Id,
+                contentBlockId,
                 new EmbedBlockUpdateRequest
                 {
                     Title = "Test title updated",
                     Url = "http://www.test.com/update",
-                    ContentBlockId = contentBlockId,
                 });
 
             var viewModel = result.AssertRight();
@@ -371,11 +372,11 @@ public class EmbedBlockServiceTests
         {
             var service = BuildEmbedBlockService(context);
             var result = await service.Update(Guid.NewGuid(),
+                contentBlockId,
                 new EmbedBlockUpdateRequest
                 {
                     Title = "Test title update",
                     Url = "http://www.test.com/update",
-                    ContentBlockId = contentBlockId,
                 });
 
             result.AssertNotFound();
@@ -422,11 +423,11 @@ public class EmbedBlockServiceTests
         {
             var service = BuildEmbedBlockService(context);
             var result = await service.Update(_release.Id,
+                contentBlockId: Guid.NewGuid(),
                 new EmbedBlockUpdateRequest
                 {
                     Title = "Test title update",
                     Url = "http://www.test.com/update",
-                    ContentBlockId = Guid.NewGuid(),
                 });
 
             result.AssertNotFound();
@@ -479,11 +480,11 @@ public class EmbedBlockServiceTests
         {
             var service = BuildEmbedBlockService(context);
             var result = await service.Update(_release.Id,
+                contentBlockId,
                 new EmbedBlockUpdateRequest
                 {
                     Title = "Test title update",
                     Url = "http://www.test.com/update",
-                    ContentBlockId = contentBlockId,
                 });
 
             result.AssertBadRequest(ValidationErrorMessages.ContentSectionNotAttachedToRelease);
@@ -496,6 +497,15 @@ public class EmbedBlockServiceTests
         var contentSectionId = Guid.NewGuid();
         var contentBlockId = Guid.NewGuid();
         var embedBlockId = Guid.NewGuid();
+
+        var contentService = new Mock<IContentService>(Strict);
+
+        contentService
+            .Setup(s => s.RemoveContentBlockFromContentSection(
+                It.Is<ContentSection>(cs => cs.Id == contentSectionId),
+                It.Is<ContentBlock>(cb => cb.Id == contentBlockId),
+                true
+            ));
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
@@ -528,7 +538,8 @@ public class EmbedBlockServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var service = BuildEmbedBlockService(context);
+            var service = BuildEmbedBlockService(context,
+                contentService: contentService.Object);
             var result = await service.Delete(_release.Id, contentBlockId);
 
             result.AssertRight();
@@ -688,14 +699,15 @@ public class EmbedBlockServiceTests
     private static EmbedBlockService BuildEmbedBlockService(
         ContentDbContext? contentDbContext = null,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
+        IContentService? contentService = null,
         IUserService? userService = null)
     {
         var context = contentDbContext ?? Mock.Of<ContentDbContext>(Strict);
-        var service = new EmbedBlockService(
+        return new EmbedBlockService(
             context,
             persistenceHelper ?? new PersistenceHelper<ContentDbContext>(context),
+            contentService ?? Mock.Of<IContentService>(Strict),
             userService ?? AlwaysTrueUserService().Object,
             AdminMapper());
-        return service;
     }
 }

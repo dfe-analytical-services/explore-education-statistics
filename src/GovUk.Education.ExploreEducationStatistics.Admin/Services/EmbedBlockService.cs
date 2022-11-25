@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -22,17 +23,20 @@ public class EmbedBlockService : IEmbedBlockService
 {
     private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+    private readonly IContentService _contentService;
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
 
     public EmbedBlockService(
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
+        IContentService contentService,
         IUserService userService,
         IMapper mapper)
     {
         _contentDbContext = contentDbContext;
         _persistenceHelper = persistenceHelper;
+        _contentService = contentService;
         _userService = userService;
         _mapper = mapper;
     }
@@ -89,6 +93,7 @@ public class EmbedBlockService : IEmbedBlockService
     }
 
     public async Task<Either<ActionResult, EmbedBlockLinkViewModel>> Update(Guid releaseId,
+        Guid contentBlockId,
         EmbedBlockUpdateRequest request)
     {
         return await _persistenceHelper
@@ -97,7 +102,7 @@ public class EmbedBlockService : IEmbedBlockService
             .OnSuccess(async release =>
             {
                 return await _persistenceHelper
-                    .CheckEntityExists<EmbedBlockLink>(request.ContentBlockId, query =>
+                    .CheckEntityExists<EmbedBlockLink>(contentBlockId, query =>
                         query.Include(cb => cb.EmbedBlock))
                     .OnSuccess<ActionResult, EmbedBlockLink, EmbedBlockLinkViewModel>(async contentBlock =>
                     {
@@ -143,6 +148,17 @@ public class EmbedBlockService : IEmbedBlockService
                         }
 
                         _contentDbContext.EmbedBlocks.Remove(contentBlock.EmbedBlock);
+
+                        var contentSection = await _contentDbContext.ContentSections
+                            .Include(cs => cs.Content)
+                            .Where(cs => cs.Id == contentBlock.ContentSectionId)
+                            .SingleAsync();
+
+                        _contentService.RemoveContentBlockFromContentSection(
+                            contentSection,
+                            contentBlock,
+                            deleteContentBlock: true);
+
                         _contentDbContext.EmbedBlockLinks.Remove(contentBlock);
                         await _contentDbContext.SaveChangesAsync();
 

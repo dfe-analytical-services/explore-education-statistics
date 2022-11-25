@@ -260,10 +260,8 @@ export default function useReleaseContentActions() {
         type: 'ADD_SECTION_BLOCK',
         payload: { meta: { sectionId, sectionKey }, block: newBlock },
       });
-
-      await updateAvailableDataBlocks({ releaseId }); // need this?
     },
-    [dispatch, updateAvailableDataBlocks],
+    [dispatch],
   );
 
   const deleteEmbedSectionBlock = useCallback(
@@ -283,10 +281,8 @@ export default function useReleaseContentActions() {
         type: 'REMOVE_SECTION_BLOCK',
         payload: { meta: { sectionId, blockId, sectionKey } },
       });
-
-      await updateAvailableDataBlocks({ releaseId });
     },
-    [dispatch, updateAvailableDataBlocks],
+    [dispatch],
   );
 
   const updateEmbedSectionBlock = useCallback(
@@ -305,6 +301,7 @@ export default function useReleaseContentActions() {
     }) => {
       const updateBlock = await releaseContentService.updateEmbedSectionBlock(
         releaseId,
+        blockId,
         request,
       );
 

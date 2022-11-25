@@ -53,5 +53,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 
         Task<Either<ActionResult, IContentBlockViewModel>> AttachDataBlock(
             Guid releaseId, Guid contentSectionId, ContentBlockAttachRequest request);
+
+        void RemoveContentBlockFromContentSection(
+            ContentSection section,
+            ContentBlock blockToRemove,
+            bool deleteContentBlock);
     }
 }

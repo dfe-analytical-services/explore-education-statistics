@@ -58,7 +58,6 @@ export type ContentBlockPostModel = Pick<
 export type EmbedBlockUpdateRequest = {
   title: string;
   url: string;
-  contentBlockId: string;
 };
 
 export type EmbedBlockCreateRequest = {

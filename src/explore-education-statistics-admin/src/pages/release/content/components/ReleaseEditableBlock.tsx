@@ -208,7 +208,6 @@ const ReleaseEditableBlock = ({
         sectionKey,
         blockId: block.id,
         request: {
-          contentBlockId: block.id,
           title: updatedBlock.title,
           url: updatedBlock.url,
         },

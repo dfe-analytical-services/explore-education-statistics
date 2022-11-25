@@ -238,7 +238,7 @@ Validate embedded table rows
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
     user scrolls to element    id:releaseMainContent
 
-    user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
+    user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
 
     ${table}=    set variable    ${datablock} >> css:table
     user waits until page contains element    ${table}    30
@@ -426,7 +426,7 @@ Save chart and validate marked as 'Has chart' in data blocks list
 Validate line chart embeds correctly
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
+    user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
     user waits until page contains element    ${datablock}
@@ -524,7 +524,7 @@ Save and validate vertical bar chart embeds correctly
 
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
-    user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
+    user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
     user waits until page contains element    ${datablock}
@@ -610,7 +610,7 @@ Save and validate horizontal bar chart embeds correctly
 
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
+    user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
     user waits until page contains element    ${datablock}
@@ -696,7 +696,7 @@ Save and validate geographic chart embeds correctly
 
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
+    user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
     user waits until page does not contain loading spinner
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
@@ -739,7 +739,7 @@ Save and validate infographic chart embeds correctly
 
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
+    user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
     user waits until page contains element    ${datablock}

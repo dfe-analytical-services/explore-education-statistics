@@ -144,127 +144,121 @@ const ReleaseContentAccordionSection = ({
   );
 
   return (
-    <>
-      <EditableAccordionSection
-        {...props}
-        heading={heading}
-        disabledRemoveSectionTooltip={
-          hasLockedBlocks
-            ? 'This section is being edited and cannot be removed'
-            : undefined
-        }
-        caption={caption}
-        onHeadingChange={handleHeadingChange}
-        onRemoveSection={handleRemoveSection}
-        headerButtons={
-          <Tooltip
-            text="This section is being edited and cannot be reordered"
-            enabled={hasLockedBlocks}
-          >
-            {({ ref }) => (
-              <Button
-                ariaDisabled={hasLockedBlocks}
-                ref={ref}
-                variant={!isReordering ? 'secondary' : undefined}
-                onClick={async () => {
-                  if (isReordering) {
-                    await reorderBlocks();
-                    setIsReordering(false);
-                  } else {
-                    setIsReordering(true);
-                  }
-                }}
-              >
-                {isReordering ? 'Save section order' : 'Reorder this section'}
-              </Button>
+    <EditableAccordionSection
+      {...props}
+      heading={heading}
+      disabledRemoveSectionTooltip={
+        hasLockedBlocks
+          ? 'This section is being edited and cannot be removed'
+          : undefined
+      }
+      caption={caption}
+      onHeadingChange={handleHeadingChange}
+      onRemoveSection={handleRemoveSection}
+      headerButtons={
+        <Tooltip
+          text="This section is being edited and cannot be reordered"
+          enabled={hasLockedBlocks}
+        >
+          {({ ref }) => (
+            <Button
+              ariaDisabled={hasLockedBlocks}
+              ref={ref}
+              variant={!isReordering ? 'secondary' : undefined}
+              onClick={async () => {
+                if (isReordering) {
+                  await reorderBlocks();
+                  setIsReordering(false);
+                } else {
+                  setIsReordering(true);
+                }
+              }}
+            >
+              {isReordering ? 'Save section order' : 'Reorder this section'}
+            </Button>
+          )}
+        </Tooltip>
+      }
+    >
+      {({ open }) => (
+        <>
+          <EditableSectionBlocks
+            blocks={blocks}
+            isReordering={isReordering}
+            sectionId={sectionId}
+            onBlocksChange={setBlocks}
+            renderBlock={block => (
+              <ReleaseBlock
+                block={block}
+                releaseId={release.id}
+                visible={open}
+              />
             )}
-          </Tooltip>
-        }
-      >
-        {({ open }) => (
-          <>
-            <EditableSectionBlocks
-              blocks={blocks}
-              isReordering={isReordering}
-              sectionId={sectionId}
-              onBlocksChange={setBlocks}
-              renderBlock={block => (
-                <ReleaseBlock
-                  block={block}
+            renderEditableBlock={block => (
+              <ReleaseEditableBlock
+                allowComments
+                allowImages
+                block={block}
+                sectionId={sectionId}
+                sectionKey="content"
+                editable={!isReordering}
+                publicationId={release.publication.id}
+                releaseId={release.id}
+                visible={open}
+              />
+            )}
+          />
+
+          {editingMode === 'edit' && !isReordering && (
+            <>
+              {showDataBlockForm && (
+                <DataBlockSelectForm
+                  id={`dataBlockSelectForm-${sectionId}`}
                   releaseId={release.id}
-                  visible={open}
+                  onSelect={async selectedDataBlockId => {
+                    await attachDataBlock(selectedDataBlockId);
+                    toggleDataBlockForm.off();
+                  }}
+                  onCancel={toggleDataBlockForm.off}
                 />
               )}
-              renderEditableBlock={block => (
-                <ReleaseEditableBlock
-                  allowComments
-                  allowImages
-                  block={block}
-                  sectionId={sectionId}
-                  sectionKey="content"
-                  editable={!isReordering}
-                  publicationId={release.publication.id}
-                  releaseId={release.id}
-                  visible={open}
-                />
-              )}
-            />
 
-            {editingMode === 'edit' && !isReordering && (
-              <>
-                {showDataBlockForm && (
-                  <DataBlockSelectForm
-                    id={`dataBlockSelectForm-${sectionId}`}
-                    releaseId={release.id}
-                    onSelect={async selectedDataBlockId => {
-                      await attachDataBlock(selectedDataBlockId);
-                      toggleDataBlockForm.off();
-                    }}
-                    onCancel={toggleDataBlockForm.off}
-                  />
-                )}
-
-                <ButtonGroup className="govuk-!-margin-bottom-8 dfe-justify-content--center">
-                  <Button variant="secondary" onClick={addBlock}>
-                    Add text block
+              <ButtonGroup className="govuk-!-margin-bottom-8 dfe-justify-content--center">
+                <Button variant="secondary" onClick={addBlock}>
+                  Add text block
+                </Button>
+                {!showDataBlockForm && (
+                  <Button variant="secondary" onClick={toggleDataBlockForm.on}>
+                    Add data block
                   </Button>
-                  {!showDataBlockForm && (
-                    <Button
-                      variant="secondary"
-                      onClick={toggleDataBlockForm.on}
-                    >
-                      Add data block
-                    </Button>
-                  )}
-                  {!showEmbedDashboardForm && (
-                    <Button
-                      variant="secondary"
-                      onClick={toggleEmbedDashboardForm.on}
-                    >
-                      Embed dashboard
-                    </Button>
-                  )}
-                </ButtonGroup>
-              </>
-            )}
-          </>
-        )}
-      </EditableAccordionSection>
-
+                )}
+                {!showEmbedDashboardForm && (
+                  <Button
+                    variant="secondary"
+                    onClick={toggleEmbedDashboardForm.on}
+                  >
+                    Add embed block
+                  </Button>
+                )}
+              </ButtonGroup>
+            </>
+          )}
+        </>
+      )}
       <Modal
-        title="Embed dashboard link"
+        title="Add embed block"
         open={showEmbedDashboardForm}
         onExit={toggleEmbedDashboardForm.off}
       >
         <EditableEmbedForm
           onCancel={toggleEmbedDashboardForm.off}
-          onSubmit={embedBlock => {
-            addEmbedBlock(embedBlock);
+          onSubmit={async embedBlock => {
+            await addEmbedBlock(embedBlock);
             toggleEmbedDashboardForm.off();
           }}
         />
       </Modal>
-    </>
+    </EditableAccordionSection>
   );
 };
 

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Clients;
@@ -13,11 +15,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -459,6 +463,90 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Empty(viewModel);
             }
         }
+
+    [Fact]
+    public async Task RemoveContentBlockFromContentSection()
+    {
+        var release = new Release();
+        var contentBlockId = Guid.NewGuid();
+        var embedBlockId = Guid.NewGuid();
+
+        var contentBlocks = new List<ContentBlock>
+        {
+            new HtmlBlock { Order = 1, },
+            new HtmlBlock { Order = 2, },
+            new EmbedBlockLink
+            {
+                Id = contentBlockId,
+                Order = 3,
+                EmbedBlockId = embedBlockId,
+            },
+            new HtmlBlock { Order = 4, },
+            new HtmlBlock { Order = 5, },
+        };
+
+        var contentSection = new ContentSection
+        {
+            Id = Guid.NewGuid(),
+            Content = contentBlocks,
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            await context.ReleaseContentSections.AddRangeAsync(new ReleaseContentSection
+            {
+                Release = release,
+                ContentSection = contentSection,
+            });
+            await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
+            {
+                Id = embedBlockId,
+                Title = "Test title",
+                Url = "http://www.test.com",
+            });
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var service = SetupContentService(context);
+            service.RemoveContentBlockFromContentSection(
+                contentSection,
+                contentSection.Content[2],
+                deleteContentBlock: true);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var dbContentSection = context.ContentSections
+                .Include(cs => cs.Content)
+                .Single(cs => cs.Id == contentSection.Id);
+
+            Assert.Equal(4, dbContentSection.Content.Count);
+
+            Assert.Equal(contentBlocks[0].Id, dbContentSection.Content[0].Id);
+            Assert.Equal(1, dbContentSection.Content[0].Order);
+            Assert.Equal(contentBlocks[1].Id, dbContentSection.Content[1].Id);
+            Assert.Equal(2, dbContentSection.Content[1].Order);
+            // NOTE: Skip contentBlocks[2] as that is the EmbedBlockLink
+            Assert.Equal(contentBlocks[2].Id, dbContentSection.Content[2].Id);
+            Assert.Equal(3, dbContentSection.Content[2].Order);
+            Assert.Equal(contentBlocks[3].Id, dbContentSection.Content[3].Id);
+            Assert.Equal(4, dbContentSection.Content[3].Order);
+
+            var embedBlockLinks = context.EmbedBlockLinks.ToList();
+            Assert.Empty(embedBlockLinks);
+
+            var embedBlocks = context.EmbedBlocks.ToList();
+            Assert.Empty(embedBlocks);
+        }
+    }
+
+    // @MarkFix Test order of other content blocks in same section are correct after deletion
+
+
 
         private static ContentService SetupContentService(
             ContentDbContext contentDbContext,

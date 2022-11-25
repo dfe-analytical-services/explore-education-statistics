@@ -38,15 +38,15 @@ const EditableEmbedBlock = ({
       </EditableBlockWrapper>
 
       <Modal
-        title="Edit dashboard link"
+        title="Edit embed block"
         open={showEmbedDashboardForm}
         onExit={toggleEmbedDashboardForm.off}
       >
         <EditableEmbedForm
           initialValues={block}
           onCancel={toggleEmbedDashboardForm.off}
-          onSubmit={embedBlock => {
-            onSubmit(embedBlock);
+          onSubmit={async embedBlock => {
+            await onSubmit(embedBlock);
             toggleEmbedDashboardForm.off();
           }}
         />

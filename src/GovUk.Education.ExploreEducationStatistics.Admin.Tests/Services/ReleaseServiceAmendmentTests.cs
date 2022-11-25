@@ -535,9 +535,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
                 Assert.Equal(release.ContentBlocks.Count, amendment.ContentBlocks.Count);
-                var amendmentContentBlock1 = amendment.ContentBlocks[0].ContentBlock;
-                var amendmentContentBlock2 = amendment.ContentBlocks[1].ContentBlock;
-                var amendmentContentBlock3 = amendment.ContentBlocks[2].ContentBlock;
+                var amendmentContentBlock1 = Assert.IsType<DataBlock>(amendment.ContentBlocks[0].ContentBlock);
+                var amendmentContentBlock2 = Assert.IsType<DataBlock>(amendment.ContentBlocks[1].ContentBlock);
+                var amendmentContentBlock3 = Assert.IsType<EmbedBlockLink>(amendment.ContentBlocks[2].ContentBlock);
                 var amendmentContentBlock1InContent = amendment.Content[0].ContentSection.Content[0];
 
                 // Check that the DataBlock that is included in this Release amendment's Content is successfully
@@ -550,15 +550,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // and check that the Data Block that is not yet included in any content is copied across OK still
                 Assert.NotEqual(dataBlock2.Id, amendmentContentBlock2.Id);
-                Assert.Equal((amendmentContentBlock2 as DataBlock)?.Name, dataBlock2.Name);
+                Assert.Equal(amendmentContentBlock2.Name, dataBlock2.Name);
 
                 Assert.NotEqual(embedBlockLink.Id, amendmentContentBlock3.Id);
-                Assert.NotEqual(embedBlockLink.EmbedBlockId,
-                    (amendmentContentBlock3 as EmbedBlockLink)!.EmbedBlockId);
-                Assert.Equal(embedBlockLink.EmbedBlock.Title,
-                    (amendmentContentBlock3 as EmbedBlockLink)!.EmbedBlock.Title);
-                Assert.Equal(embedBlockLink.EmbedBlock.Url,
-                    (amendmentContentBlock3 as EmbedBlockLink)!.EmbedBlock.Url);
+                Assert.NotEqual(embedBlockLink.EmbedBlockId, amendmentContentBlock3.EmbedBlockId);
+                Assert.Equal(embedBlockLink.EmbedBlock.Title, amendmentContentBlock3.EmbedBlock.Title);
+                Assert.Equal(embedBlockLink.EmbedBlock.Url, amendmentContentBlock3.EmbedBlock.Url);
 
                 var amendmentReleaseRoles = contentDbContext
                     .UserReleaseRoles

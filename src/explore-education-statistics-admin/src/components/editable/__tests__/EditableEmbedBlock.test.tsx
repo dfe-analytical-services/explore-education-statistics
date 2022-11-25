@@ -41,7 +41,7 @@ describe('EditableEmbedBlock', () => {
     );
 
     expect(
-      screen.getByRole('button', { name: 'Edit dashboard link' }),
+      screen.getByRole('button', { name: 'Edit embed block' }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Remove block' }),
@@ -59,7 +59,7 @@ describe('EditableEmbedBlock', () => {
     );
 
     expect(
-      screen.queryByRole('button', { name: 'Edit dashboard link' }),
+      screen.queryByRole('button', { name: 'Edit embed block' }),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Remove block' }),
@@ -76,13 +76,11 @@ describe('EditableEmbedBlock', () => {
       />,
     );
 
-    userEvent.click(
-      screen.getByRole('button', { name: 'Edit dashboard link' }),
-    );
+    userEvent.click(screen.getByRole('button', { name: 'Edit embed block' }));
 
     const modal = within(screen.getByRole('dialog'));
     expect(
-      modal.getByRole('heading', { name: 'Edit dashboard link' }),
+      modal.getByRole('heading', { name: 'Edit embed block' }),
     ).toBeInTheDocument();
     expect(modal.getByLabelText('Title')).toBeInTheDocument();
     expect(modal.getByLabelText('URL')).toBeInTheDocument();
@@ -101,9 +99,7 @@ describe('EditableEmbedBlock', () => {
       />,
     );
 
-    userEvent.click(
-      screen.getByRole('button', { name: 'Edit dashboard link' }),
-    );
+    userEvent.click(screen.getByRole('button', { name: 'Edit embed block' }));
 
     const modal = within(screen.getByRole('dialog'));
 
@@ -126,7 +122,7 @@ describe('EditableEmbedBlock', () => {
     });
   });
 
-  test('when click the remove block button it shows the modal and calls `onDelete` on confirm', async () => {
+  test('when clicking the remove block button it shows the modal and calls `onDelete` on confirm', async () => {
     const handleDelete = jest.fn();
     render(
       <EditableEmbedBlock

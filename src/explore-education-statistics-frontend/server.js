@@ -46,10 +46,6 @@ async function startServer(port = process.env.PORT || 3000) {
     process.env.CONTENT_API_BASE_URL.replace('/api', ''),
     process.env.DATA_API_BASE_URL.replace('/api', ''),
     process.env.NOTIFICATION_API_BASE_URL.replace('/api', ''),
-    'http://*.hotjar.com:*',
-    'https://*.hotjar.com:*',
-    'https://vc.hotjar.io:*',
-    'wss://*.hotjar.com',
     'https://www.google-analytics.com',
     'https://dc.services.visualstudio.com/v2/track',
   ];
@@ -57,8 +53,6 @@ async function startServer(port = process.env.PORT || 3000) {
   const cspScriptSrc = [
     "'self'",
     'https://www.google-analytics.com/',
-    'https://static.hotjar.com/',
-    'https://script.hotjar.com',
     "'unsafe-inline'",
     "'unsafe-eval'",
   ];
@@ -79,24 +73,16 @@ async function startServer(port = process.env.PORT || 3000) {
             process.env.CONTENT_API_BASE_URL.replace('/api', ''),
             'data:',
             'https://www.google-analytics.com/',
-            'https://insights.hotjar.com',
-            'https://static.hotjar.com',
-            'https://script.hotjar.com',
           ],
-          fontSrc: [
-            "'self'",
-            'https://static.hotjar.com',
-            'https://script.hotjar.com',
-          ],
+          fontSrc: ["'self'"],
           connectSrc:
             process.env.NODE_ENV !== 'production' ? ['*'] : cspConnectSrc,
           frameSrc: [
             "'self'",
-            'https://vars.hotjar.com ',
             'https://department-for-education.shinyapps.io/',
           ],
           frameAncestors: ["'self'"],
-          childSrc: ["'self'", 'https://vars.hotjar.com'],
+          childSrc: ["'self'"],
         },
       },
     }),

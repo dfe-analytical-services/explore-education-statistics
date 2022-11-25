@@ -433,7 +433,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return 1;
         }
 
-        private void RemoveContentBlockFromContentSection(
+        public void RemoveContentBlockFromContentSection(
             ContentSection section,
             ContentBlock blockToRemove,
             bool deleteContentBlock)
