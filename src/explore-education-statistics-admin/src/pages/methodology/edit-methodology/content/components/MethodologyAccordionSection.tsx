@@ -129,9 +129,8 @@ const MethodologyAccordionSection = ({
       {...props}
       anchorLinkUrl={
         editingMode === 'preview'
-          ? `${PublicAppUrl}/methodology/${
-              currentMethodology.slug
-            }#${heading.toLowerCase().split(' ').join('-')}`
+          ? id =>
+              `${PublicAppUrl}/methodology/${currentMethodology.slug}/#${id}`
           : undefined
       }
       heading={heading}

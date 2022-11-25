@@ -376,11 +376,11 @@
       "type": "securestring",
       "defaultValue": "change-me"
     },
-    "notifyReleaseApproversTemplateId": {
+    "notifyHigherReviewersTemplateId": {
       "type": "securestring",
       "defaultValue": "change-me",
       "metadata": {
-        "description": "Gov UK Notify service template ID for release approver notifications"
+        "description": "Gov UK Notify service template ID for approver notifications"
       }
     },
     "teamEmailAddresses": {
@@ -1792,7 +1792,7 @@
         "NotifyReleaseRoleTemplateId": "[parameters('notifyReleaseRoleTemplateId')]",
         "NotifyPreReleaseTemplateId": "[parameters('notifyPreReleaseTemplateId')]",
         "NotifyContributorTemplateId": "[parameters('notifyContributorTemplateId')]",
-        "NotifyReleaseApproversTemplateId": "[parameters('notifyReleaseApproversTemplateId')]",
+        "NotifyHigherReviewersTemplateId": "[parameters('notifyHigherReviewersTemplateId')]",
         "AdminUri": "[parameters('adminUri')]",
         "Azure:SignalR:ConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-signalr-admin-connectionstring'), '2018-02-14').secretUriWithVersion, ')')]",
         "PublicAppUrl": "[variables('publicAppUrl')]",

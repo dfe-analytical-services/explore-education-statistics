@@ -141,6 +141,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
             return (
               <AccordionSection
                 id={`content-section-${order}`}
+                anchorLinkIdPrefix="content-section"
                 heading={heading}
                 caption={caption}
                 key={order}
@@ -176,6 +177,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
             {data.annexes.map(({ heading, caption, order, content }) => {
               return (
                 <AccordionSection
+                  anchorLinkIdPrefix="annex-section"
                   heading={heading}
                   caption={caption}
                   key={order}

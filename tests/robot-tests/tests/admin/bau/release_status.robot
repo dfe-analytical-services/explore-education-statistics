@@ -36,7 +36,7 @@ Go to release sign off page and verify initial release checklist
     user checks page does not contain testid    releaseChecklist-success
 
 Submit release for Higher Review
-    user clicks radio    Ready for higher review (this will notify release approvers)
+    user clicks radio    Ready for higher review (this will notify approvers)
     user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    Submitted for Higher Review
     user enters text into element    id:releaseStatusForm-nextReleaseDate-month    12
     user enters text into element    id:releaseStatusForm-nextReleaseDate-year    3001
