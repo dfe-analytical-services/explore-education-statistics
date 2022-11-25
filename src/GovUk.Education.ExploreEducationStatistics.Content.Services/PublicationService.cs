@@ -4,13 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -27,18 +25,15 @@ public class PublicationService : IPublicationService
     private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
     private readonly IPublicationRepository _publicationRepository;
-    private readonly IUserService _userService;
 
     public PublicationService(
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
-        IPublicationRepository publicationRepository,
-        IUserService userService)
+        IPublicationRepository publicationRepository)
     {
         _contentDbContext = contentDbContext;
         _contentPersistenceHelper = contentPersistenceHelper;
         _publicationRepository = publicationRepository;
-        _userService = userService;
     }
 
     public async Task<Either<ActionResult, PublicationCacheViewModel>> Get(string publicationSlug)
@@ -51,9 +46,13 @@ public class PublicationService : IPublicationService
                 .Include(p => p.Topic)
                 .ThenInclude(topic => topic.Theme)
                 .Where(p => p.Slug == publicationSlug))
-            .OnSuccess(_userService.CheckCanViewPublication)
             .OnSuccess(async publication =>
             {
+                if (publication.LatestPublishedReleaseId == null)
+                {
+                    return new Either<ActionResult, PublicationCacheViewModel>(new NotFoundResult());
+                }
+
                 var isSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
                 return BuildPublicationViewModel(publication, isSuperseded);
             });

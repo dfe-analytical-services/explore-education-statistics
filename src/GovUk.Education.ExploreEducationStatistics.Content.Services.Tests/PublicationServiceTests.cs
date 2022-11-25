@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -282,6 +280,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Equal(publication.Id, publicationViewModel.Id);
                 Assert.False(publicationViewModel.IsSuperseded);
+            }
+        }
+
+        [Fact]
+        public async Task Get_PublicationHasNoPublishedRelease()
+        {
+            var publication = new Publication
+            {
+                Slug = PublicationSlug,
+                Releases = new List<Release>
+                {
+                    new()
+                    {
+                        ReleaseName = "2000",
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        Published = null
+                    }
+                },
+                LatestPublishedRelease = null
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupPublicationService(contentDbContext);
+
+                var result = await service.Get(PublicationSlug);
+
+                result.AssertNotFound();
             }
         }
 
@@ -1292,16 +1325,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
         private static PublicationService SetupPublicationService(
             ContentDbContext? contentDbContext = null,
-            IPublicationRepository? publicationRepository = null,
-            IUserService? userService = null)
+            IPublicationRepository? publicationRepository = null)
         {
             contentDbContext ??= InMemoryContentDbContext();
 
             return new(
                 contentDbContext,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
-                publicationRepository ?? new PublicationRepository(contentDbContext),
-                userService ?? MockUtils.AlwaysTrueUserService().Object
+                publicationRepository ?? new PublicationRepository(contentDbContext)
             );
         }
     }
