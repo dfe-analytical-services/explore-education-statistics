@@ -1779,14 +1779,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 result.AssertRight();
 
             }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var saved = await context.Releases.Include(r => r.ReleaseStatuses)
-                    .FirstAsync(r => r.Id == release.Id);
-
-                Assert.False(saved.ReleaseStatuses.First().NotifyReleaseApprovers);
-            }
         }
         
         [Fact]
@@ -1847,14 +1839,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 result.AssertRight();
 
             }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var saved = await context.Releases.Include(r => r.ReleaseStatuses)
-                    .FirstAsync(r => r.Id == release.Id);
-
-                Assert.False(saved.ReleaseStatuses.First().NotifyReleaseApprovers);
-            }
         }
 
         [Fact]
@@ -1904,10 +1888,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, release.Publication.Id))
                     .ReturnsAsync(ListOf( userReleaseRole1, userReleaseRole2 ));
 
-                emailTemplateService.Setup(mock => mock.SendReleaseApproverEmail(userReleaseRole1.User.Email, It.Is<Release>(r => r.Id == release.Id)))
+                emailTemplateService.Setup(mock => mock.SendHigherReviewEmail(userReleaseRole1.User.Email, It.Is<Release>(r => r.Id == release.Id)))
                     .Returns(Unit.Instance);
                 
-                emailTemplateService.Setup(mock => mock.SendReleaseApproverEmail(userReleaseRole2.User.Email, It.Is<Release>(r => r.Id == release.Id)))
+                emailTemplateService.Setup(mock => mock.SendHigherReviewEmail(userReleaseRole2.User.Email, It.Is<Release>(r => r.Id == release.Id)))
                     .Returns(Unit.Instance);
 
                 var releaseService = BuildService(
@@ -1931,13 +1915,142 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(userReleaseRoleService, emailTemplateService, contentService);
                 result.AssertRight();
             }
+        }
+
+        [Fact]
+        public async Task CreateReleaseStatus_HigherReview_SendsEmailIfPublicationOwner()
+        {
+            var release = new Release
+            {
+                Type = ReleaseType.AdHocStatistics,
+                Publication = new Publication { Title = "Test publication" },
+                ReleaseName = "2030",
+                Slug = "2030",
+                Version = 0,
+            };
+
+            var userPublicationOwnerRole = new UserPublicationRole
+            {
+                User = new User { Id = Guid.NewGuid(), Email = "test@test.com" },
+                Publication = release.Publication,
+                Role = PublicationRole.Owner
+            };
+
+            var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var saved = await context.Releases.Include(r => r.ReleaseStatuses)
-                    .FirstAsync(r => r.Id == release.Id);
+                await context.Releases.AddAsync(release);
+                await context.UserPublicationRoles.AddAsync(userPublicationOwnerRole);
+                await context.SaveChangesAsync();
+            }
 
-                Assert.True(saved.ReleaseStatuses.First().NotifyReleaseApprovers);
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var contentService = new Mock<IContentService>(MockBehavior.Strict);
+                var userReleaseRoleService = new Mock<IUserReleaseRoleService>(MockBehavior.Strict);
+                var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
+            
+                contentService.Setup(mock => mock.GetContentBlocks<HtmlBlock>(release.Id))
+                    .ReturnsAsync(new List<HtmlBlock>());
+            
+                userReleaseRoleService.Setup(mock =>
+                        mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, release.Publication.Id))
+                    .ReturnsAsync(new List<UserReleaseRole>());
+
+                emailTemplateService.Setup(mock => mock.SendHigherReviewEmail(userPublicationOwnerRole.User.Email,
+                    It.Is<Release>(r => r.Id == release.Id))).Returns(Unit.Instance);
+                
+                var releaseService = BuildService(
+                    contentDbContext: context,
+                    contentService: contentService.Object,
+                    emailTemplateService: emailTemplateService.Object,
+                    userReleaseRoleService: userReleaseRoleService.Object
+                );
+
+                var result = await releaseService
+                    .CreateReleaseStatus(
+                        release.Id, new ReleaseStatusCreateViewModel
+                        {
+                            PublishMethod = PublishMethod.Scheduled,
+                            PublishScheduled = "2051-06-30",
+                            ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
+                            LatestInternalReleaseNote = "Test internal note",
+                            NextReleaseDate = new PartialDate { Month = "12", Year = "2077" },
+                        });
+                
+                VerifyAllMocks(contentService, userReleaseRoleService, emailTemplateService);
+                
+                result.AssertRight();
+            }
+        }
+
+        [Fact]
+        public async Task CreateReleaseStatus_HigherReview_SendsEmailIfPublicationReleaseApprover()
+        {
+            var release = new Release
+            {
+                Type = ReleaseType.AdHocStatistics,
+                Publication = new Publication { Title = "Test publication" },
+                ReleaseName = "2030",
+                Slug = "2030",
+                Version = 0,
+            };
+
+            var userPublicationReleaseApproverRole = new UserPublicationRole
+            {
+                User = new User { Id = Guid.NewGuid(), Email = "test@test.com" },
+                Publication = release.Publication,
+                Role = PublicationRole.ReleaseApprover
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Releases.AddAsync(release);
+                await context.UserPublicationRoles.AddAsync(userPublicationReleaseApproverRole);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var contentService = new Mock<IContentService>(MockBehavior.Strict);
+                var userReleaseRoleService = new Mock<IUserReleaseRoleService>(MockBehavior.Strict);
+                var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
+                
+                contentService.Setup(mock => mock.GetContentBlocks<HtmlBlock>(release.Id))
+                    .ReturnsAsync(new List<HtmlBlock>());
+            
+            
+                userReleaseRoleService.Setup(mock =>
+                        mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, release.Publication.Id))
+                    .ReturnsAsync(new List<UserReleaseRole>());
+                
+                emailTemplateService.Setup(mock => mock.SendHigherReviewEmail(userPublicationReleaseApproverRole.User.Email,
+                    It.Is<Release>(r => r.Id == release.Id))).Returns(Unit.Instance);
+                
+                var releaseService = BuildService(
+                    contentDbContext: context,
+                    contentService: contentService.Object,
+                    emailTemplateService: emailTemplateService.Object,
+                    userReleaseRoleService: userReleaseRoleService.Object
+                );
+                
+                var result = await releaseService
+                    .CreateReleaseStatus(
+                        release.Id, new ReleaseStatusCreateViewModel
+                        {
+                            PublishMethod = PublishMethod.Scheduled,
+                            PublishScheduled = "2051-06-30",
+                            ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
+                            LatestInternalReleaseNote = "Test internal note",
+                            NextReleaseDate = new PartialDate { Month = "12", Year = "2077" },
+                        });
+                
+                VerifyAllMocks(contentService, userReleaseRoleService, emailTemplateService);
+                
+                result.AssertRight();
             }
         }
         

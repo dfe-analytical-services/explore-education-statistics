@@ -192,7 +192,7 @@ describe('ReleaseStatusForm', () => {
     expect(statuses.getByLabelText('In draft')).not.toBeChecked();
     expect(
       statuses.getByLabelText(
-        'Ready for higher review (this will notify release approvers)',
+        'Ready for higher review (this will notify approvers)',
       ),
     ).toBeChecked();
     expect(
@@ -256,7 +256,7 @@ describe('ReleaseStatusForm', () => {
 
       userEvent.click(
         screen.getByLabelText(
-          'Ready for higher review (this will notify release approvers)',
+          'Ready for higher review (this will notify approvers)',
         ),
       );
       await userEvent.type(
@@ -410,7 +410,7 @@ describe('ReleaseStatusForm', () => {
       expect(statuses.getByLabelText('In draft')).not.toBeChecked();
       expect(
         statuses.getByLabelText(
-          'Ready for higher review (this will notify release approvers)',
+          'Ready for higher review (this will notify approvers)',
         ),
       ).not.toBeChecked();
 
@@ -445,7 +445,7 @@ describe('ReleaseStatusForm', () => {
       expect(statuses.getByLabelText('In draft')).not.toBeChecked();
       expect(
         statuses.getByLabelText(
-          'Ready for higher review (this will notify release approvers)',
+          'Ready for higher review (this will notify approvers)',
         ),
       ).not.toBeChecked();
       expect(statuses.getByLabelText('Approved for publication')).toBeChecked();
