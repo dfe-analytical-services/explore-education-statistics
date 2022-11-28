@@ -600,9 +600,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         new StorageInstanceCreationUtil()),
                     userService: provider.GetRequiredService<IUserService>()));
 
-            // TODO EES-3882 Remove after migration has been run by EES-3894
-            services.AddTransient<IPublicationMigrationService, PublicationMigrationService>();
-
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
 
