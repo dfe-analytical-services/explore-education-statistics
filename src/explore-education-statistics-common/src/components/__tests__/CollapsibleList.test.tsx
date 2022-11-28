@@ -1,11 +1,12 @@
 import CollapsibleList from '@common/components/CollapsibleList';
-import { fireEvent, render } from '@testing-library/react';
+import { screen, render, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 
 describe('CollapsibleList', () => {
-  test('renders 5 items with 2 visually hidden', () => {
-    const { getByText, queryByText } = render(
-      <CollapsibleList collapseAfter={3}>
+  test('renders 3 of 5 items when collapseAfter is 3', () => {
+    render(
+      <CollapsibleList id="test-id" collapseAfter={3}>
         <li>Item 1</li>
         <li>Item 2</li>
         <li>Item 3</li>
@@ -14,18 +15,22 @@ describe('CollapsibleList', () => {
       </CollapsibleList>,
     );
 
-    expect(getByText('Item 1')).not.toHaveClass('govuk-visually-hidden');
-    expect(getByText('Item 2')).not.toHaveClass('govuk-visually-hidden');
-    expect(getByText('Item 3')).not.toHaveClass('govuk-visually-hidden');
-    expect(getByText('Item 4')).toHaveClass('govuk-visually-hidden');
-    expect(getByText('Item 5')).toHaveClass('govuk-visually-hidden');
+    const listItems = screen.getAllByRole('listitem');
+    expect(listItems).toHaveLength(3);
+    expect(listItems[0]).toHaveTextContent('Item 1');
+    expect(listItems[1]).toHaveTextContent('Item 2');
+    expect(listItems[2]).toHaveTextContent('Item 3');
+    expect(screen.queryByText('Item 4')).not.toBeInTheDocument();
+    expect(screen.queryByText('Item 5')).not.toBeInTheDocument();
 
-    expect(queryByText('Show 2 more items'));
+    expect(
+      screen.getByRole('button', { name: 'Show 2 more items' }),
+    ).toBeInTheDocument();
   });
 
-  test('renders 5 items with 1 visually hidden', () => {
-    const { getByText, queryByText } = render(
-      <CollapsibleList collapseAfter={4}>
+  test('renders 4 of 5 items when collapseAfter is 4', () => {
+    render(
+      <CollapsibleList id="test-id" collapseAfter={4}>
         <li>Item 1</li>
         <li>Item 2</li>
         <li>Item 3</li>
@@ -34,18 +39,22 @@ describe('CollapsibleList', () => {
       </CollapsibleList>,
     );
 
-    expect(getByText('Item 1')).not.toHaveClass('govuk-visually-hidden');
-    expect(getByText('Item 2')).not.toHaveClass('govuk-visually-hidden');
-    expect(getByText('Item 3')).not.toHaveClass('govuk-visually-hidden');
-    expect(getByText('Item 4')).not.toHaveClass('govuk-visually-hidden');
-    expect(getByText('Item 5')).toHaveClass('govuk-visually-hidden');
+    const listItems = screen.getAllByRole('listitem');
+    expect(listItems).toHaveLength(4);
+    expect(listItems[0]).toHaveTextContent('Item 1');
+    expect(listItems[1]).toHaveTextContent('Item 2');
+    expect(listItems[2]).toHaveTextContent('Item 3');
+    expect(listItems[3]).toHaveTextContent('Item 4');
+    expect(screen.queryByText('Item 5')).not.toBeInTheDocument();
 
-    expect(queryByText('Show 1 more item'));
+    expect(
+      screen.getByRole('button', { name: 'Show 1 more item' }),
+    ).toBeInTheDocument();
   });
 
-  test('renders no visually hidden items when `collapseAfter` is more than the list size', () => {
-    const { container } = render(
-      <CollapsibleList collapseAfter={8}>
+  test('renders all items when collapseAfter is more than the list size', () => {
+    render(
+      <CollapsibleList id="test-id" collapseAfter={8}>
         <li>Item 1</li>
         <li>Item 2</li>
         <li>Item 3</li>
@@ -54,14 +63,20 @@ describe('CollapsibleList', () => {
       </CollapsibleList>,
     );
 
-    expect(container.querySelectorAll('li.govuk-visually-hidden')).toHaveLength(
-      0,
-    );
+    const listItems = screen.getAllByRole('listitem');
+    expect(listItems).toHaveLength(5);
+    expect(listItems[0]).toHaveTextContent('Item 1');
+    expect(listItems[1]).toHaveTextContent('Item 2');
+    expect(listItems[2]).toHaveTextContent('Item 3');
+    expect(listItems[3]).toHaveTextContent('Item 4');
+    expect(listItems[4]).toHaveTextContent('Item 5');
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
-  test('renders all items as visually hidden when `collapseAfter` is negative', () => {
-    const { container, queryByText } = render(
-      <CollapsibleList collapseAfter={-1}>
+  test('renders all items when collapseAfter is equal to the list size', () => {
+    render(
+      <CollapsibleList id="test-id" collapseAfter={5}>
         <li>Item 1</li>
         <li>Item 2</li>
         <li>Item 3</li>
@@ -70,16 +85,20 @@ describe('CollapsibleList', () => {
       </CollapsibleList>,
     );
 
-    expect(container.querySelectorAll('li.govuk-visually-hidden')).toHaveLength(
-      5,
-    );
+    const listItems = screen.getAllByRole('listitem');
+    expect(listItems).toHaveLength(5);
+    expect(listItems[0]).toHaveTextContent('Item 1');
+    expect(listItems[1]).toHaveTextContent('Item 2');
+    expect(listItems[2]).toHaveTextContent('Item 3');
+    expect(listItems[3]).toHaveTextContent('Item 4');
+    expect(listItems[4]).toHaveTextContent('Item 5');
 
-    expect(queryByText('Show 5 items')).not.toBeNull();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
-  test('renders all items as visually hidden when `collapseAfter` is zero', () => {
-    const { container, queryByText } = render(
-      <CollapsibleList collapseAfter={0}>
+  test('renders no items when collapseAfter is negative', () => {
+    render(
+      <CollapsibleList id="test-id" collapseAfter={-1}>
         <li>Item 1</li>
         <li>Item 2</li>
         <li>Item 3</li>
@@ -88,16 +107,21 @@ describe('CollapsibleList', () => {
       </CollapsibleList>,
     );
 
-    expect(container.querySelectorAll('li.govuk-visually-hidden')).toHaveLength(
-      5,
-    );
+    expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
+    expect(screen.queryByText('Item 1')).not.toBeInTheDocument();
+    expect(screen.queryByText('Item 2')).not.toBeInTheDocument();
+    expect(screen.queryByText('Item 3')).not.toBeInTheDocument();
+    expect(screen.queryByText('Item 4')).not.toBeInTheDocument();
+    expect(screen.queryByText('Item 5')).not.toBeInTheDocument();
 
-    expect(queryByText('Show 5 items')).not.toBeNull();
+    expect(
+      screen.getByRole('button', { name: 'Show 5 items' }),
+    ).toBeInTheDocument();
   });
 
-  test("clicking on 'Show 2 more items' reveals all list items when some are hidden", () => {
-    const { container, getByText } = render(
-      <CollapsibleList collapseAfter={3}>
+  test('renders no items when collapseAfter is zero', () => {
+    render(
+      <CollapsibleList id="test-id" collapseAfter={0}>
         <li>Item 1</li>
         <li>Item 2</li>
         <li>Item 3</li>
@@ -106,20 +130,21 @@ describe('CollapsibleList', () => {
       </CollapsibleList>,
     );
 
-    expect(container.querySelectorAll('li.govuk-visually-hidden')).toHaveLength(
-      2,
-    );
+    expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
+    expect(screen.queryByText('Item 1')).not.toBeInTheDocument();
+    expect(screen.queryByText('Item 2')).not.toBeInTheDocument();
+    expect(screen.queryByText('Item 3')).not.toBeInTheDocument();
+    expect(screen.queryByText('Item 4')).not.toBeInTheDocument();
+    expect(screen.queryByText('Item 5')).not.toBeInTheDocument();
 
-    fireEvent.click(getByText('Show 2 more items'));
-
-    expect(container.querySelectorAll('li.govuk-visually-hidden')).toHaveLength(
-      0,
-    );
+    expect(
+      screen.getByRole('button', { name: 'Show 5 items' }),
+    ).toBeInTheDocument();
   });
 
-  test("clicking on 'Show all' toggles the button text to 'Collapse list'", () => {
-    const { getByText, container } = render(
-      <CollapsibleList collapseAfter={3}>
+  test('clicking the "Show X more items" button reveals all items and changes the button text to "Hide X items"', () => {
+    render(
+      <CollapsibleList id="test-id" collapseAfter={3}>
         <li>Item 1</li>
         <li>Item 2</li>
         <li>Item 3</li>
@@ -128,18 +153,29 @@ describe('CollapsibleList', () => {
       </CollapsibleList>,
     );
 
-    const button = container.querySelector('button');
+    const listItems = screen.getAllByRole('listitem');
+    expect(listItems).toHaveLength(3);
+    expect(listItems[0]).toHaveTextContent('Item 1');
+    expect(listItems[1]).toHaveTextContent('Item 2');
+    expect(listItems[2]).toHaveTextContent('Item 3');
+    expect(screen.queryByText('Item 4')).not.toBeInTheDocument();
+    expect(screen.queryByText('Item 5')).not.toBeInTheDocument();
 
-    expect(button).toHaveTextContent('Show 2 more items');
+    userEvent.click(screen.getByRole('button', { name: 'Show 2 more items' }));
 
-    fireEvent.click(getByText('Show 2 more items'));
+    const updatedListItems = screen.getAllByRole('listitem');
+    expect(updatedListItems).toHaveLength(5);
+    expect(updatedListItems[3]).toHaveTextContent('Item 4');
+    expect(updatedListItems[4]).toHaveTextContent('Item 5');
 
-    expect(button).toHaveTextContent('Collapse list');
+    expect(
+      screen.getByRole('button', { name: 'Hide 2 items' }),
+    ).toBeInTheDocument();
   });
 
-  test("clicking on 'Collapse list' hides list items", () => {
-    const { container, getByText } = render(
-      <CollapsibleList collapseAfter={3} isCollapsed={false}>
+  test('clicking the "Hide X items" button hides items and changes the button text to "Show X more items"', async () => {
+    render(
+      <CollapsibleList id="test-id" collapseAfter={3}>
         <li>Item 1</li>
         <li>Item 2</li>
         <li>Item 3</li>
@@ -148,19 +184,38 @@ describe('CollapsibleList', () => {
       </CollapsibleList>,
     );
 
-    expect(container.querySelectorAll('li.govuk-visually-hidden')).toHaveLength(
-      0,
-    );
-    fireEvent.click(getByText('Collapse list'));
+    expect(screen.getAllByRole('listitem')).toHaveLength(3);
 
-    expect(container.querySelectorAll('li.govuk-visually-hidden')).toHaveLength(
-      2,
-    );
+    userEvent.click(screen.getByRole('button', { name: 'Show 2 more items' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Hide 2 items')).toBeInTheDocument();
+    });
+
+    expect(screen.getAllByRole('listitem')).toHaveLength(5);
+
+    userEvent.click(screen.getByRole('button', { name: 'Hide 2 items' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Show 2 more items')).toBeInTheDocument();
+    });
+
+    const listItems = screen.getAllByRole('listitem');
+    expect(listItems).toHaveLength(3);
+    expect(listItems[0]).toHaveTextContent('Item 1');
+    expect(listItems[1]).toHaveTextContent('Item 2');
+    expect(listItems[2]).toHaveTextContent('Item 3');
+    expect(screen.queryByText('Item 4')).not.toBeInTheDocument();
+    expect(screen.queryByText('Item 5')).not.toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Show 2 more items' }),
+    ).toBeInTheDocument();
   });
 
-  test("clicking on 'Collapse list' toggles the button text to 'Show 2 more items'", () => {
-    const { getByText, container } = render(
-      <CollapsibleList collapseAfter={3} isCollapsed={false}>
+  test('renders all items with the hide button when isCollapsed is false', () => {
+    render(
+      <CollapsibleList id="test-id" collapseAfter={3} isCollapsed={false}>
         <li>Item 1</li>
         <li>Item 2</li>
         <li>Item 3</li>
@@ -169,12 +224,78 @@ describe('CollapsibleList', () => {
       </CollapsibleList>,
     );
 
-    const button = container.querySelector('button');
+    const listItems = screen.getAllByRole('listitem');
+    expect(listItems).toHaveLength(5);
+    expect(listItems[0]).toHaveTextContent('Item 1');
+    expect(listItems[1]).toHaveTextContent('Item 2');
+    expect(listItems[2]).toHaveTextContent('Item 3');
+    expect(listItems[3]).toHaveTextContent('Item 4');
+    expect(listItems[4]).toHaveTextContent('Item 5');
 
-    expect(button).toHaveTextContent('Collapse list');
+    expect(
+      screen.getByRole('button', { name: 'Hide 2 items' }),
+    ).toBeInTheDocument();
+  });
 
-    fireEvent.click(getByText('Collapse list'));
+  test('setting itemName and itemNamePlural changes the button text', () => {
+    render(
+      <CollapsibleList
+        id="test-id"
+        collapseAfter={3}
+        itemName="footnote"
+        itemNamePlural="footnotes"
+      >
+        <li>Item 1</li>
+        <li>Item 2</li>
+        <li>Item 3</li>
+        <li>Item 4</li>
+        <li>Item 5</li>
+      </CollapsibleList>,
+    );
 
-    expect(button).toHaveTextContent('Show 2 more items');
+    userEvent.click(
+      screen.getByRole('button', { name: 'Show 2 more footnotes' }),
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Hide 2 footnotes' }),
+    ).toBeInTheDocument();
+  });
+
+  test('uses the singular itemName in the button text when there is only 1 more item', () => {
+    render(
+      <CollapsibleList
+        id="test-id"
+        collapseAfter={4}
+        itemName="footnote"
+        itemNamePlural="footnotes"
+      >
+        <li>Item 1</li>
+        <li>Item 2</li>
+        <li>Item 3</li>
+        <li>Item 4</li>
+        <li>Item 5</li>
+      </CollapsibleList>,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Show 1 more footnote' }),
+    ).toBeInTheDocument();
+  });
+
+  test('uses the singular default name in the button text when there is only 1 more item', () => {
+    render(
+      <CollapsibleList id="test-id" collapseAfter={4}>
+        <li>Item 1</li>
+        <li>Item 2</li>
+        <li>Item 3</li>
+        <li>Item 4</li>
+        <li>Item 5</li>
+      </CollapsibleList>,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Show 1 more item' }),
+    ).toBeInTheDocument();
   });
 });

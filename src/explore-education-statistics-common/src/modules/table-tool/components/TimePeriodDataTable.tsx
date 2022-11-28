@@ -406,6 +406,11 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
             captionId={captionId}
             columnHeaders={columnHeaders}
             footnotesClassName={footnotesClassName}
+            footnotesId={
+              dataBlockId
+                ? `dataTableFootnotes-${dataBlockId}`
+                : 'dataTableFootnotes'
+            }
             rowHeaders={rowHeaders}
             rows={rows}
             ref={dataTableRef}

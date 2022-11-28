@@ -43,7 +43,7 @@ Select all LA Locations
     user checks previous table tool step contains    3    Local Authority    Barnsley
     user checks previous table tool step contains    3    Local Authority    Bath and North East Somerset
     user checks previous table tool step contains    3    Local Authority    Bedford
-    user checks previous table tool step contains    3    Local Authority    Show 151 more items
+    user checks previous table tool step contains    3    Local Authority    Show 151 more locations
 
 Select all available Time periods
     user chooses select option    id:timePeriodForm-start    2006/07

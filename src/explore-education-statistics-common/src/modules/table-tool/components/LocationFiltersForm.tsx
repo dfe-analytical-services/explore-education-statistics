@@ -255,7 +255,11 @@ const LocationFiltersForm = ({
                     term={options[levelKey].legend}
                     key={levelKey}
                   >
-                    <CollapsibleList>
+                    <CollapsibleList
+                      id="locationsList"
+                      itemName="location"
+                      itemNamePlural="locations"
+                    >
                       {sortBy(levelOptions, ['label']).map(level => (
                         <li key={level.value}>{level.label}</li>
                       ))}

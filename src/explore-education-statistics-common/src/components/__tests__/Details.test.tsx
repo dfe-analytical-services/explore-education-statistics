@@ -50,10 +50,6 @@ describe('Details', () => {
         name: 'Test summary',
       }),
     ).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByText('Test content')).toHaveAttribute(
-      'aria-hidden',
-      'false',
-    );
 
     expect(screen.getByText('Test content')).toBeVisible();
 
@@ -67,19 +63,16 @@ describe('Details', () => {
       </Details>,
     );
 
-    const content = screen.getByText('Test content');
     const summary = screen.getByRole('button', {
       name: 'Test summary',
     });
 
     expect(summary).toHaveAttribute('aria-expanded', 'false');
-    expect(content).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByText('Test content')).not.toBeVisible();
 
     userEvent.click(summary);
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
-    expect(content).toHaveAttribute('aria-hidden', 'false');
     expect(screen.getByText('Test content')).toBeVisible();
   });
 
@@ -90,19 +83,16 @@ describe('Details', () => {
       </Details>,
     );
 
-    const content = screen.getByText('Test content');
     const summary = screen.getByRole('button', {
       name: 'Test summary',
     });
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
-    expect(content).toHaveAttribute('aria-hidden', 'false');
     expect(screen.getByText('Test content')).toBeVisible();
 
     userEvent.click(summary);
 
     expect(summary).toHaveAttribute('aria-expanded', 'false');
-    expect(content).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByText('Test content')).not.toBeVisible();
   });
 
@@ -113,13 +103,11 @@ describe('Details', () => {
       </Details>,
     );
 
-    const content = screen.getByText('Test content');
     const summary = screen.getByRole('button', {
       name: 'Test summary',
     });
 
     expect(summary).toHaveAttribute('aria-expanded', 'false');
-    expect(content).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByText('Test content')).not.toBeVisible();
 
     rerender(
@@ -129,7 +117,6 @@ describe('Details', () => {
     );
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
-    expect(content).toHaveAttribute('aria-hidden', 'false');
     expect(screen.getByText('Test content')).toBeVisible();
   });
 
@@ -140,13 +127,11 @@ describe('Details', () => {
       </Details>,
     );
 
-    const content = screen.getByText('Test content');
     const summary = screen.getByRole('button', {
       name: 'Test summary',
     });
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
-    expect(content).toHaveAttribute('aria-hidden', 'false');
     expect(screen.getByText('Test content')).toBeVisible();
 
     rerender(
@@ -156,7 +141,6 @@ describe('Details', () => {
     );
 
     expect(summary).toHaveAttribute('aria-expanded', 'false');
-    expect(content).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByText('Test content')).not.toBeVisible();
   });
 

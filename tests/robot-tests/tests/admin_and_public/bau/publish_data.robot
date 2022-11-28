@@ -351,13 +351,13 @@ Create table
     user clicks button    Create table
 
 Check created table has footnotes
-    user checks list has x items    testid:footnotes    3
+    user checks list has x items    testid:footnotes    2
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR}
-    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
-    user checks page contains button    Show 1 more item
-    user checks list item is visually hidden    testid:footnotes    3
+    user clicks button    Show 1 more footnote
+    user checks list has x items    testid:footnotes    3
+    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
 Save data block as a featured table
     user enters text into element    id:dataBlockDetailsForm-name    UI Test data block name
@@ -394,13 +394,13 @@ Check footnote was updated on data block
     user clicks link    Edit block    css:tbody > tr:first-child
     user waits until table is visible
 
-    user checks list has x items    testid:footnotes    3
+    user checks list has x items    testid:footnotes    2
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
-    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
-    user checks page contains button    Show 1 more item
-    user checks list item is visually hidden    testid:footnotes    3
+    user clicks button    Show 1 more footnote
+    user checks list has x items    testid:footnotes    3
+    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
 Add public prerelease access list for release
     user clicks link    Pre-release access
@@ -506,13 +506,13 @@ Validate table
     user checks table cell in offset row contains    ${row}    0    5    3,962
 
 Validate table has footnotes
-    user checks list has x items    testid:footnotes    3
+    user checks list has x items    testid:footnotes    2
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
-    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
-    user checks page contains button    Show 1 more item
-    user checks list item is visually hidden    testid:footnotes    3
+    user clicks button    Show 1 more footnote
+    user checks list has x items    testid:footnotes    3
+    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
 Select table featured table from subjects step
     user clicks element    testid:wizardStep-2-goToButton
@@ -581,13 +581,13 @@ Validate table rows for featured table
     user checks table cell in offset row contains    ${row}    4    1    1,959
 
 Validate featured table has footnotes
-    user checks list has x items    testid:footnotes    3
+    user checks list has x items    testid:footnotes    2
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
-    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
-    user checks page contains button    Show 1 more item
-    user checks list item is visually hidden    testid:footnotes    3
+    user clicks button    Show 1 more footnote
+    user checks list has x items    testid:footnotes    3
+    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
 Go to release page
     user opens accordion section    Related information
