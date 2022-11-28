@@ -69,14 +69,14 @@ describe('SortControls', () => {
       expect(sortOptions[1]).toHaveValue('oldest');
       expect(sortOptions[1].selected).toBe(false);
       expect(sortOptions[2]).toHaveTextContent('A to Z');
-      expect(sortOptions[2]).toHaveValue('alphabetical');
+      expect(sortOptions[2]).toHaveValue('title');
       expect(sortOptions[2].selected).toBe(false);
 
       expect(screen.queryByRole('radio')).not.toBeInTheDocument();
     });
 
     test('setting the intial sortBy selects the correct option', () => {
-      render(<SortControls sortBy="alphabetical" onChange={noop} />);
+      render(<SortControls sortBy="title" onChange={noop} />);
 
       const sortDropdown = within(screen.getByLabelText('Sort results'));
       const sortOptions = sortDropdown.getAllByRole(
@@ -90,7 +90,7 @@ describe('SortControls', () => {
       expect(sortOptions[1]).toHaveValue('oldest');
       expect(sortOptions[1].selected).toBe(false);
       expect(sortOptions[2]).toHaveTextContent('A to Z');
-      expect(sortOptions[2]).toHaveValue('alphabetical');
+      expect(sortOptions[2]).toHaveValue('title');
       expect(sortOptions[2].selected).toBe(true);
     });
   });

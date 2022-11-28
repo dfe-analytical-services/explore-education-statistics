@@ -67,9 +67,6 @@ describe('FindStatisticsPageNew', () => {
     expect(
       screen.getByRole('heading', { name: 'Publication 3' }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { name: 'Publication 4' }),
-    ).toBeInTheDocument();
 
     const pagination = within(
       screen.getByRole('navigation', { name: 'Pagination' }),

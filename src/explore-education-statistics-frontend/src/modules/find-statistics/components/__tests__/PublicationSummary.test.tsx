@@ -19,19 +19,4 @@ describe('PublicationSummary', () => {
     expect(screen.getByTestId('published')).toHaveTextContent('8 Jun 2021');
     expect(screen.getByTestId('theme')).toHaveTextContent('Theme 1');
   });
-
-  test('renders a legacy publication correctly', () => {
-    render(<PublicationSummary publication={testPublications[2]} />);
-
-    const heading = screen.getByRole('heading', { name: 'Publication 3' });
-    expect(
-      within(heading).getByRole('link', { name: 'Publication 3' }),
-    ).toHaveAttribute('href', 'http://test.com');
-    expect(
-      screen.getByText(
-        'Not yet on this service. Currently available via Statistics at DfE.',
-      ),
-    ).toBeInTheDocument();
-    expect(screen.queryByRole('list')).not.toBeInTheDocument();
-  });
 });
