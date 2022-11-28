@@ -34,9 +34,9 @@ Check that the expired invite is now removed
     user waits until h1 is visible    Sign in    %{WAIT_MEDIUM}
     user clicks element    id:signin-button
 
-    ## Currently, users attempting to login with no existing user record or user invite
-    ## are simply redirected to the "Sign in" page - the user is not prompted to log into
-    ## the Identity Provider again as they have already confirmed their correct login
-    ## credentials there and are therefore sent straight back to the service.
+    # Currently, users attempting to login with no existing user record or user invite
+    # are simply redirected to the "Sign in" page - the user is not prompted to log into
+    # the Identity Provider again as they have already confirmed their correct login
+    # credentials there and are therefore sent straight back to the service.
     user waits until page contains title    Sign in
     user waits until page contains    Use this service to create

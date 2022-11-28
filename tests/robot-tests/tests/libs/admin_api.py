@@ -106,16 +106,16 @@ def user_creates_test_publication_via_api(publication_name: str, topic_id: str =
             },
         },
     )
-
     assert (
         response.status_code < 300
     ), f"Creating publication API request failed with {response.status_code} and {response.text}"
+
     return response.json()["id"]
 
 
 def user_adds_user_invite_via_api(user_email: str, role_name: str, created_date: str):
 
-    existing_invite = __get_user_invite(user_email)
+    existing_invite = _get_user_invite(user_email)
 
     if existing_invite is None:
 
@@ -123,7 +123,7 @@ def user_adds_user_invite_via_api(user_email: str, role_name: str, created_date:
             f"/api/user-management/invites",
             {
                 "email": user_email,
-                "roleId": __get_global_role_id(role_name),
+                "roleId": _get_global_role_id(role_name),
                 "createdDate": created_date or datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
             },
         )
@@ -134,7 +134,7 @@ def user_adds_user_invite_via_api(user_email: str, role_name: str, created_date:
 
 def user_adds_release_role_to_user_via_api(user_email: str, release_id: str, role_name: str = None):
 
-    user_id = __get_user_details_via_api(user_email)["id"]
+    user_id = _get_user_details_via_api(user_email)["id"]
 
     response = admin_client.post(
         f"/api/user-management/users/{user_id}/release-role",
@@ -150,7 +150,7 @@ def user_adds_release_role_to_user_via_api(user_email: str, release_id: str, rol
 
 def user_adds_publication_role_to_user_via_api(user_email: str, publication_id: str, role_name: str = None):
 
-    user_id = __get_user_details_via_api(user_email)["id"]
+    user_id = _get_user_details_via_api(user_email)["id"]
 
     response = admin_client.post(
         f"/api/user-management/users/{user_id}/publication-role",
@@ -177,20 +177,18 @@ def user_resets_user_roles_via_api_if_required(user_emails: list) -> None:
         "ees-prerelease2@education.gov.uk",
     ]
 
-    user_ids = []
-
     for user_email in user_emails:
         if user_email not in allowed_users:
             raise AssertionError(f"`User emails` must contain only allowed users: {allowed_users}")
         try:
-            user_ids = [__get_prerelease_user_details_via_api(user_email)["id"]]
+            user_ids = [_get_prerelease_user_details_via_api(user_email)["id"]]
             _ = [user_removes_all_release_and_publication_roles_from_user(user_id) for user_id in user_ids]
             BuiltIn().log(f"All userReleaseRoles & userPublicationRoles reset for user: {user_email}")
         except TypeError or IndexError:
             BuiltIn().log(f"User with email {user_email} does not exist in pre-release user list", "WARN")
 
             try:
-                user_ids = [__get_user_details_via_api(user_email)["id"]]
+                user_ids = [_get_user_details_via_api(user_email)["id"]]
                 _ = [user_removes_all_release_and_publication_roles_from_user(user_id) for user_id in user_ids]
                 BuiltIn().log(f"All userReleaseRoles & userPublicationRoles reset for user: {user_email}")
             except TypeError or IndexError:
@@ -212,13 +210,12 @@ def user_create_test_release_via_api(
             "templateReleaseId": "",
         },
     )
-
     assert (
         response.status_code < 300
     ), f"Creating release API request failed with {response.status_code} and {response.text}"
 
 
-def __get_user_details_via_api(user_email: str):
+def _get_user_details_via_api(user_email: str):
 
     users = admin_client.get("/api/user-management/users").json()
 
@@ -229,7 +226,7 @@ def __get_user_details_via_api(user_email: str):
     return matching_users[0]
 
 
-def __get_prerelease_user_details_via_api(user_email: str):
+def _get_prerelease_user_details_via_api(user_email: str):
 
     users = admin_client.get("/api/user-management/pre-release").json()
 
@@ -240,7 +237,7 @@ def __get_prerelease_user_details_via_api(user_email: str):
     return matching_users[0]
 
 
-def __get_global_role_id(role_name: str):
+def _get_global_role_id(role_name: str):
 
     response = admin_client.get("/api/user-management/roles")
     assert (
@@ -255,7 +252,7 @@ def __get_global_role_id(role_name: str):
     return matching_roles[0]["id"]
 
 
-def __get_user_invite(user_email: str):
+def _get_user_invite(user_email: str):
 
     response = admin_client.get("/api/user-management/invites")
     assert response.status_code < 300, f"Getting list of invites failed with {response.status_code} and {response.text}"
