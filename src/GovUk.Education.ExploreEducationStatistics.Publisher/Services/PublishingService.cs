@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -20,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IBlobStorageService _privateBlobStorageService;
         private readonly IBlobStorageService _publicBlobStorageService;
         private readonly IMethodologyService _methodologyService;
-        private readonly IPublicationService _publicationService;
+        private readonly IPublicationRepository _publicationRepository;
         private readonly IReleaseService _releaseService;
         private readonly ILogger<PublishingService> _logger;
 
@@ -29,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             IBlobStorageService privateBlobStorageService,
             IBlobStorageService publicBlobStorageService,
             IMethodologyService methodologyService,
-            IPublicationService publicationService,
+            IPublicationRepository publicationRepository,
             IReleaseService releaseService,
             ILogger<PublishingService> logger)
         {
@@ -37,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _privateBlobStorageService = privateBlobStorageService;
             _publicBlobStorageService = publicBlobStorageService;
             _methodologyService = methodologyService;
-            _publicationService = publicationService;
+            _publicationRepository = publicationRepository;
             _releaseService = releaseService;
             _logger = logger;
         }
@@ -69,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 // aren't already accessible but depended on this release being published,
                 // since those methodologies will be published for the first time with this release
                 var release = await _releaseService.Get(releaseId);
-                var firstRelease = !await _publicationService.IsPublicationPublished(release.PublicationId);
+                var firstRelease = !await _publicationRepository.IsPublished(release.PublicationId);
                 foreach (var methodology in methodologies)
                 {
                     if (methodology.Approved)

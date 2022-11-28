@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     if (releaseCreate.TemplateReleaseId.HasValue)
                     {
-                        CreateGenericContentFromTemplate(releaseCreate.TemplateReleaseId.Value, release);
+                        await CreateGenericContentFromTemplate(releaseCreate.TemplateReleaseId.Value, release);
                     }
                     else
                     {
@@ -239,9 +239,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Release>> CreateStatisticsReleaseAmendment(Release amendment)
         {
-            var statsRelease =_statisticsDbContext
+            var statsRelease = await _statisticsDbContext
                 .Release
-                .FirstOrDefault(r => r.Id == amendment.PreviousVersionId);
+                .FirstOrDefaultAsync(r => r.Id == amendment.PreviousVersionId);
 
             // Release does not have to have stats uploaded but if it has then
             // create a link row to link back to the original subject
@@ -330,20 +330,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, IdTitleViewModel?>> GetLatestPublishedRelease(Guid publicationId)
+        public async Task<Either<ActionResult, IdTitleViewModel>> GetLatestPublishedRelease(Guid publicationId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, queryable =>
-                    queryable.Include(r => r.Releases))
+                    queryable.Include(r => r.LatestPublishedRelease))
                 .OnSuccess(_userService.CheckCanViewPublication)
                 .OnSuccess(publication =>
                 {
-                    var latestRelease = publication.LatestPublishedRelease();
-                    return latestRelease != null ? new IdTitleViewModel
+                    var latestPublishedRelease = publication.LatestPublishedRelease;
+                    return latestPublishedRelease != null ? new IdTitleViewModel
                     {
-                        Id = latestRelease.Id,
-                        Title = latestRelease.Title
-                    } : null;
+                        Id = latestPublishedRelease.Id,
+                        Title = latestPublishedRelease.Title
+                    } : new Either<ActionResult, IdTitleViewModel>(new NotFoundResult());
                 });
         }
 
@@ -435,12 +435,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return !releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
         }
 
-        private void CreateGenericContentFromTemplate(Guid releaseId, Release newRelease)
+        private async Task CreateGenericContentFromTemplate(Guid releaseId, Release newRelease)
         {
-            var templateRelease = _context.Releases.AsNoTracking()
+            var templateRelease = await _context.Releases.AsNoTracking()
                 .Include(r => r.Content)
                 .ThenInclude(c => c.ContentSection)
-                .First(r => r.Id == releaseId);
+                .FirstAsync(r => r.Id == releaseId);
 
             templateRelease.CreateGenericContentFromTemplate(newRelease);
         }
@@ -514,9 +514,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private bool CanUpdateDataFiles(Guid releaseId)
+        private async Task<bool> CanUpdateDataFiles(Guid releaseId)
         {
-            var release = _context.Releases.First(r => r.Id == releaseId);
+            var release = await _context.Releases.FirstAsync(r => r.Id == releaseId);
             return release.ApprovalStatus != ReleaseApprovalStatus.Approved;
         }
 
@@ -530,7 +530,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(CannotRemoveDataFilesUntilImportComplete);
             }
 
-            if (!CanUpdateDataFiles(releaseId))
+            if (!await CanUpdateDataFiles(releaseId))
             {
                 return ValidationActionResult(CannotRemoveDataFilesOnceReleaseApproved);
             }
@@ -544,8 +544,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // If the release is the latest
             // The contact
             return values.Include(r => r.Publication)
-                .ThenInclude(publication => publication.Releases) // Back refs required to work out latest
-                .Include(r => r.Publication)
                 .ThenInclude(publication => publication.Contact)
                 .Include(r => r.ReleaseStatuses);
         }
@@ -614,6 +612,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
     public class DeleteReleasePlan
     {
-        public List<IdTitleViewModel> ScheduledMethodologies { get; set; } = new List<IdTitleViewModel>();
+        public List<IdTitleViewModel> ScheduledMethodologies { get; set; } = new();
     }
 }

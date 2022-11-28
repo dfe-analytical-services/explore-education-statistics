@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<Release, ReleaseViewModel>()
                 .ForMember(
                     dest => dest.LatestRelease,
-                    m => m.MapFrom(r => r.Publication.LatestPublishedRelease().Id == r.Id))
+                    m => m.MapFrom(r => r.Publication.LatestPublishedReleaseId == r.Id))
                 .ForMember(dest => dest.Contact,
                     m => m.MapFrom(r => r.Publication.Contact))
                 .ForMember(dest => dest.PublicationTitle,
@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     }))
                 .ForMember(
                     dest => dest.LatestRelease,
-                    m => m.MapFrom(r => r.Publication.LatestPublishedRelease().Id == r.Id))
+                    m => m.MapFrom(r => r.Publication.LatestPublishedReleaseId == r.Id))
                 .ForMember(dest => dest.CoverageTitle,
                     m => m.MapFrom(r => r.TimePeriodCoverage.GetEnumLabel()))
                 .ForMember(

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -23,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private readonly INotificationsService _notificationsService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
         private readonly IPublicationCacheService _publicationCacheService;
-        private readonly IPublicationService _publicationService;
+        private readonly IPublicationRepository _publicationRepository;
         private readonly IPublishingService _publishingService;
         private readonly IReleaseService _releaseService;
 
@@ -33,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             INotificationsService notificationsService,
             IReleasePublishingStatusService releasePublishingStatusService,
             IPublicationCacheService publicationCacheService,
-            IPublicationService publicationService,
+            IPublicationRepository publicationRepository,
             IPublishingService publishingService,
             IReleaseService releaseService)
         {
@@ -42,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             _notificationsService = notificationsService;
             _releasePublishingStatusService = releasePublishingStatusService;
             _publicationCacheService = publicationCacheService;
-            _publicationService = publicationService;
+            _publicationRepository = publicationRepository;
             _publishingService = publishingService;
             _releaseService = releaseService;
         }
@@ -104,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                         .Where(publication => publishedPublications.Contains(publication.Slug))
                         .Select(publication => publication.Id)
                         .ToAsyncEnumerable()
-                        .ForEachAwaitAsync(_publicationService.UpdateLatestPublishedRelease);
+                        .ForEachAwaitAsync(_publicationRepository.UpdateLatestPublishedRelease);
 
                     // Update the cached publications and any cached superseded publications.
                     // If any publications have a live release for the first time, the superseding is now enforced

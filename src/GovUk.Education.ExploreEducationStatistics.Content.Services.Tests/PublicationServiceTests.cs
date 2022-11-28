@@ -3,12 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using MockQueryable.Moq;
 using Moq;
 using Xunit;
@@ -22,29 +23,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
     public class PublicationServiceTests
     {
+        private const string PublicationSlug = "publication-slug";
+
         [Fact]
         public async Task Get()
         {
             var release2000Version0Id = Guid.NewGuid();
-            var supersedingPublication = new Publication
-            {
-                Releases = new List<Release>
-                {
-                    new ()
-                    {
-                        Published = null,
-                    },
-                }
-            };
+            var release2000Version1Id = Guid.NewGuid();
             var publication = new Publication
             {
                 Title = "Publication Title",
-                Slug = "publication-slug",
-                SupersededBy = supersedingPublication,
+                Slug = PublicationSlug,
+                LatestPublishedReleaseId = release2000Version1Id,
                 Releases = new List<Release>
                 {
-                    new () // latest published release
+                    new() // latest published release
                     {
+                        Id = release2000Version1Id,
                         ReleaseName = "2000",
                         Slug = "2000",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
@@ -52,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Version = 1,
                         PreviousVersionId = release2000Version0Id,
                     },
-                    new ()
+                    new() // previous version
                     {
                         Id = release2000Version0Id,
                         ReleaseName = "2000",
@@ -61,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Published = DateTime.UtcNow,
                         Version = 0,
                     },
-                    new () // not published
+                    new() // not published
                     {
                         ReleaseName = "2001",
                         Slug = "2001",
@@ -69,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Published = null,
                         Version = 0,
                     },
-                    new () // published so appears in ListReleases result
+                    new() // published so appears in ListPublishedReleases result
                     {
                         ReleaseName = "1999",
                         Slug = "1999",
@@ -80,10 +75,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 },
                 LegacyReleases = new List<LegacyRelease>
                 {
-                    new ()
+                    new()
                     {
                         Description = "Legacy release description",
-                        Url = "http://legacy.release.com",
+                        Url = "https://legacy.release.com",
                         Order = 0,
                     }
                 },
@@ -107,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 ExternalMethodology = new ExternalMethodology
                 {
                     Title = "External methodology title",
-                    Url = "http://external.methodology.com",
+                    Url = "https://external.methodology.com",
                 },
             };
 
@@ -129,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(publication.Id, publicationViewModel.Id);
                 Assert.Equal(publication.Title, publicationViewModel.Title);
                 Assert.Equal(publication.Slug, publicationViewModel.Slug);
-                Assert.False(publicationViewModel.IsSuperseded); // because superseding publication has no Live releases
+                Assert.False(publicationViewModel.IsSuperseded);
 
                 Assert.Equal(2, publicationViewModel.Releases.Count);
                 Assert.Equal(publication.Releases[0].Id, publicationViewModel.LatestReleaseId);
@@ -155,40 +150,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(publication.Contact.ContactName, publicationViewModel.Contact.ContactName);
                 Assert.Equal(publication.Contact.ContactTelNo, publicationViewModel.Contact.ContactTelNo);
 
-                Assert.Equal(publication.ExternalMethodology.Title, publicationViewModel.ExternalMethodology.Title);
+                Assert.NotNull(publicationViewModel.ExternalMethodology);
+                Assert.Equal(publication.ExternalMethodology.Title, publicationViewModel.ExternalMethodology!.Title);
                 Assert.Equal(publication.ExternalMethodology.Url, publicationViewModel.ExternalMethodology.Url);
             }
         }
 
         [Fact]
-        public async Task Get_IsSuperseded()
+        public async Task Get_IsSuperseded_SupersedingPublicationHasPublishedRelease()
         {
-            var release2000Version0Id = Guid.NewGuid();
-            var supersedingPublication = new Publication
-            {
-                Releases = new List<Release>
-                {
-                    new ()
-                    {
-                        Published = DateTime.UtcNow,
-                    },
-                }
-            };
+            var releaseId = Guid.NewGuid();
+
             var publication = new Publication
             {
                 Title = "Publication Title",
-                Slug = "publication-slug",
-                SupersededBy = supersedingPublication,
+                Slug = PublicationSlug,
+                LatestPublishedReleaseId = releaseId,
+                SupersededBy = new Publication
+                {
+                    LatestPublishedReleaseId = Guid.NewGuid()
+                },
                 Releases = new List<Release>
                 {
-                    new ()
+                    new()
                     {
+                        Id = releaseId,
                         ReleaseName = "2000",
                         Slug = "2000",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        Published = DateTime.UtcNow,
-                        Version = 1,
-                        PreviousVersionId = release2000Version0Id,
+                        Published = DateTime.UtcNow
                     },
                 },
                 Topic = new Topic
@@ -227,49 +217,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Equal(publication.Id, publicationViewModel.Id);
                 Assert.True(publicationViewModel.IsSuperseded);
-
-                Assert.Single(publicationViewModel.Releases);
-                Assert.Equal(publication.Releases[0].Id, publicationViewModel.LatestReleaseId);
             }
         }
 
         [Fact]
-        public async Task Get_NoPublication()
+        public async Task Get_IsSuperseded_SupersedingPublicationHasNoPublishedRelease()
         {
-            var contentDbContextId = Guid.NewGuid().ToString();
+            var releaseId = Guid.NewGuid();
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            var publication = new Publication
             {
-                var service = SetupPublicationService(contentDbContext);
-
-                var result = await service.Get("nonexistent-publication");
-
-                result.AssertNotFound();
-            }
-        }
-
-        [Fact]
-        public async Task Get_PublicationHasNoLiveLatestRelease()
-        {
-            const string publicationSlug = "publication-slug";
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(new Publication
+                Title = "Publication Title",
+                Slug = PublicationSlug,
+                LatestPublishedReleaseId = releaseId,
+                SupersededBy = new Publication
                 {
-                    Slug = publicationSlug,
-                    Releases = new List<Release>
+                    LatestPublishedReleaseId = null
+                },
+                Releases = new List<Release>
+                {
+                    new()
                     {
-                        new () // not published
-                        {
-                            ReleaseName = "2000",
-                            Slug = "2000",
-                            TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                            Published = null,
-                        },
+                        Id = releaseId,
+                        ReleaseName = "2000",
+                        Slug = "2000",
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear
                     }
-                });
+                },
+                Topic = new Topic
+                {
+                    Title = "Test topic",
+                    Slug = "test-topic",
+                    Theme = new Theme
+                    {
+                        Title = "Test theme",
+                        Slug = "test-theme",
+                    }
+                },
+                Contact = new Contact
+                {
+                    TeamName = "Team name",
+                    TeamEmail = "team@email.com",
+                    ContactName = "Contact name",
+                    ContactTelNo = "1234",
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -277,10 +274,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupPublicationService(contentDbContext);
 
-                var result = await service.Get(publicationSlug);
+                var result = await service.Get(publication.Slug);
+
+                var publicationViewModel = result.AssertRight();
+
+                Assert.Equal(publication.Id, publicationViewModel.Id);
+                Assert.False(publicationViewModel.IsSuperseded);
+            }
+        }
+
+        [Fact]
+        public async Task Get_PublicationHasNoPublishedRelease()
+        {
+            var publication = new Publication
+            {
+                Slug = PublicationSlug,
+                Releases = new List<Release>
+                {
+                    new()
+                    {
+                        ReleaseName = "2000",
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        Published = null
+                    }
+                },
+                LatestPublishedRelease = null
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupPublicationService(contentDbContext);
+
+                var result = await service.Get(PublicationSlug);
 
                 result.AssertNotFound();
             }
+        }
+
+        [Fact]
+        public async Task Get_NoPublication()
+        {
+            var service = SetupPublicationService();
+
+            var result = await service.Get("nonexistent-publication");
+
+            result.AssertNotFound();
         }
 
         [Fact]
@@ -291,7 +336,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Slug = "publication-a",
                 Title = "Publication A",
                 Summary = "Publication A summary",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = new DateTime(2020, 1, 1)
@@ -303,7 +348,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Slug = "publication-b",
                 Title = "Publication B",
                 Summary = "Publication B summary",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = OfficialStatistics,
                     Published = new DateTime(2021, 1, 1)
@@ -315,7 +360,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Slug = "publication-c",
                 Title = "Publication C",
                 Summary = "Publication C summary",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = AdHocStatistics,
                     Published = new DateTime(2022, 1, 1)
@@ -406,7 +451,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -417,7 +462,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseNew = null
+                LatestPublishedRelease = null
             };
 
             var themes = new List<Theme>
@@ -464,7 +509,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -475,7 +520,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -493,7 +538,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationD = new Publication
             {
                 Title = "Publication D",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -505,7 +550,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationE = new Publication
             {
                 Title = "Publication E",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -561,7 +606,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -571,7 +616,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -607,7 +652,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                                 new()
                                 {
                                     Title = "Publication C",
-                                    LatestPublishedReleaseNew = new Release
+                                    LatestPublishedRelease = new Release
                                     {
                                         Type = AdHocStatistics,
                                         Published = new DateTime(2022, 1, 1)
@@ -651,7 +696,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -661,7 +706,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = OfficialStatistics,
                     Published = DateTime.UtcNow
@@ -671,7 +716,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationC = new Publication
             {
                 Title = "Publication C",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = AdHocStatistics,
                     Published = DateTime.UtcNow
@@ -773,7 +818,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Id = Guid.NewGuid(),
                     Title = "Publication B",
                     LatestPublishedReleaseId = releaseB.Id,
-                    LatestPublishedReleaseNew = releaseB,
+                    LatestPublishedRelease = releaseB,
                     Topic = topic
                 },
                 new()
@@ -781,7 +826,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Id = Guid.NewGuid(),
                     Title = "Publication C",
                     LatestPublishedReleaseId = releaseC.Id,
-                    LatestPublishedReleaseNew = releaseC,
+                    LatestPublishedRelease = releaseC,
                     Topic = topic
                 },
                 new()
@@ -789,7 +834,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Id = Guid.NewGuid(),
                     Title = "Publication A",
                     LatestPublishedReleaseId = releaseA.Id,
-                    LatestPublishedReleaseNew = releaseA,
+                    LatestPublishedRelease = releaseA,
                     Topic = topic
                 },
             };
@@ -869,7 +914,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Id = Guid.NewGuid(),
                     Title = "Publication B",
                     LatestPublishedReleaseId = releaseB.Id,
-                    LatestPublishedReleaseNew = releaseB,
+                    LatestPublishedRelease = releaseB,
                     Topic = topic
                 },
                 new()
@@ -877,7 +922,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Id = Guid.NewGuid(),
                     Title = "Publication C",
                     LatestPublishedReleaseId = releaseC.Id,
-                    LatestPublishedReleaseNew = releaseC,
+                    LatestPublishedRelease = releaseC,
                     Topic = topic
                 },
                 new()
@@ -885,7 +930,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Id = Guid.NewGuid(),
                     Title = "Publication A",
                     LatestPublishedReleaseId = releaseA.Id,
-                    LatestPublishedReleaseNew = releaseA,
+                    LatestPublishedRelease = releaseA,
                     Topic = topic
                 },
             };
@@ -950,19 +995,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = releaseA
+                LatestPublishedRelease = releaseA
             };
 
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseNew = releaseB
+                LatestPublishedRelease = releaseB
             };
 
             var publicationC = new Publication
             {
                 Title = "Publication C",
-                LatestPublishedReleaseNew = releaseC
+                LatestPublishedRelease = releaseC
             };
 
             var themes = new List<Theme>
@@ -1041,19 +1086,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = releaseA
+                LatestPublishedRelease = releaseA
             };
 
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseNew = releaseB
+                LatestPublishedRelease = releaseB
             };
 
             var publicationC = new Publication
             {
                 Title = "Publication C",
-                LatestPublishedReleaseNew = releaseC
+                LatestPublishedRelease = releaseC
             };
 
             var themes = new List<Theme>
@@ -1114,7 +1159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -1124,7 +1169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = OfficialStatistics,
                     Published = DateTime.UtcNow
@@ -1134,7 +1179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationC = new Publication
             {
                 Title = "Publication C",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = AdHocStatistics,
                     Published = DateTime.UtcNow
@@ -1199,7 +1244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationA = new Publication
             {
                 Title = "Publication A",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = NationalStatistics,
                     Published = DateTime.UtcNow
@@ -1209,7 +1254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationB = new Publication
             {
                 Title = "Publication B",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = OfficialStatistics,
                     Published = DateTime.UtcNow
@@ -1219,7 +1264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationC = new Publication
             {
                 Title = "Publication C",
-                LatestPublishedReleaseNew = new Release
+                LatestPublishedRelease = new Release
                 {
                     Type = AdHocStatistics,
                     Published = DateTime.UtcNow
@@ -1280,13 +1325,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
         private static PublicationService SetupPublicationService(
             ContentDbContext? contentDbContext = null,
-            IMapper? mapper = null)
+            IPublicationRepository? publicationRepository = null)
         {
+            contentDbContext ??= InMemoryContentDbContext();
+
             return new(
-                contentDbContext ?? Mock.Of<ContentDbContext>(),
-                contentDbContext is null
-                    ? Mock.Of<IPersistenceHelper<ContentDbContext>>()
-                    : new PersistenceHelper<ContentDbContext>(contentDbContext)
+                contentDbContext,
+                new PersistenceHelper<ContentDbContext>(contentDbContext),
+                publicationRepository ?? new PublicationRepository(contentDbContext)
             );
         }
     }

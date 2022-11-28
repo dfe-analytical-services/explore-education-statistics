@@ -1342,7 +1342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "LatestPublishedReleaseNew")
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "LatestPublishedRelease")
                         .WithOne()
                         .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", "LatestPublishedReleaseId");
 
@@ -1381,7 +1381,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Navigation("ExternalMethodology");
 
-                    b.Navigation("LatestPublishedReleaseNew");
+                    b.Navigation("LatestPublishedRelease");
 
                     b.Navigation("SupersededBy");
 

@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
-    public interface IPublicationRepository
+    public interface IPublicationRepository : Content.Model.Repository.Interfaces.IPublicationRepository
     {
         IQueryable<Publication> QueryPublicationsForTopic(Guid? topicId = null);
 
@@ -16,7 +16,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<List<Release>> ListActiveReleases(Guid publicationId);
 
         Task<Release?> GetLatestReleaseForPublication(Guid publicationId);
-
-        bool IsSuperseded(Publication publication);
     }
 }

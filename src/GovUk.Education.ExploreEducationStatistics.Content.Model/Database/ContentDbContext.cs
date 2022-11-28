@@ -234,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Publication>()
-                .HasOne(p => p.LatestPublishedReleaseNew)
+                .HasOne(p => p.LatestPublishedRelease)
                 .WithOne()
                 .HasForeignKey<Publication>(p => p.LatestPublishedReleaseId)
                 .IsRequired(false);

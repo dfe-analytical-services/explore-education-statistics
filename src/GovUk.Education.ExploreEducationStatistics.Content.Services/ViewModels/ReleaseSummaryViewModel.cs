@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             ReleaseName = release.ReleaseName;
             NextReleaseDate = release.NextReleaseDate;
             Type = release.Type;
-            LatestRelease = Id == release.Publication.LatestPublishedRelease()?.Id;
+            LatestRelease = Id == release.Publication.LatestPublishedReleaseId;
             DataLastPublished = release.DataLastPublished;
         }
     }

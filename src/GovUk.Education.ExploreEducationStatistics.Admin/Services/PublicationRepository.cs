@@ -13,11 +13,11 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class PublicationRepository : IPublicationRepository
+    public class PublicationRepository : Content.Model.Repository.PublicationRepository, IPublicationRepository
     {
         private readonly ContentDbContext _context;
 
-        public PublicationRepository(ContentDbContext context)
+        public PublicationRepository(ContentDbContext context) : base(context)
         {
             _context = context;
         }
@@ -116,15 +116,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .SingleAsync(p => p.Id == publicationId);
 
             return publication.LatestRelease();
-        }
-
-        public bool IsSuperseded(Publication publication)
-        {
-            return publication.SupersededById != null
-                   // To be superseded, superseding publication must have Live release
-                   && _context.Releases
-                       .Any(r => r.PublicationId == publication.SupersededById
-                                 && r.Published.HasValue && DateTime.UtcNow >= r.Published.Value);
         }
     }
 }

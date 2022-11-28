@@ -33,9 +33,9 @@ public class ReleaseRepository : IReleaseRepository
     public async Task<Either<ActionResult, Release>> GetLatestPublishedRelease(Guid publicationId)
     {
         var publication = await _contentDbContext.Publications
-            .Include(p => p.Releases)
+            .Include(p => p.LatestPublishedRelease)
             .SingleAsync(p => p.Id == publicationId);
 
-        return publication.LatestPublishedRelease() ?? new Either<ActionResult, Release>(new NotFoundResult());
+        return publication.LatestPublishedRelease ?? new Either<ActionResult, Release>(new NotFoundResult());
     }
 }

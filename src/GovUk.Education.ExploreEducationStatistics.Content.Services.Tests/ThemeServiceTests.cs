@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -28,16 +29,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task GetPublicationTree_MultipleThemesTopics()
         {
+            var releaseA = new Release
+            {
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.OfficialStatistics,
+                Published = DateTime.UtcNow,
+            };
+            var releaseB = new Release
+            {
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.NationalStatistics,
+                Published = DateTime.UtcNow,
+            };
+
             var publicationA = new Publication
             {
                 Title = "Publication A",
                 Slug = "publication-a",
-                LegacyPublicationUrl = new Uri("https://legacy.url/")
+                LatestPublishedRelease = releaseA,
+                Releases = new List<Release>
+                {
+                    releaseA
+                }
             };
             var publicationB = new Publication
             {
                 Title = "Publication B",
                 Slug = "publication-b",
+                LatestPublishedRelease = releaseB,
+                Releases = new List<Release>
+                {
+                    releaseB
+                }
             };
             var publicationC = new Publication
             {
@@ -82,38 +107,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 }
             };
 
-            var releaseFileA = new ReleaseFile
-            {
-                Release = new Release
-                {
-                    Publication = publicationA,
-                    ReleaseName = "2020",
-                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                    Type = ReleaseType.OfficialStatistics,
-                    Published = new DateTime(2020, 1, 1),
-                },
-                File = new File { Type = FileType.Data },
-            };
-
-            var releaseFileB = new ReleaseFile
-            {
-                Release = new Release
-                {
-                    Publication = publicationB,
-                    ReleaseName = "2020",
-                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                    Type = ReleaseType.NationalStatistics,
-                    Published = new DateTime(2020, 2, 1),
-                },
-                File = new File { Type = FileType.Data },
-            };
-
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(themes);
-                await context.AddRangeAsync(releaseFileA, releaseFileB);
+                await context.Themes.AddRangeAsync(themes);
                 await context.SaveChangesAsync();
             }
 
@@ -143,8 +141,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal("publication-a", topicAPublications[0].Slug);
                 Assert.Equal("Publication A", topicAPublications[0].Title);
                 Assert.Equal(PublicationType.NationalAndOfficial, topicAPublications[0].Type);
-                // Publication has a legacy url but it's not set because Releases exist
-                Assert.Null(topicAPublications[0].LegacyPublicationUrl);
+                Assert.True(topicAPublications[0].HasLiveRelease);
+                Assert.False(topicAPublications[0].LatestReleaseHasData);
+                Assert.False(topicAPublications[0].AnyLiveReleaseHasData);
 
                 var topicBPublications = publicationTree[0].Topics[1].Publications;
 
@@ -152,8 +151,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal("publication-b", topicBPublications[0].Slug);
                 Assert.Equal("Publication B", topicBPublications[0].Title);
                 Assert.Equal(PublicationType.NationalAndOfficial, topicBPublications[0].Type);
-                // Publication has a legacy url but it's not set because Releases exist
-                Assert.Null(topicBPublications[0].LegacyPublicationUrl);
+                Assert.True(topicBPublications[0].HasLiveRelease);
+                Assert.False(topicBPublications[0].LatestReleaseHasData);
+                Assert.False(topicBPublications[0].AnyLiveReleaseHasData);
 
                 var topicCPublications = publicationTree[1].Topics[0].Publications;
 
@@ -161,6 +161,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal("publication-c", topicCPublications[0].Slug);
                 Assert.Equal("Publication C", topicCPublications[0].Title);
                 Assert.Equal(PublicationType.Legacy, topicCPublications[0].Type);
+                Assert.False(topicCPublications[0].HasLiveRelease);
+                Assert.False(topicCPublications[0].LatestReleaseHasData);
+                Assert.False(topicCPublications[0].AnyLiveReleaseHasData);
                 Assert.Equal("https://legacy.url/", topicCPublications[0].LegacyPublicationUrl);
             }
         }
@@ -168,9 +171,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task GetPublicationTree_ThemesWithNoTopicsOrPublications_Excluded()
         {
-            var publicationA = new Publication
+            var release = new Release
             {
-                Title = "Publication A",
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.OfficialStatistics,
+                Published = DateTime.UtcNow,
             };
 
             var themes = new List<Theme>
@@ -187,7 +193,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         new()
                         {
                             Title = "Topic A",
-                            Publications = ListOf(publicationA),
+                            Publications = new List<Publication>
+                            {
+                                new()
+                                {
+                                    Title = "Publication A",
+                                    LatestPublishedRelease = release,
+                                    Releases = new List<Release>
+                                    {
+                                        release
+                                    }
+                                }
+                            }
                         },
                     },
                 },
@@ -204,25 +221,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 }
             };
 
-            var releaseFile = new ReleaseFile
-            {
-                Release = new Release
-                {
-                    Publication = publicationA,
-                    ReleaseName = "2020",
-                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                    Type = ReleaseType.OfficialStatistics,
-                    Published = new DateTime(2020, 1, 1),
-                },
-                File = new File { Type = FileType.Data },
-            };
-
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(themes);
-                await context.AddAsync(releaseFile);
+                await context.Themes.AddRangeAsync(themes);
                 await context.SaveChangesAsync();
             }
 
@@ -248,6 +251,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task GetPublicationTree_ThemesWithNoVisiblePublications_Excluded()
         {
+            var releaseB = new Release
+            {
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.OfficialStatistics,
+                Published = DateTime.UtcNow,
+            };
+
             var publicationA = new Publication
             {
                 Title = "Publication A",
@@ -255,6 +266,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationB = new Publication
             {
                 Title = "Publication B",
+                LatestPublishedRelease = releaseB,
+                Releases = new List<Release>
+                {
+                    releaseB
+                }
             };
             var publicationC = new Publication
             {
@@ -264,6 +280,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationD = new Publication
             {
                 Title = "Publication D",
+                Releases = new List<Release>
+                {
+                    // Not published
+                    new()
+                    {
+                        ReleaseName = "2020",
+                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                        Type = ReleaseType.NationalStatistics,
+                        Published = null,
+                    }
+                }
             };
 
             var themes = new List<Theme>
@@ -318,33 +345,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 }
             };
 
-            var releaseFileB = new ReleaseFile
-            {
-                Release = new Release
-                {
-                    Publication = publicationB,
-                    ReleaseName = "2020",
-                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                    Type = ReleaseType.OfficialStatistics,
-                    Published = new DateTime(2020, 1, 1),
-                },
-                File = new File { Type = FileType.Data },
-            };
-            var releaseD = new Release
-            {
-                Publication = publicationD,
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = ReleaseType.NationalStatistics,
-                // Not published
-            };
-
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddRangeAsync(themes);
-                await context.AddRangeAsync(releaseFileB, releaseD);
                 await context.SaveChangesAsync();
             }
 
@@ -385,16 +390,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task GetPublicationTree_LegacyPublicationUrl()
         {
+            var releaseA = new Release
+            {
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.NationalStatistics,
+                Published = DateTime.UtcNow,
+            };
+            var releaseB = new Release
+            {
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.NationalStatistics,
+                Published = DateTime.UtcNow,
+            };
+
             var publicationA = new Publication
             {
                 Title = "Publication A",
                 Slug = "publication-a",
+                LatestPublishedRelease = releaseA,
+                Releases = new List<Release>
+                {
+                    releaseA
+                },
                 LegacyPublicationUrl = new Uri("https://legacy.url/")
             };
             var publicationB = new Publication
             {
                 Title = "Publication B",
                 Slug = "publication-b",
+                LatestPublishedRelease = releaseB,
+                Releases = new List<Release>
+                {
+                    releaseB
+                }
             };
             var publicationC = new Publication
             {
@@ -419,42 +449,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 },
             };
 
-            var releaseFileA = new ReleaseFile
-            {
-                Release = new Release
-                {
-                    Publication = publicationA,
-                    ReleaseName = "2020",
-                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                    Type = ReleaseType.NationalStatistics,
-                    Published = new DateTime(2020, 2, 1),
-                },
-                File = new File
-                {
-                    Type = FileType.Data,
-                }
-            };
-            var releaseFileB = new ReleaseFile
-            {
-                Release = new Release
-                {
-                    Publication = publicationB,
-                    ReleaseName = "2020",
-                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                    Type = ReleaseType.NationalStatistics,
-                    Published = new DateTime(2020, 2, 1),
-                },
-                File = new File
-                {
-                    Type = FileType.Data,
-                }
-            };
-
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(theme, releaseFileA, releaseFileB);
+                await context.Themes.AddRangeAsync(theme);
                 await context.SaveChangesAsync();
             }
 
@@ -483,7 +482,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal("publication-b", publications[1].Slug);
                 Assert.Equal("Publication B", publications[1].Title);
                 Assert.Equal(PublicationType.NationalAndOfficial, publications[1].Type);
-                // Publication has a legacy url but it's not set because Releases exist
                 Assert.Null(publications[1].LegacyPublicationUrl);
 
                 Assert.Equal("publication-c", publications[2].Slug);
@@ -494,71 +492,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublicationTree_ReleaseHasNoData()
+        public async Task GetPublicationTree_PublicationsWithNoReleasesAndNoLegacyUrl_Excluded()
         {
-            var publicationA = new Publication
+            var releaseA = new Release
             {
-                Title = "Publication A",
-                Slug = "publication-a",
-            };
-
-            var theme = new Theme
-            {
-                Title = "Theme A",
-                Summary = "Theme A summary",
-                Topics = new List<Topic>
-                {
-                    new()
-                    {
-                        Title = "Topic A",
-                        Publications = ListOf(publicationA)
-                    },
-                },
-            };
-
-            var release = new Release
-            {
-                Publication = publicationA,
                 ReleaseName = "2020",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
                 Type = ReleaseType.OfficialStatistics,
                 Published = new DateTime(2020, 1, 1),
             };
 
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                await context.AddRangeAsync(theme, release);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var service = BuildThemeService(context);
-
-                var publicationTree = await service.GetPublicationTree();
-
-                Assert.Single(publicationTree);
-                Assert.Equal(theme.Id, publicationTree[0].Id);
-
-                var topic = Assert.Single(publicationTree[0].Topics);
-                Assert.Equal(theme.Topics[0].Id, topic.Id);
-
-                var publication = Assert.Single(topic.Publications);
-                Assert.Equal(publicationA.Id, publication.Id);
-                Assert.False(publication.IsSuperseded);
-                Assert.True(publication.HasLiveRelease);
-                Assert.False(publication.LatestReleaseHasData);
-                Assert.False(publication.AnyLiveReleaseHasData);
-            }
-        }
-
-        [Fact]
-        public async Task GetPublicationTree_PublicationsWithNoReleasesAndNoLegacyUrl_Excluded()
-        {
             var publicationA = new Publication
             {
                 Title = "Publication A",
+                LatestPublishedRelease = releaseA,
+                Releases = new List<Release>
+                {
+                    releaseA
+                }
             };
             var publicationB = new Publication
             {
@@ -588,25 +539,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 }
             };
 
-            var releaseFileA = new ReleaseFile
-            {
-                Release = new Release
-                {
-                    Publication = publicationA,
-                    ReleaseName = "2020",
-                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                    Type = ReleaseType.OfficialStatistics,
-                    Published = new DateTime(2020, 1, 1),
-                },
-                File = new File { Type = FileType.Data },
-            };
-
-
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(theme, releaseFileA);
+                await context.Themes.AddRangeAsync(theme);
                 await context.SaveChangesAsync();
             }
 
@@ -632,6 +569,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task GetPublicationTree_PublicationWithMultipleReleasesHasCorrectLatestReleaseType()
         {
+            var previousRelease = new Release
+            {
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.OfficialStatistics,
+                Published = DateTime.UtcNow,
+            };
+
+            var latestRelease = new Release
+            {
+                ReleaseName = "2021",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.NationalStatistics,
+                Published = DateTime.UtcNow,
+            };
+
+            var unpublishedRelease = new Release
+            {
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.AdHocStatistics,
+                Published = null,
+            };
+
             var theme = new Theme
             {
                 Title = "Theme A",
@@ -647,169 +608,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                             {
                                 Title = "Publication A",
                                 Slug = "publication-a",
+                                LatestPublishedRelease = latestRelease,
+                                Releases = new List<Release>
+                                {
+                                    previousRelease,
+                                    latestRelease,
+                                    unpublishedRelease
+                                }
                             }
                         }
                     },
                 },
             };
 
-            var releaseFiles = new List<ReleaseFile>
-            {
-                new ReleaseFile
-                {
-                    // Previous release
-                    Release = new()
-                    {
-                        Publication = theme.Topics[0].Publications[0],
-                        ReleaseName = "2020",
-                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        Type = ReleaseType.OfficialStatistics,
-                        Published = new DateTime(2020, 1, 1),
-                    },
-                    File = new File { Type = FileType.Data },
-                },
-                new ReleaseFile
-                {
-                    // Latest release
-                    Release = new Release
-                    {
-                        Publication = theme.Topics[0].Publications[0],
-                        ReleaseName = "2021",
-                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        Type = ReleaseType.NationalStatistics,
-                        Published = new DateTime(2021, 1, 1),
-                    },
-                    File = new File { Type = FileType.Data },
-                },
-                new ReleaseFile
-                {
-                    // Not published
-                    Release = new Release
-                    {
-                        Publication = theme.Topics[0].Publications[0],
-                        ReleaseName = "2022",
-                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        Type = ReleaseType.AdHocStatistics,
-                    },
-                    File = new File { Type = FileType.Data },
-                },
-            };
-
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(theme);
-                await context.AddRangeAsync(releaseFiles);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var service = BuildThemeService(context);
-
-                var publicationTree = await service.GetPublicationTree();
-
-                Assert.Single(publicationTree);
-                Assert.Equal("Theme A", publicationTree[0].Title);
-                Assert.Equal("Theme A summary", publicationTree[0].Summary);
-
-                Assert.Single(publicationTree[0].Topics);
-                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
-
-                var publications = publicationTree[0].Topics[0].Publications;
-
-                Assert.Single(publications);
-                Assert.Equal("publication-a", publications[0].Slug);
-                Assert.Equal("Publication A", publications[0].Title);
-                Assert.Equal(PublicationType.NationalAndOfficial, publications[0].Type);
-            }
-        }
-
-        [Fact]
-        public async Task GetPublicationTree_PublicationWithAmendedReleaseHasCorrectLatestReleaseType()
-        {
-            var theme = new Theme
-            {
-                Title = "Theme A",
-                Summary = "Theme A summary",
-                Topics = new List<Topic>
-                {
-                    new()
-                    {
-                        Title = "Topic A",
-                        Publications = new List<Publication>
-                        {
-                            new()
-                            {
-                                Title = "Publication A",
-                                Slug = "publication-a",
-                            }
-                        }
-                    },
-                },
-            };
-
-            var previousRelease = new ReleaseFile
-            {
-                Release = new Release
-                {
-                    Publication = theme.Topics[0].Publications[0],
-                    ReleaseName = "2020",
-                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                    Type = ReleaseType.OfficialStatistics,
-                    Published = new DateTime(2020, 1, 1),
-                },
-                File = new File { Type = FileType.Data },
-            };
-
-            var latestReleaseOriginalVersion = new ReleaseFile
-            {
-                Release = new Release
-                {
-                    Publication = theme.Topics[0].Publications[0],
-                    ReleaseName = "2021",
-                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                    Type = ReleaseType.ExperimentalStatistics,
-                    Published = new DateTime(2021, 1, 1),
-                },
-                File = new File { Type = FileType.Data },
-            };
-
-            var latestReleaseAmendedVersion = new ReleaseFile
-            {
-                Release = new Release
-                {
-                    Publication = theme.Topics[0].Publications[0],
-                    ReleaseName = "2021",
-                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                    Type = ReleaseType.NationalStatistics,
-                    Published = new DateTime(2021, 2, 1),
-                    PreviousVersion = latestReleaseOriginalVersion.Release,
-                },
-                File = new File { Type = FileType.Data },
-            };
-
-            var unpublishedRelease = new ReleaseFile
-            {
-                Release = new Release
-                {
-                    Publication = theme.Topics[0].Publications[0],
-                    ReleaseName = "2022",
-                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                    Type = ReleaseType.AdHocStatistics,
-                },
-                File = new File { Type = FileType.Data },
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                await context.AddRangeAsync(theme,
-                    unpublishedRelease,
-                    latestReleaseAmendedVersion,
-                    latestReleaseOriginalVersion,
-                    previousRelease);
+                await context.Themes.AddAsync(theme);
                 await context.SaveChangesAsync();
             }
 
@@ -838,13 +653,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task GetPublicationTree_TopicsWithNoVisiblePublications_Excluded()
         {
+            var releaseA = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                ReleaseName = "2020",
+                Type = ReleaseType.OfficialStatistics,
+                Published = new DateTime(2020, 1, 1),
+            };
+
+            // Not published
+            var releaseB = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                ReleaseName = "2020",
+                Type = ReleaseType.NationalStatistics
+            };
+
             var publicationA = new Publication
             {
                 Title = "Publication A",
+                LatestPublishedRelease = releaseA,
+                Releases = new List<Release>
+                {
+                    releaseA
+                }
             };
             var publicationB = new Publication
             {
                 Title = "Publication B",
+                LatestPublishedRelease = null,
+                Releases = new List<Release>
+                {
+                    releaseB
+                }
             };
 
             var themes = new List<Theme>
@@ -868,48 +709,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 }
             };
 
-            var releaseFiles = new List<ReleaseFile>
-            {
-                // Published with latest data
-                new()
-                {
-                    Release = new Release
-                    {
-                        Publication = publicationA,
-                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        ReleaseName = "2020",
-                        Type = ReleaseType.OfficialStatistics,
-                        Published = new DateTime(2020, 1, 1),
-                    },
-                    File = new File
-                    {
-                        Type = FileType.Data
-                    }
-                },
-                // Not published
-                new()
-                {
-                    Release = new Release
-                    {
-                        Publication = publicationB,
-                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        ReleaseName = "2020",
-                        Type = ReleaseType.NationalStatistics,
-                    },
-                    File = new File
-                    {
-                        Type = FileType.Data
-                    }
-                },
-            };
-
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(themes);
-                await context.AddRangeAsync(releaseFiles);
-
+                await context.Themes.AddRangeAsync(themes);
                 await context.SaveChangesAsync();
             }
 
@@ -935,20 +739,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublicationTree_PreviousReleaseHasData()
+        public async Task GetPublicationTree_LatestReleaseHasData()
         {
+            var latestRelease = new Release
+            {
+                ReleaseName = "2021",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.OfficialStatistics,
+                Published = DateTime.UtcNow,
+            };
+
             var publication = new Publication
             {
                 Title = "Publication A",
+                LatestPublishedRelease = latestRelease,
                 Releases = new List<Release>
                 {
-                    new()
-                    {
-                        ReleaseName = "2021",
-                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        Type = ReleaseType.OfficialStatistics,
-                        Published = new DateTime(2021, 1, 1),
-                    },
+                    latestRelease,
                     new()
                     {
                         ReleaseName = "2020",
@@ -977,7 +784,102 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 // Latest release has no data
                 new()
                 {
-                    Release = publication.Releases[0],
+                    Release = latestRelease,
+                    File = new File
+                    {
+                        Type = FileType.Data
+                    }
+                },
+                // Older release has no data
+                new()
+                {
+                    Release = publication.Releases[1],
+                    File = new File
+                    {
+                        Type = FileType.Ancillary
+                    }
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddAsync(theme);
+                await context.AddRangeAsync(releaseFiles);
+
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildThemeService(context);
+
+                var publicationTree = await service.GetPublicationTree();
+
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme A", publicationTree[0].Title);
+
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
+
+                var publications = publicationTree[0].Topics[0].Publications;
+
+                var resultPublication = Assert.Single(publications);
+                Assert.Equal(publication.Title, resultPublication.Title);
+                Assert.Equal(publication.Id, resultPublication.Id);
+                Assert.True(resultPublication.LatestReleaseHasData);
+                Assert.True(resultPublication.AnyLiveReleaseHasData);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationTree_PreviousReleaseHasData()
+        {
+            var latestRelease = new Release
+            {
+                ReleaseName = "2021",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.OfficialStatistics,
+                Published = DateTime.UtcNow,
+            };
+
+            var publication = new Publication
+            {
+                Title = "Publication A",
+                LatestPublishedRelease = latestRelease,
+                Releases = new List<Release>
+                {
+                    latestRelease,
+                    new()
+                    {
+                        ReleaseName = "2020",
+                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                        Type = ReleaseType.OfficialStatistics,
+                        Published = new DateTime(2020, 1, 1),
+                    }
+                }
+            };
+
+            var theme = new Theme
+            {
+                Title = "Theme A",
+                Topics = new List<Topic>
+                {
+                    new()
+                    {
+                        Title = "Topic A",
+                        Publications = ListOf(publication)
+                    }
+                }
+            };
+
+            var releaseFiles = new List<ReleaseFile>
+            {
+                // Latest release has no data
+                new()
+                {
+                    Release = latestRelease,
                     File = new File
                     {
                         Type = FileType.Ancillary
@@ -1021,30 +923,146 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var resultPublication = Assert.Single(publications);
                 Assert.Equal(publication.Title, resultPublication.Title);
                 Assert.Equal(publication.Id, resultPublication.Id);
-                Assert.False(resultPublication.IsSuperseded);
-                Assert.True(resultPublication.HasLiveRelease);
                 Assert.False(resultPublication.LatestReleaseHasData);
                 Assert.True(resultPublication.AnyLiveReleaseHasData);
             }
         }
 
         [Fact]
-        public async Task GetPublicationTree_Superseded()
+        public async Task GetPublicationTree_UnpublishedReleaseHasData()
         {
+            var latestRelease = new Release
+            {
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.OfficialStatistics,
+                Published = DateTime.UtcNow,
+            };
+
+            var unpublishedRelease = new Release
+            {
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.OfficialStatistics,
+                Published = null,
+            };
+
             var publicationA = new Publication
             {
                 Title = "Publication A",
                 Slug = "publication-a",
+                LatestPublishedRelease = latestRelease,
+                Releases = new List<Release>
+                {
+                    latestRelease,
+                    unpublishedRelease
+                }
             };
-            var supersedingPublication = new Publication
+
+            var theme = new Theme
             {
-                Releases = ListOf(new Release { Published = DateTime.UtcNow }),
+                Title = "Theme A",
+                Summary = "Theme A summary",
+                Topics = new List<Topic>
+                {
+                    new()
+                    {
+                        Title = "Topic A",
+                        Publications = ListOf(publicationA)
+                    }
+                }
+            };
+
+            var releaseFiles = new List<ReleaseFile>
+            {
+                // Latest release has no data
+                new()
+                {
+                    Release = latestRelease,
+                    File = new File
+                    {
+                        Type = FileType.Ancillary
+                    }
+                },
+                // Unpublished release has data but this shouldn't alter anything
+                new()
+                {
+                    Release = unpublishedRelease,
+                    File = new File
+                    {
+                        Type = FileType.Data
+                    }
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.Themes.AddRangeAsync(theme);
+                await context.ReleaseFiles.AddRangeAsync(releaseFiles);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildThemeService(context);
+
+                var publicationTree = await service.GetPublicationTree();
+
+                Assert.Single(publicationTree);
+                Assert.Equal(theme.Id, publicationTree[0].Id);
+
+                var topic = Assert.Single(publicationTree[0].Topics);
+                Assert.Equal(theme.Topics[0].Id, topic.Id);
+
+                var publication = Assert.Single(topic.Publications);
+                Assert.Equal(publicationA.Id, publication.Id);
+                Assert.False(publication.LatestReleaseHasData);
+                Assert.False(publication.AnyLiveReleaseHasData);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationTree_Superseded()
+        {
+            var releaseA = new Release
+            {
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.OfficialStatistics,
+                Published = DateTime.UtcNow,
+            };
+            var releaseB = new Release
+            {
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.NationalStatistics,
+                Published = DateTime.UtcNow,
+            };
+
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+                Slug = "publication-a",
+                LatestPublishedRelease = releaseA,
+                Releases = new List<Release>
+                {
+                    releaseA
+                }
             };
             var publicationB = new Publication
             {
                 Title = "Publication B",
                 Slug = "publication-b",
-                SupersededBy = supersedingPublication,
+                LatestPublishedRelease = releaseB,
+                Releases = new List<Release>
+                {
+                    releaseB
+                },
+                SupersededBy = new Publication
+                {
+                    LatestPublishedReleaseId = Guid.NewGuid()
+                }
             };
 
             var theme = new Theme
@@ -1063,35 +1081,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 },
             };
 
-            var releaseFileA = new ReleaseFile
-            {
-                Release = new Release
-                {
-                    Publication = publicationA,
-                    ReleaseName = "2020",
-                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                    Type = ReleaseType.OfficialStatistics,
-                    Published = new DateTime(2020, 1, 1),
-                },
-                File = new File { Type = FileType.Data },
-            };
-            var releaseFileB = new ReleaseFile
-            {
-                Release = new()
-                {
-                    Publication = publicationB,
-                    ReleaseName = "2020",
-                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                    Type = ReleaseType.NationalStatistics,
-                    Published = new DateTime(2020, 2, 1),
-                },
-                File = new File { Type = FileType.Data },
-            };
-
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(theme, releaseFileA, releaseFileB);
+                await context.Themes.AddRangeAsync(theme);
                 await context.SaveChangesAsync();
             }
 
@@ -1121,7 +1114,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         private static ThemeService BuildThemeService(
             ContentDbContext contentDbContext)
         {
-            return new ThemeService(contentDbContext);
+            return new ThemeService(
+                contentDbContext: contentDbContext,
+                publicationRepository: new PublicationRepository(contentDbContext));
         }
     }
 }

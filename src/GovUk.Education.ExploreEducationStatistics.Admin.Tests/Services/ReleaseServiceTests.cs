@@ -235,72 +235,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task LatestReleaseCorrectlyReported()
-        {
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid(),
-                Contact = new Contact(),
-            };
-
-            var notLatestRelease = new Release
-            {
-                Id = new Guid("a941444a-687a-4364-9f7d-d39c35d91b9e"),
-                ReleaseName = "2019",
-                TimePeriodCoverage = TimeIdentifier.December,
-                PublicationId = publication.Id,
-                Published = DateTime.UtcNow,
-                Version = 0,
-                PreviousVersionId = new Guid("a941444a-687a-4364-9f7d-d39c35d91b9e")
-            };
-
-            var latestRelease = new Release
-            {
-                Id = new Guid("8909d1b4-78fc-4070-bb3d-90e055f39b39"),
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.June,
-                PublicationId = publication.Id,
-                Published = DateTime.UtcNow,
-                Version = 0,
-                PreviousVersionId = new Guid("8909d1b4-78fc-4070-bb3d-90e055f39b39")
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.AddAsync(publication);
-                await context.AddRangeAsync(
-                    new List<Release>
-                    {
-                        notLatestRelease, latestRelease
-                    }
-                );
-                await context.SaveChangesAsync();
-            }
-
-            // Note that we use different contexts for each method call - this is to avoid misleadingly optimistic
-            // loading of the entity graph as we go.
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var releaseService = BuildReleaseService(context);
-                var notLatest = (await releaseService.GetRelease(notLatestRelease.Id)).Right;
-
-                Assert.Equal(notLatestRelease.Id, notLatest.Id);
-                Assert.False(notLatest.LatestRelease);
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var releaseService = BuildReleaseService(context);
-                var latest = (await releaseService.GetRelease(latestRelease.Id)).Right;
-
-                Assert.Equal(latestRelease.Id, latest.Id);
-                Assert.True(latest.LatestRelease);
-            }
-        }
-
-        [Fact]
         public async Task RemoveDataFiles()
         {
             var release = new Release
@@ -761,12 +695,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetRelease()
         {
-            var releaseId = Guid.NewGuid();
             var nextReleaseDate = new PartialDate {Day = "1", Month = "1", Year = "2040"};
 
             var release = new Release
             {
-                Id = releaseId,
+                Id = Guid.NewGuid(),
                 Type = ReleaseType.AdHocStatistics,
                 TimePeriodCoverage = TimeIdentifier.January,
                 PublishScheduled = DateTime.Parse("2020-06-29T00:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
@@ -803,36 +736,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Summary = "Test summary",
                 Slug = "test-publication",
                 Contact = new Contact(),
-                Releases = new List<Release>
+                LatestPublishedRelease = release,
+                Releases =
                 {
                     release
                 }
-            };
-
-            var publication2 = new Publication
-            {
-                Contact = new Contact(),
-                Releases = new List<Release>
-                {
-                    new()
-                    {
-                        ReleaseStatuses = new List<ReleaseStatus>
-                        {
-                            new()
-                            {
-                                InternalReleaseNote = "Different release",
-                                Created = DateTime.UtcNow
-                            }
-                        }
-                    }
-                },
             };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddRangeAsync(publication, publication2);
+                await context.AddAsync(publication);
                 await context.SaveChangesAsync();
             }
 
@@ -840,10 +755,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = BuildReleaseService(context);
 
-                var result = await releaseService.GetRelease(releaseId);
+                var result = await releaseService.GetRelease(release.Id);
 
                 var viewModel = result.AssertRight();
 
+                Assert.Equal(release.Id, viewModel.Id);
                 Assert.Equal("January 2035", viewModel.Title);
                 Assert.Equal(2035, viewModel.Year);
                 Assert.Equal("2035", viewModel.YearTitle);
@@ -868,7 +784,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        async Task GetRelease_NoLatestInternalReleaseNote()
+        public async Task GetRelease_NotLatestPublishedRelease()
+        {
+            var publication = new Publication
+            {
+                Contact = new Contact(),
+                LatestPublishedRelease = new Release
+                {
+                    ReleaseName = "2022",
+                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            var notLatestRelease = new Release
+            {
+                Publication = publication,
+                ReleaseName = "2021",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Published = DateTime.UtcNow
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.Releases.AddAsync(notLatestRelease);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(context);
+                var result = await releaseService.GetRelease(notLatestRelease.Id);
+
+                var viewModel = result.AssertRight();
+
+                Assert.Equal(notLatestRelease.Id, viewModel.Id);
+                Assert.False(viewModel.LatestRelease);
+            }
+        }
+
+        [Fact]
+        public async Task GetRelease_NoLatestInternalReleaseNote()
         {
             var release = new Release
             {
@@ -908,73 +867,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var publication = new Publication
             {
-                Id = Guid.NewGuid()
-            };
-
-            var notLatestRelease = new Release
-            {
-                Id = new Guid("1cf74d85-2a20-4b2a-a944-6b74f79e56a4"),
-                Published = DateTime.UtcNow,
-                PublicationId = publication.Id,
-                ReleaseName = "2035",
-                TimePeriodCoverage = TimeIdentifier.December,
-                Version = 0,
-                PreviousVersionId = new Guid("1cf74d85-2a20-4b2a-a944-6b74f79e56a4")
-            };
-
-            var latestReleaseV0 = new Release
-            {
-                Id = new Guid("7ef22424-a66f-47b9-85b0-50bdf2a622fc"),
-                Published = DateTime.UtcNow,
-                PublicationId = publication.Id,
-                ReleaseName = "2036",
-                TimePeriodCoverage = TimeIdentifier.June,
-                Version = 0,
-                PreviousVersionId = new Guid("7ef22424-a66f-47b9-85b0-50bdf2a622fc")
-            };
-
-            var latestReleaseV1 = new Release
-            {
-                Id = new Guid("d301f5b7-a89b-4d7e-b020-53f8631c72b2"),
-                Published = DateTime.UtcNow,
-                PublicationId = publication.Id,
-                ReleaseName = "2036",
-                TimePeriodCoverage = TimeIdentifier.June,
-                Version = 1,
-                PreviousVersionId = new Guid("7ef22424-a66f-47b9-85b0-50bdf2a622fc")
-            };
-
-            var latestReleaseV2Deleted = new Release
-            {
-                Id = new Guid("efc6d4bd-9bf4-4179-a1fb-88cdfa2e19f6"),
-                Published = DateTime.UtcNow,
-                PublicationId = publication.Id,
-                ReleaseName = "2036",
-                TimePeriodCoverage = TimeIdentifier.June,
-                Version = 2,
-                PreviousVersionId = new Guid("d301f5b7-a89b-4d7e-b020-53f8631c72b2"),
-                SoftDeleted = true
+                LatestPublishedRelease = new Release
+                {
+                    ReleaseName = "2022",
+                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                    Published = DateTime.UtcNow
+                }
             };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(
-                    new UserReleaseRole
-                    {
-                        UserId = _userId,
-                        ReleaseId = notLatestRelease.Id
-                    }
-                );
-
                 await context.AddAsync(publication);
-                await context.AddRangeAsync(
-                    new List<Release>
-                    {
-                        notLatestRelease, latestReleaseV0, latestReleaseV1, latestReleaseV2Deleted
-                    }
-                );
                 await context.SaveChangesAsync();
             }
 
@@ -982,11 +887,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = BuildReleaseService(context);
 
-                var latest = releaseService.GetLatestPublishedRelease(publication.Id).Result.Right;
+                var result = await releaseService.GetLatestPublishedRelease(publication.Id);
+                var latestIdTitleViewModel = result.AssertRight();
 
-                Assert.NotNull(latest);
-                Assert.Equal(latestReleaseV1.Id, latest!.Id);
-                Assert.Equal("June 2036", latest.Title);
+                Assert.NotNull(latestIdTitleViewModel);
+                Assert.Equal(publication.LatestPublishedReleaseId, latestIdTitleViewModel!.Id);
+                Assert.Equal("Calendar Year 2022", latestIdTitleViewModel.Title);
+            }
+        }
+
+        [Fact]
+        public async Task GetLatestPublishedRelease_NoPublishedRelease()
+        {
+            var publication = new Publication
+            {
+                LatestPublishedReleaseId = null
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(context);
+
+                var result = await releaseService.GetLatestPublishedRelease(publication.Id);
+                result.AssertNotFound();
             }
         }
 

@@ -7,9 +7,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerResourceRoleService;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.
+    AuthorizationHandlerResourceRoleService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
+using IPublicationRepository =
+    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -29,8 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         public ViewSpecificMethodologyAuthorizationHandler(
             IMethodologyRepository methodologyRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository,
-            IPreReleaseService preReleaseService, 
-            IPublicationRepository publicationRepository, 
+            IPreReleaseService preReleaseService,
+            IPublicationRepository publicationRepository,
             AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
         {
             _methodologyRepository = methodologyRepository;
@@ -53,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
             var owningPublication =
                 await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
-            
+
             // If the user is a Publication Owner or Approver of the Publication that owns this Methodology, they can
             // view it.  Additionally, if the user is an Editor (Contributor, Lead) or an Approver of the latest
             // (Live or non-Live) Release of the owning Publication of this Methodology, they can view it.
@@ -67,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 context.Succeed(requirement);
                 return;
             }
-            
+
             // If the user is a PrereleaseViewer of the latest non-Live, Approved Release of any Publication
             // using this Methodology, and the methodology is approved, and the latest release under that publication
             // is within the prerelease time window, they can view it
@@ -75,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             {
                 var publicationIds = await _methodologyRepository
                     .GetAllPublicationIds(methodologyVersion.MethodologyId);
-                
+
                 foreach (var publicationId in publicationIds)
                 {
                     if (await _userReleaseRoleRepository.IsUserPrereleaseViewerOnLatestPreReleaseRelease(
@@ -85,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                         var latestReleaseForConnectedPublication = await
                             _publicationRepository.GetLatestReleaseForPublication(publicationId);
 
-                        if (latestReleaseForConnectedPublication != null && 
+                        if (latestReleaseForConnectedPublication != null &&
                             _preReleaseService
                                 .GetPreReleaseWindowStatus(latestReleaseForConnectedPublication, DateTime.UtcNow)
                                 .Access == PreReleaseAccess.Within)
