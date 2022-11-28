@@ -92,6 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                             providerOptions
                                 .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
                                 .AddBulkOperationSupport()
+                                .EnableCustomRetryOnFailure()
                         )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );

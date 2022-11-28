@@ -11,9 +11,9 @@ public static class SqlServerDbContextOptionsBuilderExtensions
         int? maxRetryCount = null,
         TimeSpan? maxRetryDelay = null)
     {
-        return builder.ExecutionStrategy(c =>
+        return builder.ExecutionStrategy(dependencies =>
             new MessageAwareSqlServerRetryingExecutionStrategy(
-                c, 
+                dependencies, 
                 maxRetryCount ?? 6, 
                 maxRetryDelay ?? TimeSpan.FromSeconds(30)));
     }

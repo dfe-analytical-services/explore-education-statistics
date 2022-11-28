@@ -58,7 +58,7 @@ public class MessageAwareSqlServerRetryingExecutionStrategy : SqlServerRetryingE
             dependencies, 
             maxRetryCount, 
             maxRetryDelay,
-            null)
+            errorNumbersToAdd: null)
     {
         _logger = dependencies.Logger.Logger;
     }
