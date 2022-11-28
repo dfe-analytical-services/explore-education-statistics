@@ -58,6 +58,8 @@ describe('FindStatisticsPageNew', () => {
     expect(sortOptions[2]).toEqual(sortGroup.getByLabelText('A to Z'));
     expect(sortOptions[2]).not.toBeChecked();
 
+    expect(screen.getByLabelText('Search')).toBeInTheDocument();
+
     expect(
       screen.getByRole('heading', { name: 'Publication 1' }),
     ).toBeInTheDocument();
@@ -97,8 +99,7 @@ describe('FindStatisticsPageNew', () => {
     render(
       <FindStatisticsPageNew
         paging={{
-          page: 1,
-          pageSize: 10,
+          ...testPaging,
           totalPages: 0,
           totalResults: 0,
         }}
@@ -113,5 +114,69 @@ describe('FindStatisticsPageNew', () => {
     expect(
       screen.queryByRole('navigation', { name: 'Pagination navigation' }),
     ).not.toBeInTheDocument();
+  });
+
+  test('renders correctly when searched and has results', () => {
+    render(
+      <FindStatisticsPageNew
+        paging={{ ...testPaging, totalPages: 1, totalResults: 1 }}
+        publications={[testPublications[1], testPublications[2]]}
+        searchTerm="Find me"
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { name: '1 result' }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByText('Page 1 of 1, filtered by:')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Remove filter: Find me' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Clear all filters' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Publication 2' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Publication 3' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByText('There are no matching results.'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders correctly when searched and has no results', () => {
+    render(
+      <FindStatisticsPageNew
+        paging={{ ...testPaging, totalPages: 0, totalResults: 0 }}
+        publications={[]}
+        searchTerm="Can't find me"
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { name: '0 results' }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByText('0 pages, filtered by:')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: "Remove filter: Can't find me" }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Clear all filters' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText('There are no matching results.'),
+    ).toBeInTheDocument();
   });
 });

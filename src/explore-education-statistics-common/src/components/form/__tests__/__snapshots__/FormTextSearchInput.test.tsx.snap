@@ -14,13 +14,15 @@ exports[`FormTextSearchInput renders correctly with error 1`] = `
   </span>
   Field is required
 </span>
-<input name="testInput"
-       aria-describedby="test-input-error"
-       class="govuk-input searchInput govuk-input--error"
-       id="test-input"
-       type="text"
-       value
->
+<div class>
+  <input name="testInput"
+         aria-describedby="test-input-error"
+         class="govuk-input searchInput govuk-input--error"
+         id="test-input"
+         type="text"
+         value
+  >
+</div>
 `;
 
 exports[`FormTextSearchInput renders correctly with hint 1`] = `
@@ -34,13 +36,15 @@ exports[`FormTextSearchInput renders correctly with hint 1`] = `
 >
   Fill me in
 </span>
-<input name="testInput"
-       aria-describedby="test-input-hint"
-       class="govuk-input searchInput"
-       id="test-input"
-       type="text"
-       value
->
+<div class>
+  <input name="testInput"
+         aria-describedby="test-input-hint"
+         class="govuk-input searchInput"
+         id="test-input"
+         type="text"
+         value
+  >
+</div>
 `;
 
 exports[`FormTextSearchInput renders correctly with required props 1`] = `
@@ -49,12 +53,14 @@ exports[`FormTextSearchInput renders correctly with required props 1`] = `
 >
   Test input
 </label>
-<input name="testInput"
-       class="govuk-input searchInput"
-       id="test-input"
-       type="text"
-       value
->
+<div class>
+  <input name="testInput"
+         class="govuk-input searchInput"
+         id="test-input"
+         type="text"
+         value
+  >
+</div>
 `;
 
 exports[`FormTextSearchInput renders with a specific width class 1`] = `
@@ -68,11 +74,13 @@ exports[`FormTextSearchInput renders with a specific width class 1`] = `
 >
   Fill me in
 </span>
-<input name="testInput"
-       aria-describedby="test-input-hint"
-       class="govuk-input searchInput govuk-input--width-20"
-       id="test-input"
-       type="text"
-       value
->
+<div class>
+  <input name="testInput"
+         aria-describedby="test-input-hint"
+         class="govuk-input searchInput govuk-input--width-20"
+         id="test-input"
+         type="text"
+         value
+  >
+</div>
 `;

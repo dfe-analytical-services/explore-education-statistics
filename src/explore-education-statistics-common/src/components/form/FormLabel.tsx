@@ -6,12 +6,20 @@ export interface FormLabelProps {
   id: string;
   hideLabel?: boolean;
   label: string | ReactNode;
+  labelSize?: 'xl' | 'l' | 'm' | 's';
 }
 
-const FormLabel = ({ className, id, hideLabel, label }: FormLabelProps) => {
+const FormLabel = ({
+  className,
+  id,
+  hideLabel,
+  label,
+  labelSize,
+}: FormLabelProps) => {
   return (
     <label
       className={classNames('govuk-label', className, {
+        [`govuk-label--${labelSize}`]: labelSize,
         'govuk-visually-hidden': hideLabel,
       })}
       htmlFor={id}

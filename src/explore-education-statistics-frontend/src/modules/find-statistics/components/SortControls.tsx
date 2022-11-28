@@ -10,7 +10,7 @@ interface Option {
   value: PublicationSortOption;
 }
 
-const options: Option[] = [
+const defaultOptions: Option[] = [
   { label: 'Newest', value: 'newest' },
   { label: 'Oldest', value: 'oldest' },
   { label: 'A to Z', value: 'title' },
@@ -20,12 +20,17 @@ const formId = 'sortControlsForm';
 const fieldId = `${formId}-sortBy`;
 
 interface Props {
+  hasSearch?: boolean;
   sortBy: PublicationSortOption;
   onChange: (nextSortBy: PublicationSortOption) => void;
 }
 
-const SortControls = ({ sortBy, onChange }: Props) => {
+const SortControls = ({ hasSearch = false, sortBy, onChange }: Props) => {
   const { isMedia: isMobileMedia } = useMobileMedia();
+
+  const options = hasSearch
+    ? [...defaultOptions, { label: 'Relevance', value: 'relevance' }]
+    : defaultOptions;
 
   return (
     <form id={formId} className={styles.form}>
