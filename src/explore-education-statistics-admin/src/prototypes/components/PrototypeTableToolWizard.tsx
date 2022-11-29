@@ -29,7 +29,7 @@ import {
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
-import { Theme } from '@common/services/themeService';
+import { Theme } from '@common/services/publicationService';
 import React, { ReactElement, ReactNode } from 'react';
 import { useImmer } from 'use-immer';
 import {

@@ -1,5 +1,5 @@
 import tableBuilderService from '@common/services/tableBuilderService';
-import themeService from '@common/services/themeService';
+import publicationService from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import TableToolPage, {
   TableToolPageProps,
@@ -15,7 +15,7 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
 
   const [fastTrack, themeMeta] = await Promise.all([
     tableBuilderService.getFastTrackTableAndReleaseMeta(dataBlockId),
-    themeService.listThemes({
+    publicationService.getPublicationTree({
       publicationFilter: 'FastTrack',
     }),
   ]);

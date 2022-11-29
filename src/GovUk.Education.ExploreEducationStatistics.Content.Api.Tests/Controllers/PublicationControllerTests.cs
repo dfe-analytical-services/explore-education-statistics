@@ -1,10 +1,12 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -57,6 +59,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             VerifyAllMocks(publicationCacheService);
 
             result.AssertNotFoundResult();
+        }
+
+        [Fact]
+        public async Task GetPublicationTree()
+        {
+            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+
+            var controller = BuildPublicationController(publicationCacheService: publicationCacheService.Object);
+
+            publicationCacheService
+                .Setup(s => s.GetPublicationTree(PublicationTreeFilter.FindStatistics))
+                .ReturnsAsync(new List<ThemeTree>
+                {
+                    new()
+                    {
+                        Topics = new List<TopicTree>
+                        {
+                            new()
+                            {
+                                Publications = new List<PublicationTreeNode>
+                                {
+                                    new()
+                                }
+                            }
+                        }
+                    }
+                });
+
+            var result = await controller.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+
+            VerifyAllMocks(publicationCacheService);
+
+            var publicationTree = result.AssertOkResult();
+
+            var theme = Assert.Single(publicationTree);
+
+            var topic = Assert.Single(theme.Topics);
+
+            Assert.Single(topic.Publications);
         }
 
         private static PublicationController BuildPublicationController(

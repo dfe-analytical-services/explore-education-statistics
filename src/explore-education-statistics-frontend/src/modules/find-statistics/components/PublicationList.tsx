@@ -1,4 +1,4 @@
-import { PublicationSummary } from '@common/services/themeService';
+import { PublicationTreeSummary } from '@common/services/publicationService';
 import {
   PublicationType,
   publicationTypes,
@@ -8,7 +8,7 @@ import groupBy from 'lodash/groupBy';
 import React from 'react';
 
 interface Props {
-  publications: PublicationSummary[];
+  publications: PublicationTreeSummary[];
 }
 
 const publicationTypeReferenceOrder: PublicationType[] = [
@@ -19,7 +19,7 @@ const publicationTypeReferenceOrder: PublicationType[] = [
   'Legacy',
 ];
 
-const groupPublicationsByType = (publications: PublicationSummary[]) =>
+const groupPublicationsByType = (publications: PublicationTreeSummary[]) =>
   Object.entries(groupBy(publications, publication => publication.type))
     .map(([key, value]) => ({
       type: key as PublicationType,

@@ -1,4 +1,4 @@
-import { Theme } from '@common/services/themeService';
+import { Theme } from '@common/services/publicationService';
 
 export const publications = [
   {

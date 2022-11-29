@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -12,6 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 public interface IPublicationService
 {
     Task<Either<ActionResult, PublicationCacheViewModel>> Get(string publicationSlug);
+
+    Task<IList<ThemeTree>> GetPublicationTree();
 
     Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
         ReleaseType? releaseType = null,
