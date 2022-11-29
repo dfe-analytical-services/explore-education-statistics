@@ -24,6 +24,7 @@ const FigureFootnotes = ({ footnotes, headingHiddenText, id }: Props) => {
         id={id}
         itemName="footnote"
         itemNamePlural="footnotes"
+        testId="footnotes"
       >
         {footnotes.map(footnote => (
           <li key={footnote.id}>{footnote.label}</li>
