@@ -63,6 +63,7 @@ const AccordionSection = ({
 
   const headingId = `${id}-heading`;
   const contentId = `${id}-content`;
+  const anchorId = `${anchorLinkIdPrefix}-${kebabCase(heading)}`;
 
   return (
     <div
@@ -76,7 +77,7 @@ const AccordionSection = ({
         {anchorLinkUrl && (
           <CopyLinkButton
             className={styles.copyLinkButton}
-            url={anchorLinkUrl(id)}
+            url={anchorLinkUrl(anchorId)}
           />
         )}
         {header ??
@@ -84,7 +85,7 @@ const AccordionSection = ({
             headingTag,
             {
               className: classes.sectionHeading,
-              id: `${anchorLinkIdPrefix}-${kebabCase(heading)}`,
+              id: anchorId,
             },
             isMounted ? (
               <button

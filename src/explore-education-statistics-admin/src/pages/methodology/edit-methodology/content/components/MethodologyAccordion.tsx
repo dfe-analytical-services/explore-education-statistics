@@ -6,7 +6,6 @@ import { ContentSectionKeys } from '@admin/pages/methodology/edit-methodology/co
 import useMethodologyContentActions from '@admin/pages/methodology/edit-methodology/content/context/useMethodologyContentActions';
 import MethodologyAccordionSection from '@admin/pages/methodology/edit-methodology/content/components/MethodologyAccordionSection';
 import React, { useCallback } from 'react';
-import kebabCase from 'lodash/kebabCase';
 
 export interface MethodologyAccordionProps {
   id?: string;
@@ -72,7 +71,7 @@ const MethodologyAccordion = ({
       {methodology[sectionKey].map(section => (
         <MethodologyAccordionSection
           key={section.id}
-          id={`${sectionKey}-section-${kebabCase(section.heading)}`}
+          id={`${id}-${section.id}`}
           methodologyId={methodology.id}
           section={section}
           sectionKey={sectionKey}
