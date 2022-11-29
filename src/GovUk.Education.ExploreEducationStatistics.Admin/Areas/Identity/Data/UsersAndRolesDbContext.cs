@@ -56,6 +56,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                     v => v,
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
+            modelBuilder.Entity<UserInvite>()
+                .HasQueryFilter(invite => !invite.Expired);
+
             modelBuilder.Entity<IdentityRole>()
                 .HasData(
                     CreateRole(Role.BauUser),

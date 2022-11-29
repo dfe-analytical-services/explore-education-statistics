@@ -26,8 +26,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
     {
         private const string LoginErrorMessage = "Sorry, there was a problem logging you in.";
 
-        private static readonly TimeSpan InviteExpirySpan = TimeSpan.FromDays(14);
-        
         private readonly ISignInManagerDelegate _signInManager;
         private readonly IUserManagerDelegate _userManager;
         private readonly ContentDbContext _contentDbContext;
@@ -140,6 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             // need to be invited in with a particular global or resource-specific role.
             var inviteToSystem = await _usersAndRolesDbContext
                 .UserInvites
+                .IgnoreQueryFilters()
                 .Include(i => i.Role)
                 .FirstOrDefaultAsync(invite =>
                     invite.Email.ToLower() == userDetails.email.ToLower() && invite.Accepted == false);
@@ -242,9 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             ExternalLoginInfo info,
             string returnUrl)
         {
-            var inviteExpiryTime = inviteToSystem.Created + InviteExpirySpan;
-
-            if (DateTime.UtcNow >= inviteExpiryTime)
+            if (inviteToSystem.Expired)
             {
                 return await HandleExpiredInvite(inviteToSystem, email);
             }

@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -21,5 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.M
         public ApplicationUser? CreatedBy { get; set; }
 
         public string? CreatedById { get; set; }
+
+        [NotMapped] public bool Expired => Created < DateTime.UtcNow.AddDays(-14);
     }
 }
