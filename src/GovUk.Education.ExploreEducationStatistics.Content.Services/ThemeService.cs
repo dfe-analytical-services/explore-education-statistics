@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             _publicationRepository = publicationRepository;
         }
 
-        public async Task<IList<ThemeTree<PublicationTreeNode>>> GetPublicationTree()
+        public async Task<IList<ThemeTree>> GetPublicationTree()
         {
             var themes = await _contentDbContext.Themes
                 .Include(theme => theme.Topics)
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .ToListAsync();
         }
 
-        private async Task<ThemeTree<PublicationTreeNode>> BuildThemeTree(Theme theme)
+        private async Task<ThemeTree> BuildThemeTree(Theme theme)
         {
             var topics = await theme.Topics
                 .ToAsyncEnumerable()
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .OrderBy(topic => topic.Title)
                 .ToListAsync();
 
-            return new ThemeTree<PublicationTreeNode>
+            return new ThemeTree
             {
                 Id = theme.Id,
                 Title = theme.Title,
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             };
         }
 
-        private async Task<TopicTree<PublicationTreeNode>> BuildTopicTree(Topic topic)
+        private async Task<TopicTree> BuildTopicTree(Topic topic)
         {
             var publications = await topic.Publications
                 .ToAsyncEnumerable()
@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .OrderBy(publication => publication.Title)
                 .ToListAsync();
 
-            return new TopicTree<PublicationTreeNode>
+            return new TopicTree
             {
                 Id = topic.Id,
                 Title = topic.Title,

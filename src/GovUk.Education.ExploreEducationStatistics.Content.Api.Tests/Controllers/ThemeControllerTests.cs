@@ -17,11 +17,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 {
     public class ThemeControllerTests
     {
-        private static readonly List<ThemeTree<PublicationTreeNode>> Themes = new()
+        private static readonly List<ThemeTree> Themes = new()
         {
             new()
             {
-                Topics = new List<TopicTree<PublicationTreeNode>>
+                Topics = new List<TopicTree>
                 {
                     new()
                     {
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             var theme = Assert.Single(publicationTree);
 
-            Assert.IsType<ThemeTree<PublicationTreeNode>>(theme);
+            Assert.IsType<ThemeTree>(theme);
 
             var topic = Assert.Single(theme.Topics);
 

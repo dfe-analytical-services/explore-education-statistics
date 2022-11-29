@@ -23,10 +23,10 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetPublicationTree_NoCachedTreeExists()
     {
-        var publicationTree = ListOf(new ThemeTree<PublicationTreeNode>
+        var publicationTree = ListOf(new ThemeTree
         {
             Title = "Theme A",
-            Topics = new List<TopicTree<PublicationTreeNode>>
+            Topics = new List<TopicTree>
             {
                 new()
                 {
@@ -43,7 +43,7 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
         
         PublicBlobCacheService
             .Setup(s => s.GetItem(
-                new PublicationTreeCacheKey(), typeof(IList<ThemeTree<PublicationTreeNode>>)))
+                new PublicationTreeCacheKey(), typeof(IList<ThemeTree>)))
             .ReturnsAsync(null);
 
         var themeService = new Mock<IThemeService>(Strict);
@@ -70,10 +70,10 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetPublicationTree_CachedTreeExists()
     {
-        var publicationTree = new ThemeTree<PublicationTreeNode>
+        var publicationTree = new ThemeTree
         {
             Title = "Theme A",
-            Topics = new List<TopicTree<PublicationTreeNode>>
+            Topics = new List<TopicTree>
             {
                 new()
                 {
@@ -90,7 +90,7 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
         
         PublicBlobCacheService
             .Setup(s => s.GetItem(
-                new PublicationTreeCacheKey(), typeof(IList<ThemeTree<PublicationTreeNode>>)))
+                new PublicationTreeCacheKey(), typeof(IList<ThemeTree>)))
             .ReturnsAsync(ListOf(publicationTree));
 
         var service = BuildService();
@@ -106,10 +106,10 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetPublicationTree_FindStatistics_NonSupersededPublicationWithLiveRelease_Included()
     {
-        var publicationTree = new ThemeTree<PublicationTreeNode>
+        var publicationTree = new ThemeTree
         {
             Title = "Theme A",
-            Topics = new List<TopicTree<PublicationTreeNode>>
+            Topics = new List<TopicTree>
             {
                 new()
                 {
@@ -130,10 +130,10 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetPublicationTree_FindStatistics_NonSupersededPublicationWithLegacyRelease_Included()
     {
-        var publicationTree = new ThemeTree<PublicationTreeNode>
+        var publicationTree = new ThemeTree
         {
             Title = "Theme A",
-            Topics = new List<TopicTree<PublicationTreeNode>>
+            Topics = new List<TopicTree>
             {
                 new()
                 {
@@ -154,10 +154,10 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetPublicationTree_FindStatistics_SupersededPublicationWithLiveRelease_Excluded()
     {
-        var publicationTree = new ThemeTree<PublicationTreeNode>
+        var publicationTree = new ThemeTree
         {
             Title = "Theme A",
-            Topics = new List<TopicTree<PublicationTreeNode>>
+            Topics = new List<TopicTree>
             {
                 new()
                 {
@@ -178,10 +178,10 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetPublicationTree_FindStatistics_SupersededPublicationWithLegacyRelease_Excluded()
     {
-        var publicationTree = new ThemeTree<PublicationTreeNode>
+        var publicationTree = new ThemeTree
         {
             Title = "Theme A",
-            Topics = new List<TopicTree<PublicationTreeNode>>
+            Topics = new List<TopicTree>
             {
                 new()
                 {
@@ -202,10 +202,10 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetPublicationTree_DataCatalogue_SomeLiveReleaseHasData_Included()
     {
-        var publicationTree = new ThemeTree<PublicationTreeNode>
+        var publicationTree = new ThemeTree
         {
             Title = "Theme A",
-            Topics = new List<TopicTree<PublicationTreeNode>>
+            Topics = new List<TopicTree>
             {
                 new()
                 {
@@ -231,10 +231,10 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
             AnyLiveReleaseHasData = false
         };
         
-        var publicationTree = new ThemeTree<PublicationTreeNode>
+        var publicationTree = new ThemeTree
         {
             Title = "Theme A",
-            Topics = new List<TopicTree<PublicationTreeNode>>
+            Topics = new List<TopicTree>
             {
                 new()
                 {
@@ -250,10 +250,10 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetPublicationTree_DataTables_NonSupersededPublicationWithDataOnLatestRelease_Included()
     {
-        var publicationTree = new ThemeTree<PublicationTreeNode>
+        var publicationTree = new ThemeTree
         {
             Title = "Theme A",
-            Topics = new List<TopicTree<PublicationTreeNode>>
+            Topics = new List<TopicTree>
             {
                 new()
                 {
@@ -274,10 +274,10 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetPublicationTree_DataTables_SupersededPublicationWithDataOnLatestRelease_Excluded()
     {
-        var publicationTree = new ThemeTree<PublicationTreeNode>
+        var publicationTree = new ThemeTree
         {
             Title = "Theme A",
-            Topics = new List<TopicTree<PublicationTreeNode>>
+            Topics = new List<TopicTree>
             {
                 new()
                 {
@@ -298,10 +298,10 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetPublicationTree_DataTables_NonSupersededPublicationWithNoDataOnLatestRelease_Excluded()
     {
-        var publicationTree = new ThemeTree<PublicationTreeNode>
+        var publicationTree = new ThemeTree
         {
             Title = "Theme A",
-            Topics = new List<TopicTree<PublicationTreeNode>>
+            Topics = new List<TopicTree>
             {
                 new()
                 {
@@ -322,10 +322,10 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetPublicationTree_FastTrack_SomeLiveReleaseHasData_Included()
     {
-        var publicationTree = new ThemeTree<PublicationTreeNode>
+        var publicationTree = new ThemeTree
         {
             Title = "Theme A",
-            Topics = new List<TopicTree<PublicationTreeNode>>
+            Topics = new List<TopicTree>
             {
                 new()
                 {
@@ -351,10 +351,10 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
             AnyLiveReleaseHasData = false
         };
         
-        var publicationTree = new ThemeTree<PublicationTreeNode>
+        var publicationTree = new ThemeTree
         {
             Title = "Theme A",
-            Topics = new List<TopicTree<PublicationTreeNode>>
+            Topics = new List<TopicTree>
             {
                 new()
                 {
@@ -370,7 +370,7 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task UpdatePublicationTree()
     {
-        var publicationTree = ListOf(new ThemeTree<PublicationTreeNode>
+        var publicationTree = ListOf(new ThemeTree
         {
             Title = "Theme A",
         });
@@ -400,9 +400,9 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public void ThemeTree_SerializeAndDeserialize()
     {
-        var themeTree = new ThemeTree<PublicationTreeNode>
+        var themeTree = new ThemeTree
         {
-            Topics = new List<TopicTree<PublicationTreeNode>>
+            Topics = new List<TopicTree>
             {
                 new()
                 {
@@ -414,17 +414,17 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
             }
         };
 
-        var converted = DeserializeObject<ThemeTree<PublicationTreeNode>>(SerializeObject(themeTree));
+        var converted = DeserializeObject<ThemeTree>(SerializeObject(themeTree));
         converted.AssertDeepEqualTo(themeTree);
     }
 
     private static async Task AssertPublicationTreeUnfiltered(
-        ThemeTree<PublicationTreeNode> publicationTree,
+        ThemeTree publicationTree,
         PublicationTreeFilter filter)
     {
         PublicBlobCacheService
             .Setup(s => s.GetItem(
-                new PublicationTreeCacheKey(), typeof(IList<ThemeTree<PublicationTreeNode>>)))
+                new PublicationTreeCacheKey(), typeof(IList<ThemeTree>)))
             .ReturnsAsync(ListOf(publicationTree));
 
         var service = BuildService();
@@ -438,12 +438,12 @@ public class ThemeCacheServiceTests : CacheServiceTestFixture
     }
 
     private static async Task AssertPublicationTreeEmpty(
-        ThemeTree<PublicationTreeNode> publicationTree,
+        ThemeTree publicationTree,
         PublicationTreeFilter filter)
     {
         PublicBlobCacheService
             .Setup(s => s.GetItem(
-                new PublicationTreeCacheKey(), typeof(IList<ThemeTree<PublicationTreeNode>>)))
+                new PublicationTreeCacheKey(), typeof(IList<ThemeTree>)))
             .ReturnsAsync(ListOf(publicationTree));
 
         var service = BuildService();

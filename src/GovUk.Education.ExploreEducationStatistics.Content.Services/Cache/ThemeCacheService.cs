@@ -28,19 +28,19 @@ public class ThemeCacheService : IThemeCacheService
     }
 
     [BlobCache(typeof(PublicationTreeCacheKey), ServiceName = "public")]
-    private Task<IList<ThemeTree<PublicationTreeNode>>> GetFullPublicationTree()
+    private Task<IList<ThemeTree>> GetFullPublicationTree()
     {
         return _themeService.GetPublicationTree();
     }
 
     [BlobCache(typeof(PublicationTreeCacheKey), forceUpdate: true, ServiceName = "public")]
-    public Task<IList<ThemeTree<PublicationTreeNode>>> UpdatePublicationTree()
+    public Task<IList<ThemeTree>> UpdatePublicationTree()
     {
         _logger.LogInformation("Updating cached Publication Tree");
         return _themeService.GetPublicationTree();
     }
 
-    public async Task<Either<ActionResult, IList<ThemeTree<PublicationTreeNode>>>> GetPublicationTree(
+    public async Task<Either<ActionResult, IList<ThemeTree>>> GetPublicationTree(
         PublicationTreeFilter filter)
     {
         var fullPublicationTree = await GetFullPublicationTree();
@@ -53,8 +53,8 @@ public class ThemeCacheService : IThemeCacheService
             .ToListAsync();
     }
 
-    private async Task<ThemeTree<PublicationTreeNode>> FilterThemeTree(
-        ThemeTree<PublicationTreeNode> themeTree,
+    private async Task<ThemeTree> FilterThemeTree(
+        ThemeTree themeTree,
         PublicationTreeFilter filter)
     {
         var topics = await themeTree.Topics
@@ -64,7 +64,7 @@ public class ThemeCacheService : IThemeCacheService
             .OrderBy(topic => topic.Title)
             .ToListAsync();
 
-        return new ThemeTree<PublicationTreeNode>
+        return new ThemeTree
         {
             Id = themeTree.Id,
             Title = themeTree.Title,
@@ -73,8 +73,8 @@ public class ThemeCacheService : IThemeCacheService
         };
     }
 
-    private async Task<TopicTree<PublicationTreeNode>> FilterTopicTree(
-        TopicTree<PublicationTreeNode> topicTree,
+    private async Task<TopicTree> FilterTopicTree(
+        TopicTree topicTree,
         PublicationTreeFilter filter)
     {
         var publications = await topicTree.Publications
@@ -83,7 +83,7 @@ public class ThemeCacheService : IThemeCacheService
             .OrderBy(publication => publication.Title)
             .ToListAsync();
 
-        return new TopicTree<PublicationTreeNode>
+        return new TopicTree
         {
             Id = topicTree.Id,
             Title = topicTree.Title,

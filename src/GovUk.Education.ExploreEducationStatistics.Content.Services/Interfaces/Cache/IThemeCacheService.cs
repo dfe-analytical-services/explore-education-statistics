@@ -10,8 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 
 public interface IThemeCacheService
 {
-    Task<Either<ActionResult, IList<ThemeTree<PublicationTreeNode>>>> GetPublicationTree(
+    Task<Either<ActionResult, IList<ThemeTree>>> GetPublicationTree(
         PublicationTreeFilter filter);
     
-    Task<IList<ThemeTree<PublicationTreeNode>>> UpdatePublicationTree();
+    Task<IList<ThemeTree>> UpdatePublicationTree();
 }

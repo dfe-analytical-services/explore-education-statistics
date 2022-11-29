@@ -26,14 +26,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [HttpGet("themes")]
-        public async Task<ActionResult<IList<ThemeTree<PublicationTreeNode>>>> GetPublicationTree(
+        public async Task<ActionResult<IList<ThemeTree>>> GetPublicationTree(
             [FromQuery(Name = "publicationFilter")] PublicationTreeFilter? filter = null)
         {
             if (filter == null)
             {
                 return new BadRequestResult();
             }
-            
+
             return await _themeCacheService
                 .GetPublicationTree(filter.Value)
                 .HandleFailuresOrOk();
