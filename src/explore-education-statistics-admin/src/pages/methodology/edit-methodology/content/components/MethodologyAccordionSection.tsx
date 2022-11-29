@@ -127,6 +127,7 @@ const MethodologyAccordionSection = ({
   return (
     <EditableAccordionSection
       {...props}
+      anchorLinkIdPrefix={sectionKey}
       anchorLinkUrl={
         editingMode === 'preview'
           ? id => `${PublicAppUrl}/methodology/${currentMethodology.slug}#${id}`
