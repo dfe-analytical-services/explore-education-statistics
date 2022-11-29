@@ -8,13 +8,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
     
 public interface IUserInviteRepository
 {
-    Task<UserInvite> CreateIfNotExists(
+    Task<UserInvite> CreateOrUpdate(
         string email, 
         Role role, 
         Guid createdById, 
         DateTime? createdDate = null);
 
-    Task<UserInvite> CreateIfNotExists(
+    Task<UserInvite> CreateOrUpdate(
         string email, 
         string roleId, 
         Guid createdById, 

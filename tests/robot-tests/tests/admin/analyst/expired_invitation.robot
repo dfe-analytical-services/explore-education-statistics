@@ -11,6 +11,11 @@ Force Tags          Admin    Local    Dev
 
 *** Test Cases ***
 Check that the invite does not appear on the Invite Users page
+    user signs in as bau1
+    user navigates to admin frontend    %{ADMIN_URL}/administration/users
+    user waits until page contains    Active user accounts
+    user checks page does not contain    %{EXPIRED_INVITE_USER_EMAIL}
+    user closes the browser
 
 Login with an expired invite and assert that the user is redirected to the expired invite page
     user opens the browser    %{ADMIN_URL}

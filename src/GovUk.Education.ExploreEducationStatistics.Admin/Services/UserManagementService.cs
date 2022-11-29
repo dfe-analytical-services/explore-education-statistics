@@ -286,12 +286,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(InvalidUserRole);
                     }
 
-                    var userInvite = await _userInviteRepository.CreateIfNotExists(
+                    var userInvite = await _userInviteRepository.CreateOrUpdate(
                         email: sanitisedEmail,
                         roleId: roleId,
                         createdById: _userService.GetUserId(),
                         request.CreatedDate);
+                    
+                    // Clear out any pre-existing Release or Publication invites prior to adding
+                    // new ones.
+                    var existingReleaseInvites = _contentDbContext
+                        .UserReleaseInvites
+                        .Where(invite => invite.Email.ToLower() == sanitisedEmail);
+                    
+                    var existingPublicationInvites = _contentDbContext
+                        .UserPublicationInvites
+                        .Where(invite => invite.Email.ToLower() == sanitisedEmail);
 
+                    _contentDbContext.RemoveRange(existingReleaseInvites);
+                    _contentDbContext.RemoveRange(existingPublicationInvites);
+                    
                     foreach (var userReleaseRole in request.UserReleaseRoles)
                     {
                         await _userReleaseInviteRepository.Create(

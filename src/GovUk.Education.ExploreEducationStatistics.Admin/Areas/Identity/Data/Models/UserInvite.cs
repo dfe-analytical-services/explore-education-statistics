@@ -9,6 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.M
 {
     public class UserInvite
     {
+        public static int InviteExpiryDurationDays = 14;
+        
         [Key] public string Email { get; set; } = string.Empty;
 
         public bool Accepted { get; set; }
@@ -23,6 +25,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.M
 
         public string? CreatedById { get; set; }
 
-        [NotMapped] public bool Expired => Created < DateTime.UtcNow.AddDays(-14);
+        /// <remarks>
+        /// Note that this logic is also present in <see cref="UsersAndRolesDbContext.OnModelCreating"/>.
+        /// It is implemented there as well as EF is not able to translate this computed field for use in
+        /// a QueryFilter. 
+        /// </remarks>
+        [NotMapped] public bool Expired => !Accepted && 
+                                           Created < DateTime.UtcNow.AddDays(-InviteExpiryDurationDays);
     }
 }

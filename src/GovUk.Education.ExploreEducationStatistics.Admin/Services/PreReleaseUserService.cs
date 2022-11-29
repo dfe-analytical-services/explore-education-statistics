@@ -286,7 +286,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (user == null)
             {
                 return await CreateUserReleaseInvite(release, email)
-                    .OnSuccessDo(() => _userInviteRepository.CreateIfNotExists(
+                    .OnSuccessDo(() => _userInviteRepository.CreateOrUpdate(
                         email: email,
                         role: Role.PrereleaseUser,
                         createdById: _userService.GetUserId()))

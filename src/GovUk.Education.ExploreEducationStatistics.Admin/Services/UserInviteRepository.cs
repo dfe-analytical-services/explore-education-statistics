@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
@@ -19,16 +20,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _usersAndRolesDbContext = usersAndRolesDbContext;
         }
 
-        public async Task<UserInvite> CreateIfNotExists(
+        public async Task<UserInvite> CreateOrUpdate(
             string email, 
             Role role, 
             Guid createdById,
             DateTime? createdDate = null)
         {
-            return await CreateIfNotExists(email, role.GetEnumValue(), createdById, createdDate);
+            return await CreateOrUpdate(email, role.GetEnumValue(), createdById, createdDate);
         }
 
-        public async Task<UserInvite> CreateIfNotExists(
+        public async Task<UserInvite> CreateOrUpdate(
             string email, 
             string roleId, 
             Guid createdById,
@@ -41,24 +42,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             
             var existingInvite = await _usersAndRolesDbContext
                 .UserInvites
+                .IgnoreQueryFilters()
                 .AsQueryable()
                 .SingleOrDefaultAsync(i => i.Email.ToLower().Equals(email.ToLower()));
 
+            var inviteToPopulate = existingInvite ?? new UserInvite();
+            inviteToPopulate.Email = email.ToLower();
+            inviteToPopulate.RoleId = roleId;
+            inviteToPopulate.Created = createdDate ?? DateTime.UtcNow;
+            inviteToPopulate.CreatedById = createdById.ToString();
+
             if (existingInvite != null)
             {
-                return existingInvite;
+                _usersAndRolesDbContext.UserInvites.Update(inviteToPopulate);
+            }
+            else
+            {
+                await _usersAndRolesDbContext.UserInvites.AddAsync(inviteToPopulate);
             }
 
-            var newInvite = new UserInvite
-            {
-                Email = email.ToLower(),
-                RoleId = roleId,
-                Created = createdDate ?? DateTime.UtcNow,
-                CreatedById = createdById.ToString(),
-            };
-            await _usersAndRolesDbContext.AddAsync(newInvite);
             await _usersAndRolesDbContext.SaveChangesAsync();
-            return newInvite;
+            return inviteToPopulate;
         }
     }
 }
