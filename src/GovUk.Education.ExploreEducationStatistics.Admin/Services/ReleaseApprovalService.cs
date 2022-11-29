@@ -141,11 +141,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var userReleaseRoles =
                         await _userReleaseRoleService.ListUserReleaseRolesByPublication(ReleaseRole.Approver,
                             release.Publication.Id);
-                    
-                    
+
                     var userPublicationRoles = await _context.UserPublicationRoles
                         .Include(upr => upr.User)
-                        .Where(upr => upr.PublicationId == release.PublicationId && (upr.Role == PublicationRole.Owner || upr.Role == PublicationRole.ReleaseApprover))
+                        .Where(upr => upr.PublicationId == release.PublicationId &&  upr.Role == PublicationRole.ReleaseApprover)
                         .ToListAsync();
                     
                     var releaseStatus = new ReleaseStatus
