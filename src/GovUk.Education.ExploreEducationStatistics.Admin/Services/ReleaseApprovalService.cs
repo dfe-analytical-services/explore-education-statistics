@@ -137,17 +137,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var notifySubscribers = request.ApprovalStatus == ReleaseApprovalStatus.Approved &&
                         (!release.Amendment || request.NotifySubscribers.HasValue && request.NotifySubscribers.Value);
 
-
-                    var userReleaseRoles =
-                        await _userReleaseRoleService.ListUserReleaseRolesByPublication(ReleaseRole.Approver,
-                            release.Publication.Id);
-                    
-                    
-                    var userPublicationRoles = await _context.UserPublicationRoles
-                        .Include(upr => upr.User)
-                        .Where(upr => upr.PublicationId == release.PublicationId && (upr.Role == PublicationRole.Owner || upr.Role == PublicationRole.ReleaseApprover))
-                        .ToListAsync();
-                    
                     var releaseStatus = new ReleaseStatus
                     {
                         Release = release,
@@ -185,11 +174,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 case ReleaseApprovalStatus.Approved:
                                     await _preReleaseUserService.SendPreReleaseUserInviteEmails(release.Id);
                                     break;
-                                
+
                                 case ReleaseApprovalStatus.HigherLevelReview:
-                                    var notifyHigherReviewers = request.ApprovalStatus == ReleaseApprovalStatus.HigherLevelReview &&
-                                        userReleaseRoles.Any() || userPublicationRoles.Any();
-                                    
+                                    var userReleaseRoles =
+                                        await _userReleaseRoleService.ListUserReleaseRolesByPublication(
+                                            ReleaseRole.Approver,
+                                            release.Publication.Id);
+
+                                    var userPublicationRoles = await _context.UserPublicationRoles
+                                        .Include(upr => upr.User)
+                                        .Where(upr => upr.PublicationId == release.PublicationId
+                                                      && upr.Role == PublicationRole.ReleaseApprover)
+                                        .ToListAsync();
+
+                                    var notifyHigherReviewers = userReleaseRoles.Any() || userPublicationRoles.Any();
                                     if (notifyHigherReviewers)
                                     {
                                         userReleaseRoles.Select(urr => urr.User.Email)
@@ -202,7 +200,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     }
                                     break;
                             }
-                          
                         });
                 });
         }
