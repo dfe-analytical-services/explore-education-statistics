@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -16,7 +17,7 @@ public class PublishingCompletionService : IPublishingCompletionService
     private readonly IContentService _contentService;
     private readonly INotificationsService _notificationsService;
     private readonly IReleasePublishingStatusService _releasePublishingStatusService;
-    private readonly IPublicationService _publicationService;
+    private readonly IPublicationRepository _publicationRepository;
     private readonly IPublicationCacheService _publicationCacheService;
     private readonly IReleaseService _releaseService;
 
@@ -24,7 +25,7 @@ public class PublishingCompletionService : IPublishingCompletionService
         IContentService contentService,
         INotificationsService notificationsService,
         IReleasePublishingStatusService releasePublishingStatusService,
-        IPublicationService publicationService,
+        IPublicationRepository publicationRepository,
         IPublicationCacheService publicationCacheService,
         IReleaseService releaseService)
     {
@@ -34,7 +35,7 @@ public class PublishingCompletionService : IPublishingCompletionService
         _releasePublishingStatusService = releasePublishingStatusService;
         _publicationCacheService = publicationCacheService;
         _releaseService = releaseService;
-        _publicationService = publicationService;
+        _publicationRepository = publicationRepository;
     }
 
     public async Task CompletePublishingIfAllPriorStagesComplete(
@@ -90,7 +91,7 @@ public class PublishingCompletionService : IPublishingCompletionService
         
         await directlyRelatedPublicationIds
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(_publicationService.UpdateLatestPublishedRelease);
+            .ForEachAwaitAsync(_publicationRepository.UpdateLatestPublishedRelease);
         
         // Update the cached publication and any cached superseded publications.
         // If this is the first live release of the publication, the superseding is now enforced
