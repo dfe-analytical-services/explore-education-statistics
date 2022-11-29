@@ -72,7 +72,7 @@ const MethodologyAccordion = ({
       {methodology[sectionKey].map(section => (
         <MethodologyAccordionSection
           key={section.id}
-          id={`content-section-${kebabCase(section.heading)}`}
+          id={`${sectionKey}-section-${kebabCase(section.heading)}`}
           methodologyId={methodology.id}
           section={section}
           sectionKey={sectionKey}
