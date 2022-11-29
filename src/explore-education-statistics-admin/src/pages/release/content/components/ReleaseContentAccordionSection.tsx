@@ -89,7 +89,7 @@ const ReleaseContentAccordionSection = ({
         },
       });
     },
-    [actions, release.id, sectionId, sectionContent.length],
+    [actions, release.id, sectionId],
   );
 
   const attachDataBlock = useCallback(
@@ -243,21 +243,21 @@ const ReleaseContentAccordionSection = ({
               </ButtonGroup>
             </>
           )}
+          <Modal
+            title="Add embed block"
+            open={showEmbedDashboardForm}
+            onExit={toggleEmbedDashboardForm.off}
+          >
+            <EditableEmbedForm
+              onCancel={toggleEmbedDashboardForm.off}
+              onSubmit={async embedBlock => {
+                await addEmbedBlock(embedBlock);
+                toggleEmbedDashboardForm.off();
+              }}
+            />
+          </Modal>
         </>
       )}
-      <Modal
-        title="Add embed block"
-        open={showEmbedDashboardForm}
-        onExit={toggleEmbedDashboardForm.off}
-      >
-        <EditableEmbedForm
-          onCancel={toggleEmbedDashboardForm.off}
-          onSubmit={async embedBlock => {
-            await addEmbedBlock(embedBlock);
-            toggleEmbedDashboardForm.off();
-          }}
-        />
-      </Modal>
     </EditableAccordionSection>
   );
 };
