@@ -101,7 +101,7 @@ public class ProcessorStage1Tests
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
 
-        var transactionHelper = new InMemoryDatabaseHelper();
+        var transactionHelper = new InMemoryDatabaseHelper(dbContextSupplier);
         
         var dataImportService = new DataImportService(
             dbContextSupplier,
@@ -165,7 +165,7 @@ public class ProcessorStage1Tests
         
         await function.ProcessUploads(
             importMessage, 
-            null,
+            new ExecutionContext(),
             importStagesMessageQueue.Object,
             Mock.Of<ICollector<ImportObservationsMessage>>(Strict));
         

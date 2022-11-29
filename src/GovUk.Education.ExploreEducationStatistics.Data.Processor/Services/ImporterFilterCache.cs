@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
@@ -21,35 +20,33 @@ public class ImporterFilterCache
     };
     
     public FilterItem GetOrCacheFilterItem(
-        FilterGroup filterGroup, 
+        Guid filterGroupId, 
         string filterItemLabel, 
-        StatisticsDbContext context,
         Func<FilterItem> filterItemProvider)
     {
         return GetOrCreate(
-            GetFilterItemCacheKey(filterGroup, filterItemLabel, context), 
+            GetFilterItemCacheKey(filterGroupId, filterItemLabel), 
             filterItemProvider);
     }
     
     public FilterGroup GetOrCacheFilterGroup(
-        Filter filter, 
+        Guid filterId, 
         string filterGroupLabel, 
-        StatisticsDbContext context,
         Func<FilterGroup> filterGroupProvider)
     {
         return GetOrCreate(
-            GetFilterGroupCacheKey(filter, filterGroupLabel, context), 
+            GetFilterGroupCacheKey(filterId, filterGroupLabel), 
             filterGroupProvider);
     }
     
-    public void AddFilterGroup(FilterGroup filterGroup, StatisticsDbContext context)
+    public void AddFilterGroup(FilterGroup filterGroup)
     {
-        Set(GetFilterGroupCacheKey(filterGroup.Filter, filterGroup.Label, context), filterGroup);
+        Set(GetFilterGroupCacheKey(filterGroup.FilterId, filterGroup.Label), filterGroup);
     }
     
-    public void AddFilterItem(FilterItem filterItem, StatisticsDbContext context)
+    public void AddFilterItem(FilterItem filterItem)
     {
-        Set(GetFilterItemCacheKey(filterItem.FilterGroup, filterItem.Label, context), filterItem);
+        Set(GetFilterItemCacheKey(filterItem.FilterGroupId, filterItem.Label), filterItem);
     }
 
     private void Set<TItem>(object cacheKey, TItem cacheItem)
@@ -68,17 +65,17 @@ public class ImporterFilterCache
         });
     }
 
-    private static string GetFilterGroupCacheKey(Filter filter, string filterGroupLabel, StatisticsDbContext context)
+    private static string GetFilterGroupCacheKey(Guid filterId, string filterGroupLabel)
     {
         return nameof(FilterGroup) + "_" +
-               (filter.Id == null ? context.Entry(filter).Property(e => e.Id).CurrentValue : filter.Id) + "_" +
+               filterId + "_" +
                filterGroupLabel.ToLower().Replace(" ", "_");            
     }
 
-    private static string GetFilterItemCacheKey(FilterGroup filterGroup, string filterItemLabel, StatisticsDbContext context)
+    private static string GetFilterItemCacheKey(Guid filterGroupId, string filterItemLabel)
     {
         return nameof(FilterItem) + "_" +
-               (filterGroup.Id == null ? context.Entry(filterGroup).Property(e => e.Id).CurrentValue : filterGroup.Id) + "_" +
+               filterGroupId + "_" +
                filterItemLabel.ToLower().Replace(" ", "_");
     }
 }

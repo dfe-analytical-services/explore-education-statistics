@@ -26,6 +26,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
@@ -189,25 +190,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddDbContext<UsersAndRolesDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
+                        providerOptions =>
+                            providerOptions
+                                .MigrationsAssembly(typeof(Startup).Assembly.FullName)
+                                .EnableCustomRetryOnFailure()
+                            )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
             services.AddDbContext<ContentDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                        builder => { builder.MigrationsAssembly(typeof(Startup).Assembly.FullName); })
+                        providerOptions => 
+                            providerOptions
+                                .MigrationsAssembly(typeof(Startup).Assembly.FullName)
+                                .EnableCustomRetryOnFailure()
+                        )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
-                        builder =>
-                        {
-                            builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model");
-                            builder.AddBulkOperationSupport();
-                        })
+                        providerOptions =>
+                            providerOptions
+                                .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
+                                .AddBulkOperationSupport()
+                                .EnableCustomRetryOnFailure()
+                            )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 

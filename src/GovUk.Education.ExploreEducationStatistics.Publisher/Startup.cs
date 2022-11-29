@@ -2,6 +2,7 @@
 using System;
 using AutoMapper;
 using Azure.Storage.Blobs;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -50,11 +51,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
             builder.Services
                 .AddMemoryCache()
                 .AddDbContext<ContentDbContext>(options =>
-                    options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb")))
+                    options.UseSqlServer(
+                        ConnectionUtils.GetAzureSqlConnectionString("ContentDb"),
+                        providerOptions => providerOptions.EnableCustomRetryOnFailure()))
                 .AddDbContext<StatisticsDbContext>(options =>
-                    options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb")))
+                    options.UseSqlServer(
+                        ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb"),
+                        providerOptions => providerOptions.EnableCustomRetryOnFailure()))
                 .AddDbContext<PublicStatisticsDbContext>(options =>
-                    options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("PublicStatisticsDb")))
+                    options.UseSqlServer(
+                        ConnectionUtils.GetAzureSqlConnectionString("PublicStatisticsDb"),
+                        providerOptions => providerOptions.EnableCustomRetryOnFailure()))
                 .AddSingleton<IFileStorageService, FileStorageService>(provider =>
                     new FileStorageService(GetConfigurationValue(provider, "PublisherStorage")))
 

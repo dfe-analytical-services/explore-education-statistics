@@ -211,7 +211,7 @@ public class ProcessorStage2Tests
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
 
-        var transactionHelper = new InMemoryDatabaseHelper();
+        var transactionHelper = new InMemoryDatabaseHelper(dbContextSupplier);
         
         var dataImportService = new DataImportService(
             dbContextSupplier,
@@ -259,7 +259,7 @@ public class ProcessorStage2Tests
         
         await function.ProcessUploads(
             importMessage, 
-            null,
+            new ExecutionContext(),
             importStagesMessageQueue.Object,
             Mock.Of<ICollector<ImportObservationsMessage>>(Strict));
         
@@ -344,9 +344,8 @@ public class ProcessorStage2Tests
                     Assert.Equal(filterIndexPrefix + expectedFilterItemLabels, filterIndexPrefix + filterItemLabels);
 
                     var cachedFilterGroup = importerFilterCache.GetOrCacheFilterGroup(
-                        matchingFilter, 
+                        matchingFilter.Id, 
                         matchingFilterGroup.Label,
-                        statisticsDbContext,
                         () => null!);
                     
                     Assert.Equal(matchingFilterGroup.Id, cachedFilterGroup.Id);
@@ -358,9 +357,8 @@ public class ProcessorStage2Tests
                             .Single(f => f.Label == expectedFilterItem.Label);
 
                         var cachedFilterItem = importerFilterCache.GetOrCacheFilterItem(
-                            matchingFilterGroup, 
+                            matchingFilterGroup.Id, 
                             matchingFilterItem.Label,
-                            statisticsDbContext,
                             () => null!);
                         
                         Assert.Equal(matchingFilterItem.Id, cachedFilterItem.Id);

@@ -20,24 +20,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return LookupFilterItem(filterGroup, filterItemLabel, context);
         }
 
-        public FilterItem LookupFilterItem(FilterGroup filterGroup, string label, StatisticsDbContext context)
+        private FilterItem LookupFilterItem(FilterGroup filterGroup, string label, StatisticsDbContext context)
         {
             return _importerFilterCache.GetOrCacheFilterItem(
-                filterGroup, 
+                filterGroup.Id, 
                 label, 
-                context, 
                 () => context
                     .FilterItem
                     .AsNoTracking()
                     .First(fi => fi.FilterGroupId == filterGroup.Id && fi.Label == label));
         }
 
-        public FilterGroup LookupFilterGroup(Filter filter, string label, StatisticsDbContext context)
+        private FilterGroup LookupFilterGroup(Filter filter, string label, StatisticsDbContext context)
         {
             return _importerFilterCache.GetOrCacheFilterGroup(
-                filter, 
+                filter.Id, 
                 label, 
-                context, 
                 () => context
                     .FilterGroup
                     .AsNoTracking()

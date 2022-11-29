@@ -63,12 +63,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 var indicators = indicatorsAndMeta.Select(i => i.Indicator).ToList();
                 indicators.ForEach(indicator => indicator.Id = _guidGenerator.NewGuid());
 
-                await _databaseHelper.DoInTransaction(context, async () =>
-                {
-                    await context.Filter.AddRangeAsync(filters);
-                    await context.Indicator.AddRangeAsync(indicators);
-                    await context.SaveChangesAsync();
-                });
+                await _databaseHelper.DoInTransaction(
+                    context,
+                    async ctxDelegate =>
+                    {
+                        await ctxDelegate.Filter.AddRangeAsync(filters);
+                        await ctxDelegate.Indicator.AddRangeAsync(indicators);
+                        await ctxDelegate.SaveChangesAsync();
+                    });
             }
             
             return new SubjectMeta
@@ -121,14 +123,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 });
         }
 
-        public List<(Filter Filter, string Column, string FilterGroupingColumn)> ReadFiltersFromCsv(
+        private List<(Filter Filter, string Column, string FilterGroupingColumn)> ReadFiltersFromCsv(
             IEnumerable<MetaRow> metaRows, 
             Subject subject)
         {
             return metaRows
                 .Where(row => row.ColumnType == ColumnType.Filter)
                 .Select(filter => (
-                    filter: new Filter(filter.FilterHint, filter.Label, filter.ColumnName, subject),
+                    filter: new Filter(filter.FilterHint, filter.Label, filter.ColumnName, subject.Id),
                     column: filter.ColumnName,
                     filterGroupingColumn: filter.FilterGroupingColumn))
                 .ToList();
@@ -164,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .GroupBy(row => row.IndicatorGrouping)
                 .ToDictionary(
                     rows => rows.Key, 
-                    rows => new IndicatorGroup(rows.Key, subject));
+                    rows => new IndicatorGroup(rows.Key, subject.Id));
 
             return indicatorRows
                 .Select(row =>
