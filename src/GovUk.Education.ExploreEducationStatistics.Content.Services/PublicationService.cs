@@ -159,6 +159,13 @@ public class PublicationService : IPublicationService
         Publication publication,
         bool isSuperseded)
     {
+        var topic = new TopicViewModel(new ThemeViewModel(
+            publication.Topic.Theme.Id,
+            Slug: publication.Topic.Theme.Slug,
+            Title: publication.Topic.Theme.Title,
+            Summary: publication.Topic.Theme.Summary
+        ));
+
         return new PublicationCacheViewModel
         {
             Id = publication.Id,
@@ -168,7 +175,7 @@ public class PublicationService : IPublicationService
                 .OrderByDescending(legacyRelease => legacyRelease.Order)
                 .Select(legacyRelease => new LegacyReleaseViewModel(legacyRelease))
                 .ToList(),
-            Topic = new TopicViewModel(new ThemeViewModel(publication.Topic.Theme.Title)),
+            Topic = topic,
             Contact = new ContactViewModel(publication.Contact),
             ExternalMethodology = publication.ExternalMethodology != null
                 ? new ExternalMethodologyViewModel(publication.ExternalMethodology)
