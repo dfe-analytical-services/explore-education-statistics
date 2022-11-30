@@ -250,7 +250,7 @@ describe('LineChartBlock', () => {
             referenceLines: [
               {
                 label: 'hello',
-                position: 0,
+                position: 5,
               },
             ],
           },
@@ -259,7 +259,7 @@ describe('LineChartBlock', () => {
     );
 
     expect(
-      container.querySelector('.recharts-reference-line'),
+      container.querySelectorAll('.recharts-reference-line')[1],
     ).toHaveTextContent('hello');
   });
 

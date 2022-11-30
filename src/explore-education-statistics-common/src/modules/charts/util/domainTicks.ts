@@ -13,28 +13,39 @@ export interface DomainTicks {
   ticks?: (string | number)[];
 }
 
-function getNiceMaxValue(maxValue: number): number {
-  if (maxValue === 0) {
+/**
+ * Return a nice rounded number for the min and max axis values:
+ * Max:
+ * - round up to one significant figure and return the next 'nice' value (even or starting with 5), e.g.
+ *   - 222 rounded up to next s.f. is 300, return 400
+ *   - 367 rounded up to next s.f. is 400, return 400
+ *   - 429 rounded up to next s.f. is 500, return 500
+ * Min:
+ * - if it's positive return 0
+ * - if it's negative round down to one significant figure and return the next 'nice' value (even or starting with 5)
+ */
+function getNiceMinMaxValue(initialValue: number, isMin = false): number {
+  if (initialValue === 0 || (isMin && initialValue > 0)) {
     return 0;
   }
 
-  const maxIsLessThanOne = Math.abs(maxValue) < 1;
-  let max = maxValue;
-  if (maxIsLessThanOne) {
-    max = maxValue * 100;
-  }
+  const valueIsLessThanOne = Math.abs(initialValue) < 1;
+  const value = valueIsLessThanOne ? initialValue * 100 : initialValue;
+  const numberOf0s = 10 ** Math.floor(Math.log10(Math.abs(value)));
 
-  const numberOf0s = 10 ** Math.floor(Math.log10(Math.abs(max)));
-  const maxReducedToLessThan10 = Math.ceil(max / numberOf0s);
+  // round up for max and down for min
+  const roundedAndReducedToLessThan10 = !isMin
+    ? Math.ceil(value / numberOf0s)
+    : Math.floor(value / numberOf0s);
 
-  if (maxReducedToLessThan10 % 2 && maxReducedToLessThan10 % 5) {
-    return maxIsLessThanOne
-      ? ((maxReducedToLessThan10 + 1) * numberOf0s) / 100
-      : (maxReducedToLessThan10 + 1) * numberOf0s;
-  }
-  return maxIsLessThanOne
-    ? (maxReducedToLessThan10 * numberOf0s) / 100
-    : maxReducedToLessThan10 * numberOf0s;
+  // adjust up by 1 for max and down for min
+  const adjustBy = isMin ? -1 : 1;
+
+  const rounded =
+    roundedAndReducedToLessThan10 % 2 && roundedAndReducedToLessThan10 % 5
+      ? (roundedAndReducedToLessThan10 + adjustBy) * numberOf0s
+      : roundedAndReducedToLessThan10 * numberOf0s;
+  return valueIsLessThanOne ? rounded / 100 : rounded;
 }
 
 function calculateMinorTicks(
@@ -54,7 +65,7 @@ function calculateMinorTicks(
   }
 
   if (config === 'custom') {
-    const minimumSpacingValue = getNiceMaxValue(
+    const minimumSpacingValue = getNiceMinMaxValue(
       Math.floor((Number(max) - Number(min)) / 100),
     );
 
@@ -134,8 +145,8 @@ export function calculateMinorAxisDomainValues(
   );
 
   return {
-    min: parseNumber(axis.min) ?? (min >= 0 ? 0 : min),
-    max: parseNumber(axis.max) ?? getNiceMaxValue(max),
+    min: parseNumber(axis.min) ?? getNiceMinMaxValue(min, true),
+    max: parseNumber(axis.max) ?? getNiceMinMaxValue(max),
   };
 }
 
@@ -180,6 +191,5 @@ export function getMajorAxisDomainTicks(
     max,
     axis.tickSpacing,
   );
-
   return { domain, ticks };
 }
