@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     subject.Id,
                     new List<Guid>(),
                     query.Indicators))
-                .Returns(Enumerable.Empty<Footnote>());
+                .ReturnsAsync(new List<Footnote>());
 
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
@@ -318,7 +318,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     subject.Id,
                     new List<Guid>(),
                     query.Indicators))
-                .Returns(Enumerable.Empty<Footnote>());
+                .ReturnsAsync(new List<Footnote>());
 
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
@@ -541,7 +541,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     subject.Id,
                     new List<Guid>(),
                     query.Indicators))
-                .Returns(Enumerable.Empty<Footnote>());
+                .ReturnsAsync(new List<Footnote>());
 
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
@@ -779,7 +779,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     subject.Id,
                     new List<Guid>(),
                     query.Indicators))
-                .Returns(Enumerable.Empty<Footnote>());
+                .ReturnsAsync(new List<Footnote>());
 
             geoJsonRepository.Setup(s => s.FindByBoundaryLevelAndCodes(
                     query.BoundaryLevel.Value,

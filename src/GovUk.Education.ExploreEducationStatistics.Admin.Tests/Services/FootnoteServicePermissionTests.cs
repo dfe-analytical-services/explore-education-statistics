@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -5,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -110,8 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService,
                 dataBlockService,
                 footnoteService,
-                footnoteHelper,
-                guidGenerator
+                footnoteHelper
                 ) = Mocks();
 
             using var context = InMemoryStatisticsDbContext();
@@ -121,8 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService.Object,
                 dataBlockService.Object,
                 footnoteService.Object,
-                footnoteHelper.Object,
-                guidGenerator.Object
+                footnoteHelper.Object
             );
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, Release, userService, service, policies);
@@ -134,8 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IUserService>,
             Mock<IDataBlockService>,
             Mock<IFootnoteRepository>,
-            Mock<IPersistenceHelper<StatisticsDbContext>>,
-            Mock<IGuidGenerator>) Mocks()
+            Mock<IPersistenceHelper<StatisticsDbContext>>) Mocks()
         {
             var contentPersistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
             MockUtils.SetupCall(contentPersistenceHelper, Release.Id, Release);
@@ -146,8 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IUserService>(),
                 new Mock<IDataBlockService>(),
                 new Mock<IFootnoteRepository>(),
-                MockUtils.MockPersistenceHelper<StatisticsDbContext, Footnote>(Footnote.Id, Footnote),
-                new Mock<IGuidGenerator>());
+                MockUtils.MockPersistenceHelper<StatisticsDbContext, Footnote>(Footnote.Id, Footnote));
         }
     }
 }

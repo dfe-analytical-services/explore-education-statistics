@@ -1,27 +1,31 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces
 {
     public interface IFootnoteRepository
     {
-        IEnumerable<Footnote> GetFilteredFootnotes(
+        Task<Footnote> CreateFootnote(
+            Guid releaseId,
+            string content,
+            IReadOnlyCollection<Guid> filterIds,
+            IReadOnlyCollection<Guid> filterGroupIds,
+            IReadOnlyCollection<Guid> filterItemIds,
+            IReadOnlyCollection<Guid> indicatorIds,
+            IReadOnlyCollection<Guid> subjectIds);
+
+        Task<List<Footnote>> GetFilteredFootnotes(
             Guid releaseId,
             Guid subjectId,
             IEnumerable<Guid> filterItemIds,
             IEnumerable<Guid> indicatorIds
         );
 
-        Task<Footnote> GetFootnote(Guid id);
+        Task<Footnote> GetFootnote(Guid footnoteId);
 
-        IEnumerable<Footnote> GetFootnotes(Guid releaseId);
-
-        IEnumerable<Footnote> GetFootnotes(Guid releaseId, Guid subjectId);
-
-        IEnumerable<Footnote> GetFootnotes(Guid releaseId, IEnumerable<Guid> subjectIds);
+        Task<List<Footnote>> GetFootnotes(Guid releaseId, Guid? subjectId = null);
 
         Task<IList<Subject>> GetSubjectsWithNoFootnotes(Guid releaseId);
 

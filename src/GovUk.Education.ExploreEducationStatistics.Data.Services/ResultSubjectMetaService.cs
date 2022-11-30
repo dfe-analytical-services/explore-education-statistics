@@ -101,8 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var footnoteViewModels =
-                        GetFilteredFootnoteViewModels(releaseId, filterItems.Select(fi => fi.Id).ToList(), query);
+                    var footnoteViewModels = await GetFilteredFootnoteViewModels(releaseId, filterItems.Select(fi => fi.Id).ToList(), query);
                     _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
@@ -176,18 +175,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return IndicatorsViewModelBuilder.BuildIndicators(indicators, indicatorsOrdering);
         }
 
-        private List<FootnoteViewModel> GetFilteredFootnoteViewModels(
+        private async Task<List<FootnoteViewModel>> GetFilteredFootnoteViewModels(
             Guid releaseId,
             IEnumerable<Guid> filterItemIds,
             ObservationQueryContext queryContext)
         {
-            return _footnoteRepository
-                .GetFilteredFootnotes(releaseId, queryContext.SubjectId, filterItemIds, queryContext.Indicators)
-                .Select(footnote => new FootnoteViewModel
-                {
-                    Id = footnote.Id,
-                    Label = footnote.Content
-                })
+            var footnotes = await _footnoteRepository
+                .GetFilteredFootnotes(releaseId, queryContext.SubjectId, filterItemIds, queryContext.Indicators);
+
+            return footnotes
+                .Select(footnote => new FootnoteViewModel(footnote.Id, footnote.Content))
                 .ToList();
         }
 

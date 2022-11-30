@@ -110,7 +110,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                 .OnSuccess(async subjects =>
                 {
                     var subjectMetaViewModels = await subjects
-                        .SelectAsync(async subject =>
+                        .ToAsyncEnumerable()
+                        .SelectAwait(async subject =>
                             new FootnotesSubjectMetaViewModel
                             {
                                 Filters = await GetFilters(subject.Id),
@@ -118,7 +119,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                 SubjectId = subject.Id,
                                 SubjectName = (await _releaseDataFileRepository.GetBySubject(releaseId, subject.Id)).Name,
                             }
-                        );
+                        )
+                        .ToListAsync();
 
                     return new FootnotesMetaViewModel
                     {

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -21,17 +22,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<Footnote>>> CopyFootnotes(Guid sourceReleaseId, Guid destinationReleaseId);
 
-        Task<Either<ActionResult, Unit>> DeleteFootnote(Guid releaseId, Guid id);
+        Task<Either<ActionResult, Unit>> DeleteFootnote(Guid releaseId, Guid footnoteId);
 
-        Task<Either<ActionResult, Footnote>> GetFootnote(Guid releaseId, Guid id);
+        Task<Either<ActionResult, Footnote>> GetFootnote(Guid releaseId, Guid footnoteId);
 
-        Task<Either<ActionResult, IEnumerable<Footnote>>> GetFootnotes(Guid releaseId);
-
-        IEnumerable<Footnote> GetFootnotes(Guid releaseId, Guid subjectId);
+        Task<Either<ActionResult, List<Footnote>>> GetFootnotes(Guid releaseId);
 
         Task<Either<ActionResult, Footnote>> UpdateFootnote(
             Guid releaseId,
-            Guid id,
+            Guid footnoteId,
             string content,
             IReadOnlyCollection<Guid> filterIds,
             IReadOnlyCollection<Guid> filterGroupIds,

@@ -84,11 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 },
                 Footnotes = new List<FootnoteViewModel>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "footnote"
-                    }
+                    new(Guid.NewGuid(), "footnote")
                 },
                 Indicators = new List<IndicatorMetaViewModel>
                 {

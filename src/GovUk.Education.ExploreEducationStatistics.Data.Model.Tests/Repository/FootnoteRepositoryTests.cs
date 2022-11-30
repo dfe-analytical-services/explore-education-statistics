@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,32 +34,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 Content = "Test footnote",
                 Releases = new List<ReleaseFootnote>
                 {
-                    new ReleaseFootnote
+                    new()
                     {
                         Release = release
                     },
                 },
                 Subjects = new List<SubjectFootnote>
                 {
-                    new SubjectFootnote
+                    new()
                     {
                         Subject = releaseSubject1.Subject
                     },
-                    new SubjectFootnote
+                    new()
                     {
                         Subject = releaseSubject2.Subject
                     },
                 },
                 Filters = new List<FilterFootnote>
                 {
-                    new FilterFootnote
+                    new()
                     {
                         Filter = new Filter
                         {
                             Subject = releaseSubject1.Subject
                         }
                     },
-                    new FilterFootnote
+                    new()
                     {
                         Filter = new Filter
                         {
@@ -68,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 },
                 FilterGroups = new List<FilterGroupFootnote>
                 {
-                    new FilterGroupFootnote
+                    new()
                     {
                         FilterGroup = new FilterGroup
                         {
@@ -78,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                             }
                         }
                     },
-                    new FilterGroupFootnote
+                    new()
                     {
                         FilterGroup = new FilterGroup
                         {
@@ -91,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 },
                 FilterItems = new List<FilterItemFootnote>
                 {
-                    new FilterItemFootnote
+                    new()
                     {
                         FilterItem = new FilterItem
                         {
@@ -104,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                             }
                         }
                     },
-                    new FilterItemFootnote
+                    new()
                     {
                         FilterItem = new FilterItem
                         {
@@ -120,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 },
                 Indicators = new List<IndicatorFootnote>
                 {
-                    new IndicatorFootnote
+                    new()
                     {
                         Indicator = new Indicator
                         {
@@ -130,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                             }
                         }
                     },
-                    new IndicatorFootnote
+                    new()
                     {
                         Indicator = new Indicator
                         {
@@ -156,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
-                var results = repository.GetFootnotes(release.Id).ToList();
+                var results = await repository.GetFootnotes(release.Id);
 
                 Assert.Single(results);
 
@@ -222,20 +223,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 Content = "Test footnote 1",
                 Releases = new List<ReleaseFootnote>
                 {
-                    new ReleaseFootnote
+                    new()
                     {
                         Release = release
                     },
                     // Check that footnote is still fetched
                     // even if it also linked to another release
-                    new ReleaseFootnote
+                    new()
                     {
                         Release = otherRelease
                     }
                 },
                 Subjects = new List<SubjectFootnote>
                 {
-                    new SubjectFootnote
+                    new()
                     {
                         Subject = releaseSubject1.Subject
                     }
@@ -247,14 +248,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 Content = "Test footnote 2",
                 Releases = new List<ReleaseFootnote>
                 {
-                    new ReleaseFootnote
+                    new()
                     {
                         Release = release
                     },
                 },
                 Subjects = new List<SubjectFootnote>
                 {
-                    new SubjectFootnote
+                    new()
                     {
                         Subject = releaseSubject2.Subject
                     }
@@ -266,14 +267,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 Content = "Test footnote for other release",
                 Releases = new List<ReleaseFootnote>
                 {
-                    new ReleaseFootnote
+                    new()
                     {
                         Release = new Release()
                     },
                 },
                 Subjects = new List<SubjectFootnote>
                 {
-                    new SubjectFootnote
+                    new()
                     {
                         Subject = new Subject()
                     }
@@ -293,7 +294,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
-                var results = repository.GetFootnotes(release.Id).ToList();
+                var results = await repository.GetFootnotes(release.Id);
 
                 Assert.Equal(2, results.Count);
 
@@ -344,14 +345,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 Content = "Test footnote 1",
                 Releases = new List<ReleaseFootnote>
                 {
-                    new ReleaseFootnote
+                    new()
                     {
                         Release = release
                     },
                 },
                 Subjects = new List<SubjectFootnote>
                 {
-                    new SubjectFootnote
+                    new()
                     {
                         Subject = releaseSubject1.Subject
                     }
@@ -363,14 +364,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 Content = "Test footnote 2",
                 Releases = new List<ReleaseFootnote>
                 {
-                    new ReleaseFootnote
+                    new()
                     {
                         Release = release
                     },
                 },
                 Subjects = new List<SubjectFootnote>
                 {
-                    new SubjectFootnote
+                    new()
                     {
                         Subject = releaseSubject2.Subject
                     }
@@ -390,116 +391,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
-                var results = repository.GetFootnotes(release.Id, releaseSubject2.SubjectId).ToList();
+                var results = await repository.GetFootnotes(release.Id, releaseSubject2.SubjectId);
 
                 Assert.Single(results);
                 Assert.Equal("Test footnote 2", results[0].Content);
-            }
-        }
-
-        [Fact]
-        public async Task GetFootnotes_FiltersBySubjectIds()
-        {
-            var release = new Release();
-
-            var releaseSubject1 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
-
-            var releaseSubject2 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
-
-            var releaseSubject3 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
-
-            var footnote1 = new Footnote
-            {
-                Content = "Test footnote 1",
-                Releases = new List<ReleaseFootnote>
-                {
-                    new ReleaseFootnote
-                    {
-                        Release = release
-                    },
-                },
-                Subjects = new List<SubjectFootnote>
-                {
-                    new SubjectFootnote
-                    {
-                        Subject = releaseSubject1.Subject
-                    }
-                },
-            };
-
-            var footnote2 = new Footnote
-            {
-                Content = "Test footnote 2",
-                Releases = new List<ReleaseFootnote>
-                {
-                    new ReleaseFootnote
-                    {
-                        Release = release
-                    },
-                },
-                Subjects = new List<SubjectFootnote>
-                {
-                    new SubjectFootnote
-                    {
-                        Subject = releaseSubject2.Subject
-                    }
-                },
-            };
-
-            var footnote3 = new Footnote
-            {
-                Content = "Test footnote 3",
-                Releases = new List<ReleaseFootnote>
-                {
-                    new ReleaseFootnote
-                    {
-                        Release = release
-                    },
-                },
-                Subjects = new List<SubjectFootnote>
-                {
-                    new SubjectFootnote
-                    {
-                        Subject = releaseSubject3.Subject
-                    }
-                },
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryStatisticsDbContext(contextId))
-            {
-                await context.AddAsync(release);
-                await context.AddRangeAsync(releaseSubject1, releaseSubject2, releaseSubject3);
-                await context.AddRangeAsync(footnote1, footnote2, footnote3);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryStatisticsDbContext(contextId))
-            {
-                var repository = BuildFootnoteRepository(context);
-                var results = repository.GetFootnotes(
-                        release.Id,
-                        new List<Guid> {releaseSubject1.SubjectId, releaseSubject3.SubjectId}
-                    )
-                    .ToList();
-
-                Assert.Equal(2, results.Count);
-
-                Assert.Equal("Test footnote 1", results[0].Content);
-                Assert.Equal("Test footnote 3", results[1].Content);
             }
         }
 
@@ -526,36 +421,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 Content = "Test footnote",
                 Releases = new List<ReleaseFootnote>
                 {
-                    new ReleaseFootnote
+                    new()
                     {
                         Release = release
                     },
-                    new ReleaseFootnote
+                    new()
                     {
                         Release = otherRelease
                     }
                 },
                 Subjects = new List<SubjectFootnote>
                 {
-                    new SubjectFootnote
+                    new()
                     {
                         Subject = releaseSubject.Subject
                     },
-                    new SubjectFootnote
+                    new()
                     {
                         Subject = otherReleaseSubject.Subject
                     },
                 },
                 Filters = new List<FilterFootnote>
                 {
-                    new FilterFootnote
+                    new()
                     {
                         Filter = new Filter
                         {
                             Subject = releaseSubject.Subject
                         }
                     },
-                    new FilterFootnote
+                    new()
                     {
                         Filter = new Filter
                         {
@@ -565,7 +460,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 },
                 FilterGroups = new List<FilterGroupFootnote>
                 {
-                    new FilterGroupFootnote
+                    new()
                     {
                         FilterGroup = new FilterGroup
                         {
@@ -575,7 +470,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                             }
                         }
                     },
-                    new FilterGroupFootnote
+                    new()
                     {
                         FilterGroup = new FilterGroup
                         {
@@ -588,7 +483,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 },
                 FilterItems = new List<FilterItemFootnote>
                 {
-                    new FilterItemFootnote
+                    new()
                     {
                         FilterItem = new FilterItem
                         {
@@ -601,7 +496,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                             }
                         }
                     },
-                    new FilterItemFootnote
+                    new()
                     {
                         FilterItem = new FilterItem
                         {
@@ -617,7 +512,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 },
                 Indicators = new List<IndicatorFootnote>
                 {
-                    new IndicatorFootnote
+                    new()
                     {
                         Indicator = new Indicator
                         {
@@ -627,7 +522,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                             }
                         }
                     },
-                    new IndicatorFootnote
+                    new()
                     {
                         Indicator = new Indicator
                         {
@@ -653,7 +548,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
-                var results = repository.GetFootnotes(release.Id, releaseSubject.SubjectId).ToList();
+                var results = await repository.GetFootnotes(release.Id, releaseSubject.SubjectId);
 
                 Assert.Single(results);
                 Assert.Equal("Test footnote", results[0].Content);
@@ -731,14 +626,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 Content = "Test footnote 1",
                 Releases = new List<ReleaseFootnote>
                 {
-                    new ReleaseFootnote
+                    new()
                     {
                         Release = release
                     },
                 },
                 Subjects = new List<SubjectFootnote>
                 {
-                    new SubjectFootnote
+                    new()
                     {
                         Subject = releaseSubject1.Subject,
                     }
@@ -749,14 +644,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 Content = "Test footnote 2",
                 Releases = new List<ReleaseFootnote>
                 {
-                    new ReleaseFootnote
+                    new()
                     {
                         Release = release
                     },
                 },
                 Filters = new List<FilterFootnote>
                 {
-                    new FilterFootnote
+                    new()
                     {
                         Filter = new Filter
                         {
@@ -770,14 +665,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 Content = "Test footnote 3",
                 Releases = new List<ReleaseFootnote>
                 {
-                    new ReleaseFootnote
+                    new()
                     {
                         Release = release
                     },
                 },
                 FilterGroups = new List<FilterGroupFootnote>
                 {
-                    new FilterGroupFootnote
+                    new()
                     {
                         FilterGroup = new FilterGroup
                         {
@@ -794,14 +689,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 Content = "Test footnote 4",
                 Releases = new List<ReleaseFootnote>
                 {
-                    new ReleaseFootnote
+                    new()
                     {
                         Release = release
                     },
                 },
                 FilterItems = new List<FilterItemFootnote>
                 {
-                    new FilterItemFootnote
+                    new()
                     {
                         FilterItem = new FilterItem
                         {
@@ -821,14 +716,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 Content = "Test footnote 5",
                 Releases = new List<ReleaseFootnote>
                 {
-                    new ReleaseFootnote
+                    new()
                     {
                         Release = release
                     },
                 },
                 Indicators = new List<IndicatorFootnote>
                 {
-                    new IndicatorFootnote
+                    new()
                     {
                         Indicator = new Indicator
                         {
@@ -910,21 +805,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 Content = "Test footnote 1",
                 Releases = new List<ReleaseFootnote>
                 {
-                    new ReleaseFootnote
+                    new()
                     {
                         Release = release
                     },
                 },
                 Subjects = new List<SubjectFootnote>
                 {
-                    new SubjectFootnote
+                    new()
                     {
                         Subject = releaseSubject1.Subject,
                     }
                 },
                 Filters = new List<FilterFootnote>
                 {
-                    new FilterFootnote
+                    new()
                     {
                         Filter = new Filter
                         {
@@ -934,7 +829,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 },
                 FilterGroups = new List<FilterGroupFootnote>
                 {
-                    new FilterGroupFootnote
+                    new()
                     {
                         FilterGroup = new FilterGroup
                         {
@@ -947,7 +842,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 },
                 FilterItems = new List<FilterItemFootnote>
                 {
-                    new FilterItemFootnote
+                    new()
                     {
                         FilterItem = new FilterItem
                         {
@@ -963,7 +858,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 },
                 Indicators = new List<IndicatorFootnote>
                 {
-                    new IndicatorFootnote
+                    new()
                     {
                         Indicator = new Indicator
                         {

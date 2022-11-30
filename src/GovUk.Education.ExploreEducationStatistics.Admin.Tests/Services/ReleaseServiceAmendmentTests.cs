@@ -719,6 +719,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseFileService? releaseFileService = null,
             IDataImportService? dataImportService = null,
             IFootnoteService? footnoteService = null,
+            IFootnoteRepository? footnoteRepository = null,
             IDataBlockService? dataBlockService = null,
             IReleaseSubjectRepository? releaseSubjectRepository = null,
             IGuidGenerator? guidGenerator = null)
@@ -735,6 +736,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
                 dataImportService ?? Mock.Of<IDataImportService>(Strict),
                 footnoteService ?? Mock.Of<IFootnoteService>(Strict),
+                footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict),
                 statisticsDbContext,
                 dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
                 releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),

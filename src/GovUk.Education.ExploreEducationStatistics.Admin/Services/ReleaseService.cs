@@ -49,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseFileService _releaseFileService;
         private readonly IDataImportService _dataImportService;
         private readonly IFootnoteService _footnoteService;
+        private readonly IFootnoteRepository _footnoteRepository;
         private readonly IDataBlockService _dataBlockService;
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly IGuidGenerator _guidGenerator;
@@ -68,6 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseFileService releaseFileService,
             IDataImportService dataImportService,
             IFootnoteService footnoteService,
+            IFootnoteRepository footnoteRepository,
             StatisticsDbContext statisticsDbContext,
             IDataBlockService dataBlockService,
             IReleaseSubjectRepository releaseSubjectRepository,
@@ -85,6 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseFileService = releaseFileService;
             _dataImportService = dataImportService;
             _footnoteService = footnoteService;
+            _footnoteRepository = footnoteRepository;
             _statisticsDbContext = statisticsDbContext;
             _dataBlockService = dataBlockService;
             _releaseSubjectRepository = releaseSubjectRepository;
@@ -155,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanDeleteRelease)
-                .OnSuccess(release =>
+                .OnSuccess(_ =>
                 {
                     var methodologiesScheduledWithRelease =
                         GetMethodologiesScheduledWithRelease(releaseId)
@@ -457,7 +460,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     var footnotes = subject == null
                         ? new List<Footnote>()
-                        : _footnoteService.GetFootnotes(releaseId, subject.Id);
+                        : await _footnoteRepository.GetFootnotes(releaseId, subject.Id);
 
                     return new DeleteDataFilePlan
                     {

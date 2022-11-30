@@ -81,12 +81,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 It.IsAny<IReadOnlyCollection<Guid>>(),
                 It.IsAny<IReadOnlyCollection<Guid>>())).Returns(updateFootnoteResult);
 
-            var footnotes = Task.FromResult(new Either<ActionResult, IEnumerable<Footnote>>(new List<Footnote>
-            {
-                footnote
-            }));
-
-            footnoteService.Setup(s => s.GetFootnotes(ReleaseId)).Returns(footnotes);
+            footnoteService.Setup(s => s.GetFootnotes(ReleaseId))
+                .ReturnsAsync(new List<Footnote>
+                {
+                    footnote
+                });
 
             footnoteService.Setup(s => s.DeleteFootnote(ReleaseId, FootnoteId)).ReturnsAsync(Unit.Instance);
 
