@@ -28,11 +28,11 @@ public class ThemeService : IThemeService
                         (publication.SupersededById == null ||
                          !publication.SupersededBy!.LatestPublishedReleaseId.HasValue))))
             .OrderBy(theme => theme.Title)
-            .Select(theme => new ThemeViewModel
-            {
-                Id = theme.Id,
-                Slug = theme.Slug,
-                Title = theme.Title
-            }).ToListAsync();
+            .Select(theme => new ThemeViewModel(
+                theme.Id,
+                theme.Slug,
+                theme.Title,
+                theme.Summary
+            )).ToListAsync();
     }
 }

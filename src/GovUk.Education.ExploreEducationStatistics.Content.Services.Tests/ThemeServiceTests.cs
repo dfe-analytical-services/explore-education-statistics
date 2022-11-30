@@ -20,6 +20,7 @@ public class ThemeServiceTests
             {
                 Slug = "theme-c",
                 Title = "Theme C",
+                Summary = "Theme C summary",
                 Topics = new List<Topic>
                 {
                     new()
@@ -38,6 +39,7 @@ public class ThemeServiceTests
             {
                 Slug = "theme-a",
                 Title = "Theme A",
+                Summary = "Theme A summary",
                 Topics = new List<Topic>
                 {
                     new()
@@ -56,6 +58,7 @@ public class ThemeServiceTests
             {
                 Slug = "theme-b",
                 Title = "Theme B",
+                Summary = "Theme B summary",
                 Topics = new List<Topic>
                 {
                     new()
@@ -90,14 +93,17 @@ public class ThemeServiceTests
             Assert.Equal(themes[1].Id, result[0].Id);
             Assert.Equal("theme-a", result[0].Slug);
             Assert.Equal("Theme A", result[0].Title);
+            Assert.Equal("Theme A summary", result[0].Summary);
 
             Assert.Equal(themes[2].Id, result[1].Id);
             Assert.Equal("theme-b", result[1].Slug);
             Assert.Equal("Theme B", result[1].Title);
+            Assert.Equal("Theme B summary", result[1].Summary);
 
             Assert.Equal(themes[0].Id, result[2].Id);
             Assert.Equal("theme-c", result[2].Slug);
             Assert.Equal("Theme C", result[2].Title);
+            Assert.Equal("Theme C summary", result[2].Summary);
         }
     }
 

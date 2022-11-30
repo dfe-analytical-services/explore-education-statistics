@@ -61,12 +61,12 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
                 Title = ""
             }
         },
-        Topic = new TopicViewModel(new ThemeViewModel
-        {
-            Id = Guid.NewGuid(),
-            Slug = "",
-            Title = ""
-        })
+        Topic = new TopicViewModel(new ThemeViewModel(
+            Guid.NewGuid(),
+            Slug: "",
+            Title: "",
+            Summary: ""
+        ))
     };
 
     [Fact]

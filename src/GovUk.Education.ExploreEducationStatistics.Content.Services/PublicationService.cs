@@ -159,12 +159,12 @@ public class PublicationService : IPublicationService
         Publication publication,
         bool isSuperseded)
     {
-        var topic = new TopicViewModel(new ThemeViewModel
-        {
-            Id = publication.Topic.Theme.Id,
-            Slug = publication.Topic.Theme.Slug,
-            Title = publication.Topic.Theme.Title
-        });
+        var topic = new TopicViewModel(new ThemeViewModel(
+            publication.Topic.Theme.Id,
+            Slug: publication.Topic.Theme.Slug,
+            Title: publication.Topic.Theme.Title,
+            Summary: publication.Topic.Theme.Summary
+        ));
 
         return new PublicationCacheViewModel
         {

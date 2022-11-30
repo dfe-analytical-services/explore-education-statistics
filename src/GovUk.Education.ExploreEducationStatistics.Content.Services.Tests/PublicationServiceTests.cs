@@ -92,6 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     {
                         Title = "Test theme",
                         Slug = "test-theme",
+                        Summary = "Test theme summary"
                     }
                 },
                 Contact = new Contact
@@ -148,6 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(publication.Topic.Theme.Id, publicationViewModel.Topic.Theme.Id);
                 Assert.Equal(publication.Topic.Theme.Slug, publicationViewModel.Topic.Theme.Slug);
                 Assert.Equal(publication.Topic.Theme.Title, publicationViewModel.Topic.Theme.Title);
+                Assert.Equal(publication.Topic.Theme.Summary, publicationViewModel.Topic.Theme.Summary);
 
                 Assert.Equal(publication.Contact.TeamName, publicationViewModel.Contact.TeamName);
                 Assert.Equal(publication.Contact.TeamEmail, publicationViewModel.Contact.TeamEmail);
