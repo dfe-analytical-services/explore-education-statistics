@@ -70,15 +70,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             publicationCacheService
                 .Setup(s => s.GetPublicationTree(PublicationTreeFilter.FindStatistics))
-                .ReturnsAsync(new List<ThemeTree>
+                .ReturnsAsync(new List<PublicationTreeThemeViewModel>
                 {
                     new()
                     {
-                        Topics = new List<TopicTree>
+                        Topics = new List<PublicationTreeTopicViewModel>
                         {
                             new()
                             {
-                                Publications = new List<PublicationTreeNode>
+                                Publications = new List<PublicationTreePublicationViewModel>
                                 {
                                     new()
                                 }

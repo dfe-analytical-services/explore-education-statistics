@@ -1067,7 +1067,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new PublicationCacheViewModel());
 
                 publicationCacheService.Setup(mock => mock.UpdatePublicationTree())
-                    .ReturnsAsync(new List<ThemeTree>());
+                    .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
 
                 methodologyCacheService.Setup(mock => mock.UpdateSummariesTree())
                     .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
@@ -1265,7 +1265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new PublicationCacheViewModel());
 
                 publicationCacheService.Setup(mock => mock.UpdatePublicationTree())
-                    .ReturnsAsync(new List<ThemeTree>());
+                    .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
 
                 methodologyCacheService.Setup(mock => mock.UpdateSummariesTree())
                     .ReturnsAsync(

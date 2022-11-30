@@ -14,7 +14,7 @@ public interface IPublicationService
 {
     Task<Either<ActionResult, PublicationCacheViewModel>> Get(string publicationSlug);
 
-    Task<IList<ThemeTree>> GetPublicationTree();
+    Task<IList<PublicationTreeThemeViewModel>> GetPublicationTree();
 
     Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
         ReleaseType? releaseType = null,

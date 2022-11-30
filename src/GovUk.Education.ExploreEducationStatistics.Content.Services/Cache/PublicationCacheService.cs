@@ -32,14 +32,14 @@ public class PublicationCacheService : IPublicationCacheService
         return _publicationService.Get(publicationSlug);
     }
 
-    public async Task<Either<ActionResult, IList<ThemeTree>>> GetPublicationTree(
+    public async Task<Either<ActionResult, IList<PublicationTreeThemeViewModel>>> GetPublicationTree(
         PublicationTreeFilter filter)
     {
         var fullPublicationTree = await GetFullPublicationTree();
 
         return await fullPublicationTree
             .ToAsyncEnumerable()
-            .SelectAwait(async theme => await FilterThemeTree(theme, filter))
+            .SelectAwait(async theme => await FilterPublicationTreeTheme(theme, filter))
             .Where(theme => theme.Topics.Any())
             .OrderBy(theme => theme.Title)
             .ToListAsync();
@@ -52,72 +52,72 @@ public class PublicationCacheService : IPublicationCacheService
     }
 
     [BlobCache(typeof(PublicationTreeCacheKey), forceUpdate: true, ServiceName = "public")]
-    public Task<IList<ThemeTree>> UpdatePublicationTree()
+    public Task<IList<PublicationTreeThemeViewModel>> UpdatePublicationTree()
     {
         _logger.LogInformation("Updating cached Publication Tree");
         return _publicationService.GetPublicationTree();
     }
 
     [BlobCache(typeof(PublicationTreeCacheKey), ServiceName = "public")]
-    private Task<IList<ThemeTree>> GetFullPublicationTree()
+    private Task<IList<PublicationTreeThemeViewModel>> GetFullPublicationTree()
     {
         return _publicationService.GetPublicationTree();
     }
 
-    private async Task<ThemeTree> FilterThemeTree(
-        ThemeTree themeTree,
+    private static async Task<PublicationTreeThemeViewModel> FilterPublicationTreeTheme(
+        PublicationTreeThemeViewModel theme,
         PublicationTreeFilter filter)
     {
-        var topics = await themeTree.Topics
+        var topics = await theme.Topics
             .ToAsyncEnumerable()
-            .SelectAwait(async topic => await FilterTopicTree(topic, filter))
+            .SelectAwait(async topic => await FilterPublicationTreeTopic(topic, filter))
             .Where(topic => topic.Publications.Any())
             .OrderBy(topic => topic.Title)
             .ToListAsync();
 
-        return new ThemeTree
+        return new PublicationTreeThemeViewModel
         {
-            Id = themeTree.Id,
-            Title = themeTree.Title,
-            Summary = themeTree.Summary,
+            Id = theme.Id,
+            Title = theme.Title,
+            Summary = theme.Summary,
             Topics = topics,
         };
     }
 
-    private async Task<TopicTree> FilterTopicTree(
-        TopicTree topicTree,
+    private static async Task<PublicationTreeTopicViewModel> FilterPublicationTreeTopic(
+        PublicationTreeTopicViewModel topic,
         PublicationTreeFilter filter)
     {
-        var publications = await topicTree.Publications
+        var publications = await topic.Publications
             .ToAsyncEnumerable()
-            .Where(publication => FilterPublicationTreeNode(publication, filter))
+            .Where(publication => FilterPublicationTreePublication(publication, filter))
             .OrderBy(publication => publication.Title)
             .ToListAsync();
 
-        return new TopicTree
+        return new PublicationTreeTopicViewModel
         {
-            Id = topicTree.Id,
-            Title = topicTree.Title,
+            Id = topic.Id,
+            Title = topic.Title,
             Publications = publications
         };
     }
 
-    private static bool FilterPublicationTreeNode(
-        PublicationTreeNode publicationTreeNode,
+    private static bool FilterPublicationTreePublication(
+        PublicationTreePublicationViewModel publication,
         PublicationTreeFilter filter)
     {
         switch (filter)
         {
             case PublicationTreeFilter.FindStatistics:
-                return !publicationTreeNode.IsSuperseded
-                       && (publicationTreeNode.HasLiveRelease
-                           || publicationTreeNode.Type == PublicationType.Legacy);
+                return !publication.IsSuperseded
+                       && (publication.HasLiveRelease
+                           || publication.Type == PublicationType.Legacy);
             case PublicationTreeFilter.DataTables:
-                return publicationTreeNode.LatestReleaseHasData
-                       && !publicationTreeNode.IsSuperseded;
+                return publication.LatestReleaseHasData
+                       && !publication.IsSuperseded;
             case PublicationTreeFilter.DataCatalogue:
             case PublicationTreeFilter.FastTrack:
-                return publicationTreeNode.AnyLiveReleaseHasData;
+                return publication.AnyLiveReleaseHasData;
             default:
                 throw new ArgumentOutOfRangeException(nameof(filter), filter, null);
         }

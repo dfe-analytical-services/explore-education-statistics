@@ -12,9 +12,9 @@ public interface IPublicationCacheService
 {
     Task<Either<ActionResult, PublicationCacheViewModel>> GetPublication(string publicationSlug);
 
-    Task<Either<ActionResult, IList<ThemeTree>>> GetPublicationTree(PublicationTreeFilter filter);
+    Task<Either<ActionResult, IList<PublicationTreeThemeViewModel>>> GetPublicationTree(PublicationTreeFilter filter);
 
     Task<Either<ActionResult, PublicationCacheViewModel>> UpdatePublication(string publicationSlug);
 
-    Task<IList<ThemeTree>> UpdatePublicationTree();
+    Task<IList<PublicationTreeThemeViewModel>> UpdatePublicationTree();
 }

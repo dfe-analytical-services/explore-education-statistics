@@ -293,7 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             publicationCacheService
                 .Setup(s => s.UpdatePublicationTree())
-                .ReturnsAsync(new List<ThemeTree>());
+                .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
 
             var controller = BuildController(publicationCacheService: publicationCacheService.Object);
 
@@ -319,7 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             publicationCacheService
                 .Setup(s => s.UpdatePublicationTree())
-                .ReturnsAsync(new List<ThemeTree>());
+                .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
 
             methodologyCacheService
                 .Setup(s => s.UpdateSummariesTree())

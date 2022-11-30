@@ -59,7 +59,7 @@ public class PublicationService : IPublicationService
             });
     }
 
-    public async Task<IList<ThemeTree>> GetPublicationTree()
+    public async Task<IList<PublicationTreeThemeViewModel>> GetPublicationTree()
     {
         var themes = await _contentDbContext.Themes
             .Include(theme => theme.Topics)
@@ -69,7 +69,7 @@ public class PublicationService : IPublicationService
 
         return await themes
             .ToAsyncEnumerable()
-            .SelectAwait(async theme => await BuildThemeTree(theme))
+            .SelectAwait(async theme => await BuildPublicationTreeTheme(theme))
             .Where(theme => theme.Topics.Any())
             .OrderBy(theme => theme.Title)
             .ToListAsync();
@@ -193,16 +193,16 @@ public class PublicationService : IPublicationService
             .ToList();
     }
 
-    private async Task<ThemeTree> BuildThemeTree(Theme theme)
+    private async Task<PublicationTreeThemeViewModel> BuildPublicationTreeTheme(Theme theme)
     {
         var topics = await theme.Topics
             .ToAsyncEnumerable()
-            .SelectAwait(async topic => await BuildTopicTree(topic))
+            .SelectAwait(async topic => await BuildPublicationTreeTopic(topic))
             .Where(topic => topic.Publications.Any())
             .OrderBy(topic => topic.Title)
             .ToListAsync();
 
-        return new ThemeTree
+        return new PublicationTreeThemeViewModel
         {
             Id = theme.Id,
             Title = theme.Title,
@@ -211,18 +211,18 @@ public class PublicationService : IPublicationService
         };
     }
 
-    private async Task<TopicTree> BuildTopicTree(Topic topic)
+    private async Task<PublicationTreeTopicViewModel> BuildPublicationTreeTopic(Topic topic)
     {
         var publications = await topic.Publications
             .ToAsyncEnumerable()
             .Where(publication =>
                 publication.LatestPublishedReleaseId != null || publication.LegacyPublicationUrl != null)
             .SelectAwait(async publication =>
-                await BuildPublicationNode(publication))
+                await BuildPublicationTreePublication(publication))
             .OrderBy(publication => publication.Title)
             .ToListAsync();
 
-        return new TopicTree
+        return new PublicationTreeTopicViewModel
         {
             Id = topic.Id,
             Title = topic.Title,
@@ -230,12 +230,12 @@ public class PublicationService : IPublicationService
         };
     }
 
-    private async Task<PublicationTreeNode> BuildPublicationNode(Publication publication)
+    private async Task<PublicationTreePublicationViewModel> BuildPublicationTreePublication(Publication publication)
     {
         var type = await GetPublicationType(publication);
         var latestPublishedReleaseId = publication.LatestPublishedReleaseId;
 
-        return new PublicationTreeNode
+        return new PublicationTreePublicationViewModel
         {
             Id = publication.Id,
             Title = publication.Title,

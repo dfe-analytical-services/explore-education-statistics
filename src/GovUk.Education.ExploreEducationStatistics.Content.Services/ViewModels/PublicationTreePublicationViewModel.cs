@@ -5,7 +5,7 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
-    public record PublicationTreeNode
+    public record PublicationTreePublicationViewModel
     {
         public Guid Id { get; init; }
 

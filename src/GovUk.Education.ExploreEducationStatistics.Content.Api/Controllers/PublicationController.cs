@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [HttpGet("publication-tree")]
-        public async Task<ActionResult<IList<ThemeTree>>> GetPublicationTree(
+        public async Task<ActionResult<IList<PublicationTreeThemeViewModel>>> GetPublicationTree(
             [FromQuery(Name = "publicationFilter")]
             PublicationTreeFilter? filter = null)
         {
