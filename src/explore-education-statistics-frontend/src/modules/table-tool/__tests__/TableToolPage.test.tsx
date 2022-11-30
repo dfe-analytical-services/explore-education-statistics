@@ -1,10 +1,10 @@
+import { Theme } from '@common/services/publicationService';
 import {
   FastTrackTable,
   SelectedPublication,
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
-import { Theme } from '@common/services/themeService';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import preloadAll from 'jest-next-dynamic';

@@ -82,8 +82,6 @@ using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Co
 using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
 using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
 using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
-using IContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
-using ContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.ThemeService;
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
 using IDataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IDataGuidanceService;
@@ -418,12 +416,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // EES-3528 plans to send a request to the Content API to update its cached resources instead of this
             // being done from Admin directly, and so these DI dependencies should eventually be removed.
             services.AddTransient<IContentGlossaryService, ContentGlossaryService>();
-            services.AddTransient<IContentThemeService, ContentThemeService>();
             services.AddTransient<IContentMethodologyService, ContentMethodologyService>();
             services.AddTransient<IContentPublicationService, ContentPublicationService>();
             services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
             services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
-            services.AddTransient<IThemeCacheService, ThemeCacheService>();
             services.AddTransient<IPublicationCacheService, PublicationCacheService>();
 
             services.AddTransient<IFileRepository, FileRepository>();
@@ -473,8 +469,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     publicationRepository: provider.GetRequiredService<IPublicationRepository>(),
                     methodologyVersionRepository: provider.GetRequiredService<IMethodologyVersionRepository>(),
                     methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
-                    publicationCacheService: provider.GetRequiredService<IPublicationCacheService>(),
-                    themeCacheService: provider.GetRequiredService<IThemeCacheService>()
+                    publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()
                 )
             );
             services.AddTransient<IPublicationRepository, Services.PublicationRepository>();
@@ -639,7 +634,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
                     glossaryCacheService: provider.GetRequiredService<IGlossaryCacheService>(),
                     methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
-                    themeCacheService: provider.GetRequiredService<IThemeCacheService>()
+                    publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()
                 )
             );
 

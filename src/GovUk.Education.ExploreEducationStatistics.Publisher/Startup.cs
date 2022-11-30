@@ -31,8 +31,6 @@ using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Co
 using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
 using IContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
-using IContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
-using ContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.ThemeService;
 using FileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.FileStorageService;
 using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IFileStorageService;
 using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
@@ -76,8 +74,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IContentReleaseService, ContentReleaseService>()
                 .AddScoped<IReleaseFileRepository, ReleaseFileRepository>()
                 .AddScoped<IReleaseCacheService, ReleaseCacheService>()
-                .AddScoped<IThemeCacheService, ThemeCacheService>()
-                .AddScoped<IContentThemeService, ContentThemeService>()
 
                 .AddScoped<IPublishingService, PublishingService>(provider =>
                     new PublishingService(
@@ -96,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         releaseCacheService: provider.GetRequiredService<IReleaseCacheService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
                         methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
-                        themeCacheService: provider.GetRequiredService<IThemeCacheService>()))
+                        publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()))
                 .AddScoped<IReleaseService, ReleaseService>(provider =>
                     new ReleaseService(
                         contentDbContext: provider.GetRequiredService<ContentDbContext>(),

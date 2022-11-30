@@ -2,7 +2,7 @@ import PublicationForm, {
   PublicationFormSubmitHandler,
 } from '@common/modules/table-tool/components/PublicationForm';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
-import { Theme } from '@common/services/themeService';
+import { Theme } from '@common/services/publicationService';
 import { waitFor } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';

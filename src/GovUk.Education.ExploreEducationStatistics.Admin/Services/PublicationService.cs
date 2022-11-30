@@ -35,7 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IPublicationCacheService _publicationCacheService;
         private readonly IMethodologyCacheService _methodologyCacheService;
-        private readonly IThemeCacheService _themeCacheService;
 
         public PublicationService(
             ContentDbContext context,
@@ -45,8 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPublicationRepository publicationRepository,
             IMethodologyVersionRepository methodologyVersionRepository,
             IPublicationCacheService publicationCacheService,
-            IMethodologyCacheService methodologyCacheService,
-            IThemeCacheService themeCacheService)
+            IMethodologyCacheService methodologyCacheService)
         {
             _context = context;
             _mapper = mapper;
@@ -56,7 +54,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _methodologyVersionRepository = methodologyVersionRepository;
             _publicationCacheService = publicationCacheService;
             _methodologyCacheService = methodologyCacheService;
-            _themeCacheService = themeCacheService;
         }
 
         public async Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(
@@ -225,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await _context.SaveChangesAsync();
 
                         await _methodologyCacheService.UpdateSummariesTree();
-                        await _themeCacheService.UpdatePublicationTree();
+                        await _publicationCacheService.UpdatePublicationTree();
                         await _publicationCacheService.UpdatePublication(publication.Slug);
 
                         await UpdateCachedSupersededPublications(publication);

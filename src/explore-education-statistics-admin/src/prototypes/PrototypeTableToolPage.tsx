@@ -10,7 +10,7 @@ import {
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
-import { Theme } from '@common/services/themeService';
+import { Theme } from '@common/services/publicationService';
 import Link from '@admin/components/Link';
 import styles from '@admin/prototypes/PrototypePublicPage.module.scss';
 import { themes } from '@admin/prototypes/data/newThemesData';

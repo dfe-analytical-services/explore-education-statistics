@@ -1,10 +1,10 @@
-import themeService, { Theme } from '@common/services/themeService';
 import publicationService, {
   PublicationListSummary,
   PublicationOrderParam,
   PublicationSortOption,
   publicationSortOptions,
   PublicationSortParam,
+  Theme,
 } from '@common/services/publicationService';
 import { Paging } from '@common/services/types/pagination';
 import parseNumber from '@common/utils/number/parseNumber';
@@ -73,7 +73,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   // TODO EES-3517 - remove themes
   const themes = newDesign
     ? []
-    : await themeService.listThemes({
+    : await publicationService.getPublicationTree({
         publicationFilter: 'FindStatistics',
       });
 
