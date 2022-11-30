@@ -2,7 +2,7 @@
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
 
-Suite Setup         invite user to the service with an expired invite via the API
+Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
@@ -10,10 +10,25 @@ Force Tags          Admin    Local    Dev
 
 
 *** Test Cases ***
+Invite user to the service with an unexpired invite via the API
+    user adds user invite via api
+    ...    %{EXPIRED_INVITE_USER_EMAIL}
+    ...    Analyst
+
+Check that the invite appears on the Invite Users page
+    user navigates to admin frontend    %{ADMIN_URL}/administration/users/invites
+    user waits until page contains title    Pending invites
+    user checks page contains    %{EXPIRED_INVITE_USER_EMAIL}
+
+Update user invite with an expired created date via the API
+    user adds user invite via api
+    ...    %{EXPIRED_INVITE_USER_EMAIL}
+    ...    Analyst
+    ...    2022-10-01 11:00:00
+
 Check that the invite does not appear on the Invite Users page
-    user signs in as bau1
-    user navigates to admin frontend    %{ADMIN_URL}/administration/users
-    user waits until page contains    Active user accounts
+    user reloads page
+    user waits until page contains title    Pending invites
     user checks page does not contain    %{EXPIRED_INVITE_USER_EMAIL}
     user closes the browser
 
@@ -42,11 +57,3 @@ Check that the expired invite is now removed
     # credentials there and are therefore sent straight back to the service.
     user waits until page contains title    Sign in
     user waits until page contains    Use this service to create
-
-
-*** Keywords ***
-Invite user to the service with an expired invite via the API
-    user adds user invite via api
-    ...    %{EXPIRED_INVITE_USER_EMAIL}
-    ...    Analyst
-    ...    2022-10-01 11:00:00
