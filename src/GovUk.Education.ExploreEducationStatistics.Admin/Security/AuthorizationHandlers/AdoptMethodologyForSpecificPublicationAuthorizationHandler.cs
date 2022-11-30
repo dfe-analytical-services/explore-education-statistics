@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -15,7 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class AdoptMethodologyForSpecificPublicationAuthorizationHandler
         : AuthorizationHandler<AdoptMethodologyForSpecificPublicationRequirement, Publication>
     {
-        private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
         private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
         public AdoptMethodologyForSpecificPublicationAuthorizationHandler(

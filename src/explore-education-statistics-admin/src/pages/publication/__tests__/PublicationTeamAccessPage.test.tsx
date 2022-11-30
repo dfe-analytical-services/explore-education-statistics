@@ -47,6 +47,7 @@ describe('PublicationTeamAccessPage', () => {
     releasePermissionService.listReleaseContributorInvites.mockResolvedValue(
       testInvites,
     );
+    publicationService.getRoles.mockResolvedValue([]);
   });
 
   test('renders the page correctly with no releases', async () => {

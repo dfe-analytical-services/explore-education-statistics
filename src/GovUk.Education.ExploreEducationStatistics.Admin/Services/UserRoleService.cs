@@ -340,15 +340,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return await _contentDbContext.UserPublicationRoles
                         .Include(userPublicationRole => userPublicationRole.Publication)
+                        .Include(userPublicationRole => userPublicationRole.User)
                         .Where(userPublicationRole => userPublicationRole.UserId == userId)
                         .OrderBy(userPublicationRole => userPublicationRole.Publication.Title)
                         .Select(userPublicationRole => new UserPublicationRoleViewModel
                         {
                             Id = userPublicationRole.Id,
                             Publication = userPublicationRole.Publication.Title,
-                            Role = userPublicationRole.Role
+                            Role = userPublicationRole.Role,
+                            UserName = userPublicationRole.User.DisplayName
                         })
                         .ToListAsync();
+                });
+        }
+        
+        public async Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForPublication(Guid publicationId)
+        {
+            return await _contentPersistenceHelper.CheckEntityExists<Publication>(publicationId)
+                .OnSuccess(_userService.CheckCanViewPublication)
+                .OnSuccess(async () =>
+                {
+                    return (await _contentDbContext
+                        .UserPublicationRoles
+                        .Include(userPublicationRole => userPublicationRole.Publication)
+                        .Include(userPublicationRole => userPublicationRole.User)
+                        .Where(userPublicationRole => userPublicationRole.PublicationId == publicationId)
+                        .Select(userPublicationRole => new UserPublicationRoleViewModel
+                        {
+                            Id = userPublicationRole.Id,
+                            Publication = userPublicationRole.Publication.Title,
+                            Role = userPublicationRole.Role,
+                            UserName = userPublicationRole.User.DisplayName
+                        })
+                        .ToListAsync())
+                        .OrderBy(userPublicationRole => userPublicationRole.UserName)
+                        .ToList();
                 });
         }
 

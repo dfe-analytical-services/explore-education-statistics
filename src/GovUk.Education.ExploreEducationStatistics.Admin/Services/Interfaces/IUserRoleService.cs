@@ -29,6 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRoles(Guid userId);
 
+        Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForPublication(Guid publicationId);
+
         Task<Either<ActionResult, List<UserReleaseRoleViewModel>>> GetReleaseRoles(Guid userId);
 
         Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid userPublicationRoleId);
