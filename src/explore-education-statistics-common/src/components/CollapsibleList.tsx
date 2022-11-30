@@ -9,6 +9,7 @@ interface BaseProps {
   id: string;
   isCollapsed?: boolean;
   listStyle?: 'none' | 'number' | 'bullet';
+  testId?: string;
 }
 
 type Props = BaseProps &
@@ -31,6 +32,7 @@ const CollapsibleList = ({
   itemNamePlural = 'items',
   isCollapsed = true,
   listStyle = 'none',
+  testId,
 }: Props) => {
   const [collapsed, toggleCollapsed] = useToggle(isCollapsed);
 
@@ -49,7 +51,7 @@ const CollapsibleList = ({
 
   const list = createElement(
     listTag,
-    { id, className: listClasses, 'data-testid': id },
+    { id, className: listClasses, 'data-testid': testId },
     renderedListItems,
   );
 

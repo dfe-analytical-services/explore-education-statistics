@@ -20,7 +20,6 @@ exports[`FiltersForm renders a read-only view of selected options when no longer
     >
       <ul
         class="govuk-list"
-        data-testid="indicatorsList"
         id="indicatorsList"
       >
         <li>
@@ -45,7 +44,6 @@ exports[`FiltersForm renders a read-only view of selected options when no longer
     >
       <ul
         class="govuk-list"
-        data-testid="filtersList-SchoolType"
         id="filtersList-SchoolType"
       >
         <li>
@@ -70,7 +68,6 @@ exports[`FiltersForm renders a read-only view of selected options when no longer
     >
       <ul
         class="govuk-list"
-        data-testid="filtersList-Characteristic"
         id="filtersList-Characteristic"
       >
         <li>
