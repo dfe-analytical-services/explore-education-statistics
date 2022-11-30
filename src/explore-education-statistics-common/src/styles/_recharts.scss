@@ -51,3 +51,7 @@
     }
   }
 }
+// workaround for recharts legend sharing the same color as chart lines
+.recharts-legend-item-text {
+  color: #000 !important;
+}

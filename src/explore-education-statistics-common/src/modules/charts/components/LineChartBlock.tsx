@@ -35,11 +35,11 @@ import {
   LineChart,
   ReferenceLine,
   ResponsiveContainer,
-  Symbols,
-  SymbolsProps,
   Tooltip,
   XAxis,
   YAxis,
+  Symbols,
+  SymbolsProps,
 } from 'recharts';
 import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
 
@@ -78,8 +78,9 @@ const LineChartBlock = ({
     axes.minor === undefined ||
     data === undefined ||
     meta === undefined
-  )
+  ) {
     return <div>Unable to render chart, chart incorrectly configured</div>;
+  }
 
   const dataSetCategories: DataSetCategory[] = createDataSetCategories(
     axes.major,
@@ -314,14 +315,15 @@ export const lineChartBlockDefinition: ChartDefinition = {
 export default memo(LineChartBlock);
 
 // eslint-disable-next-line react/display-name
-const getDot = (symbol: ChartSymbol | 'none' = 'circle') => (
-  props: SymbolsProps,
-) => {
+const getDot = (symbol: ChartSymbol | 'none' = 'circle') => ({
+  ref,
+  ...props
+}: SymbolsProps) => {
   if (symbol === 'none') {
     return undefined;
   }
 
-  return <Symbols {...props} type={symbol} />;
+  return <Symbols {...props} ref={ref as never} type={symbol} />;
 };
 
 const getLegendType = (
