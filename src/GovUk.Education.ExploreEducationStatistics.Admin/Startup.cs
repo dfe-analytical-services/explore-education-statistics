@@ -199,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddDbContext<ContentDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                        providerOptions => 
+                        providerOptions =>
                             providerOptions
                                 .MigrationsAssembly(typeof(Startup).Assembly.FullName)
                                 .EnableCustomRetryOnFailure()
@@ -514,6 +514,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IPreReleaseSummaryService, PreReleaseSummaryService>();
 
             services.AddTransient<IManageContentPageService, ManageContentPageService>();
+            services.AddTransient<IContentBlockService, ContentBlockService>();
             services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IEmbedBlockService, EmbedBlockService>();
             services.AddTransient<IReleaseContentBlockService, ReleaseContentBlockService>();

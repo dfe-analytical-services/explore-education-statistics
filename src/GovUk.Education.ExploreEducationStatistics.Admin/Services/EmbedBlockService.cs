@@ -23,20 +23,20 @@ public class EmbedBlockService : IEmbedBlockService
 {
     private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-    private readonly IContentService _contentService;
+    private readonly IContentBlockService _contentBlockService;
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
 
     public EmbedBlockService(
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
-        IContentService contentService,
+        IContentBlockService contentBlockService,
         IUserService userService,
         IMapper mapper)
     {
         _contentDbContext = contentDbContext;
         _persistenceHelper = persistenceHelper;
-        _contentService = contentService;
+        _contentBlockService = contentBlockService;
         _userService = userService;
         _mapper = mapper;
     }
@@ -147,19 +147,7 @@ public class EmbedBlockService : IEmbedBlockService
                                 ValidationErrorMessages.ContentBlockNotAttachedToRelease);
                         }
 
-                        _contentDbContext.EmbedBlocks.Remove(contentBlock.EmbedBlock);
-
-                        var contentSection = await _contentDbContext.ContentSections
-                            .Include(cs => cs.Content)
-                            .Where(cs => cs.Id == contentBlock.ContentSectionId)
-                            .SingleAsync();
-
-                        _contentService.RemoveContentBlockFromContentSection(
-                            contentSection,
-                            contentBlock,
-                            deleteContentBlock: true);
-
-                        _contentDbContext.EmbedBlockLinks.Remove(contentBlock);
+                        await _contentBlockService.DeleteContentBlockAndReorder(contentBlock.Id);
                         await _contentDbContext.SaveChangesAsync();
 
                         return Unit.Instance;

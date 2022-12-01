@@ -82,13 +82,13 @@ public class EmbedBlockServicePermissionTests
     private EmbedBlockService SetupEmbedBlockService(
         ContentDbContext contentDbContext = null,
         IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-        IContentService contentService = null,
+        IContentBlockService contentBlockService = null,
         IUserService userService = null)
     {
         return new EmbedBlockService(
             contentDbContext ?? Mock.Of<ContentDbContext>(),
             contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-            contentService ?? Mock.Of<IContentService>(),
+            contentBlockService ?? Mock.Of<IContentBlockService>(),
             userService ?? Mock.Of<IUserService>(),
             AdminMapper()
         );
