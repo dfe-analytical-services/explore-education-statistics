@@ -27,7 +27,8 @@ export function useRouter() {
   return {
     route: '/',
     pathname: '',
-    query: '',
+    push: jest.fn(),
+    query: {},
     asPath: '',
     events: {
       on: jest.fn(),

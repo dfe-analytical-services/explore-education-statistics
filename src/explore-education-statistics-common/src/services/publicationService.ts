@@ -109,6 +109,10 @@ export type PublicationSortParam = 'published' | 'title' | 'relevance';
 
 export type PublicationOrderParam = 'asc' | 'desc';
 
+export const publicationFilters = ['releaseType', 'search', 'themeId'] as const;
+
+export type PublicationFilter = typeof publicationFilters[number];
+
 export interface PublicationListRequest {
   order?: PublicationOrderParam;
   page?: number;

@@ -33,3 +33,16 @@
     outline-offset: 0;
   }
 }
+
+.fullScreen {
+  height: 100%;
+  margin: 0;
+  max-width: 100%;
+  overflow-y: auto;
+  padding: 0;
+  width: 100%;
+
+  &:focus {
+    outline-offset: -$govuk-focus-width;
+  }
+}

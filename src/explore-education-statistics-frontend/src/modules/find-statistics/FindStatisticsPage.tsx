@@ -1,36 +1,39 @@
 import publicationService, {
-  PublicationListRequest,
   PublicationListSummary,
-  PublicationOrderParam,
   PublicationSortOption,
-  publicationSortOptions,
-  PublicationSortParam,
   Theme,
 } from '@common/services/publicationService';
+import themeService, { ThemeSummary } from '@common/services/themeService';
 import { Paging } from '@common/services/types/pagination';
-import parseNumber from '@common/utils/number/parseNumber';
-import isOneOf from '@common/utils/type-guards/isOneOf';
+import { ReleaseType } from '@common/services/types/releaseType';
+import createPublicationListRequest from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import FindStatisticsPageCurrent from './FindStatisticsPageCurrent';
 import FindStatisticsPageNew from './FindStatisticsPageNew';
 
+export interface FindStatisticsPageQuery {
+  page?: number;
+  releaseType?: ReleaseType;
+  search?: string;
+  sortBy?: PublicationSortOption;
+  themeId?: string;
+}
+
 interface Props {
   newDesign?: boolean; // TODO EES-3517 flag
   paging?: Paging | null; // TODO EES-3517 won't be optional or null
   publications?: PublicationListSummary[]; // TODO EES-3517 won't be optional
-  search?: string;
-  sortBy?: PublicationSortOption;
-  themes: Theme[];
+  query: FindStatisticsPageQuery;
+  themes: Theme[] | ThemeSummary[];
 }
 
 const FindStatisticsPage: NextPage<Props> = ({
   newDesign = false,
   paging,
   publications,
-  search,
-  sortBy,
-  themes = [],
+  query,
+  themes,
 }) => {
   // TODO EES-3517 remove these and move FindStatisticsPageNew into here
   if (newDesign && paging && publications) {
@@ -38,39 +41,24 @@ const FindStatisticsPage: NextPage<Props> = ({
       <FindStatisticsPageNew
         paging={paging}
         publications={publications}
-        searchTerm={search}
-        sortBy={sortBy}
+        query={query}
+        themes={themes as ThemeSummary[]} // TODO EES-3517 won't need `as ThemeSummary[]` when only have one theme type
       />
     );
   }
-  return <FindStatisticsPageCurrent themes={themes} />;
+  return <FindStatisticsPageCurrent themes={themes as Theme[]} />;
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({
   query,
 }) => {
   const { newDesign } = query;
-  const sortBy = isOneOf(query.sortBy, publicationSortOptions)
-    ? query.sortBy
-    : 'newest';
-  const { order, sort } = getSortParams(sortBy);
-  const minSearchCharacters = 3;
-  const searchQuery = Array.isArray(query.search)
-    ? query.search[0]
-    : query.search;
-  const search =
-    searchQuery && searchQuery.length >= minSearchCharacters ? searchQuery : '';
-
-  const params: PublicationListRequest = {
-    order,
-    page: parseNumber(query.page) ?? 1,
-    sort,
-    ...(search && { search }),
-  };
 
   // TODO EES-3517 - remove newDesign check
   const publicationsResponse = newDesign
-    ? await publicationService.listPublications(params)
+    ? await publicationService.listPublications(
+        createPublicationListRequest(query),
+      )
     : {
         results: [],
         paging: {
@@ -81,9 +69,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
         },
       };
 
-  // TODO EES-3517 - remove themes
+  // TODO EES-3517 - remove newDesign check
   const themes = newDesign
-    ? []
+    ? await themeService.listThemes()
     : await publicationService.getPublicationTree({
         publicationFilter: 'FindStatistics',
       });
@@ -93,35 +81,10 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
       newDesign: !!newDesign,
       paging: newDesign ? publicationsResponse.paging : null,
       publications: newDesign ? publicationsResponse.results : [],
-      search,
-      sortBy,
+      query,
       themes,
     },
   };
 };
 
 export default FindStatisticsPage;
-
-function getSortParams(
-  sortBy: PublicationSortOption,
-): {
-  order?: PublicationOrderParam;
-  sort?: PublicationSortParam;
-} {
-  if (sortBy === 'title') {
-    return {
-      order: 'asc',
-      sort: 'title',
-    };
-  }
-  if (sortBy === 'oldest') {
-    return {
-      order: 'asc',
-      sort: 'published',
-    };
-  }
-  return {
-    order: 'desc',
-    sort: 'published',
-  };
-}

@@ -9,7 +9,7 @@ import {
 
 describe('FindStatisticsPage', () => {
   test('renders basic page correctly', async () => {
-    render(<FindStatisticsPage themes={[]} />);
+    render(<FindStatisticsPage query={{}} themes={[]} />);
 
     expect(screen.getByTestId('page-title')).toHaveTextContent(
       'Find statistics and data',
@@ -23,7 +23,7 @@ describe('FindStatisticsPage', () => {
   });
 
   test('renders related information links', async () => {
-    render(<FindStatisticsPage themes={[]} />);
+    render(<FindStatisticsPage query={{}} themes={[]} />);
 
     const relatedInformationNav = screen.getByRole('navigation', {
       name: 'Related information',
@@ -43,7 +43,7 @@ describe('FindStatisticsPage', () => {
   });
 
   test('renders without the accordion when there are no themes', async () => {
-    render(<FindStatisticsPage themes={[]} />);
+    render(<FindStatisticsPage query={{}} themes={[]} />);
 
     expect(screen.queryByTestId('accordion')).not.toBeInTheDocument();
 
@@ -53,7 +53,9 @@ describe('FindStatisticsPage', () => {
   });
 
   test('renders the accordion correctly with multiple themes, topics and publications', async () => {
-    const { container } = render(<FindStatisticsPage themes={testThemes} />);
+    const { container } = render(
+      <FindStatisticsPage query={{}} themes={testThemes} />,
+    );
 
     const contentAccordion = screen.getByTestId('accordion');
 
@@ -258,7 +260,12 @@ describe('FindStatisticsPage', () => {
   });
 
   test('renders publication types in correct order within a topic', async () => {
-    render(<FindStatisticsPage themes={[testThemeWithAllPublicationTypes]} />);
+    render(
+      <FindStatisticsPage
+        query={{}}
+        themes={[testThemeWithAllPublicationTypes]}
+      />,
+    );
 
     const contentAccordion = screen.getByTestId('accordion');
     const accordionSections = within(contentAccordion).getAllByTestId(
