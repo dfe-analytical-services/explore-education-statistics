@@ -100,9 +100,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                         .ToList();
 
                     // TODO EES-3369 (Read Replica-2) This needs moving to the new PublishingCompletionService
-                    await _contentDbContext.Publications
+                    var publicationIds = await _contentDbContext.Publications
                         .Where(publication => publishedPublications.Contains(publication.Slug))
                         .Select(publication => publication.Id)
+                        .ToListAsync();
+
+                    await publicationIds
                         .ToAsyncEnumerable()
                         .ForEachAwaitAsync(_publicationService.UpdateLatestPublishedRelease);
 
