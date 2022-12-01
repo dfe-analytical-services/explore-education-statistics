@@ -49,7 +49,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Where(release => ids.Contains(release.Id))
                 .Include(release => release.Publication)
                 .Include(release => release.PreviousVersion)
-                .ToAsyncEnumerable()
                 .ToListAsync();
         }
 
@@ -113,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _methodologyService.SetPublishedDatesByPublication(contentRelease.PublicationId, published);
 
             await _contentDbContext.SaveChangesAsync();
-            
+
             var statisticsRelease = await _statisticsDbContext.Release
                 .AsQueryable()
                 .SingleOrDefaultAsync(r => r.Id == id);
@@ -129,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 _statisticsDbContext.Release.Update(statisticsRelease);
                 await _statisticsDbContext.SaveChangesAsync();
             }
-            
+
             if (publicStatisticsRelease != null)
             {
                 publicStatisticsRelease.Published ??= published;
