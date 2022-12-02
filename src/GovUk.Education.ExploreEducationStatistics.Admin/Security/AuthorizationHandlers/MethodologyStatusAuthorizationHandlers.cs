@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                         .HasRolesOnPublicationOrLatestRelease(
                             context.User.GetUserId(),
                             owningPublication.Id,
-                            ListOf(PublicationRole.ReleaseApprover),
+                            ListOf(PublicationRole.Approver),
                             ListOf(ReleaseRole.Approver)))
                 {
                     context.Succeed(requirement);
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                         .HasRolesOnPublicationOrLatestRelease(
                             context.User.GetUserId(),
                             owningPublication.Id,
-                            ListOf(PublicationRole.ReleaseApprover),
+                            ListOf(PublicationRole.Approver),
                             ListOf(ReleaseRole.Approver)))
                 {
                     context.Succeed(requirement);

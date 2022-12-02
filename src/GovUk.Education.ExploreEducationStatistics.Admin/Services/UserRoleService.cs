@@ -253,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             switch (role)
             {
                 case PublicationRole.Owner:
-                case PublicationRole.ReleaseApprover:
+                case PublicationRole.Approver:
                     return RoleNames.Analyst;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(role), role,

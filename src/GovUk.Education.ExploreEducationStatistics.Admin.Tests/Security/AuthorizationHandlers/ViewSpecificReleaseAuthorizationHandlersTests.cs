@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     PublicationId = publication.Id,
                     Publication = publication
                 },
-                Owner, ReleaseApprover);
+                Owner, Approver);
         }
 
         [Fact]

@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 {
                     // If the user has the Approver role on the Owning Publication of this
                     // Methodology they are allowed to mark it as draft.
-                    var expectedToPassByPublicationRole = publicationRole == PublicationRole.ReleaseApprover;
+                    var expectedToPassByPublicationRole = publicationRole == PublicationRole.Approver;
 
                     var (
                         handler,

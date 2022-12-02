@@ -46,7 +46,7 @@ Create new publications and published releases - for Publication Owner
     user creates releases in all states for publication    ${PUBLICATION_ID}    ${PUBLICATION_FOR_PUBLICATION_OWNER}
     user gives analyst publication owner access    ${PUBLICATION_FOR_PUBLICATION_OWNER}
 
-Create new publications and published releases - for Publication Release Approver
+Create new publications and published releases - for Publication Approver
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_FOR_PUBLICATION_RELEASE_APPROVER}
     ...    ${TOPIC_ID}
     user creates releases in all states for publication    ${PUBLICATION_ID}

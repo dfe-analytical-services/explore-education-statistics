@@ -24,7 +24,7 @@ Create new publication and release for "UI tests topic" topic and adds analyst1 
     user adds publication role to user via api
     ...    EES-test.ANALYST1@education.gov.uk
     ...    ${PUBLICATION_ID}
-    ...    ReleaseApprover
+    ...    Approver
     user create test release via api    ${PUBLICATION_ID}    FY    3000
 
 Go to "Release summary" page

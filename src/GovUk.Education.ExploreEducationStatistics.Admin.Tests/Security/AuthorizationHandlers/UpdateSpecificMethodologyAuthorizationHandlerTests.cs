@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(ListOf(publicationRole));
 
-                    var expectedToPassByRole = ListOf(Owner, PublicationRole.ReleaseApprover).Contains(publicationRole);
+                    var expectedToPassByRole = ListOf(Owner, PublicationRole.Approver).Contains(publicationRole);
 
                     if (!expectedToPassByRole)
                     {

@@ -640,7 +640,7 @@ user gives analyst publication owner access
 
 user gives analyst publication release approver access
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
-    user gives publication access to analyst    ${PUBLICATION_NAME}    ReleaseApprover    ${ANALYST_EMAIL}
+    user gives publication access to analyst    ${PUBLICATION_NAME}    Approver    ${ANALYST_EMAIL}
 
 user removes publication owner access from analyst
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
@@ -648,7 +648,7 @@ user removes publication owner access from analyst
 
 user removes publication release approver access from analyst
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
-    user removes publication access from analyst    ${PUBLICATION_NAME}    ReleaseApprover    ${ANALYST_EMAIL}
+    user removes publication access from analyst    ${PUBLICATION_NAME}    Approver    ${ANALYST_EMAIL}
 
 user gives publication access to analyst
     [Arguments]

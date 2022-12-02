@@ -184,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     var userPublicationRoles = await _context.UserPublicationRoles
                                         .Include(upr => upr.User)
                                         .Where(upr => upr.PublicationId == release.PublicationId
-                                                      && upr.Role == PublicationRole.ReleaseApprover)
+                                                      && upr.Role == PublicationRole.Approver)
                                         .ToListAsync();
 
                                     var notifyHigherReviewers = userReleaseRoles.Any() || userPublicationRoles.Any();

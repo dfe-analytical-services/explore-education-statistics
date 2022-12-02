@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             });
 
             // Set up a publication and releases related to the topic that will be granted via the Publication
-            // ReleaseApprover role
+            // Approver role
             userPublicationRoles.Add(new UserPublicationRole
             {
                 Publication = new Publication
@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Topic = topic,
                 },
                 User = user,
-                Role = ReleaseApprover
+                Role = Approver
             });
 
             var contextId = Guid.NewGuid().ToString();
@@ -132,11 +132,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Publication = new Publication
                     {
-                        Title = "Publication ReleaseApprover publication",
+                        Title = "Publication Approver publication",
                         Topic = new Topic { Theme = new Theme(), },
                     },
                     User = user,
-                    Role = ReleaseApprover,
+                    Role = Approver,
                 },
                 new()
                 {
@@ -243,7 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Publication Owner publication", result[0].Title);
                 Assert.Empty(result[0].Releases);   // ListPublicationsForUser doesn't hydrate releases
 
-                Assert.Equal("Publication ReleaseApprover publication", result[1].Title);
+                Assert.Equal("Publication Approver publication", result[1].Title);
                 Assert.Empty(result[1].Releases);
 
                 Assert.Equal("Publication Owner publication 2", result[2].Title);

@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                         .HasRolesOnPublication(
                             context.User.GetUserId(),
                             publication.Id,
-                            Owner, ReleaseApprover))
+                            Owner, Approver))
                 {
                     context.Succeed(requirement);
                 }

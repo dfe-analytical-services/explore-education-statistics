@@ -52,7 +52,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
                 PublicationId = publication.Id,
                 Publication = publication
             },
-            Owner, ReleaseApprover);
+            Owner, Approver);
     }
 
     private static ViewSpecificPreReleaseSummaryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
