@@ -35,7 +35,7 @@ Validate Manage release contributors page
 
 Validate Invite new users page
     user clicks button    Go back
-    user waits until h2 is visible    Update release access
+    user waits until h3 is visible    Update release access
 
     user clicks link    Invite new users
 
