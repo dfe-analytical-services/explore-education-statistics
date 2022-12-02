@@ -252,20 +252,20 @@ Validate data guidance variables and descriptions
     user checks table column heading contains    1    1    Variable name    ${subject_1_variables}
     user checks table column heading contains    1    2    Variable description    ${subject_1_variables}
 
-    user checks results table cell contains    1    1    colour    ${subject_1_variables}
-    user checks results table cell contains    1    2    Colour    ${subject_1_variables}
+    user checks table cell contains    1    1    colour    ${subject_1_variables}
+    user checks table cell contains    1    2    Colour    ${subject_1_variables}
 
-    user checks results table cell contains    2    1    enrolments    ${subject_1_variables}
-    user checks results table cell contains    2    2    Number of pupil enrolments    ${subject_1_variables}
+    user checks table cell contains    2    1    enrolments    ${subject_1_variables}
+    user checks table cell contains    2    2    Number of pupil enrolments    ${subject_1_variables}
 
-    user checks results table cell contains    4    1    enrolments_pa_10_exact_percent    ${subject_1_variables}
-    user checks results table cell contains    4    2    Percentage of persistent absentees    ${subject_1_variables}
+    user checks table cell contains    4    1    enrolments_pa_10_exact_percent    ${subject_1_variables}
+    user checks table cell contains    4    2    Percentage of persistent absentees    ${subject_1_variables}
 
-    user checks results table cell contains    8    1    sess_overall_percent    ${subject_1_variables}
-    user checks results table cell contains    8    2    Overall absence rate    ${subject_1_variables}
+    user checks table cell contains    8    1    sess_overall_percent    ${subject_1_variables}
+    user checks table cell contains    8    2    Overall absence rate    ${subject_1_variables}
 
-    user checks results table cell contains    9    1    sess_unauthorised_percent    ${subject_1_variables}
-    user checks results table cell contains    9    2    Unauthorised absence rate    ${subject_1_variables}
+    user checks table cell contains    9    1    sess_unauthorised_percent    ${subject_1_variables}
+    user checks table cell contains    9    2    Unauthorised absence rate    ${subject_1_variables}
 
     ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
     ...    id:dataGuidance-dataFiles
@@ -277,11 +277,11 @@ Validate data guidance variables and descriptions
     user checks table column heading contains    1    1    Variable name    ${subject_2_variables}
     user checks table column heading contains    1    2    Variable description    ${subject_2_variables}
 
-    user checks results table cell contains    1    1    admission_numbers    ${subject_2_variables}
-    user checks results table cell contains    1    2    Admission Numbers    ${subject_2_variables}
+    user checks table cell contains    1    1    admission_numbers    ${subject_2_variables}
+    user checks table cell contains    1    2    Admission Numbers    ${subject_2_variables}
 
-    user checks results table cell contains    2    1    some_filter    ${subject_2_variables}
-    user checks results table cell contains    2    2    Random Filter    ${subject_2_variables}
+    user checks table cell contains    2    1    some_filter    ${subject_2_variables}
+    user checks table cell contains    2    2    Random Filter    ${subject_2_variables}
 
 Validate data guidance footnotes
     ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
@@ -638,20 +638,20 @@ Validate data guidance document variables
     user checks table column heading contains    1    1    Variable name    ${subject_1_variables}
     user checks table column heading contains    1    2    Variable description    ${subject_1_variables}
 
-    user checks results table cell contains    1    1    colour    ${subject_1_variables}
-    user checks results table cell contains    1    2    Colour    ${subject_1_variables}
+    user checks table cell contains    1    1    colour    ${subject_1_variables}
+    user checks table cell contains    1    2    Colour    ${subject_1_variables}
 
-    user checks results table cell contains    2    1    enrolments    ${subject_1_variables}
-    user checks results table cell contains    2    2    Number of pupil enrolments    ${subject_1_variables}
+    user checks table cell contains    2    1    enrolments    ${subject_1_variables}
+    user checks table cell contains    2    2    Number of pupil enrolments    ${subject_1_variables}
 
-    user checks results table cell contains    4    1    enrolments_pa_10_exact_percent    ${subject_1_variables}
-    user checks results table cell contains    4    2    Percentage of persistent absentees    ${subject_1_variables}
+    user checks table cell contains    4    1    enrolments_pa_10_exact_percent    ${subject_1_variables}
+    user checks table cell contains    4    2    Percentage of persistent absentees    ${subject_1_variables}
 
-    user checks results table cell contains    8    1    sess_overall_percent    ${subject_1_variables}
-    user checks results table cell contains    8    2    Overall absence rate    ${subject_1_variables}
+    user checks table cell contains    8    1    sess_overall_percent    ${subject_1_variables}
+    user checks table cell contains    8    2    Overall absence rate    ${subject_1_variables}
 
-    user checks results table cell contains    9    1    sess_unauthorised_percent    ${subject_1_variables}
-    user checks results table cell contains    9    2    Unauthorised absence rate    ${subject_1_variables}
+    user checks table cell contains    9    1    sess_unauthorised_percent    ${subject_1_variables}
+    user checks table cell contains    9    2    Unauthorised absence rate    ${subject_1_variables}
 
     ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
     user opens details dropdown    Variable names and descriptions    ${subject_2_content}
@@ -662,11 +662,11 @@ Validate data guidance document variables
     user checks table column heading contains    1    1    Variable name    ${subject_2_variables}
     user checks table column heading contains    1    2    Variable description    ${subject_2_variables}
 
-    user checks results table cell contains    1    1    admission_numbers    ${subject_2_variables}
-    user checks results table cell contains    1    2    Admission Numbers    ${subject_2_variables}
+    user checks table cell contains    1    1    admission_numbers    ${subject_2_variables}
+    user checks table cell contains    1    2    Admission Numbers    ${subject_2_variables}
 
-    user checks results table cell contains    2    1    some_filter    ${subject_2_variables}
-    user checks results table cell contains    2    2    Random Filter    ${subject_2_variables}
+    user checks table cell contains    2    1    some_filter    ${subject_2_variables}
+    user checks table cell contains    2    2    Random Filter    ${subject_2_variables}
 
 Validate data guidance document footnotes
     ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}

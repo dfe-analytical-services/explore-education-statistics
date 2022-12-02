@@ -64,13 +64,13 @@ Validate results table column headings
     user checks table column heading contains    1    4    2016/17
 
 Validate results table row headings
-    user checks results table row heading contains    1    1    Number of schools
+    user checks table row heading contains    1    1    Number of schools
 
 Validate Number of schools row results
-    user checks results table cell contains    1    1    361
-    user checks results table cell contains    1    2    363
-    user checks results table cell contains    1    3    350
-    user checks results table cell contains    1    4    349
+    user checks table cell contains    1    1    361
+    user checks table cell contains    1    2    363
+    user checks table cell contains    1    3    350
+    user checks table cell contains    1    4    349
 
 Go back to Locations step
     user clicks element    xpath://button[contains(text(), "Edit locations")]

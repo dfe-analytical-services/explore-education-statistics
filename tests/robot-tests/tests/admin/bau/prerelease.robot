@@ -47,8 +47,8 @@ Add metadata guidance
     user checks table column heading contains    1    1    Variable name    css:table[data-testid="Variables"]
     user checks table column heading contains    1    2    Variable description    css:table[data-testid="Variables"]
 
-    user checks results table cell contains    1    1    admission_numbers    id:dataGuidance-dataFiles
-    user checks results table cell contains    1    2    Admission Numbers    id:dataGuidance-dataFiles
+    user checks table cell contains    1    1    admission_numbers    id:dataGuidance-dataFiles
+    user checks table cell contains    1    2    Admission Numbers    id:dataGuidance-dataFiles
 
     user enters text into element    id:dataGuidanceForm-content    Test metadata guidance content
     user enters text into element    id:dataGuidanceForm-subjects-0-content    Test file guidance content
@@ -183,8 +183,8 @@ Invite users to the prerelease
     user checks list item contains    testid:invitableList    2    EES-test.ANALYST1@education.gov.uk    ${modal}
     user clicks button    Confirm
     user checks table column heading contains    1    1    User email
-    user checks results table cell contains    1    1    simulate-delivered@notifications.service.gov.uk
-    user checks results table cell contains    2    1    EES-test.ANALYST1@education.gov.uk
+    user checks table cell contains    1    1    simulate-delivered@notifications.service.gov.uk
+    user checks table cell contains    2    1    EES-test.ANALYST1@education.gov.uk
 
 Refresh page and check prerelease user list isn't duplicated
     [Documentation]    EES-3535
@@ -233,10 +233,10 @@ Invite a further list of new users but mixed with existing invitees and accepted
     user waits until table is visible    css:body    %{WAIT_SMALL}
     user checks table column heading contains    1    1    User email
 
-    user checks results table cell contains    1    1    ees-test.analyst1@education.gov.uk
-    user checks results table cell contains    2    1    simulate-delivered@notifications.service.gov.uk
-    user checks results table cell contains    3    1    simulate-delivered-2@notifications.service.gov.uk
-    user checks results table cell contains    4    1    simulate-delivered-3@notifications.service.gov.uk
+    user checks table cell contains    1    1    ees-test.analyst1@education.gov.uk
+    user checks table cell contains    2    1    simulate-delivered@notifications.service.gov.uk
+    user checks table cell contains    3    1    simulate-delivered-2@notifications.service.gov.uk
+    user checks table cell contains    4    1    simulate-delivered-3@notifications.service.gov.uk
 
 Validate prerelease has not started for Analyst user
     user changes to analyst1
@@ -321,8 +321,8 @@ Validate metadata guidance page
     user checks table column heading contains    1    1    Variable name
     user checks table column heading contains    1    2    Variable description
 
-    user checks results table cell contains    1    1    admission_numbers
-    user checks results table cell contains    1    2    Admission Numbers
+    user checks table cell contains    1    1    admission_numbers
+    user checks table cell contains    1    2    Admission Numbers
 
 Go back to prerelease content page
     user clicks link    Back
@@ -434,8 +434,8 @@ Validate public metdata guidance for Analyst user
     user checks table column heading contains    1    1    Variable name
     user checks table column heading contains    1    2    Variable description
 
-    user checks results table cell contains    1    1    admission_numbers
-    user checks results table cell contains    1    2    Admission Numbers
+    user checks table cell contains    1    1    admission_numbers
+    user checks table cell contains    1    2    Admission Numbers
 
 Go back to prerelease content page as Analyst user
     user clicks link    Back

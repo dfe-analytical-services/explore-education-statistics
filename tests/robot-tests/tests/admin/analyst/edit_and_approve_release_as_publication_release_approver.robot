@@ -5,7 +5,7 @@ Resource            ../../libs/admin/manage-content-common.robot
 Resource            ../../libs/charts.robot
 Resource            ../../libs/public-common.robot
 
-Suite Setup         user signs in as analyst1
+Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
@@ -19,16 +19,32 @@ ${DATABLOCK_NAME}=      Dates data block name
 
 
 *** Test Cases ***
-Create new publication and release for "UI tests topic" topic and adds analyst1 as publication release approver
+Create new publication and release for "UI tests topic" topic
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
+    Set suite variable    ${PUBLICATION_ID}
+    user create test release via api    ${PUBLICATION_ID}    FY    3000
+
+Check that no publication roles are listed yet on the Team access page
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user waits until page contains link    Team access
+    user clicks link    Team access
+    user waits until page contains    There are no publication roles currently assigned.
+
+Assign publication approver permissions to analyst1
     user adds publication role to user via api
     ...    EES-test.ANALYST1@education.gov.uk
     ...    ${PUBLICATION_ID}
     ...    Approver
-    user create test release via api    ${PUBLICATION_ID}    FY    3000
-
-Go to "Release summary" page
     user reloads page
+    user waits until page contains    To request changing the assigned publication roles
+    user checks table column heading contains    1    1    Name
+    user checks table column heading contains    1    2    Publication role
+    user checks table body has x rows    1
+    user checks table cell contains    1    1    Analyst1 User1
+    user checks table cell contains    1    2    Approver
+
+Sign in as analyst1 and navigate to the "Release summary" page for the new release
+    user signs in as analyst1
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
 

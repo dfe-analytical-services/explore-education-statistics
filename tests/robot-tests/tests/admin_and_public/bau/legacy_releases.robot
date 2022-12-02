@@ -37,9 +37,9 @@ Create legacy release
 Validate created legacy release
     user waits until h2 is visible    Legacy releases
     user checks element count is x    css:tbody tr    1
-    user checks results table cell contains    1    1    1
-    user checks results table cell contains    1    2    ${DESCRIPTION}
-    user checks results table cell contains    1    3    http://test.com
+    user checks table cell contains    1    1    1
+    user checks table cell contains    1    2    ${DESCRIPTION}
+    user checks table cell contains    1    3    http://test.com
 
 Navigate to admin dashboard to create new release
     user navigates to admin dashboard    Bau1
@@ -87,9 +87,9 @@ Update legacy release
 Validate updated legacy release
     user waits until h2 is visible    Legacy releases
     user checks element count is x    css:tbody tr    1
-    user checks results table cell contains    1    1    1
-    user checks results table cell contains    1    2    ${UPDATED_DESCRIPTION}
-    user checks results table cell contains    1    3    http://test2.com
+    user checks table cell contains    1    1    1
+    user checks table cell contains    1    2    ${UPDATED_DESCRIPTION}
+    user checks table cell contains    1    3    http://test2.com
 
 Validate public frontend shows changes made to legacy release after saving publication
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
@@ -127,17 +127,17 @@ Create multiple legacy releases
 Validate legacy release order
     user checks element count is x    css:tbody tr    3
 
-    user checks results table cell contains    1    1    3
-    user checks results table cell contains    1    2    Test collection 3
-    user checks results table cell contains    1    3    http://test-3.com
+    user checks table cell contains    1    1    3
+    user checks table cell contains    1    2    Test collection 3
+    user checks table cell contains    1    3    http://test-3.com
 
-    user checks results table cell contains    2    1    2
-    user checks results table cell contains    2    2    Test collection 2
-    user checks results table cell contains    2    3    http://test-2.com
+    user checks table cell contains    2    1    2
+    user checks table cell contains    2    2    Test collection 2
+    user checks table cell contains    2    3    http://test-2.com
 
-    user checks results table cell contains    3    1    1
-    user checks results table cell contains    3    2    Test collection 1
-    user checks results table cell contains    3    3    http://test-1.com
+    user checks table cell contains    3    1    1
+    user checks table cell contains    3    2    Test collection 1
+    user checks table cell contains    3    3    http://test-1.com
 
 Reorder legacy releases
     user clicks button    Reorder legacy releases
@@ -156,17 +156,17 @@ Validate reordered legacy releases
     user waits until page contains button    Reorder legacy releases
     user checks element count is x    css:tbody tr    3
 
-    user checks results table cell contains    1    1    3
-    user checks results table cell contains    1    2    Test collection 2
-    user checks results table cell contains    1    3    http://test-2.com
+    user checks table cell contains    1    1    3
+    user checks table cell contains    1    2    Test collection 2
+    user checks table cell contains    1    3    http://test-2.com
 
-    user checks results table cell contains    2    1    2
-    user checks results table cell contains    2    2    Test collection 1
-    user checks results table cell contains    2    3    http://test-1.com
+    user checks table cell contains    2    1    2
+    user checks table cell contains    2    2    Test collection 1
+    user checks table cell contains    2    3    http://test-1.com
 
-    user checks results table cell contains    3    1    1
-    user checks results table cell contains    3    2    Test collection 3
-    user checks results table cell contains    3    3    http://test-3.com
+    user checks table cell contains    3    1    1
+    user checks table cell contains    3    2    Test collection 3
+    user checks table cell contains    3    3    http://test-3.com
 
 
 *** Keywords ***
