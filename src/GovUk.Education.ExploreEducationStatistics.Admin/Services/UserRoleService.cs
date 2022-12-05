@@ -331,7 +331,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRoles(Guid userId)
+        public async Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForUser(Guid userId)
         {
             return await _userService
                 .CheckCanManageAllUsers()
@@ -356,7 +356,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         
         public async Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRolesForPublication(Guid publicationId)
         {
-            return await _contentPersistenceHelper.CheckEntityExists<Publication>(publicationId)
+            return await _contentPersistenceHelper
+                .CheckEntityExists<Publication>(publicationId)
                 .OnSuccess(_userService.CheckCanViewPublication)
                 .OnSuccess(async () =>
                 {

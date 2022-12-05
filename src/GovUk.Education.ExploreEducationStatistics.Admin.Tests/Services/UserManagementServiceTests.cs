@@ -108,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 mock.GetGlobalRoles(user.Id)).ReturnsAsync(globalRoles);
 
             userRoleService.Setup(mock =>
-                mock.GetPublicationRoles(userId)).ReturnsAsync(publicationRoles);
+                mock.GetPublicationRolesForUser(userId)).ReturnsAsync(publicationRoles);
 
             userRoleService.Setup(mock =>
                 mock.GetReleaseRoles(userId)).ReturnsAsync(releaseRoles);
@@ -135,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(releaseRoles, userViewModel.UserReleaseRoles);
 
                 userRoleService.Verify(mock => mock.GetGlobalRoles(user.Id), Times.Once);
-                userRoleService.Verify(mock => mock.GetPublicationRoles(userId), Times.Once);
+                userRoleService.Verify(mock => mock.GetPublicationRolesForUser(userId), Times.Once);
                 userRoleService.Verify(mock => mock.GetReleaseRoles(userId), Times.Once);
             }
         }

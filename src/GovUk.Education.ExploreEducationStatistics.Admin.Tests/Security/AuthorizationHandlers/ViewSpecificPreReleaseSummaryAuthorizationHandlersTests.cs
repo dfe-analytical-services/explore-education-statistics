@@ -9,10 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    ReleaseAuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
@@ -35,7 +32,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
         // Assert that a User who has any unrestricted viewer role on a Release can view the PreRelease Summary
         await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ViewSpecificPreReleaseSummaryRequirement>(
             CreateHandler,
-            Viewer, Lead, Contributor, Approver, PrereleaseViewer);
+            ReleaseRole.Viewer, ReleaseRole.Lead, ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.PrereleaseViewer);
     }
 
     [Fact]
@@ -52,7 +49,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
                 PublicationId = publication.Id,
                 Publication = publication
             },
-            Owner, Approver);
+            PublicationRole.Owner, PublicationRole.Approver);
     }
 
     private static ViewSpecificPreReleaseSummaryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)

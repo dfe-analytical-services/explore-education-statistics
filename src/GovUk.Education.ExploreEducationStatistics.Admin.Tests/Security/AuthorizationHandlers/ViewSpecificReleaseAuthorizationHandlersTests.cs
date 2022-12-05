@@ -15,8 +15,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.Authoriza
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
@@ -43,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             new UserReleaseRoleRepository(contentDbContext),
                             new UserPublicationRoleRepository(contentDbContext),
                             Mock.Of<IPublicationRepository>(Strict))),
-                Viewer, Lead, Contributor, Approver);
+                ReleaseRole.Viewer, ReleaseRole.Lead, ReleaseRole.Contributor, ReleaseRole.Approver);
         }
 
         [Fact]
@@ -64,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     PublicationId = publication.Id,
                     Publication = publication
                 },
-                Owner, Approver);
+                PublicationRole.Owner, PublicationRole.Approver);
         }
 
         [Fact]
@@ -92,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             new UserPublicationRoleRepository(contentDbContext),
                             Mock.Of<IPublicationRepository>(Strict))),
                 release,
-                PrereleaseViewer);
+                ReleaseRole.PrereleaseViewer);
         }
 
         [Fact]
@@ -117,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     {
                         ReleaseId = release.Id,
                         UserId = userId,
-                        Role = PrereleaseViewer
+                        Role = ReleaseRole.PrereleaseViewer
                     }
                 },
                 ExpectedToPass = false,

@@ -15,6 +15,7 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React, { useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { generatePath, useHistory } from 'react-router-dom';
+import orderBy from 'lodash/orderBy';
 
 interface Model {
   releases: ReleaseSummary[];
@@ -86,7 +87,10 @@ const PublicationTeamAccessPage = ({
               </tr>
             </thead>
             <tbody>
-              {model.publicationRoles.map(role => (
+              {orderBy(model.publicationRoles, role => [
+                role.userName,
+                role.role,
+              ]).map(role => (
                 <tr key={`${role.id}_${role.role}`}>
                   <td>{role.userName}</td>
                   <td>{role.role}</td>
