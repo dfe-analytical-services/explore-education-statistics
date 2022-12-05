@@ -92,7 +92,12 @@ export interface ContentSection<BlockType> {
   content: BlockType[];
 }
 
-export const publicationSortOptions = ['newest', 'oldest', 'title'] as const;
+export const publicationSortOptions = [
+  'newest',
+  'oldest',
+  'relevance',
+  'title',
+] as const;
 
 export type PublicationSortOption = typeof publicationSortOptions[number];
 
@@ -100,7 +105,7 @@ export type PublicationSortParam = 'published' | 'title' | 'relevance';
 
 export type PublicationOrderParam = 'asc' | 'desc';
 
-interface PublicationListRequest {
+export interface PublicationListRequest {
   order?: PublicationOrderParam;
   page?: number;
   pageSize?: number;
