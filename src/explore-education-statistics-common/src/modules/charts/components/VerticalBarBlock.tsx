@@ -69,8 +69,9 @@ const VerticalBarBlock = ({
     axes.minor === undefined ||
     data === undefined ||
     meta === undefined
-  )
+  ) {
     return <div>Unable to render chart, chart incorrectly configured</div>;
+  }
 
   const dataSetCategories: DataSetCategory[] = createDataSetCategories(
     axes.major,
@@ -186,7 +187,7 @@ const VerticalBarBlock = ({
                       }),
                       position:
                         dataLabelPosition === 'inside' ? 'insideTop' : 'top',
-                      formatter: value =>
+                      formatter: (value: string | number) =>
                         formatPretty(
                           value.toString(),
                           dataSet.indicator.unit,
