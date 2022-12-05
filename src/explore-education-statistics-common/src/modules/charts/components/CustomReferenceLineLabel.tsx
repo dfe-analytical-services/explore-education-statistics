@@ -36,7 +36,7 @@ const CustomReferenceLineLabel = ({
   const labelPosition = getReferenceLineLabelPosition({
     axis,
     axisType,
-    otherAxisDomainMin: axisType === 'major' ? otherAxisDomainMax : 0,
+    otherAxisDomainMin: axisType === 'major' ? otherAxisDomainMin : 0,
     otherAxisDomainMax: axisType === 'major' ? otherAxisDomainMax : 100, // otherAxisPosition is set as a percentage on minor axis lines
     otherAxisPosition,
     viewBox,
