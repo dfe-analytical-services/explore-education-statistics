@@ -4,14 +4,10 @@ import useLegend from '@common/modules/charts/components/hooks/useLegend';
 import createReferenceLine from '@common/modules/charts/components/utils/createReferenceLine';
 import {
   AxisConfiguration,
-  BarChartDataLabelPosition,
   ChartDefinition,
   StackedBarProps,
 } from '@common/modules/charts/types/chart';
-import {
-  ChartData,
-  DataSetCategory,
-} from '@common/modules/charts/types/dataSet';
+import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import createDataSetCategories, {
   toChartData,
@@ -178,12 +174,10 @@ const HorizontalBarBlock = ({
                 showDataLabels
                   ? {
                       fontSize: 14,
-                      position: getDataLabelPosition({
-                        chartData,
-                        chartHasNegativeValues,
-                        dataKey,
-                        dataLabelPosition,
-                      }),
+                      position:
+                        dataLabelPosition === 'inside'
+                          ? 'insideRight'
+                          : 'right',
                       formatter: (value: string | number) =>
                         formatPretty(
                           value.toString(),
@@ -306,22 +300,3 @@ export const horizontalBarBlockDefinition: ChartDefinition = {
 };
 
 export default memo(HorizontalBarBlock);
-
-function getDataLabelPosition({
-  chartData,
-  chartHasNegativeValues,
-  dataKey,
-  dataLabelPosition,
-}: {
-  chartData: ChartData[];
-  chartHasNegativeValues: boolean;
-  dataKey: string;
-  dataLabelPosition?: BarChartDataLabelPosition;
-}) {
-  const dataValue =
-    parseNumber(chartData.find(d => d[dataKey])?.[dataKey]) ?? 0;
-  if (!chartHasNegativeValues || !dataLabelPosition || dataValue >= 0) {
-    return dataLabelPosition === 'inside' ? 'insideRight' : 'right';
-  }
-  return dataLabelPosition === 'inside' ? 'right' : 'insideRight';
-}
