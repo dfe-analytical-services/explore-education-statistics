@@ -1,72 +1,45 @@
 @import '~govuk-frontend/govuk/base';
 
-.dropArea {
-  background: govuk-colour('light-grey');
-  list-style: none;
-  margin: 0 govuk-spacing(2) govuk-spacing(2) 0;
-  padding: 0;
-}
+.isExpandedItem {
+  background: govuk-colour('light-grey') !important;
 
-.dropAreaActive {
-  outline: $govuk-focus-width solid $govuk-focus-colour;
-}
-
-.draggable {
-  background: govuk-colour('white');
-  border-bottom: 1px solid govuk-colour('dark-grey');
-  margin-bottom: 0;
-  padding: 0 0 0 govuk-spacing(7);
-  position: relative;
-
-  &::before {
-    color: govuk-colour('dark-grey');
-    content: '\2630';
-    cursor: grab;
-    font-size: 1.6rem;
-    left: 4px;
-    position: absolute;
-    top: 7px;
-  }
-
-  &:focus,
-  &.isDragging {
-    @include govuk-focused-text;
-  }
-
-  &.isDraggedOutside {
-    opacity: 0.7;
-  }
-}
-
-.draggable.isDisabled {
-  &::before {
-    content: none;
-  }
-}
-
-.draggable.isExpanded {
-  background: govuk-colour('light-grey');
-
-  &::before {
-    content: '\25BC';
-    font-size: 1rem;
-    left: 8px;
-    top: 12px;
-  }
-
-  .isExpanded {
+  .isExpandedItem {
     background: lighten(govuk-colour('light-grey'), 2);
   }
 }
 
+.dragHandle {
+  font-size: 1rem;
+  left: 12px;
+  position: absolute;
+  top: govuk-spacing(3);
+}
+
 .draggableInner {
+  align-items: center;
   display: flex;
   flex-grow: 1;
   justify-content: space-between;
-  padding: govuk-spacing(2) govuk-spacing(2) govuk-spacing(2) 0;
+  padding: 0 govuk-spacing(2) 0 0;
 }
+
 .optionLabel {
   &.isExpanded {
     font-weight: $govuk-font-weight-bold;
+  }
+
+  &.hideDragHandle {
+    padding-left: 40px;
+  }
+}
+
+.inner {
+  width: 100%;
+}
+
+.dropArea {
+  margin-bottom: govuk-spacing(6);
+  .dropArea & {
+    margin: govuk-spacing(2) govuk-spacing(1) govuk-spacing(4) 0;
   }
 }

@@ -1,0 +1,56 @@
+@import '~govuk-frontend/govuk/base';
+
+$vertical-spacing: govuk-spacing(3);
+
+.draggable {
+  background: govuk-colour('white');
+  border-bottom: 1px solid govuk-colour('dark-grey');
+  margin-bottom: 0;
+  padding: $vertical-spacing govuk-spacing(1) $vertical-spacing 40px;
+  position: relative;
+
+  &:hover {
+    background: govuk-colour('light-grey');
+  }
+
+  &:focus {
+    @include govuk-focused-text;
+    z-index: 1;
+  }
+}
+
+.isDragging {
+  @include govuk-focused-text;
+  z-index: 1;
+}
+
+.isDraggedOutside {
+  opacity: 0.7;
+}
+
+.dragHandle {
+  color: govuk-colour('dark-grey');
+  font-size: 1.6rem;
+  left: 4px;
+  line-height: 1;
+  position: absolute;
+  top: $vertical-spacing;
+}
+
+.hideDragHandle {
+  padding-left: 0;
+  &::before {
+    content: none;
+  }
+}
+
+/* stylelint-disable selector-no-qualifying-type */
+tr.draggable {
+  border-bottom: 0;
+  display: table-row;
+
+  &.isDragging {
+    display: table;
+  }
+}
+/* stylelint-enable */

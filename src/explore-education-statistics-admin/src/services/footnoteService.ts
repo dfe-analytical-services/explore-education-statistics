@@ -106,6 +106,14 @@ const footnoteService = {
   deleteFootnote(releaseId: string, id: string): Promise<void> {
     return client.delete(`/releases/${releaseId}/footnotes/${id}`);
   },
+  updateFootnotesOrder(
+    releaseId: string,
+    footnoteIds: string[],
+  ): Promise<string[]> {
+    return client.patch(`/releases/${releaseId}/footnotes/`, {
+      footnoteIds,
+    });
+  },
 };
 
 export default footnoteService;
