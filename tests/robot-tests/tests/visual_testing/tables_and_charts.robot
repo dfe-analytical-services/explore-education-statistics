@@ -11,6 +11,7 @@ ${KEY_STATS_FOLDER}=            key-stats
 ${SECONDARY_STATS_FOLDER}=      secondary-stats
 ${CONTENT_SECTIONS_FOLDER}=     content-sections
 ${FAST_TRACKS_FOLDER}=          fast-tracks
+${tables_tab}=                  None
 
 
 *** Keywords ***
@@ -68,7 +69,12 @@ Check Fast Track Table
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${FAST_TRACKS_FOLDER}/${content_block.content_block_id}-table.png
     user takes html snapshot of element    id:tableToolWizard
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${FAST_TRACKS_FOLDER}/${content_block.content_block_id}-table.html
-    log content block details    ${content_block}    Fast Track    ${filepath}
+
+    IF    ${content_block.has_chart_config}
+        log content block details    ${content_block}    Fast Track    ${TRUE}
+    ELSE
+        log content block details    ${content_block}    Fast Track    ${FALSE}
+    END
 
 Check Content Block Table
     [Arguments]    ${content_block}
@@ -80,15 +86,19 @@ Check Content Block Table
     user scrolls to the bottom of the page
     user scrolls to the top of the page
     user scrolls to the bottom of the page
-    user waits until parent contains element    ${accordion}    id:dataBlock-${content_block.content_block_id}
+
     ${data_block}=    get child element    ${accordion}    id:dataBlock-${content_block.content_block_id}
-    user waits until parent contains element    ${data_block}
-    ...    id:dataBlock-${content_block.content_block_id}-tables-tab
-    user scrolls to element    id:dataBlock-${content_block.content_block_id}-tables-tab
-    user scrolls down    100
-    ${data_block_table_tab}=    get child element    ${data_block}
-    ...    id:dataBlock-${content_block.content_block_id}-tables-tab
-    user clicks element    ${data_block_table_tab}
+
+    IF    ${content_block.has_chart_config}
+        ${tables_tab}=    set variable    dataBlock-${content_block.content_block_id}-tables
+        user waits until parent contains element    ${data_block}    id:${tables_tab}
+        user waits until element is enabled    id:${tables_tab}
+        user clicks link by visible text    Table    ${data_block}
+    ELSE
+        ${tables_tab}=    set variable    dataBlock-${content_block.content_block_id}
+        user scrolls to element    ${data_block}
+    END
+
     ${table_filepath}=    user takes screenshot of element    ${data_block}
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${CONTENT_SECTIONS_FOLDER}/${content_block.content_block_id}-table.png
     user takes html snapshot of element    ${data_block}
@@ -110,7 +120,7 @@ Check Content Block Table
 
 Check Secondary Stats Table
     [Arguments]    ${content_block}
-    user scrolls to element    id:content
+    user scrolls to element    id:releaseHeadlines
     user waits until page contains element    id:releaseHeadlines-tables-tab
     user scrolls to element    id:releaseHeadlines-tables-tab
     user clicks element    id:releaseHeadlines-tables-tab

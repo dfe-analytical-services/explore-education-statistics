@@ -8,13 +8,9 @@ import cv2
 import imutils
 import numpy as np
 from skimage.metrics import structural_similarity as compare_ssim
-from tests.libs.logger import get_logger
-
-logger = get_logger(__name__)
 
 
 def resize_and_pad(img, size, padColor=0):
-
     h, w = img.shape[:2]
     sh, sw = size
 
@@ -50,7 +46,7 @@ def resize_and_pad(img, size, padColor=0):
     ):  # color image but only one color provided
         padColor = [padColor] * 3
 
-    logger.warn(f"Resizing: {pad_top}, {pad_bot}, {pad_left}, {pad_right}")
+    print(f"Resizing: {pad_top}, {pad_bot}, {pad_left}, {pad_right}")
 
     # scale and pad
     scaled_img = cv2.resize(img, (new_w, new_h), interpolation=interp)
@@ -91,7 +87,7 @@ def compare_images(
         diff_image = (diff_image * 255).astype("uint8")
 
         if score < (1 - diff_threshold):
-            logger.info(
+            print(
                 f"Visual difference detected in snapshot {os.path.basename(first_filepath)} - similarity : {format(score)}"
             )
 
@@ -125,4 +121,4 @@ def compare_images(
                     cv2.destroyAllWindows()
 
     except BaseException:
-        logger.warn(f"Could not compare image {first_filepath}")
+        print(f"Could not compare image {first_filepath}")
