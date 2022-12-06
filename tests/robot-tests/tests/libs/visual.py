@@ -1,5 +1,4 @@
 import os
-from os import getcwd, makedirs, pardir, path
 
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.webdriver.remote.webelement import WebElement
@@ -56,9 +55,9 @@ def capture_large_screenshot():
 @with_maximised_browser
 def take_screenshot_of_element(element: WebElement, filename: str):
     try:
-        filepath = f"{getcwd()}{os.sep}{filename}"
-        folder = path.abspath(path.join(filepath, pardir))
-        makedirs(folder, exist_ok=True)
+        filepath = f"{os.getcwd()}{os.sep}{filename}"
+        folder = os.path.abspath(os.path.join(filepath, os.pardir))
+        os.makedirs(folder, exist_ok=True)
         element.screenshot(filepath)
         return f"file://{filepath}"
     except BaseException:
@@ -67,9 +66,9 @@ def take_screenshot_of_element(element: WebElement, filename: str):
 
 
 def take_html_snapshot_of_element(element: WebElement, filename: str):
-    filepath = f"{getcwd()}{os.sep}{filename}"
-    folder = path.abspath(path.join(filepath, pardir))
-    makedirs(folder, exist_ok=True)
+    filepath = f"{os.getcwd()}{os.sep}{filename}"
+    folder = os.path.abspath(os.path.join(filepath, os.pardir))
+    os.makedirs(folder, exist_ok=True)
     html = element.get_attribute("innerHTML")
     with open(filepath, "w", encoding="utf-8") as html_file:
         html_file.write(html)
