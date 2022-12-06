@@ -28,6 +28,7 @@ import createDataSetCategories, {
   toChartData,
 } from '@common/modules/charts/util/createDataSetCategories';
 import { calculateMinorAxisDomainValues } from '@common/modules/charts/util/domainTicks';
+import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
 import { OmitStrict } from '@common/types';
@@ -298,7 +299,12 @@ const ChartAxisConfiguration = ({
         onSubmit({
           ...nextConfiguration,
           referenceLines: nextConfiguration.referenceLines.filter(line =>
-            groupByFilters.some(filter => filter.value === line.position),
+            groupByFilters.some(filter => {
+              if (filter instanceof LocationFilter) {
+                return LocationFilter.createId(filter) === line.position;
+              }
+              return filter.value === line.position;
+            }),
           ),
         });
       } else {
