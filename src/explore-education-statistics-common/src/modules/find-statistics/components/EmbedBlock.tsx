@@ -24,8 +24,7 @@ const EmbedBlock = ({ title, url }: Props) => {
         <WarningMessage>Could not load iframe.</WarningMessage>
       )}
       <IframeResizer
-        heightCalculationMethod="max"
-        widthCalculationMethod="max"
+        heightCalculationMethod="lowestElement"
         src={url}
         style={{ border: 0, minWidth: '100%', width: '1px' }}
         title={title}
