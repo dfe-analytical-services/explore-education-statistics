@@ -18,12 +18,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task CreateManyIfNotExists()
         {
             var createdById = Guid.NewGuid();
-            var userPublicationRole1 = new UserPublicationRoleAddViewModel
+            var userPublicationRole1 = new UserPublicationRoleCreateRequest
             {
                 PublicationId = Guid.NewGuid(),
                 PublicationRole = Owner,
             };
-            var userPublicationRole2 = new UserPublicationRoleAddViewModel
+            var userPublicationRole2 = new UserPublicationRoleCreateRequest
             {
                 PublicationId = Guid.NewGuid(),
                 PublicationRole = ReleaseApprover,
@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userPublicationRoles: ListOf(
                         userPublicationRole1,
                         userPublicationRole2,
-                        new UserPublicationRoleAddViewModel
+                        new UserPublicationRoleCreateRequest
                         {
                             PublicationId = existingPublicationInvite.PublicationId,
                             PublicationRole = existingPublicationInvite.Role,

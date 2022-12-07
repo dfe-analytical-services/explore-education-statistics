@@ -43,6 +43,15 @@ const InvitedUsersPage = () => {
       title="Pending invites"
       caption="Manage invites to the service"
     >
+      <Link to="/administration/users/invites/create" className="govuk-button">
+        Invite a new user
+      </Link>
+      <p>
+        <Link to="/administration/" className="govuk-back-link">
+          Back
+        </Link>
+      </p>
+
       {errorStatus && errorStatus === 404 ? (
         'There are currently no pending user invites'
       ) : (
@@ -118,14 +127,6 @@ const InvitedUsersPage = () => {
           </table>
         </LoadingSpinner>
       )}
-      <Link to="/administration/users/invites/create" className="govuk-button">
-        Invite a new user
-      </Link>
-      <p>
-        <Link to="/administration/" className="govuk-back-link">
-          Back
-        </Link>
-      </p>
     </Page>
   );
 };

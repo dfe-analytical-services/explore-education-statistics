@@ -172,6 +172,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                     Assert.True(DateTime.UtcNow > saved.Created);
                 }
             }
+            
+            [Fact]
+            public async Task CreatedTimestamp_DateTime_AlreadySet()
+            {
+                var entityCreated = DateTime.UtcNow.AddDays(-10);
+                
+                var entity = new CreatedDateTimeEntity
+                {
+                    Created = entityCreated
+                };
+
+                var contextId = Guid.NewGuid().ToString();
+
+                await using (var context = new TestContext(contextId))
+                {
+                    await context.AddAsync(entity);
+                    await context.SaveChangesAsync();
+                }
+
+                // Check entity's created data was left alone as it was already set
+                await using (var context = new TestContext(contextId))
+                {
+                    var saved = await context.CreatedDateTimeEntity.FindAsync(entity.Id);
+
+                    Assert.Equal(entityCreated, saved!.Created);
+                }
+            }
+
+            [Fact]
+            public async Task CreatedTimestamp_DateTimeOffset_AlreadySet()
+            {
+                var entityCreated = DateTimeOffset.UtcNow.AddDays(-10);
+
+                var entity = new CreatedDateTimeOffsetEntity
+                {
+                    Created = entityCreated
+                };
+
+                var contextId = Guid.NewGuid().ToString();
+
+                await using (var context = new TestContext(contextId))
+                {
+                    await context.AddAsync(entity);
+                    await context.SaveChangesAsync();
+                }
+
+                // Check entity's created data was left alone as it was already set
+                await using (var context = new TestContext(contextId))
+                {
+                    var saved = await context.CreatedDateTimeOffsetEntity.FindAsync(entity.Id);
+
+                    Assert.Equal(entityCreated, saved!.Created);
+                }
+            }
 
             [Fact]
             public async Task CreatedTimestamp_InvalidType_Throws()
