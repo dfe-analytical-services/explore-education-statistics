@@ -38,13 +38,6 @@ const PrototypeTableHighlights = () => {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <PageTitle title="Explore our datasets" caption="Table tool" />
-            <p>
-              Choose the data and area of interest you want to explore and then
-              use filters to create your table.
-              <br />
-              Once you've created your table, you can download the data it
-              contains for your own offline analysis.
-            </p>
           </div>
         </div>
         <div className="govuk-!-margin-bottom-9">
@@ -132,9 +125,12 @@ const PrototypeTableHighlights = () => {
                       </div>
                       <div className="dfe-flex dfe-justify-content--space-between  govuk-grid-column-three-quarters">
                         <h3>
-                          {datasetValue
-                            ? 'Dataset details'
-                            : 'No dataset selected'}
+                          {!datasetValue && <>No dataset selected</>}
+
+                          {datasetValue &&
+                            (datasetValue === 'All featured tables'
+                              ? 'All featured tables for this publication'
+                              : 'Dataset details')}
                         </h3>
                       </div>
                     </div>
@@ -142,7 +138,7 @@ const PrototypeTableHighlights = () => {
                   <form>
                     <div className="govuk-grid-row govuk-!-width-full">
                       <div className="govuk-grid-column-one-quarter">
-                        <div className="govuk-form-group govuk-!-padding-left-3 govuk-!-padding-right-5">
+                        <div>
                           <fieldset className="govuk-fieldset">
                             <legend
                               className={classNames(
@@ -154,211 +150,319 @@ const PrototypeTableHighlights = () => {
                             >
                               Select a dataset
                             </legend>
-                            <div className="govuk-radios govuk-radios--small">
-                              <div className="govuk-radios__item">
-                                <input
-                                  type="radio"
-                                  className="govuk-radios__input"
-                                  name="subject"
-                                  id="subject-all"
-                                  onClick={() => {
-                                    setDatasetValue('All featured tables');
-                                    setDataset('subject-all');
-                                  }}
-                                />
-                                <label
-                                  className={classNames(
-                                    'govuk-label',
-                                    'govuk-radios__label',
-                                  )}
-                                  htmlFor="subject-all"
-                                >
-                                  All featured tables
-                                </label>
-                              </div>
 
-                              <div className="govuk-radios__item">
-                                <input
-                                  type="radio"
-                                  className="govuk-radios__input"
-                                  name="subject"
-                                  id="subject-1"
-                                  onClick={() => {
-                                    setDatasetValue(
-                                      'Annual Headlines - detailed series',
-                                    );
-                                    setDataset('subject-1');
-                                  }}
-                                />
-                                <label
-                                  className={classNames(
-                                    'govuk-label',
-                                    'govuk-radios__label',
-                                  )}
-                                  htmlFor="subject-1"
-                                >
-                                  Annual Headlines - detailed series
-                                </label>
-                              </div>
-                              <div className="govuk-radios__item">
-                                <input
-                                  type="radio"
-                                  className="govuk-radios__input"
-                                  name="subject"
-                                  id="subject-2"
-                                  onClick={() => {
-                                    setDatasetValue(
-                                      'Apprenticeship Achievement Rates Demographics',
-                                    );
-                                    setDataset('subject-2');
-                                  }}
-                                />
-                                <label
-                                  className={classNames(
-                                    'govuk-label',
-                                    'govuk-radios__label',
-                                  )}
-                                  htmlFor="subject-2"
-                                >
-                                  Apprenticeship Achievement Rates Demographics
-                                </label>
-                              </div>
-                              <div className="govuk-radios__item">
-                                <input
-                                  type="radio"
-                                  className="govuk-radios__input"
-                                  name="subject"
-                                  id="subject-3"
-                                  onClick={() => {
-                                    setDatasetValue(
-                                      'Apprenticeship Achievement Rates  Detailed series',
-                                    );
-                                    setDataset('subject-3');
-                                  }}
-                                />
-                                <label
-                                  className={classNames(
-                                    'govuk-label',
-                                    'govuk-radios__label',
-                                  )}
-                                  htmlFor="subject-3"
-                                >
-                                  Apprenticeship Achievement Rates Detailed
-                                  Series
-                                </label>
-                              </div>
-                              <div className="govuk-radios__item">
-                                <input
-                                  type="radio"
-                                  className="govuk-radios__input"
-                                  name="subject"
-                                  id="subject-4"
-                                  onClick={() => {
-                                    setDatasetValue(
-                                      'Apprenticeship Achievement Rates Headliness',
-                                    );
-                                    setDataset('subject-4');
-                                  }}
-                                />
-                                <label
-                                  className={classNames(
-                                    'govuk-label',
-                                    'govuk-radios__label',
-                                  )}
-                                  htmlFor="subject-4"
-                                >
-                                  Apprenticeship Achievement Rates Headlines
-                                </label>
-                              </div>
-                              <div className="govuk-radios__item">
-                                <input
-                                  type="radio"
-                                  className="govuk-radios__input"
-                                  name="subject"
-                                  id="subject-5"
-                                />
-                                <label
-                                  className={classNames(
-                                    'govuk-label',
-                                    'govuk-radios__label',
-                                  )}
-                                  htmlFor="subject-5"
-                                >
-                                  Apprenticeship Service - incentives
-                                </label>
-                              </div>
-                              <div className="govuk-radios__item">
-                                <input
-                                  type="radio"
-                                  className="govuk-radios__input"
-                                  name="subject"
-                                  id="subject-6"
-                                />
-                                <label
-                                  className={classNames(
-                                    'govuk-label',
-                                    'govuk-radios__label',
-                                  )}
-                                  htmlFor="subject-6"
-                                >
-                                  Charts data
-                                </label>
-                              </div>
-                              <div className="govuk-radios__item">
-                                <input
-                                  type="radio"
-                                  className="govuk-radios__input"
-                                  name="subject"
-                                  id="subject-7"
-                                />
-                                <label
-                                  className={classNames(
-                                    'govuk-label',
-                                    'govuk-radios__label',
-                                  )}
-                                  htmlFor="subject-7"
-                                >
-                                  Duration, planned length of stay and length of
-                                  employment
-                                </label>
-                              </div>
-                              <div className="govuk-radios__item">
-                                <input
-                                  type="radio"
-                                  className="govuk-radios__input"
-                                  name="subject"
-                                  id="subject-8"
-                                />
-                                <label
-                                  className={classNames(
-                                    'govuk-label',
-                                    'govuk-radios__label',
-                                  )}
-                                  htmlFor="subject-8"
-                                >
-                                  Find an apprenticeship adverts and vacancies
-                                </label>
-                              </div>
-                              <div className="govuk-radios__item">
-                                <input
-                                  type="radio"
-                                  className="govuk-radios__input"
-                                  name="subject"
-                                  id="subject-9"
-                                />
-                                <label
-                                  className={classNames(
-                                    'govuk-label',
-                                    'govuk-radios__label',
-                                  )}
-                                  htmlFor="subject-9"
-                                >
-                                  Geographical breakdowns - detailed (reported
-                                  to date)
-                                </label>
-                              </div>
+                            <div
+                              className={classNames(
+                                'govuk-radios',
+                                'govuk-radios--small',
+                                'govuk-form-group',
+                                'govuk-!-padding-left-3',
+                                'govuk-!-padding-right-5',
+                                styles.prototypeScrollArea,
+                              )}
+                            >
+                              <fieldset className="govuk-fieldset govuk-!-margin-top-3">
+                                <div className="govuk-radios__item">
+                                  <input
+                                    type="radio"
+                                    className="govuk-radios__input"
+                                    name="subject"
+                                    id="subject-all"
+                                    onClick={() => {
+                                      setDatasetValue('All featured tables');
+                                      setDataset('subject-all');
+                                    }}
+                                  />
+                                  <label
+                                    className={classNames(
+                                      'govuk-label',
+                                      'govuk-radios__label',
+                                    )}
+                                    htmlFor="subject-all"
+                                  >
+                                    All featured tables
+                                  </label>
+                                </div>
+                              </fieldset>
+
+                              <fieldset className="govuk-fieldset govuk-!-margin-top-6">
+                                <legend className="govuk-heading-s govuk-!-margin-bottom-0 ">
+                                  <h3>Available datasets</h3>
+                                  Headlines
+                                </legend>
+                                <div className="govuk-radios__item">
+                                  <input
+                                    type="radio"
+                                    className="govuk-radios__input"
+                                    name="subject"
+                                    id="subject-1"
+                                    onClick={() => {
+                                      setDatasetValue(
+                                        'Annual Headlines - detailed series',
+                                      );
+                                      setDataset('subject-1');
+                                    }}
+                                  />
+                                  <label
+                                    className={classNames(
+                                      'govuk-label',
+                                      'govuk-radios__label',
+                                    )}
+                                    htmlFor="subject-1"
+                                  >
+                                    Annual Headlines - detailed series
+                                  </label>
+                                </div>
+                              </fieldset>
+
+                              <fieldset className="govuk-fieldset govuk-!-margin-top-6">
+                                <legend className="govuk-heading-s govuk-!-margin-bottom-0 ">
+                                  Apprenticeship Achievement Rates
+                                </legend>
+                                <div className="govuk-radios__item">
+                                  <input
+                                    type="radio"
+                                    className="govuk-radios__input"
+                                    name="subject"
+                                    id="subject-2"
+                                    onClick={() => {
+                                      setDatasetValue(
+                                        'Apprenticeship Achievement Rates Demographics',
+                                      );
+                                      setDataset('subject-2');
+                                    }}
+                                  />
+                                  <label
+                                    className={classNames(
+                                      'govuk-label',
+                                      'govuk-radios__label',
+                                    )}
+                                    htmlFor="subject-2"
+                                  >
+                                    Rates Demographics
+                                  </label>
+                                </div>
+                                <div className="govuk-radios__item">
+                                  <input
+                                    type="radio"
+                                    className="govuk-radios__input"
+                                    name="subject"
+                                    id="subject-3"
+                                    onClick={() => {
+                                      setDatasetValue(
+                                        'Apprenticeship Achievement Rates  Detailed series',
+                                      );
+                                      setDataset('subject-3');
+                                    }}
+                                  />
+                                  <label
+                                    className={classNames(
+                                      'govuk-label',
+                                      'govuk-radios__label',
+                                    )}
+                                    htmlFor="subject-3"
+                                  >
+                                    {' '}
+                                    Rates Detailed Series
+                                  </label>
+                                </div>
+                                <div className="govuk-radios__item">
+                                  <input
+                                    type="radio"
+                                    className="govuk-radios__input"
+                                    name="subject"
+                                    id="subject-4"
+                                    onClick={() => {
+                                      setDatasetValue(
+                                        'Apprenticeship Achievement Rates Headliness',
+                                      );
+                                      setDataset('subject-4');
+                                    }}
+                                  />
+                                  <label
+                                    className={classNames(
+                                      'govuk-label',
+                                      'govuk-radios__label',
+                                    )}
+                                    htmlFor="subject-4"
+                                  >
+                                    Rates Headlines
+                                  </label>
+                                </div>
+                              </fieldset>
+                              <fieldset className="govuk-fieldset govuk-!-margin-top-6">
+                                <legend className="govuk-heading-s govuk-!-margin-bottom-0 ">
+                                  Other heading example
+                                </legend>
+
+                                <div className="govuk-radios__item">
+                                  <input
+                                    type="radio"
+                                    className="govuk-radios__input"
+                                    name="subject"
+                                    id="subject-5"
+                                  />
+                                  <label
+                                    className={classNames(
+                                      'govuk-label',
+                                      'govuk-radios__label',
+                                    )}
+                                    htmlFor="subject-5"
+                                  >
+                                    Apprenticeship Service - incentives
+                                  </label>
+                                </div>
+                                <div className="govuk-radios__item">
+                                  <input
+                                    type="radio"
+                                    className="govuk-radios__input"
+                                    name="subject"
+                                    id="subject-6"
+                                  />
+                                  <label
+                                    className={classNames(
+                                      'govuk-label',
+                                      'govuk-radios__label',
+                                    )}
+                                    htmlFor="subject-6"
+                                  >
+                                    Charts data
+                                  </label>
+                                </div>
+                                <div className="govuk-radios__item">
+                                  <input
+                                    type="radio"
+                                    className="govuk-radios__input"
+                                    name="subject"
+                                    id="subject-7"
+                                  />
+                                  <label
+                                    className={classNames(
+                                      'govuk-label',
+                                      'govuk-radios__label',
+                                    )}
+                                    htmlFor="subject-7"
+                                  >
+                                    Duration, planned length of stay and length
+                                    of employment
+                                  </label>
+                                </div>
+                                <div className="govuk-radios__item">
+                                  <input
+                                    type="radio"
+                                    className="govuk-radios__input"
+                                    name="subject"
+                                    id="subject-8"
+                                  />
+                                  <label
+                                    className={classNames(
+                                      'govuk-label',
+                                      'govuk-radios__label',
+                                    )}
+                                    htmlFor="subject-8"
+                                  >
+                                    Find an apprenticeship adverts and vacancies
+                                  </label>
+                                </div>
+                                <div className="govuk-radios__item">
+                                  <input
+                                    type="radio"
+                                    className="govuk-radios__input"
+                                    name="subject"
+                                    id="subject-9"
+                                  />
+                                  <label
+                                    className={classNames(
+                                      'govuk-label',
+                                      'govuk-radios__label',
+                                    )}
+                                    htmlFor="subject-9"
+                                  >
+                                    Geographical breakdowns - detailed (reported
+                                    to date)
+                                  </label>
+                                </div>
+                              </fieldset>
                             </div>
                           </fieldset>
+                          <Details
+                            summary="Filter datasets"
+                            className="govuk-!-margin-top-6 govuk-!-margin-left-5"
+                          >
+                            <div
+                              className="govuk-form-group govuk-!-margin-bottom-6"
+                              style={{ position: 'relative' }}
+                            >
+                              <h2 className="govuk-label-wrapper">
+                                <label
+                                  className="govuk-label govuk-label--s"
+                                  htmlFor="search"
+                                >
+                                  Search
+                                </label>
+                              </h2>
+
+                              <input
+                                type="search"
+                                id="search"
+                                className="govuk-input"
+                                value=""
+                                style={{ width: 'calc(100% - 36px)' }}
+                              />
+                            </div>
+                            <div
+                              className="govuk-form-group govuk-!-margin-bottom-6"
+                              style={{ position: 'relative' }}
+                            >
+                              <h2 className="govuk-label-wrapper">
+                                <label
+                                  className="govuk-label govuk-label--s"
+                                  htmlFor="search"
+                                >
+                                  Geographic level including
+                                </label>
+                              </h2>
+
+                              <select className="govuk-select">
+                                <option value="">Any geographic level</option>
+                                <option value="">National</option>
+                                <option value="">Regional</option>
+                                <option value="">Local authority</option>
+                              </select>
+                            </div>
+                            <div
+                              className="govuk-form-group govuk-!-margin-bottom-6"
+                              style={{ position: 'relative' }}
+                            >
+                              <h2 className="govuk-label-wrapper">
+                                <label
+                                  className="govuk-label govuk-label--s"
+                                  htmlFor="search"
+                                >
+                                  Indicators including
+                                </label>
+                              </h2>
+
+                              <select className="govuk-select">
+                                <option value="">Any indicator</option>
+                                <option value="">Achievements</option>
+                                <option value="">Learner participation</option>
+                                <option value="">
+                                  Percentage Achievements
+                                </option>
+                                <option value="">
+                                  Percentage Learner participations
+                                </option>
+                                <option value="">Starts</option>
+                              </select>
+                              <button
+                                type="submit"
+                                className="govuk-button govuk-!-margin-top-6"
+                              >
+                                Apply filters
+                              </button>
+                            </div>
+                          </Details>
                         </div>
                       </div>
                       <div className="govuk-grid-column-three-quarters">
@@ -369,6 +473,11 @@ const PrototypeTableHighlights = () => {
                               see a summary of the data, create your own tables,
                               view featured tables, or download the entire data
                               file.
+                            </p>
+                            <p>
+                              Selecting 'All featured tables' will show a list
+                              of featured tables from across all our datasets
+                              for this publication.
                             </p>
                           </div>
                         )}
@@ -387,21 +496,21 @@ const PrototypeTableHighlights = () => {
                               <SummaryListItem term="Content">
                                 <p>
                                   Time series of headline apprenticeship figures
-                                  <Details
-                                    summary="View more details"
-                                    className="govuk-!-margin-bottom-0"
-                                  >
-                                    <p>
-                                      Indicators: Starts, Achievements, Learner
-                                      participation, Percentage Starts,
-                                      Percentage Achievements, Percentage
-                                      Learner participation
-                                    </p>
-                                    <p>
-                                      Filters: Apprenticeship level, Funding
-                                      type, Age group
-                                    </p>
-                                  </Details>
+                                </p>
+
+                                <h4 className="govuk-!-margin-bottom-0">
+                                  Indicators
+                                </h4>
+                                <p>
+                                  Starts, Achievements, Learner participation,
+                                  Percentage Starts, Percentage Achievements,
+                                  Percentage Learner participation
+                                </p>
+                                <h4 className="govuk-!-margin-bottom-0">
+                                  Filters
+                                </h4>
+                                <p>
+                                  Apprenticeship level, Funding type, Age group
                                 </p>
                               </SummaryListItem>
                             </SummaryList>
@@ -430,21 +539,20 @@ const PrototypeTableHighlights = () => {
                                 <p>
                                   Apprenticeship national achievement rate
                                   tables
-                                  <Details
-                                    summary="View more details"
-                                    className="govuk-!-margin-bottom-0"
-                                  >
-                                    <p>
-                                      Indicators: Achievement rate, Achievers,
-                                      Completers, Leavers, Pass rate, Retention
-                                      rate
-                                    </p>
-                                    <p>
-                                      Filters: Age, Level, demographic -
-                                      ethnicity, gender and lldd, Standard
-                                      /Framework flag
-                                    </p>
-                                  </Details>
+                                </p>
+                                <h4 className="govuk-!-margin-bottom-0">
+                                  Indicators
+                                </h4>
+                                <p>
+                                  Achievement rate, Achievers, Completers,
+                                  Leavers, Pass rate, Retention rate
+                                </p>
+                                <h4 className="govuk-!-margin-bottom-0">
+                                  Filters
+                                </h4>
+                                <p>
+                                  Age, Level, demographic - ethnicity, gender
+                                  and lldd, Standard /Framework flag
                                 </p>
                               </SummaryListItem>
                             </SummaryList>
