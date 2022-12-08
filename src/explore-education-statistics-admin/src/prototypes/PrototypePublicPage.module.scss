@@ -204,3 +204,20 @@
     display: none;
   }
 }
+
+.prototypeScrollArea {
+  border: 1px solid $govuk-border-colour;
+  max-height: 60vh;
+  overflow: auto;
+}
+
+/*.prototypeScrollArea::-webkit-scrollbar{
+  appearance: none;
+  width: 7px;
+}
+
+.prototypeScrollArea::-webkit-scrollbar-thumb{
+  border-radius: 4px;
+  background-color: rgba(0,0,0,0.5);
+  box-shadow: 0 0 1px rgb(255 255 255 / 87%);
+}*/

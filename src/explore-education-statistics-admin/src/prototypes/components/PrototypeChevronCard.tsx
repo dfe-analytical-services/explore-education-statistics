@@ -6,16 +6,20 @@ interface Props {
   title?: string;
   description?: string;
   url?: string;
+  view?: string;
 }
 
-const ChevronCard = ({ title, description, url }: Props) => {
+const ChevronCard = ({ title, description, url, view }: Props) => {
   return (
-    <li className={styles.card}>
+    <li className={view === 'list' ? styles.cardListView : styles.card}>
       <div className={styles.wrapper}>
         <h4 className="govuk-heading-m govuk-!-margin-bottom-0">
           <a
             href={url || '#'}
-            className={classNames(styles.cardLink, 'govuk-!-margin-bottom-2')}
+            className={classNames(
+              view === 'list' ? styles.list : styles.cardLink,
+              'govuk-!-margin-bottom-2',
+            )}
           >
             {title}
           </a>
