@@ -5,9 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
@@ -78,25 +76,100 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             IEnumerable<Guid> filterItemIds,
             IEnumerable<Guid> indicatorIds)
         {
-            var releaseIdParam = new SqlParameter("releaseId", releaseId);
-            var subjectIdParam = new SqlParameter("subjectId", subjectId);
-            var filterItemListParam = CreateIdListType("filterItemList", filterItemIds);
-            var indicatorListParam = CreateIdListType("indicatorList", indicatorIds);
-
-            return await _context
-                .Footnote
-                .FromSqlRaw(
-                    "EXEC dbo.FilteredFootnotes " +
-                    "@releaseId," +
-                    "@subjectId," +
-                    "@indicatorList," +
-                    "@filterItemList",
-                    releaseIdParam,
-                    subjectIdParam,
-                    indicatorListParam,
-                    filterItemListParam)
-                .AsNoTracking()
+            // Query the id's of the filter groups and filters corresponding with the filter item id's
+            // Sanitise all id's to make sure they belong to the subject
+            var filterIdsResult = await _context.FilterItem
+                .Where(filterItem => filterItemIds.Contains(filterItem.Id)
+                                     && filterItem.FilterGroup.Filter.SubjectId == subjectId)
+                .Select(filterItem => new
+                {
+                    FilterItemId = filterItem.Id,
+                    filterItem.FilterGroupId,
+                    filterItem.FilterGroup.FilterId
+                })
                 .ToListAsync();
+
+            var filterItemIdsSanitised = filterIdsResult
+                .Select(filter => filter.FilterItemId)
+                .ToList();
+
+            var filterGroupsIdsSanitised = filterIdsResult
+                .Select(filter => filter.FilterGroupId)
+                .Distinct()
+                .ToList();
+
+            var filterIdsSanitised = filterIdsResult
+                .Select(filter => filter.FilterId)
+                .Distinct()
+                .ToList();
+
+            // Sanitise the indicator id's to make sure they belong to the subject
+            var indicatorIdsSanitised = await _context.Indicator
+                .Where(indicator => indicatorIds.Contains(indicator.Id)
+                                    && indicator.IndicatorGroup.SubjectId == subjectId)
+                .Select(indicator => indicator.Id)
+                .ToListAsync();
+
+            // A footnote must be linked to the release id
+            var footnotesQueryable = _context
+                .Footnote
+                .Where(footnote => footnote.Releases.Any(releaseFootnote => releaseFootnote.ReleaseId == releaseId));
+
+            // If the list of filter and indicator id's are empty,
+            // return early with only footnotes that apply directly to this subject
+            if (!filterIdsResult.Any() && !indicatorIdsSanitised.Any())
+            {
+                return await footnotesQueryable.Where(footnote =>
+                        footnote.Subjects.Any(subjectFootnote => subjectFootnote.SubjectId == subjectId)
+
+                        // We don't allow a footnote to apply to directly to a subject and to specific subject data
+                        // of the same subject at the same time, so these additional conditions aren't strictly necessary
+                        && footnote.FilterItems.All(itemFootnote =>
+                            itemFootnote.FilterItem.FilterGroup.Filter.SubjectId != subjectId)
+                        && footnote.FilterGroups.All(filterGroupFootnote =>
+                            filterGroupFootnote.FilterGroup.Filter.SubjectId != subjectId)
+                        && footnote.Filters.All(filterFootnote =>
+                            filterFootnote.Filter.SubjectId != subjectId)
+                        && footnote.Indicators.All(indicatorFootnote =>
+                            indicatorFootnote.Indicator.IndicatorGroup.SubjectId != subjectId))
+                    .ToListAsync();
+            }
+
+            // A footnote which applies directly to any subjects must include this subject id
+            footnotesQueryable = footnotesQueryable.Where(footnote =>
+                !footnote.Subjects.Any() || footnote.Subjects.Any(subjectFootnote =>
+                    subjectFootnote.SubjectId == subjectId));
+
+            // A footnote which applies to any indicators of this subject must include one of the indicator id's
+            footnotesQueryable = footnotesQueryable.Where(footnote =>
+                footnote.Indicators.All(indicatorFootnote =>
+                    indicatorFootnote.Indicator.IndicatorGroup.SubjectId != subjectId) ||
+                footnote.Indicators.Any(indicatorFootnote =>
+                    indicatorIdsSanitised.Contains(indicatorFootnote.IndicatorId)));
+
+            // A footnote which applies to any filter items of this subject must include one of the the filter item id's 
+            footnotesQueryable = footnotesQueryable.Where(footnote =>
+                footnote.FilterItems.All(filterItemFootnote =>
+                    filterItemFootnote.FilterItem.FilterGroup.Filter.SubjectId != subjectId) ||
+                footnote.FilterItems.Any(filterItemFootnote =>
+                    filterItemIdsSanitised.Contains(filterItemFootnote.FilterItemId)));
+
+            // A footnote which applies to any filter groups of this subject must include one of the the filter group id's
+            footnotesQueryable = footnotesQueryable.Where(footnote =>
+                footnote.FilterGroups.All(filterGroupFootnote =>
+                    filterGroupFootnote.FilterGroup.Filter.SubjectId != subjectId) ||
+                footnote.FilterGroups.Any(filterGroupFootnote =>
+                    filterGroupsIdsSanitised.Contains(filterGroupFootnote.FilterGroupId)));
+
+            // A footnote which applies to any filters of this subject must include one of the the filter id's
+            footnotesQueryable = footnotesQueryable.Where(footnote =>
+                footnote.Filters.All(filterFootnote =>
+                    filterFootnote.Filter.SubjectId != subjectId) ||
+                footnote.Filters.Any(filterFootnote =>
+                    filterIdsSanitised.Contains(filterFootnote.FilterId)));
+
+            // Execute the query
+            return await footnotesQueryable.ToListAsync();
         }
 
         public async Task DeleteAllFootnotesBySubject(Guid releaseId, Guid subjectId)
