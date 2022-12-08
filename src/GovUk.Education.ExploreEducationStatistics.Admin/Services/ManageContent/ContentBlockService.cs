@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             _context = context;
         }
 
-        public async Task DeleteContentBlockAndReorder(Guid blockToRemoveId, bool reorder = true)
+        public async Task DeleteContentBlockAndReorder(Guid blockToRemoveId)
         {
             var blockToRemove = await _context
                 .ContentBlocks
@@ -26,6 +26,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             var originalBlockOrder = blockToRemove.Order;
             var originalContentSectionId = blockToRemove.ContentSectionId;
 
+            await DeleteContentBlock(blockToRemove);
+
+            var contentSection = await _context.ContentSections
+                .Include(cs => cs.Content)
+                .SingleAsync(cs => cs.Id == originalContentSectionId);
+
+            var contentBlocksRequiringOrderChange = contentSection.Content
+                .Where(cb => cb.Order > originalBlockOrder)
+                .ToList();
+
+            _context.ContentBlocks.UpdateRange(contentBlocksRequiringOrderChange);
+            contentBlocksRequiringOrderChange
+                .ForEach(contentBlock => contentBlock.Order--);
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteSectionContentBlocks(Guid contentSectionId)
+        {
+            var contentSection = await _context.ContentSections
+                .Include(cs => cs.Content)
+                .SingleAsync(cs => cs.Id == contentSectionId);
+
+            await contentSection
+                .Content
+                .ToList()
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async contentBlock =>
+                {
+                    await DeleteContentBlock(contentBlock);
+                });
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task DeleteContentBlock(ContentBlock blockToRemove)
+        {
             switch (blockToRemove)
             {
                 case DataBlock dataBlock:
@@ -45,21 +82,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 default:
                     _context.ContentBlocks.Remove(blockToRemove);
                     break;
-            }
-
-            if (reorder)
-            {
-                var contentSection = await _context.ContentSections
-                    .Include(cs => cs.Content)
-                    .SingleAsync(cs => cs.Id == originalContentSectionId);
-
-                var contentBlocksRequiringOrderChange = contentSection.Content
-                    .Where(cb => cb.Order > originalBlockOrder)
-                    .ToList();
-
-                _context.ContentBlocks.UpdateRange(contentBlocksRequiringOrderChange);
-                contentBlocksRequiringOrderChange
-                    .ForEach(contentBlock => contentBlock.Order--);
             }
         }
     }

@@ -158,14 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     {
                         var (release, sectionToRemove) = tuple;
 
-                        await sectionToRemove
-                            .Content
-                            .ToList()
-                            .ToAsyncEnumerable()
-                            .ForEachAwaitAsync(async contentBlock =>
-                            {
-                                await _contentBlockService.DeleteContentBlockAndReorder(contentBlock.Id, reorder: false);
-                            });
+                        await _contentBlockService.DeleteSectionContentBlocks(sectionToRemove.Id);
 
                         release.RemoveGenericContentSection(sectionToRemove);
                         _context.ContentSections.Remove(sectionToRemove);
@@ -268,7 +261,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                     await _contentBlockService.DeleteContentBlockAndReorder(blockToRemove.Id);
 
-                    await _context.SaveChangesAsync();
                     return OrderedContentBlocks(section);
                 });
         }

@@ -6,6 +6,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 {
     public interface IContentBlockService
     {
-        Task DeleteContentBlockAndReorder(Guid blockToRemoveId, bool reorder = true);
+        Task DeleteContentBlockAndReorder(Guid blockToRemoveId);
+
+        Task DeleteSectionContentBlocks(Guid contentSectionId);
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -148,7 +149,6 @@ public class EmbedBlockService : IEmbedBlockService
                         }
 
                         await _contentBlockService.DeleteContentBlockAndReorder(contentBlock.Id);
-                        await _contentDbContext.SaveChangesAsync();
 
                         return Unit.Instance;
                     });

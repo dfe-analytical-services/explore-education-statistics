@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 public class ContentBlockServiceTests
 {
     [Fact]
-    public async Task DeleteContentBlockFromContentSection_EmbedBlockLink()
+    public async Task DeleteContentBlockAndReorder_EmbedBlockLink()
     {
         var release = new Release();
         var contentBlockId = Guid.NewGuid();
@@ -60,7 +60,6 @@ public class ContentBlockServiceTests
         {
             var service = SetupContentBlockService(context);
             await service.DeleteContentBlockAndReorder(contentSection.Content[2].Id);
-            await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
@@ -90,7 +89,7 @@ public class ContentBlockServiceTests
     }
 
     [Fact]
-    public async Task DeleteContentBlockFromContentSection_DataBlock()
+    public async Task DeleteContentBlockAndReorder_DataBlock()
     {
         var contentBlockId = Guid.NewGuid();
 
@@ -128,7 +127,6 @@ public class ContentBlockServiceTests
         {
             var service = SetupContentBlockService(context);
             await service.DeleteContentBlockAndReorder(contentSection.Content[2].Id);
-            await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
@@ -157,7 +155,7 @@ public class ContentBlockServiceTests
     }
 
     [Fact]
-    public async Task DeleteContentBlockFromContentSection_HtmlBlock()
+    public async Task DeleteContentBlockAndReorder_HtmlBlock()
     {
         var contentBlockId = Guid.NewGuid();
 
@@ -195,7 +193,6 @@ public class ContentBlockServiceTests
         {
             var service = SetupContentBlockService(context);
             await service.DeleteContentBlockAndReorder(contentSection.Content[2].Id);
-            await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
@@ -219,9 +216,9 @@ public class ContentBlockServiceTests
     }
 
     [Fact]
-    public async Task DeleteContentBlockFromContentSection_NoReorder()
+    public async Task DeleteSectionContentBlocks()
     {
-        var contentBlockId = Guid.NewGuid();
+        var dataBlockId = Guid.NewGuid();
 
         var releaseContentSection = new ReleaseContentSection
         {
@@ -230,15 +227,18 @@ public class ContentBlockServiceTests
             {
                 Content = new List<ContentBlock>
                 {
-                    new HtmlBlock { Order = 1, },
-                    new HtmlBlock { Order = 2, },
-                    new HtmlBlock
+                    new HtmlBlock(),
+                    new DataBlock { Id = dataBlockId, },
+                    new EmbedBlockLink
                     {
-                        Id = contentBlockId,
-                        Order = 3,
+                        EmbedBlock = new EmbedBlock
+                        {
+                            Title = "title",
+                            Url = "https://"
+                        }
                     },
-                    new HtmlBlock { Order = 4, },
-                    new HtmlBlock { Order = 5, },
+                    new HtmlBlock(),
+                    new HtmlBlock(),
                 },
             }
         };
@@ -256,7 +256,7 @@ public class ContentBlockServiceTests
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = SetupContentBlockService(context);
-            await service.DeleteContentBlockAndReorder(contentSection.Content[2].Id, reorder: false);
+            await service.DeleteSectionContentBlocks(contentSection.Id);
             await context.SaveChangesAsync();
         }
 
@@ -266,17 +266,16 @@ public class ContentBlockServiceTests
                 .Include(cs => cs.Content)
                 .Single(cs => cs.Id == contentSection.Id);
 
-            Assert.Equal(4, dbContentSection.Content.Count);
+            Assert.Empty(dbContentSection.Content);
 
-            Assert.Equal(contentBlocks[0].Id, dbContentSection.Content[0].Id);
-            Assert.Equal(1, dbContentSection.Content[0].Order);
-            Assert.Equal(contentBlocks[1].Id, dbContentSection.Content[1].Id);
-            Assert.Equal(2, dbContentSection.Content[1].Order);
-            // NOTE: Skip contentBlocks[2] as it will be deleted
-            Assert.Equal(contentBlocks[3].Id, dbContentSection.Content[2].Id);
-            Assert.Equal(4, dbContentSection.Content[2].Order);
-            Assert.Equal(contentBlocks[4].Id, dbContentSection.Content[3].Id);
-            Assert.Equal(5, dbContentSection.Content[3].Order);
+            var dbContentBlocks = context.ContentBlocks.ToList();
+            var dataBlock = Assert.Single(dbContentBlocks);
+            Assert.Equal(dataBlockId, dataBlock.Id);
+            Assert.Null(dataBlock.ContentSectionId);
+            Assert.Equal(0, dataBlock.Order);
+
+            var embedBlocks = context.EmbedBlocks.ToList();
+            Assert.Empty(embedBlocks);
         }
     }
     private static ContentBlockService SetupContentBlockService(ContentDbContext contentDbContext)
