@@ -147,6 +147,12 @@ environment variables, and instead must be passed as an argument to this script.
 parser.add_argument("--slack-webhook-url", dest="slack_webhook_url", default=None, help="URL for Slack webhook")
 parser.add_argument("--admin-pass", dest="admin_pass", default=None, help="manually specify the admin password")
 parser.add_argument("--analyst-pass", dest="analyst_pass", default=None, help="manually specify the analyst password")
+parser.add_argument(
+    "--expiredinvite-pass",
+    dest="expiredinvite_pass",
+    default=None,
+    help="manually specify the expiredinvite user password",
+)
 args = parser.parse_args()
 
 if args.custom_env:
@@ -167,6 +173,7 @@ assert os.getenv("WAIT_SMALL") is not None
 assert os.getenv("FAIL_TEST_SUITES_FAST") is not None
 assert os.getenv("IDENTITY_PROVIDER") is not None
 assert os.getenv("WAIT_MEMORY_CACHE_EXPIRY") is not None
+assert os.getenv("EXPIRED_INVITE_USER_EMAIL") is not None
 
 
 if args.slack_webhook_url:
@@ -177,6 +184,9 @@ if args.admin_pass:
 
 if args.analyst_pass:
     os.environ["ANALYST_PASSWORD"] = args.analyst_pass
+
+if args.expiredinvite_pass:
+    os.environ["EXPIRED_INVITE_USER_PASSWORD"] = args.expiredinvite_pass
 
 # Install chromedriver and add it to PATH
 get_webdriver(args.chromedriver_version or "latest")
