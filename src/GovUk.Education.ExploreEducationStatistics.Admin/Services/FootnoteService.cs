@@ -56,17 +56,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(() => _footnoteRepository.CreateFootnote(
-                    releaseId,
-                    content,
-                    filterIds: filterIds,
-                    filterGroupIds: filterGroupIds,
-                    filterItemIds: filterItemIds,
-                    indicatorIds: indicatorIds,
-                    subjectIds: subjectIds))
-                .OnSuccessDo(async _ => await _dataBlockService.InvalidateCachedDataBlocks(releaseId))
-                .OnSuccess(async footnote => await GetFootnote(releaseId, footnote.Id)
-                );
+                .OnSuccess(async () =>
+                {
+                    var releaseHasFootnotes = await _context.ReleaseFootnote
+                        .AnyAsync(rf => rf.ReleaseId == releaseId);
+
+                    var order = releaseHasFootnotes
+                        ? await _context.ReleaseFootnote
+                            .Include(rf => rf.Footnote)
+                            .Where(rf => rf.ReleaseId == releaseId)
+                            .MaxAsync(rf => rf.Footnote.Order) + 1
+                        : 0;
+
+                    var footnote = await _footnoteRepository.CreateFootnote(
+                        releaseId,
+                        content,
+                        filterIds: filterIds,
+                        filterGroupIds: filterGroupIds,
+                        filterItemIds: filterItemIds,
+                        indicatorIds: indicatorIds,
+                        subjectIds: subjectIds,
+                        order);
+
+                    await _dataBlockService.InvalidateCachedDataBlocks(releaseId);
+                    return await GetFootnote(releaseId, footnote.Id);
+                });
         }
 
         public async Task<Either<ActionResult, List<Footnote>>> CopyFootnotes(Guid sourceReleaseId,
@@ -98,7 +112,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 filterGroupIds: filterGroupIds,
                                 filterItemIds: filterItemIds,
                                 indicatorIds: indicatorIds,
-                                subjectIds: subjectIds);
+                                subjectIds: subjectIds,
+                                footnote.Order);
                         })
                         .ToListAsync();
                 });
@@ -165,7 +180,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         filterGroupIds: filterGroupIds,
                         filterItemIds: filterItemIds,
                         indicatorIds: indicatorIds,
-                        subjectIds: subjectIds);
+                        subjectIds: subjectIds,
+                        footnote.Order);
                     })
                     .OnSuccessDo(async _ => await _dataBlockService.InvalidateCachedDataBlocks(releaseId)));
         }

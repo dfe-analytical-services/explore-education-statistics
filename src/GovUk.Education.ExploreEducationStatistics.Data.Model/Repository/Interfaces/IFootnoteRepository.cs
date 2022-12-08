@@ -14,7 +14,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
             IReadOnlySet<Guid> filterGroupIds,
             IReadOnlySet<Guid> filterItemIds,
             IReadOnlySet<Guid> indicatorIds,
-            IReadOnlySet<Guid> subjectIds);
+            IReadOnlySet<Guid> subjectIds,
+            int order);
 
         Task<List<Footnote>> GetFilteredFootnotes(
             Guid releaseId,
