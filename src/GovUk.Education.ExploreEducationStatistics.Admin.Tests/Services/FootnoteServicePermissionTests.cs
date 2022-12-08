@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -209,6 +210,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         filterItemIds: SetOf<Guid>(),
                         indicatorIds: SetOf<Guid>(),
                         subjectIds: SetOf(Subject.Id)
+                    ),
+                Release,
+                SecurityPolicies.CanUpdateSpecificRelease
+            );
+        }
+
+        [Fact]
+        public async Task UpdateFootnotes()
+        {
+            await AssertSecurityPolicyChecked(
+                service => service
+                    .UpdateFootnotes(
+                        Release.Id,
+                        new FootnotesUpdateRequest
+                        {
+                            FootnoteIds = new List<Guid>()
+                        }
                     ),
                 Release,
                 SecurityPolicies.CanUpdateSpecificRelease
