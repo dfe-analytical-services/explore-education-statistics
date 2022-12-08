@@ -3,8 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -14,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
@@ -186,6 +189,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .OnSuccessDo(async _ => await _dataBlockService.InvalidateCachedDataBlocks(releaseId)));
         }
 
+        public async Task<Either<ActionResult, Unit>> UpdateFootnotes(Guid releaseId,
+            FootnotesUpdateRequest request)
+        {
+            return await _contentPersistenceHelper.CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(() => ValidateFootnoteIdsForRelease(releaseId, request.FootnoteIds))
+                .OnSuccessVoid(async _ =>
+                {
+                    // Set the order of each footnote based on the order observed in the request
+                    await request.FootnoteIds
+                        .ToAsyncEnumerable()
+                        .ForEachAwaitAsync(async (footnoteId, index) =>
+                        {
+                            var footnote = await _context.Footnote.SingleAsync(footnote => footnote.Id == footnoteId);
+                            _context.Update(footnote);
+                            footnote.Order = index;
+                        });
+                    await _context.SaveChangesAsync();
+                })
+                .OnSuccessVoid(async _ => await _dataBlockService.InvalidateCachedDataBlocks(releaseId));
+        }
+
         public Task<Either<ActionResult, Footnote>> GetFootnote(Guid releaseId, Guid footnoteId)
         {
             return _contentPersistenceHelper
@@ -332,6 +357,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(f => f.FilterItems)
                 .Include(f => f.Indicators)
                 .Include(f => f.Subjects);
+        }
+
+        private async Task<Either<ActionResult, Unit>> ValidateFootnoteIdsForRelease(
+            Guid releaseId,
+            IEnumerable<Guid> footnoteIds)
+        {
+            var allReleaseFootnoteIds = await _context.ReleaseFootnote
+                .Where(rf => rf.ReleaseId == releaseId)
+                .Select(rf => rf.FootnoteId)
+                .ToListAsync();
+
+            if (!SequencesAreEqualIgnoringOrder(allReleaseFootnoteIds, footnoteIds))
+            {
+                return ValidationResult(ValidationErrorMessages.FootnotesDifferFromReleaseFootnotes);
+            }
+
+            return Unit.Instance;
         }
     }
 }

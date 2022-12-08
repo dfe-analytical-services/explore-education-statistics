@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -19,6 +20,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
@@ -1316,6 +1318,443 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Empty(statisticsDbContext.FilterGroupFootnote);
                 Assert.Empty(statisticsDbContext.FilterItemFootnote);
                 Assert.Empty(statisticsDbContext.IndicatorFootnote);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateFootnotes()
+        {
+            var subject = new Subject();
+
+            // Create a release which already has some existing footnotes
+            var release = new Release
+            {
+                Footnotes = new List<ReleaseFootnote>
+                {
+                    new()
+                    {
+                        Footnote = new Footnote
+                        {
+                            Content = "Footnote 1",
+                            Order = 0,
+                            Subjects = new List<SubjectFootnote>
+                            {
+                                new()
+                                {
+                                    Subject = subject
+                                }
+                            }
+                        }
+                    },
+                    new()
+                    {
+                        Footnote = new Footnote
+                        {
+                            Content = "Footnote 2",
+                            Order = 1,
+                            Subjects = new List<SubjectFootnote>
+                            {
+                                new()
+                                {
+                                    Subject = subject
+                                }
+                            }
+                        }
+                    },
+                    new()
+                    {
+                        Footnote = new Footnote
+                        {
+                            Content = "Footnote 3",
+                            Order = 2,
+                            Subjects = new List<SubjectFootnote>
+                            {
+                                new()
+                                {
+                                    Subject = subject
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                await statisticsDbContext.Subject.AddAsync(subject);
+                await statisticsDbContext.Release.AddAsync(release);
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+
+                await contentDbContext.AddAsync(new Content.Model.Release
+                {
+                    Id = release.Id
+                });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
+
+            dataBlockService.Setup(mock => mock.InvalidateCachedDataBlocks(release.Id))
+                .Returns(Task.CompletedTask);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var service = SetupFootnoteService(contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    dataBlockService: dataBlockService.Object);
+
+                // Create a request with identical footnotes but in a new order
+                var request = new FootnotesUpdateRequest
+                {
+                    FootnoteIds = ListOf(
+                        release.Footnotes.ToList()[2].FootnoteId,
+                        release.Footnotes.ToList()[0].FootnoteId,
+                        release.Footnotes.ToList()[1].FootnoteId
+                    )
+                };
+
+                var result = await service.UpdateFootnotes(
+                    release.Id,
+                    request);
+
+                MockUtils.VerifyAllMocks(dataBlockService);
+
+                result.AssertRight();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var footnotes = await statisticsDbContext.Footnote
+                    .OrderBy(f => f.Order)
+                    .ToListAsync();
+
+                Assert.Equal(3, footnotes.Count);
+
+                // Check the footnotes have been reordered
+                Assert.Equal("Footnote 3", footnotes[0].Content);
+                Assert.Equal(0, footnotes[0].Order);
+                Assert.Equal("Footnote 1", footnotes[1].Content);
+                Assert.Equal(1, footnotes[1].Order);
+                Assert.Equal("Footnote 2", footnotes[2].Content);
+                Assert.Equal(2, footnotes[2].Order);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateFootnotes_ReleaseNotFound()
+        {
+            var subject = new Subject();
+
+            // Create some existing footnotes but for a different release than the one which will be used in the update
+            var release = new Release
+            {
+                Footnotes = new List<ReleaseFootnote>
+                {
+                    new()
+                    {
+                        Footnote = new Footnote
+                        {
+                            Content = "Footnote 1",
+                            Order = 0,
+                            Subjects = new List<SubjectFootnote>
+                            {
+                                new()
+                                {
+                                    Subject = subject
+                                }
+                            }
+                        }
+                    },
+                    new()
+                    {
+                        Footnote = new Footnote
+                        {
+                            Content = "Footnote 2",
+                            Order = 1,
+                            Subjects = new List<SubjectFootnote>
+                            {
+                                new()
+                                {
+                                    Subject = subject
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                await statisticsDbContext.Subject.AddAsync(subject);
+                await statisticsDbContext.Release.AddAsync(release);
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+
+                await contentDbContext.AddAsync(new Content.Model.Release
+                {
+                    Id = release.Id
+                });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var service = SetupFootnoteService(contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext);
+
+                // Attempt to update the footnotes but use a different release id
+                var result = await service.UpdateFootnotes(
+                    Guid.NewGuid(),
+                    new FootnotesUpdateRequest
+                    {
+                        FootnoteIds = ListOf(
+                            release.Footnotes.ToList()[0].FootnoteId,
+                            release.Footnotes.ToList()[1].FootnoteId
+                        )
+                    });
+
+                result.AssertNotFound();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var footnotes = await statisticsDbContext.Footnote
+                    .OrderBy(f => f.Order)
+                    .ToListAsync();
+
+                // Verify that the footnotes remain untouched
+                Assert.Equal(2, footnotes.Count);
+                Assert.Equal("Footnote 1", footnotes[0].Content);
+                Assert.Equal(0, footnotes[0].Order);
+                Assert.Equal("Footnote 2", footnotes[1].Content);
+                Assert.Equal(1, footnotes[1].Order);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateFootnotes_FootnoteMissing()
+        {
+            var subject = new Subject();
+
+            // Create a release which already has some existing footnotes
+            var release = new Release
+            {
+                Footnotes = new List<ReleaseFootnote>
+                {
+                    new()
+                    {
+                        Footnote = new Footnote
+                        {
+                            Content = "Footnote 1",
+                            Order = 0,
+                            Subjects = new List<SubjectFootnote>
+                            {
+                                new()
+                                {
+                                    Subject = subject
+                                }
+                            }
+                        }
+                    },
+                    new()
+                    {
+                        Footnote = new Footnote
+                        {
+                            Content = "Footnote 2",
+                            Order = 1,
+                            Subjects = new List<SubjectFootnote>
+                            {
+                                new()
+                                {
+                                    Subject = subject
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                await statisticsDbContext.Subject.AddAsync(subject);
+                await statisticsDbContext.Release.AddAsync(release);
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+
+                await contentDbContext.AddAsync(new Content.Model.Release
+                {
+                    Id = release.Id
+                });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var service = SetupFootnoteService(contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext);
+
+                // Request has the first footnote id missing
+                var request = new FootnotesUpdateRequest
+                {
+                    FootnoteIds = ListOf(
+                        release.Footnotes.ToList()[1].FootnoteId
+                    )
+                };
+
+                var result = await service.UpdateFootnotes(
+                    release.Id,
+                    request);
+
+                result.AssertBadRequest(FootnotesDifferFromReleaseFootnotes);
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var footnotes = await statisticsDbContext.Footnote
+                    .OrderBy(f => f.Order)
+                    .ToListAsync();
+
+                // Verify that the footnotes remain untouched
+                Assert.Equal(2, footnotes.Count);
+                Assert.Equal("Footnote 1", footnotes[0].Content);
+                Assert.Equal(0, footnotes[0].Order);
+                Assert.Equal("Footnote 2", footnotes[1].Content);
+                Assert.Equal(1, footnotes[1].Order);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateFootnotes_FootnoteNotForRelease()
+        {
+            var subject = new Subject();
+
+            // Create a release which already has some existing footnotes
+            var release = new Release
+            {
+                Footnotes = new List<ReleaseFootnote>
+                {
+                    new()
+                    {
+                        Footnote = new Footnote
+                        {
+                            Content = "Footnote 1",
+                            Order = 0,
+                            Subjects = new List<SubjectFootnote>
+                            {
+                                new()
+                                {
+                                    Subject = subject
+                                }
+                            }
+                        }
+                    },
+                    new()
+                    {
+                        Footnote = new Footnote
+                        {
+                            Content = "Footnote 2",
+                            Order = 1,
+                            Subjects = new List<SubjectFootnote>
+                            {
+                                new()
+                                {
+                                    Subject = subject
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                await statisticsDbContext.Subject.AddAsync(subject);
+                await statisticsDbContext.Release.AddAsync(release);
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+
+                await contentDbContext.AddAsync(new Content.Model.Release
+                {
+                    Id = release.Id
+                });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var service = SetupFootnoteService(contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext);
+
+                // Request has a footnote id not for this release
+                var request = new FootnotesUpdateRequest
+                {
+                    FootnoteIds = ListOf(
+                        release.Footnotes.ToList()[1].FootnoteId,
+                        release.Footnotes.ToList()[0].FootnoteId,
+                        Guid.NewGuid()
+                    )
+                };
+
+                var result = await service.UpdateFootnotes(
+                    release.Id,
+                    request);
+
+                result.AssertBadRequest(FootnotesDifferFromReleaseFootnotes);
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var footnotes = await statisticsDbContext.Footnote
+                    .OrderBy(f => f.Order)
+                    .ToListAsync();
+
+                // Verify that the footnotes remain untouched
+                Assert.Equal(2, footnotes.Count);
+                Assert.Equal("Footnote 1", footnotes[0].Content);
+                Assert.Equal(0, footnotes[0].Order);
+                Assert.Equal("Footnote 2", footnotes[1].Content);
+                Assert.Equal(1, footnotes[1].Order);
             }
         }
 

@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces.IReleaseService;
+using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
 {
@@ -137,6 +138,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                 result => result)
                     };
                 })
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPatch("releases/{releaseId:guid}/footnotes")]
+        public async Task<ActionResult<Unit>> UpdateFootnotes(
+            Guid releaseId,
+            FootnotesUpdateRequest request)
+        {
+            return await _footnoteService.UpdateFootnotes(releaseId, request)
                 .HandleFailuresOrOk();
         }
 
