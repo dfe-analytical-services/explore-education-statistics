@@ -132,12 +132,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 
             if (await IsFootnoteExclusiveToReleaseAsync(releaseId, footnote.Id))
             {
-                DeleteEntities(footnote.Subjects);
-                DeleteEntities(footnote.Filters);
-                DeleteEntities(footnote.FilterGroups);
-                DeleteEntities(footnote.FilterItems);
-                DeleteEntities(footnote.Indicators);
-
                 if (canRemoveFootnote)
                 {
                     var footnoteToRemove = await _context.Footnote.SingleAsync(f => f.Id == footnote.Id);
@@ -281,14 +275,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .FirstAsync();
 
             _context.ReleaseFootnote.Remove(releaseFootnote);
-        }
-
-        private void DeleteEntities<T>(IEnumerable<T> entitiesToDelete)
-        {
-            foreach (var t in entitiesToDelete)
-            {
-                _context.Entry(t).State = EntityState.Deleted;
-            }
         }
 
         private bool IsFootnoteLinkedToAnotherSubject(Guid id, Guid subjectId)
