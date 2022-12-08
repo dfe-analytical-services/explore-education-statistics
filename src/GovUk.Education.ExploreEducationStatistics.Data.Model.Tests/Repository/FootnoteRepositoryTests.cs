@@ -101,6 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1",
+                            Order = 0,
                             Subjects = new List<SubjectFootnote>
                             {
                                 new()
@@ -115,6 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 filter 1",
+                            Order = 1,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -129,6 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 filter 2 group 1",
+                            Order = 2,
                             FilterGroups = new List<FilterGroupFootnote>
                             {
                                 new()
@@ -143,6 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 filter 3 group 1 item 1",
+                            Order = 3,
                             FilterItems = new List<FilterItemFootnote>
                             {
                                 new()
@@ -157,6 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 indicator 1",
+                            Order = 4,
                             Indicators = new List<IndicatorFootnote>
                             {
                                 new()
@@ -175,6 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to multiple attributes of subject 1",
+                            Order = 5,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -210,6 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 2",
+                            Order = 6,
                             Subjects = new List<SubjectFootnote>
                             {
                                 new()
@@ -377,6 +384,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1",
+                            Order = 0,
                             Subjects = new List<SubjectFootnote>
                             {
                                 new()
@@ -391,6 +399,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 2",
+                            Order = 1,
                             Subjects = new List<SubjectFootnote>
                             {
                                 new()
@@ -405,6 +414,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 filter 1",
+                            Order = 2,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -419,6 +429,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 2 filter 1",
+                            Order = 3,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -433,6 +444,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 filter 1 group 1",
+                            Order = 4,
                             FilterGroups = new List<FilterGroupFootnote>
                             {
                                 new()
@@ -447,6 +459,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 2 filter 1 group 1",
+                            Order = 5,
                             FilterGroups = new List<FilterGroupFootnote>
                             {
                                 new()
@@ -461,6 +474,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 filter 1 group 1 item 1",
+                            Order = 6,
                             FilterItems = new List<FilterItemFootnote>
                             {
                                 new()
@@ -475,6 +489,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 2 filter 1 group 1 item 1",
+                            Order = 7,
                             FilterItems = new List<FilterItemFootnote>
                             {
                                 new()
@@ -489,6 +504,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 indicator 1",
+                            Order = 8,
                             Indicators = new List<IndicatorFootnote>
                             {
                                 new()
@@ -503,6 +519,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 2 indicator 1",
+                            Order = 9,
                             Indicators = new List<IndicatorFootnote>
                             {
                                 new()
@@ -635,6 +652,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 1",
+                            Order = 0,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -649,6 +667,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 1 group 1",
+                            Order = 1,
                             FilterGroups = new List<FilterGroupFootnote>
                             {
                                 new()
@@ -663,6 +682,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter item 1",
+                            Order = 2,
                             FilterItems = new List<FilterItemFootnote>
                             {
                                 new()
@@ -677,6 +697,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter item 2",
+                            Order = 3,
                             FilterItems = new List<FilterItemFootnote>
                             {
                                 new()
@@ -691,6 +712,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to indicator 1",
+                            Order = 4,
                             Indicators = new List<IndicatorFootnote>
                             {
                                 new()
@@ -705,6 +727,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to indicator 2",
+                            Order = 5,
                             Indicators = new List<IndicatorFootnote>
                             {
                                 new()
@@ -719,6 +742,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 1 and indicator 1",
+                            Order = 6,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -740,6 +764,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 1 and indicator 2",
+                            Order = 7,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -761,6 +786,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 1 group 1 and indicator 1",
+                            Order = 8,
                             FilterGroups = new List<FilterGroupFootnote>
                             {
                                 new()
@@ -782,6 +808,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 1 group 1 and indicator 2",
+                            Order = 9,
                             FilterGroups = new List<FilterGroupFootnote>
                             {
                                 new()
@@ -803,6 +830,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter item 1 and indicator 1",
+                            Order = 10,
                             FilterItems = new List<FilterItemFootnote>
                             {
                                 new()
@@ -824,6 +852,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter item 1 and indicator 2",
+                            Order = 11,
                             FilterItems = new List<FilterItemFootnote>
                             {
                                 new()
@@ -845,6 +874,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter item 2 and indicator 1",
+                            Order = 12,
                             FilterItems = new List<FilterItemFootnote>
                             {
                                 new()
@@ -866,6 +896,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter item 2 and indicator 2",
+                            Order = 13,
                             FilterItems = new List<FilterItemFootnote>
                             {
                                 new()
@@ -1036,6 +1067,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 1",
+                            Order = 0,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -1050,6 +1082,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 3",
+                            Order = 1,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -1064,6 +1097,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 1 and filter 3",
+                            Order = 2,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -1082,6 +1116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 1 and filter 3 group 1",
+                            Order = 3,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -1103,6 +1138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 3 and filter 1 group 1",
+                            Order = 4,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -1124,6 +1160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 1 and filter 3 group item 1",
+                            Order = 5,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -1145,6 +1182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 3 and filter 1 group item 1",
+                            Order = 6,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -1166,6 +1204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 1 group 1",
+                            Order = 7,
                             FilterGroups = new List<FilterGroupFootnote>
                             {
                                 new()
@@ -1180,6 +1219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 3 group 1",
+                            Order = 8,
                             FilterGroups = new List<FilterGroupFootnote>
                             {
                                 new()
@@ -1194,6 +1234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 1 group 1 and filter 1 group 1 item 1",
+                            Order = 9,
                             FilterGroups = new List<FilterGroupFootnote>
                             {
                                 new()
@@ -1215,6 +1256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 1 group 1 and filter 3 group 1 item 1",
+                            Order = 10,
                             FilterGroups = new List<FilterGroupFootnote>
                             {
                                 new()
@@ -1236,6 +1278,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 3 group 1 and filter 1 group 1 item 1",
+                            Order = 11,
                             FilterGroups = new List<FilterGroupFootnote>
                             {
                                 new()
@@ -1257,6 +1300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 3 group 1 and filter 3 group 1 item 1",
+                            Order = 12,
                             FilterGroups = new List<FilterGroupFootnote>
                             {
                                 new()
@@ -1278,6 +1322,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 1 group 1 item 1",
+                            Order = 13,
                             FilterItems = new List<FilterItemFootnote>
                             {
                                 new()
@@ -1292,6 +1337,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 1 group 1 item 3",
+                            Order = 14,
                             FilterItems = new List<FilterItemFootnote>
                             {
                                 new()
@@ -1306,6 +1352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 3 group 1 item 1",
+                            Order = 15,
                             FilterItems = new List<FilterItemFootnote>
                             {
                                 new()
@@ -1320,6 +1367,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to filter 1 group 1 item 1 and filter 1 group 1 item 3",
+                            Order = 16,
                             FilterItems = new List<FilterItemFootnote>
                             {
                                 new()
@@ -1456,6 +1504,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to indicator 1",
+                            Order = 0,
                             Indicators = new List<IndicatorFootnote>
                             {
                                 new()
@@ -1470,6 +1519,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to indicator 3",
+                            Order = 1,
                             Indicators = new List<IndicatorFootnote>
                             {
                                 new()
@@ -1484,6 +1534,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to indicator 1 and indicator 3",
+                            Order = 2,
                             Indicators = new List<IndicatorFootnote>
                             {
                                 new()
@@ -1671,6 +1722,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Footnote 1",
+                            Order = 0,
                             Subjects = new List<SubjectFootnote>
                             {
                                 new()
@@ -1693,6 +1745,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Footnote 2",
+                            Order = 1,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -1727,6 +1780,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Footnote 3",
+                            Order = 2,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -1750,6 +1804,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Footnote 4",
+                            Order = 3,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -1773,6 +1828,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Footnote 5",
+                            Order = 4,
                             Indicators = new List<IndicatorFootnote>
                             {
                                 new()
@@ -1945,6 +2001,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1",
+                            Order = 0,
                             Subjects = new List<SubjectFootnote>
                             {
                                 new()
@@ -1959,6 +2016,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 filter 1",
+                            Order = 1,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -1973,6 +2031,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 filter 2 group 1",
+                            Order = 2,
                             FilterGroups = new List<FilterGroupFootnote>
                             {
                                 new()
@@ -1987,6 +2046,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 filter 3 group 1 item 1",
+                            Order = 3,
                             FilterItems = new List<FilterItemFootnote>
                             {
                                 new()
@@ -2001,6 +2061,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 indicator 1",
+                            Order = 4,
                             Indicators = new List<IndicatorFootnote>
                             {
                                 new()
@@ -2015,6 +2076,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 2",
+                            Order = 5,
                             Subjects = new List<SubjectFootnote>
                             {
                                 new()
@@ -2162,6 +2224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1",
+                            Order = 0,
                             Subjects = new List<SubjectFootnote>
                             {
                                 new()
@@ -2176,6 +2239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 filter 1",
+                            Order = 1,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -2190,6 +2254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 filter 2 group 1",
+                            Order = 2,
                             FilterGroups = new List<FilterGroupFootnote>
                             {
                                 new()
@@ -2204,6 +2269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 filter 3 group 1 item 1",
+                            Order = 3,
                             FilterItems = new List<FilterItemFootnote>
                             {
                                 new()
@@ -2218,6 +2284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 indicator 1",
+                            Order = 4,
                             Indicators = new List<IndicatorFootnote>
                             {
                                 new()
@@ -2384,6 +2451,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1",
+                            Order = 0,
                             Subjects = new List<SubjectFootnote>
                             {
                                 new()
@@ -2398,6 +2466,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 filter 1",
+                            Order = 1,
                             Filters = new List<FilterFootnote>
                             {
                                 new()
@@ -2412,6 +2481,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 filter 2 group 1",
+                            Order = 2,
                             FilterGroups = new List<FilterGroupFootnote>
                             {
                                 new()
@@ -2426,6 +2496,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 filter 3 group 1 item 1",
+                            Order = 3,
                             FilterItems = new List<FilterItemFootnote>
                             {
                                 new()
@@ -2440,6 +2511,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 1 indicator 1",
+                            Order = 4,
                             Indicators = new List<IndicatorFootnote>
                             {
                                 new()
@@ -2454,6 +2526,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 2",
+                            Order = 5,
                             Subjects = new List<SubjectFootnote>
                             {
                                 new()
@@ -2468,6 +2541,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                         Footnote = new Footnote
                         {
                             Content = "Applies to subject 2 indicator 1",
+                            Order = 6,
                             Indicators = new List<IndicatorFootnote>
                             {
                                 new()
@@ -2560,6 +2634,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             var footnote = new Footnote
             {
                 Content = "Test footnote",
+                Order = 0,
                 Releases = new List<ReleaseFootnote>
                 {
                     new()
@@ -2749,6 +2824,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             var footnote1 = new Footnote
             {
                 Content = "Test footnote 1",
+                Order = 0,
                 Releases = new List<ReleaseFootnote>
                 {
                     new()
@@ -2774,6 +2850,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             var footnote2 = new Footnote
             {
                 Content = "Test footnote 2",
+                Order = 1,
                 Releases = new List<ReleaseFootnote>
                 {
                     new()
@@ -2793,6 +2870,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             var footnoteForOtherRelease = new Footnote
             {
                 Content = "Test footnote for other release",
+                Order = 0,
                 Releases = new List<ReleaseFootnote>
                 {
                     new()
@@ -2871,6 +2949,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             var footnote1 = new Footnote
             {
                 Content = "Test footnote 1",
+                Order = 0,
                 Releases = new List<ReleaseFootnote>
                 {
                     new()
@@ -2890,6 +2969,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             var footnote2 = new Footnote
             {
                 Content = "Test footnote 2",
+                Order = 1,
                 Releases = new List<ReleaseFootnote>
                 {
                     new()
@@ -2947,6 +3027,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             var footnote = new Footnote
             {
                 Content = "Test footnote",
+                Order = 0,
                 Releases = new List<ReleaseFootnote>
                 {
                     new()
@@ -3110,6 +3191,106 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
                 Assert.Single(footnoteIndicators);
                 Assert.Equal(releaseSubject.SubjectId, footnoteIndicators[0].Indicator.IndicatorGroup.SubjectId);
+            }
+        }
+
+        [Fact]
+        public async Task GetFootnotes_OrdersFootnotes()
+        {
+            var release = new Release();
+
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = new Subject()
+            };
+
+            var footnotes = new List<Footnote>
+            {
+                new()
+                {
+                    Content = "Footnote 3",
+                    Releases = new List<ReleaseFootnote>
+                    {
+                        new()
+                        {
+                            Release = release
+                        }
+                    },
+                    Subjects = new List<SubjectFootnote>
+                    {
+                        new()
+                        {
+                            Subject = releaseSubject.Subject
+                        }
+                    },
+                    Order = 2
+                },
+                new()
+                {
+                    Content = "Footnote 1",
+                    Releases = new List<ReleaseFootnote>
+                    {
+                        new()
+                        {
+                            Release = release
+                        }
+                    },
+                    Subjects = new List<SubjectFootnote>
+                    {
+                        new()
+                        {
+                            Subject = releaseSubject.Subject
+                        }
+                    },
+                    Order = 0
+                },
+                new()
+                {
+                    Content = "Footnote 2",
+                    Releases = new List<ReleaseFootnote>
+                    {
+                        new()
+                        {
+                            Release = release
+                        }
+                    },
+                    Subjects = new List<SubjectFootnote>
+                    {
+                        new()
+                        {
+                            Subject = releaseSubject.Subject
+                        }
+                    },
+                    Order = 1
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryStatisticsDbContext(contextId))
+            {
+                await context.AddRangeAsync(release);
+                await context.AddRangeAsync(releaseSubject);
+                await context.AddRangeAsync(footnotes);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryStatisticsDbContext(contextId))
+            {
+                var repository = BuildFootnoteRepository(context);
+                var results = await repository.GetFootnotes(release.Id);
+
+                Assert.Equal(3, results.Count);
+
+                Assert.Equal("Footnote 1", results[0].Content);
+                Assert.Equal(0, results[0].Order);
+
+                Assert.Equal("Footnote 2", results[1].Content);
+                Assert.Equal(1, results[1].Order);
+
+                Assert.Equal("Footnote 3", results[2].Content);
+                Assert.Equal(2, results[2].Order);
             }
         }
 
