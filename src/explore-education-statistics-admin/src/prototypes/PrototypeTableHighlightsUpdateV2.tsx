@@ -77,17 +77,17 @@ const PrototypeTableHighlights = () => {
                       </div>
                       <div>
                         <a
-                          href="https://explore-education-statistics.service.gov.uk/find-statistics/apprenticeships-and-traineeships"
+                          href="https://explore-education-statistics.service.gov.uk/methodology/further-education-and-skills-statistics-methodology"
                           className="govuk-!-margin-right-6"
                         >
-                          View publication
+                          View methodology
                         </a>
 
                         <a
                           href="https://explore-education-statistics.service.gov.uk/data-tables"
                           className="govuk-!-margin-right-6"
                         >
-                          Change
+                          Change publication
                         </a>
                       </div>
                     </div>
