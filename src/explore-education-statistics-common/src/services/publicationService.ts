@@ -10,7 +10,7 @@ import {
   ExternalMethodology,
 } from '@common/services/types/methodology';
 import { PublicationType } from '@common/services/types/publicationType';
-import { Paging } from '@common/services/types/pagination';
+import { PaginatedList } from '@common/services/types/pagination';
 import { PartialDate } from '@common/utils/date/partialDate';
 import { contentApi } from './api';
 
@@ -57,11 +57,6 @@ export interface PublicationListSummary {
   theme: string;
   title: string;
   type: ReleaseType;
-}
-
-interface PublicationsResponse {
-  results: PublicationListSummary[];
-  paging: Paging;
 }
 
 export interface Contact {
@@ -264,7 +259,7 @@ export default {
   },
   listPublications(
     params: PublicationListRequest,
-  ): Promise<PublicationsResponse> {
+  ): Promise<PaginatedList<PublicationListSummary>> {
     return contentApi.get(`/publications`, {
       params,
     });

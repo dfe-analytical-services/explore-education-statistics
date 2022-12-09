@@ -1,4 +1,4 @@
-import render from '@admin-test/render';
+import render from '@common-test/render';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import PublicationReleasesPage from '@admin/pages/publication/PublicationReleasesPage';

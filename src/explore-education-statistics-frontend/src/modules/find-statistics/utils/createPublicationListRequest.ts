@@ -15,25 +15,18 @@ import omitBy from 'lodash/omitBy';
 export default function createPublicationListRequest(
   query: FindStatisticsPageQuery,
 ): PublicationListRequest {
-  const sortBy = isOneOf(query.sortBy, publicationSortOptions)
-    ? query.sortBy
-    : 'newest';
+  const {
+    releaseType,
+    search: searchParam,
+    sortBy,
+    themeId,
+  } = getParamsFromQuery(query);
+
   const { order, sort } = getSortParams(sortBy);
 
   const minSearchCharacters = 3;
-  const searchQuery = getFirst(query.search);
   const search =
-    searchQuery && searchQuery.length >= minSearchCharacters ? searchQuery : '';
-
-  const releaseTypeParam = getFirst(query.releaseType);
-  const releaseType = isOneOf(
-    releaseTypeParam,
-    Object.keys(releaseTypes) as ReleaseType[],
-  )
-    ? releaseTypeParam
-    : undefined;
-
-  const themeId = getFirst(query.themeId);
+    searchParam && searchParam.length >= minSearchCharacters ? searchParam : '';
 
   return omitBy(
     {
@@ -75,5 +68,21 @@ function getSortParams(
   return {
     order: 'desc',
     sort: 'published',
+  };
+}
+
+export function getParamsFromQuery(query: FindStatisticsPageQuery) {
+  return {
+    releaseType:
+      query.releaseType &&
+      isOneOf(query.releaseType, Object.keys(releaseTypes) as ReleaseType[])
+        ? query.releaseType
+        : undefined,
+    search: getFirst(query.search),
+    sortBy:
+      query.sortBy && isOneOf(query.sortBy, publicationSortOptions)
+        ? query.sortBy
+        : 'newest',
+    themeId: getFirst(query.themeId),
   };
 }

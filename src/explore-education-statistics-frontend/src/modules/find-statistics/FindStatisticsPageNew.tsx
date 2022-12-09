@@ -2,65 +2,59 @@ import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
+import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useMobileMedia } from '@common/hooks/useMedia';
-import publicationService, {
+import {
   publicationFilters,
   PublicationFilter,
-  PublicationListSummary,
   PublicationSortOption,
 } from '@common/services/publicationService';
-import { ThemeSummary } from '@common/services/themeService';
 import { releaseTypes, ReleaseType } from '@common/services/types/releaseType';
-import { Paging } from '@common/services/types/pagination';
 import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
-import useRouterLoading from '@frontend/hooks/useRouterLoading';
 import FilterClearButton from '@frontend/modules/find-statistics/components/FilterClearButton';
 import Filters from '@frontend/modules/find-statistics/components/Filters';
 import PublicationSummary from '@frontend/modules/find-statistics/components/PublicationSummary';
 import { FindStatisticsPageQuery } from '@frontend/modules/find-statistics/FindStatisticsPage';
 import SearchForm from '@frontend/modules/find-statistics/components/SearchForm';
 import SortControls from '@frontend/modules/find-statistics/components/SortControls';
-import createPublicationListRequest from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
+import { getParamsFromQuery } from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
+import publicationQueries from '@frontend/queries/publicationQueries';
+import themeQueries from '@frontend/queries/themeQueries';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import compact from 'lodash/compact';
-import isEqual from 'lodash/isEqual';
 import omit from 'lodash/omit';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-interface Props {
-  paging: Paging;
-  publications: PublicationListSummary[];
-  query: FindStatisticsPageQuery;
-  themes: ThemeSummary[];
-}
-
-const FindStatisticsPageNew: NextPage<Props> = ({
-  paging: initialPaging,
-  publications: initialPublications,
-  query,
-  themes,
-}) => {
+const FindStatisticsPageNew: NextPage = () => {
   const router = useRouter();
-  const isLoading = useRouterLoading();
-
-  const [currentQuery, setQuery] = useState<FindStatisticsPageQuery>(query);
-  const { releaseType, search, sortBy = 'newest', themeId } = currentQuery;
-
-  const [publications, setPublications] = useState<PublicationListSummary[]>(
-    initialPublications,
-  );
-  const [paging, setPaging] = useState<Paging>(initialPaging);
-  const { page, totalPages, totalResults } = paging;
-
   const { isMedia: isMobileMedia } = useMobileMedia();
   const mobileFilterButtonRef = useRef<HTMLButtonElement>(null);
   const [showMobileFilters, toggleMobileFilters] = useToggle(false);
+
+  const { data: publicationsData, isError, isFetching, isLoading } = useQuery({
+    ...publicationQueries.list(router.query),
+    keepPreviousData: true,
+    staleTime: 60000,
+  });
+
+  const { data: themes = [] } = useQuery({
+    ...themeQueries.list(),
+    staleTime: Infinity,
+  });
+
+  const { paging, results: publications = [] } = publicationsData ?? {};
+  const { page, totalPages, totalResults } = paging ?? {};
+
+  const { releaseType, search, sortBy, themeId } = getParamsFromQuery(
+    router.query,
+  );
 
   const isFiltered = !!search || !!releaseType || !!themeId;
 
@@ -72,23 +66,6 @@ const FindStatisticsPageNew: NextPage<Props> = ({
     selectedTheme?.title,
     selectedReleaseType,
   ]).join(', ');
-
-  useEffect(() => {
-    async function fetchPublications(nextQuery: FindStatisticsPageQuery) {
-      const updatedPublications = await publicationService.listPublications(
-        nextQuery,
-      );
-      setPublications(updatedPublications.results);
-      setPaging(updatedPublications.paging);
-    }
-    if (
-      Object.keys(router.query).length &&
-      !isEqual(router.query, currentQuery)
-    ) {
-      setQuery(router.query);
-      fetchPublications(createPublicationListRequest(router.query));
-    }
-  }, [router.query, currentQuery]);
 
   const updateQueryParams = async (nextQuery: FindStatisticsPageQuery) => {
     await router.push(
@@ -171,7 +148,7 @@ const FindStatisticsPageNew: NextPage<Props> = ({
     <Page
       title="Find statistics and data"
       metaTitle={
-        totalPages > 1
+        totalPages && totalPages > 1
           ? `Find statistics and data (page ${page} of ${totalPages})`
           : undefined
       }
@@ -329,47 +306,59 @@ const FindStatisticsPageNew: NextPage<Props> = ({
             />
           )}
 
-          <LoadingSpinner loading={isLoading} className="govuk-!-margin-top-4">
-            {publications.length === 0 ? (
-              <div className="govuk-!-margin-top-5" id="searchResults">
-                {isFiltered ? (
-                  <>
-                    <p className="govuk-!-font-weight-bold">
-                      There are no matching results.
-                    </p>
-                    <p>Improve your search results by:</p>
-                    <ul>
-                      <li>removing filters</li>
-                      <li>double-checking your spelling</li>
-                      <li>using fewer keywords</li>
-                      <li>searching for something less specific</li>
-                    </ul>
-                  </>
-                ) : (
-                  <p>No data currently published.</p>
-                )}
-              </div>
+          <LoadingSpinner
+            loading={isLoading || isFetching}
+            className="govuk-!-margin-top-4"
+          >
+            {isError ? (
+              <WarningMessage>
+                Cannot load publications, please try again later.
+              </WarningMessage>
             ) : (
-              <ul
-                className="govuk-list"
-                id="searchResults"
-                data-testid="publicationsList"
-              >
-                {publications.map(publication => (
-                  <PublicationSummary
-                    key={publication.id}
-                    publication={publication}
-                  />
-                ))}
-              </ul>
+              <>
+                {publications.length === 0 ? (
+                  <div className="govuk-!-margin-top-5" id="searchResults">
+                    {isFiltered ? (
+                      <>
+                        <p className="govuk-!-font-weight-bold">
+                          There are no matching results.
+                        </p>
+                        <p>Improve your search results by:</p>
+                        <ul>
+                          <li>removing filters</li>
+                          <li>double-checking your spelling</li>
+                          <li>using fewer keywords</li>
+                          <li>searching for something less specific</li>
+                        </ul>
+                      </>
+                    ) : (
+                      <p>No data currently published.</p>
+                    )}
+                  </div>
+                ) : (
+                  <ul
+                    className="govuk-list"
+                    id="searchResults"
+                    data-testid="publicationsList"
+                  >
+                    {publications.map(publication => (
+                      <PublicationSummary
+                        key={publication.id}
+                        publication={publication}
+                      />
+                    ))}
+                  </ul>
+                )}
+              </>
             )}
-
-            <Pagination
-              currentPage={page}
-              scroll
-              shallow
-              totalPages={totalPages}
-            />
+            {page && totalPages && (
+              <Pagination
+                currentPage={page}
+                scroll
+                shallow
+                totalPages={totalPages}
+              />
+            )}
           </LoadingSpinner>
         </div>
       </div>

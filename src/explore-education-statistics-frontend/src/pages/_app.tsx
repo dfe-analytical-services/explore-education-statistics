@@ -16,7 +16,12 @@ import NextApp, { AppContext, AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { parseCookies } from 'nookies';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import {
+  Hydrate,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
 
 loadEnv();
 
@@ -48,6 +53,7 @@ interface Props extends AppProps {
 const App = ({ Component, pageProps, cookies }: Props) => {
   const router = useRouter();
   const { getCookie } = useCookies(cookies);
+  const [queryClient] = useState(() => new QueryClient());
 
   loadEnv();
 
@@ -88,7 +94,11 @@ const App = ({ Component, pageProps, cookies }: Props) => {
 
       <ApplicationInsightsTracking />
 
-      <Component {...pageProps} />
+      <QueryClientProvider client={queryClient}>
+        <Hydrate state={pageProps.dehydratedState}>
+          <Component {...pageProps} />
+        </Hydrate>
+      </QueryClientProvider>
     </ApplicationInsightsContextProvider>
   );
 };

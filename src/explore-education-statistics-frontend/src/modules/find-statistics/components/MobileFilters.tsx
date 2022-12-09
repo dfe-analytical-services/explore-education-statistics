@@ -13,7 +13,7 @@ interface Props {
   releaseType?: ReleaseType;
   themeId?: string;
   themes: ThemeSummary[];
-  totalResults: number;
+  totalResults?: number;
   onChange: FilterChangeHandler;
   onClose: () => void;
 }
