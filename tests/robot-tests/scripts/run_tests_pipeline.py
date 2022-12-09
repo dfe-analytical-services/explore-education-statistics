@@ -30,9 +30,9 @@ def run_tests_pipeline():
 
     def get_test_command() -> str:
         if args.file == "tests/general_public/check_snapshots.robot":
-            return f"pipenv run python run_tests.py --admin-pass {args.admin_password} --analyst-pass {args.analyst_password} --expiredinvite-pass {args.expiredinvite_password} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes {args.processes}"
+            return f"pipenv run python run_tests.py --admin-pass {args.admin_pass} --analyst-pass {args.analyst_pass} --expiredinvite-pass {args.expiredinvite_pass} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes {args.processes}"
         else:
-            return f"pipenv run python run_tests.py --admin-pass {args.admin_password} --analyst-pass {args.analyst_password} --expiredinvite-pass {args.expiredinvite_password} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes {args.processes} --enable-slack"
+            return f"pipenv run python run_tests.py --admin-pass {args.admin_pass} --analyst-pass {args.analyst_pass} --expiredinvite-pass {args.expiredinvite_pass} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes {args.processes} --enable-slack"
 
     subprocess.run(get_test_command(), shell=True)
 
