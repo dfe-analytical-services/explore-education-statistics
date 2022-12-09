@@ -134,9 +134,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async footnote =>
                 {
                     // NOTE: At the time of writing, footnotes are now always exclusive to a particular release, but
-                    // in the past this wasn't always the case. It's unclear whether this is still necessary for
-                    // the sake of older footnotes.
-                    if (await _footnoteRepository.IsFootnoteExclusiveToReleaseAsync(releaseId, footnote.Id))
+                    // in the past this wasn't always the case.
+                    // TODO EES-2979 Remove this check once all footnotes only belong to one release
+                    if (await _footnoteRepository.IsFootnoteExclusiveToRelease(releaseId, footnote.Id))
                     {
                         _context.Update(footnote);
 
@@ -152,6 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return await _footnoteRepository.GetFootnote(footnoteId);
                     }
 
+                    // TODO EES-2979 Remove this delete link and create call once all footnotes only belong to one release
                     // If this amendment of the footnote affects other release then break the link with the old
                     // and create a new one
                     await _footnoteRepository.DeleteReleaseFootnoteLinkAsync(releaseId, footnote.Id);

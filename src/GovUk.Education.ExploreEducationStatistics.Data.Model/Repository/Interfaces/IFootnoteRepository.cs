@@ -29,11 +29,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
 
         Task<IList<Subject>> GetSubjectsWithNoFootnotes(Guid releaseId);
 
-        Task DeleteFootnote(Guid releaseId, Guid id);
+        Task DeleteFootnote(Guid releaseId, Guid footnoteId);
 
         Task DeleteAllFootnotesBySubject(Guid releaseId, Guid subjectId);
 
-        Task<bool> IsFootnoteExclusiveToReleaseAsync(Guid releaseId, Guid footnoteId);
+        Task<bool> IsFootnoteExclusiveToRelease(Guid releaseId, Guid footnoteId);
 
         Task DeleteReleaseFootnoteLinkAsync(Guid releaseId, Guid footnoteId);
     }
