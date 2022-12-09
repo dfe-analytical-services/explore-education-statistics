@@ -102,8 +102,7 @@ Switch to bau1 to add review comments for first text block
     user sets focus to element    ${editor}
 
     # Selects the rest of the line
-    user presses keys    END    ${\n}    Block 1 another sentence
-    user presses keys    SHIFT+ARROW_LEFT    SHIFT+ARROW_LEFT
+    user presses keys    END    ${\n}    Block 1 another sentence    SHIFT+ARROW_LEFT    SHIFT+HOME
     user clicks button    Add comment    ${toolbar}
 
     user waits until parent contains element    ${comments}    testid:comment-textarea

@@ -17,7 +17,7 @@ Invite user to the service with an unexpired invite via the API
 
 Check that the invite appears on the Invite Users page
     user navigates to admin frontend    %{ADMIN_URL}/administration/users/invites
-    user waits until page contains title    Pending invites
+    user waits until page contains    Invited users
     user checks page contains    %{EXPIRED_INVITE_USER_EMAIL}
 
 Update user invite with an expired created date via the API
@@ -28,7 +28,7 @@ Update user invite with an expired created date via the API
 
 Check that the invite does not appear on the Invite Users page
     user reloads page
-    user waits until page contains title    Pending invites
+    user waits until page contains    Invited users
     user checks page does not contain    %{EXPIRED_INVITE_USER_EMAIL}
     user closes the browser
 
