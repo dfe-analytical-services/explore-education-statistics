@@ -65,8 +65,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                         logger.LogError(e, "Exception occured while executing {FunctionName}",
                             executionContext.FunctionName);
 
-                        logger.LogError("{StackTrace}", e.StackTrace);
-
                         return false;
                     }
                 })
@@ -78,11 +76,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             await UpdateFilesStage(successfulReleases, Complete);
             await UpdateFilesStage(unsuccessfulReleases, Failed);
-                
-            await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
-                successfulReleases, 
-                DateTime.UtcNow);
 
+            try
+            {
+                await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
+                    successfulReleases,
+                    DateTime.UtcNow);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Exception occured while completing publishing in {FunctionName}",
+                    executionContext.FunctionName);
+                
+                await UpdatePublishingStage(
+                    successfulReleases, 
+                    ReleasePublishingStatusPublishingStage.Failed,
+                    new ReleasePublishingStatusLogMessage($"Failed during completion of the Publishing process: {e.Message}"));
+            }
+            
             logger.LogInformation("{FunctionName} completed", executionContext.FunctionName);
         }
 
@@ -95,6 +106,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(status => 
                     _releasePublishingStatusService.UpdateFilesStageAsync(
+                        status.releaseId, 
+                        status.releaseStatusId, 
+                        stage, 
+                        logMessage));
+        }
+        
+        private async Task UpdatePublishingStage(
+            IEnumerable<(Guid releaseId, Guid releaseStatusId)> releaseStatuses, 
+            ReleasePublishingStatusPublishingStage stage,
+            ReleasePublishingStatusLogMessage logMessage = null)
+        {
+            await releaseStatuses
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(status => 
+                    _releasePublishingStatusService.UpdatePublishingStageAsync(
                         status.releaseId, 
                         status.releaseStatusId, 
                         stage, 

@@ -115,12 +115,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return result.OrderByDescending(releaseStatus => releaseStatus.Created).FirstOrDefault();
         }
 
-        public async Task<bool> IsImmediate(Guid releaseId, Guid releaseStatusId)
-        {
-            var releaseStatus = await GetAsync(releaseId, releaseStatusId);
-            return releaseStatus.Immediate;
-        }
-
         private Task<IEnumerable<ReleasePublishingStatus>> ExecuteQueryAsync(TableQuery<ReleasePublishingStatus> query)
         {
             return _tableStorageService.ExecuteQueryAsync(PublisherReleaseStatusTableName, query);
@@ -131,42 +125,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await UpdateRowAsync(releaseId, releaseStatusId, row =>
             {
                 row.State = state;
-                return row;
-            });
-        }
-
-        public async Task UpdateStagesAsync(
-            Guid releaseId,
-            Guid releaseStatusId,
-            ReleasePublishingStatusContentStage? content = null,
-            ReleasePublishingStatusFilesStage? files = null,
-            ReleasePublishingStatusPublishingStage? publishing = null,
-            ReleasePublishingStatusOverallStage? overall = null,
-            ReleasePublishingStatusLogMessage logMessage = null)
-        {
-            await UpdateRowAsync(releaseId, releaseStatusId, row =>
-            {
-                if (content.HasValue)
-                {
-                    row.State.Content = content.Value;
-                }
-
-                if (files.HasValue)
-                {
-                    row.State.Files = files.Value;
-                }
-
-                if (publishing.HasValue)
-                {
-                    row.State.Publishing = publishing.Value;
-                }
-
-                if (overall.HasValue)
-                {
-                    row.State.Overall = overall.Value;
-                }
-
-                row.AppendLogMessage(logMessage);
                 return row;
             });
         }

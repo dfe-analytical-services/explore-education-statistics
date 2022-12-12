@@ -7,7 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
 public interface IPublishingCompletionService
 {
-    Task CompletePublishingIfAllPriorStagesComplete(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releaseAndReleaseStatusIds, DateTime publishedDate);
+    Task CompletePublishingIfAllPriorStagesComplete(
+        IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releaseAndReleaseStatusIds, 
+        DateTime publishedDate);
     
-    Task CompletePublishingIfAllPriorStagesComplete(ReleasePublishingStatus[] releaseStatuses, DateTime publishedDate);
+    Task CompletePublishingIfAllPriorStagesComplete(
+        ReleasePublishingStatus[] releaseStatuses, 
+        DateTime publishedDate);
 }

@@ -28,18 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task<ReleasePublishingStatus> GetLatestAsync(Guid releaseId);
 
-        Task<bool> IsImmediate(Guid releaseId, Guid releaseStatusId);
-
         Task UpdateStateAsync(Guid releaseId, Guid releaseStatusId, ReleasePublishingStatusState state);
-
-        Task UpdateStagesAsync(
-            Guid releaseId, 
-            Guid releaseStatusId, 
-            ReleasePublishingStatusContentStage? content = null,
-            ReleasePublishingStatusFilesStage? files = null,
-            ReleasePublishingStatusPublishingStage? publishing = null, 
-            ReleasePublishingStatusOverallStage? overall = null, 
-            ReleasePublishingStatusLogMessage logMessage = null);
 
         Task UpdateContentStageAsync(
             Guid releaseId, 

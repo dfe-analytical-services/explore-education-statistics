@@ -68,7 +68,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 logger.LogError(e, "Exception occured while executing {FunctionName}",
                     executionContext.FunctionName);
-                logger.LogError("{StackTrace}", e.StackTrace);
 
                 await UpdateContentStage(message.ReleaseId, message.ReleaseStatusId, Failed,
                     new ReleasePublishingStatusLogMessage($"Exception publishing Release Content immediately: {e.Message}"));

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [DbContext(typeof(StatisticsDbContext))]
-    [Migration("20220629155651_EES3369_RemoveUnusedDatabaseTypes")]
+    [Migration("20221212111503_EES3369_RemoveUnusedDatabaseTypes")]
     partial class EES3369_RemoveUnusedDatabaseTypes
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

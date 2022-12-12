@@ -29,15 +29,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         /// <summary>
-        /// BAU Azure function which retries stage of the publishing workflow, updating the latest ReleaseStatus.
+        /// BAU Azure function which retries the publishing of a Release by enqueueing a message to publish its
+        /// content.  Note that this does not attempt to copy any Release files.
         /// </summary>
         /// <param name="message"></param>
         /// <param name="executionContext"></param>
         /// <param name="logger"></param>
         /// <returns></returns>
-        [FunctionName("RetryStage")]
+        [FunctionName("RetryReleasePublishing")]
         // ReSharper disable once UnusedMember.Global
-        public async Task RetryStage(
+        public async Task RetryReleasePublishing(
             [QueueTrigger(RetryReleasePublishingQueue)]
             RetryReleasePublishingMessage message,
             ExecutionContext executionContext,

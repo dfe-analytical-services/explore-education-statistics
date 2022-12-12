@@ -266,17 +266,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var actualContentRelease = await contentDbContext.Releases
+                var actualContentRelease = await contentDbContext
+                    .Releases
                     .Include(r => r.Publication)
                     .SingleAsync(r => r.Id == contentRelease.Id);
-                var actualStatisticsRelease = await statisticsDbContext.Release.FindAsync(contentRelease.Id);
-
-                Assert.NotNull(actualContentRelease);
-                Assert.NotNull(actualStatisticsRelease);
+                
+                var actualStatisticsRelease = await statisticsDbContext
+                    .Release
+                    .SingleAsync(r => r.Id == contentRelease.Id);
 
                 Assert.Equal(published, actualContentRelease.Published);
                 Assert.Equal(published, actualContentRelease.Publication.Published);
-                Assert.Equal(published, actualStatisticsRelease!.Published);
+                Assert.Equal(published, actualStatisticsRelease.Published);
 
                 Assert.True(actualContentRelease.DataLastPublished.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(actualContentRelease.DataLastPublished!.Value).Milliseconds, 0,
@@ -402,17 +403,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var actualContentRelease = await contentDbContext.Releases
+                var actualContentRelease = await contentDbContext
+                    .Releases
                     .Include(r => r.Publication)
                     .SingleAsync(r => r.Id == contentRelease.Id);
-                var actualStatisticsRelease = await statisticsDbContext.Release.FindAsync(contentRelease.Id);
-
-                Assert.NotNull(actualContentRelease);
-                Assert.NotNull(actualStatisticsRelease);
+                
+                var actualStatisticsRelease = await statisticsDbContext
+                    .Release
+                    .SingleAsync(r => r.Id == contentRelease.Id);
 
                 Assert.Equal(previousContentRelease.Published.Value, actualContentRelease.Published);
                 Assert.Equal(previousContentRelease.Published.Value, actualContentRelease.Publication.Published);
-                Assert.Equal(previousContentRelease.Published.Value, actualStatisticsRelease!.Published);
+                Assert.Equal(previousContentRelease.Published.Value, actualStatisticsRelease.Published);
 
                 Assert.True(actualContentRelease.DataLastPublished.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(actualContentRelease.DataLastPublished!.Value).Milliseconds, 0,

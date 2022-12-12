@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
 using Azure.Storage.Blobs;
@@ -161,10 +161,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
-            services.AddTransient<ITableStorageService, TableStorageService>(s =>
-                new TableStorageService(
-                    publicStorageConnectionString,
-                    new StorageInstanceCreationUtil()));
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<ICacheKeyService, CacheKeyService>();
 

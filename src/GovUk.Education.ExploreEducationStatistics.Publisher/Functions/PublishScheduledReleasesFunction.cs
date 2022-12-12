@@ -29,10 +29,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         /// <summary>
-        /// Azure function which publishes the content for a Release at a scheduled time by moving it from a staging directory.
+        /// Azure function which publishes the content for a Release at a scheduled time by moving it from a staging
+        /// directory.
         /// </summary>
         /// <remarks>
-        /// Sets the published time on the Release which means it's considered as 'Live'.
+        /// It will then call PublishingCompletionService in order to complete the publishing process for that Release.
         /// </remarks>
         /// <param name="timer"></param>
         /// <param name="executionContext"></param>

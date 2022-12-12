@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <param name="timer"></param>
         /// <param name="executionContext"></param>
         /// <param name="logger"></param>
-        [FunctionName("PublishReleases")]
+        [FunctionName("StageScheduledReleases")]
         // ReSharper disable once UnusedMember.Global
         public async Task StageScheduledReleases([TimerTrigger("%PublishReleasesCronSchedule%")]
             TimerInfo timer,
@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName,
                 DateTime.UtcNow);
 
-            await PublishReleases();
+            await PublishReleaseFilesAndStageContent();
 
             logger.LogInformation(
                 "{0} completed. {1}",
@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 timer.FormatNextOccurrences(1));
         }
 
-        private async Task PublishReleases()
+        private async Task PublishReleaseFilesAndStageContent()
         {
             var scheduled = (await QueryScheduledReleases()).Select(status => (status.ReleaseId, status.Id)).ToList();
             if (scheduled.Any())
