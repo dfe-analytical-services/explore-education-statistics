@@ -72,6 +72,7 @@ user selects dashboard theme and topic if possible
     [Arguments]
     ...    ${theme_name}=%{TEST_THEME_NAME}
     ...    ${topic_name}=%{TEST_TOPIC_NAME}
+    user waits until page does not contain loading spinner
     ${DROPDOWNS_EXIST}=    user checks dashboard theme topic dropdowns exist
     IF    ${DROPDOWNS_EXIST}
         user chooses select option    id:publicationsReleases-themeTopic-themeId    ${theme_name}
