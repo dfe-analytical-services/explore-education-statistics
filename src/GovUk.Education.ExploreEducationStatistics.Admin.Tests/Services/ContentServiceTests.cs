@@ -644,6 +644,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static ContentService SetupContentService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
+            IKeyStatisticService keyStatisticService = null,
             IReleaseContentSectionRepository releaseContentSectionRepository = null,
             IContentBlockService contentBlockService = null,
             IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext = null,
@@ -652,6 +653,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new ContentService(
                 contentDbContext,
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
+                keyStatisticService ?? Mock.Of<IKeyStatisticService>(), // @MarkFix strict?
                 releaseContentSectionRepository ?? new ReleaseContentSectionRepository(contentDbContext),
                 contentBlockService ?? new ContentBlockService(contentDbContext),
                 hubContext ?? Mock.Of<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(),

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
@@ -94,6 +95,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(
                     dest => dest.ChartsCount,
                     m => m.MapFrom(d => d.Charts.Count));
+
+            CreateMap<KeyStatisticDataBlockCreateRequest, KeyStatisticDataBlock>();
 
             CreateMap<Release, Data.Model.Release>()
                 .ForMember(dest => dest.TimeIdentifier, m => m.MapFrom(r => r.TimePeriodCoverage));

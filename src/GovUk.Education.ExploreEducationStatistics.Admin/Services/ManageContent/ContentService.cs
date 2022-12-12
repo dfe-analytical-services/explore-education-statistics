@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Clients;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -29,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     {
         private readonly ContentDbContext _context;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+        private readonly IKeyStatisticService _keyStatisticService;
         private readonly IReleaseContentSectionRepository _releaseContentSectionRepository;
         private readonly IContentBlockService _contentBlockService;
         private readonly IHubContext<ReleaseContentHub, IReleaseContentHubClient> _hubContext;
@@ -37,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
         public ContentService(ContentDbContext context,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
+            IKeyStatisticService keyStatisticService,
             IReleaseContentSectionRepository releaseContentSectionRepository,
             IContentBlockService contentBlockService,
             IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext,
@@ -45,6 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             _context = context;
             _persistenceHelper = persistenceHelper;
+            _keyStatisticService = keyStatisticService;
             _releaseContentSectionRepository = releaseContentSectionRepository;
             _contentBlockService = contentBlockService;
             _hubContext = hubContext;
@@ -261,6 +265,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                     await _contentBlockService.DeleteContentBlockAndReorder(blockToRemove.Id);
 
+                    if (section.Type == ContentSectionType.KeyStatistics)
+                    {
+                        _keyStatisticService.Delete(releaseId, contentBlockId);
+                    }
+
+                    _context.ContentSections.Update(section);
+                    await _context.SaveChangesAsync();
                     return OrderedContentBlocks(section);
                 });
         }
@@ -284,6 +295,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     if (!(blockToUpdate is DataBlock dataBlock))
                     {
                         return ValidationActionResult(IncorrectContentBlockTypeForUpdate);
+                    }
+
+                    if (section.Type == ContentSectionType.KeyStatistics)
+                    {
+                        _keyStatisticService.UpdateKeyStatisticDataBlock(new KeyStatisticDataBlockUpdateRequest
+                        {
+                            Id = blockToUpdate.Id,
+                            ReleaseId = releaseId,
+                            Trend = request.DataSummary, // @MarkFix correct?
+                            GuidanceTitle = request.DataDefinitionTitle, // @MarkFix correct?
+                            GuidanceText = request.DataDefinition, // @MarkFix correct?
+                        });
                     }
 
                     return await UpdateDataBlock(dataBlock, request);
@@ -331,6 +354,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
             if (typeof(T) == typeof(DataBlock))
             {
+                // @MarkFix also filter data blocks that have associated KeyStatisticDataBlock row
                 return unattachedContentBlocks
                     .OfType<DataBlock>()
                     .OrderBy(contentBlock => contentBlock.Name)
@@ -366,6 +390,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     if (dataBlock.ContentSectionId.HasValue)
                     {
                         return ValidationActionResult(ContentBlockAlreadyAttachedToContentSection);
+                    }
+
+                    if (section.Type == ContentSectionType.KeyStatistics)
+                    {
+                        _keyStatisticService.CreateKeyStatisticDataBlock(new KeyStatisticDataBlockCreateRequest
+                        {
+                            DataBlockId = blockToAttach.Id,
+                            ReleaseId = releaseId,
+                            Trend = null,
+                            GuidanceTitle = null,
+                            GuidanceText = null,
+                            Order = request.Order ?? 0, // @MarkFix ???
+                        });
                     }
 
                     return await AddContentBlockToContentSectionAndSave(request.Order, section, dataBlock);

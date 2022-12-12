@@ -49,7 +49,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
   const ReorderKeyStatisticsButton = () => {
     return !isReordering ? (
       <Button variant="secondary" onClick={toggleReordering.on}>
-        Reorder <span className="govuk-visually-hidden">key statistics</span>
+        Reorder<span className="govuk-visually-hidden"> key statistics</span>
       </Button>
     ) : (
       <Button variant="secondary" onClick={saveOrder}>
@@ -70,6 +70,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
         sectionKey: 'keyStatisticsSection',
         order,
       });
+      // @MarkFix reorder KeyStatisticBase here
     },
     [release.id, release.keyStatisticsSection.id, updateSectionBlockOrder],
   );
@@ -160,6 +161,8 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                               blockId: block.id,
                               sectionKey: 'keyStatisticsSection',
                             });
+                            // @MarkFix call keyStatisticService.Delete here
+                            // call useReleaseContentActions#updateAvailableDataBlocks too
                           }}
                           onSubmit={async values => {
                             await updateContentSectionDataBlock({
@@ -169,6 +172,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                               sectionKey: 'keyStatisticsSection',
                               values,
                             });
+                            // @MarkFix call keyStatisticService.Update here
                           }}
                         />
                       </div>
@@ -201,6 +205,8 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
           order: release.keyStatisticsSection.content.length || 0,
         },
       });
+      // @MarkFix call keyStatisticService.Create here
+      // call useReleaseContentActions#updateAvailableDataBlocks too
       setIsFormOpen(false);
     },
     [release.id, release.keyStatisticsSection, attachContentSectionBlock],

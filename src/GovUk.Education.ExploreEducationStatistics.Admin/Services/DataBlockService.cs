@@ -91,6 +91,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return InvalidateDataBlockCaches(deletePlan)
                 .OnSuccess(() => DeleteDependentDataBlocks(deletePlan))
+                .OnSuccessVoid(async () =>
+                {
+                    var dataBlockIds = deletePlan.DependentDataBlocks
+                        .Select(db => db.Id)
+                        .ToList();
+                    var keyStats = await _context.KeyStatisticsDataBlock
+                        .Where(ks => dataBlockIds.Contains(ks.DataBlockId))
+                        .ToListAsync();
+                    _context.KeyStatisticsDataBlock.RemoveRange(keyStats);
+                    await _context.SaveChangesAsync();
+                })
                 .OnSuccessVoid(() => RemoveChartFileReleaseLinks(deletePlan));
         }
 
