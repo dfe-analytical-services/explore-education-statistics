@@ -6,10 +6,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 using static Newtonsoft.Json.JsonConvert;
@@ -58,7 +61,12 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
                 Title = ""
             }
         },
-        Topic = new TopicViewModel(new ThemeViewModel(""))
+        Topic = new TopicViewModel(new ThemeViewModel(
+            Guid.NewGuid(),
+            Slug: "",
+            Title: "",
+            Summary: ""
+        ))
     };
 
     [Fact]
@@ -132,6 +140,353 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     }
 
     [Fact]
+    public async Task GetPublicationTree_NoCachedTreeExists()
+    {
+        var publicationTree = ListOf(new PublicationTreeThemeViewModel
+        {
+            Title = "Theme A",
+            Topics = new List<PublicationTreeTopicViewModel>
+            {
+                new()
+                {
+                    Title = "Topic A",
+                    Publications = ListOf(new PublicationTreePublicationViewModel
+                    {
+                        Title = "Publication A",
+                        IsSuperseded = false,
+                        HasLiveRelease = true
+                    })
+                }
+            }
+        });
+
+        PublicBlobCacheService
+            .Setup(s => s.GetItem(
+                new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
+            .ReturnsAsync(null);
+
+        var publicationService = new Mock<IPublicationService>(Strict);
+
+        publicationService
+            .Setup(s => s.GetPublicationTree())
+            .ReturnsAsync(publicationTree);
+
+        PublicBlobCacheService
+            .Setup(s => s.SetItem<object>(
+                new PublicationTreeCacheKey(), publicationTree))
+            .Returns(Task.CompletedTask);
+
+        var service = BuildService(publicationService.Object);
+
+        var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+
+        VerifyAllMocks(PublicBlobCacheService);
+
+        var filteredTree = result.AssertRight();
+        filteredTree.AssertDeepEqualTo(publicationTree);
+    }
+
+    [Fact]
+    public async Task GetPublicationTree_CachedTreeExists()
+    {
+        var publicationTree = new PublicationTreeThemeViewModel
+        {
+            Title = "Theme A",
+            Topics = new List<PublicationTreeTopicViewModel>
+            {
+                new()
+                {
+                    Title = "Topic A",
+                    Publications = ListOf(new PublicationTreePublicationViewModel
+                    {
+                        Title = "Publication A",
+                        IsSuperseded = false,
+                        HasLiveRelease = true
+                    })
+                }
+            }
+        };
+
+        PublicBlobCacheService
+            .Setup(s => s.GetItem(
+                new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
+            .ReturnsAsync(ListOf(publicationTree));
+
+        var service = BuildService();
+
+        var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+
+        VerifyAllMocks(PublicBlobCacheService);
+
+        var filteredTree = result.AssertRight();
+        filteredTree.AssertDeepEqualTo(ListOf(publicationTree));
+    }
+
+    [Fact]
+    public async Task GetPublicationTree_FindStatistics_NonSupersededPublicationWithLiveRelease_Included()
+    {
+        var publicationTree = new PublicationTreeThemeViewModel
+        {
+            Title = "Theme A",
+            Topics = new List<PublicationTreeTopicViewModel>
+            {
+                new()
+                {
+                    Title = "Topic A",
+                    Publications = ListOf(new PublicationTreePublicationViewModel
+                    {
+                        Title = "Publication A",
+                        IsSuperseded = false,
+                        HasLiveRelease = true
+                    })
+                }
+            }
+        };
+
+        await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.FindStatistics);
+    }
+
+    [Fact]
+    public async Task GetPublicationTree_FindStatistics_NonSupersededPublicationWithLegacyRelease_Included()
+    {
+        var publicationTree = new PublicationTreeThemeViewModel
+        {
+            Title = "Theme A",
+            Topics = new List<PublicationTreeTopicViewModel>
+            {
+                new()
+                {
+                    Title = "Topic A",
+                    Publications = ListOf(new PublicationTreePublicationViewModel
+                    {
+                        Title = "Publication A",
+                        IsSuperseded = false,
+                        Type = PublicationType.Legacy
+                    })
+                }
+            }
+        };
+
+        await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.FindStatistics);
+    }
+
+    [Fact]
+    public async Task GetPublicationTree_FindStatistics_SupersededPublicationWithLiveRelease_Excluded()
+    {
+        var publicationTree = new PublicationTreeThemeViewModel
+        {
+            Title = "Theme A",
+            Topics = new List<PublicationTreeTopicViewModel>
+            {
+                new()
+                {
+                    Title = "Topic A",
+                    Publications = ListOf(new PublicationTreePublicationViewModel
+                    {
+                        Title = "Publication A",
+                        IsSuperseded = true,
+                        HasLiveRelease = true
+                    })
+                }
+            }
+        };
+
+        await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.FindStatistics);
+    }
+
+    [Fact]
+    public async Task GetPublicationTree_FindStatistics_SupersededPublicationWithLegacyRelease_Excluded()
+    {
+        var publicationTree = new PublicationTreeThemeViewModel
+        {
+            Title = "Theme A",
+            Topics = new List<PublicationTreeTopicViewModel>
+            {
+                new()
+                {
+                    Title = "Topic A",
+                    Publications = ListOf(new PublicationTreePublicationViewModel
+                    {
+                        Title = "Publication A",
+                        IsSuperseded = true,
+                        Type = PublicationType.Legacy
+                    })
+                }
+            }
+        };
+
+        await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.FindStatistics);
+    }
+
+    [Fact]
+    public async Task GetPublicationTree_DataCatalogue_SomeLiveReleaseHasData_Included()
+    {
+        var publicationTree = new PublicationTreeThemeViewModel
+        {
+            Title = "Theme A",
+            Topics = new List<PublicationTreeTopicViewModel>
+            {
+                new()
+                {
+                    Title = "Topic A",
+                    Publications = ListOf(new PublicationTreePublicationViewModel
+                    {
+                        Title = "Publication A",
+                        AnyLiveReleaseHasData = true
+                    })
+                }
+            }
+        };
+
+        await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.DataCatalogue);
+    }
+
+    [Fact]
+    public async Task GetPublicationTree_DataCatalogue_NoLiveReleaseHasData_Excluded()
+    {
+        var publication = new PublicationTreePublicationViewModel
+        {
+            Title = "Publication A",
+            AnyLiveReleaseHasData = false
+        };
+
+        var publicationTree = new PublicationTreeThemeViewModel
+        {
+            Title = "Theme A",
+            Topics = new List<PublicationTreeTopicViewModel>
+            {
+                new()
+                {
+                    Title = "Topic A",
+                    Publications = ListOf(publication)
+                }
+            }
+        };
+
+        await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.DataCatalogue);
+    }
+
+    [Fact]
+    public async Task GetPublicationTree_DataTables_NonSupersededPublicationWithDataOnLatestRelease_Included()
+    {
+        var publicationTree = new PublicationTreeThemeViewModel
+        {
+            Title = "Theme A",
+            Topics = new List<PublicationTreeTopicViewModel>
+            {
+                new()
+                {
+                    Title = "Topic A",
+                    Publications = ListOf(new PublicationTreePublicationViewModel
+                    {
+                        Title = "Publication A",
+                        IsSuperseded = false,
+                        LatestReleaseHasData = true
+                    })
+                }
+            }
+        };
+
+        await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.DataTables);
+    }
+
+    [Fact]
+    public async Task GetPublicationTree_DataTables_SupersededPublicationWithDataOnLatestRelease_Excluded()
+    {
+        var publicationTree = new PublicationTreeThemeViewModel
+        {
+            Title = "Theme A",
+            Topics = new List<PublicationTreeTopicViewModel>
+            {
+                new()
+                {
+                    Title = "Topic A",
+                    Publications = ListOf(new PublicationTreePublicationViewModel
+                    {
+                        Title = "Publication A",
+                        IsSuperseded = true,
+                        LatestReleaseHasData = true
+                    })
+                }
+            }
+        };
+
+        await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.DataTables);
+    }
+
+    [Fact]
+    public async Task GetPublicationTree_DataTables_NonSupersededPublicationWithNoDataOnLatestRelease_Excluded()
+    {
+        var publicationTree = new PublicationTreeThemeViewModel
+        {
+            Title = "Theme A",
+            Topics = new List<PublicationTreeTopicViewModel>
+            {
+                new()
+                {
+                    Title = "Topic A",
+                    Publications = ListOf(new PublicationTreePublicationViewModel
+                    {
+                        Title = "Publication A",
+                        IsSuperseded = false,
+                        LatestReleaseHasData = false
+                    })
+                }
+            }
+        };
+
+        await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.DataTables);
+    }
+
+    [Fact]
+    public async Task GetPublicationTree_FastTrack_SomeLiveReleaseHasData_Included()
+    {
+        var publicationTree = new PublicationTreeThemeViewModel
+        {
+            Title = "Theme A",
+            Topics = new List<PublicationTreeTopicViewModel>
+            {
+                new()
+                {
+                    Title = "Topic A",
+                    Publications = ListOf(new PublicationTreePublicationViewModel
+                    {
+                        Title = "Publication A",
+                        AnyLiveReleaseHasData = true
+                    })
+                }
+            }
+        };
+
+        await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.FastTrack);
+    }
+
+    [Fact]
+    public async Task GetPublicationTree_FastTrack_NoLiveReleaseHasData_Excluded()
+    {
+        var publication = new PublicationTreePublicationViewModel
+        {
+            Title = "Publication A",
+            AnyLiveReleaseHasData = false
+        };
+
+        var publicationTree = new PublicationTreeThemeViewModel
+        {
+            Title = "Theme A",
+            Topics = new List<PublicationTreeTopicViewModel>
+            {
+                new()
+                {
+                    Title = "Topic A",
+                    Publications = ListOf(publication)
+                }
+            }
+        };
+
+        await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.FastTrack);
+    }
+
+    [Fact]
     public async Task UpdatePublication()
     {
         var cacheKey = new PublicationCacheKey(PublicationSlug);
@@ -158,10 +513,99 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     }
 
     [Fact]
+    public async Task UpdatePublicationTree()
+    {
+        var publicationTree = ListOf(new PublicationTreeThemeViewModel
+        {
+            Title = "Theme A",
+        });
+
+        var publicationService = new Mock<IPublicationService>(Strict);
+
+        publicationService
+            .Setup(s => s.GetPublicationTree())
+            .ReturnsAsync(publicationTree);
+
+        // We should not see any attempt to "get" the cached tree, but rather only see a fresh fetching
+        // of the latest tree and then it being cached.
+        PublicBlobCacheService
+            .Setup(s => s.SetItem<object>(
+                new PublicationTreeCacheKey(), publicationTree))
+            .Returns(Task.CompletedTask);
+
+        var service = BuildService(publicationService.Object);
+
+        var filteredTree = await service.UpdatePublicationTree();
+
+        VerifyAllMocks(PublicBlobCacheService);
+
+        publicationTree.AssertDeepEqualTo(filteredTree);
+    }
+
+    [Fact]
     public void PublicationCacheViewModel_SerializeAndDeserialize()
     {
         var converted = DeserializeObject<PublicationCacheViewModel>(SerializeObject(_publicationViewModel));
         converted.AssertDeepEqualTo(_publicationViewModel);
+    }
+
+    [Fact]
+    public void PublicationTree_SerializeAndDeserialize()
+    {
+        var publicationTree = new PublicationTreeThemeViewModel
+        {
+            Topics = new List<PublicationTreeTopicViewModel>
+            {
+                new()
+                {
+                    Publications = new List<PublicationTreePublicationViewModel>
+                    {
+                        new()
+                    }
+                }
+            }
+        };
+
+        var converted = DeserializeObject<PublicationTreeThemeViewModel>(SerializeObject(publicationTree));
+        converted.AssertDeepEqualTo(publicationTree);
+    }
+
+    private static async Task AssertPublicationTreeUnfiltered(
+        PublicationTreeThemeViewModel publicationTree,
+        PublicationTreeFilter filter)
+    {
+        PublicBlobCacheService
+            .Setup(s => s.GetItem(
+                new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
+            .ReturnsAsync(ListOf(publicationTree));
+
+        var service = BuildService();
+
+        var result = await service.GetPublicationTree(filter);
+
+        VerifyAllMocks(PublicBlobCacheService);
+
+        var filteredTree = result.AssertRight();
+        filteredTree.AssertDeepEqualTo(ListOf(publicationTree));
+    }
+
+    private static async Task AssertPublicationTreeEmpty(
+        PublicationTreeThemeViewModel publicationTree,
+        PublicationTreeFilter filter)
+    {
+        PublicBlobCacheService
+            .Setup(s => s.GetItem(
+                new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
+            .ReturnsAsync(ListOf(publicationTree));
+
+        var service = BuildService();
+
+        var result = await service.GetPublicationTree(filter);
+
+        VerifyAllMocks(PublicBlobCacheService);
+
+        var filteredTree = result.AssertRight();
+        Assert.Empty(filteredTree);
     }
 
     private static PublicationCacheService BuildService(
@@ -169,7 +613,8 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     )
     {
         return new PublicationCacheService(
-            publicationService: publicationService ?? Mock.Of<IPublicationService>(Strict)
+            publicationService: publicationService ?? Mock.Of<IPublicationService>(Strict),
+            Mock.Of<ILogger<PublicationCacheService>>()
         );
     }
 }

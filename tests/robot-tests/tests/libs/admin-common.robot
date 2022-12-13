@@ -9,6 +9,25 @@ ${ANALYST1_BROWSER}=    analyst1
 
 
 *** Keywords ***
+user logs in via identity provider
+    [Arguments]    ${email}    ${password}
+
+    IF    "%{IDENTITY_PROVIDER}" == "KEYCLOAK"
+        user waits until page contains element    xpath://h1[contains(text(), "Sign in to your account")]
+        user enters text into element    id:username    ${email}
+        user enters text into element    id:password    ${password}
+        user clicks element    id:kc-login
+    ELSE IF    "%{IDENTITY_PROVIDER}" == "AZURE"
+        user waits until page contains element    xpath://*[.='Sign in']
+        user enters text into element    xpath://*[@name='loginfmt']    ${email}
+        user clicks element    //*[@type='submit']
+        user waits until page contains element    xpath://*[@name='passwd']
+        user enters text into element    xpath://*[@name='passwd']    ${password}
+        user clicks element    xpath://*[@type='submit']
+        user waits until page contains element    xpath://*[.='Stay signed in?']
+        user clicks element    id:idBtn_Back
+    END
+
 user signs in as bau1
     [Arguments]    ${open_browser}=True    ${alias}=${BAU1_BROWSER}
     IF    ${open_browser}

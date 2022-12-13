@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
@@ -91,11 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(async userService =>
                 {
                     var service = SetupUserManagementService(userService: userService.Object);
-                    return await service.InviteUser(
-                        "test@test.com",
-                        Guid.NewGuid().ToString(),
-                        new List<UserReleaseRoleAddViewModel>(),
-                        new List<UserPublicationRoleAddViewModel>());
+                    return await service.InviteUser(new UserInviteCreateRequest());
                 });
         }
 

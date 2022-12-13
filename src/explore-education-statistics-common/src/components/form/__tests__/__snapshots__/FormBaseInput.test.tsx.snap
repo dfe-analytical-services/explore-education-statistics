@@ -14,12 +14,14 @@ exports[`FormTextInput renders correctly with error 1`] = `
   </span>
   Field is required
 </span>
-<input name="testInput"
-       aria-describedby="test-input-error"
-       class="govuk-input govuk-input--error"
-       id="test-input"
-       type="text"
->
+<div class>
+  <input name="testInput"
+         aria-describedby="test-input-error"
+         class="govuk-input govuk-input--error"
+         id="test-input"
+         type="text"
+  >
+</div>
 `;
 
 exports[`FormTextInput renders correctly with hint 1`] = `
@@ -33,12 +35,14 @@ exports[`FormTextInput renders correctly with hint 1`] = `
 >
   Fill me in
 </span>
-<input name="testInput"
-       aria-describedby="test-input-hint"
-       class="govuk-input"
-       id="test-input"
-       type="text"
->
+<div class>
+  <input name="testInput"
+         aria-describedby="test-input-hint"
+         class="govuk-input"
+         id="test-input"
+         type="text"
+  >
+</div>
 `;
 
 exports[`FormTextInput renders correctly with required props 1`] = `
@@ -47,11 +51,13 @@ exports[`FormTextInput renders correctly with required props 1`] = `
 >
   Test input
 </label>
-<input name="testInput"
-       class="govuk-input"
-       id="test-input"
-       type="text"
->
+<div class>
+  <input name="testInput"
+         class="govuk-input"
+         id="test-input"
+         type="text"
+  >
+</div>
 `;
 
 exports[`FormTextInput renders with a specific width class 1`] = `
@@ -65,10 +71,36 @@ exports[`FormTextInput renders with a specific width class 1`] = `
 >
   Fill me in
 </span>
-<input name="testInput"
-       aria-describedby="test-input-hint"
-       class="govuk-input govuk-input--width-20"
-       id="test-input"
-       type="text"
+<div class>
+  <input name="testInput"
+         aria-describedby="test-input-hint"
+         class="govuk-input govuk-input--width-20"
+         id="test-input"
+         type="text"
+  >
+</div>
+`;
+
+exports[`FormTextInput renders with an add on 1`] = `
+<label class="govuk-label"
+       for="test-input"
 >
+  Test input
+</label>
+<span id="test-input-hint"
+      class="govuk-hint"
+>
+  Fill me in
+</span>
+<div class="dfe-flex">
+  <input name="testInput"
+         aria-describedby="test-input-hint"
+         class="govuk-input govuk-input--width-20"
+         id="test-input"
+         type="text"
+  >
+  <button type="button">
+    Click me!
+  </button>
+</div>
 `;

@@ -3,7 +3,7 @@ import _tableBuilderService, {
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
-import { Theme } from '@common/services/themeService';
+import { Theme } from '@common/services/publicationService';
 import { within } from '@testing-library/dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';

@@ -3,6 +3,7 @@ import Button from '@common/components/Button';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import Tooltip from '@common/components/Tooltip';
 import {
   ChartDefinitionAxis,
@@ -11,10 +12,8 @@ import {
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import { MinorAxisDomainValues } from '@common/modules/charts/util/domainTicks';
+import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import Yup from '@common/validation/yup';
-import FormSelect, {
-  SelectOption,
-} from 'explore-education-statistics-common/src/components/form/FormSelect';
 import { Formik } from 'formik';
 import upperFirst from 'lodash/upperFirst';
 import React, { useMemo } from 'react';
@@ -52,7 +51,10 @@ export default function ChartReferenceLinesConfiguration({
 
     return dataSetCategories.map(({ filter }) => ({
       label: filter.label,
-      value: filter.value,
+      value:
+        filter instanceof LocationFilter
+          ? LocationFilter.createId(filter)
+          : filter.value,
     }));
   }, [type, dataSetCategories]);
 

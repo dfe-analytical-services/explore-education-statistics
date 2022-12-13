@@ -3,9 +3,10 @@ import _tableBuilderService, {
   Subject,
 } from '@common/services/tableBuilderService';
 import DataCataloguePage from '@frontend/modules/data-catalogue/DataCataloguePage';
-import { PublicationSummary, Theme } from '@common/services/themeService';
 import _publicationService, {
   ReleaseSummary,
+  PublicationTreeSummary,
+  Theme,
 } from '@common/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -56,7 +57,7 @@ describe('DataCataloguePage', () => {
     id: 'publication-1',
     title: 'Test publication',
     slug: 'test-publication',
-  } as PublicationSummary;
+  } as PublicationTreeSummary;
 
   const testReleases: ReleaseSummary[] = [
     {

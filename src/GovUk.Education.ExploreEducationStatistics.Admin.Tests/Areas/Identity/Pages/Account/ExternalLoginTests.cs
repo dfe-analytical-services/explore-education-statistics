@@ -269,13 +269,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                     {
                         Email = email,
                         Role = new IdentityRole("Role A"),
-                        Accepted = false
+                        Accepted = false,
+                        Created = DateTime.UtcNow.AddDays(-14).AddSeconds(10) // not yet expired
                     },
                     new UserInvite
                     {
                         Email = "anotheruser@example.com",
                         Role = new IdentityRole("Role B"),
-                        Accepted = false
+                        Accepted = false,
+                        Created = DateTime.UtcNow.AddDays(-14).AddSeconds(10) // not yet expired
                     });
 
                 await usersDbContext.SaveChangesAsync();
@@ -405,6 +407,177 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                 Assert.Equal(
                     ListOf(PublicationRole.Owner, PublicationRole.Approver),
                     newUserPublicationRoles.Select(r => r.Role));
+            }
+        }
+        
+        [Fact]
+        public async Task Login_InvitedUser_Expired()
+        {
+            await AssertInviteExpired(DateTime.UtcNow.AddDays(-14).AddSeconds(-1));
+        }
+
+        [Fact]
+        public async Task Login_InvitedUser_JustExpired()
+        {
+            await AssertInviteExpired(DateTime.UtcNow.AddDays(-14));
+        }
+        
+        private static async Task AssertInviteExpired(DateTime invitationCreatedDate)
+        {
+            var contextId = Guid.NewGuid().ToString();
+
+            const string email = "inviteduser@example.com";
+            const string firstName = "FirstName";
+            const string lastName = "LastName";
+
+            var claimsPrincipal = CreateClaimsPrincipal(email, firstName, lastName);
+
+            var userManager = new Mock<IUserManagerDelegate>(Strict);
+            var signInManager = new Mock<ISignInManagerDelegate>(Strict);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.UserReleaseInvites.AddRangeAsync(
+                    new UserReleaseInvite
+                    {
+                        Email = email,
+                        Role = ReleaseRole.Approver,
+                    },
+                    new UserReleaseInvite
+                    {
+                        Email = email,
+                        Role = ReleaseRole.Lead,
+                    },
+                    new UserReleaseInvite
+                    {
+                        Email = "anotheruser@example.com",
+                    });
+
+                await contentDbContext.UserPublicationInvites.AddRangeAsync(
+                    new UserPublicationInvite
+                    {
+                        Email = email,
+                        Role = PublicationRole.Owner
+                    },
+                    new UserPublicationInvite
+                    {
+                        Email = email,
+                        Role = PublicationRole.ReleaseApprover
+                    },
+                    new UserPublicationInvite
+                    {
+                        Email = "anotheruser@example.com"
+                    }
+                );
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var usersDbContext = InMemoryUserAndRolesDbContext(contextId))
+            {
+                await usersDbContext.UserInvites.AddRangeAsync(
+                    new UserInvite
+                    {
+                        Email = email,
+                        Role = new IdentityRole("Role A"),
+                        Accepted = false,
+                        Created = invitationCreatedDate  // expired
+                    },
+                    new UserInvite
+                    {
+                        Email = "anotheruser@example.com",
+                        Role = new IdentityRole("Role B"),
+                        Accepted = false,
+                        Created = DateTime.UtcNow.AddDays(-1)  // not yet expired
+                    });
+
+                await usersDbContext.SaveChangesAsync();
+            }
+
+            await using (var usersDbContext = InMemoryUserAndRolesDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var loginService = BuildService(
+                    signInManager.Object,
+                    userManager.Object,
+                    contentDbContext,
+                    usersDbContext);
+
+                signInManager
+                    .Setup(s => s.GetExternalLoginInfoAsync(null))
+                    .ReturnsAsync(new ExternalLoginInfo(
+                        claimsPrincipal,
+                        LoginProvider,
+                        ProviderKey,
+                        LoginProviderDisplayName));
+
+                var result = await loginService.OnGetCallbackAsync(ReturnUrl);
+                VerifyAllMocks(signInManager);
+
+                AssertInviteExpired(result);
+            }
+
+            await using (var usersDbContext = InMemoryUserAndRolesDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                // Assert that the new user's expired invite has been deleted.
+                var newUsersInvite = await usersDbContext
+                    .UserInvites
+                    .AsQueryable()
+                    .SingleOrDefaultAsync(invite => invite.Email == email);
+                Assert.Null(newUsersInvite);
+
+                // Assert that the other user's invites have all been left alone.
+                var otherUsersInvite = await usersDbContext
+                    .UserInvites
+                    .AsQueryable()
+                    .SingleAsync(invite => invite.Email != email);
+                Assert.False(otherUsersInvite.Accepted);
+
+                // Assert that the new user's release role invites have all been deleted.
+                var newUsersReleaseRoleInvites = await contentDbContext
+                    .UserReleaseInvites
+                    .AsQueryable()
+                    .Where(invite => invite.Email == email)
+                    .ToListAsync();
+                Assert.Empty(newUsersReleaseRoleInvites);
+
+                // Assert that the other user's release role invites have all been left alone.
+                var otherUsersReleaseRoleInvites = await contentDbContext
+                    .UserReleaseInvites
+                    .AsQueryable()
+                    .Where(invite => invite.Email != email)
+                    .ToListAsync();
+                Assert.Single(otherUsersReleaseRoleInvites);
+
+                // Assert that the new user's publication role invites have all been deleted.
+                var newUsersPublicationRoleInvites = await contentDbContext
+                    .UserPublicationInvites
+                    .AsQueryable()
+                    .Where(invite => invite.Email == email)
+                    .ToListAsync();
+                Assert.Empty(newUsersPublicationRoleInvites);
+
+                // Assert that the other user's publication role invites have all been left alone.
+                var otherUsersPublicationRoleInvites = await contentDbContext
+                    .UserPublicationInvites
+                    .AsQueryable()
+                    .Where(invite => invite.Email != email)
+                    .ToListAsync();
+                Assert.Single(otherUsersPublicationRoleInvites);
+
+                // Assert that the user has not been assigned the new release roles.
+                var newUsersReleaseRoles = await contentDbContext
+                    .UserReleaseRoles
+                    .AsQueryable()
+                    .ToListAsync();
+                Assert.Empty(newUsersReleaseRoles);
+
+                // Assert that the user has not been assigned the new publication roles.
+                var newUserPublicationRoles = await contentDbContext
+                    .UserPublicationRoles
+                    .AsQueryable()
+                    .ToListAsync();
+                Assert.Empty(newUserPublicationRoles);
             }
         }
 
@@ -595,6 +768,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
             Assert.False(redirectPage.Permanent);
             Assert.Null(loginService.ErrorMessage);
             Assert.Empty(loginService.ModelState);
+        }
+        
+        private static void AssertInviteExpired(IActionResult? result)
+        {
+            var redirectPage = Assert.IsType<RedirectToPageResult>(result);
+            Assert.Equal("./InviteExpired", redirectPage.PageName);
+            Assert.False(redirectPage.Permanent);
         }
 
         private static ExternalLoginModel BuildService(

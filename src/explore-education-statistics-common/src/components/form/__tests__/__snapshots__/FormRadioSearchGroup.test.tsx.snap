@@ -13,12 +13,14 @@ exports[`FormRadioSearchGroup renders list of radio buttons in correct order 1`]
     >
       Search
     </label>
-    <input name="testRadios-search"
-           class="govuk-input govuk-!-margin-bottom-4 searchInput govuk-input--width-20"
-           id="test-radios-search"
-           type="text"
-           value
-    >
+    <div class>
+      <input name="testRadios-search"
+             class="govuk-input govuk-!-margin-bottom-4 searchInput govuk-input--width-20"
+             id="test-radios-search"
+             type="text"
+             value
+      >
+    </div>
     <div aria-live="assertive">
       <div class="govuk-radios">
         <div class="govuk-radios__item"

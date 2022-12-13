@@ -9,8 +9,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     public interface IUserPublicationInviteRepository
     {
         Task CreateManyIfNotExists(
-            List<UserPublicationRoleAddViewModel> userPublicationRoles,
+            List<UserPublicationRoleCreateRequest> userPublicationRoles,
             string email,
-            Guid createdById);
+            Guid createdById,
+            DateTime? createdDate = null);
     }
 }

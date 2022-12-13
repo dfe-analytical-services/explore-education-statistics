@@ -6,7 +6,8 @@ import {
 } from '@common/modules/charts/types/chart';
 import { ChartData } from '@common/modules/charts/types/dataSet';
 import React, { ReactElement } from 'react';
-import { AxisDomain, ReferenceLine, ReferenceLineProps } from 'recharts';
+import { ReferenceLine, ReferenceLineProps } from 'recharts';
+import { AxisDomainItem } from 'recharts/types/util/types';
 
 interface Props
   extends Omit<ReferenceLineProps, 'label' | 'position' | 'style'> {
@@ -14,7 +15,7 @@ interface Props
   axisType: AxisType;
   chartData: ChartData[];
   label: string;
-  otherAxisDomain?: [AxisDomain, AxisDomain];
+  otherAxisDomain?: [AxisDomainItem, AxisDomainItem];
   otherAxisPosition?: number;
   position: string | number;
   style?: ReferenceLineStyle;

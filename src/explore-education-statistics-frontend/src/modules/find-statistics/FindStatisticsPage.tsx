@@ -1,10 +1,11 @@
-import themeService, { Theme } from '@common/services/themeService';
 import publicationService, {
+  PublicationListRequest,
   PublicationListSummary,
   PublicationOrderParam,
   PublicationSortOption,
   publicationSortOptions,
   PublicationSortParam,
+  Theme,
 } from '@common/services/publicationService';
 import { Paging } from '@common/services/types/pagination';
 import parseNumber from '@common/utils/number/parseNumber';
@@ -18,6 +19,7 @@ interface Props {
   newDesign?: boolean; // TODO EES-3517 flag
   paging?: Paging | null; // TODO EES-3517 won't be optional or null
   publications?: PublicationListSummary[]; // TODO EES-3517 won't be optional
+  search?: string;
   sortBy?: PublicationSortOption;
   themes: Theme[];
 }
@@ -26,6 +28,7 @@ const FindStatisticsPage: NextPage<Props> = ({
   newDesign = false,
   paging,
   publications,
+  search,
   sortBy,
   themes = [],
 }) => {
@@ -35,6 +38,7 @@ const FindStatisticsPage: NextPage<Props> = ({
       <FindStatisticsPageNew
         paging={paging}
         publications={publications}
+        searchTerm={search}
         sortBy={sortBy}
       />
     );
@@ -50,11 +54,18 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
     ? query.sortBy
     : 'newest';
   const { order, sort } = getSortParams(sortBy);
+  const minSearchCharacters = 3;
+  const searchQuery = Array.isArray(query.search)
+    ? query.search[0]
+    : query.search;
+  const search =
+    searchQuery && searchQuery.length >= minSearchCharacters ? searchQuery : '';
 
-  const params = {
+  const params: PublicationListRequest = {
     order,
     page: parseNumber(query.page) ?? 1,
     sort,
+    ...(search && { search }),
   };
 
   // TODO EES-3517 - remove newDesign check
@@ -73,7 +84,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
   // TODO EES-3517 - remove themes
   const themes = newDesign
     ? []
-    : await themeService.listThemes({
+    : await publicationService.getPublicationTree({
         publicationFilter: 'FindStatistics',
       });
 
@@ -82,6 +93,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
       newDesign: !!newDesign,
       paging: newDesign ? publicationsResponse.paging : null,
       publications: newDesign ? publicationsResponse.results : [],
+      search,
       sortBy,
       themes,
     },

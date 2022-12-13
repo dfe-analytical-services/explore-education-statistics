@@ -12,13 +12,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             string email,
             ReleaseRole releaseRole,
             bool emailSent,
-            Guid createdById);
+            Guid createdById,
+            DateTime? createdDate = null);
 
         Task CreateManyIfNotExists(List<Guid> releaseIds,
             string email,
             ReleaseRole releaseRole,
             bool emailSent,
-            Guid createdById);
+            Guid createdById,
+            DateTime? createdDate = null);
 
         Task Remove(Guid releaseId, string email, ReleaseRole role);
 

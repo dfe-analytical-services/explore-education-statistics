@@ -120,4 +120,20 @@ describe('FormTextInput', () => {
     expect(container.querySelector('.govuk-input--width-20')).not.toBeNull();
     expect(container.innerHTML).toMatchSnapshot();
   });
+
+  test('renders with an add on', () => {
+    const { container, getByRole } = render(
+      <FormBaseInput
+        addOn={<button type="button">Click me!</button>}
+        id="test-input"
+        label="Test input"
+        name="testInput"
+        hint="Fill me in"
+        width={20}
+      />,
+    );
+
+    expect(getByRole('button', { name: 'Click me!' })).toBeInTheDocument();
+    expect(container.innerHTML).toMatchSnapshot();
+  });
 });

@@ -5,7 +5,6 @@ import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
-import publicationService from '@common/services/publicationService';
 import tableBuilderService, {
   FastTrackTable,
   FeaturedTable,
@@ -13,7 +12,7 @@ import tableBuilderService, {
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
-import themeService, { Theme } from '@common/services/themeService';
+import publicationService, { Theme } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
@@ -214,7 +213,7 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
     string
   >;
 
-  const themeMeta = await themeService.listThemes({
+  const themeMeta = await publicationService.getPublicationTree({
     publicationFilter: 'DataTables',
   });
 

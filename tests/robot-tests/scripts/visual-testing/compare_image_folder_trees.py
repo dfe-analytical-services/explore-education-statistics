@@ -2,12 +2,9 @@ import argparse
 import os
 
 from compare_images import compare_images
-from tests.libs.logger import get_logger
-
-logger = get_logger(__name__)
 
 
-def compare_images_in_folder_trees(first_folderpath, second_folderpath, diff_folderpath):
+def compare_images_in_folder_trees(first_folderpath: str, second_folderpath: str, diff_folderpath: str) -> None:
 
     first_folderpath_absolute = os.path.abspath(os.path.join(os.getcwd(), first_folderpath))
     second_folderpath_absolute = os.path.abspath(os.path.join(os.getcwd(), second_folderpath))
@@ -21,7 +18,7 @@ def compare_images_in_folder_trees(first_folderpath, second_folderpath, diff_fol
             second_filepath = f"{second_folderpath_absolute}/{original_folder_relative_path}/{original_filename}"
 
             if not os.path.exists(second_filepath):
-                logger.warn(f"Comparison file does not exist at {second_filepath}")
+                print(f"Comparison file does not exist at {second_filepath}")
                 continue
 
             diff_folderpath = f"{diff_folderpath_absolute}/{original_folder_relative_path}"

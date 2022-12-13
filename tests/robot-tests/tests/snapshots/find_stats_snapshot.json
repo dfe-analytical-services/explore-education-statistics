@@ -221,6 +221,14 @@
                 "publication_heading": "Participation in education, training and employment age 16 to 18"
               }
             ]
+          },
+          {
+            "publication_type_heading": "Management information",
+            "publications": [
+              {
+                "publication_heading": "Participation in education, training and NEET age 16 to 17 by local authority"
+              }
+            ]
           }
         ],
         "topic_heading": "NEET and participation"
@@ -322,19 +330,6 @@
       {
         "publication_types": [
           {
-            "publication_type_heading": "Not yet on this service",
-            "publications": [
-              {
-                "publication_heading": "FE choices learner satisfaction survey"
-              }
-            ]
-          }
-        ],
-        "topic_heading": "FE choices"
-      },
-      {
-        "publication_types": [
-          {
             "publication_type_heading": "National and official statistics",
             "publications": [
               {
@@ -358,6 +353,9 @@
             "publications": [
               {
                 "publication_heading": "Skills Bootcamps outcomes"
+              },
+              {
+                "publication_heading": "Skills Bootcamps starts"
               }
             ]
           }
@@ -665,14 +663,6 @@
               },
               {
                 "publication_heading": "Special educational needs in England"
-              }
-            ]
-          },
-          {
-            "publication_type_heading": "Not yet on this service",
-            "publications": [
-              {
-                "publication_heading": "Special educational needs: analysis and summary of data sources"
               }
             ]
           }

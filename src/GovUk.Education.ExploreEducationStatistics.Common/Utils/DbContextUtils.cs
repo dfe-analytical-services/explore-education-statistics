@@ -19,19 +19,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
                 switch (e.Entry.Entity)
                 {
                     case ICreatedTimestamp<DateTime> entityWithCreated:
-                        entityWithCreated.Created = now;
+                        if (entityWithCreated.Created == null)
+                        {
+                            entityWithCreated.Created = now;
+                        }
                         break;
 
                     case ICreatedTimestamp<DateTime?> entityWithCreated:
-                        entityWithCreated.Created = now;
+                        if (entityWithCreated.Created == null)
+                        {
+                            entityWithCreated.Created = now;
+                        }
                         break;
 
                     case ICreatedTimestamp<DateTimeOffset> entityWithCreated:
-                        entityWithCreated.Created = now;
+                        if (entityWithCreated.Created == null)
+                        {
+                            entityWithCreated.Created = now;
+                        }
                         break;
 
                     case ICreatedTimestamp<DateTimeOffset?> entityWithCreated:
-                        entityWithCreated.Created = now;
+                        if (entityWithCreated.Created == null)
+                        {
+                            entityWithCreated.Created = now;
+                        }
                         break;
 
                     default:

@@ -6,10 +6,10 @@ import { ChartData } from '@common/modules/charts/types/dataSet';
 import getMinMax from '@common/utils/number/getMinMax';
 import parseNumber from '@common/utils/number/parseNumber';
 import omit from 'lodash/omit';
-import { AxisDomain } from 'recharts';
+import { AxisDomainItem } from 'recharts/types/util/types';
 
 export interface DomainTicks {
-  domain?: [AxisDomain, AxisDomain];
+  domain?: [AxisDomainItem, AxisDomainItem];
   ticks?: (string | number)[];
 }
 
@@ -49,10 +49,10 @@ function getNiceMinMaxValue(initialValue: number, isMin = false): number {
 }
 
 function calculateMinorTicks(
-  config: TickConfig | undefined,
   min: number,
   max: number,
   spacing = 5,
+  config?: TickConfig,
 ): number[] | undefined {
   if (config === 'startEnd') {
     return [min, max];
@@ -159,15 +159,21 @@ export function getMinorAxisDomainTicks(
   }
   const axisDomain = calculateMinorAxisDomainValues(chartData, axis);
 
-  const domain: [AxisDomain, AxisDomain] = [axisDomain.min, axisDomain.max];
+  const domain: [AxisDomainItem, AxisDomainItem] = [
+    axisDomain.min,
+    axisDomain.max,
+  ];
   const ticks = calculateMinorTicks(
-    axis.tickConfig,
     axisDomain.min,
     axisDomain.max,
     axis.tickSpacing,
+    axis.tickConfig,
   );
 
-  return { domain, ticks };
+  return {
+    domain,
+    ticks,
+  };
 }
 
 export function getMajorAxisDomainTicks(
@@ -183,7 +189,8 @@ export function getMajorAxisDomainTicks(
   const min = parseNumber(axis.min) ?? 0;
   const max = parseNumber(axis.max) ?? majorAxisCategories.length - 1;
 
-  const domain: [AxisDomain, AxisDomain] = [min, max];
+  const domain: [AxisDomainItem, AxisDomainItem] = [min, max];
+
   const ticks = calculateMajorTicks(
     axis.tickConfig,
     majorAxisCategories,

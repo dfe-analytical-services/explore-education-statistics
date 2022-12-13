@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
-    public record ThemeTree<TNode> where TNode : BasePublicationTreeNode
+    public record PublicationTreeTopicViewModel
     {
         public Guid Id { get; init; }
 
@@ -12,6 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public string Summary { get; init; } = string.Empty;
 
-        public List<TopicTree<TNode>> Topics { get; init; } = new();
+        public List<PublicationTreePublicationViewModel> Publications { get; init; } = new();
     }
 }

@@ -22,9 +22,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task CreateManyIfNotExists(
-            List<UserPublicationRoleAddViewModel> userPublicationRoles,
+            List<UserPublicationRoleCreateRequest> userPublicationRoles,
             string email,
-            Guid createdById)
+            Guid createdById,
+            DateTime? createdDate = null)
         {
             var invites = await userPublicationRoles
                 .ToAsyncEnumerable()
@@ -34,11 +35,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         userPublicationRole.PublicationRole,
                         email))
                 .Select(userPublicationRole =>
-                    new UserPublicationInvite()
+                    new UserPublicationInvite
                     {
                         Email = email.ToLower(),
                         PublicationId = userPublicationRole.PublicationId,
                         Role = userPublicationRole.PublicationRole,
+                        Created = createdDate ?? DateTime.UtcNow,
                         CreatedById = createdById,
                     }
                 ).ToListAsync();
@@ -57,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .AnyAsync(i =>
                     i.PublicationId == publicationId
                     && i.Role == role
-                    && i.Email.ToLower() == email.ToLower());
+                    && i.Email.ToLower().Equals(email.ToLower()));
         }
     }
 }

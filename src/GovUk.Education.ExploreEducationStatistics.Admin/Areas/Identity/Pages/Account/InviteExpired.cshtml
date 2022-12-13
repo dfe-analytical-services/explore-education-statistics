@@ -1,0 +1,16 @@
+@page
+@model InviteExpiredModel
+@{
+    ViewData["Title"] = "Invitation expired";
+    var contactEmail = "explore.statistics@education.gov.uk";
+}
+
+<h1 class="govuk-heading-l" data-testid="page-title">@ViewData["Title"]</h1>
+
+<p class="govuk-body">
+    Your invitation to the service has expired.
+</p>
+
+<p class="govuk-body">
+    You can request access to the Explore education statistics service by contacting <a class="govuk-link" href="mailto:@contactEmail">@contactEmail</a>.
+</p>

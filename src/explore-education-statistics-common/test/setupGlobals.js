@@ -36,6 +36,14 @@ beforeEach(() => {
       matches: true,
     };
   });
+
+  delete window.ResizeObserver;
+
+  window.ResizeObserver = jest.fn(() => ({
+    observe: jest.fn(),
+    unobserve: jest.fn(),
+    disconnect: jest.fn(),
+  }));
 });
 
 afterEach(() => {

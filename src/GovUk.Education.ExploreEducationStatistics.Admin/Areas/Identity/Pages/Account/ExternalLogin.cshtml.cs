@@ -68,7 +68,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             return new ChallengeResult(provider, properties);
         }
 
-        // NOTE: Argument names are important - e.g. if `returnUrl`'s name is changed, the returnUrl will always be null
+        /// <remarks>
+        /// Argument names are important - e.g. if `returnUrl`'s name is changed, the returnUrl will always be null
+        /// </remarks>
         public async Task<IActionResult> OnGetCallbackAsync(string returnUrl = null, string remoteError = null)
         {
             var returnUrlOrFallback = returnUrl ?? Url.Content("~/");
@@ -136,6 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             // need to be invited in with a particular global or resource-specific role.
             var inviteToSystem = await _usersAndRolesDbContext
                 .UserInvites
+                .IgnoreQueryFilters()
                 .Include(i => i.Role)
                 .FirstOrDefaultAsync(invite =>
                     invite.Email.ToLower() == userDetails.email.ToLower() && invite.Accepted == false);
@@ -166,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             return await LoginUserWithProviderDetails(returnUrl, info);
         }
 
-        private IActionResult RedirectToLoginPageWithError(string returnUrl)
+        private IActionResult RedirectToLoginPageWithError(string returnUrl = null)
         {
             ReturnUrl = returnUrl;
             ErrorMessage = LoginErrorMessage;
@@ -238,6 +241,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             ExternalLoginInfo info,
             string returnUrl)
         {
+            if (inviteToSystem.Expired)
+            {
+                return await HandleExpiredInvite(inviteToSystem, email);
+            }
+            
             // Mark the invite as accepted.
             inviteToSystem.Accepted = true;
             _usersAndRolesDbContext.UserInvites.Update(inviteToSystem);
@@ -302,9 +310,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
 
                 await _contentDbContext.Users.AddAsync(newInternalUser);
 
-                var rolesToCreate = await _contentDbContext
-                    .UserReleaseInvites
-                    .Where(invite => invite.Email.ToLower().Equals(newAspNetUser.Email.ToLower()))
+                var releaseRolesToCreate = await 
+                    GetUserReleaseInvites(email)
                     .Select(invite => new UserReleaseRole
                     {
                         ReleaseId = invite.ReleaseId,
@@ -314,11 +321,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                         CreatedById = invite.CreatedById,
                     })
                     .ToListAsync();
-                await _contentDbContext.UserReleaseRoles.AddRangeAsync(rolesToCreate);
+                await _contentDbContext.UserReleaseRoles.AddRangeAsync(releaseRolesToCreate);
 
-                var publicationRolesToCreate = await _contentDbContext
-                    .UserPublicationInvites
-                    .Where(invite => invite.Email.ToLower().Equals(newAspNetUser.Email.ToLower()))
+                var publicationRolesToCreate = await 
+                    GetUserPublicationInvites(email)
                     .Select(invite => new UserPublicationRole
                     {
                         PublicationId = invite.PublicationId,
@@ -341,6 +347,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                 bypassTwoFactor: true);
 
             return LocalRedirect(returnUrl);
+        }
+
+        public async Task<IActionResult> OnPostConfirmationAsync(string returnUrl = null)
+        {
+            // This method should no longer be used but just in case, return user to login page if it is hit.
+            var pageRedirect = RedirectToPage("./Login", new {ReturnUrl = returnUrl ?? Url.Content("~/")});
+            return await Task.FromResult(pageRedirect);
+        }
+
+        private async Task<IActionResult> HandleExpiredInvite(UserInvite inviteToSystem, string email)
+        {
+            var releaseInvites = GetUserReleaseInvites(email);
+            var publicationInvites = GetUserPublicationInvites(email);
+            _usersAndRolesDbContext.UserInvites.Remove(inviteToSystem);
+            _contentDbContext.UserReleaseInvites.RemoveRange(releaseInvites);
+            _contentDbContext.UserPublicationInvites.RemoveRange(publicationInvites);
+            await _usersAndRolesDbContext.SaveChangesAsync();
+            await _contentDbContext.SaveChangesAsync();
+            return RedirectToPage("./InviteExpired");
+        }
+
+        private IQueryable<UserPublicationInvite> GetUserPublicationInvites(string email)
+        {
+            return _contentDbContext
+                .UserPublicationInvites
+                .Where(invite => invite.Email.ToLower().Equals(email.ToLower()));
+        }
+
+        private IQueryable<UserReleaseInvite> GetUserReleaseInvites(string email)
+        {
+            return _contentDbContext
+                .UserReleaseInvites
+                .Where(invite => invite.Email.ToLower().Equals(email.ToLower()));
         }
 
         private IActionResult HandleCreateIdentityFailure(string returnUrl, IdentityResult createdIdentityUserResult)
@@ -389,13 +428,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             }
 
             return (email, nameClaim, "");
-        }
-
-        public async Task<IActionResult> OnPostConfirmationAsync(string returnUrl = null)
-        {
-            // This method should no longer be used but just in case, return user to login page if it is hit.
-            var pageRedirect = RedirectToPage("./Login", new {ReturnUrl = returnUrl ?? Url.Content("~/")});
-            return await Task.FromResult(pageRedirect);
         }
 
         private IActionResult HandleAddingLoginIdentityFailure(

@@ -289,13 +289,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task UpdatePublicCacheTrees_SingleValidCacheEntry()
         {
-            var themeCacheService = new Mock<IThemeCacheService>(Strict);
+            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-            themeCacheService
+            publicationCacheService
                 .Setup(s => s.UpdatePublicationTree())
-                .ReturnsAsync(new List<ThemeTree<PublicationTreeNode>>());
+                .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
 
-            var controller = BuildController(themeCacheService: themeCacheService.Object);
+            var controller = BuildController(publicationCacheService: publicationCacheService.Object);
 
             var publicationTreeOption = UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree.ToString();
 
@@ -306,7 +306,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 }
             );
 
-            VerifyAllMocks(themeCacheService);
+            VerifyAllMocks(publicationCacheService);
 
             result.AssertNoContent();
         }
@@ -315,11 +315,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async Task UpdatePublicCacheTrees_AllValidCacheEntries()
         {
             var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
-            var themeCacheService = new Mock<IThemeCacheService>(Strict);
+            var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
-            themeCacheService
+            publicationCacheService
                 .Setup(s => s.UpdatePublicationTree())
-                .ReturnsAsync(new List<ThemeTree<PublicationTreeNode>>());
+                .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
 
             methodologyCacheService
                 .Setup(s => s.UpdateSummariesTree())
@@ -328,7 +328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(
                 methodologyCacheService: methodologyCacheService.Object,
-                themeCacheService: themeCacheService.Object);
+                publicationCacheService: publicationCacheService.Object);
 
             var publicationTreeOption = UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree.ToString();
             var methodologyTreeOption = UpdatePublicCacheTreePathsViewModel.CacheEntry.MethodologyTree.ToString();
@@ -344,7 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 }
             );
 
-            VerifyAllMocks(themeCacheService, methodologyCacheService);
+            VerifyAllMocks(publicationCacheService, methodologyCacheService);
 
             result.AssertNoContent();
         }
@@ -368,14 +368,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             IBlobStorageService? publicBlobStorageService = null,
             IGlossaryCacheService? glossaryCacheService = null,
             IMethodologyCacheService? methodologyCacheService = null,
-            IThemeCacheService? themeCacheService = null)
+            IPublicationCacheService? publicationCacheService = null)
         {
             return new BauCacheController(
                 privateBlobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
                 publicBlobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
                 glossaryCacheService ?? Mock.Of<IGlossaryCacheService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
-                themeCacheService ?? Mock.Of<IThemeCacheService>(Strict)
+                publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict)
             );
         }
     }

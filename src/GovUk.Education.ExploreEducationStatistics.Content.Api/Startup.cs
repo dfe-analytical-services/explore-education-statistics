@@ -36,8 +36,6 @@ using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
-using IThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
-using ThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.ThemeService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 {
@@ -155,9 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IMethodologyService, MethodologyService>();
             services.AddTransient<IMethodologyRepository, MethodologyRepository>();
             services.AddTransient<IMethodologyVersionRepository, MethodologyVersionRepository>();
-            services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
-            services.AddTransient<IThemeCacheService, ThemeCacheService>();
             services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
             services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<IReleaseService, Services.ReleaseService>();
@@ -167,6 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
             services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
             services.AddTransient<IGlossaryService, GlossaryService>();
+            services.AddTransient<IThemeService, ThemeService>();
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
             StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);

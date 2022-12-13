@@ -6,7 +6,7 @@ import { LegendPosition } from '@common/modules/charts/types/legend';
 import classNames from 'classnames';
 import React, { ReactNode, useState } from 'react';
 import { LegendProps } from 'recharts';
-import DefaultLegendContent from 'recharts/lib/component/DefaultLegendContent';
+import { DefaultLegendContent } from 'recharts/lib/component/DefaultLegendContent';
 
 interface Props {
   children: ReactNode;

@@ -13,9 +13,9 @@ interface Props {
   position?: LineChartDataLabelPosition | LegendInlinePosition;
   totalDataPoints: number;
   unit?: string;
-  value: string;
-  x: number;
-  y: number;
+  value?: string | number;
+  x?: string | number;
+  y?: string | number;
 }
 
 export default function LineChartLabel({

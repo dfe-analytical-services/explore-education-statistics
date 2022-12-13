@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IReleaseService _releaseService;
         private readonly IMethodologyCacheService _methodologyCacheService;
         private readonly IReleaseCacheService _releaseCacheService;
-        private readonly IThemeCacheService _themeCacheService;
+        private readonly IPublicationCacheService _publicationCacheService;
 
         public ContentService(
             IBlobCacheService privateBlobCacheService,
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             IReleaseService releaseService,
             IMethodologyCacheService methodologyCacheService,
             IReleaseCacheService releaseCacheService,
-            IThemeCacheService themeCacheService)
+            IPublicationCacheService publicationCacheService)
         {
             _privateBlobCacheService = privateBlobCacheService;
             _publicBlobCacheService = publicBlobCacheService;
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _releaseService = releaseService;
             _methodologyCacheService = methodologyCacheService;
             _releaseCacheService = releaseCacheService;
-            _themeCacheService = themeCacheService;
+            _publicationCacheService = publicationCacheService;
         }
 
         public async Task DeletePreviousVersionsContent(params Guid[] releaseIds)
@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task UpdateCachedTaxonomyBlobs()
         {
             await _methodologyCacheService.UpdateSummariesTree();
-            await _themeCacheService.UpdatePublicationTree();
+            await _publicationCacheService.UpdatePublicationTree();
         }
 
         private async Task CacheLatestRelease(Publication publication, PublishContext context, params Guid[] includedReleaseIds)

@@ -1,14 +1,12 @@
 import omit from 'lodash/omit';
 import { useCallback, useState } from 'react';
-import { ContentRenderer, LegendProps } from 'recharts';
+import { LegendProps } from 'recharts';
+import { ContentType } from 'recharts/types/component/DefaultLegendContent';
 
-export default function useLegend(): [
-  LegendProps | undefined,
-  ContentRenderer<LegendProps>,
-] {
+export default function useLegend(): [LegendProps | undefined, ContentType] {
   const [legendProps, setLegendProps] = useState<LegendProps>();
 
-  const renderLegend: ContentRenderer<LegendProps> = useCallback(
+  const renderLegend: ContentType = useCallback(
     nextProps => {
       const nextLegendProps = omit(nextProps, 'content');
 
