@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -45,13 +46,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             }
         };
-
-        private static readonly IReadOnlyCollection<Guid> SubjectIdsList = new List<Guid>
-        {
-            Subject.Id
-        };
-
-        private static readonly IReadOnlyCollection<Guid> GuidList = new List<Guid>();
 
         [Fact]
         public async Task CopyFootnotes_ViewSourceRelease()
@@ -94,7 +88,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             statisticsPersistenceHelper.Object
                         );
 
-                        return await service.CopyFootnotes(sourceRelease.Id, destinationRelease.Id);
+                        return await service.CopyFootnotes(
+                            sourceReleaseId: sourceRelease.Id,
+                            destinationReleaseId: destinationRelease.Id);
                     }
                 );
         }
@@ -136,7 +132,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             statisticsPersistenceHelper.Object
                         );
 
-                        return await service.CopyFootnotes(sourceRelease.Id, destinationRelease.Id);
+                        return await service.CopyFootnotes(
+                            sourceReleaseId: sourceRelease.Id,
+                            destinationReleaseId: destinationRelease.Id);
                     }
                 );
         }
@@ -149,11 +147,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .CreateFootnote(
                         Release.Id,
                         "",
-                        GuidList,
-                        GuidList,
-                        GuidList,
-                        GuidList,
-                        SubjectIdsList
+                        filterIds: SetOf<Guid>(),
+                        filterGroupIds: SetOf<Guid>(),
+                        filterItemIds: SetOf<Guid>(),
+                        indicatorIds: SetOf<Guid>(),
+                        subjectIds: SetOf(Subject.Id)
                     ),
                 Release,
                 SecurityPolicies.CanUpdateSpecificRelease
@@ -165,7 +163,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             await AssertSecurityPolicyChecked(
                 service => service
-                    .DeleteFootnote(Release.Id, Footnote.Id),
+                    .DeleteFootnote(
+                        releaseId: Release.Id,
+                        footnoteId: Footnote.Id),
                 Release,
                 SecurityPolicies.CanUpdateSpecificRelease
             );
@@ -176,7 +176,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             await AssertSecurityPolicyChecked(
                 service => service
-                    .GetFootnote(Release.Id, Footnote.Id),
+                    .GetFootnote(
+                        releaseId: Release.Id,
+                        footnoteId: Footnote.Id),
                 Release,
                 ContentSecurityPolicies.CanViewSpecificRelease
             );
@@ -199,14 +201,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await AssertSecurityPolicyChecked(
                 service => service
                     .UpdateFootnote(
-                        Release.Id,
-                        Footnote.Id,
+                        releaseId: Release.Id,
+                        footnoteId: Footnote.Id,
                         "",
-                        GuidList,
-                        GuidList,
-                        GuidList,
-                        GuidList,
-                        SubjectIdsList
+                        filterIds: SetOf<Guid>(),
+                        filterGroupIds: SetOf<Guid>(),
+                        filterItemIds: SetOf<Guid>(),
+                        indicatorIds: SetOf<Guid>(),
+                        subjectIds: SetOf(Subject.Id)
                     ),
                 Release,
                 SecurityPolicies.CanUpdateSpecificRelease

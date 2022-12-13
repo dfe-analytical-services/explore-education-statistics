@@ -20,11 +20,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 
         public async Task<Footnote> CreateFootnote(Guid releaseId,
             string content,
-            IReadOnlyCollection<Guid> filterIds,
-            IReadOnlyCollection<Guid> filterGroupIds,
-            IReadOnlyCollection<Guid> filterItemIds,
-            IReadOnlyCollection<Guid> indicatorIds,
-            IReadOnlyCollection<Guid> subjectIds)
+            IReadOnlySet<Guid> filterIds,
+            IReadOnlySet<Guid> filterGroupIds,
+            IReadOnlySet<Guid> filterItemIds,
+            IReadOnlySet<Guid> indicatorIds,
+            IReadOnlySet<Guid> subjectIds)
         {
             var footnote = new Footnote
             {

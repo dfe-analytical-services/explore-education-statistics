@@ -19,6 +19,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 
@@ -523,7 +524,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     new()
                     {
-                        FilterGroup =  filterGroup,
+                        FilterGroup = filterGroup,
                     }
                 },
                 FilterItems = new List<FilterItemFootnote>
@@ -697,14 +698,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataBlockService: dataBlockService.Object);
 
                 var result = await service.UpdateFootnote(
-                    release.Id,
-                    footnote.Id,
+                    releaseId: release.Id,
+                    footnoteId: footnote.Id,
                     "Updated footnote",
-                    new List<Guid>{ filter.Id },
-                    new List<Guid>{ filterGroup.Id },
-                    new List<Guid>{ filterItem.Id },
-                    new List<Guid>{ indicator.Id },
-                    new List<Guid>{ subject.Id });
+                    filterIds: SetOf(filter.Id),
+                    filterGroupIds: SetOf(filterGroup.Id),
+                    filterItemIds: SetOf(filterItem.Id),
+                    indicatorIds: SetOf(indicator.Id),
+                    subjectIds: SetOf(subject.Id));
 
                 result.AssertRight();
             }
@@ -808,7 +809,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     new()
                     {
-                        FilterGroup =  filterGroup,
+                        FilterGroup = filterGroup,
                     }
                 },
                 FilterItems = new List<FilterItemFootnote>
@@ -868,14 +869,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     dataBlockService: dataBlockService.Object);
 
                 var result = await service.UpdateFootnote(
-                    release.Id,
-                    footnote.Id,
+                    releaseId: release.Id,
+                    footnoteId: footnote.Id,
                     "Updated footnote",
-                    new List<Guid>(),
-                    new List<Guid>(),
-                    new List<Guid>(),
-                    new List<Guid>(),
-                    new List<Guid>());
+                    filterIds: SetOf<Guid>(),
+                    filterGroupIds: SetOf<Guid>(),
+                    filterItemIds: SetOf<Guid>(),
+                    indicatorIds: SetOf<Guid>(),
+                    subjectIds: SetOf<Guid>());
 
                 result.AssertRight();
             }
