@@ -84,6 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .Include(r => r.Content)
                 .ThenInclude(releaseContentSection => releaseContentSection.ContentSection)
                 .ThenInclude(section => section.Content)
+                .ThenInclude(contentBlock => (contentBlock as EmbedBlockLink)!.EmbedBlock)
                 .Include(r => r.Updates)
                 .Single(r => r.Id == releaseId);
 

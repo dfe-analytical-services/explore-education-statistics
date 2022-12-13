@@ -60,6 +60,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
 
             CreateDataBlockMap();
 
+            CreateMap<EmbedBlockLink, EmbedBlockLinkViewModel>()
+                .ForMember(dest => dest.Title,
+                    m => m.MapFrom(embedBlockLink =>
+                        embedBlockLink.EmbedBlock.Title))
+                .ForMember(dest => dest.Url,
+                    m => m.MapFrom(embedBlockLink =>
+                        embedBlockLink.EmbedBlock.Url));
+
             CreateMap<HtmlBlock, HtmlBlockViewModel>();
 
             CreateMap<MarkDownBlock, MarkDownBlockViewModel>();

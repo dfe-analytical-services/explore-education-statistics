@@ -18,6 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         IncorrectContentBlockTypeForAttach,
         ContentBlockAlreadyDetached,
         ContentBlockNotAttachedToThisContentSection,
+        ContentSectionNotAttachedToRelease,
+        ContentBlockNotAttachedToRelease,
 
         // User Management
         UserAlreadyExists,

@@ -42,8 +42,8 @@ Add an accordion section to release content
     user changes accordion section title    1    Test section
 
 Add text block with link to absence glossary entry to accordion section
-    user adds text block to editable accordion section    Test section    css:#releaseMainContent
-    ${block}=    user starts editing accordion section text block    Test section    1    css:#releaseMainContent
+    user adds text block to editable accordion section    Test section    id:releaseMainContent
+    ${block}=    user starts editing accordion section text block    Test section    1    id:releaseMainContent
     user presses keys    Absence
     user presses keys    CTRL+a
     user clicks element    xpath://*[@aria-label="Editor toolbar"]//button[3]    # CKEditor link button
@@ -55,7 +55,7 @@ Add text block with link to absence glossary entry to accordion section
 
 Check glossary info icon appears on release preview
     user clicks radio    Preview release page
-    user opens accordion section    Test section    css:#releaseMainContent
+    user opens accordion section    Test section    id:releaseMainContent
     user waits until page contains button    Absence
 
 Click glossary info icon and validate glossary entry

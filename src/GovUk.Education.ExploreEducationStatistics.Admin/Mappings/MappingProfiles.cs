@@ -5,10 +5,25 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+using ContactViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContactViewModel;
+using ContentSectionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContentSectionViewModel;
+using DataBlockSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.DataBlockSummaryViewModel;
+using DataBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.DataBlockViewModel;
+using HtmlBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.HtmlBlockViewModel;
+using IContentBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.IContentBlockViewModel;
+using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
+using MarkDownBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MarkDownBlockViewModel;
+using MethodologyNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyNoteViewModel;
+using MethodologyVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyVersionViewModel;
+using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
+using ReleaseNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent.ReleaseNoteViewModel;
+using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
+using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseViewModel;
+using ThemeViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ThemeViewModel;
+using TopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.TopicViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 {
@@ -203,6 +218,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(block => block.Comments.OrderBy(comment => comment.Created)));
 
             CreateMap<DataBlock, DataBlockViewModel>();
+
+            CreateMap<EmbedBlockLink, EmbedBlockLinkViewModel>()
+                .ForMember(dest => dest.Title,
+                    m => m.MapFrom(embedBlockLink =>
+                        embedBlockLink.EmbedBlock.Title))
+                .ForMember(dest => dest.Url,
+                    m => m.MapFrom(embedBlockLink =>
+                        embedBlockLink.EmbedBlock.Url));
 
             CreateMap<HtmlBlock, HtmlBlockViewModel>();
 

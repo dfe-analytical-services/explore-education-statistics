@@ -30,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private readonly ContentDbContext _context;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IReleaseContentSectionRepository _releaseContentSectionRepository;
+        private readonly IContentBlockService _contentBlockService;
         private readonly IHubContext<ReleaseContentHub, IReleaseContentHubClient> _hubContext;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
@@ -37,6 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public ContentService(ContentDbContext context,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IReleaseContentSectionRepository releaseContentSectionRepository,
+            IContentBlockService contentBlockService,
             IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext,
             IUserService userService,
             IMapper mapper)
@@ -44,6 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             _context = context;
             _persistenceHelper = persistenceHelper;
             _releaseContentSectionRepository = releaseContentSectionRepository;
+            _contentBlockService = contentBlockService;
             _hubContext = hubContext;
             _userService = userService;
             _mapper = mapper;
@@ -155,14 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     {
                         var (release, sectionToRemove) = tuple;
 
-                        // detach DataBlocks before removing the ContentSection and its ContentBlocks
-                        var dataBlocks = sectionToRemove
-                            .Content
-                            .OfType<DataBlock>()
-                            .ToList();
-
-                        dataBlocks.ForEach(dataBlock =>
-                            RemoveContentBlockFromContentSection(sectionToRemove, dataBlock, false));
+                        await _contentBlockService.DeleteSectionContentBlocks(sectionToRemove.Id);
 
                         release.RemoveGenericContentSection(sectionToRemove);
                         _context.ContentSections.Remove(sectionToRemove);
@@ -263,16 +259,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return ValidationActionResult(ContentBlockNotAttachedToThisContentSection);
                     }
 
-                    // This is rubbish. Data blocks and content blocks are only the
-                    // same type in name as they actually do very different things.
-                    // Ideally we need to separate out data blocks from the content block model.
-                    // TODO: EES-1306 Refactor data blocks out of content block model
-                    var deleteContentBlock = !(blockToRemove is DataBlock);
+                    await _contentBlockService.DeleteContentBlockAndReorder(blockToRemove.Id);
 
-                    RemoveContentBlockFromContentSection(section, blockToRemove, deleteContentBlock);
-
-                    _context.ContentSections.Update(section);
-                    await _context.SaveChangesAsync();
                     return OrderedContentBlocks(section);
                 });
         }
@@ -421,31 +409,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return 1;
         }
 
-        private void RemoveContentBlockFromContentSection(
-            ContentSection section,
-            ContentBlock blockToRemove,
-            bool deleteContentBlock)
-        {
-            section.Content.Remove(blockToRemove);
-
-            var removedBlockOrder = blockToRemove.Order;
-
-            section.Content
-                .FindAll(contentBlock => contentBlock.Order > removedBlockOrder)
-                .ForEach(contentBlock => contentBlock.Order--);
-
-            if (deleteContentBlock)
-            {
-                _context.ContentBlocks.Remove(blockToRemove);
-            }
-            else
-            {
-                blockToRemove.Order = 0;
-                blockToRemove.ContentSectionId = null;
-                _context.ContentBlocks.Update(blockToRemove);
-            }
-        }
-
         private async Task<Either<ActionResult, IContentBlockViewModel>> UpdateMarkDownBlock(MarkDownBlock markDownBlock,
             string body)
         {
@@ -538,6 +501,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     .ThenInclude(section => section.Content)
                     .ThenInclude(content => content.Comments)
                     .ThenInclude(comment => comment.ResolvedBy)
+                .Include(r => r.Content)
+                    .ThenInclude(rcs => rcs.ContentSection)
+                    .ThenInclude(cs => cs.Content)
+                    .ThenInclude(cb => (cb as EmbedBlockLink).EmbedBlock)
                 .Include(r => r.Content)
                     .ThenInclude(join => join.ContentSection)
                     .ThenInclude(section => section.Content)
