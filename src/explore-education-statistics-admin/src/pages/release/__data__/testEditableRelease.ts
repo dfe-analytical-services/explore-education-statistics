@@ -52,6 +52,7 @@ export const testEditableRelease: EditableRelease = {
       on: new Date(),
     },
   ],
+  keyStatistics: [], // @MarkFix
   content: [
     {
       id: '30e57106-66e2-43a3-fc07-08d7bf65f293',

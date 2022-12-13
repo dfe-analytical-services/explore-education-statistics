@@ -123,6 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .ThenInclude(join => join.ContentSection)
                 .ThenInclude(section => section.Content)
                 .ThenInclude(contentBlock => (contentBlock as EmbedBlockLink)!.EmbedBlock)
+                .Include(r => r.KeyStatistics)
                 .Include(r => r.Updates);
         }
     }

@@ -42,6 +42,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public ContentSectionViewModel HeadlinesSection { get; set; } = null!;
 
+        public List<KeyStatistic> KeyStatistics { get; set; } = null!; // @MarkFix create view model
+
         public ContentSectionViewModel KeyStatisticsSection { get; set; } = null!;
 
         public ContentSectionViewModel KeyStatisticsSecondarySection { get; set; } = null!;

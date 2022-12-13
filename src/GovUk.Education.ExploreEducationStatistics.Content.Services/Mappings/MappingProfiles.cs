@@ -46,7 +46,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
                     m => m.MapFrom(r => r.Updates.OrderByDescending(update => update.On)))
                 .ForMember(
                     dest => dest.Content,
-                    m => m.MapFrom(r => r.GenericContent.OrderBy(s => s.Order)));
+                    m => m.MapFrom(r => r.GenericContent.OrderBy(s => s.Order)))
+                .ForMember(
+                    dest => dest.KeyStatistics,
+                    m => m.MapFrom(r => r.KeyStatistics.OrderBy(ks => ks.Order)));
 
             CreateMap<Link, LinkViewModel>();
 

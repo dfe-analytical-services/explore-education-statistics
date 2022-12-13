@@ -484,9 +484,9 @@ describe('EditableKeyStat', () => {
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
       expect(handleSubmit).toHaveBeenCalledWith({
-        dataDefinition: '',
-        dataDefinitionTitle: 'New guidance title',
-        dataSummary: 'New trend text',
+        guidanceText: '',
+        guidanceTitle: 'New guidance title',
+        trend: 'New trend text',
       } as KeyStatsFormValues);
     });
   });

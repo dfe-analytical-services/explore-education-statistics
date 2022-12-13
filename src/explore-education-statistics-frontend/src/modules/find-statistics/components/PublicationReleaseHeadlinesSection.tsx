@@ -11,9 +11,14 @@ import {
   logEvent,
   logOutboundLink,
 } from '@frontend/services/googleAnalyticsService';
-import { Release } from '@common/services/publicationService';
+import {
+  KeyStatisticDataBlock,
+  KeyStatisticText,
+  Release,
+} from '@common/services/publicationService';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
+import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStatDataBlock';
 
 interface Props {
   release: Release;
@@ -21,29 +26,33 @@ interface Props {
 
 const PublicationReleaseHeadlinesSection = ({
   release: {
-    id,
+    id: releaseId,
     keyStatisticsSecondarySection,
-    keyStatisticsSection,
+    keyStatistics,
     headlinesSection,
   },
 }: Props) => {
-  const getReleaseFile = useGetReleaseFile(id);
+  const getReleaseFile = useGetReleaseFile(releaseId);
 
   const summaryTab = (
     <TabsSection title="Summary" id="releaseHeadlines-summary">
       <KeyStatContainer>
-        {keyStatisticsSection.content.map(block => {
-          if (block.type !== 'DataBlock') {
-            return null;
+        {keyStatistics.map(keyStat => {
+          if ((keyStat as KeyStatisticDataBlock).dataBlockId) {
+            return (
+              <KeyStatDataBlock
+                key={keyStat.id}
+                releaseId={releaseId}
+                dataBlockId={(keyStat as KeyStatisticDataBlock).dataBlockId}
+                trend={keyStat.trend}
+                guidanceTitle={keyStat.guidanceTitle}
+                guidanceText={keyStat.guidanceText}
+              />
+            );
           }
 
           return (
-            <KeyStat
-              key={block.id}
-              releaseId={id}
-              dataBlockId={block.id}
-              summary={block.summary}
-            />
+            <KeyStat key={keyStat.id} {...(keyStat as KeyStatisticText)} />
           );
         })}
       </KeyStatContainer>
@@ -79,7 +88,7 @@ const PublicationReleaseHeadlinesSection = ({
   return (
     <DataBlockTabs
       id="releaseHeadlines"
-      releaseId={id}
+      releaseId={releaseId}
       getInfographic={getReleaseFile}
       dataBlock={keyStatisticsSecondarySection.content[0]}
       firstTabs={summaryTab}

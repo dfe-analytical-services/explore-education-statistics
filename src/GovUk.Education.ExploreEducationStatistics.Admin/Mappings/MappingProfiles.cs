@@ -111,6 +111,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<Release, ManageContentPageViewModel.ReleaseViewModel>()
                 .ForMember(dest => dest.Content,
                     m => m.MapFrom(r => r.GenericContent.OrderBy(s => s.Order)))
+                .ForMember(dest => dest.KeyStatistics,
+                    m => m.MapFrom(r => r.KeyStatistics.OrderBy(ks => ks.Order)))
                 .ForMember(
                     dest => dest.Updates,
                     m => m.MapFrom(r => r.Updates.OrderByDescending(update => update.On)))

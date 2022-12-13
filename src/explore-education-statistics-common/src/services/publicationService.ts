@@ -83,6 +83,26 @@ export interface ReleaseNote {
   reason: string;
 }
 
+export interface KeyStatistic {
+  id: string;
+  releaseId: string;
+  trend?: string;
+  guidanceTitle?: string;
+  guidanceText?: string;
+  order: number;
+  created: string;
+  updated?: string;
+}
+
+export interface KeyStatisticDataBlock extends KeyStatistic {
+  dataBlockId: string;
+}
+
+export interface KeyStatisticText extends KeyStatistic {
+  title: string;
+  statistic: string;
+}
+
 export interface ContentSection<BlockType> {
   id: string;
   order: number;
@@ -131,6 +151,7 @@ export interface Release<
   published: string;
   slug: string;
   summarySection: ContentSection<ContentBlockType>;
+  keyStatistics: KeyStatistic[];
   keyStatisticsSection: ContentSection<DataBlockType>;
   keyStatisticsSecondarySection: ContentSection<DataBlockType>;
   headlinesSection: ContentSection<ContentBlockType>;

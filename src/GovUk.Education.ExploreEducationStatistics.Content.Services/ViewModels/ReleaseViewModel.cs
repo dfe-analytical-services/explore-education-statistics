@@ -39,6 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public ContentSectionViewModel? HeadlinesSection { get; }
 
+        public List<KeyStatistic> KeyStatistics { get; } // @MarkFix switch to view model
+
         public ContentSectionViewModel? KeyStatisticsSection { get; }
 
         public ContentSectionViewModel? KeyStatisticsSecondarySection { get; }
@@ -72,6 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             Content = release.Content;
             SummarySection = release.SummarySection;
             HeadlinesSection = release.HeadlinesSection;
+            KeyStatistics = release.KeyStatistics;
             KeyStatisticsSection = release.KeyStatisticsSection;
             KeyStatisticsSecondarySection = release.KeyStatisticsSecondarySection;
             RelatedDashboardsSection = release.RelatedDashboardsSection;

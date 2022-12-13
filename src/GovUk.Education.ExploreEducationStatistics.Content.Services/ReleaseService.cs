@@ -86,6 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .ThenInclude(section => section.Content)
                 .ThenInclude(contentBlock => (contentBlock as EmbedBlockLink)!.EmbedBlock)
                 .Include(r => r.Updates)
+                .Include(r => r.KeyStatistics)
                 .Single(r => r.Id == releaseId);
 
             var releaseViewModel = _mapper.Map<ReleaseCacheViewModel>(release);

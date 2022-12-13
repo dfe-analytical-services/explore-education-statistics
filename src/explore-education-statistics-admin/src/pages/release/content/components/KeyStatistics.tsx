@@ -1,5 +1,5 @@
 import EditableKeyStat from '@admin/components/editable/EditableKeyStat';
-import KeyStatSelectForm from '@admin/pages/release/content/components/KeyStatSelectForm';
+import KeyStatDataBlockSelectForm from '@admin/pages/release/content/components/KeyStatDataBlockSelectForm';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import BlockDroppable from '@admin/components/editable/BlockDroppable';
@@ -15,7 +15,11 @@ import { Draggable, DragDropContext, DropResult } from 'react-beautiful-dnd';
 import classNames from 'classnames';
 import reorder from '@common/utils/reorder';
 import { Dictionary } from '@admin/types';
-import { ReleaseDataBlock } from '@admin/services/dataBlockService';
+import {
+  KeyStatistic,
+  KeyStatisticDataBlock,
+  KeyStatisticText,
+} from '@common/services/publicationService';
 
 export interface KeyStatisticsProps {
   release: EditableRelease;
@@ -25,26 +29,18 @@ export interface KeyStatisticsProps {
 const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
   const {
     deleteContentSectionBlock,
-    updateContentSectionDataBlock,
+    updateSectionBlockOrder,
   } = useReleaseContentActions();
 
   const [keyStatisticsBlocks, setKeyStatisticsBlocks] = useState(
-    release.keyStatisticsSection.content.filter(
-      block => block.type === 'DataBlock',
-    ),
+    release.keyStatistics,
   );
 
   useEffect(() => {
-    setKeyStatisticsBlocks(
-      release.keyStatisticsSection.content.filter(
-        block => block.type === 'DataBlock',
-      ),
-    );
+    setKeyStatisticsBlocks(release.keyStatistics);
   }, [release]);
 
   const [isReordering, toggleReordering] = useToggle(false);
-
-  const { updateSectionBlockOrder } = useReleaseContentActions();
 
   const ReorderKeyStatisticsButton = () => {
     return !isReordering ? (
@@ -59,11 +55,14 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
   };
 
   const reorderKeyStatistics = useCallback(
-    async (blocks: ReleaseDataBlock[]) => {
-      const order = blocks.reduce<Dictionary<number>>((acc, block, index) => {
-        acc[block.id] = index;
-        return acc;
-      }, {});
+    async (keyStatistics: KeyStatistic[]) => {
+      const order = keyStatistics.reduce<Dictionary<number>>(
+        (acc, keyStat, index) => {
+          acc[keyStat.id] = index;
+          return acc;
+        },
+        {},
+      );
       await updateSectionBlockOrder({
         releaseId: release.id,
         sectionId: release.keyStatisticsSection.id,
@@ -117,13 +116,13 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
         >
           <div className="govuk-!-margin-bottom-9">
             <KeyStatContainer>
-              {keyStatisticsBlocks.map((block, index) => {
+              {keyStatisticsBlocks.map((keyStat, index) => {
                 return (
                   <Draggable
-                    draggableId={block.id}
+                    draggableId={keyStat.id}
                     index={index}
                     isDragDisabled={!isReordering}
-                    key={block.id}
+                    key={keyStat.id}
                   >
                     {(draggableProvided, snapshot) => (
                       <div
@@ -147,32 +146,28 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                           />
                         )}
                         <EditableKeyStat
-                          key={block.id}
-                          name={block.name}
+                          key={keyStat.id}
                           releaseId={release.id}
-                          dataBlockId={block.id}
-                          summary={block.summary}
+                          keyStatId={keyStat.id}
+                          dataBlockId={
+                            (keyStat as KeyStatisticDataBlock).dataBlockId
+                          }
+                          title={(keyStat as KeyStatisticText).title}
+                          statistic={(keyStat as KeyStatisticText).statistic}
+                          trend={keyStat.trend}
+                          guidanceTitle={keyStat.guidanceTitle}
+                          guidanceText={keyStat.guidanceText}
                           isEditing={isEditing}
                           isReordering={isReordering}
                           onRemove={async () => {
                             await deleteContentSectionBlock({
                               releaseId: release.id,
                               sectionId: release.keyStatisticsSection.id,
-                              blockId: block.id,
+                              blockId: keyStat.id,
                               sectionKey: 'keyStatisticsSection',
                             });
                             // @MarkFix call keyStatisticService.Delete here
                             // call useReleaseContentActions#updateAvailableDataBlocks too
-                          }}
-                          onSubmit={async values => {
-                            await updateContentSectionDataBlock({
-                              releaseId: release.id,
-                              sectionId: release.keyStatisticsSection.id,
-                              blockId: block.id,
-                              sectionKey: 'keyStatisticsSection',
-                              values,
-                            });
-                            // @MarkFix call keyStatisticService.Update here
                           }}
                         />
                       </div>
@@ -216,7 +211,7 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
     <>
       {isFormOpen ? (
         <div className={styles.formContainer}>
-          <KeyStatSelectForm
+          <KeyStatDataBlockSelectForm
             releaseId={release.id}
             onSelect={addKeyStatToSection}
             onCancel={() => setIsFormOpen(false)}

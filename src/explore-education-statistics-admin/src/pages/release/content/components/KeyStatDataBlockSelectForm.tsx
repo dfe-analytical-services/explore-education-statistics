@@ -3,9 +3,9 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
-import KeyStat from '@common/modules/find-statistics/components/KeyStat';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo, useState } from 'react';
+import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStatDataBlock';
 
 interface Props {
   releaseId: string;
@@ -15,7 +15,7 @@ interface Props {
   label?: string;
 }
 
-const KeyStatSelectForm = ({
+const KeyStatDataBlockSelectForm = ({
   releaseId,
   onSelect,
   onCancel = () => {},
@@ -50,10 +50,12 @@ const KeyStatSelectForm = ({
           summary="Key statistic preview"
           open
         >
-          <KeyStat
-            summary={selectedDataBlock.summary}
+          <KeyStatDataBlock
             releaseId={releaseId}
             dataBlockId={selectedDataBlock.id}
+            trend={selectedDataBlock.summary?.dataSummary[0]} // @MarkFix
+            guidanceTitle={selectedDataBlock.summary?.dataDefinitionTitle[0]}
+            guidanceText={selectedDataBlock.summary?.dataDefinition[0]}
           />
         </Details>
       </section>
@@ -100,4 +102,4 @@ const KeyStatSelectForm = ({
   );
 };
 
-export default KeyStatSelectForm;
+export default KeyStatDataBlockSelectForm;
