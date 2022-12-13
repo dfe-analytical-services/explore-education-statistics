@@ -101,12 +101,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var footnoteViewModels = await GetFilteredFootnoteViewModels(releaseId, filterItems.Select(fi => fi.Id).ToList(), query);
-                    _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-                    stopwatch.Restart();
-
                     var indicatorViewModels = GetIndicatorViewModels(query, releaseSubject);
                     _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
+
+                    var footnoteViewModels = await GetFootnoteViewModels(
+                        releaseId: releaseId,
+                        subjectId: query.SubjectId,
+                        filterItemIds: filterItems.Select(fi => fi.Id).ToList(),
+                        indicatorIds: indicatorViewModels.Select(i => i.Value).ToList());
+                    _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
                     var timePeriodViewModels = GetTimePeriodViewModels(observations);
@@ -175,17 +179,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return IndicatorsViewModelBuilder.BuildIndicators(indicators, indicatorsOrdering);
         }
 
-        private async Task<List<FootnoteViewModel>> GetFilteredFootnoteViewModels(
+        private async Task<List<FootnoteViewModel>> GetFootnoteViewModels(
             Guid releaseId,
+            Guid subjectId,
             IEnumerable<Guid> filterItemIds,
-            ObservationQueryContext queryContext)
+            IEnumerable<Guid> indicatorIds)
         {
             var footnotes = await _footnoteRepository
                 .GetFilteredFootnotes(
                     releaseId: releaseId,
-                    subjectId: queryContext.SubjectId,
+                    subjectId: subjectId,
                     filterItemIds: filterItemIds,
-                    indicatorIds: queryContext.Indicators);
+                    indicatorIds: indicatorIds);
 
             return footnotes
                 .Select(footnote => new FootnoteViewModel(footnote.Id, footnote.Content))
