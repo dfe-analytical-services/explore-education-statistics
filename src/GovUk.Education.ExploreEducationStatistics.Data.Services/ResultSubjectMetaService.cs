@@ -181,7 +181,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ObservationQueryContext queryContext)
         {
             var footnotes = await _footnoteRepository
-                .GetFilteredFootnotes(releaseId, queryContext.SubjectId, filterItemIds, queryContext.Indicators);
+                .GetFilteredFootnotes(
+                    releaseId: releaseId,
+                    subjectId: queryContext.SubjectId,
+                    filterItemIds: filterItemIds,
+                    indicatorIds: queryContext.Indicators);
 
             return footnotes
                 .Select(footnote => new FootnoteViewModel(footnote.Id, footnote.Content))

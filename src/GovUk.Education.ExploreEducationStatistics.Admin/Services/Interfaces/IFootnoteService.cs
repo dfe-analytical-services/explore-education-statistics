@@ -14,11 +14,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, Footnote>> CreateFootnote(
             Guid releaseId,
             string content,
-            IReadOnlyCollection<Guid> filterIds,
-            IReadOnlyCollection<Guid> filterGroupIds,
-            IReadOnlyCollection<Guid> filterItemIds,
-            IReadOnlyCollection<Guid> indicatorIds,
-            IReadOnlyCollection<Guid> subjectIds);
+            IReadOnlySet<Guid> filterIds,
+            IReadOnlySet<Guid> filterGroupIds,
+            IReadOnlySet<Guid> filterItemIds,
+            IReadOnlySet<Guid> indicatorIds,
+            IReadOnlySet<Guid> subjectIds);
 
         Task<Either<ActionResult, List<Footnote>>> CopyFootnotes(Guid sourceReleaseId, Guid destinationReleaseId);
 
@@ -32,10 +32,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseId,
             Guid footnoteId,
             string content,
-            IReadOnlyCollection<Guid> filterIds,
-            IReadOnlyCollection<Guid> filterGroupIds,
-            IReadOnlyCollection<Guid> filterItemIds,
-            IReadOnlyCollection<Guid> indicatorIds,
-            IReadOnlyCollection<Guid> subjectIds);
+            IReadOnlySet<Guid> filterIds,
+            IReadOnlySet<Guid> filterGroupIds,
+            IReadOnlySet<Guid> filterItemIds,
+            IReadOnlySet<Guid> indicatorIds,
+            IReadOnlySet<Guid> subjectIds);
     }
 }

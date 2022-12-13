@@ -47,11 +47,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, Footnote>> CreateFootnote(
             Guid releaseId,
             string content,
-            IReadOnlyCollection<Guid> filterIds,
-            IReadOnlyCollection<Guid> filterGroupIds,
-            IReadOnlyCollection<Guid> filterItemIds,
-            IReadOnlyCollection<Guid> indicatorIds,
-            IReadOnlyCollection<Guid> subjectIds)
+            IReadOnlySet<Guid> filterIds,
+            IReadOnlySet<Guid> filterGroupIds,
+            IReadOnlySet<Guid> filterItemIds,
+            IReadOnlySet<Guid> indicatorIds,
+            IReadOnlySet<Guid> subjectIds)
         {
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -59,17 +59,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(() => _footnoteRepository.CreateFootnote(
                     releaseId,
                     content,
-                    filterIds,
-                    filterGroupIds,
-                    filterItemIds,
-                    indicatorIds,
-                    subjectIds))
+                    filterIds: filterIds,
+                    filterGroupIds: filterGroupIds,
+                    filterItemIds: filterItemIds,
+                    indicatorIds: indicatorIds,
+                    subjectIds: subjectIds))
                 .OnSuccessDo(async _ => await _dataBlockService.InvalidateCachedDataBlocks(releaseId))
                 .OnSuccess(async footnote => await GetFootnote(releaseId, footnote.Id)
                 );
         }
 
-        public async Task<Either<ActionResult, List<Footnote>>> CopyFootnotes(Guid sourceReleaseId, Guid destinationReleaseId)
+        public async Task<Either<ActionResult, List<Footnote>>> CopyFootnotes(Guid sourceReleaseId,
+            Guid destinationReleaseId)
         {
             return await _contentPersistenceHelper.CheckEntityExists<Release>(destinationReleaseId)
                 .OnSuccessDo(_userService.CheckCanUpdateRelease)
@@ -80,24 +81,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ToAsyncEnumerable()
                         .SelectAwait(async footnote =>
                         {
-                            var filters = footnote.Filters
-                                .Select(filterFootnote => filterFootnote.FilterId).ToList();
-                            var filterGroups = footnote.FilterGroups
-                                .Select(filterGroupFootnote => filterGroupFootnote.FilterGroupId).ToList();
-                            var filterItems = footnote.FilterItems
-                                .Select(filterItemFootnote => filterItemFootnote.FilterItemId).ToList();
-                            var indicators = footnote.Indicators
-                                .Select(indicatorFootnote => indicatorFootnote.IndicatorId).ToList();
-                            var subjects = footnote.Subjects
-                                .Select(subjectFootnote => subjectFootnote.SubjectId).ToList();
+                            var filterIds = footnote.Filters
+                                .Select(filterFootnote => filterFootnote.FilterId).ToHashSet();
+                            var filterGroupIds = footnote.FilterGroups
+                                .Select(filterGroupFootnote => filterGroupFootnote.FilterGroupId).ToHashSet();
+                            var filterItemIds = footnote.FilterItems
+                                .Select(filterItemFootnote => filterItemFootnote.FilterItemId).ToHashSet();
+                            var indicatorIds = footnote.Indicators
+                                .Select(indicatorFootnote => indicatorFootnote.IndicatorId).ToHashSet();
+                            var subjectIds = footnote.Subjects
+                                .Select(subjectFootnote => subjectFootnote.SubjectId).ToHashSet();
 
                             return await _footnoteRepository.CreateFootnote(destinationReleaseId,
                                 footnote.Content,
-                                filters,
-                                filterGroups,
-                                filterItems,
-                                indicators,
-                                subjects);
+                                filterIds: filterIds,
+                                filterGroupIds: filterGroupIds,
+                                filterItemIds: filterItemIds,
+                                indicatorIds: indicatorIds,
+                                subjectIds: subjectIds);
                         })
                         .ToListAsync();
                 });
@@ -121,11 +122,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseId,
             Guid footnoteId,
             string content,
-            IReadOnlyCollection<Guid> filterIds,
-            IReadOnlyCollection<Guid> filterGroupIds,
-            IReadOnlyCollection<Guid> filterItemIds,
-            IReadOnlyCollection<Guid> indicatorIds,
-            IReadOnlyCollection<Guid> subjectIds)
+            IReadOnlySet<Guid> filterIds,
+            IReadOnlySet<Guid> filterGroupIds,
+            IReadOnlySet<Guid> filterItemIds,
+            IReadOnlySet<Guid> indicatorIds,
+            IReadOnlySet<Guid> subjectIds)
         {
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -160,13 +161,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await _footnoteRepository.CreateFootnote(
                         releaseId,
                         content,
-                        filterIds,
-                        filterGroupIds,
-                        filterItemIds,
-                        indicatorIds,
-                        subjectIds);
-                })
-                .OnSuccessDo(async _ => await _dataBlockService.InvalidateCachedDataBlocks(releaseId)));
+                        filterIds: filterIds,
+                        filterGroupIds: filterGroupIds,
+                        filterItemIds: filterItemIds,
+                        indicatorIds: indicatorIds,
+                        subjectIds: subjectIds);
+                    })
+                    .OnSuccessDo(async _ => await _dataBlockService.InvalidateCachedDataBlocks(releaseId)));
         }
 
         public Task<Either<ActionResult, Footnote>> GetFootnote(Guid releaseId, Guid footnoteId)
@@ -196,10 +197,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _ => await _footnoteRepository.GetFootnotes(releaseId));
         }
 
-        private List<SubjectFootnote> CreateSubjectLinks(Guid footnoteId, IReadOnlyCollection<Guid> subjectIds)
+        private List<SubjectFootnote> CreateSubjectLinks(Guid footnoteId,
+            IReadOnlyCollection<Guid> subjectIds)
         {
             return subjectIds
-                .Select(id => 
+                .Select(id =>
                     new SubjectFootnote
                     {
                         FootnoteId = footnoteId,
@@ -208,9 +210,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        private List<FilterFootnote> CreateFilterLinks(Guid footnoteId, IReadOnlyCollection<Guid> filterIds)
+        private List<FilterFootnote> CreateFilterLinks(Guid footnoteId,
+            IReadOnlyCollection<Guid> filterIds)
         {
-            return filterIds.Select(id => 
+            return filterIds.Select(id =>
                 new FilterFootnote
                 {
                     FootnoteId = footnoteId,
@@ -219,9 +222,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        private List<FilterGroupFootnote> CreateFilterGroupLinks(Guid footnoteId, IReadOnlyCollection<Guid> filterGroupIds)
+        private List<FilterGroupFootnote> CreateFilterGroupLinks(Guid footnoteId,
+            IReadOnlyCollection<Guid> filterGroupIds)
         {
-            return filterGroupIds.Select(id => 
+            return filterGroupIds.Select(id =>
                 new FilterGroupFootnote
                 {
                     FootnoteId = footnoteId,
@@ -230,9 +234,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        private List<FilterItemFootnote> CreateFilterItemLinks(Guid footnoteId, IReadOnlyCollection<Guid> filterItemIds)
+        private List<FilterItemFootnote> CreateFilterItemLinks(Guid footnoteId,
+            IReadOnlyCollection<Guid> filterItemIds)
         {
-            return filterItemIds.Select(id => 
+            return filterItemIds.Select(id =>
                 new FilterItemFootnote
                 {
                     FootnoteId = footnoteId,
@@ -241,9 +246,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        private List<IndicatorFootnote> CreateIndicatorsLinks(Guid footnoteId, IReadOnlyCollection<Guid> indicatorIds)
+        private List<IndicatorFootnote> CreateIndicatorsLinks(Guid footnoteId,
+            IReadOnlyCollection<Guid> indicatorIds)
         {
-            return indicatorIds.Select(id => 
+            return indicatorIds.Select(id =>
                 new IndicatorFootnote
                 {
                     FootnoteId = footnoteId,
@@ -255,7 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private void UpdateFilterLinks(Footnote footnote, IReadOnlyCollection<Guid> filterIds)
         {
             if (!SequencesAreEqualIgnoringOrder(
-                footnote.Filters.Select(link => link.FilterId), filterIds))
+                    footnote.Filters.Select(link => link.FilterId), filterIds))
             {
                 footnote.Filters = CreateFilterLinks(footnote.Id, filterIds);
             }
@@ -264,7 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private void UpdateFilterGroupLinks(Footnote footnote, IReadOnlyCollection<Guid> filterGroupIds)
         {
             if (!SequencesAreEqualIgnoringOrder(
-                footnote.FilterGroups.Select(link => link.FilterGroupId), filterGroupIds))
+                    footnote.FilterGroups.Select(link => link.FilterGroupId), filterGroupIds))
             {
                 footnote.FilterGroups = CreateFilterGroupLinks(footnote.Id, filterGroupIds);
             }
@@ -273,7 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private void UpdateFilterItemLinks(Footnote footnote, IReadOnlyCollection<Guid> filterItemIds)
         {
             if (!SequencesAreEqualIgnoringOrder(
-                footnote.FilterItems.Select(link => link.FilterItemId), filterItemIds))
+                    footnote.FilterItems.Select(link => link.FilterItemId), filterItemIds))
             {
                 footnote.FilterItems = CreateFilterItemLinks(footnote.Id, filterItemIds);
             }
@@ -282,7 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private void UpdateIndicatorLinks(Footnote footnote, IReadOnlyCollection<Guid> indicatorIds)
         {
             if (!SequencesAreEqualIgnoringOrder(
-                footnote.Indicators.Select(link => link.IndicatorId), indicatorIds))
+                    footnote.Indicators.Select(link => link.IndicatorId), indicatorIds))
             {
                 footnote.Indicators = CreateIndicatorsLinks(footnote.Id, indicatorIds);
             }
@@ -291,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private void UpdateSubjectLinks(Footnote footnote, IReadOnlyCollection<Guid> subjectIds)
         {
             if (!SequencesAreEqualIgnoringOrder(
-                footnote.Subjects.Select(link => link.SubjectId), subjectIds))
+                    footnote.Subjects.Select(link => link.SubjectId), subjectIds))
             {
                 footnote.Subjects = CreateSubjectLinks(footnote.Id, subjectIds);
             }
