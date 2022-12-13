@@ -31,14 +31,6 @@ using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Co
 using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
 using IContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
-using ContentService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.ContentService;
-using FileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.FileStorageService;
-using IContentService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IContentService;
-using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IFileStorageService;
-using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
-using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
-using MethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.MethodologyService;
-using ReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseService;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 
@@ -125,7 +117,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                             GetConfigurationValue(provider, "PublisherStorage"),
                             new StorageInstanceCreationUtil()
                         )))
-                .AddScoped<IReleaseSubjectRepository, ReleaseSubjectRepository>()
                 .AddScoped<IFilterRepository, FilterRepository>()
                 .AddScoped<IFootnoteRepository, FootnoteRepository>()
                 .AddScoped<IIndicatorRepository, IndicatorRepository>()

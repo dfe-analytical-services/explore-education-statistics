@@ -67,9 +67,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                             {
                                 var releaseStatus =
                                     await CreateReleaseStatusAsync(message, ImmediateReleaseStartedState);
-                                await _queueService.QueuePublishReleaseFilesMessageAsync(releaseStatus.ReleaseId,
+                                await _queueService.QueuePublishReleaseFilesMessage(releaseStatus.ReleaseId,
                                     releaseStatus.Id);
-                                await _queueService.QueuePublishReleaseContentMessageAsync(message.ReleaseId,
+                                await _queueService.QueuePublishReleaseContentMessage(message.ReleaseId,
                                     message.ReleaseStatusId);
                             }
                             else

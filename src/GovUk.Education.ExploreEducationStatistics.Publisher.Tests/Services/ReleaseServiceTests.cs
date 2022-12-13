@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -425,14 +423,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         private static ReleaseService BuildReleaseService(
             ContentDbContext? contentDbContext = null,
             StatisticsDbContext? statisticsDbContext = null,
-            IMethodologyService? methodologyService = null,
-            IReleaseSubjectRepository? releaseSubjectRepository = null)
+            IMethodologyService? methodologyService = null)
         {
             return new(
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
                 statisticsDbContext ?? Mock.Of<StatisticsDbContext>(Strict),
-                methodologyService ?? Mock.Of<IMethodologyService>(Strict),
-                releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict));
+                methodologyService ?? Mock.Of<IMethodologyService>(Strict));
         }
     }
 }

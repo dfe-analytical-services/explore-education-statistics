@@ -33,10 +33,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <param name="executionContext"></param>
         /// <param name="logger"></param>
         /// <returns></returns>
-        [FunctionName("GenerateReleaseContent")]
+        [FunctionName("StageReleaseContent")]
         // ReSharper disable once UnusedMember.Global
         public async Task StageReleaseContent(
-            [QueueTrigger(GenerateStagedReleaseContentQueue)] GenerateStagedReleaseContentMessage message,
+            [QueueTrigger(StageReleaseContentQueue)] StageReleaseContentMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 logger.LogError(e, "Exception occured while executing {FunctionName}",
                     executionContext.FunctionName);
-                logger.LogError("{StackTrace}", e.StackTrace);
+                
                 await UpdateContentStage(message, Failed,
                     new ReleasePublishingStatusLogMessage($"Exception in content stage: {e.Message}"));
             }
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         private async Task UpdateContentStage(
-            GenerateStagedReleaseContentMessage message, 
+            StageReleaseContentMessage message, 
             ReleasePublishingStatusContentStage stage,
             ReleasePublishingStatusLogMessage logMessage = null)
         {

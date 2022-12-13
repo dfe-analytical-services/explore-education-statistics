@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 }
                 else
                 {
-                    await _queueService.QueuePublishReleaseContentMessageAsync(message.ReleaseId, releaseStatus.Id);
+                    await _queueService.QueuePublishReleaseContentMessage(message.ReleaseId, releaseStatus.Id);
                 }
             }
 

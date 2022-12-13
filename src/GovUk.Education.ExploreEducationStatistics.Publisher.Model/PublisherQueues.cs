@@ -3,7 +3,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 {
     public static class PublisherQueues
     {
-        public const string GenerateStagedReleaseContentQueue = "generate-release-content";
+        public const string StageReleaseContentQueue = "generate-release-content";
         public const string PublishMethodologyFilesQueue = "publish-methodology-files";
         public const string PublishReleaseContentQueue = "publish-release-content";
         public const string PublishReleaseFilesQueue = "publish-release-files";

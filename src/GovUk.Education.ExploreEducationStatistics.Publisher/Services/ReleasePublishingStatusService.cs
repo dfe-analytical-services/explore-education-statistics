@@ -31,8 +31,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _tableStorageService = tableStorageService;
         }
 
-        public async Task<ReleasePublishingStatus> CreateAsync(Guid releaseId, Guid releaseStatusId,
-            ReleasePublishingStatusState state, bool immediate,
+        public async Task<ReleasePublishingStatus> CreateAsync(
+            Guid releaseId, 
+            Guid releaseStatusId,
+            ReleasePublishingStatusState state, 
+            bool immediate,
             IEnumerable<ReleasePublishingStatusLogMessage> logMessages = null)
         {
             var release = await GetReleaseAsync(releaseId);
@@ -129,7 +132,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             });
         }
 
-        public async Task UpdateContentStageAsync(Guid releaseId, Guid releaseStatusId,
+        public async Task UpdateContentStageAsync(
+            Guid releaseId, 
+            Guid releaseStatusId,
             ReleasePublishingStatusContentStage stage,
             ReleasePublishingStatusLogMessage logMessage = null)
         {
@@ -164,8 +169,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             });
         }
 
-        private async Task UpdateRowAsync(Guid releaseId, Guid releaseStatusId,
-            Func<ReleasePublishingStatus, ReleasePublishingStatus> updateFunction, int retry = 0)
+        private async Task UpdateRowAsync(
+            Guid releaseId, 
+            Guid releaseStatusId,
+            Func<ReleasePublishingStatus, ReleasePublishingStatus> updateFunction, 
+            int retry = 0)
         {
             var table = GetTable();
             var releaseStatus = await GetAsync(releaseId, releaseStatusId);

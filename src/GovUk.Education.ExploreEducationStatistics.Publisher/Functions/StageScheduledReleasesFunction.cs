@@ -59,8 +59,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                         ScheduledReleaseStartedState);
                 }
 
-                await _queueService.QueuePublishReleaseFilesMessageAsync(scheduled);
-                await _queueService.QueueGenerateStagedReleaseContentMessageAsync(scheduled);
+                await _queueService.QueuePublishReleaseFilesMessage(scheduled);
+                await _queueService.QueueGenerateStagedReleaseContentMessage(scheduled);
             }
         }
 
