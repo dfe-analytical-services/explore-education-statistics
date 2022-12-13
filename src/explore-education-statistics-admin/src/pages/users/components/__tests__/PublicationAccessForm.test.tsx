@@ -23,11 +23,13 @@ describe('PublicationAccessForm', () => {
         id: 'pr-id-1',
         publication: 'pub-1',
         role: 'Viewer',
+        userName: 'Analyst1 User1',
       },
       {
         id: 'pr-id-2',
         publication: 'pub-2',
         role: 'Owner',
+        userName: 'Analyst2 User2',
       },
     ],
     userReleaseRoles: [],
