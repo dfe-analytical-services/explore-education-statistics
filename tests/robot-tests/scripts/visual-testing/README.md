@@ -23,7 +23,7 @@ their HTML.
 #### Capture "before" and "after" images
 
 After a code change is deployed, a migration applied or other change is performed on an environment whereby we want to sanity check that 
-no changes to the existing tables and charts have occurred (or that only certain expected changes have occurred), we can then run the 
+no changes to the existing tables and charts have occurred (or that only certain expected changes have occurred), we can then run the
 tests again and capture snapshot images of the "after" state of each table and chart.
 
 #### Visually compare images

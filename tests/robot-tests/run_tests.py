@@ -22,7 +22,7 @@ from scripts.get_webdriver import get_webdriver
 from tests.libs.create_emulator_release_files import ReleaseFilesGenerator
 from tests.libs.logger import get_logger
 from tests.libs.setup_auth_variables import setup_auth_variables
-from tests.libs.slack import send_slack_report
+from tests.libs.slack import SlackService
 
 current_dir = Path(__file__).absolute().parent
 os.chdir(current_dir)
@@ -121,7 +121,12 @@ parser.add_argument(
     action="store_true",
     help="choose to print out keywords as they are started",
 )
-parser.add_argument("--enable-slack", dest="enable_slack", action="store_true")
+parser.add_argument(
+    "--enable-slack-notifications",
+    dest="enable_slack_notifications",
+    action="store_true",
+    help="enable Slack notifications to be sent for test-results & snapshot test alerts",
+)
 parser.add_argument(
     "--prompt-to-continue",
     dest="prompt_to_continue",
@@ -160,20 +165,26 @@ if args.custom_env:
 else:
     load_dotenv(".env." + args.env)
 
-assert os.getenv("TIMEOUT") is not None
-assert os.getenv("IMPLICIT_WAIT") is not None
-assert os.getenv("PUBLIC_URL") is not None
-assert os.getenv("ADMIN_URL") is not None
-assert os.getenv("PUBLIC_AUTH_USER") is not None
-assert os.getenv("PUBLIC_AUTH_PASSWORD") is not None
-assert os.getenv("RELEASE_COMPLETE_WAIT") is not None
-assert os.getenv("WAIT_MEDIUM") is not None
-assert os.getenv("WAIT_LONG") is not None
-assert os.getenv("WAIT_SMALL") is not None
-assert os.getenv("FAIL_TEST_SUITES_FAST") is not None
-assert os.getenv("IDENTITY_PROVIDER") is not None
-assert os.getenv("WAIT_MEMORY_CACHE_EXPIRY") is not None
-assert os.getenv("EXPIRED_INVITE_USER_EMAIL") is not None
+
+required_env_vars = [
+    "TIMEOUT",
+    "IMPLICIT_WAIT",
+    "PUBLIC_URL",
+    "ADMIN_URL",
+    "PUBLIC_AUTH_USER",
+    "PUBLIC_AUTH_PASSWORD",
+    "RELEASE_COMPLETE_WAIT",
+    "WAIT_MEDIUM",
+    "WAIT_LONG",
+    "WAIT_SMALL",
+    "FAIL_TEST_SUITES_FAST",
+    "IDENTITY_PROVIDER",
+    "WAIT_MEMORY_CACHE_EXPIRY",
+    "EXPIRED_INVITE_USER_EMAIL",
+]
+
+for env_var in required_env_vars:
+    assert os.getenv(env_var) is not None, f"Environment variable {env_var} is not set"
 
 
 if args.slack_webhook_url:
@@ -435,5 +446,7 @@ finally:
     logger.info(f"\nLog available at: file://{os.getcwd()}{os.sep}test-results{os.sep}log.html")
     logger.info(f"Report available at: file://{os.getcwd()}{os.sep}test-results{os.sep}report.html")
     logger.info("\nTests finished!")
-    if args.enable_slack:
-        send_slack_report(args.env, args.tests)
+
+    if args.enable_slack_notifications:
+        slack_service = SlackService()
+        slack_service.send_test_report(args.env, args.tests)
