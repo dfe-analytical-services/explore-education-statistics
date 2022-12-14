@@ -17,6 +17,7 @@ import times from 'lodash/times';
 
 export interface LegendDataGroup {
   colour: string;
+  decimalPlaces: number;
   min: string;
   minRaw: number;
   max: string;
@@ -83,6 +84,7 @@ export default function generateLegendDataGroups({
     return [
       {
         colour,
+        decimalPlaces,
         min: formatPretty(min, unit, decimalPlaces),
         max: formatPretty(max, unit, decimalPlaces),
         minRaw: min,
@@ -132,6 +134,7 @@ export default function generateLegendDataGroups({
 
         return {
           colour: colourScale(i + groupProportion),
+          decimalPlaces,
           min: formatPretty(minRaw, unit, decimalPlaces),
           max: formatPretty(maxRaw, unit, decimalPlaces),
           minRaw,
@@ -158,6 +161,7 @@ export default function generateLegendDataGroups({
 
           acc.push({
             colour: colourScale((index + 1) * groupProportion),
+            decimalPlaces,
             min: formatPretty(minRaw, unit, decimalPlaces),
             max: formatPretty(maxRaw, unit, decimalPlaces),
             minRaw,
@@ -204,6 +208,7 @@ export default function generateLegendDataGroups({
 
           return {
             colour: colourScale((index + 1) * (1 / customDataGroups.length)),
+            decimalPlaces: groupDecimals,
             min: formatPretty(group.min, unit, countDecimalPlaces(group.min)),
             max: formatPretty(group.max, unit, countDecimalPlaces(group.max)),
             minRaw,
