@@ -19,9 +19,19 @@ export interface MethodologyTheme {
   topics: MethodologyTopic[];
 }
 
+export interface ThemeSummary {
+  id: string;
+  slug: string;
+  summary: string;
+  title: string;
+}
+
 const themeService = {
   getMethodologyThemes(): Promise<MethodologyTheme[]> {
     return contentApi.get(`/methodology-themes`);
+  },
+  listThemes(): Promise<ThemeSummary[]> {
+    return contentApi.get(`/themes`);
   },
 };
 

@@ -1,4 +1,4 @@
-import render from '@admin-test/render';
+import render from '@common-test/render';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import PublicationPageContainer from '@admin/pages/publication/PublicationPageContainer';
 import {

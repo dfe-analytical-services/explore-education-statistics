@@ -4,7 +4,7 @@ import _releaseService, {
   ReleaseSummaryWithPermissions,
 } from '@admin/services/releaseService';
 import _publicationService from '@admin/services/publicationService';
-import baseRender from '@admin-test/render';
+import baseRender from '@common-test/render';
 import { PaginatedList } from '@common/services/types/pagination';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';

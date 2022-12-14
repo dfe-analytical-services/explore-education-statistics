@@ -10,7 +10,7 @@ import {
   ExternalMethodology,
 } from '@common/services/types/methodology';
 import { PublicationType } from '@common/services/types/publicationType';
-import { Paging } from '@common/services/types/pagination';
+import { PaginatedList } from '@common/services/types/pagination';
 import { PartialDate } from '@common/utils/date/partialDate';
 import { contentApi } from './api';
 
@@ -59,11 +59,6 @@ export interface PublicationListSummary {
   type: ReleaseType;
 }
 
-interface PublicationsResponse {
-  results: PublicationListSummary[];
-  paging: Paging;
-}
-
 export interface Contact {
   teamName: string;
   teamEmail: string;
@@ -108,6 +103,10 @@ export type PublicationSortOption = typeof publicationSortOptions[number];
 export type PublicationSortParam = 'published' | 'title' | 'relevance';
 
 export type PublicationOrderParam = 'asc' | 'desc';
+
+export const publicationFilters = ['releaseType', 'search', 'themeId'] as const;
+
+export type PublicationFilter = typeof publicationFilters[number];
 
 export interface PublicationListRequest {
   order?: PublicationOrderParam;
@@ -260,7 +259,7 @@ export default {
   },
   listPublications(
     params: PublicationListRequest,
-  ): Promise<PublicationsResponse> {
+  ): Promise<PaginatedList<PublicationListSummary>> {
     return contentApi.get(`/publications`, {
       params,
     });
