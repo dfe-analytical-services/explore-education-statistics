@@ -14,8 +14,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Uti
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 using static Moq.MockBehavior;
 using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 
@@ -182,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(ListOf(publicationRole));
 
-                    var expectedToPassByRole = ListOf(Owner, PublicationRole.ReleaseApprover).Contains(publicationRole);
+                    var expectedToPassByRole = ListOf(PublicationRole.Owner, PublicationRole.Approver).Contains(publicationRole);
 
                     if (!expectedToPassByRole)
                     {
@@ -216,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task EditorsOrApproversOnOwningPublicationsLatestReleaseCanUpdateMethodology()
             {
-                var expectedReleaseRolesToPass = ListOf(Approver, Contributor, Lead);
+                var expectedReleaseRolesToPass = ListOf(ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.Lead);
 
                 await ForEachReleaseRoleAsync(async releaseRole =>
                 {

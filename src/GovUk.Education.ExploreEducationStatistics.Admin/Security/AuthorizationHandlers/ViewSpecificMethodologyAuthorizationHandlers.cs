@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                     .HasRolesOnPublicationOrLatestRelease(
                         context.User.GetUserId(),
                         owningPublication.Id,
-                        ListOf(Owner, ReleaseApprover),
+                        ListOf(Owner, Approver),
                         ReleaseEditorAndApproverRoles))
             {
                 context.Succeed(requirement);

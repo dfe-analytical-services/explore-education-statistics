@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .UserPublicationRoles
                 .AsQueryable()
                 .Where(userPublicationRole => userPublicationRole.UserId == userId &&
-                                              ListOf(PublicationRole.Owner, PublicationRole.ReleaseApprover)
+                                              ListOf(PublicationRole.Owner, PublicationRole.Approver)
                                                   .Contains(userPublicationRole.Role));
 
             if (topicId.HasValue)

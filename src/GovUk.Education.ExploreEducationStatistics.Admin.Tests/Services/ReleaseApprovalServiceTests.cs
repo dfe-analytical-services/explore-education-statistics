@@ -1788,11 +1788,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Version = 0,
             };
 
-            var userPublicationReleaseApproverRole = new UserPublicationRole
+            var userPublicationApproverRole = new UserPublicationRole
             {
                 User = new User { Id = Guid.NewGuid(), Email = "test@test.com" },
                 Publication = release.Publication,
-                Role = PublicationRole.ReleaseApprover
+                Role = PublicationRole.Approver
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1800,7 +1800,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 await context.Releases.AddAsync(release);
-                await context.UserPublicationRoles.AddAsync(userPublicationReleaseApproverRole);
+                await context.UserPublicationRoles.AddAsync(userPublicationApproverRole);
                 await context.SaveChangesAsync();
             }
 
@@ -1819,7 +1819,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new List<UserReleaseRole>());
 
                 emailTemplateService.Setup(mock => mock.SendHigherReviewEmail(
-                    userPublicationReleaseApproverRole.User.Email,
+                    userPublicationApproverRole.User.Email,
                     It.Is<Release>(r => r.Id == release.Id))).Returns(Unit.Instance);
 
                 var releaseService = BuildService(

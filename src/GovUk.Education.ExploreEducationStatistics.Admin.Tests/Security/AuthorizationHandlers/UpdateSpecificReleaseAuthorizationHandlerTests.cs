@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     UpdateSpecificReleaseRequirement>(
                                     HandlerSupplier(release),
                                     release,
-                                    Owner, ReleaseApprover
+                                    Owner, Approver
                                 );
                             }
                             else
@@ -140,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     UpdateSpecificReleaseRequirement>(
                                     HandlerSupplier(release),
                                     release,
-                                    ReleaseApprover
+                                    Approver
                                 );
                             }
                         }

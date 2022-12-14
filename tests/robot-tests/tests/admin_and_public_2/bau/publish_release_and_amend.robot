@@ -272,16 +272,16 @@ Verify public metadata guidance document
     user checks table column heading contains    1    1    Variable name    css:table[data-testid="Variables"]
     user checks table column heading contains    1    2    Variable description    css:table[data-testid="Variables"]
 
-    user checks results table cell contains    1    1    children_attending    css:table[data-testid="Variables"]
-    user checks results table cell contains    1    2    Number of children attending
+    user checks table cell contains    1    1    children_attending    css:table[data-testid="Variables"]
+    user checks table cell contains    1    2    Number of children attending
     ...    css:table[data-testid="Variables"]
 
-    user checks results table cell contains    6    1    date    css:table[data-testid="Variables"]
-    user checks results table cell contains    6    2    Date    css:table[data-testid="Variables"]
+    user checks table cell contains    6    1    date    css:table[data-testid="Variables"]
+    user checks table cell contains    6    2    Date    css:table[data-testid="Variables"]
 
-    user checks results table cell contains    10    1    otherwise_vulnerable_children_attending
+    user checks table cell contains    10    1    otherwise_vulnerable_children_attending
     ...    css:table[data-testid="Variables"]
-    user checks results table cell contains    10    2    Number of otherwise vulnerable children attending
+    user checks table cell contains    10    2    Number of otherwise vulnerable children attending
     ...    css:table[data-testid="Variables"]
 
     user goes to release page via breadcrumb    ${PUBLICATION_NAME}    ${RELEASE_NAME}
@@ -501,10 +501,10 @@ Edit data block for amendment
     user waits until table is visible
 
     user checks table body has x rows    1
-    user checks results table cell contains    1    1    ${DATABLOCK_NAME}
-    user checks results table cell contains    1    2    Yes
-    user checks results table cell contains    1    3    Yes
-    user checks results table cell contains    1    4    None
+    user checks table cell contains    1    1    ${DATABLOCK_NAME}
+    user checks table cell contains    1    2    Yes
+    user checks table cell contains    1    3    Yes
+    user checks table cell contains    1    4    None
 
     user clicks link    Edit block    css:tbody > tr:first-child
 
@@ -693,14 +693,14 @@ Verify amendment public metadata guidance document
     user checks table column heading contains    1    1    Variable name
     user checks table column heading contains    1    2    Variable description
 
-    user checks results table cell contains    1    1    children_attending
-    user checks results table cell contains    1    2    Number of children attending
+    user checks table cell contains    1    1    children_attending
+    user checks table cell contains    1    2    Number of children attending
 
-    user checks results table cell contains    6    1    date
-    user checks results table cell contains    6    2    Date
+    user checks table cell contains    6    1    date
+    user checks table cell contains    6    2    Date
 
-    user checks results table cell contains    10    1    otherwise_vulnerable_children_attending
-    user checks results table cell contains    10    2    Number of otherwise vulnerable children attending
+    user checks table cell contains    10    1    otherwise_vulnerable_children_attending
+    user checks table cell contains    10    2    Number of otherwise vulnerable children attending
 
     user goes to release page via breadcrumb    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 

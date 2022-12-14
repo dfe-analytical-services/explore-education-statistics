@@ -4,12 +4,9 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.
-    AuthorizationHandlerResourceRoleService;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerResourceRoleService;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
@@ -23,7 +20,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandler
     private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
     private static readonly ReleaseRole[] UnrestrictedReleaseViewerAndPrereleaseViewerRoles =
-        UnrestrictedReleaseViewerRoles.Append(PrereleaseViewer).ToArray();
+        UnrestrictedReleaseViewerRoles.Append(ReleaseRole.PrereleaseViewer).ToArray();
 
     public ViewSpecificPreReleaseSummaryAuthorizationHandler(
         AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
@@ -46,7 +43,7 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandler
                     context.User.GetUserId(),
                     release.PublicationId,
                     release.Id,
-                    ListOf(Owner, ReleaseApprover),
+                    ListOf(PublicationRole.Owner, PublicationRole.Approver),
                     UnrestrictedReleaseViewerAndPrereleaseViewerRoles))
         {
             context.Succeed(requirement);

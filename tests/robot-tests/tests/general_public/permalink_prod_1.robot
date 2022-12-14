@@ -37,10 +37,10 @@ Validate table
     user checks table column heading contains    2    2    2015/16
     user checks table column heading contains    2    3    2016/17
 
-    user checks results table row heading contains    1    1    England
-    user checks results table cell contains    1    1    124,995
-    user checks results table cell contains    1    2    135,925
-    user checks results table cell contains    1    3    148,820
+    user checks table row heading contains    1    1    England
+    user checks table cell contains    1    1    124,995
+    user checks table cell contains    1    2    135,925
+    user checks table cell contains    1    3    148,820
 
 Validate footnotes
     user checks page contains element

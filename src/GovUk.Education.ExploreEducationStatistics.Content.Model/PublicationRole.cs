@@ -3,6 +3,6 @@
     public enum PublicationRole
     {
         Owner,
-        ReleaseApprover
+        Approver
     }
 }

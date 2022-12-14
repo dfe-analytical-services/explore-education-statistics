@@ -9,8 +9,6 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -45,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Publication = relatedPublication1
                     },
                     User = user,
-                    Role = Viewer
+                    Role = ReleaseRole.Viewer
                 },
             });
 
@@ -59,11 +57,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Topic = topic,
                 },
                 User = user,
-                Role = Owner
+                Role = PublicationRole.Owner
             });
 
             // Set up a publication and releases related to the topic that will be granted via the Publication
-            // ReleaseApprover role
+            // Approver role
             userPublicationRoles.Add(new UserPublicationRole
             {
                 Publication = new Publication
@@ -72,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Topic = topic,
                 },
                 User = user,
-                Role = ReleaseApprover
+                Role = PublicationRole.Approver
             });
 
             var contextId = Guid.NewGuid().ToString();
@@ -126,17 +124,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Topic = new Topic { Theme = new Theme(), },
                     },
                     User = user,
-                    Role = Owner,
+                    Role = PublicationRole.Owner,
                 },
                 new()
                 {
                     Publication = new Publication
                     {
-                        Title = "Publication ReleaseApprover publication",
+                        Title = "Publication Approver publication",
                         Topic = new Topic { Theme = new Theme(), },
                     },
                     User = user,
-                    Role = ReleaseApprover,
+                    Role = PublicationRole.Approver,
                 },
                 new()
                 {
@@ -149,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         },
                     },
                     User = user,
-                    Role = Owner,
+                    Role = PublicationRole.Owner,
                 },
             };
 
@@ -168,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         },
                     },
                     User = user,
-                    Role = Contributor,
+                    Role = ReleaseRole.Contributor,
                 },
                 new()
                 {
@@ -183,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         },
                     },
                     User = user,
-                    Role = Viewer,
+                    Role = ReleaseRole.Viewer,
                 },
                 new()
                 {
@@ -198,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     },
                     User = user,
-                    Role = PrereleaseViewer,
+                    Role = ReleaseRole.PrereleaseViewer,
                 },
                 new()
                 {
@@ -216,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     },
                     User = user,
-                    Role = Contributor,
+                    Role = ReleaseRole.Contributor,
                 },
             };
 
@@ -243,7 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Publication Owner publication", result[0].Title);
                 Assert.Empty(result[0].Releases);   // ListPublicationsForUser doesn't hydrate releases
 
-                Assert.Equal("Publication ReleaseApprover publication", result[1].Title);
+                Assert.Equal("Publication Approver publication", result[1].Title);
                 Assert.Empty(result[1].Releases);
 
                 Assert.Equal("Publication Owner publication 2", result[2].Title);
@@ -281,7 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 },
                 User = user,
-                Role = Contributor
+                Role = ReleaseRole.Contributor
             };
 
             // Set up publication and release unrelated to the topic that will be granted via a publication role
@@ -302,7 +300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Topic = new Topic()
                 },
                 User = user,
-                Role = Owner
+                Role = PublicationRole.Owner
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -346,7 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 },
                 UserId = new Guid(),
-                Role = Contributor
+                Role = ReleaseRole.Contributor
             };
 
             // Set up a publication and release related to the topic that is granted via a publication role but not for this user
@@ -367,7 +365,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Topic = topic
                 },
                 UserId = new Guid(),
-                Role = Owner
+                Role = PublicationRole.Owner
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -425,13 +423,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Release = release,
                     User = user,
-                    Role = Contributor
+                    Role = ReleaseRole.Contributor
                 },
                 new()
                 {
                     Release = release,
                     User = user,
-                    Role = Lead
+                    Role = ReleaseRole.Lead
                 }
             });
 
@@ -439,7 +437,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Publication = publication,
                 User = user,
-                Role = Owner
+                Role = PublicationRole.Owner
             });
 
             var contextId = Guid.NewGuid().ToString();
@@ -511,7 +509,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2, publications.Count);
                 Assert.Equal(topic1.Publications[0].Title, publications[0].Title);
                 Assert.Equal(topic1.Publications[1].Title, publications[1].Title);
-
             }
         }
 

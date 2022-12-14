@@ -196,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await ForEachPublicationRoleAsync(async publicationRole =>
                 {
                     // If the user has the Approver role on the owning Publication, they are allowed to approve it.
-                    var expectedToPassByPublicationRole = publicationRole == PublicationRole.ReleaseApprover;
+                    var expectedToPassByPublicationRole = publicationRole == PublicationRole.Approver;
 
                     var (
                         handler,

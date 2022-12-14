@@ -9,6 +9,7 @@ import client from '@admin/services/utils/service';
 import { OmitStrict } from '@common/types';
 import { PublicationSummary } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
+import { UserPublicationRole } from '@admin/services/userService';
 
 export interface Contact {
   contactName: string;
@@ -212,6 +213,10 @@ const publicationService = {
       `/publications/${publicationId}/legacy-releases`,
       legacyReleases,
     );
+  },
+
+  getRoles(publicationId: string): Promise<UserPublicationRole[]> {
+    return client.get(`/publications/${publicationId}/roles`);
   },
 };
 

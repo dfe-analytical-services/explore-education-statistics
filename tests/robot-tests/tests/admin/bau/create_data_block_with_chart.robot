@@ -183,10 +183,10 @@ Validate data block is in list
     user checks table column heading contains    1    6    Actions
 
     user checks table body has x rows    1
-    user checks results table cell contains    1    1    ${DATABLOCK_NAME}
-    user checks results table cell contains    1    2    No
-    user checks results table cell contains    1    3    No
-    user checks results table cell contains    1    4    UI test highlight name
+    user checks table cell contains    1    1    ${DATABLOCK_NAME}
+    user checks table cell contains    1    2    No
+    user checks table cell contains    1    3    No
+    user checks table cell contains    1    4    UI test highlight name
 
 Embed data block into release content
     user clicks link    Content
@@ -308,8 +308,8 @@ Validate marked as 'In content' on data block list
     user checks table column heading contains    1    3    In content
 
     user checks table body has x rows    1
-    user checks results table cell contains    1    1    ${DATABLOCK_NAME}
-    user checks results table cell contains    1    3    Yes
+    user checks table cell contains    1    1    ${DATABLOCK_NAME}
+    user checks table cell contains    1    3    Yes
 
 Navigate to Chart tab
     user clicks link    Edit block
@@ -420,8 +420,8 @@ Save chart and validate marked as 'Has chart' in data blocks list
     user checks table column heading contains    1    2    Has chart
 
     user checks table body has x rows    1
-    user checks results table cell contains    1    1    ${DATABLOCK_NAME}
-    user checks results table cell contains    1    2    Yes
+    user checks table cell contains    1    1    ${DATABLOCK_NAME}
+    user checks table cell contains    1    2    Yes
 
 Validate line chart embeds correctly
     user clicks link    Content

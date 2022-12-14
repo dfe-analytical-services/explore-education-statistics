@@ -175,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(async user =>
                         {
                             return await _userRoleService.GetGlobalRoles(user.Id)
-                                .OnSuccessCombineWith(_ => _userRoleService.GetPublicationRoles(id))
+                                .OnSuccessCombineWith(_ => _userRoleService.GetPublicationRolesForUser(id))
                                 .OnSuccessCombineWith(_ => _userRoleService.GetReleaseRoles(id))
                                 .OnSuccess(tuple =>
                                 {

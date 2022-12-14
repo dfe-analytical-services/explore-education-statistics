@@ -252,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                     new UserPublicationInvite
                     {
                         Email = email,
-                        Role = PublicationRole.ReleaseApprover
+                        Role = PublicationRole.Approver
                     },
                     new UserPublicationInvite
                     {
@@ -405,7 +405,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                     .ToListAsync();
                 Assert.Equal(2, newUserPublicationRoles.Count);
                 Assert.Equal(
-                    ListOf(PublicationRole.Owner, PublicationRole.ReleaseApprover),
+                    ListOf(PublicationRole.Owner, PublicationRole.Approver),
                     newUserPublicationRoles.Select(r => r.Role));
             }
         }
@@ -462,7 +462,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                     new UserPublicationInvite
                     {
                         Email = email,
-                        Role = PublicationRole.ReleaseApprover
+                        Role = PublicationRole.Approver
                     },
                     new UserPublicationInvite
                     {

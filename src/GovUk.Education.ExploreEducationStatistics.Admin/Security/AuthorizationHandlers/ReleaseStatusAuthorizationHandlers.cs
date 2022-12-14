@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                         context.User.GetUserId(),
                         release.PublicationId,
                         release.Id,
-                        ListOf(ReleaseApprover),
+                        ListOf(Approver),
                         ListOf(ReleaseRole.Approver)))
             {
                 context.Succeed(requirement);
@@ -96,8 +96,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
 
             var allowedPublicationRoles = release.ApprovalStatus == Approved
-                ? ListOf(ReleaseApprover)
-                : ListOf(Owner, ReleaseApprover);
+                ? ListOf(Approver)
+                : ListOf(Owner, Approver);
             
             var allowedReleaseRoles = release.ApprovalStatus == Approved
                 ? ListOf(ReleaseRole.Approver)
@@ -127,8 +127,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
 
             var allowedPublicationRoles = release.ApprovalStatus == Approved
-                ? ListOf(ReleaseApprover)
-                : ListOf(Owner, ReleaseApprover);
+                ? ListOf(Approver)
+                : ListOf(Owner, Approver);
             
             var allowedReleaseRoles = release.ApprovalStatus == Approved
                 ? ListOf(ReleaseRole.Approver)

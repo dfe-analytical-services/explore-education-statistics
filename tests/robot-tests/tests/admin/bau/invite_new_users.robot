@@ -89,12 +89,12 @@ Invite a new user with release and publication roles
     user checks element does not contain    testid:release-role-table    ${RELEASE3_NAME}
 
     user chooses select option    name:publicationId    ${PUBLICATION_NAME}
-    user chooses select option    name:publicationRole    ReleaseApprover
+    user chooses select option    name:publicationRole    Approver
     user clicks button    Add publication role
 
     user checks table body has x rows    1    testid:publication-role-table
     ${ROW}=    user gets table row    ${PUBLICATION_NAME}    testid:publication-role-table
-    user checks element contains    ${ROW}    ReleaseApprover
+    user checks element contains    ${ROW}    Approver
 
     user clicks button    Send invite
     user waits until h1 is visible    Pending invites
@@ -112,7 +112,7 @@ Validate newly invited user with roles appears on Pending invites page
     user checks element does not contain    ${ROW}    Academic Year 2002/03
     user checks element does not contain    ${ROW}    PrereleaseViewer
 
-    user checks element contains    ${ROW}    ${PUBLICATION_NAME} - ReleaseApprover
+    user checks element contains    ${ROW}    ${PUBLICATION_NAME} - Approver
 
 Cancel invite with roles
     user clicks button    Cancel invite    ${ROW}

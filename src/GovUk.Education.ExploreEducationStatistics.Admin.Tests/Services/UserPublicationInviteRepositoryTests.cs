@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userPublicationRole2 = new UserPublicationRoleCreateRequest
             {
                 PublicationId = Guid.NewGuid(),
-                PublicationRole = ReleaseApprover,
+                PublicationRole = Approver,
             };
             var existingPublicationInvite = new UserPublicationInvite
             {
