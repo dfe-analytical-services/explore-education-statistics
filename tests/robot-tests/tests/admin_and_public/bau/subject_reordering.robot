@@ -230,14 +230,7 @@ Check subject order in data catalogue
 
 Check subject order in data guidance
     user navigates to find statistics page on public frontend
-
-    user waits until page contains accordion section    %{TEST_THEME_NAME}
-    user opens accordion section    %{TEST_THEME_NAME}
-    user waits until accordion section contains text    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
-
-    user opens details dropdown    %{TEST_TOPIC_NAME}
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME}
-    user clicks element    testid:View stats link for ${PUBLICATION_NAME}
+    user clicks link    ${PUBLICATION_NAME}
 
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
     user clicks link    View data guidance
