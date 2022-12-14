@@ -462,7 +462,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                     new UserPublicationInvite
                     {
                         Email = email,
-                        Role = PublicationRole.ReleaseApprover
+                        Role = PublicationRole.Approver
                     },
                     new UserPublicationInvite
                     {
