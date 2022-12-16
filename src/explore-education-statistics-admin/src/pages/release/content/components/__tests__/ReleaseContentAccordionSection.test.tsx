@@ -73,6 +73,7 @@ describe('ReleaseContentAccordionSection', () => {
                   ...testSection,
                   content: [testBlock],
                 }}
+                embedBlocksEnabled
               />
             </EditableAccordion>
           </ReleaseContentHubContextProvider>
@@ -101,6 +102,56 @@ describe('ReleaseContentAccordionSection', () => {
     ).toBeInTheDocument();
   });
 
+  test('disables the Add Embed block option by default', () => {
+    render(
+      <EditingContextProvider editingMode="edit">
+        <ReleaseContentProvider
+          value={{
+            release: testEditableRelease,
+            canUpdateRelease: true,
+            availableDataBlocks: [],
+          }}
+        >
+          <ReleaseContentHubContextProvider releaseId={testEditableRelease.id}>
+            <EditableAccordion
+              onAddSection={noop}
+              id="test-accordion"
+              onReorder={noop}
+            >
+              <ReleaseContentAccordionSection
+                id="test-section-1"
+                section={{
+                  ...testSection,
+                  content: [testBlock],
+                }}
+              />
+            </EditableAccordion>
+          </ReleaseContentHubContextProvider>
+        </ReleaseContentProvider>
+      </EditingContextProvider>,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Edit section title' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Reorder this section' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Remove this section' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Add text block' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Add data block' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Add embed block' }),
+    ).not.toBeInTheDocument();
+  });
+
   test('renders correctly in preview mode', () => {
     render(
       <EditingContextProvider editingMode="preview">
@@ -123,6 +174,7 @@ describe('ReleaseContentAccordionSection', () => {
                   ...testSection,
                   content: [testBlock],
                 }}
+                embedBlocksEnabled
               />
             </EditableAccordion>
           </ReleaseContentHubContextProvider>

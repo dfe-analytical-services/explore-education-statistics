@@ -130,8 +130,10 @@ Add three accordion sections to release
     user changes accordion section title    1    Dates data block
     user clicks button    Add new section
     user changes accordion section title    2    Test text
-    user clicks button    Add new section
-    user changes accordion section title    3    Test embedded dashboard section
+
+    # EES-3682 - reinstate when embed blocks are enabled
+    # user clicks button    Add new section
+    # user changes accordion section title    3    Test embedded dashboard section
 
 Add data block to first accordion section
     user adds data block to editable accordion section    Dates data block    ${DATABLOCK_NAME}
@@ -160,6 +162,8 @@ Add test text to second accordion section
     ...    id:releaseMainContent
 
 Add embedded dashboard to third accordion section
+    Skip    EES-3682 - skipping adding embedded blocks until functionailty is enabled
+
     user adds embedded dashboard to editable accordion section
     ...    Test embedded dashboard section
     ...    Test embedded dashboard title
@@ -307,10 +311,14 @@ Verify accordions are correct
     user checks there are x accordion sections    1    id:data-accordion
     user checks accordion is in position    Explore data and files    1    id:data-accordion
 
-    user checks there are x accordion sections    3    id:content
+    # EES-3682 - reinstate the check for 3 rows when embed blocks are enabled
+    # user checks there are x accordion sections    3    id:content
+    user checks there are x accordion sections    2    id:content
     user checks accordion is in position    Dates data block    1    id:content
     user checks accordion is in position    Test text    2    id:content
-    user checks accordion is in position    Test embedded dashboard section    3    id:content
+
+    # EES-3682 - reinstate when embed blocks are enabled
+    # user checks accordion is in position    Test embedded dashboard section    3    id:content
 
     user checks there are x accordion sections    2    id:help-and-support
     user checks accordion is in position    National statistics    1    id:help-and-support
@@ -354,6 +362,8 @@ Verify Test text accordion section contains correct text
     user closes accordion section    Test text    id:content
 
 Verify embedded dashboard accordion section contains dashboard
+    Skip    EES-3682 - skipping adding embedded blocks until functionailty is enabled
+
     user opens accordion section    Test embedded dashboard section    id:content
     ${section}=    user gets accordion section content element    Test embedded dashboard section    id:content
     user waits until parent contains element    ${section}    xpath:.//iframe[@title="Test embedded dashboard title"]
@@ -583,6 +593,8 @@ Update second accordion section text for amendment
     ...    id:releaseMainContent
 
 Update embedded dashboard title
+    Skip    EES-3682 - skipping adding embedded blocks until functionailty is enabled
+
     user updates embedded dashboard in editable accordion section
     ...    Test embedded dashboard section
     ...    Test embedded dashboard title updated
@@ -724,7 +736,9 @@ Verify amendment accordions are correct
     user goes to release page via breadcrumb    ${PUBLICATION_NAME}    ${RELEASE_NAME}
     user checks accordion is in position    Dates data block    1    id:content
     user checks accordion is in position    Test text    2    id:content
-    user checks accordion is in position    Test embedded dashboard section    3    id:content
+
+    # EES-3682 - reinstate this line when embed blocks are enabled
+    # user checks accordion is in position    Test embedded dashboard section    3    id:content
 
     user checks accordion is in position    Experimental statistics    1    id:help-and-support
     user checks accordion is in position    Contact us    2    id:help-and-support
@@ -774,6 +788,8 @@ Verify amendment Test text accordion section contains correct text
     user closes accordion section    Test text    id:content
 
 Verify amendment embedded dashboard accordion section is correct
+    Skip    EES-3682 - skipping adding embedded blocks until functionailty is enabled
+
     user opens accordion section    Test embedded dashboard section    id:content
     ${section}=    user gets accordion section content element    Test embedded dashboard section    id:content
     user checks element contains child element    ${section}
