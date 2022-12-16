@@ -23,10 +23,12 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 export interface ReleaseContentAccordionSectionProps {
   id: string;
   section: ContentSection<EditableBlock>;
+  embedBlocksEnabled?: boolean; // EES-3862 - remove to enable Embed Blocks
 }
 
 const ReleaseContentAccordionSection = ({
   section,
+  embedBlocksEnabled = false,
   ...props
 }: ReleaseContentAccordionSectionProps) => {
   const { id: sectionId, caption, content: sectionContent = [] } = section;
@@ -232,13 +234,17 @@ const ReleaseContentAccordionSection = ({
                     Add data block
                   </Button>
                 )}
-                {!showEmbedDashboardForm && (
-                  <Button
-                    variant="secondary"
-                    onClick={toggleEmbedDashboardForm.on}
-                  >
-                    Add embed block
-                  </Button>
+                {embedBlocksEnabled && (
+                  <>
+                    {!showEmbedDashboardForm && (
+                      <Button
+                        variant="secondary"
+                        onClick={toggleEmbedDashboardForm.on}
+                      >
+                        Add embed block
+                      </Button>
+                    )}
+                  </>
                 )}
               </ButtonGroup>
             </>
