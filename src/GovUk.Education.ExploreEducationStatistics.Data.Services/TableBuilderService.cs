@@ -66,10 +66,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ObservationQueryContext queryContext,
             CancellationToken cancellationToken = default)
         {
-            return await _subjectRepository.FindPublicationIdForSubject(queryContext.SubjectId)
-                .OrNotFound()
-                .OnSuccess(publicationId => _releaseRepository.GetLatestPublishedRelease(publicationId))
-                .OnSuccess(release => Query(release.Id, queryContext, cancellationToken));
+            return await FindLatestPublishedReleaseId(queryContext.SubjectId)
+                .OnSuccess(releaseId => Query(releaseId, queryContext, cancellationToken));
         }
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
@@ -142,6 +140,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 countOfTimePeriods: TimePeriodUtil.Range(queryContext.TimePeriod).Count,
                 countsOfFilterItemsByFilter: countsOfFilterItemsByFilter
             );
+        }
+
+        private async Task<Either<ActionResult, Guid>> FindLatestPublishedReleaseId(Guid subjectId)
+        {
+            return await _subjectRepository.FindPublicationIdForSubject(subjectId)
+                .OrNotFound()
+                .OnSuccess(publicationId => _releaseRepository.GetLatestPublishedRelease(publicationId))
+                .OnSuccess(release => release.Id);
         }
 
         private Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid subjectId, Guid releaseId)
