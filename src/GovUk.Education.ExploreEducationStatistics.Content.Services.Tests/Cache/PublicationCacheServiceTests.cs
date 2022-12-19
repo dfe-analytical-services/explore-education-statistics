@@ -153,8 +153,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
                     Publications = ListOf(new PublicationTreePublicationViewModel
                     {
                         Title = "Publication A",
-                        IsSuperseded = false,
-                        HasLiveRelease = true
+                        AnyLiveReleaseHasData = true
                     })
                 }
             }
@@ -178,7 +177,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
         var service = BuildService(publicationService.Object);
 
-        var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+        var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
 
         VerifyAllMocks(PublicBlobCacheService);
 
@@ -200,8 +199,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
                     Publications = ListOf(new PublicationTreePublicationViewModel
                     {
                         Title = "Publication A",
-                        IsSuperseded = false,
-                        HasLiveRelease = true
+                        AnyLiveReleaseHasData = true
                     })
                 }
             }
@@ -214,108 +212,12 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
 
         var service = BuildService();
 
-        var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+        var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
 
         VerifyAllMocks(PublicBlobCacheService);
 
         var filteredTree = result.AssertRight();
         filteredTree.AssertDeepEqualTo(ListOf(publicationTree));
-    }
-
-    [Fact]
-    public async Task GetPublicationTree_FindStatistics_NonSupersededPublicationWithLiveRelease_Included()
-    {
-        var publicationTree = new PublicationTreeThemeViewModel
-        {
-            Title = "Theme A",
-            Topics = new List<PublicationTreeTopicViewModel>
-            {
-                new()
-                {
-                    Title = "Topic A",
-                    Publications = ListOf(new PublicationTreePublicationViewModel
-                    {
-                        Title = "Publication A",
-                        IsSuperseded = false,
-                        HasLiveRelease = true
-                    })
-                }
-            }
-        };
-
-        await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.FindStatistics);
-    }
-
-    [Fact]
-    public async Task GetPublicationTree_FindStatistics_NonSupersededPublicationWithLegacyRelease_Included()
-    {
-        var publicationTree = new PublicationTreeThemeViewModel
-        {
-            Title = "Theme A",
-            Topics = new List<PublicationTreeTopicViewModel>
-            {
-                new()
-                {
-                    Title = "Topic A",
-                    Publications = ListOf(new PublicationTreePublicationViewModel
-                    {
-                        Title = "Publication A",
-                        IsSuperseded = false,
-                        Type = PublicationType.Legacy
-                    })
-                }
-            }
-        };
-
-        await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.FindStatistics);
-    }
-
-    [Fact]
-    public async Task GetPublicationTree_FindStatistics_SupersededPublicationWithLiveRelease_Excluded()
-    {
-        var publicationTree = new PublicationTreeThemeViewModel
-        {
-            Title = "Theme A",
-            Topics = new List<PublicationTreeTopicViewModel>
-            {
-                new()
-                {
-                    Title = "Topic A",
-                    Publications = ListOf(new PublicationTreePublicationViewModel
-                    {
-                        Title = "Publication A",
-                        IsSuperseded = true,
-                        HasLiveRelease = true
-                    })
-                }
-            }
-        };
-
-        await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.FindStatistics);
-    }
-
-    [Fact]
-    public async Task GetPublicationTree_FindStatistics_SupersededPublicationWithLegacyRelease_Excluded()
-    {
-        var publicationTree = new PublicationTreeThemeViewModel
-        {
-            Title = "Theme A",
-            Topics = new List<PublicationTreeTopicViewModel>
-            {
-                new()
-                {
-                    Title = "Topic A",
-                    Publications = ListOf(new PublicationTreePublicationViewModel
-                    {
-                        Title = "Publication A",
-                        IsSuperseded = true,
-                        Type = PublicationType.Legacy
-                    })
-                }
-            }
-        };
-
-        await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.FindStatistics);
     }
 
     [Fact]
@@ -344,12 +246,6 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetPublicationTree_DataCatalogue_NoLiveReleaseHasData_Excluded()
     {
-        var publication = new PublicationTreePublicationViewModel
-        {
-            Title = "Publication A",
-            AnyLiveReleaseHasData = false
-        };
-
         var publicationTree = new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
@@ -358,7 +254,11 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
                 new()
                 {
                     Title = "Topic A",
-                    Publications = ListOf(publication)
+                    Publications = ListOf(new PublicationTreePublicationViewModel
+                    {
+                        Title = "Publication A",
+                        AnyLiveReleaseHasData = false
+                    })
                 }
             }
         };
@@ -464,12 +364,6 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task GetPublicationTree_FastTrack_NoLiveReleaseHasData_Excluded()
     {
-        var publication = new PublicationTreePublicationViewModel
-        {
-            Title = "Publication A",
-            AnyLiveReleaseHasData = false
-        };
-
         var publicationTree = new PublicationTreeThemeViewModel
         {
             Title = "Theme A",
@@ -478,7 +372,11 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
                 new()
                 {
                     Title = "Topic A",
-                    Publications = ListOf(publication)
+                    Publications = ListOf(new PublicationTreePublicationViewModel
+                    {
+                        Title = "Publication A",
+                        AnyLiveReleaseHasData = false
+                    })
                 }
             }
         };

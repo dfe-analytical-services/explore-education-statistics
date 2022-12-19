@@ -195,11 +195,7 @@ export interface Theme {
 }
 
 interface PublicationTreeOptions {
-  publicationFilter?:
-    | 'FindStatistics'
-    | 'DataTables'
-    | 'DataCatalogue'
-    | 'FastTrack';
+  publicationFilter?: 'DataTables' | 'DataCatalogue' | 'FastTrack';
 }
 
 export default {
