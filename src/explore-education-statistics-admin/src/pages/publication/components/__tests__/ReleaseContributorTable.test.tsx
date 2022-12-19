@@ -1,4 +1,4 @@
-import ReleaseContributorsPermissions from '@admin/pages/publication/components/ReleaseContributorTable';
+import ReleaseContributorsPermissions from '@admin/pages/publication/components/ReleaseUserTable';
 import {
   ContributorInvite,
   ContributorViewModel,

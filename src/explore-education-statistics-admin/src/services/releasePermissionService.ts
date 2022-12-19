@@ -1,27 +1,27 @@
 import client from '@admin/services/utils/service';
 
-export interface ContributorViewModel {
+export interface UserReleaseRole {
   userId: string;
   userDisplayName: string;
   userEmail: string;
+  role: 'Contributor' | 'Approver';
 }
 
-export interface ContributorInvite {
+export interface UserReleaseInvite {
   email: string;
+  role: 'Contributor' | 'Approver';
 }
 
 const releasePermissionService = {
-  listReleaseContributors(releaseId: string): Promise<ContributorViewModel[]> {
-    return client.get(`/releases/${releaseId}/contributors`);
+  listRoles(releaseId: string): Promise<UserReleaseRole[]> {
+    return client.get(`/releases/${releaseId}/roles`);
   },
-  listReleaseContributorInvites(
-    releaseId: string,
-  ): Promise<ContributorInvite[]> {
-    return client.get(`/releases/${releaseId}/contributor-invites`);
+  listInvites(releaseId: string): Promise<UserReleaseInvite[]> {
+    return client.get(`/releases/${releaseId}/invites`);
   },
   listPublicationContributors(
     publicationId: string,
-  ): Promise<ContributorViewModel[]> {
+  ): Promise<UserReleaseRole[]> {
     return client.get(`/publications/${publicationId}/contributors`);
   },
   updateReleaseContributors(

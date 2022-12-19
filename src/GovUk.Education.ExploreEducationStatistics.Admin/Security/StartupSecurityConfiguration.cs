@@ -72,6 +72,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanUpdateSpecificReleaseRole.ToString(), policy =>
                     policy.Requirements.Add(new UpdateReleaseRoleRequirement()));
 
+                // does this user have permission to view the team access for releases of a specific Publication?
+                options.AddPolicy(SecurityPolicies.CanViewReleaseTeamAccess.ToString(), policy =>
+                    policy.Requirements.Add(new ViewReleaseTeamAccessRequirement()));
+
                 /**
                  * Release management
                  */
@@ -239,6 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, CreateReleaseForSpecificPublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CreateMethodologyForSpecificPublicationAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ManageExternalMethodologyForSpecificPublicationAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, ViewReleaseTeamAccessAuthorizationHandler>();
 
             /**
              * Release management

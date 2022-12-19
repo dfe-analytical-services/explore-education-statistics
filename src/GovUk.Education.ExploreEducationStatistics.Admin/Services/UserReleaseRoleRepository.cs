@@ -119,9 +119,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return UserHasRoleOnResource(email, releaseId, role);
         }
 
-        public Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseId, ReleaseRole role)
+        public Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseId, params ReleaseRole[] rolesToInclude)
         {
-            return ListResourceRoles(releaseId, role);
+            return ListResourceRoles(releaseId, rolesToInclude);
         }
 
         public async Task<bool> UserHasAnyOfRolesOnLatestRelease(Guid userId,

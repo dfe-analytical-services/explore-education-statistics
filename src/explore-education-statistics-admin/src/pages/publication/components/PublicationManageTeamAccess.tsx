@@ -1,5 +1,5 @@
 import ButtonLink from '@admin/components/ButtonLink';
-import ReleaseContributorTable from '@admin/pages/publication/components/ReleaseContributorTable';
+import UserReleaseRoleTable from '@admin/pages/publication/components/ReleaseUserTable';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import {
   PublicationTeamRouteParams,
@@ -7,8 +7,8 @@ import {
 } from '@admin/routes/publicationRoutes';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import releasePermissionService, {
-  ContributorViewModel,
-  ContributorInvite,
+  UserReleaseRole,
+  UserReleaseInvite,
 } from '@admin/services/releasePermissionService';
 import userService from '@admin/services/userService';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
@@ -27,16 +27,25 @@ const PublicationManageTeamAccess = ({ publicationId, release }: Props) => {
   const {
     value,
     isLoading,
-    setState: setContributorsAndInvites,
+    setState: setUsersAndInvites,
   } = useAsyncHandledRetry<{
-    contributors: ContributorViewModel[];
-    invites: ContributorInvite[];
+    approvers: UserReleaseRole[];
+    approverInvites: UserReleaseInvite[];
+    contributors: UserReleaseRole[];
+    contributorInvites: UserReleaseInvite[];
   }>(async () => {
-    const [contributors, invites] = await Promise.all([
-      releasePermissionService.listReleaseContributors(release.id),
-      releasePermissionService.listReleaseContributorInvites(release.id),
+    const [roles, invites] = await Promise.all([
+      releasePermissionService.listRoles(release.id),
+      releasePermissionService.listInvites(release.id),
     ]);
-    return { contributors, invites };
+    return {
+      approvers: roles.filter(role => role.role === 'Approver'),
+      approverInvites: invites.filter(invite => invite.role === 'Approver'),
+      contributors: roles.filter(role => role.role === 'Contributor'),
+      contributorInvites: invites.filter(
+        invite => invite.role === 'Contributor',
+      ),
+    };
   }, [release]);
 
   const handleUserRemove = async (userId: string) => {
@@ -44,20 +53,24 @@ const PublicationManageTeamAccess = ({ publicationId, release }: Props) => {
       publicationId,
       userId,
     );
-    setContributorsAndInvites({
+    setUsersAndInvites({
       value: {
         contributors: contributors.filter(c => c.userId !== userId),
-        invites,
+        contributorInvites,
+        approvers,
+        approverInvites,
       },
     });
   };
 
   const handleUserInvitesRemove = async (email: string) => {
     await userService.removeContributorReleaseInvites(email, publicationId);
-    setContributorsAndInvites({
+    setUsersAndInvites({
       value: {
         contributors,
-        invites: invites.filter(i => i.email !== email),
+        contributorInvites: contributorInvites.filter(i => i.email !== email),
+        approvers,
+        approverInvites,
       },
     });
   };
@@ -66,7 +79,12 @@ const PublicationManageTeamAccess = ({ publicationId, release }: Props) => {
     return <LoadingSpinner />;
   }
 
-  const { contributors = [], invites = [] } = value ?? {};
+  const {
+    approvers = [],
+    approverInvites = [],
+    contributors = [],
+    contributorInvites = [],
+  } = value ?? {};
 
   return (
     <>
@@ -80,15 +98,25 @@ const PublicationManageTeamAccess = ({ publicationId, release }: Props) => {
         </Tag>
       </h3>
 
-      {contributors.length === 0 && invites.length === 0 ? (
+      <h4>Release approvers</h4>
+      {approvers.length === 0 && approverInvites.length === 0 ? (
+        <WarningMessage>
+          There are no approvers or pending approver invites for this release.
+        </WarningMessage>
+      ) : (
+        <UserReleaseRoleTable users={approvers} invites={approverInvites} />
+      )}
+
+      <h4>Release contributors</h4>
+      {contributors.length === 0 && contributorInvites.length === 0 ? (
         <WarningMessage>
           There are no contributors or pending contributor invites for this
           release.
         </WarningMessage>
       ) : (
-        <ReleaseContributorTable
-          contributors={contributors}
-          invites={invites}
+        <UserReleaseRoleTable
+          users={contributors}
+          invites={contributorInvites}
           onUserRemove={handleUserRemove}
           onUserInvitesRemove={handleUserInvitesRemove}
         />

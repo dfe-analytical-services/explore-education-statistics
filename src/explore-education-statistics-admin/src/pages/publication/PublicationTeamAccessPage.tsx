@@ -6,7 +6,10 @@ import {
   publicationTeamAccessRoute,
   PublicationTeamRouteParams,
 } from '@admin/routes/publicationRoutes';
-import publicationService from '@admin/services/publicationService';
+import publicationService, {
+  PublicationPermissions,
+  PublicationWithPermissions,
+} from '@admin/services/publicationService';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import { FormSelect } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -15,15 +18,13 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React, { useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { generatePath, useHistory } from 'react-router-dom';
+import { UserPublicationRole } from '@admin/services/userService';
 import orderBy from 'lodash/orderBy';
 
 interface Model {
   releases: ReleaseSummary[];
-  publicationRoles: {
-    id: string;
-    userName: string;
-    role: string;
-  }[];
+  publicationRoles: UserPublicationRole[];
+  permissions: PublicationPermissions;
 }
 
 const PublicationTeamAccessPage = ({
@@ -40,7 +41,10 @@ const PublicationTeamAccessPage = ({
     const { results: releases } = await publicationService.listReleases(
       publicationId,
     );
-    const publicationRoles = await publicationService.getRoles(publicationId);
+    const publicationRoles = await publicationService.listRoles(publicationId);
+    const { permissions } = await publicationService.getPublication<
+      PublicationWithPermissions
+    >(publicationId, true);
 
     if (!releaseId && releases.length) {
       setCurrentReleaseId(releases[0].id);
@@ -58,11 +62,8 @@ const PublicationTeamAccessPage = ({
 
     return {
       releases,
-      publicationRoles: publicationRoles.map(role => ({
-        id: role.id,
-        userName: role.userName,
-        role: role.role,
-      })),
+      publicationRoles,
+      permissions,
     };
   });
 
@@ -121,67 +122,71 @@ const PublicationTeamAccessPage = ({
         </>
       )}
 
-      {model?.releases.length ? (
+      {model.permissions.canViewReleaseTeamAccess && (
         <>
-          <div className="govuk-grid-row govuk-!-margin-bottom-8">
-            <div className="govuk-grid-column-two-thirds">
-              <h3>Update release access</h3>
+          {model?.releases.length ? (
+            <>
+              <div className="govuk-grid-row govuk-!-margin-bottom-8">
+                <div className="govuk-grid-column-two-thirds">
+                  <h3>Update release access</h3>
 
-              <FormSelect
-                id="currentRelease"
-                name="release"
-                label="Select release"
-                options={model?.releases.map(release => ({
-                  label: release.title,
-                  value: release.id,
-                }))}
-                order={[]}
-                value={currentReleaseId}
-                onChange={e => {
-                  setCurrentReleaseId(e.target.value);
-                  history.replace(
-                    generatePath<PublicationTeamRouteParams>(
-                      publicationTeamAccessRoute.path,
-                      {
-                        publicationId,
-                        releaseId: e.target.value,
-                      },
-                    ),
-                  );
-                }}
-              />
-            </div>
-            {currentReleaseId && (
-              <div className="govuk-grid-column-one-third dfe-align--right">
-                <h3 className="govuk-!-font-size-19">Other options</h3>
-                <Link
-                  to={generatePath<PublicationTeamRouteParams>(
-                    publicationInviteUsersPageRoute.path,
-                    {
-                      publicationId,
-                      releaseId: currentReleaseId,
-                    },
-                  )}
-                >
-                  Invite new users
-                </Link>
+                  <FormSelect
+                    id="currentRelease"
+                    name="release"
+                    label="Select release"
+                    options={model?.releases.map(release => ({
+                      label: release.title,
+                      value: release.id,
+                    }))}
+                    order={[]}
+                    value={currentReleaseId}
+                    onChange={e => {
+                      setCurrentReleaseId(e.target.value);
+                      history.replace(
+                        generatePath<PublicationTeamRouteParams>(
+                          publicationTeamAccessRoute.path,
+                          {
+                            publicationId,
+                            releaseId: e.target.value,
+                          },
+                        ),
+                      );
+                    }}
+                  />
+                </div>
+                {currentReleaseId && (
+                  <div className="govuk-grid-column-one-third dfe-align--right">
+                    <h3 className="govuk-!-font-size-19">Other options</h3>
+                    <Link
+                      to={generatePath<PublicationTeamRouteParams>(
+                        publicationInviteUsersPageRoute.path,
+                        {
+                          publicationId,
+                          releaseId: currentReleaseId,
+                        },
+                      )}
+                    >
+                      Invite new users
+                    </Link>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          {currentRelease && (
-            <PublicationManageTeamAccess
-              publicationId={publicationId}
-              release={currentRelease}
-            />
+              {currentRelease && (
+                <PublicationManageTeamAccess
+                  publicationId={publicationId}
+                  release={currentRelease}
+                />
+              )}
+            </>
+          ) : (
+            <>
+              <h3>Update release access</h3>
+              <WarningMessage>
+                Create a release for this publication to manage release access.
+              </WarningMessage>
+            </>
           )}
-        </>
-      ) : (
-        <>
-          <h3>Update release access</h3>
-          <WarningMessage>
-            Create a release for this publication to manage release access.
-          </WarningMessage>
         </>
       )}
     </>

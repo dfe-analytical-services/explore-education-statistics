@@ -24,26 +24,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releasePermissionService = releasePermissionService;
         }
 
-        [HttpGet("releases/{releaseId}/contributors")]
-        public async Task<ActionResult<List<ContributorViewModel>>> ListReleaseContributors(
+        [HttpGet("releases/{releaseId}/roles")]
+        public async Task<ActionResult<List<UserReleaseRoleSummaryViewModel>>> ListReleaseRoles(
             Guid releaseId)
         {
             return await _releasePermissionService
-                .ListReleaseContributors(releaseId)
+                .ListReleaseRoles(releaseId, ReleaseRole.Contributor, ReleaseRole.Approver)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("releases/{releaseId}/contributor-invites")]
-        public async Task<ActionResult<List<ContributorInviteViewModel>>> ListReleaseContributorInvites(
+        [HttpGet("releases/{releaseId}/invites")]
+        public async Task<ActionResult<List<UserReleaseInviteViewModel>>> ListReleaseRoleInvites(
             Guid releaseId)
         {
             return await _releasePermissionService
-                .ListReleaseContributorInvites(releaseId)
+                .ListReleaseInvites(releaseId, ReleaseRole.Contributor, ReleaseRole.Approver)
                 .HandleFailuresOrOk();
         }
 
         [HttpGet("publications/{publicationId}/contributors")]
-        public async Task<ActionResult<List<ContributorViewModel>>> ListPublicationContributors(
+        public async Task<ActionResult<List<UserReleaseRoleSummaryViewModel>>> ListPublicationContributors(
             Guid publicationId)
         {
             return await _releasePermissionService

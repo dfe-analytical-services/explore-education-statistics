@@ -39,63 +39,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
         }
 
-        public async Task<Either<ActionResult, List<ContributorViewModel>>>
-            ListReleaseContributors(Guid releaseId)
+        public async Task<Either<ActionResult, List<UserReleaseRoleSummaryViewModel>>>
+            ListReleaseRoles(Guid releaseId, params ReleaseRole[] rolesToInclude)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId,
                     query =>
-                        query.Include(r => r.Publication)
-                            .ThenInclude(p => p.Releases))
-                .OnSuccessDo(release => _userService
-                    .CheckCanUpdateReleaseRole(release.Publication, Contributor))
-                .OnSuccess(async release =>
+                        query.Include(r => r.Publication))
+                .OnSuccessDo(release => _userService.CheckCanViewReleaseTeamAccess(release.Publication))
+                .OnSuccess(async _ =>
                 {
-                    var contributors = await _userReleaseRoleRepository
-                        .ListUserReleaseRoles(releaseId, Contributor);
+                    var users = await _userReleaseRoleRepository
+                        .ListUserReleaseRoles(releaseId, rolesToInclude);
 
-                   return contributors
-                        .Select(userReleaseRole => new ContributorViewModel
+                   return users
+                        .Select(userReleaseRole => new UserReleaseRoleSummaryViewModel
                         {
                             UserId = userReleaseRole.UserId,
                             UserDisplayName = userReleaseRole.User.DisplayName,
                             UserEmail = userReleaseRole.User.Email,
+                            Role = userReleaseRole.Role,
                         })
                         .OrderBy(model => model.UserDisplayName)
                         .ToList();
                 });
         }
 
-        public async Task<Either<ActionResult, List<ContributorInviteViewModel>>>
-            ListReleaseContributorInvites(Guid releaseId)
+        public async Task<Either<ActionResult, List<UserReleaseInviteViewModel>>>
+            ListReleaseInvites(Guid releaseId, params ReleaseRole[] rolesToInclude)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId,
                     query =>
-                        query.Include(r => r.Publication)
-                            .ThenInclude(p => p.Releases))
-                .OnSuccessDo(release => _userService
-                    .CheckCanUpdateReleaseRole(release.Publication, Contributor))
-                .OnSuccess(async release =>
+                        query.Include(r => r.Publication))
+                .OnSuccessDo(release => _userService.CheckCanViewReleaseTeamAccess(release.Publication))
+                .OnSuccess(async _ =>
                 {
-                    var invites = await _contentDbContext.UserReleaseInvites
+                    var invites = await _contentDbContext
+                        .UserReleaseInvites
                         .AsQueryable()
                         .Where(i =>
                             i.ReleaseId == releaseId
-                            && i.Role == Contributor)
+                            && rolesToInclude.Contains(i.Role))
                         .ToListAsync();
 
                     return invites
-                        .Select(i => new ContributorInviteViewModel
+                        .Select(i => new UserReleaseInviteViewModel
                         {
                             Email = i.Email,
+                            Role = i.Role
                         })
                         .OrderBy(model => model.Email)
                         .ToList();
                 });
         }
 
-        public async Task<Either<ActionResult, List<ContributorViewModel>>>
+        public async Task<Either<ActionResult, List<UserReleaseRoleSummaryViewModel>>>
             ListPublicationContributors(Guid publicationId)
         {
             return await _persistenceHelper
@@ -124,11 +123,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     return users
                         .Select(user =>
-                            new ContributorViewModel
+                            new UserReleaseRoleSummaryViewModel
                             {
                                 UserId = user.Id,
                                 UserDisplayName = user.DisplayName,
                                 UserEmail = user.Email,
+                                Role = Contributor
                             }
                         )
                         .OrderBy(model => model.UserDisplayName)

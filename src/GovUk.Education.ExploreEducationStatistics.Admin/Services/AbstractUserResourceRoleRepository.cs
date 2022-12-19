@@ -138,12 +138,12 @@ public abstract class AbstractUserResourceRoleRepository<TResourceRole, TResourc
                 r.Role.Equals(role));
     }
 
-    protected async Task<List<TResourceRole>> ListResourceRoles(Guid resourceId, TRoleEnum role)
+    protected async Task<List<TResourceRole>> ListResourceRoles(Guid resourceId, params TRoleEnum[] rolesToInclude)
     {
         return await 
             GetResourceRolesQueryByResourceId(resourceId)
             .Include(urr => urr.User)
-            .Where(urr => urr.Role.Equals(role))
+            .Where(urr => rolesToInclude.Contains(urr.Role))
             .ToListAsync();
     }
 
