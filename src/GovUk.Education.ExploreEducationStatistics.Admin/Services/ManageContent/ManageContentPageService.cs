@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     releaseViewModel.DownloadFiles = files.ToList();
                     releaseViewModel.Publication.Methodologies =
                         _mapper.Map<List<IdTitleViewModel>>(methodologies);
-                    
+
                     // TODO EES-3319 - remove backwards-compatibility for Map Configuration without its
                     // own Boundary Level selection
                     releaseViewModel.Content.ForEach(c => c.Content.ForEach(contentBlock =>
@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                             {
                                 if (chart is MapChart { BoundaryLevel: null } mapChart)
                                 {
-                                    mapChart.BoundaryLevel = dataBlock.Query.BoundaryLevel;       
+                                    mapChart.BoundaryLevel = dataBlock.Query.BoundaryLevel;
                                 }
                             });
                         }
@@ -119,6 +119,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .ThenInclude(join => join.ContentSection)
                 .ThenInclude(section => section.Content)
                 .ThenInclude(content => content.LockedBy)
+                .Include(r => r.Content)
+                .ThenInclude(join => join.ContentSection)
+                .ThenInclude(section => section.Content)
+                .ThenInclude(contentBlock => (contentBlock as EmbedBlockLink)!.EmbedBlock)
                 .Include(r => r.Updates);
         }
     }

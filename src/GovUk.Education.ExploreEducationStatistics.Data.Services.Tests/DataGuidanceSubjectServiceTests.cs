@@ -161,7 +161,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Subject = subject1,
                 Footnote = new Footnote
                 {
-                    Content = "Subject 1 Footnote 1"
+                    Content = "Subject 1 Footnote 1",
+                    Order = 0
                 }
             };
             var subject1Footnote2 = new FilterFootnote
@@ -169,7 +170,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Filter = subject1Filter,
                 Footnote = new Footnote
                 {
-                    Content = "Subject 1 Footnote 2"
+                    Content = "Subject 1 Footnote 2",
+                    Order = 1
                 }
             };
             var subject1Footnote3 = new FilterGroupFootnote
@@ -180,7 +182,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 },
                 Footnote = new Footnote
                 {
-                    Content = "Subject 1 Footnote 3"
+                    Content = "Subject 1 Footnote 3",
+                    Order = 2
                 }
             };
 
@@ -195,7 +198,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 },
                 Footnote = new Footnote
                 {
-                    Content = "Subject 2 Footnote 1"
+                    Content = "Subject 2 Footnote 1",
+                    Order = 0
                 }
             };
             var subject2Footnote2 = new IndicatorFootnote
@@ -203,7 +207,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Indicator = subject2IndicatorGroup.Indicators[0],
                 Footnote = new Footnote
                 {
-                    Content = "Subject 2 Footnote 2"
+                    Content = "Subject 2 Footnote 2",
+                    Order = 1
                 }
             };
 

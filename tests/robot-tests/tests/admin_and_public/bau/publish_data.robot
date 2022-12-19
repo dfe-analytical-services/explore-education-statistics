@@ -252,20 +252,20 @@ Validate data guidance variables and descriptions
     user checks table column heading contains    1    1    Variable name    ${subject_1_variables}
     user checks table column heading contains    1    2    Variable description    ${subject_1_variables}
 
-    user checks results table cell contains    1    1    colour    ${subject_1_variables}
-    user checks results table cell contains    1    2    Colour    ${subject_1_variables}
+    user checks table cell contains    1    1    colour    ${subject_1_variables}
+    user checks table cell contains    1    2    Colour    ${subject_1_variables}
 
-    user checks results table cell contains    2    1    enrolments    ${subject_1_variables}
-    user checks results table cell contains    2    2    Number of pupil enrolments    ${subject_1_variables}
+    user checks table cell contains    2    1    enrolments    ${subject_1_variables}
+    user checks table cell contains    2    2    Number of pupil enrolments    ${subject_1_variables}
 
-    user checks results table cell contains    4    1    enrolments_pa_10_exact_percent    ${subject_1_variables}
-    user checks results table cell contains    4    2    Percentage of persistent absentees    ${subject_1_variables}
+    user checks table cell contains    4    1    enrolments_pa_10_exact_percent    ${subject_1_variables}
+    user checks table cell contains    4    2    Percentage of persistent absentees    ${subject_1_variables}
 
-    user checks results table cell contains    8    1    sess_overall_percent    ${subject_1_variables}
-    user checks results table cell contains    8    2    Overall absence rate    ${subject_1_variables}
+    user checks table cell contains    8    1    sess_overall_percent    ${subject_1_variables}
+    user checks table cell contains    8    2    Overall absence rate    ${subject_1_variables}
 
-    user checks results table cell contains    9    1    sess_unauthorised_percent    ${subject_1_variables}
-    user checks results table cell contains    9    2    Unauthorised absence rate    ${subject_1_variables}
+    user checks table cell contains    9    1    sess_unauthorised_percent    ${subject_1_variables}
+    user checks table cell contains    9    2    Unauthorised absence rate    ${subject_1_variables}
 
     ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
     ...    id:dataGuidance-dataFiles
@@ -277,11 +277,11 @@ Validate data guidance variables and descriptions
     user checks table column heading contains    1    1    Variable name    ${subject_2_variables}
     user checks table column heading contains    1    2    Variable description    ${subject_2_variables}
 
-    user checks results table cell contains    1    1    admission_numbers    ${subject_2_variables}
-    user checks results table cell contains    1    2    Admission Numbers    ${subject_2_variables}
+    user checks table cell contains    1    1    admission_numbers    ${subject_2_variables}
+    user checks table cell contains    1    2    Admission Numbers    ${subject_2_variables}
 
-    user checks results table cell contains    2    1    some_filter    ${subject_2_variables}
-    user checks results table cell contains    2    2    Random Filter    ${subject_2_variables}
+    user checks table cell contains    2    1    some_filter    ${subject_2_variables}
+    user checks table cell contains    2    2    Random Filter    ${subject_2_variables}
 
 Validate data guidance footnotes
     ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
@@ -351,13 +351,13 @@ Create table
     user clicks button    Create table
 
 Check created table has footnotes
-    user checks list has x items    testid:footnotes    3
+    user checks list has x items    testid:footnotes    2
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR}
-    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
-    user checks page contains button    Show 1 more item
-    user checks list item is visually hidden    testid:footnotes    3
+    user clicks button    Show 1 more footnote
+    user checks list has x items    testid:footnotes    3
+    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
 Save data block as a featured table
     user enters text into element    id:dataBlockDetailsForm-name    UI Test data block name
@@ -394,13 +394,13 @@ Check footnote was updated on data block
     user clicks link    Edit block    css:tbody > tr:first-child
     user waits until table is visible
 
-    user checks list has x items    testid:footnotes    3
+    user checks list has x items    testid:footnotes    2
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
-    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
-    user checks page contains button    Show 1 more item
-    user checks list item is visually hidden    testid:footnotes    3
+    user clicks button    Show 1 more footnote
+    user checks list has x items    testid:footnotes    3
+    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
 Add public prerelease access list for release
     user clicks link    Pre-release access
@@ -506,13 +506,13 @@ Validate table
     user checks table cell in offset row contains    ${row}    0    5    3,962
 
 Validate table has footnotes
-    user checks list has x items    testid:footnotes    3
+    user checks list has x items    testid:footnotes    2
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
-    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
-    user checks page contains button    Show 1 more item
-    user checks list item is visually hidden    testid:footnotes    3
+    user clicks button    Show 1 more footnote
+    user checks list has x items    testid:footnotes    3
+    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
 Select table featured table from subjects step
     user clicks element    testid:wizardStep-2-goToButton
@@ -581,13 +581,13 @@ Validate table rows for featured table
     user checks table cell in offset row contains    ${row}    4    1    1,959
 
 Validate featured table has footnotes
-    user checks list has x items    testid:footnotes    3
+    user checks list has x items    testid:footnotes    2
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
-    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
-    user checks page contains button    Show 1 more item
-    user checks list item is visually hidden    testid:footnotes    3
+    user clicks button    Show 1 more footnote
+    user checks list has x items    testid:footnotes    3
+    user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
 Go to release page
     user opens accordion section    Related information
@@ -638,20 +638,20 @@ Validate data guidance document variables
     user checks table column heading contains    1    1    Variable name    ${subject_1_variables}
     user checks table column heading contains    1    2    Variable description    ${subject_1_variables}
 
-    user checks results table cell contains    1    1    colour    ${subject_1_variables}
-    user checks results table cell contains    1    2    Colour    ${subject_1_variables}
+    user checks table cell contains    1    1    colour    ${subject_1_variables}
+    user checks table cell contains    1    2    Colour    ${subject_1_variables}
 
-    user checks results table cell contains    2    1    enrolments    ${subject_1_variables}
-    user checks results table cell contains    2    2    Number of pupil enrolments    ${subject_1_variables}
+    user checks table cell contains    2    1    enrolments    ${subject_1_variables}
+    user checks table cell contains    2    2    Number of pupil enrolments    ${subject_1_variables}
 
-    user checks results table cell contains    4    1    enrolments_pa_10_exact_percent    ${subject_1_variables}
-    user checks results table cell contains    4    2    Percentage of persistent absentees    ${subject_1_variables}
+    user checks table cell contains    4    1    enrolments_pa_10_exact_percent    ${subject_1_variables}
+    user checks table cell contains    4    2    Percentage of persistent absentees    ${subject_1_variables}
 
-    user checks results table cell contains    8    1    sess_overall_percent    ${subject_1_variables}
-    user checks results table cell contains    8    2    Overall absence rate    ${subject_1_variables}
+    user checks table cell contains    8    1    sess_overall_percent    ${subject_1_variables}
+    user checks table cell contains    8    2    Overall absence rate    ${subject_1_variables}
 
-    user checks results table cell contains    9    1    sess_unauthorised_percent    ${subject_1_variables}
-    user checks results table cell contains    9    2    Unauthorised absence rate    ${subject_1_variables}
+    user checks table cell contains    9    1    sess_unauthorised_percent    ${subject_1_variables}
+    user checks table cell contains    9    2    Unauthorised absence rate    ${subject_1_variables}
 
     ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
     user opens details dropdown    Variable names and descriptions    ${subject_2_content}
@@ -662,11 +662,11 @@ Validate data guidance document variables
     user checks table column heading contains    1    1    Variable name    ${subject_2_variables}
     user checks table column heading contains    1    2    Variable description    ${subject_2_variables}
 
-    user checks results table cell contains    1    1    admission_numbers    ${subject_2_variables}
-    user checks results table cell contains    1    2    Admission Numbers    ${subject_2_variables}
+    user checks table cell contains    1    1    admission_numbers    ${subject_2_variables}
+    user checks table cell contains    1    2    Admission Numbers    ${subject_2_variables}
 
-    user checks results table cell contains    2    1    some_filter    ${subject_2_variables}
-    user checks results table cell contains    2    2    Random Filter    ${subject_2_variables}
+    user checks table cell contains    2    1    some_filter    ${subject_2_variables}
+    user checks table cell contains    2    2    Random Filter    ${subject_2_variables}
 
 Validate data guidance document footnotes
     ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}

@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.Serialization;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
@@ -20,6 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     [KnownType(typeof(MarkDownBlock))]
     [KnownType(typeof(DataBlock))]
     [KnownType(typeof(HtmlBlock))]
+    [KnownType(typeof(EmbedBlockLink))]
     public abstract class ContentBlock : ICreatedUpdatedTimestamps<DateTime?, DateTime?>
     {
         /// <summary>
@@ -97,6 +99,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         }
 
         public string Body { get; set; }
+    }
+
+    public class EmbedBlockLink : ContentBlock
+    {
+        public EmbedBlockLink()
+        {
+        }
+
+        public Guid EmbedBlockId { get; set; }
+
+        [JsonIgnore, IgnoreMap]
+        public EmbedBlock EmbedBlock { get; set; }
     }
 
     public class DataBlock : ContentBlock

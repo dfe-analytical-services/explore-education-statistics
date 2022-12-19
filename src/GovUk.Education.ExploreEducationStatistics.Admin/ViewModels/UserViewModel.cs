@@ -30,6 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         
         [JsonConverter(typeof(StringEnumConverter))]
         public PublicationRole Role { get; set; }
+        
+        public string UserName { get; set; } = null!;
     }
     
     public class UserReleaseRoleViewModel

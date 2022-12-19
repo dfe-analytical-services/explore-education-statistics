@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
@@ -110,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         {
             try
             {
-                await _fileImportService.ImportObservations(message, _dbContextSupplier.CreateStatisticsDbContext());
+                await _fileImportService.ImportObservations(message, _dbContextSupplier.CreateDbContext<StatisticsDbContext>());
             }
             catch (Exception e)
             {

@@ -1,134 +1,38 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
+
+public class ThemeService : IThemeService
 {
-    public class ThemeService : IThemeService
+    private readonly ContentDbContext _contentDbContext;
+
+    public ThemeService(ContentDbContext contentDbContext)
     {
-        private readonly ContentDbContext _contentDbContext;
+        _contentDbContext = contentDbContext;
+    }
 
-        public ThemeService(ContentDbContext contentDbContext)
-        {
-            _contentDbContext = contentDbContext;
-        }
-
-        public async Task<IList<ThemeTree<PublicationTreeNode>>> GetPublicationTree()
-        {
-            var themes = await _contentDbContext.Themes
-                .Include(theme => theme.Topics)
-                .ThenInclude(topic => topic.Publications)
-                .ThenInclude(publication => publication.Releases)
-                .ToListAsync();
-
-            return await themes
-                .ToAsyncEnumerable()
-                .SelectAwait(async theme => await BuildThemeTree(theme))
-                .Where(theme => theme.Topics.Any())
-                .OrderBy(theme => theme.Title)
-                .ToListAsync();
-        }
-
-        private async Task<ThemeTree<PublicationTreeNode>> BuildThemeTree(Theme theme)
-        {
-            var topics = await theme.Topics
-                .ToAsyncEnumerable()
-                .SelectAwait(async topic => await BuildTopicTree(topic))
-                .Where(topic => topic.Publications.Any())
-                .OrderBy(topic => topic.Title)
-                .ToListAsync();
-
-            return new ThemeTree<PublicationTreeNode>
-            {
-                Id = theme.Id,
-                Title = theme.Title,
-                Summary = theme.Summary,
-                Topics = topics
-            };
-        }
-
-        private async Task<TopicTree<PublicationTreeNode>> BuildTopicTree(Topic topic)
-        {
-            var publications = await topic.Publications
-                .ToAsyncEnumerable()
-                .Where(publication => publication
-                                          .Releases
-                                          .Any(r => r.IsLatestPublishedVersionOfRelease())
-                                      || publication.LegacyPublicationUrl != null)
-                .SelectAwait(async publication =>
-                    await BuildPublicationNode(publication))
-                .OrderBy(publication => publication.Title)
-                .ToListAsync();
-
-            return new TopicTree<PublicationTreeNode>
-            {
-                Id = topic.Id,
-                Title = topic.Title,
-                Publications = publications
-            };
-        }
-
-        private async Task<PublicationTreeNode> BuildPublicationNode(Publication publication)
-        {
-            var latestRelease = publication.LatestPublishedRelease();
-            var type = GetPublicationType(latestRelease?.Type);
-
-            return new PublicationTreeNode
-            {
-                Id = publication.Id,
-                Title = publication.Title,
-                Slug = publication.Slug,
-                Type = type,
-                LegacyPublicationUrl = type == PublicationType.Legacy
-                    ? publication.LegacyPublicationUrl?.ToString()
-                    : null,
-                IsSuperseded = IsSuperseded(publication),
-                HasLiveRelease = latestRelease != null,
-                LatestReleaseHasData = latestRelease != null && await HasAnyDataFiles(latestRelease),
-                AnyLiveReleaseHasData = await publication.Releases
-                    .ToAsyncEnumerable()
-                    .AnyAwaitAsync(async r => r.IsLatestPublishedVersionOfRelease()
-                                              && await HasAnyDataFiles(r))
-            };
-        }
-
-        private bool IsSuperseded(Publication publication)
-        {
-            return publication.SupersededById != null
-                   && _contentDbContext.Releases
-                       .Include(r => r.Publication)
-                       .Any(r => r.PublicationId == publication.SupersededById
-                                 && r.Published.HasValue && DateTime.UtcNow >= r.Published.Value);
-        }
-
-        private async Task<bool> HasAnyDataFiles(Release release)
-        {
-            return await _contentDbContext.ReleaseFiles
-                .Include(rf => rf.File)
-                .AnyAsync(rf => rf.ReleaseId == release.Id && rf.File.Type == FileType.Data);
-        }
-
-        private static PublicationType GetPublicationType(ReleaseType? releaseType)
-        {
-            return releaseType switch
-            {
-                ReleaseType.AdHocStatistics => PublicationType.AdHoc,
-                ReleaseType.NationalStatistics => PublicationType.NationalAndOfficial,
-                ReleaseType.ExperimentalStatistics => PublicationType.Experimental,
-                ReleaseType.ManagementInformation => PublicationType.ManagementInformation,
-                ReleaseType.OfficialStatistics => PublicationType.NationalAndOfficial,
-                null => PublicationType.Legacy,
-                _ => throw new ArgumentOutOfRangeException()
-            };
-        }
+    public async Task<IList<ThemeViewModel>> ListThemes()
+    {
+        return await _contentDbContext.Themes
+            .Where(theme =>
+                theme.Topics.Any(topic =>
+                    topic.Publications.Any(publication =>
+                        publication.LatestPublishedReleaseId.HasValue &&
+                        (publication.SupersededById == null ||
+                         !publication.SupersededBy!.LatestPublishedReleaseId.HasValue))))
+            .OrderBy(theme => theme.Title)
+            .Select(theme => new ThemeViewModel(
+                theme.Id,
+                theme.Slug,
+                theme.Title,
+                theme.Summary
+            )).ToListAsync();
     }
 }

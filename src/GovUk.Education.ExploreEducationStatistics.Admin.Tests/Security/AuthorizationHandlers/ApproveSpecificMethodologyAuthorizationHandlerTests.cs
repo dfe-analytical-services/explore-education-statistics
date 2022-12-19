@@ -17,6 +17,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 using static Moq.MockBehavior;
+using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -115,8 +116,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             (user, methodologyVersion);
 
                     await handler.HandleAsync(authContext);
-                    VerifyAllMocks(methodologyRepository, methodologyVersionRepository,
-                        userReleaseRoleRepository);
+                    VerifyAllMocks(
+                        methodologyRepository,
+                        methodologyVersionRepository,
+                        userPublicationRoleRepository,
+                        userReleaseRoleRepository,
+                        publicationRepository);
 
                     Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
                 });
@@ -170,8 +175,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             (user, methodologyVersion);
 
                     await handler.HandleAsync(authContext);
-                    VerifyAllMocks(methodologyRepository, methodologyVersionRepository,
-                        userReleaseRoleRepository);
+                    VerifyAllMocks(
+                        methodologyRepository, 
+                        methodologyVersionRepository,
+                        userReleaseRoleRepository,
+                        userPublicationRoleRepository,
+                        publicationRepository);
 
                     Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
                 });
@@ -187,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await ForEachPublicationRoleAsync(async publicationRole =>
                 {
                     // If the user has the Approver role on the owning Publication, they are allowed to approve it.
-                    var expectedToPassByPublicationRole = publicationRole == PublicationRole.ReleaseApprover;
+                    var expectedToPassByPublicationRole = publicationRole == PublicationRole.Approver;
 
                     var (
                         handler,
@@ -224,7 +233,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             MethodologyVersion);
 
                     await handler.HandleAsync(authContext);
-
                     VerifyAllMocks(
                         methodologyRepository,
                         methodologyVersionRepository,
@@ -289,7 +297,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             MethodologyVersion);
 
                     await handler.HandleAsync(authContext);
-
                     VerifyAllMocks(
                         methodologyRepository,
                         methodologyVersionRepository,
@@ -344,7 +351,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         (user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
-                VerifyAllMocks(methodologyRepository, methodologyVersionRepository, userReleaseRoleRepository);
+                VerifyAllMocks(
+                    methodologyRepository,
+                    methodologyVersionRepository,
+                    userPublicationRoleRepository,
+                    userReleaseRoleRepository,
+                    publicationRepository);
 
                 // A user with no role on the owning Publication's latest release is not allowed to approve it
                 Assert.False(authContext.HasSucceeded);
@@ -384,7 +396,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         (user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
-                VerifyAllMocks(methodologyRepository, methodologyVersionRepository, userReleaseRoleRepository);
+                VerifyAllMocks(
+                    methodologyRepository,
+                    methodologyVersionRepository,
+                    userPublicationRoleRepository,
+                    userReleaseRoleRepository,
+                    publicationRepository);
 
                 Assert.False(authContext.HasSucceeded);
             }

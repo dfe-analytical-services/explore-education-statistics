@@ -27,6 +27,7 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -64,8 +65,9 @@ const HorizontalBarBlock = ({
     axes.minor === undefined ||
     data === undefined ||
     meta === undefined
-  )
+  ) {
     return <div>Unable to render chart, chart incorrectly configured</div>;
+  }
 
   const dataSetCategories: DataSetCategory[] = createDataSetCategories(
     axes.major,
@@ -90,6 +92,8 @@ const HorizontalBarBlock = ({
 
   const minorAxisDecimals = getMinorAxisDecimalPlaces(dataSetCategoryConfigs);
   const minorAxisUnit = axes.minor.unit || getUnit(dataSetCategoryConfigs);
+  const chartHasNegativeValues =
+    (parseNumber(minorDomainTicks.domain?.[0]) ?? 0) < 0;
 
   return (
     <ChartContainer
@@ -134,6 +138,7 @@ const HorizontalBarBlock = ({
           <YAxis
             {...majorDomainTicks}
             type="category"
+            axisLine={!chartHasNegativeValues}
             dataKey="name"
             hide={!axes.major.visible}
             unit={axes.major.unit}
@@ -173,7 +178,7 @@ const HorizontalBarBlock = ({
                         dataLabelPosition === 'inside'
                           ? 'insideRight'
                           : 'right',
-                      formatter: value =>
+                      formatter: (value: string | number) =>
                         formatPretty(
                           value.toString(),
                           dataSet.indicator.unit,
@@ -184,6 +189,7 @@ const HorizontalBarBlock = ({
               }
             />
           ))}
+          {chartHasNegativeValues && <ReferenceLine x={0} stroke="#666" />}
 
           {axes.major.referenceLines?.map(referenceLine =>
             createReferenceLine({

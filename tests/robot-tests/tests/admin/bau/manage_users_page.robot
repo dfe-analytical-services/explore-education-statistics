@@ -93,7 +93,7 @@ Check the initial manage user page
     user checks select contains option    name:selectedPublicationId    ${PUBLICATION_2_NAME}
     user checks select contains x options    name:selectedPublicationRole    2
     user checks select contains option    name:selectedPublicationRole    Owner
-    user checks select contains option    name:selectedPublicationRole    ReleaseApprover
+    user checks select contains option    name:selectedPublicationRole    Approver
     user checks table body has x rows    0    testid:publicationAccessTable
 
 Give the user prerelease access to a release
@@ -106,10 +106,10 @@ Give the user prerelease access to a release
     user checks table column heading contains    1    3    Role    testid:releaseAccessTable
     user checks table column heading contains    1    4    Actions    testid:releaseAccessTable
 
-    user checks results table cell contains    1    1    ${PUBLICATION_NAME}    testid:releaseAccessTable
-    user checks results table cell contains    1    2    ${RELEASE_NAME}    testid:releaseAccessTable
-    user checks results table cell contains    1    3    PrereleaseViewer    testid:releaseAccessTable
-    user checks results table cell contains    1    4    Remove    testid:releaseAccessTable
+    user checks table cell contains    1    1    ${PUBLICATION_NAME}    testid:releaseAccessTable
+    user checks table cell contains    1    2    ${RELEASE_NAME}    testid:releaseAccessTable
+    user checks table cell contains    1    3    PrereleaseViewer    testid:releaseAccessTable
+    user checks table cell contains    1    4    Remove    testid:releaseAccessTable
     user checks selected option label    //*[@name="selectedRoleId"]    Prerelease User
 
 Give the user approver access to a release
@@ -118,23 +118,23 @@ Give the user approver access to a release
     user clicks button    Add release access
     user checks table body has x rows    2    testid:releaseAccessTable
 
-    user checks results table cell contains    1    1    ${PUBLICATION_NAME}    testid:releaseAccessTable
-    user checks results table cell contains    1    2    ${RELEASE_NAME}    testid:releaseAccessTable
-    user checks results table cell contains    1    3    PrereleaseViewer    testid:releaseAccessTable
-    user checks results table cell contains    1    4    Remove    testid:releaseAccessTable
-    user checks results table cell contains    2    1    ${PUBLICATION_NAME}    testid:releaseAccessTable
-    user checks results table cell contains    2    2    ${RELEASE_NAME}    testid:releaseAccessTable
-    user checks results table cell contains    2    3    Approver    testid:releaseAccessTable
-    user checks results table cell contains    2    4    Remove    testid:releaseAccessTable
+    user checks table cell contains    1    1    ${PUBLICATION_NAME}    testid:releaseAccessTable
+    user checks table cell contains    1    2    ${RELEASE_NAME}    testid:releaseAccessTable
+    user checks table cell contains    1    3    PrereleaseViewer    testid:releaseAccessTable
+    user checks table cell contains    1    4    Remove    testid:releaseAccessTable
+    user checks table cell contains    2    1    ${PUBLICATION_NAME}    testid:releaseAccessTable
+    user checks table cell contains    2    2    ${RELEASE_NAME}    testid:releaseAccessTable
+    user checks table cell contains    2    3    Approver    testid:releaseAccessTable
+    user checks table cell contains    2    4    Remove    testid:releaseAccessTable
     user checks selected option label    //*[@name="selectedRoleId"]    Analyst
 
 Remove approver access for release from user
     user clicks button in table cell    2    4    Remove    testid:releaseAccessTable
     user checks table body has x rows    1    testid:releaseAccessTable
-    user checks results table cell contains    1    1    ${PUBLICATION_NAME}    testid:releaseAccessTable
-    user checks results table cell contains    1    2    ${RELEASE_NAME}    testid:releaseAccessTable
-    user checks results table cell contains    1    3    PrereleaseViewer    testid:releaseAccessTable
-    user checks results table cell contains    1    4    Remove    testid:releaseAccessTable
+    user checks table cell contains    1    1    ${PUBLICATION_NAME}    testid:releaseAccessTable
+    user checks table cell contains    1    2    ${RELEASE_NAME}    testid:releaseAccessTable
+    user checks table cell contains    1    3    PrereleaseViewer    testid:releaseAccessTable
+    user checks table cell contains    1    4    Remove    testid:releaseAccessTable
     user checks selected option label    //*[@name="selectedRoleId"]    Prerelease User
 
 Remove prerelease access for release from user
@@ -147,21 +147,21 @@ Give the user owner access to some publications
     user chooses select option    name:selectedPublicationRole    Owner
     user clicks button    Add publication access
     user checks table body has x rows    1    testid:publicationAccessTable
-    user checks results table cell contains    1    1    ${PUBLICATION_NAME}    testid:publicationAccessTable
-    user checks results table cell contains    1    2    Owner    testid:publicationAccessTable
-    user checks results table cell contains    1    3    Remove    testid:publicationAccessTable
+    user checks table cell contains    1    1    ${PUBLICATION_NAME}    testid:publicationAccessTable
+    user checks table cell contains    1    2    Owner    testid:publicationAccessTable
+    user checks table cell contains    1    3    Remove    testid:publicationAccessTable
     user checks selected option label    //*[@name="selectedRoleId"]    Analyst
 
     user chooses select option    name:selectedPublicationId    ${PUBLICATION_2_NAME}
     user chooses select option    name:selectedPublicationRole    Owner
     user clicks button    Add publication access
     user checks table body has x rows    2    testid:publicationAccessTable
-    user checks results table cell contains    1    1    ${PUBLICATION_NAME}    testid:publicationAccessTable
-    user checks results table cell contains    1    2    Owner    testid:publicationAccessTable
-    user checks results table cell contains    1    3    Remove    testid:publicationAccessTable
-    user checks results table cell contains    2    1    ${PUBLICATION_2_NAME}    testid:publicationAccessTable
-    user checks results table cell contains    2    2    Owner    testid:publicationAccessTable
-    user checks results table cell contains    2    3    Remove    testid:publicationAccessTable
+    user checks table cell contains    1    1    ${PUBLICATION_NAME}    testid:publicationAccessTable
+    user checks table cell contains    1    2    Owner    testid:publicationAccessTable
+    user checks table cell contains    1    3    Remove    testid:publicationAccessTable
+    user checks table cell contains    2    1    ${PUBLICATION_2_NAME}    testid:publicationAccessTable
+    user checks table cell contains    2    2    Owner    testid:publicationAccessTable
+    user checks table cell contains    2    3    Remove    testid:publicationAccessTable
     user checks selected option label    //*[@name="selectedRoleId"]    Analyst
 
 Give the user the BAU User role
@@ -173,9 +173,9 @@ Give the user the BAU User role
 Remove publication owner access for one of the publications from user while they are BAU
     user clicks button in table cell    1    3    Remove    testid:publicationAccessTable
     user checks table body has x rows    1    testid:publicationAccessTable
-    user checks results table cell contains    1    1    ${PUBLICATION_2_NAME}    testid:publicationAccessTable
-    user checks results table cell contains    1    2    Owner    testid:publicationAccessTable
-    user checks results table cell contains    1    3    Remove    testid:publicationAccessTable
+    user checks table cell contains    1    1    ${PUBLICATION_2_NAME}    testid:publicationAccessTable
+    user checks table cell contains    1    2    Owner    testid:publicationAccessTable
+    user checks table cell contains    1    3    Remove    testid:publicationAccessTable
     user checks selected option label    //*[@name="selectedRoleId"]    BAU User
 
 Give the user approver access to a release while they are BAU
@@ -183,10 +183,10 @@ Give the user approver access to a release while they are BAU
     user chooses select option    name:selectedReleaseRole    Approver
     user clicks button    Add release access
     user checks table body has x rows    1    testid:releaseAccessTable
-    user checks results table cell contains    1    1    ${PUBLICATION_NAME}    testid:releaseAccessTable
-    user checks results table cell contains    1    2    ${RELEASE_NAME}    testid:releaseAccessTable
-    user checks results table cell contains    1    3    Approver    testid:releaseAccessTable
-    user checks results table cell contains    1    4    Remove    testid:releaseAccessTable
+    user checks table cell contains    1    1    ${PUBLICATION_NAME}    testid:releaseAccessTable
+    user checks table cell contains    1    2    ${RELEASE_NAME}    testid:releaseAccessTable
+    user checks table cell contains    1    3    Approver    testid:releaseAccessTable
+    user checks table cell contains    1    4    Remove    testid:releaseAccessTable
     user checks selected option label    //*[@name="selectedRoleId"]    BAU User
 
 Remove approver access for release from user while they are BAU
@@ -204,10 +204,10 @@ Give the user approver access to a release while they are BAU and manually set t
     user chooses select option    name:selectedReleaseRole    Approver
     user clicks button    Add release access
     user checks table body has x rows    1    testid:releaseAccessTable
-    user checks results table cell contains    1    1    ${PUBLICATION_NAME}    testid:releaseAccessTable
-    user checks results table cell contains    1    2    ${RELEASE_NAME}    testid:releaseAccessTable
-    user checks results table cell contains    1    3    Approver    testid:releaseAccessTable
-    user checks results table cell contains    1    4    Remove    testid:releaseAccessTable
+    user checks table cell contains    1    1    ${PUBLICATION_NAME}    testid:releaseAccessTable
+    user checks table cell contains    1    2    ${RELEASE_NAME}    testid:releaseAccessTable
+    user checks table cell contains    1    3    Approver    testid:releaseAccessTable
+    user checks table cell contains    1    4    Remove    testid:releaseAccessTable
     user checks selected option label    //*[@name="selectedRoleId"]    BAU User
 
     user chooses select option    //*[@name="selectedRoleId"]    Analyst

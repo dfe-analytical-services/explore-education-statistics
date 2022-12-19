@@ -4,17 +4,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
-using FootnoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics.FootnoteViewModel;
-using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces.IReleaseService;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
@@ -43,50 +43,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Subjects = new List<SubjectFootnote>()
             };
 
-            var filterRepository = new Mock<IFilterRepository>();
-            var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>();
-            var footnoteService = new Mock<IFootnoteService>();
-            var releaseService = new Mock<IReleaseService>();
-            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>();
-
-            var createFootnoteResult = Task.FromResult(new Either<ActionResult, Footnote>(footnote));
+            var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+            var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+            var footnoteService = new Mock<IFootnoteService>(MockBehavior.Strict);
+            var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
+            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
 
             footnoteService.Setup(s => s.CreateFootnote(
-                ReleaseId,
-                "Sample footnote",
-                It.IsAny<IReadOnlyCollection<Guid>>(),
-                It.IsAny<IReadOnlyCollection<Guid>>(),
-                It.IsAny<IReadOnlyCollection<Guid>>(),
-                It.IsAny<IReadOnlyCollection<Guid>>(),
-                It.IsAny<IReadOnlyCollection<Guid>>())).Returns(createFootnoteResult);
-
-            var updateFootnoteResult = Task.FromResult(new Either<ActionResult, Footnote>(new Footnote
-            {
-                Id = FootnoteId,
-                Content = "Updated sample footnote",
-                Filters = new List<FilterFootnote>(),
-                FilterGroups = new List<FilterGroupFootnote>(),
-                FilterItems = new List<FilterItemFootnote>(),
-                Indicators = new List<IndicatorFootnote>(),
-                Subjects = new List<SubjectFootnote>()
-            }));
+                    ReleaseId,
+                    "Sample footnote",
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>()))
+                .ReturnsAsync(footnote);
 
             footnoteService.Setup(s => s.UpdateFootnote(
-                ReleaseId,
-                FootnoteId,
-                "Updated sample footnote",
-                It.IsAny<IReadOnlyCollection<Guid>>(),
-                It.IsAny<IReadOnlyCollection<Guid>>(),
-                It.IsAny<IReadOnlyCollection<Guid>>(),
-                It.IsAny<IReadOnlyCollection<Guid>>(),
-                It.IsAny<IReadOnlyCollection<Guid>>())).Returns(updateFootnoteResult);
+                    ReleaseId,
+                    FootnoteId,
+                    "Updated sample footnote",
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>()))
+                .ReturnsAsync(new Footnote
+                {
+                    Id = FootnoteId,
+                    Content = "Updated sample footnote",
+                    Filters = new List<FilterFootnote>(),
+                    FilterGroups = new List<FilterGroupFootnote>(),
+                    FilterItems = new List<FilterItemFootnote>(),
+                    Indicators = new List<IndicatorFootnote>(),
+                    Subjects = new List<SubjectFootnote>()
+                });
 
-            var footnotes = Task.FromResult(new Either<ActionResult, IEnumerable<Footnote>>(new List<Footnote>
-            {
-                footnote
-            }));
-
-            footnoteService.Setup(s => s.GetFootnotes(ReleaseId)).Returns(footnotes);
+            footnoteService.Setup(s => s.GetFootnotes(ReleaseId))
+                .ReturnsAsync(new List<Footnote>
+                {
+                    footnote
+                });
 
             footnoteService.Setup(s => s.DeleteFootnote(ReleaseId, FootnoteId)).ReturnsAsync(Unit.Instance);
 
@@ -172,49 +169,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task Post_CreateFootnote_Returns_Ok()
+        public async Task CreateFootnote()
         {
-            var result = await _controller.CreateFootnote(ReleaseId, new FootnoteCreateViewModel()
-            {
-                Content = "Sample footnote",
-                Filters = new List<Guid>(),
-                FilterGroups = new List<Guid>(),
-                FilterItems = new List<Guid>(),
-                Indicators = new List<Guid>(),
-                Subjects = new List<Guid>()
-            });
+            var result = await _controller.CreateFootnote(ReleaseId,
+                new FootnoteCreateRequest
+                {
+                    Content = "Sample footnote",
+                    Filters = SetOf<Guid>(),
+                    FilterGroups = SetOf<Guid>(),
+                    FilterItems = SetOf<Guid>(),
+                    Indicators = SetOf<Guid>(),
+                    Subjects = SetOf<Guid>()
+                });
 
-            Assert.IsType<FootnoteViewModel>(result.Value);
+            result.AssertOkResult();
         }
 
         [Fact]
-        public async Task Get_Footnotes_Returns_Ok()
+        public async Task GetFootnotes()
         {
             var result = await _controller.GetFootnotes(ReleaseId);
-            Assert.IsAssignableFrom<IEnumerable<FootnoteViewModel>>(result.Value);
+
+            result.AssertOkResult();
         }
 
         [Fact]
-        public async Task Put_UpdateFootnote_Returns_Ok()
+        public async Task UpdateFootnote()
         {
-            var result = await _controller.UpdateFootnote(ReleaseId, FootnoteId, new FootnoteUpdateViewModel
-            {
-                Content = "Updated sample footnote",
-                Filters = new List<Guid>(),
-                FilterGroups = new List<Guid>(),
-                FilterItems = new List<Guid>(),
-                Indicators = new List<Guid>(),
-                Subjects = new List<Guid>()
-            });
+            var result = await _controller.UpdateFootnote(ReleaseId,
+                FootnoteId,
+                new FootnoteUpdateRequest
+                {
+                    Content = "Updated sample footnote",
+                    Filters = SetOf<Guid>(),
+                    FilterGroups = SetOf<Guid>(),
+                    FilterItems = SetOf<Guid>(),
+                    Indicators = SetOf<Guid>(),
+                    Subjects = SetOf<Guid>()
+                });
 
-            Assert.IsType<FootnoteViewModel>(result.Value);
-        }
-
-        [Fact]
-        public async Task Delete_DeleteFootnote_Returns_Ok()
-        {
-            var result = await _controller.DeleteFootnote(ReleaseId, FootnoteId);
-            Assert.IsType<NoContentResult>(result);
+            result.AssertOkResult();
         }
     }
 }

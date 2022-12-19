@@ -231,6 +231,58 @@ user adds data block to editable accordion section
     user clicks button    Embed    ${section}
     user waits until parent does not contain element    ${section}    xpath://button[text()="Embed"]
 
+user adds embedded dashboard to editable accordion section
+    [Arguments]
+    ...    ${section_name}
+    ...    ${dashboard_title}
+    ...    ${dashboard_url}
+    ...    ${section_parent}=css:[data-testid="accordion"]
+
+    user opens accordion section    ${section_name}    ${section_parent}
+    ${section}=    user gets accordion section content element    ${section_name}    ${section_parent}
+    user clicks button    Add embed block    ${section}
+
+    user updates embedded dashboard modal
+    ...    ${dashboard_title}
+    ...    ${dashboard_url}
+
+user updates embedded dashboard in editable accordion section
+    [Arguments]
+    ...    ${section_name}
+    ...    ${dashboard_title}
+    ...    ${dashboard_url}
+    ...    ${section_parent}=css:[data-testid="accordion"]
+
+    user opens accordion section    ${section_name}    ${section_parent}
+    user waits until page does not contain loading spinner
+    user waits until page contains button    Edit embed block
+
+    ${section}=    user gets accordion section content element    ${section_name}    ${section_parent}
+    user clicks button    Edit embed block    ${section}
+
+    user updates embedded dashboard modal
+    ...    ${dashboard_title}
+    ...    ${dashboard_url}
+    ...    Edit embed block
+
+user updates embedded dashboard modal
+    [Arguments]
+    ...    ${title}
+    ...    ${url}
+    ...    ${modal_heading}=Add embed block
+
+    ${modal}=    user waits until modal is visible    ${modal_heading}
+
+    ${title_input}=    get child element    ${modal}    id:embedBlockForm-title
+    user enters text into element    ${title_input}    ${title}
+
+    ${url_input}=    get child element    ${modal}    id:embedBlockForm-url
+    user enters text into element    ${url_input}    ${url}
+
+    user clicks button    Save    ${modal}
+    user waits until modal is not visible    Add embed block
+    user waits until page contains element    xpath://iframe[@title="${title}"]
+
 user starts editing accordion section text block
     [Arguments]
     ...    ${section_name}

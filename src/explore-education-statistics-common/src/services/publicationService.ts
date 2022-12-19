@@ -1,10 +1,16 @@
-import { ContentBlock, DataBlock } from '@common/services/types/blocks';
+import {
+  ContentBlock,
+  DataBlock,
+  EmbedBlock,
+} from '@common/services/types/blocks';
 import { FileInfo } from '@common/services/types/file';
 import { ReleaseType } from '@common/services/types/releaseType';
 import {
   MethodologySummary,
   ExternalMethodology,
 } from '@common/services/types/methodology';
+import { PublicationType } from '@common/services/types/publicationType';
+import { PaginatedList } from '@common/services/types/pagination';
 import { PartialDate } from '@common/utils/date/partialDate';
 import { contentApi } from './api';
 
@@ -42,21 +48,15 @@ export interface PublicationSummary {
   title: string;
 }
 
-// TODO EES-3517 a guess at the new type for the find stats page.
-export interface PublicationSummaryWithRelease {
+export interface PublicationListSummary {
   id: string;
-  legacyPublicationUrl?: string;
-  latestRelease?: {
-    id: string;
-    published: string;
-    type: ReleaseType;
-  };
+  published: Date;
+  rank: number;
   slug: string;
   summary?: string;
-  theme: {
-    title: string;
-  };
+  theme: string;
   title: string;
+  type: ReleaseType;
 }
 
 export interface Contact {
@@ -94,21 +94,34 @@ export interface ContentSection<BlockType> {
 export const publicationSortOptions = [
   'newest',
   'oldest',
-  'alphabetical',
+  'relevance',
+  'title',
 ] as const;
 
 export type PublicationSortOption = typeof publicationSortOptions[number];
 
-// TODO EES-3517 expand to include filters and search
-export interface ListPublicationsRequest {
+export type PublicationSortParam = 'published' | 'title' | 'relevance';
+
+export type PublicationOrderParam = 'asc' | 'desc';
+
+export const publicationFilters = ['releaseType', 'search', 'themeId'] as const;
+
+export type PublicationFilter = typeof publicationFilters[number];
+
+export interface PublicationListRequest {
+  order?: PublicationOrderParam;
   page?: number;
-  sortBy?: PublicationSortOption;
+  pageSize?: number;
+  releaseType?: ReleaseType;
+  search?: string;
+  sort?: PublicationSortParam;
+  themeId?: string;
 }
 
 export interface Release<
   ContentBlockType extends ContentBlock = ContentBlock,
   DataBlockType extends DataBlock = DataBlock,
-  PublicationType = Publication
+  EmbedBlockType extends EmbedBlock = EmbedBlock
 > {
   id: string;
   title: string;
@@ -122,13 +135,13 @@ export interface Release<
   keyStatisticsSecondarySection: ContentSection<DataBlockType>;
   headlinesSection: ContentSection<ContentBlockType>;
   relatedDashboardsSection?: ContentSection<ContentBlockType>; // optional because older releases may not have this section
-  publication: PublicationType;
+  publication: Publication;
   latestRelease: boolean;
   nextReleaseDate?: PartialDate;
   relatedInformation: BasicLink[];
   type: ReleaseType;
   updates: ReleaseNote[];
-  content: ContentSection<ContentBlockType | DataBlockType>[];
+  content: ContentSection<ContentBlockType | DataBlockType | EmbedBlockType>[];
   downloadFiles: FileInfo[];
   dataLastPublished: string;
   hasPreReleaseAccessList: boolean;
@@ -156,6 +169,37 @@ export interface PublicationReleaseSummary extends ReleaseSummary {
 export interface PreReleaseAccessListSummary extends ReleaseSummary {
   publication: PublicationSummary;
   preReleaseAccessList: string;
+}
+
+export interface PublicationTreeSummary {
+  id: string;
+  title: string;
+  slug: string;
+  type: PublicationType;
+  legacyPublicationUrl?: string;
+  isSuperseded: boolean;
+}
+
+export interface Topic {
+  id: string;
+  title: string;
+  summary: string;
+  publications: PublicationTreeSummary[];
+}
+
+export interface Theme {
+  id: string;
+  title: string;
+  summary: string;
+  topics: Topic[];
+}
+
+interface PublicationTreeOptions {
+  publicationFilter?:
+    | 'FindStatistics'
+    | 'DataTables'
+    | 'DataCatalogue'
+    | 'FastTrack';
 }
 
 export default {
@@ -205,5 +249,19 @@ export default {
     return contentApi.get(
       `/publications/${publicationSlug}/releases/${releaseSlug}/prerelease-access-list`,
     );
+  },
+  getPublicationTree({
+    publicationFilter,
+  }: PublicationTreeOptions = {}): Promise<Theme[]> {
+    return contentApi.get('/publication-tree', {
+      params: { publicationFilter },
+    });
+  },
+  listPublications(
+    params: PublicationListRequest,
+  ): Promise<PaginatedList<PublicationListSummary>> {
+    return contentApi.get(`/publications`, {
+      params,
+    });
   },
 };

@@ -47,6 +47,26 @@ describe('SortControls', () => {
       expect(sortOptions[2]).toEqual(sortGroup.getByLabelText('A to Z'));
       expect(sortOptions[2]).not.toBeChecked();
     });
+
+    test('setting hasSearch to true shows the relevance option', () => {
+      render(<SortControls hasSearch sortBy="relevance" onChange={noop} />);
+
+      const sortGroup = within(
+        screen.getByRole('group', { name: 'Sort results' }),
+      );
+      const sortOptions = sortGroup.getAllByRole('radio');
+      expect(sortOptions).toHaveLength(4);
+      expect(sortOptions[0]).toEqual(sortGroup.getByLabelText('Newest'));
+      expect(sortOptions[0]).not.toBeChecked();
+      expect(sortOptions[1]).toEqual(sortGroup.getByLabelText('Oldest'));
+      expect(sortOptions[1]).not.toBeChecked();
+      expect(sortOptions[2]).toEqual(sortGroup.getByLabelText('A to Z'));
+      expect(sortOptions[2]).not.toBeChecked();
+      expect(sortOptions[3]).toEqual(sortGroup.getByLabelText('Relevance'));
+      expect(sortOptions[3]).toBeChecked();
+
+      expect(screen.queryByLabelText('Sort results')).not.toBeInTheDocument();
+    });
   });
 
   describe('mobile', () => {
@@ -69,14 +89,14 @@ describe('SortControls', () => {
       expect(sortOptions[1]).toHaveValue('oldest');
       expect(sortOptions[1].selected).toBe(false);
       expect(sortOptions[2]).toHaveTextContent('A to Z');
-      expect(sortOptions[2]).toHaveValue('alphabetical');
+      expect(sortOptions[2]).toHaveValue('title');
       expect(sortOptions[2].selected).toBe(false);
 
       expect(screen.queryByRole('radio')).not.toBeInTheDocument();
     });
 
     test('setting the intial sortBy selects the correct option', () => {
-      render(<SortControls sortBy="alphabetical" onChange={noop} />);
+      render(<SortControls sortBy="title" onChange={noop} />);
 
       const sortDropdown = within(screen.getByLabelText('Sort results'));
       const sortOptions = sortDropdown.getAllByRole(
@@ -90,8 +110,30 @@ describe('SortControls', () => {
       expect(sortOptions[1]).toHaveValue('oldest');
       expect(sortOptions[1].selected).toBe(false);
       expect(sortOptions[2]).toHaveTextContent('A to Z');
-      expect(sortOptions[2]).toHaveValue('alphabetical');
+      expect(sortOptions[2]).toHaveValue('title');
       expect(sortOptions[2].selected).toBe(true);
+    });
+
+    test('setting hasSearch to true shows the relevance option', () => {
+      render(<SortControls hasSearch sortBy="relevance" onChange={noop} />);
+
+      const sortDropdown = within(screen.getByLabelText('Sort results'));
+      const sortOptions = sortDropdown.getAllByRole(
+        'option',
+      ) as HTMLOptionElement[];
+      expect(sortOptions).toHaveLength(4);
+      expect(sortOptions[0]).toHaveTextContent('Newest');
+      expect(sortOptions[0]).toHaveValue('newest');
+      expect(sortOptions[0].selected).toBe(false);
+      expect(sortOptions[1]).toHaveTextContent('Oldest');
+      expect(sortOptions[1]).toHaveValue('oldest');
+      expect(sortOptions[1].selected).toBe(false);
+      expect(sortOptions[2]).toHaveTextContent('A to Z');
+      expect(sortOptions[2]).toHaveValue('title');
+      expect(sortOptions[2].selected).toBe(false);
+      expect(sortOptions[3]).toHaveTextContent('Relevance');
+      expect(sortOptions[3]).toHaveValue('relevance');
+      expect(sortOptions[3].selected).toBe(true);
     });
   });
 });

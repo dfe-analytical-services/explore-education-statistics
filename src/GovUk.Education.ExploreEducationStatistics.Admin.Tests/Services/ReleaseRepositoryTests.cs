@@ -233,7 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListReleasesForUser_PublicationRole_ReleaseApprover_Approved()
+        public async Task ListReleasesForUser_PublicationRole_Approver_Approved()
         {
             var userId = Guid.NewGuid();
             var userPublicationRole1 = new UserPublicationRole()
@@ -254,7 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         },
                     }
                 },
-                Role = PublicationRole.ReleaseApprover,
+                Role = PublicationRole.Approver,
             };
 
             var otherPublication = new Publication

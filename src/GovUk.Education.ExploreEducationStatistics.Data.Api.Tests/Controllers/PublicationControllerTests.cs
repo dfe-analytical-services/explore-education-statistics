@@ -6,8 +6,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
@@ -29,20 +30,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         {
             var subjects = new List<SubjectViewModel>();
 
-            var publicationId = Guid.NewGuid();
+            var latestReleaseId = Guid.NewGuid();
 
-            var release = new Release
+            var publication = new Publication
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                LatestPublishedReleaseId = latestReleaseId
             };
 
             var (controller, mocks) = BuildControllerAndMocks();
 
-            var cacheKey = new ReleaseSubjectsCacheKey("publication", "release", release.Id);
+            var cacheKey = new ReleaseSubjectsCacheKey("publication", "release", latestReleaseId);
+
+            SetupCall(mocks.contentPersistenceHelper, publication.Id, publication);
 
             mocks
                 .cacheKeyService
-                .Setup(s => s.CreateCacheKeyForReleaseSubjects(release.Id))
+                .Setup(s => s.CreateCacheKeyForReleaseSubjects(latestReleaseId))
                 .ReturnsAsync(cacheKey);
 
             mocks.cacheService
@@ -50,33 +54,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .ReturnsAsync(null);
 
             mocks
-                .releaseRepository
-                .Setup(s => s.GetLatestPublishedRelease(publicationId))
-                .ReturnsAsync(release);
-
-            mocks
                 .releaseService
-                .Setup(s => s.ListSubjects(release.Id))
+                .Setup(s => s.ListSubjects(latestReleaseId))
                 .ReturnsAsync(subjects);
 
             mocks.cacheService
                 .Setup(s => s.SetItem<object>(cacheKey, subjects))
                 .Returns(Task.CompletedTask);
 
-            var result = await controller.ListLatestReleaseSubjects(publicationId);
+            var result = await controller.ListLatestReleaseSubjects(publication.Id);
             VerifyAllMocks(mocks);
 
             result.AssertOkResult(subjects);
         }
 
         [Fact]
+        public async Task ListLatestReleaseSubjects_PublicationHasNoPublishedRelease()
+        {
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid(),
+                LatestPublishedReleaseId = null
+            };
+
+            var (controller, mocks) = BuildControllerAndMocks();
+
+            SetupCall(mocks.contentPersistenceHelper, publication.Id, publication);
+
+            var result = await controller.ListLatestReleaseSubjects(publication.Id);
+            VerifyAllMocks(mocks);
+
+            result.AssertNotFoundResult();
+        }
+
+        [Fact]
         public async Task ListLatestReleaseFeaturedTables()
         {
-            var publicationId = Guid.NewGuid();
+            var latestReleaseId = Guid.NewGuid();
 
-            var release = new Release
+            var publication = new Publication
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                LatestPublishedReleaseId = latestReleaseId
             };
 
             var featuredTables = new List<FeaturedTableViewModel>
@@ -86,18 +105,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var (controller, mocks) = BuildControllerAndMocks();
 
-            mocks.releaseRepository
-                .Setup(s => s.GetLatestPublishedRelease(publicationId))
-                .ReturnsAsync(release);
+            SetupCall(mocks.contentPersistenceHelper, publication.Id, publication);
 
             mocks.releaseService
-                .Setup(s => s.ListFeaturedTables(release.Id))
+                .Setup(s => s.ListFeaturedTables(latestReleaseId))
                 .ReturnsAsync(featuredTables);
 
-            var result = await controller.ListLatestReleaseFeaturedTables(publicationId);
+            var result = await controller.ListLatestReleaseFeaturedTables(publication.Id);
             VerifyAllMocks(mocks);
 
             result.AssertOkResult(featuredTables);
+        }
+
+        [Fact]
+        public async Task ListLatestReleaseFeaturedTables_PublicationHasNoPublishedRelease()
+        {
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid(),
+                LatestPublishedReleaseId = null
+            };
+
+            var (controller, mocks) = BuildControllerAndMocks();
+
+            SetupCall(mocks.contentPersistenceHelper, publication.Id, publication);
+
+            var result = await controller.ListLatestReleaseFeaturedTables(publication.Id);
+            VerifyAllMocks(mocks);
+
+            result.AssertNotFoundResult();
         }
 
         [Fact]
@@ -135,20 +171,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
         private (PublicationController controller,
             (
-            Mock<IReleaseRepository> releaseRepository,
+            Mock<IPersistenceHelper<ContentDbContext>> contentPersistenceHelper,
             Mock<IReleaseService> releaseService,
             Mock<ICacheKeyService> cacheKeyService,
             Mock<IBlobCacheService> cacheService
             ) mocks
             ) BuildControllerAndMocks()
         {
-            var releaseRepository = new Mock<IReleaseRepository>(Strict);
+            var contentPersistenceHelper = MockPersistenceHelper<ContentDbContext>();
             var releaseService = new Mock<IReleaseService>(Strict);
             var cacheKeyService = new Mock<ICacheKeyService>(Strict);
             var controller = new PublicationController(
-                releaseRepository.Object, releaseService.Object, cacheKeyService.Object);
+                contentPersistenceHelper.Object, releaseService.Object, cacheKeyService.Object);
 
-            return (controller, (releaseRepository, releaseService, cacheKeyService, BlobCacheService));
+            return (controller,
+                (contentPersistenceHelper, releaseService, cacheKeyService, BlobCacheService));
         }
     }
 }

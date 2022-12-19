@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                         context.User.GetUserId(),
                         release.PublicationId,
                         release.Id,
-                        ListOf(Owner, ReleaseApprover),
+                        ListOf(Owner, Approver),
                         ReleaseEditorAndApproverRoles))
             {
                 context.Succeed(requirement);

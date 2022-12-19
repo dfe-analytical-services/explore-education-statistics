@@ -8,7 +8,10 @@ import {
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
-import { PublicationSummary, Theme } from '@common/services/themeService';
+import {
+  PublicationTreeSummary,
+  Theme,
+} from '@common/services/publicationService';
 import Yup from '@common/validation/yup';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
@@ -24,7 +27,7 @@ export interface PublicationFormValues {
 }
 
 export type PublicationFormSubmitHandler = (values: {
-  publication: PublicationSummary;
+  publication: PublicationTreeSummary;
 }) => void;
 
 const formId = 'publicationForm';

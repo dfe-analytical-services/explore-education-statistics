@@ -20,10 +20,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     public class PublicationController : ControllerBase
     {
         private readonly IPublicationService _publicationService;
+        private readonly IUserRoleService _roleService;
 
-        public PublicationController(IPublicationService publicationService)
+        public PublicationController(
+            IPublicationService publicationService, 
+            IUserRoleService roleService)
         {
             _publicationService = publicationService;
+            _roleService = roleService;
         }
 
         [HttpGet("api/publications")]
@@ -134,6 +138,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _publicationService
                 .PartialUpdateLegacyReleases(publicationId, legacyReleases)
+                .HandleFailuresOrOk();
+        }
+        
+        [HttpGet("api/publications/{publicationId}/roles")]
+        public async Task<ActionResult<List<UserPublicationRoleViewModel>>> GetRoles(Guid publicationId)
+        {
+            return await _roleService
+                .GetPublicationRolesForPublication(publicationId)
                 .HandleFailuresOrOk();
         }
     }

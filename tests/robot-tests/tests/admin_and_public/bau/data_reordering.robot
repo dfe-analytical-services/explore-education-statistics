@@ -40,9 +40,9 @@ Check reordering table contains subject row
     user checks table column heading contains    1    1    Data file    id:reordering
     user checks table body has x rows    1    id:reordering
 
-    user checks results table cell contains    1    1    ${SUBJECT_NAME}    id:reordering
-    user checks results table cell contains    1    2    Reorder filters    id:reordering
-    user checks results table cell contains    1    2    Reorder indicators    id:reordering
+    user checks table cell contains    1    1    ${SUBJECT_NAME}    id:reordering
+    user checks table cell contains    1    2    Reorder filters    id:reordering
+    user checks table cell contains    1    2    Reorder indicators    id:reordering
 
 Check the initial order of filters
     user clicks button in table cell    1    2    Reorder filters    id:reordering
@@ -239,9 +239,9 @@ Check reordering table contains subject row after data replacement
     user checks table column heading contains    1    1    Data file    id:reordering
     user checks table body has x rows    1    id:reordering
 
-    user checks results table cell contains    1    1    ${SUBJECT_NAME}    id:reordering
-    user checks results table cell contains    1    2    Reorder filters    id:reordering
-    user checks results table cell contains    1    2    Reorder indicators    id:reordering
+    user checks table cell contains    1    1    ${SUBJECT_NAME}    id:reordering
+    user checks table cell contains    1    2    Reorder filters    id:reordering
+    user checks table cell contains    1    2    Reorder indicators    id:reordering
 
 Check the order of filters after data replacement
     # Filters are identical in the replacement so the previous order should be retained
@@ -487,46 +487,46 @@ Validate step 5 options
     user checks previous table tool step contains    5    Filter 1    Total
 
 Validate results table column headings
-    user checks results table row heading contains    1    1    Provider 1
-    user checks results table row heading contains    1    2    Indicator 4
-    user checks results table row heading contains    2    1    Indicator 2
-    user checks results table row heading contains    3    1    Indicator 1
-    user checks results table row heading contains    4    1    Indicator 5
-    user checks results table row heading contains    5    1    Indicator 6
+    user checks table row heading contains    1    1    Provider 1
+    user checks table row heading contains    1    2    Indicator 4
+    user checks table row heading contains    2    1    Indicator 2
+    user checks table row heading contains    3    1    Indicator 1
+    user checks table row heading contains    4    1    Indicator 5
+    user checks table row heading contains    5    1    Indicator 6
 
-    user checks results table row heading contains    6    1    Provider 2
-    user checks results table row heading contains    6    2    Indicator 4
-    user checks results table row heading contains    7    1    Indicator 2
-    user checks results table row heading contains    8    1    Indicator 1
-    user checks results table row heading contains    9    1    Indicator 5
-    user checks results table row heading contains    10    1    Indicator 6
+    user checks table row heading contains    6    1    Provider 2
+    user checks table row heading contains    6    2    Indicator 4
+    user checks table row heading contains    7    1    Indicator 2
+    user checks table row heading contains    8    1    Indicator 1
+    user checks table row heading contains    9    1    Indicator 5
+    user checks table row heading contains    10    1    Indicator 6
 
 Validate row headings
     user checks table column heading contains    1    1    2021
     user checks table column heading contains    1    2    2022
 
 Validate table cells
-    user checks results table cell contains    1    1    91,732,417
-    user checks results table cell contains    2    1    89,626,171
-    user checks results table cell contains    3    1    51,029,335
-    user checks results table cell contains    4    1    83,771,711
-    user checks results table cell contains    5    1    91,439,757
-    user checks results table cell contains    6    1    84,288,196
-    user checks results table cell contains    7    1    68,482,122
-    user checks results table cell contains    8    1    65,182,202
-    user checks results table cell contains    9    1    61,121,060
-    user checks results table cell contains    10    1    37,961,046
+    user checks table cell contains    1    1    91,732,417
+    user checks table cell contains    2    1    89,626,171
+    user checks table cell contains    3    1    51,029,335
+    user checks table cell contains    4    1    83,771,711
+    user checks table cell contains    5    1    91,439,757
+    user checks table cell contains    6    1    84,288,196
+    user checks table cell contains    7    1    68,482,122
+    user checks table cell contains    8    1    65,182,202
+    user checks table cell contains    9    1    61,121,060
+    user checks table cell contains    10    1    37,961,046
 
-    user checks results table cell contains    1    2    56,920,389
-    user checks results table cell contains    2    2    75,873,610
-    user checks results table cell contains    3    2    49,220,007
-    user checks results table cell contains    4    2    31,859,890
-    user checks results table cell contains    5    2    63,230,370
-    user checks results table cell contains    6    2    54,759,203
-    user checks results table cell contains    7    2    10,214,603
-    user checks results table cell contains    8    2    28,403,292
-    user checks results table cell contains    9    2    24,284,255
-    user checks results table cell contains    10    2    39,761,905
+    user checks table cell contains    1    2    56,920,389
+    user checks table cell contains    2    2    75,873,610
+    user checks table cell contains    3    2    49,220,007
+    user checks table cell contains    4    2    31,859,890
+    user checks table cell contains    5    2    63,230,370
+    user checks table cell contains    6    2    54,759,203
+    user checks table cell contains    7    2    10,214,603
+    user checks table cell contains    8    2    28,403,292
+    user checks table cell contains    9    2    24,284,255
+    user checks table cell contains    10    2    39,761,905
 
 Go back to locations step
     user clicks button    Edit locations
@@ -564,6 +564,7 @@ Create table again
     user waits until results table appears    %{WAIT_SMALL}
 
 Validate step 5 options again
+    user clicks button    Show 2 more filters
     user checks previous table tool step contains    5    Indicators    Indicator 1
     user checks previous table tool step contains    5    Filter 2    Total
     user checks previous table tool step contains    5    Filter 1    Total
@@ -575,28 +576,28 @@ Validate step 5 options again
     user checks previous table tool step contains    5    Filter 1    F1G3-2
 
 Validate results table column headings again
-    user checks results table row heading contains    1    1    Total
-    user checks results table row heading contains    2    1    Filter 1 group 2
-    user checks results table row heading contains    2    2    F1G2-2
-    user checks results table row heading contains    3    1    Filter 1 group 1
-    user checks results table row heading contains    3    2    F1G1-2
-    user checks results table row heading contains    4    1    F1G1-1
-    user checks results table row heading contains    5    1    F1G1-3
-    user checks results table row heading contains    6    1    Filter 1 group 3
-    user checks results table row heading contains    6    2    F1G3-1
-    user checks results table row heading contains    7    1    F1G3-2
+    user checks table row heading contains    1    1    Total
+    user checks table row heading contains    2    1    Filter 1 group 2
+    user checks table row heading contains    2    2    F1G2-2
+    user checks table row heading contains    3    1    Filter 1 group 1
+    user checks table row heading contains    3    2    F1G1-2
+    user checks table row heading contains    4    1    F1G1-1
+    user checks table row heading contains    5    1    F1G1-3
+    user checks table row heading contains    6    1    Filter 1 group 3
+    user checks table row heading contains    6    2    F1G3-1
+    user checks table row heading contains    7    1    F1G3-2
 
 Validate row headings again
     user checks table column heading contains    1    1    2021
 
 Validate table cells again
-    user checks results table cell contains    1    1    51,029,335
-    user checks results table cell contains    2    1    7,392,787
-    user checks results table cell contains    3    1    7,552,538
-    user checks results table cell contains    4    1    2,553,275
-    user checks results table cell contains    5    1    4,355,910
-    user checks results table cell contains    6    1    7,922,048
-    user checks results table cell contains    7    1    6,759,498
+    user checks table cell contains    1    1    51,029,335
+    user checks table cell contains    2    1    7,392,787
+    user checks table cell contains    3    1    7,552,538
+    user checks table cell contains    4    1    2,553,275
+    user checks table cell contains    5    1    4,355,910
+    user checks table cell contains    6    1    7,922,048
+    user checks table cell contains    7    1    6,759,498
 
 
 *** Keywords ***

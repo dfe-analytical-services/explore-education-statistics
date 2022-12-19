@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings;
@@ -89,16 +90,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var contentRelease = new Release
+            var release = new Release
             {
                 Id = Guid.NewGuid(),
-                Publication = new Publication
-                {
-                    Id = _publicationId
-                },
+                PublicationId = _publicationId,
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
                 ReleaseName = "2000",
                 Published = DateTime.UtcNow,
+            };
+
+            var publication = new Publication
+            {
+                Id = _publicationId,
+                LatestPublishedRelease = release
             };
 
             var tableResult = new TableBuilderResultViewModel
@@ -132,30 +136,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             releaseRepository
                 .Setup(s => s.GetLatestPublishedRelease(_publicationId))
-                .ReturnsAsync(new Release
-                {
-                    Id = contentRelease.Id,
-                    PublicationId = _publicationId,
-                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                    ReleaseName = "2000"
-                });
+                .ReturnsAsync(release);
 
             subjectRepository
                 .Setup(s => s.GetPublicationIdForSubject(subject.Id))
                 .ReturnsAsync(_publicationId);
 
             tableBuilderService
-                .Setup(s => s.Query(contentRelease.Id, request.Query, CancellationToken.None))
+                .Setup(s => s.Query(release.Id, request.Query, CancellationToken.None))
                 .ReturnsAsync(tableResult);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(
-                    contentRelease,
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(
                     new ReleaseFile
                     {
-                        Release = contentRelease,
+                        Release = release,
                         File = new File
                         {
                             SubjectId = subject.Id,
@@ -194,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Assert.InRange(DateTime.UtcNow.Subtract(permalink.Created).Milliseconds, 0, 1500);
                 Assert.Equal("Test publication", permalink.PublicationTitle);
                 Assert.Equal("Test data set", permalink.DataSetTitle);
-                Assert.Equal(contentRelease.Id, permalink.ReleaseId);
+                Assert.Equal(release.Id, permalink.ReleaseId);
                 Assert.Equal(subject.Id, permalink.SubjectId);
             }
         }
@@ -224,13 +223,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var release = new Release
             {
                 Id = Guid.NewGuid(),
-                Publication = new Publication
-                {
-                    Id = _publicationId
-                },
+                PublicationId = _publicationId,
                 ReleaseName = "2000",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
                 Published = DateTime.UtcNow,
+            };
+
+            var publication = new Publication
+            {
+                Id = _publicationId,
+                LatestPublishedRelease = release 
             };
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
@@ -258,8 +260,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(
-                    release,
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(
                     new ReleaseFile
                     {
                         Release = release,
@@ -308,13 +311,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var release = new Release
             {
                 Id = Guid.NewGuid(),
-                Publication = new Publication
-                {
-                    Id = _publicationId
-                },
                 ReleaseName = "2000",
+                PublicationId = _publicationId,
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
                 Published = DateTime.UtcNow,
+            };
+
+            var publication = new Publication
+            {
+                Id = _publicationId,
+                LatestPublishedRelease = release
             };
 
             var subjectId = Guid.NewGuid();
@@ -342,8 +348,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(
-                    release,
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(
                     new ReleaseFile
                     {
                         Release = release,
@@ -439,18 +446,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(
-                    new Release
-                    {
-                        Id = releaseId,
-                        Publication = new Publication
-                        {
-                            Id = _publicationId
-                        },
-                        ReleaseName = "2000",
-                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        Published = DateTime.UtcNow,
-                    },
+                await contentDbContext.ReleaseFiles.AddRangeAsync(
                     new ReleaseFile
                     {
                         ReleaseId = releaseId,
@@ -561,15 +557,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task Get_SubjectIsForMultipleVersions()
         {
-            var publication = new Publication
-            {
-                Id = _publicationId
-            };
-
             var previousVersion = new Release
             {
                 Id = Guid.NewGuid(),
-                Publication = publication,
+                PublicationId = _publicationId,
                 ReleaseName = "2000",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
                 Published = DateTime.UtcNow,
@@ -579,11 +570,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var latestVersion = new Release
             {
                 Id = Guid.NewGuid(),
-                Publication = publication,
+                PublicationId = _publicationId,
                 ReleaseName = "2000",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
                 Published = DateTime.UtcNow,
                 PreviousVersionId = previousVersion.Id
+            };
+
+            var publication = new Publication
+            {
+                Id = _publicationId,
+                LatestPublishedRelease = latestVersion
             };
 
             var subjectId = Guid.NewGuid();
@@ -611,6 +608,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                await contentDbContext.Publications.AddAsync(publication);
                 await contentDbContext.Releases.AddRangeAsync(previousVersion, latestVersion);
                 await contentDbContext.ReleaseFiles.AddRangeAsync(
                     new ReleaseFile
@@ -651,16 +649,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
-        public async Task Get_SubjectIsNotForNextYearInSeries()
+        public async Task Get_SubjectIsNotForLatestRelease_OlderByYear()
         {
-            var publication = new Publication
-            {
-                Id = _publicationId
-            };
             var release = new Release
             {
                 Id = Guid.NewGuid(),
-                Publication = publication,
+                PublicationId = _publicationId,
                 ReleaseName = "2000",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
                 Published = DateTime.UtcNow,
@@ -669,10 +663,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var latestRelease = new Release
             {
                 Id = Guid.NewGuid(),
-                Publication = publication,
+                PublicationId = _publicationId,
                 ReleaseName = "2001",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
                 Published = DateTime.UtcNow,
+            };
+
+            var publication = new Publication
+            {
+                Id = _publicationId,
+                LatestPublishedRelease = latestRelease
             };
 
             var subjectId = Guid.NewGuid();
@@ -700,6 +700,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                await contentDbContext.Publications.AddAsync(publication);
                 await contentDbContext.Releases.AddRangeAsync(release, latestRelease);
                 await contentDbContext.ReleaseFiles.AddRangeAsync(
                     new ReleaseFile
@@ -731,16 +732,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
-        public async Task Get_SubjectIsNotForNextTimePeriodInSeries()
+        public async Task Get_SubjectIsNotForLatestRelease_OlderByTimePeriod()
         {
-            var publication = new Publication
-            {
-                Id = _publicationId
-            };
             var release = new Release
             {
                 Id = Guid.NewGuid(),
-                Publication = publication,
+                PublicationId = _publicationId,
                 ReleaseName = "2000",
                 TimePeriodCoverage = TimeIdentifier.January,
                 Published = DateTime.UtcNow,
@@ -749,10 +746,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var latestRelease = new Release
             {
                 Id = Guid.NewGuid(),
-                Publication = publication,
+                PublicationId = _publicationId,
                 ReleaseName = "2000",
                 TimePeriodCoverage = TimeIdentifier.February,
                 Published = DateTime.UtcNow,
+            };
+
+            var publication = new Publication
+            {
+                Id = _publicationId,
+                LatestPublishedRelease = latestRelease
             };
 
             var subjectId = Guid.NewGuid();
@@ -780,6 +783,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                await contentDbContext.Publications.AddAsync(publication);
                 await contentDbContext.Releases.AddRangeAsync(release, latestRelease);
                 await contentDbContext.ReleaseFiles.AddRangeAsync(
                     new ReleaseFile
@@ -813,15 +817,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task Get_SubjectIsNotForLatestVersion()
         {
-            var publication = new Publication
-            {
-                Id = _publicationId
-            };
-
             var previousVersion = new Release
             {
                 Id = Guid.NewGuid(),
-                Publication = publication,
+                PublicationId = _publicationId,
                 ReleaseName = "2000",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
                 Published = DateTime.UtcNow,
@@ -831,11 +830,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var latestVersion = new Release
             {
                 Id = Guid.NewGuid(),
-                Publication = publication,
+                PublicationId = _publicationId,
                 ReleaseName = "2000",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
                 Published = DateTime.UtcNow,
                 PreviousVersionId = previousVersion.Id
+            };
+
+            var publication = new Publication
+            {
+                Id = _publicationId,
+                LatestPublishedRelease = latestVersion
             };
 
             var subjectId = Guid.NewGuid();
@@ -863,10 +868,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                await contentDbContext.Publications.AddAsync(publication);
                 await contentDbContext.Releases.AddRangeAsync(previousVersion, latestVersion);
-                await contentDbContext.AddRangeAsync(
-                    previousVersion,
-                    latestVersion,
+                await contentDbContext.ReleaseFiles.AddRangeAsync(
                     new ReleaseFile
                     {
                         Release = previousVersion,
@@ -898,8 +902,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task Get_SubjectIsFromSupersededPublication()
         {
-            var supersededPublicationId = Guid.NewGuid();
-            var releaseId = Guid.NewGuid();
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                PublicationId = _publicationId,
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                Published = DateTime.UtcNow,
+            };
+
+            var publication = new Publication
+            {
+                Id = _publicationId,
+                LatestPublishedRelease = release,
+                SupersededBy = new Publication
+                {
+                    LatestPublishedReleaseId = Guid.NewGuid()
+                }
+            };
+
             var subjectId = Guid.NewGuid();
 
             var permalink = new LegacyPermalink(
@@ -925,37 +946,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(
-                    new Release
-                    {
-                        Id = releaseId,
-                        Publication = new Publication
-                        {
-                            Id = _publicationId,
-                            SupersededById = supersededPublicationId,
-                        },
-                        ReleaseName = "2000",
-                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        Published = DateTime.UtcNow,
-                    },
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(
                     new ReleaseFile
                     {
-                        ReleaseId = releaseId,
+                        Release = release,
                         File = new File
                         {
                             SubjectId = subjectId,
                             Type = FileType.Data,
-                        }
-                    },
-                    new Publication
-                    {
-                        Id = supersededPublicationId,
-                        Releases = new List<Release>
-                        {
-                            new()
-                            {
-                                Published = DateTime.UtcNow,
-                            }
                         }
                     });
 
@@ -982,13 +982,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             ITableBuilderService? tableBuilderService = null,
             IBlobStorageService? blobStorageService = null,
             IReleaseRepository? releaseRepository = null,
-            ISubjectRepository? subjectRepository = null)
+            ISubjectRepository? subjectRepository = null,
+            IPublicationRepository? publicationRepository = null)
         {
+            contentDbContext ??= InMemoryContentDbContext();
+
             return new(
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
                 tableBuilderService ?? Mock.Of<ITableBuilderService>(MockBehavior.Strict),
                 blobStorageService ?? Mock.Of<IBlobStorageService>(MockBehavior.Strict),
                 subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
+                publicationRepository ?? new PublicationRepository(contentDbContext),
                 releaseRepository ?? Mock.Of<IReleaseRepository>(MockBehavior.Strict),
                 MapperUtils.MapperForProfile<MappingProfiles>()
             );

@@ -527,7 +527,29 @@
     "realmRoles" : [ "default-roles-ees" ],
     "notBefore" : 0,
     "groups" : [ ]
-  } ],
+  }, {
+    "id" : "dd13c7f2-f6f4-467c-8b87-b73cc795aa1c",
+    "createdTimestamp" : 1621850929630,
+    "username" : "expiredinvite",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : true,
+    "firstName" : "Expired",
+    "lastName" : "Invite",
+    "email" : "ees-test.expiredinvite@education.gov.uk",
+    "credentials" : [ {
+      "id" : "42635b87-54e8-4f9e-9173-97a5baa62d2e",
+      "type" : "password",
+      "createdDate" : 1621851408696,
+      "secretData" : "{\"value\":\"nzdlQDKfAnM1SyG3pby3kcZtc/zG3kADXSChk3hEvRj7XNl8K7gds0ZoOTjOkbnOkph5hS+t39GQ5ZfAmcV6Zw==\",\"salt\":\"cJ/b0vXruVQODwV5jBXMYQ==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-ees" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }],
   "scopeMappings" : [ {
     "clientScope" : "offline_access",
     "roles" : [ "offline_access" ]
@@ -667,7 +689,7 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "eaa4cc70-e80b-4a7e-a20f-2856d97f470d",
-    "redirectUris" : [ 
+    "redirectUris" : [
       "https://localhost:5021/signed-out",
       "https://localhost:5021/signin-oidc",
       "https://ees.local:5021/signin-oidc",

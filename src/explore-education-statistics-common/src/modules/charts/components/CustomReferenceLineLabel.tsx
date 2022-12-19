@@ -2,18 +2,18 @@ import { Axis, AxisType } from '@common/modules/charts/types/chart';
 import { ChartData } from '@common/modules/charts/types/dataSet';
 import getReferenceLineLabelPosition from '@common/modules/charts/components/utils/getReferenceLineLabelPosition';
 import React, { memo } from 'react';
-import { AxisDomain, ViewBox } from 'recharts';
 import parseNumber from '@common/utils/number/parseNumber';
+import { AxisDomainItem, CartesianViewBox } from 'recharts/types/util/types';
 
 interface Props {
   axis: Axis;
   axisType: AxisType;
   chartData: ChartData[];
   label: string;
-  otherAxisDomain?: [AxisDomain, AxisDomain];
+  otherAxisDomain?: [AxisDomainItem, AxisDomainItem];
   otherAxisPosition?: number;
   position: string | number;
-  viewBox?: ViewBox;
+  viewBox?: CartesianViewBox;
 }
 
 const CustomReferenceLineLabel = ({
@@ -36,7 +36,7 @@ const CustomReferenceLineLabel = ({
   const labelPosition = getReferenceLineLabelPosition({
     axis,
     axisType,
-    otherAxisDomainMin: axisType === 'major' ? otherAxisDomainMax : 0,
+    otherAxisDomainMin: axisType === 'major' ? otherAxisDomainMin : 0,
     otherAxisDomainMax: axisType === 'major' ? otherAxisDomainMax : 100, // otherAxisPosition is set as a percentage on minor axis lines
     otherAxisPosition,
     viewBox,

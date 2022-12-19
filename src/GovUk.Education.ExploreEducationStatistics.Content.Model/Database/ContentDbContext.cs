@@ -63,6 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<DataImportError> DataImportErrors { get; set; }
         public virtual DbSet<HtmlBlock> HtmlBlocks { get; set; }
         public virtual DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
+        public virtual DbSet<EmbedBlock> EmbedBlocks { get; set; }
+        public virtual DbSet<EmbedBlockLink> EmbedBlockLinks { get; set; }
         public virtual DbSet<MethodologyNote> MethodologyNotes { get; set; }
         public virtual DbSet<Permalink> Permalinks { get; set; } = null!;
         public virtual DbSet<Contact> Contacts { get; set; }
@@ -234,7 +236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Publication>()
-                .HasOne(p => p.LatestPublishedReleaseNew)
+                .HasOne(p => p.LatestPublishedRelease)
                 .WithOne()
                 .HasForeignKey<Publication>(p => p.LatestPublishedReleaseId)
                 .IsRequired(false);
@@ -429,6 +431,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<HtmlBlock>()
                 .Property(block => block.Body)
                 .HasColumnName("Body");
+
+            modelBuilder.Entity<EmbedBlockLink>()
+                .Property(block => block.EmbedBlockId)
+                .HasColumnName("EmbedBlockId");
+
+            modelBuilder.Entity<EmbedBlockLink>()
+                .HasOne(eb => eb.EmbedBlock)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<MarkDownBlock>()
                 .Property(block => block.Body)

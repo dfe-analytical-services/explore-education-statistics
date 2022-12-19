@@ -1,4 +1,7 @@
-import { testPaginatedReleaseSummaries } from '@admin/pages/publication/__data__/testReleases';
+import {
+  testPaginatedReleaseSummaries,
+  testPaginatedReleaseSummariesNoResults,
+} from '@admin/pages/publication/__data__/testReleases';
 import PublicationTeamAccessPage from '@admin/pages/publication/PublicationTeamAccessPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
@@ -47,19 +50,91 @@ describe('PublicationTeamAccessPage', () => {
     releasePermissionService.listReleaseContributorInvites.mockResolvedValue(
       testInvites,
     );
+    publicationService.getRoles.mockResolvedValue([]);
+  });
+
+  test('renders the page correctly without any publication roles assigned', async () => {
+    publicationService.listReleases.mockResolvedValue(
+      testPaginatedReleaseSummariesNoResults,
+    );
+
+    await renderPage({});
+
+    expect(
+      screen.getByText('There are no publication roles currently assigned.'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('explore.statistics@education.gov.uk'),
+    ).toHaveAttribute('href', 'mailto:explore.statistics@education.gov.uk');
+  });
+
+  test('renders the page correctly with publication roles assigned', async () => {
+    publicationService.listReleases.mockResolvedValue(
+      testPaginatedReleaseSummariesNoResults,
+    );
+    publicationService.getRoles.mockClear();
+    publicationService.getRoles.mockResolvedValue([
+      {
+        id: 'role-1',
+        publication: 'publication',
+        role: 'Owner',
+        userName: 'Analyst1 User1',
+      },
+      {
+        id: 'role-2',
+        publication: 'publication',
+        role: 'Owner',
+        userName: 'Analyst2 User2',
+      },
+      {
+        id: 'role-3',
+        publication: 'publication',
+        role: 'Approver',
+        userName: 'Analyst2 User2',
+      },
+    ]);
+
+    await renderPage({});
+
+    expect(
+      screen.getByText(/To request changing the assigned publication roles/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('explore.statistics@education.gov.uk'),
+    ).toHaveAttribute('href', 'mailto:explore.statistics@education.gov.uk');
+
+    expect(screen.getByRole('table')).toBeInTheDocument();
+
+    const rows = screen.getAllByRole('row');
+    expect(rows).toHaveLength(4);
+
+    const headerCells = within(rows[0]).getAllByRole('columnheader');
+    expect(headerCells[0]).toHaveTextContent('Name');
+    expect(headerCells[1]).toHaveTextContent('Publication role');
+
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+    expect(row1Cells[0]).toHaveTextContent('Analyst1 User1');
+    expect(row1Cells[1]).toHaveTextContent('Owner');
+
+    const row2Cells = within(rows[2]).getAllByRole('cell');
+    expect(row2Cells[0]).toHaveTextContent('Analyst2 User2');
+    expect(row2Cells[1]).toHaveTextContent('Approver');
+
+    const row3Cells = within(rows[3]).getAllByRole('cell');
+    expect(row3Cells[0]).toHaveTextContent('Analyst2 User2');
+    expect(row3Cells[1]).toHaveTextContent('Owner');
   });
 
   test('renders the page correctly with no releases', async () => {
-    publicationService.listReleases.mockResolvedValue({
-      results: [],
-      paging: { page: 1, pageSize: 1, totalPages: 1, totalResults: 0 },
-    });
+    publicationService.listReleases.mockResolvedValue(
+      testPaginatedReleaseSummariesNoResults,
+    );
 
     await renderPage({});
 
     expect(
       screen.getByText(
-        'Create a release for this publication to manage team access.',
+        'Create a release for this publication to manage release access.',
       ),
     ).toBeInTheDocument();
   });

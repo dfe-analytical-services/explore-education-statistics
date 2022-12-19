@@ -45,28 +45,28 @@ Validate table data
     user checks table column heading contains    1    4    2015/16
     user checks table column heading contains    1    5    2016/17
 
-    user checks results table row heading contains    1    1    England
-    user checks results table row heading contains    1    2    Authorised absence rate
-    user checks results table row heading contains    2    1    Unauthorised absence rate
-    user checks results table row heading contains    3    1    Overall absence rate
+    user checks table row heading contains    1    1    England
+    user checks table row heading contains    1    2    Authorised absence rate
+    user checks table row heading contains    2    1    Unauthorised absence rate
+    user checks table row heading contains    3    1    Overall absence rate
 
     # Authorised absence rate
-    user checks results table cell contains    1    1    4.2%
-    user checks results table cell contains    1    2    3.5%
-    user checks results table cell contains    1    3    3.5%
-    user checks results table cell contains    1    4    3.4%
-    user checks results table cell contains    1    5    3.4%
+    user checks table cell contains    1    1    4.2%
+    user checks table cell contains    1    2    3.5%
+    user checks table cell contains    1    3    3.5%
+    user checks table cell contains    1    4    3.4%
+    user checks table cell contains    1    5    3.4%
 
     # Unauthorised absence rate
-    user checks results table cell contains    2    1    1.1%
-    user checks results table cell contains    2    2    1.1%
-    user checks results table cell contains    2    3    1.1%
-    user checks results table cell contains    2    4    1.1%
-    user checks results table cell contains    2    5    1.3%
+    user checks table cell contains    2    1    1.1%
+    user checks table cell contains    2    2    1.1%
+    user checks table cell contains    2    3    1.1%
+    user checks table cell contains    2    4    1.1%
+    user checks table cell contains    2    5    1.3%
 
     # Overall absence rate
-    user checks results table cell contains    3    1    5.3%
-    user checks results table cell contains    3    2    4.5%
-    user checks results table cell contains    3    3    4.6%
-    user checks results table cell contains    3    4    4.6%
-    user checks results table cell contains    3    5    4.7%
+    user checks table cell contains    3    1    5.3%
+    user checks table cell contains    3    2    4.5%
+    user checks table cell contains    3    3    4.6%
+    user checks table cell contains    3    4    4.6%
+    user checks table cell contains    3    5    4.7%

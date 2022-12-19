@@ -19,10 +19,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         {
         }
 
-        public FilterGroup(Filter filter, string label)
+        public FilterGroup(Guid filterId, string label)
         {
             Id = Guid.NewGuid();
-            Filter = filter;
+            FilterId = filterId;
             Label = label;
             FilterItems = new List<FilterItem>();
         }

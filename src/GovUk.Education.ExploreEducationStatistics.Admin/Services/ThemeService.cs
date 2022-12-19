@@ -194,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .AsQueryable()
                     .Where(userPublicationRole => 
                         userPublicationRole.UserId == userId &&
-                        ListOf(Owner, ReleaseApprover).Contains(userPublicationRole.Role))
+                        ListOf(Owner, Approver).Contains(userPublicationRole.Role))
                     .Select(userPublicationRole => userPublicationRole.Publication))
                 .Include(publication => publication.Topic)
                 .ThenInclude(topic => topic.Theme)

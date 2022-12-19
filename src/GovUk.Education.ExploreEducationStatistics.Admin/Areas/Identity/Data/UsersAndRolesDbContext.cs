@@ -56,6 +56,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                     v => v,
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
+            // Note that this logic is also present in UserInvite.Expired.
+            // It is implemented here as well because EF is not able to translate the "Expired" computed field for
+            // use in this QueryFilter. 
+            modelBuilder.Entity<UserInvite>()
+                .HasQueryFilter(invite => invite.Accepted || 
+                                          invite.Created >= DateTime.UtcNow.AddDays(-UserInvite.InviteExpiryDurationDays));
+
             modelBuilder.Entity<IdentityRole>()
                 .HasData(
                     CreateRole(Role.BauUser),

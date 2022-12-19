@@ -47,18 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid? LatestPublishedReleaseId { get; set; }
 
-        // TODO EES-3881 Remove once all Publications with a published release have their LatestPublishedReleaseId set
-        public Release? LatestPublishedRelease()
-        {
-            return Releases
-                .Where(IsLatestPublishedVersionOfRelease)
-                .OrderBy(r => r.Year)
-                .ThenBy(r => r.TimePeriodCoverage)
-                .LastOrDefault();
-        }
-
-        // TODO EES-3881 Rename this LatestPublishedRelease
-        public Release? LatestPublishedReleaseNew { get; set; }
+        public Release? LatestPublishedRelease { get; set; }
 
         public Release? LatestRelease()
         {

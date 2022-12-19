@@ -6,9 +6,10 @@ import VisuallyHidden from './VisuallyHidden';
 interface Props {
   footnotes: Footnote[];
   headingHiddenText?: string;
+  id: string;
 }
 
-const FigureFootnotes = ({ footnotes, headingHiddenText }: Props) => {
+const FigureFootnotes = ({ footnotes, headingHiddenText, id }: Props) => {
   return footnotes.length > 0 ? (
     <>
       <h3 className="govuk-heading-m">
@@ -17,7 +18,14 @@ const FigureFootnotes = ({ footnotes, headingHiddenText }: Props) => {
           <VisuallyHidden>{` ${headingHiddenText}`}</VisuallyHidden>
         )}
       </h3>
-      <CollapsibleList listStyle="number" collapseAfter={2} testId="footnotes">
+      <CollapsibleList
+        listStyle="number"
+        collapseAfter={2}
+        id={id}
+        itemName="footnote"
+        itemNamePlural="footnotes"
+        testId="footnotes"
+      >
         {footnotes.map(footnote => (
           <li key={footnote.id}>{footnote.label}</li>
         ))}

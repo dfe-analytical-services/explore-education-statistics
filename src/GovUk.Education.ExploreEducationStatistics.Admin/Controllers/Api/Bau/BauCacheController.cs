@@ -27,20 +27,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
         private readonly IBlobStorageService _publicBlobStorageService;
         private readonly IGlossaryCacheService _glossaryCacheService;
         private readonly IMethodologyCacheService _methodologyCacheService;
-        private readonly IThemeCacheService _themeCacheService;
+        private readonly IPublicationCacheService _publicationCacheService;
 
         public BauCacheController(
             IBlobStorageService privateBlobStorageService,
             IBlobStorageService publicBlobStorageService,
             IGlossaryCacheService glossaryCacheService,
             IMethodologyCacheService methodologyCacheService, 
-            IThemeCacheService themeCacheService)
+            IPublicationCacheService publicationCacheService)
         {
             _privateBlobStorageService = privateBlobStorageService;
             _publicBlobStorageService = publicBlobStorageService;
             _glossaryCacheService = glossaryCacheService;
             _methodologyCacheService = methodologyCacheService;
-            _themeCacheService = themeCacheService;
+            _publicationCacheService = publicationCacheService;
         }
 
         [HttpDelete("private-cache")]
@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                                     await _methodologyCacheService.UpdateSummariesTree();
                                     break;
                                 case UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree:
-                                    await _themeCacheService.UpdatePublicationTree();
+                                    await _publicationCacheService.UpdatePublicationTree();
                                     break;
                                 default:
                                     throw new ArgumentException($"Unsupported cache entry {entry}");

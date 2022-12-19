@@ -10,10 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    ReleaseAuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
@@ -80,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         return CreateHandler(contentDbContext);
                     },
                     release,
-                    Owner, ReleaseApprover);
+                    PublicationRole.Owner, PublicationRole.Approver);
             }
 
             [Fact]
@@ -107,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         return CreateHandler(contentDbContext);
                     },
                     release,
-                    Owner, ReleaseApprover);
+                    PublicationRole.Owner, PublicationRole.Approver);
             }
         }
 
@@ -125,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     {
                         ApprovalStatus = ReleaseApprovalStatus.Draft
                     },
-                    Approver, Contributor, Lead);
+                    ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.Lead);
             }
 
             [Fact]
@@ -140,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     {
                         ApprovalStatus = ReleaseApprovalStatus.Approved
                     },
-                    Approver, Contributor, Lead);
+                    ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.Lead);
             }
         }
 

@@ -183,10 +183,10 @@ Validate data block is in list
     user checks table column heading contains    1    6    Actions
 
     user checks table body has x rows    1
-    user checks results table cell contains    1    1    ${DATABLOCK_NAME}
-    user checks results table cell contains    1    2    No
-    user checks results table cell contains    1    3    No
-    user checks results table cell contains    1    4    UI test highlight name
+    user checks table cell contains    1    1    ${DATABLOCK_NAME}
+    user checks table cell contains    1    2    No
+    user checks table cell contains    1    3    No
+    user checks table cell contains    1    4    UI test highlight name
 
 Embed data block into release content
     user clicks link    Content
@@ -238,7 +238,7 @@ Validate embedded table rows
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
     user scrolls to element    id:releaseMainContent
 
-    user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
+    user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
 
     ${table}=    set variable    ${datablock} >> css:table
     user waits until page contains element    ${table}    30
@@ -308,8 +308,8 @@ Validate marked as 'In content' on data block list
     user checks table column heading contains    1    3    In content
 
     user checks table body has x rows    1
-    user checks results table cell contains    1    1    ${DATABLOCK_NAME}
-    user checks results table cell contains    1    3    Yes
+    user checks table cell contains    1    1    ${DATABLOCK_NAME}
+    user checks table cell contains    1    3    Yes
 
 Navigate to Chart tab
     user clicks link    Edit block
@@ -420,13 +420,13 @@ Save chart and validate marked as 'Has chart' in data blocks list
     user checks table column heading contains    1    2    Has chart
 
     user checks table body has x rows    1
-    user checks results table cell contains    1    1    ${DATABLOCK_NAME}
-    user checks results table cell contains    1    2    Yes
+    user checks table cell contains    1    1    ${DATABLOCK_NAME}
+    user checks table cell contains    1    2    Yes
 
 Validate line chart embeds correctly
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
+    user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
     user waits until page contains element    ${datablock}
@@ -524,7 +524,7 @@ Save and validate vertical bar chart embeds correctly
 
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
-    user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
+    user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
     user waits until page contains element    ${datablock}
@@ -610,7 +610,7 @@ Save and validate horizontal bar chart embeds correctly
 
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
+    user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
     user waits until page contains element    ${datablock}
@@ -696,7 +696,7 @@ Save and validate geographic chart embeds correctly
 
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
+    user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
     user waits until page does not contain loading spinner
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
@@ -739,7 +739,7 @@ Save and validate infographic chart embeds correctly
 
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
+    user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
     user waits until page contains element    ${datablock}

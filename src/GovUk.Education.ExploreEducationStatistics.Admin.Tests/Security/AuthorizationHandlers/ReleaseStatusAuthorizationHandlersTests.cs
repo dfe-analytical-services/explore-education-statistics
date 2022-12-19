@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                         return CreateHandler(releaseStatusRepository, context);
                                     },
                                     release,
-                                    Owner, ReleaseApprover
+                                    Owner, Approver
                                 );
                             }
                             else
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                         return CreateHandler(releaseStatusRepository, context);
                                     },
                                     release,
-                                    ReleaseApprover
+                                    Approver
                                 );
                             }
                         }
@@ -354,7 +354,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     },
                                     release,
                                     Owner, 
-                                    ReleaseApprover
+                                    Approver
                                 );
                             }
                             else
@@ -371,7 +371,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                         return CreateHandler(releaseStatusRepository, context);
                                     },
                                     release,
-                                    ReleaseApprover
+                                    Approver
                                 );
                             }
                         }
@@ -518,7 +518,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     return CreateHandler(releaseStatusRepository, context);
                                 },
                                 release,
-                                ReleaseApprover
+                                Approver
                             );
                         }
                     );

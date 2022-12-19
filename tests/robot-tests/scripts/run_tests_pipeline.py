@@ -11,8 +11,9 @@ import subprocess
 
 
 def run_tests_pipeline():
-    assert args.admin_password, "Provide an admin password with an '--admin-pass PASS' argument"
-    assert args.analyst_password, "Provide an analyst password with an '--analyst-pass PASS' argument"
+    assert args.admin_pass, "Provide an admin password with an '--admin-pass PASS' argument"
+    assert args.analyst_pass, "Provide an analyst password with an '--analyst-pass PASS' argument"
+    assert args.expiredinvite_pass, "Provide an expiredinvite password with an '--expiredinvite-pass PASS' argument"
     assert args.slack_webhook_url, "Please provide slack webhook URL"
     assert args.env, "Provide an environment with an '--env ENV' argument"
     assert args.file, "Provide a file/dir to run with an '--file FILE/DIR' argument"
@@ -29,9 +30,9 @@ def run_tests_pipeline():
 
     def get_test_command() -> str:
         if args.file == "tests/general_public/check_snapshots.robot":
-            return f"pipenv run python run_tests.py --admin-pass {args.admin_password} --analyst-pass {args.analyst_password} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes {args.processes}"
+            return f"pipenv run python run_tests.py --admin-pass {args.admin_pass} --analyst-pass {args.analyst_pass} --expiredinvite-pass {args.expiredinvite_pass} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes {args.processes}"
         else:
-            return f"pipenv run python run_tests.py --admin-pass {args.admin_password} --analyst-pass {args.analyst_password} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes {args.processes} --enable-slack"
+            return f"pipenv run python run_tests.py --admin-pass {args.admin_pass} --analyst-pass {args.analyst_pass} --expiredinvite-pass {args.expiredinvite_pass} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes {args.processes} --enable-slack-notifications"
 
     subprocess.run(get_test_command(), shell=True)
 
@@ -42,9 +43,13 @@ if __name__ == "__main__":
         description="Use this script in a CI environment to run UI tests",
     )
 
-    parser.add_argument("--admin-password", dest="admin_password", help="BAU admin password", required=True)
+    parser.add_argument("--admin-pass", dest="admin_pass", help="BAU admin password", required=True)
 
-    parser.add_argument("--analyst-password", dest="analyst_password", help="Analyst password", required=True)
+    parser.add_argument("--analyst-pass", dest="analyst_pass", help="Analyst password", required=True)
+
+    parser.add_argument(
+        "--expiredinvite-pass", dest="expiredinvite_pass", help="ExpiredInvite account password", required=True
+    )
 
     parser.add_argument(
         "--slack-webhook-url",

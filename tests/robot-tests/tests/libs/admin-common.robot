@@ -9,6 +9,25 @@ ${ANALYST1_BROWSER}=    analyst1
 
 
 *** Keywords ***
+user logs in via identity provider
+    [Arguments]    ${email}    ${password}
+
+    IF    "%{IDENTITY_PROVIDER}" == "KEYCLOAK"
+        user waits until page contains element    xpath://h1[contains(text(), "Sign in to your account")]
+        user enters text into element    id:username    ${email}
+        user enters text into element    id:password    ${password}
+        user clicks element    id:kc-login
+    ELSE IF    "%{IDENTITY_PROVIDER}" == "AZURE"
+        user waits until page contains element    xpath://*[.='Sign in']
+        user enters text into element    xpath://*[@name='loginfmt']    ${email}
+        user clicks element    //*[@type='submit']
+        user waits until page contains element    xpath://*[@name='passwd']
+        user enters text into element    xpath://*[@name='passwd']    ${password}
+        user clicks element    xpath://*[@type='submit']
+        user waits until page contains element    xpath://*[.='Stay signed in?']
+        user clicks element    id:idBtn_Back
+    END
+
 user signs in as bau1
     [Arguments]    ${open_browser}=True    ${alias}=${BAU1_BROWSER}
     IF    ${open_browser}
@@ -53,6 +72,7 @@ user selects dashboard theme and topic if possible
     [Arguments]
     ...    ${theme_name}=%{TEST_THEME_NAME}
     ...    ${topic_name}=%{TEST_TOPIC_NAME}
+    user waits until page does not contain loading spinner
     ${DROPDOWNS_EXIST}=    user checks dashboard theme topic dropdowns exist
     IF    ${DROPDOWNS_EXIST}
         user chooses select option    id:publicationsReleases-themeTopic-themeId    ${theme_name}
@@ -640,7 +660,7 @@ user gives analyst publication owner access
 
 user gives analyst publication release approver access
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
-    user gives publication access to analyst    ${PUBLICATION_NAME}    ReleaseApprover    ${ANALYST_EMAIL}
+    user gives publication access to analyst    ${PUBLICATION_NAME}    Approver    ${ANALYST_EMAIL}
 
 user removes publication owner access from analyst
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
@@ -648,7 +668,7 @@ user removes publication owner access from analyst
 
 user removes publication release approver access from analyst
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
-    user removes publication access from analyst    ${PUBLICATION_NAME}    ReleaseApprover    ${ANALYST_EMAIL}
+    user removes publication access from analyst    ${PUBLICATION_NAME}    Approver    ${ANALYST_EMAIL}
 
 user gives publication access to analyst
     [Arguments]

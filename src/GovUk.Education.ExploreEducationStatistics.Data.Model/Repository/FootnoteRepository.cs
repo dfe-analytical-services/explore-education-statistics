@@ -1,12 +1,11 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.DbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
@@ -19,40 +18,194 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             _context = context;
         }
 
-        public IEnumerable<Footnote> GetFilteredFootnotes(
+        public async Task<Footnote> CreateFootnote(Guid releaseId,
+            string content,
+            IReadOnlySet<Guid> filterIds,
+            IReadOnlySet<Guid> filterGroupIds,
+            IReadOnlySet<Guid> filterItemIds,
+            IReadOnlySet<Guid> indicatorIds,
+            IReadOnlySet<Guid> subjectIds,
+            int order)
+        {
+            var footnote = new Footnote
+            {
+                Releases = new List<ReleaseFootnote>
+                {
+                    new()
+                    {
+                        ReleaseId = releaseId
+                    }
+                },
+                Content = content,
+                Order = order,
+                Filters = filterIds.Select(filterId => new FilterFootnote
+                {
+                    FilterId = filterId
+                }).ToList(),
+                FilterGroups = filterGroupIds.Select(filterGroupId => new FilterGroupFootnote
+                {
+                    FilterGroupId = filterGroupId
+                }).ToList(),
+                FilterItems = filterItemIds.Select(filterItemId => new FilterItemFootnote
+                {
+                    FilterItemId = filterItemId
+                }).ToList(),
+                Indicators = indicatorIds.Select(indicatorId => new IndicatorFootnote
+                {
+                    IndicatorId = indicatorId
+                }).ToList(),
+                Subjects = subjectIds.Select(subjectId => new SubjectFootnote
+                {
+                    SubjectId = subjectId
+                }).ToList()
+            };
+
+            // TODO EES-2971 We could link Footnote with ReleaseSubject to simplify getting all foonotes for a subject.
+            // Currently this involves getting all footnotes with criteria matching the subject directly or indirectly.
+            // This would also prevent removing a subject from a release until all of its footnote links are removed.
+            // Currently a footnote could remain linked to a release and a subject (either directly or indirectly via
+            // its FilterItems/FilterGroups/Filters/Indicators) even though no ReleaseSubject exists.
+
+            await _context.Footnote.AddAsync(footnote);
+            await _context.SaveChangesAsync();
+
+            return footnote;
+        }
+
+        public async Task<List<Footnote>> GetFilteredFootnotes(
             Guid releaseId,
             Guid subjectId,
             IEnumerable<Guid> filterItemIds,
             IEnumerable<Guid> indicatorIds)
         {
-            var releaseIdParam = new SqlParameter("releaseId", releaseId);
-            var subjectIdParam = new SqlParameter("subjectId", subjectId);
-            var filterItemListParam = CreateIdListType("filterItemList", filterItemIds);
-            var indicatorListParam = CreateIdListType("indicatorList", indicatorIds);
+            // Query the id's of the filter groups and filters corresponding with the filter item id's
+            // Sanitise all id's to make sure they belong to the subject
+            var filterIdsResult = await _context.FilterItem
+                .Where(filterItem => filterItemIds.Contains(filterItem.Id)
+                                     && filterItem.FilterGroup.Filter.SubjectId == subjectId)
+                .Select(filterItem => new
+                {
+                    FilterItemId = filterItem.Id,
+                    filterItem.FilterGroupId,
+                    filterItem.FilterGroup.FilterId
+                })
+                .ToListAsync();
 
-            return _context
+            var filterItemIdsSanitised = filterIdsResult
+                .Select(filter => filter.FilterItemId)
+                .ToList();
+
+            var filterGroupsIdsSanitised = filterIdsResult
+                .Select(filter => filter.FilterGroupId)
+                .Distinct()
+                .ToList();
+
+            var filterIdsSanitised = filterIdsResult
+                .Select(filter => filter.FilterId)
+                .Distinct()
+                .ToList();
+
+            // Sanitise the indicator id's to make sure they belong to the subject
+            var indicatorIdsSanitised = await _context.Indicator
+                .Where(indicator => indicatorIds.Contains(indicator.Id)
+                                    && indicator.IndicatorGroup.SubjectId == subjectId)
+                .Select(indicator => indicator.Id)
+                .ToListAsync();
+
+            // A footnote must be linked to the release id
+            var footnotesQueryable = _context
                 .Footnote
-                .FromSqlRaw(
-                    "EXEC dbo.FilteredFootnotes " +
-                    "@releaseId," +
-                    "@subjectId," +
-                    "@indicatorList," +
-                    "@filterItemList",
-                    releaseIdParam,
-                    subjectIdParam,
-                    indicatorListParam,
-                    filterItemListParam)
-                .AsNoTracking();
+                .Where(footnote => footnote.Releases.Any(releaseFootnote => releaseFootnote.ReleaseId == releaseId));
+
+            // If the list of filter and indicator id's are empty,
+            // return early with only footnotes that apply directly to this subject
+            if (!filterIdsResult.Any() && !indicatorIdsSanitised.Any())
+            {
+                return await footnotesQueryable.Where(footnote =>
+                        footnote.Subjects.Any(subjectFootnote => subjectFootnote.SubjectId == subjectId)
+
+                        // We don't allow a footnote to apply to directly to a subject and to specific subject data
+                        // of the same subject at the same time, so these additional conditions aren't strictly necessary
+                        && footnote.FilterItems.All(itemFootnote =>
+                            itemFootnote.FilterItem.FilterGroup.Filter.SubjectId != subjectId)
+                        && footnote.FilterGroups.All(filterGroupFootnote =>
+                            filterGroupFootnote.FilterGroup.Filter.SubjectId != subjectId)
+                        && footnote.Filters.All(filterFootnote =>
+                            filterFootnote.Filter.SubjectId != subjectId)
+                        && footnote.Indicators.All(indicatorFootnote =>
+                            indicatorFootnote.Indicator.IndicatorGroup.SubjectId != subjectId))
+                    .OrderBy(footnote => footnote.Order)
+                    .ThenBy(footnote => footnote.Id)
+                    .ToListAsync();
+            }
+
+            footnotesQueryable = footnotesQueryable.Where(footnote =>
+                // A footnote must be applied directly to this subject id    
+                footnote.Subjects.Any(subjectFootnote =>
+                    subjectFootnote.SubjectId == subjectId)
+                ||
+                // or be applicable to it through filters / filter groups / filter items or indicators.
+                (
+                    // It must be applicable to it in some way
+                    // rather than just being applicable exclusively to other subjects
+                    (footnote.FilterItems.Any(filterItemFootnote =>
+                         filterItemFootnote.FilterItem.FilterGroup.Filter.SubjectId == subjectId) ||
+                     footnote.FilterGroups.Any(filterGroupFootnote =>
+                         filterGroupFootnote.FilterGroup.Filter.SubjectId == subjectId) ||
+                     footnote.Filters.Any(filterFootnote =>
+                         filterFootnote.Filter.SubjectId == subjectId) ||
+                     footnote.Indicators.Any(indicatorFootnote =>
+                         indicatorFootnote.Indicator.IndicatorGroup.SubjectId == subjectId)) 
+                    &&
+                    // and it must be applicable to one or more filters / filter groups / filter items if there are any.
+                    (
+                        // It's either not got any applicable filters / filter groups / filter items for this subject id
+                        (footnote.FilterItems.All(filterItemFootnote =>
+                             filterItemFootnote.FilterItem.FilterGroup.Filter.SubjectId != subjectId) &&
+                         footnote.FilterGroups.All(filterGroupFootnote =>
+                             filterGroupFootnote.FilterGroup.Filter.SubjectId != subjectId) &&
+                         footnote.Filters.All(filterFootnote => filterFootnote.Filter.SubjectId != subjectId))
+                        ||
+                         // or it's got a filter item applicable to one of the filter item id's 
+                        footnote.FilterItems.Any(filterItemFootnote =>
+                            filterItemIdsSanitised.Contains(filterItemFootnote.FilterItemId))
+                        ||
+                        // or it's got a filter group applicable to one of the filter group id's
+                        footnote.FilterGroups.Any(filterGroupFootnote =>
+                            filterGroupsIdsSanitised.Contains(filterGroupFootnote.FilterGroupId))
+                        ||
+                        // or it's got a filter applicable to one of the filter id's.
+                        footnote.Filters.Any(filterFootnote =>
+                            filterIdsSanitised.Contains(filterFootnote.FilterId))
+                    )
+                    &&
+                    // and it must be applicable to one or more of the indicators if there are any.
+                    (
+                        // It's either not got any applicable indicators for this subject id 
+                        footnote.Indicators.All(indicatorFootnote =>
+                         indicatorFootnote.Indicator.IndicatorGroup.SubjectId != subjectId)
+                        ||
+                        // or it's got an indicator applicable to one of the indicator id's.
+                        footnote.Indicators.Any(indicatorFootnote =>
+                         indicatorIdsSanitised.Contains(indicatorFootnote.IndicatorId))
+                    )
+                ));
+
+            // Execute the query
+            return await footnotesQueryable
+                .OrderBy(footnote => footnote.Order)
+                .ThenBy(footnote => footnote.Id)
+                .ToListAsync();
         }
 
         public async Task DeleteAllFootnotesBySubject(Guid releaseId, Guid subjectId)
         {
-            var footnotesLinkedToSubject = GetFootnotes(releaseId, subjectId);
+            var footnotesLinkedToSubject = await GetFootnotes(releaseId, subjectId);
 
             foreach (var footnote in footnotesLinkedToSubject)
             {
-                var canRemoveReleaseFootnote = !IsFootnoteLinkedToAnotherSubjectForThisRelease(footnote.Id, releaseId, subjectId);
-                var canRemoveFootnote = canRemoveReleaseFootnote && !IsFootnoteLinkedToAnotherSubject(footnote.Id, subjectId);
+                var canRemoveReleaseFootnote = !await IsFootnoteLinkedToAnotherSubjectForThisRelease(footnote.Id, releaseId, subjectId);
+                var canRemoveFootnote = canRemoveReleaseFootnote && !await IsFootnoteLinkedToAnotherSubject(footnote.Id, subjectId);
 
                 await DeleteFootnote(releaseId, footnote, canRemoveReleaseFootnote, canRemoveFootnote);
             }
@@ -62,17 +215,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 
         public async Task DeleteFootnote(Guid releaseId, Guid id)
         {
-            var footnotes = GetFootnotes(releaseId).Where(f => f.Id == id);
-
-            foreach (var footnote in footnotes)
-            {
-                await DeleteFootnote(releaseId, footnote, true, true);
-            }
-
+            var footnote = await GetFootnote(id);
+            await DeleteFootnote(releaseId, footnote, canRemoveReleaseFootnote: true, canRemoveFootnote: true);
             await _context.SaveChangesAsync();
         }
 
-        private async Task DeleteFootnote(Guid releaseId, Footnote footnote, bool canRemoveReleaseFootnote, bool canRemoveFootnote)
+        private async Task DeleteFootnote(Guid releaseId,
+            Footnote footnote,
+            bool canRemoveReleaseFootnote,
+            bool canRemoveFootnote)
         {
             // Break link with the whole release if this footnote is not related to any other subject for the release
             // Else, as the ReleaseSubject link will be broken then footnote will not be visible.
@@ -81,23 +232,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 await DeleteReleaseFootnoteLinkAsync(releaseId, footnote.Id);
             }
 
-            if (await IsFootnoteExclusiveToReleaseAsync(releaseId, footnote.Id))
+            if (await IsFootnoteExclusiveToRelease(releaseId, footnote.Id))
             {
-                DeleteEntities(footnote.Subjects);
-                DeleteEntities(footnote.Filters);
-                DeleteEntities(footnote.FilterGroups);
-                DeleteEntities(footnote.FilterItems);
-                DeleteEntities(footnote.Indicators);
-
                 if (canRemoveFootnote)
                 {
                     var footnoteToRemove = await _context.Footnote.SingleAsync(f => f.Id == footnote.Id);
+                    var footnotesToReorder = await _context.ReleaseFootnote
+                        .Include(rf => rf.Footnote)
+                        .Where(rf => rf.ReleaseId == releaseId &&
+                                     rf.Footnote.Order > footnoteToRemove.Order)
+                        .Select(rf => rf.Footnote)
+                        .OrderBy(f => f.Order)
+                        .ToListAsync();
+
                     _context.Footnote.Remove(footnoteToRemove);
+                    _context.Footnote.UpdateRange(footnotesToReorder);
+                    footnotesToReorder.ForEach(footnoteToReorder =>
+                    {
+                        if (footnoteToReorder.Order > 0)
+                        {
+                            footnoteToReorder.Order--;
+                        }
+                    });
                 }
             }
         }
 
-        public async Task<bool> IsFootnoteExclusiveToReleaseAsync(Guid releaseId, Guid footnoteId)
+        public async Task<bool> IsFootnoteExclusiveToRelease(Guid releaseId, Guid footnoteId)
         {
             var otherFootnoteReferences = await _context.ReleaseFootnote
                 .CountAsync(rf => rf.FootnoteId == footnoteId && rf.ReleaseId != releaseId);
@@ -107,18 +268,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 
         public Task<Footnote> GetFootnote(Guid id)
         {
-            return GetBaseFootnoteQuery().SingleOrDefaultAsync(f => f.Id == id);
+            return GetBaseFootnoteQuery().SingleAsync(f => f.Id == id);
         }
 
-        public IEnumerable<Footnote> GetFootnotes(Guid releaseId)
+        public async Task<List<Footnote>> GetFootnotes(Guid releaseId, Guid? subjectId = null)
         {
-            var subjectsIdsForRelease = _context.ReleaseSubject
+            if (subjectId.HasValue)
+            {
+                return await GetFootnotes(releaseId, new List<Guid>
+                {
+                    subjectId.Value
+                });
+            }
+
+            var subjectsIdsForRelease = await _context.ReleaseSubject
                 .Where(rs => rs.ReleaseId == releaseId)
                 .Select(rs => rs.SubjectId)
-                .ToList();
+                .ToListAsync();
 
-            var footnotes = GetFootnotes(releaseId, subjectsIdsForRelease)
-                .ToList();
+            var footnotes = await GetFootnotes(releaseId, subjectsIdsForRelease);
 
             // Remove the below check as part of EES-2971
             var releaseFootnotes = _context.ReleaseFootnote
@@ -133,49 +301,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             return footnotes;
         }
 
-        public IEnumerable<Footnote> GetFootnotes(Guid releaseId, Guid subjectId)
+        private async Task<List<Footnote>> GetFootnotes(Guid releaseId, IEnumerable<Guid> subjectIds)
         {
-            return GetFootnotes(releaseId, new List<Guid>
-            {
-                subjectId
-            });
-        }
-
-        public IEnumerable<Footnote> GetFootnotes(Guid releaseId, IEnumerable<Guid> subjectIds)
-        {
-            return GetBaseFootnoteQuery()
+            return (await GetBaseFootnoteQuery()
                     .Where(footnote => footnote.Releases.Any(releaseFootnote => releaseFootnote.ReleaseId == releaseId))
                     .Select(f => new Footnote
                     {
                         Id = f.Id,
                         Content = f.Content,
+                        Order = f.Order,
                         Filters = f.Filters
                             .Where(filterFootnote => subjectIds.Contains(filterFootnote.Filter.SubjectId))
                             .ToList(),
                         Indicators = f.Indicators
-                            .Where(indicatorFootnote => subjectIds.Contains(indicatorFootnote.Indicator.IndicatorGroup.SubjectId))
+                            .Where(indicatorFootnote =>
+                                subjectIds.Contains(indicatorFootnote.Indicator.IndicatorGroup.SubjectId))
                             .ToList(),
                         Releases = f.Releases
                             .Where(releaseFootnote => releaseFootnote.ReleaseId == releaseId)
                             .ToList(),
                         FilterGroups = f.FilterGroups
-                            .Where(filterGroupFootnote => subjectIds.Contains(filterGroupFootnote.FilterGroup.Filter.SubjectId))
+                            .Where(filterGroupFootnote =>
+                                subjectIds.Contains(filterGroupFootnote.FilterGroup.Filter.SubjectId))
                             .ToList(),
                         FilterItems = f.FilterItems
-                            .Where(filterItemFootnote => subjectIds.Contains(filterItemFootnote.FilterItem.FilterGroup.Filter.SubjectId))
+                            .Where(filterItemFootnote =>
+                                subjectIds.Contains(filterItemFootnote.FilterItem.FilterGroup.Filter.SubjectId))
                             .ToList(),
                         Subjects = f.Subjects
                             .Where(subjectFootnote => subjectIds.Contains(subjectFootnote.SubjectId))
                             .ToList()
                     })
-                    .ToList()
-                    .Where(f => (f.Filters != null && f.Filters.Any()) ||
-                                  (f.Indicators != null && f.Indicators.Any()) ||
-                                  (f.FilterGroups != null && f.FilterGroups.Any()) ||
-                                  (f.FilterItems != null && f.FilterItems.Any()) ||
-                                  (f.Subjects != null && f.Subjects.Any())
-                    )
-                    .ToList();
+                    .ToListAsync())
+                .Where(f => f.Filters.Any() ||
+                            f.Indicators.Any() ||
+                            f.FilterGroups.Any() ||
+                            f.FilterItems.Any() ||
+                            f.Subjects.Any()
+                )
+                .OrderBy(f => f.Order)
+                .ThenBy(f => f.Id)
+                .ToList();
         }
 
         private IQueryable<Footnote> GetBaseFootnoteQuery()
@@ -227,60 +393,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
         {
             var releaseFootnote = await _context.ReleaseFootnote
                 .Where(rf => rf.ReleaseId == releaseId && rf.FootnoteId == footnoteId)
-                .FirstOrDefaultAsync();
+                .FirstAsync();
 
             _context.ReleaseFootnote.Remove(releaseFootnote);
         }
 
-        private void DeleteEntities<T>(IEnumerable<T> entitiesToDelete)
+        private async Task<bool> IsFootnoteLinkedToAnotherSubject(Guid footnoteId, Guid subjectId)
         {
-            foreach (var t in entitiesToDelete)
-            {
-                _context.Entry(t).State = EntityState.Deleted;
-            }
-        }
-
-        private bool IsFootnoteLinkedToAnotherSubject(Guid id, Guid subjectId)
-        {
-            var footnote = _context.Footnote
-                .Include(f => f.Filters)
-                .Include(f => f.FilterGroups)
-                .Include(f => f.FilterItems)
-                .Include(f => f.Indicators)
-                .ThenInclude(i => i.Indicator.IndicatorGroup)
-                .Include(f => f.Subjects).Single(f => f.Id == id);
-
+            var footnote = await GetFootnote(footnoteId);
             return footnote.Subjects.Any(subject => subject.SubjectId != subjectId) ||
-                    footnote.Filters.Any(filter => filter.Filter.SubjectId != subjectId) ||
-                    footnote.Indicators.Any(indicator => indicator.Indicator.IndicatorGroup.SubjectId != subjectId) ||
-                    footnote.FilterGroups.Any(filterGroup => filterGroup.FilterGroup.Filter.SubjectId != subjectId) ||
-                    footnote.FilterItems.Any(filterItem => filterItem.FilterItem.FilterGroup.Filter.SubjectId != subjectId);
+                   footnote.Filters.Any(filter => filter.Filter.SubjectId != subjectId) ||
+                   footnote.Indicators.Any(indicator => indicator.Indicator.IndicatorGroup.SubjectId != subjectId) ||
+                   footnote.FilterGroups.Any(filterGroup => filterGroup.FilterGroup.Filter.SubjectId != subjectId) ||
+                   footnote.FilterItems.Any(filterItem => filterItem.FilterItem.FilterGroup.Filter.SubjectId != subjectId);
         }
 
-        private bool IsFootnoteLinkedToAnotherSubjectForThisRelease(Guid id, Guid releaseId, Guid subjectId)
+        private async Task<bool> IsFootnoteLinkedToAnotherSubjectForThisRelease(Guid footnoteId,
+            Guid releaseId,
+            Guid subjectId)
         {
-            var otherSubjectIds = _context.ReleaseSubject
+            var otherSubjectIds = await _context.ReleaseSubject
                 .Where(rs => rs.ReleaseId == releaseId && rs.SubjectId != subjectId)
-                .ToList()
-                .Select(rs => rs.SubjectId).ToList();
+                .Select(rs => rs.SubjectId)
+                .ToListAsync();
 
-            var footnote = _context.Footnote
-                .Include(f => f.Filters)
-                .ThenInclude(f => f.Filter)
-                .Include(f => f.FilterGroups)
-                .ThenInclude(f => f.FilterGroup.Filter)
-                .Include(f => f.FilterItems)
-                .ThenInclude(itemFootnote => itemFootnote.FilterItem.FilterGroup.Filter)
-                .Include(f => f.Indicators)
-                .ThenInclude(i => i.Indicator.IndicatorGroup)
-                .Include(f => f.Subjects)
-                .Single(f => f.Id == id);
-
+            var footnote = await GetFootnote(footnoteId);
             return footnote.Subjects.Any(subject => otherSubjectIds.Contains(subject.SubjectId)) ||
-                    footnote.Filters.Any(filter => otherSubjectIds.Contains(filter.Filter.SubjectId)) ||
-                    footnote.Indicators.Any(indicator => otherSubjectIds.Contains(indicator.Indicator.IndicatorGroup.SubjectId)) ||
-                    footnote.FilterGroups.Any(filterGroup => otherSubjectIds.Contains(filterGroup.FilterGroup.Filter.SubjectId)) ||
-                    footnote.FilterItems.Any(filterItem => otherSubjectIds.Contains(filterItem.FilterItem.FilterGroup.Filter.SubjectId));
+                   footnote.Filters.Any(filter => otherSubjectIds.Contains(filter.Filter.SubjectId)) ||
+                   footnote.Indicators.Any(indicator => otherSubjectIds.Contains(indicator.Indicator.IndicatorGroup.SubjectId)) ||
+                   footnote.FilterGroups.Any(filterGroup => otherSubjectIds.Contains(filterGroup.FilterGroup.Filter.SubjectId)) ||
+                   footnote.FilterItems.Any(filterItem => otherSubjectIds.Contains(filterItem.FilterItem.FilterGroup.Filter.SubjectId));
         }
     }
 }

@@ -7,8 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationH
 using Microsoft.AspNetCore.Authorization;
 using static System.DateTime;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerResourceRoleService;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -81,14 +79,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                         .HasRolesOnPublication(
                             context.User.GetUserId(),
                             release.PublicationId,
-                            Owner, ReleaseApprover))
+                            PublicationRole.Owner, PublicationRole.Approver))
                 {
                     context.Succeed(requirement);
                 }
             }
         }
-        
-        
         
         public class HasPreReleaseRoleWithinAccessWindowAuthorizationHandler
             : AuthorizationHandler<ViewReleaseRequirement, Release>
@@ -113,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                         .HasRolesOnRelease(
                             context.User.GetUserId(),
                             release.Id,
-                            PrereleaseViewer))
+                            ReleaseRole.PrereleaseViewer))
                 {
                     var windowStatus = _preReleaseService.GetPreReleaseWindowStatus(release, UtcNow);
                     if (windowStatus.Access == PreReleaseAccess.Within)

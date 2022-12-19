@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -27,6 +26,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
+using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -634,16 +634,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetPublication_IsSuperseded()
         {
-            var supersedingPublication = new Publication
-            {
-                Title = "Superseding publication",
-                Releases = ListOf(
-                    new Release
-                    {
-                        Published = DateTime.UtcNow,
-                    }),
-            };
-
             var publication = new Publication
             {
                 Title = "Test publication",
@@ -651,14 +641,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Theme = new Theme(),
                 },
-                SupersededBy = supersedingPublication,
+                SupersededBy = new Publication
+                {
+                    LatestPublishedReleaseId = Guid.NewGuid()
+                }
             };
 
-        var contextId = Guid.NewGuid().ToString();
+            var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Publications.AddRangeAsync(supersedingPublication, publication);
+                await context.Publications.AddAsync(publication);
                 await context.SaveChangesAsync();
             }
 
@@ -666,11 +659,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var publicationService = BuildPublicationService(context);
 
-                var result = (await publicationService.GetPublication(publication.Id, includePermissions: true)).AssertRight();
+                var result = (await publicationService.GetPublication(publication.Id, includePermissions: true))
+                    .AssertRight();
 
                 Assert.Equal(publication.Id, result.Id);
 
-                Assert.Equal(supersedingPublication.Id, result.SupersededById);
+                Assert.Equal(publication.SupersededById, result.SupersededById);
                 Assert.True(result.IsSuperseded);
             }
         }
@@ -678,16 +672,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetPublication_IsSuperseded_False()
         {
-            var supersedingPublication = new Publication
-            {
-                Title = "Superseding publication",
-                Releases = ListOf(
-                    new Release
-                    {
-                        Published = DateTime.UtcNow.AddDays(1),
-                    }),
-            };
-
             var publication = new Publication
             {
                 Title = "Test publication",
@@ -695,14 +679,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Theme = new Theme(),
                 },
-                SupersededBy = supersedingPublication,
+                SupersededBy = new Publication
+                {
+                    // Superseding publication doesn't have a published release
+                    LatestPublishedReleaseId = null
+                }
             };
 
-        var contextId = Guid.NewGuid().ToString();
+            var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Publications.AddRangeAsync(supersedingPublication, publication);
+                await context.Publications.AddAsync(publication);
                 await context.SaveChangesAsync();
             }
 
@@ -714,7 +702,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(publication.Id, result.Id);
 
-                Assert.Equal(supersedingPublication.Id, result.SupersededById);
+                Assert.Equal(publication.SupersededById, result.SupersededById);
                 Assert.False(result.IsSuperseded);
             }
         }
@@ -1001,8 +989,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Include(p => p.Contact)
                     .SingleAsync(p => p.Id == viewModel.Id);
 
-                Assert.NotNull(updatedPublication);
-                Assert.False(updatedPublication!.Live);
+                Assert.False(updatedPublication.Live);
                 Assert.True(updatedPublication.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated!.Value).Milliseconds, 0, 1500);
                 Assert.Equal("new-title", updatedPublication.Slug);
@@ -1070,7 +1057,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-                var themeCacheService = new Mock<IThemeCacheService>(Strict);
                 var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
                 var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
@@ -1080,8 +1066,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 publicationCacheService.Setup(mock => mock.UpdatePublication(supersededPublication.Slug))
                     .ReturnsAsync(new PublicationCacheViewModel());
 
-                themeCacheService.Setup(mock => mock.UpdatePublicationTree())
-                    .ReturnsAsync(new List<ThemeTree<PublicationTreeNode>>());
+                publicationCacheService.Setup(mock => mock.UpdatePublicationTree())
+                    .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
 
                 methodologyCacheService.Setup(mock => mock.UpdateSummariesTree())
                     .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
@@ -1090,7 +1076,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publicationService = BuildPublicationService(context,
                     methodologyVersionRepository: methodologyVersionRepository.Object,
                     publicationCacheService: publicationCacheService.Object,
-                    themeCacheService: themeCacheService.Object,
                     methodologyCacheService: methodologyCacheService.Object);
 
                 // Expect the title to change but not the slug, as the Publication is already published.
@@ -1118,8 +1103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 VerifyAllMocks(methodologyVersionRepository,
                     methodologyCacheService,
-                    publicationCacheService,
-                    themeCacheService);
+                    publicationCacheService);
 
                 var viewModel = result.AssertRight();
 
@@ -1136,8 +1120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Include(p => p.Contact)
                     .SingleAsync(p => p.Id == viewModel.Id);
 
-                Assert.NotNull(updatedPublication);
-                Assert.True(updatedPublication!.Live);
+                Assert.True(updatedPublication.Live);
                 Assert.True(updatedPublication.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated!.Value).Milliseconds, 0, 1500);
                 // Slug remains unchanged
@@ -1266,7 +1249,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var themeCacheService = new Mock<IThemeCacheService>(Strict);
                 var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
                 var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
@@ -1282,8 +1264,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         mock.UpdatePublication(supersededPublication2.Slug))
                     .ReturnsAsync(new PublicationCacheViewModel());
 
-                themeCacheService.Setup(mock => mock.UpdatePublicationTree())
-                    .ReturnsAsync(new List<ThemeTree<PublicationTreeNode>>());
+                publicationCacheService.Setup(mock => mock.UpdatePublicationTree())
+                    .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
 
                 methodologyCacheService.Setup(mock => mock.UpdateSummariesTree())
                     .ReturnsAsync(
@@ -1292,7 +1274,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var publicationService = BuildPublicationService(context,
                     publicationCacheService: publicationCacheService.Object,
-                    themeCacheService: themeCacheService.Object,
                     methodologyCacheService: methodologyCacheService.Object);
 
                 var result = await publicationService.UpdatePublication(
@@ -1305,8 +1286,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                VerifyAllMocks(themeCacheService,
-                    methodologyCacheService,
+                VerifyAllMocks(methodologyCacheService,
                     publicationCacheService,
                     publicationCacheService);
 
@@ -1642,7 +1622,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Single(p => p.Id == publication.Id);
 
                 Assert.NotNull(dbPublication.ExternalMethodology);
-                Assert.Equal("New external methodology", dbPublication!.ExternalMethodology!.Title);
+                Assert.Equal("New external methodology", dbPublication.ExternalMethodology!.Title);
                 Assert.Equal("http://test.external.methodology/new", dbPublication.ExternalMethodology.Url);
             }
         }
@@ -2317,7 +2297,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPublicationRepository? publicationRepository = null,
             IMethodologyVersionRepository? methodologyVersionRepository = null,
             IPublicationCacheService? publicationCacheService = null,
-            IThemeCacheService? themeCacheService = null,
             IMethodologyCacheService? methodologyCacheService = null)
         {
             return new(
@@ -2328,8 +2307,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 publicationRepository ?? new PublicationRepository(context),
                 methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
-                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
-                themeCacheService ?? Mock.Of<IThemeCacheService>(Strict));
+                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict));
         }
     }
 }

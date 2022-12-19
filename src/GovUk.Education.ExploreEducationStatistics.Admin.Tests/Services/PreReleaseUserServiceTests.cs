@@ -1631,7 +1631,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Email = "test@test.com",
                         RoleId = Role.PrereleaseUser.GetEnumValue(),
-                        Accepted = false
+                        Accepted = false,
+                        Created = DateTime.UtcNow.AddDays(-1)
                     }
                 );
 

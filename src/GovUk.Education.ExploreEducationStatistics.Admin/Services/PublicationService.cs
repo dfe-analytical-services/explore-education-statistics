@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -34,7 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IPublicationCacheService _publicationCacheService;
         private readonly IMethodologyCacheService _methodologyCacheService;
-        private readonly IThemeCacheService _themeCacheService;
 
         public PublicationService(
             ContentDbContext context,
@@ -44,8 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPublicationRepository publicationRepository,
             IMethodologyVersionRepository methodologyVersionRepository,
             IPublicationCacheService publicationCacheService,
-            IMethodologyCacheService methodologyCacheService,
-            IThemeCacheService themeCacheService)
+            IMethodologyCacheService methodologyCacheService)
         {
             _context = context;
             _mapper = mapper;
@@ -55,7 +54,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _methodologyVersionRepository = methodologyVersionRepository;
             _publicationCacheService = publicationCacheService;
             _methodologyCacheService = methodologyCacheService;
-            _themeCacheService = themeCacheService;
         }
 
         public async Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(
@@ -224,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await _context.SaveChangesAsync();
 
                         await _methodologyCacheService.UpdateSummariesTree();
-                        await _themeCacheService.UpdatePublicationTree();
+                        await _publicationCacheService.UpdatePublicationTree();
                         await _publicationCacheService.UpdatePublication(publication.Slug);
 
                         await UpdateCachedSupersededPublications(publication);
@@ -326,12 +324,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Publication>(publicationId, query =>
                     query.Include(p => p.Contact))
                 .OnSuccessDo(_userService.CheckCanViewPublication)
-                .OnSuccess(async publication =>
-                {
-                    var contact = _mapper.Map<ContactViewModel>(publication.Contact);
-
-                    return contact;
-                });
+                .OnSuccess(publication => _mapper.Map<ContactViewModel>(publication.Contact));
         }
 
         public async Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId, Contact updatedContact)
@@ -474,7 +467,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var publicationViewModel = _mapper.Map<PublicationViewModel>(publication);
 
-            publicationViewModel.IsSuperseded = _publicationRepository.IsSuperseded(publication);
+            publicationViewModel.IsSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
 
             if (includePermissions)
             {
@@ -485,11 +478,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return publicationViewModel;
         }
 
-        private PublicationCreateViewModel GeneratePublicationCreateViewModel(Publication publication)
+        private async Task<PublicationCreateViewModel> GeneratePublicationCreateViewModel(Publication publication)
         {
             var publicationCreateViewModel = _mapper.Map<PublicationCreateViewModel>(publication);
 
-            publicationCreateViewModel.IsSuperseded = _publicationRepository.IsSuperseded(publication);
+            publicationCreateViewModel.IsSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
 
             return publicationCreateViewModel;
         }

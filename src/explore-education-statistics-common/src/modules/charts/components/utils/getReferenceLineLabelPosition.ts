@@ -1,5 +1,5 @@
 import { Axis, AxisType } from '@common/modules/charts/types/chart';
-import { ViewBox } from 'recharts';
+import { CartesianViewBox } from 'recharts/types/util/types';
 
 interface LabelPosition {
   x: number;
@@ -19,7 +19,7 @@ export default function getReferenceLineLabelPosition({
   otherAxisDomainMax?: number;
   otherAxisDomainMin?: number;
   otherAxisPosition?: number;
-  viewBox?: ViewBox;
+  viewBox?: CartesianViewBox;
 }): LabelPosition {
   const { height = 0, width = 0, x = 0, y = 0 } = viewBox ?? {};
   const defaultXPosition = axis === 'x' ? x : width / 2 + x;

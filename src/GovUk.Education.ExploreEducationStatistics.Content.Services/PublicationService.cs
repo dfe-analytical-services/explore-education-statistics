@@ -8,6 +8,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -23,13 +25,16 @@ public class PublicationService : IPublicationService
 {
     private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
+    private readonly IPublicationRepository _publicationRepository;
 
     public PublicationService(
         ContentDbContext contentDbContext,
-        IPersistenceHelper<ContentDbContext> contentPersistenceHelper)
+        IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
+        IPublicationRepository publicationRepository)
     {
         _contentDbContext = contentDbContext;
         _contentPersistenceHelper = contentPersistenceHelper;
+        _publicationRepository = publicationRepository;
     }
 
     public async Task<Either<ActionResult, PublicationCacheViewModel>> Get(string publicationSlug)
@@ -42,12 +47,32 @@ public class PublicationService : IPublicationService
                 .Include(p => p.Topic)
                 .ThenInclude(topic => topic.Theme)
                 .Where(p => p.Slug == publicationSlug))
-            .OnSuccessCombineWith(GetLatestRelease)
-            .OnSuccess(async tuple =>
+            .OnSuccess(async publication =>
             {
-                var (publication, latestRelease) = tuple;
-                return await BuildPublicationViewModel(publication, latestRelease);
+                if (publication.LatestPublishedReleaseId == null)
+                {
+                    return new Either<ActionResult, PublicationCacheViewModel>(new NotFoundResult());
+                }
+
+                var isSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
+                return BuildPublicationViewModel(publication, isSuperseded);
             });
+    }
+
+    public async Task<IList<PublicationTreeThemeViewModel>> GetPublicationTree()
+    {
+        var themes = await _contentDbContext.Themes
+            .Include(theme => theme.Topics)
+            .ThenInclude(topic => topic.Publications)
+            .ThenInclude(publication => publication.Releases)
+            .ToListAsync();
+
+        return await themes
+            .ToAsyncEnumerable()
+            .SelectAwait(async theme => await BuildPublicationTreeTheme(theme))
+            .Where(theme => theme.Topics.Any())
+            .OrderBy(theme => theme.Title)
+            .ToListAsync();
     }
 
     public async Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
@@ -70,7 +95,7 @@ public class PublicationService : IPublicationService
         // Apply release type and theme filters
         if (releaseType.HasValue)
         {
-            baseQueryable = baseQueryable.Where(p => p.LatestPublishedReleaseNew!.Type == releaseType.Value);
+            baseQueryable = baseQueryable.Where(p => p.LatestPublishedRelease!.Type == releaseType.Value);
         }
 
         if (themeId.HasValue)
@@ -91,8 +116,8 @@ public class PublicationService : IPublicationService
         {
             Published =>
                 order == Asc
-                    ? queryable.OrderBy(p => p.Publication.LatestPublishedReleaseNew!.Published)
-                    : queryable.OrderByDescending(p => p.Publication.LatestPublishedReleaseNew!.Published),
+                    ? queryable.OrderBy(p => p.Publication.LatestPublishedRelease!.Published)
+                    : queryable.OrderByDescending(p => p.Publication.LatestPublishedRelease!.Published),
             Relevance =>
                 order == Asc
                     ? queryable.OrderBy(p => p.Rank)
@@ -122,22 +147,25 @@ public class PublicationService : IPublicationService
                     Summary = tuple.Publication.Summary,
                     Title = tuple.Publication.Title,
                     Theme = tuple.Publication.Topic.Theme.Title,
-                    Published = tuple.Publication.LatestPublishedReleaseNew!.Published!.Value,
-                    Type = tuple.Publication.LatestPublishedReleaseNew!.Type,
+                    Published = tuple.Publication.LatestPublishedRelease!.Published!.Value,
+                    Type = tuple.Publication.LatestPublishedRelease!.Type,
                     Rank = tuple.Rank
                 }).ToListAsync();
 
         return new PaginatedListViewModel<PublicationSearchResultViewModel>(results, totalResults, page, pageSize);
     }
 
-    private static Either<ActionResult, Release> GetLatestRelease(Publication publication)
+    private static PublicationCacheViewModel BuildPublicationViewModel(
+        Publication publication,
+        bool isSuperseded)
     {
-        return publication.LatestPublishedRelease() ?? new Either<ActionResult, Release>(new NotFoundResult());
-    }
+        var topic = new TopicViewModel(new ThemeViewModel(
+            publication.Topic.Theme.Id,
+            Slug: publication.Topic.Theme.Slug,
+            Title: publication.Topic.Theme.Title,
+            Summary: publication.Topic.Theme.Summary
+        ));
 
-    private async Task<PublicationCacheViewModel> BuildPublicationViewModel(Publication publication,
-        Release latestRelease)
-    {
         return new PublicationCacheViewModel
         {
             Id = publication.Id,
@@ -147,13 +175,13 @@ public class PublicationService : IPublicationService
                 .OrderByDescending(legacyRelease => legacyRelease.Order)
                 .Select(legacyRelease => new LegacyReleaseViewModel(legacyRelease))
                 .ToList(),
-            Topic = new TopicViewModel(new ThemeViewModel(publication.Topic.Theme.Title)),
+            Topic = topic,
             Contact = new ContactViewModel(publication.Contact),
             ExternalMethodology = publication.ExternalMethodology != null
                 ? new ExternalMethodologyViewModel(publication.ExternalMethodology)
                 : null,
-            LatestReleaseId = latestRelease.Id,
-            IsSuperseded = await IsSuperseded(publication),
+            LatestReleaseId = publication.LatestPublishedReleaseId!.Value,
+            IsSuperseded = isSuperseded,
             Releases = ListPublishedReleases(publication)
         };
     }
@@ -172,12 +200,96 @@ public class PublicationService : IPublicationService
             .ToList();
     }
 
-    private async Task<bool> IsSuperseded(Publication publication)
+    private async Task<PublicationTreeThemeViewModel> BuildPublicationTreeTheme(Theme theme)
     {
-        return publication.SupersededById != null
-               // To be superseded, superseding publication must have Live release
-               && await _contentDbContext.Releases
-                   .AnyAsync(r => r.PublicationId == publication.SupersededById
-                                  && r.Published.HasValue && DateTime.UtcNow >= r.Published.Value);
+        var topics = await theme.Topics
+            .ToAsyncEnumerable()
+            .SelectAwait(async topic => await BuildPublicationTreeTopic(topic))
+            .Where(topic => topic.Publications.Any())
+            .OrderBy(topic => topic.Title)
+            .ToListAsync();
+
+        return new PublicationTreeThemeViewModel
+        {
+            Id = theme.Id,
+            Title = theme.Title,
+            Summary = theme.Summary,
+            Topics = topics
+        };
     }
+
+    private async Task<PublicationTreeTopicViewModel> BuildPublicationTreeTopic(Topic topic)
+    {
+        var publications = await topic.Publications
+            .ToAsyncEnumerable()
+            .Where(publication =>
+                publication.LatestPublishedReleaseId != null || publication.LegacyPublicationUrl != null)
+            .SelectAwait(async publication =>
+                await BuildPublicationTreePublication(publication))
+            .OrderBy(publication => publication.Title)
+            .ToListAsync();
+
+        return new PublicationTreeTopicViewModel
+        {
+            Id = topic.Id,
+            Title = topic.Title,
+            Publications = publications
+        };
+    }
+
+    private async Task<PublicationTreePublicationViewModel> BuildPublicationTreePublication(Publication publication)
+    {
+        var type = await GetPublicationType(publication);
+        var latestPublishedReleaseId = publication.LatestPublishedReleaseId;
+
+        return new PublicationTreePublicationViewModel
+        {
+            Id = publication.Id,
+            Title = publication.Title,
+            Slug = publication.Slug,
+            Type = type,
+            LegacyPublicationUrl = type == PublicationType.Legacy
+                ? publication.LegacyPublicationUrl?.ToString()
+                : null,
+            IsSuperseded = await _publicationRepository.IsSuperseded(publication.Id),
+            HasLiveRelease = latestPublishedReleaseId != null,
+            LatestReleaseHasData = latestPublishedReleaseId != null &&
+                                   await HasAnyDataFiles(latestPublishedReleaseId.Value),
+            AnyLiveReleaseHasData = await publication.Releases
+                .ToAsyncEnumerable()
+                .AnyAwaitAsync(async r => r.IsLatestPublishedVersionOfRelease()
+                                          && await HasAnyDataFiles(r.Id))
+        };
+    }
+
+    private async Task<bool> HasAnyDataFiles(Guid releaseId)
+    {
+        return await _contentDbContext.ReleaseFiles
+            .Include(rf => rf.File)
+            .AnyAsync(rf => rf.ReleaseId == releaseId && rf.File.Type == FileType.Data);
+    }
+
+    private async Task<PublicationType> GetPublicationType(Publication publication)
+    {
+        if (publication.LatestPublishedReleaseId == null)
+        {
+            return PublicationType.Legacy;
+        }
+
+        await _contentDbContext.Entry(publication)
+            .Reference(p => p.LatestPublishedRelease)
+            .LoadAsync();
+
+        return GetPublicationType(publication.LatestPublishedRelease!.Type);
+    }
+
+    private static PublicationType GetPublicationType(ReleaseType releaseType) => releaseType switch
+    {
+        ReleaseType.AdHocStatistics => PublicationType.AdHoc,
+        ReleaseType.NationalStatistics => PublicationType.NationalAndOfficial,
+        ReleaseType.ExperimentalStatistics => PublicationType.Experimental,
+        ReleaseType.ManagementInformation => PublicationType.ManagementInformation,
+        ReleaseType.OfficialStatistics => PublicationType.NationalAndOfficial,
+        _ => throw new ArgumentOutOfRangeException(nameof(releaseType), releaseType, message: null)
+    };
 }

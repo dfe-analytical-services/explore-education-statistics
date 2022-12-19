@@ -1,4 +1,4 @@
-import baseRender from '@admin-test/render';
+import baseRender from '@common-test/render';
 import PublicationUnpublishedReleases from '@admin/pages/publication/components/PublicationUnpublishedReleases';
 import _publicationService from '@admin/services/publicationService';
 import _releaseService, {

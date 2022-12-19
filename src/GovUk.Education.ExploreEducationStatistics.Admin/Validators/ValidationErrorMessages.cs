@@ -18,6 +18,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         IncorrectContentBlockTypeForAttach,
         ContentBlockAlreadyDetached,
         ContentBlockNotAttachedToThisContentSection,
+        ContentSectionNotAttachedToRelease,
+        ContentBlockNotAttachedToRelease,
 
         // User Management
         UserAlreadyExists,
@@ -101,6 +103,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         NoTableHighlights,
         NoPublicPreReleaseAccessList,
         MethodologyNotApproved,
+
+        // Footnotes
+        FootnotesDifferFromReleaseFootnotes,
 
         // TODO EES-3755 Remove after Permalink snapshot migration work is complete
         NullMessageCountForPermalinksMigrationQueue,

@@ -19,7 +19,8 @@ exports[`FiltersForm renders a read-only view of selected options when no longer
       data-testid="Indicators-value"
     >
       <ul
-        class="govuk-list listContainer"
+        class="govuk-list"
+        id="indicatorsList"
       >
         <li>
           Number of excluded sessions
@@ -42,7 +43,8 @@ exports[`FiltersForm renders a read-only view of selected options when no longer
       data-testid="School type-value"
     >
       <ul
-        class="govuk-list listContainer"
+        class="govuk-list"
+        id="filtersList-SchoolType"
       >
         <li>
           State-funded secondary
@@ -65,7 +67,8 @@ exports[`FiltersForm renders a read-only view of selected options when no longer
       data-testid="Characteristic-value"
     >
       <ul
-        class="govuk-list listContainer"
+        class="govuk-list"
+        id="filtersList-Characteristic"
       >
         <li>
           Ethnicity Major Black Total

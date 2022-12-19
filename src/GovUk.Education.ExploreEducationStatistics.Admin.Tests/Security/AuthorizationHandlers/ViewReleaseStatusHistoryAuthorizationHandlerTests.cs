@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         Publication = new Publication()
                     },
                     PublicationRole.Owner,
-                    PublicationRole.ReleaseApprover
+                    PublicationRole.Approver
                 );
             }
         }

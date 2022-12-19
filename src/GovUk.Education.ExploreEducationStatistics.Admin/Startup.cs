@@ -26,6 +26,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
@@ -81,14 +82,13 @@ using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Co
 using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
 using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
 using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
-using IContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
-using ContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.ThemeService;
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
 using IDataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IDataGuidanceService;
 using IGlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IGlossaryService;
 using IMethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
 using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyService;
+using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
 using IReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseFileService;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
@@ -188,25 +188,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddDbContext<UsersAndRolesDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
+                        providerOptions =>
+                            providerOptions
+                                .MigrationsAssembly(typeof(Startup).Assembly.FullName)
+                                .EnableCustomRetryOnFailure()
+                            )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
             services.AddDbContext<ContentDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                        builder => { builder.MigrationsAssembly(typeof(Startup).Assembly.FullName); })
+                        providerOptions =>
+                            providerOptions
+                                .MigrationsAssembly(typeof(Startup).Assembly.FullName)
+                                .EnableCustomRetryOnFailure()
+                        )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
-                        builder =>
-                        {
-                            builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model");
-                            builder.AddBulkOperationSupport();
-                        })
+                        providerOptions =>
+                            providerOptions
+                                .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
+                                .AddBulkOperationSupport()
+                                .EnableCustomRetryOnFailure()
+                            )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
@@ -407,12 +416,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // EES-3528 plans to send a request to the Content API to update its cached resources instead of this
             // being done from Admin directly, and so these DI dependencies should eventually be removed.
             services.AddTransient<IContentGlossaryService, ContentGlossaryService>();
-            services.AddTransient<IContentThemeService, ContentThemeService>();
             services.AddTransient<IContentMethodologyService, ContentMethodologyService>();
             services.AddTransient<IContentPublicationService, ContentPublicationService>();
             services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
             services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
-            services.AddTransient<IThemeCacheService, ThemeCacheService>();
             services.AddTransient<IPublicationCacheService, PublicationCacheService>();
 
             services.AddTransient<IFileRepository, FileRepository>();
@@ -462,11 +469,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     publicationRepository: provider.GetRequiredService<IPublicationRepository>(),
                     methodologyVersionRepository: provider.GetRequiredService<IMethodologyVersionRepository>(),
                     methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
-                    publicationCacheService: provider.GetRequiredService<IPublicationCacheService>(),
-                    themeCacheService: provider.GetRequiredService<IThemeCacheService>()
+                    publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()
                 )
             );
-            services.AddTransient<IPublicationRepository, PublicationRepository>();
+            services.AddTransient<IPublicationRepository, Services.PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<ILegacyReleaseService, LegacyReleaseService>(provider =>
                 new LegacyReleaseService(
@@ -508,7 +514,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IPreReleaseSummaryService, PreReleaseSummaryService>();
 
             services.AddTransient<IManageContentPageService, ManageContentPageService>();
+            services.AddTransient<IContentBlockService, ContentBlockService>();
             services.AddTransient<IContentService, ContentService>();
+            services.AddTransient<IEmbedBlockService, EmbedBlockService>();
             services.AddTransient<IReleaseContentBlockService, ReleaseContentBlockService>();
             services.AddTransient<ICommentService, CommentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
@@ -561,6 +569,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
             services.AddTransient<Content.Model.Repository.Interfaces.IReleaseRepository,
                 Content.Model.Repository.ReleaseRepository>();
+            services.AddTransient<Content.Model.Repository.Interfaces.IPublicationRepository,
+                Content.Model.Repository.PublicationRepository>();
             services.AddTransient<ISubjectRepository, SubjectRepository>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
@@ -597,9 +607,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         new StorageInstanceCreationUtil()),
                     userService: provider.GetRequiredService<IUserService>()));
 
-            // TODO EES-3882 Remove after migration has been run by EES-3894
-            services.AddTransient<IPublicationMigrationService, PublicationMigrationService>();
-
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
 
@@ -629,7 +636,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
                     glossaryCacheService: provider.GetRequiredService<IGlossaryCacheService>(),
                     methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
-                    themeCacheService: provider.GetRequiredService<IThemeCacheService>()
+                    publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()
                 )
             );
 
@@ -741,10 +748,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseIdentityServer();
             app.UseAuthorization();
 
-            // deny access to all Identity routes other than /Identity/Account/Login and
+            // Deny access to all /Identity routes other than:
+            // 
+            // /Identity/Account/Login
             // /Identity/Account/ExternalLogin
+            // /Identity/Account/InviteExpired
+            //
+            // This Regex is case insensitive.
             var options = new RewriteOptions()
-                .AddRewrite(@"^(?i)identity/(?!account/(?:external)*login$)", "/", skipRemainingRules: true);
+                .AddRewrite(
+                    @"^(?i)identity/(?!account/(login|externallogin|inviteexpired))", 
+                    replacement: "/", 
+                    skipRemainingRules: true);
             app.UseRewriter(options);
 
             app.UseEndpoints(endpoints =>

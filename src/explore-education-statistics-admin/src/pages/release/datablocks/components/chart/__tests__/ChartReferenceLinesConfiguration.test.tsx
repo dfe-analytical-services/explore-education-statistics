@@ -7,6 +7,7 @@ import {
   AxisConfiguration,
   ChartDefinitionAxis,
 } from '@common/modules/charts/types/chart';
+import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -96,6 +97,15 @@ describe('ChartReferenceLinesConfiguration', () => {
   );
 
   const testMinorAxisDomain: MinorAxisDomainValues = { min: 0, max: 50000 };
+
+  const barnsleyId = LocationFilter.createId({
+    level: 'localAuthority',
+    value: 'barnsley',
+  });
+  const barnetId = LocationFilter.createId({
+    level: 'localAuthority',
+    value: 'barnet',
+  });
 
   test('renders correctly with existing lines when grouped by time periods', () => {
     render(
@@ -190,7 +200,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           testTable.subjectMeta,
         )}
         axisDefinition={testMajorAxisDefinition}
-        lines={[{ position: 'barnet', label: 'Test label 1' }]}
+        lines={[{ position: barnetId, label: 'Test label 1' }]}
         minorAxisDomain={testMinorAxisDomain}
         onAddLine={noop}
         onRemoveLine={noop}
@@ -214,7 +224,7 @@ describe('ChartReferenceLinesConfiguration', () => {
     expect(options[0]).toHaveTextContent('Choose position');
     expect(options[0]).toHaveAttribute('value', '');
     expect(options[1]).toHaveTextContent('Barnsley');
-    expect(options[1]).toHaveAttribute('value', 'barnsley');
+    expect(options[1]).toHaveAttribute('value', barnsleyId);
   });
 
   test('renders correctly with existing lines when grouped by indicators', () => {
@@ -633,9 +643,10 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
     expect(referenceLines.getAllByRole('row')).toHaveLength(2);
 
-    userEvent.selectOptions(referenceLines.getByLabelText('Position'), [
-      'barnsley',
-    ]);
+    userEvent.selectOptions(
+      referenceLines.getByLabelText('Position'),
+      barnsleyId,
+    );
 
     await userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
 
@@ -647,7 +658,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         Parameters<ChartReferenceLinesConfigurationProps['onAddLine']>
       >({
         label: 'Test label',
-        position: 'barnsley',
+        position: barnsleyId,
         style: 'dashed',
       });
     });
@@ -907,8 +918,8 @@ describe('ChartReferenceLinesConfiguration', () => {
         )}
         axisDefinition={testMajorAxisDefinition}
         lines={[
-          { position: 'barnet', label: 'Test label 1' },
-          { position: 'barnsley', label: 'Test label 2' },
+          { position: barnetId, label: 'Test label 1' },
+          { position: barnsleyId, label: 'Test label 2' },
         ]}
         minorAxisDomain={testMinorAxisDomain}
         onAddLine={noop}
@@ -932,7 +943,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         Parameters<ChartReferenceLinesConfigurationProps['onRemoveLine']>
       >({
         label: 'Test label 2',
-        position: 'barnsley',
+        position: barnsleyId,
       });
     });
   });

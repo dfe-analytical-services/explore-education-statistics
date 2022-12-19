@@ -2,6 +2,7 @@
 using System;
 using AutoMapper;
 using Azure.Storage.Blobs;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -30,15 +31,13 @@ using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Co
 using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
 using IContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
-using IContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
-using ContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.ThemeService;
+using ContentService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.ContentService;
 using FileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.FileStorageService;
+using IContentService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IContentService;
 using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IFileStorageService;
 using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
-using IPublicationService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IPublicationService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.MethodologyService;
-using PublicationService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.PublicationService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseService;
 
 [assembly: FunctionsStartup(typeof(Startup))]
@@ -52,11 +51,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
             builder.Services
                 .AddMemoryCache()
                 .AddDbContext<ContentDbContext>(options =>
-                    options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb")))
+                    options.UseSqlServer(
+                        ConnectionUtils.GetAzureSqlConnectionString("ContentDb"),
+                        providerOptions => providerOptions.EnableCustomRetryOnFailure()))
                 .AddDbContext<StatisticsDbContext>(options =>
-                    options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb")))
+                    options.UseSqlServer(
+                        ConnectionUtils.GetAzureSqlConnectionString("StatisticsDb"),
+                        providerOptions => providerOptions.EnableCustomRetryOnFailure()))
                 .AddDbContext<PublicStatisticsDbContext>(options =>
-                    options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("PublicStatisticsDb")))
+                    options.UseSqlServer(
+                        ConnectionUtils.GetAzureSqlConnectionString("PublicStatisticsDb"),
+                        providerOptions => providerOptions.EnableCustomRetryOnFailure()))
                 .AddSingleton<IFileStorageService, FileStorageService>(provider =>
                     new FileStorageService(GetConfigurationValue(provider, "PublisherStorage")))
 
@@ -71,8 +76,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IContentReleaseService, ContentReleaseService>()
                 .AddScoped<IReleaseFileRepository, ReleaseFileRepository>()
                 .AddScoped<IReleaseCacheService, ReleaseCacheService>()
-                .AddScoped<IThemeCacheService, ThemeCacheService>()
-                .AddScoped<IContentThemeService, ContentThemeService>()
 
                 .AddScoped<IPublishingService, PublishingService>(provider =>
                     new PublishingService(
@@ -80,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage"),
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
                         methodologyService: provider.GetRequiredService<IMethodologyService>(),
-                        publicationService: provider.GetRequiredService<IPublicationService>(),
+                        publicationRepository: provider.GetRequiredService<IPublicationRepository>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
                         logger: provider.GetRequiredService<ILogger<PublishingService>>()))
                 .AddScoped<IContentService, ContentService>(provider =>
@@ -90,9 +93,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         publicBlobCacheService: GetBlobCacheService(provider, "PublicStorage"),
                         releaseCacheService: provider.GetRequiredService<IReleaseCacheService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
-                        publicationService: provider.GetRequiredService<IPublicationService>(),
                         methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
-                        themeCacheService: provider.GetRequiredService<IThemeCacheService>()))
+                        publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()))
                 .AddScoped<IReleaseService, ReleaseService>(provider =>
                     new ReleaseService(
                         contentDbContext: provider.GetRequiredService<ContentDbContext>(),
@@ -105,7 +107,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     new TableStorageService(
                         GetConfigurationValue(provider, "PublisherStorage"),
                         new StorageInstanceCreationUtil()))
-                .AddScoped<IPublicationService, PublicationService>()
                 .AddScoped<IMethodologyVersionRepository, MethodologyVersionRepository>()
                 .AddScoped<IMethodologyRepository, MethodologyRepository>()
                 .AddScoped<IMethodologyService, MethodologyService>()
@@ -142,7 +143,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     ))
                 .AddScoped<IFilterRepository, FilterRepository>()
                 .AddScoped<IFootnoteRepository, FootnoteRepository>()
-                .AddScoped<IIndicatorRepository, IndicatorRepository>();
+                .AddScoped<IIndicatorRepository, IndicatorRepository>()
+                .AddScoped<IPublicationRepository, PublicationRepository>();
 
             AddPersistenceHelper<ContentDbContext>(builder.Services);
             AddPersistenceHelper<StatisticsDbContext>(builder.Services);

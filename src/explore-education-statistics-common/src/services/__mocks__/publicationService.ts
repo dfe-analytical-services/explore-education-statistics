@@ -1,7 +1,13 @@
 import mockObject from '@common-test/mockObject';
 
-const service = jest.requireActual('../publicationService').default;
+const { default: service, ...actual } = jest.requireActual(
+  '../publicationService',
+);
 
 const mock = mockObject(service);
 
-export default mock;
+module.exports = {
+  ...actual,
+  default: mock,
+  __esModule: true,
+};

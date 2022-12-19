@@ -7,15 +7,13 @@ import Wizard, {
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import downloadService from '@common/services/downloadService';
 import publicationService, {
+  PublicationTreeSummary,
   ReleaseSummary,
+  Theme,
 } from '@common/services/publicationService';
 import tableBuilderService, {
   Subject,
 } from '@common/services/tableBuilderService';
-import themeService, {
-  PublicationSummary,
-  Theme,
-} from '@common/services/themeService';
 import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
 import DownloadStep, {
@@ -31,7 +29,7 @@ import { useImmer } from 'use-immer';
 
 interface Props {
   releases?: ReleaseSummary[];
-  selectedPublication?: PublicationSummary;
+  selectedPublication?: PublicationTreeSummary;
   selectedRelease?: ReleaseSummary;
   subjects?: Subject[];
   themes: Theme[];
@@ -42,7 +40,7 @@ interface DataCatalogueState {
   releases: ReleaseSummary[];
   subjects: Subject[];
   query: {
-    publication?: PublicationSummary;
+    publication?: PublicationTreeSummary;
     release?: ReleaseSummary;
   };
 }
@@ -193,7 +191,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
     releaseSlug = '',
   } = context.query as Dictionary<string>;
 
-  const themes = await themeService.listThemes({
+  const themes = await publicationService.getPublicationTree({
     publicationFilter: 'DataCatalogue',
   });
 

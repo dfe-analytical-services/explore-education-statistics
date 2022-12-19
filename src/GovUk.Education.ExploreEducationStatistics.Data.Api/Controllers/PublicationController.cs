@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -18,16 +20,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     [ApiController]
     public class PublicationController : ControllerBase
     {
-        private readonly IReleaseRepository _releaseRepository;
+        private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly IReleaseService _releaseService;
         private readonly ICacheKeyService _cacheKeyService;
 
         public PublicationController(
-            IReleaseRepository releaseRepository,
+            IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             IReleaseService releaseService,
             ICacheKeyService cacheKeyService)
         {
-            _releaseRepository = releaseRepository;
+            _contentPersistenceHelper = contentPersistenceHelper;
             _releaseService = releaseService;
             _cacheKeyService = cacheKeyService;
         }
@@ -35,9 +37,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("publications/{publicationId}/subjects")]
         public async Task<ActionResult<List<SubjectViewModel>>> ListLatestReleaseSubjects(Guid publicationId)
         {
-            return await _releaseRepository
-                .GetLatestPublishedRelease(publicationId)
-                .OnSuccess(release => _cacheKeyService.CreateCacheKeyForReleaseSubjects(release.Id))
+            return await GetLatestPublishedReleaseId(publicationId)
+                .OnSuccess(_cacheKeyService.CreateCacheKeyForReleaseSubjects)
                 .OnSuccess(ListLatestReleaseSubjects)
                 .HandleFailuresOrOk();
         }
@@ -46,10 +47,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         public async Task<ActionResult<List<FeaturedTableViewModel>>> ListLatestReleaseFeaturedTables(
             Guid publicationId)
         {
-            return await _releaseRepository
-                .GetLatestPublishedRelease(publicationId)
-                .OnSuccess(release => _releaseService.ListFeaturedTables(release.Id))
+            return await GetLatestPublishedReleaseId(publicationId)
+                .OnSuccess(_releaseService.ListFeaturedTables)
                 .HandleFailuresOrOk();
+        }
+
+        private Task<Either<ActionResult, Guid>> GetLatestPublishedReleaseId(Guid publicationId)
+        {
+            return _contentPersistenceHelper.CheckEntityExists<Publication>(publicationId)
+                .OnSuccess(publication => publication.LatestPublishedReleaseId ??
+                                          new Either<ActionResult, Guid>(new NotFoundResult()));
         }
 
         [BlobCache(typeof(ReleaseSubjectsCacheKey))]

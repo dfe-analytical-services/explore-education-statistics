@@ -8,7 +8,7 @@ export interface FormFieldsetProps {
   children?: ReactNode;
   className?: string;
   error?: string;
-  hint?: string;
+  hint?: string | ReactNode;
   id: string;
   legend: ReactNode | string;
   legendSize?: 'xl' | 'l' | 'm' | 's';

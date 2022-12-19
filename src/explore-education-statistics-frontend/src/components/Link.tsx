@@ -7,6 +7,8 @@ export type LinkProps = {
   children: ReactNode;
   className?: string;
   prefetch?: boolean;
+  scroll?: RouterLinkProps['scroll'];
+  shallow?: RouterLinkProps['shallow'];
   to: RouterLinkProps['href'];
   unvisited?: boolean;
   testId?: string;
@@ -16,6 +18,8 @@ const Link = ({
   children,
   className,
   prefetch,
+  scroll = false,
+  shallow = false,
   to,
   unvisited = false,
   testId,
@@ -46,7 +50,13 @@ const Link = ({
   }
 
   return (
-    <RouterLink href={to} prefetch={prefetch} passHref>
+    <RouterLink
+      href={to}
+      prefetch={prefetch}
+      scroll={scroll}
+      shallow={shallow}
+      passHref
+    >
       {link}
     </RouterLink>
   );

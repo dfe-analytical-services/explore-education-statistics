@@ -1,88 +1,64 @@
-import themeService, { Theme } from '@common/services/themeService';
-import {
-  PublicationSummaryWithRelease,
+import publicationService, {
   PublicationSortOption,
-  publicationSortOptions,
+  Theme,
 } from '@common/services/publicationService';
-import { Paging } from '@common/services/types/pagination';
-import parseNumber from '@common/utils/number/parseNumber';
-import isOneOf from '@common/utils/type-guards/isOneOf';
-import { testPublications } from '@frontend/modules/find-statistics/__tests__/__data__/testPublications';
+import { ReleaseType } from '@common/services/types/releaseType';
+import publicationQueries from '@frontend/queries/publicationQueries';
+import themeQueries from '@frontend/queries/themeQueries';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
+import { dehydrate, QueryClient } from '@tanstack/react-query';
 import FindStatisticsPageCurrent from './FindStatisticsPageCurrent';
 import FindStatisticsPageNew from './FindStatisticsPageNew';
 
-interface Props {
-  newDesign?: boolean; // TODO EES-3517 flag
-  paging?: Paging | null; // TODO EES-3517 won't be optional or null
-  publications?: PublicationSummaryWithRelease[]; // TODO EES-3517 won't be optional
+export interface FindStatisticsPageQuery {
+  page?: number;
+  releaseType?: ReleaseType;
+  search?: string;
   sortBy?: PublicationSortOption;
-  themes: Theme[];
+  themeId?: string;
 }
 
-const FindStatisticsPage: NextPage<Props> = ({
-  newDesign = false,
-  paging,
-  publications,
-  sortBy,
-  themes = [],
-}) => {
+interface Props {
+  newDesign?: boolean; // TODO EES-3517 flag
+  themes: Theme[]; // TODO EES-3517 remove
+}
+
+const FindStatisticsPage: NextPage<Props> = ({ newDesign = false, themes }) => {
   // TODO EES-3517 remove these and move FindStatisticsPageNew into here
-  if (newDesign && paging && publications) {
-    return (
-      <FindStatisticsPageNew
-        paging={paging}
-        publications={publications}
-        sortBy={sortBy}
-      />
-    );
+  if (newDesign) {
+    return <FindStatisticsPageNew />;
   }
-  return <FindStatisticsPageCurrent themes={themes} />;
+  return <FindStatisticsPageCurrent themes={themes as Theme[]} />;
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({
   query,
 }) => {
   const { newDesign } = query;
-  const page = parseNumber(query.page) ?? 1;
-  const sortBy = isOneOf(query.sortBy, publicationSortOptions)
-    ? query.sortBy
-    : 'newest';
 
-  // TODO EES-3517 - fetch publications here, using pagination and filters from query.
-  // const publicationsResponse = newDesign ? await publicationService.getPublications({
-  //   page,
-  //   pageSize: 10,
-  //   sortBy
-  // }) : []
-
-  // Will need to handle if the requested page doesn't exist.
-  // Fake response for now
-  const paging: Paging = {
-    page,
-    pageSize: 10,
-    totalResults: 100,
-    totalPages: 10,
-  };
-
-  const publications: PublicationSummaryWithRelease[] =
-    page === 1 ? testPublications : [testPublications[1]]; // faking different page to test pagination
-
-  // TODO EES-3517 - remove themes
+  // TODO EES-3517 - remove this
   const themes = newDesign
     ? []
-    : await themeService.listThemes({
+    : await publicationService.getPublicationTree({
         publicationFilter: 'FindStatistics',
       });
+
+  const queryClient = new QueryClient();
+
+  // TODO EES-3517 - remove newDesign check
+  if (newDesign) {
+    await Promise.all([
+      queryClient.prefetchQuery(publicationQueries.list(query)),
+      queryClient.prefetchQuery(themeQueries.list()),
+    ]);
+  }
 
   return {
     props: {
       newDesign: !!newDesign,
-      paging: newDesign ? paging : null,
-      publications: newDesign ? publications : [],
-      sortBy,
       themes,
+      dehydratedState: dehydrate(queryClient),
     },
   };
 };

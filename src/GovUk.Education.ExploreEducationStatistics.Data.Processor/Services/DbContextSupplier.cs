@@ -1,32 +1,69 @@
+#nullable enable
+using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.EntityFrameworkCore;
-using DbUtils = GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Functions.ConnectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 
 public class DbContextSupplier : IDbContextSupplier
 {
-    /// <summary>
-    /// DbContextOptions that are unique per Function job. It is therefore a transient dependency in CI, and
-    /// thus this component must also be a transient DI dependency for other services to use.
-    /// </summary>
-    private readonly DbContextOptions<ContentDbContext> _contentDbContextOptions;
-
-    public DbContextSupplier(DbContextOptions<ContentDbContext> contentDbContextOptions)
+    public TDbContext CreateDbContext<TDbContext>() where TDbContext : DbContext
     {
-        _contentDbContextOptions = contentDbContextOptions;
+        return (typeof(TDbContext).Name switch
+        {
+            nameof(ContentDbContext) => CreateContentDbContext() as TDbContext,
+            nameof(StatisticsDbContext) => CreateStatisticsDbContext() as TDbContext,
+            _ => throw new ArgumentOutOfRangeException("Unable to provide DbContext of type " + 
+                                                       typeof(TDbContext).Name)
+        })!;
     }
 
-    public ContentDbContext CreateContentDbContext()
+    public TDbContext CreateDbContextDelegate<TDbContext>() where TDbContext : DbContext
     {
-        return new ContentDbContext(_contentDbContextOptions);
+        return (typeof(TDbContext).Name switch
+        {
+            nameof(ContentDbContext) => CreateContentDbContextDelegate() as TDbContext,
+            nameof(StatisticsDbContext) => CreateStatisticsDbContextDelegate() as TDbContext,
+            _ => throw new ArgumentException($"Unable to provide DbContext delegate of type " +
+                                             $"{typeof(TDbContext).Name}")
+        })!;
     }
 
-    public StatisticsDbContext CreateStatisticsDbContext()
+    private ContentDbContext CreateContentDbContext()
     {
-        return DbUtils.CreateStatisticsDbContext();
+        var optionsBuilder = new DbContextOptionsBuilder<ContentDbContext>();
+        optionsBuilder.UseSqlServer(
+            GetAzureSqlConnectionString("ContentDb"),
+            providerOptions => providerOptions.EnableCustomRetryOnFailure());
+        return new ContentDbContext(optionsBuilder.Options);
+    }
+
+    private static StatisticsDbContext CreateStatisticsDbContext()
+    {
+        var optionsBuilder = new DbContextOptionsBuilder<StatisticsDbContext>();
+        optionsBuilder.UseSqlServer(
+            GetAzureSqlConnectionString("StatisticsDb"),
+            providerOptions => providerOptions.EnableCustomRetryOnFailure());
+        return new StatisticsDbContext(optionsBuilder.Options);
+    }
+
+    private static ContentDbContext CreateContentDbContextDelegate()
+    {
+        var optionsBuilder = new DbContextOptionsBuilder<ContentDbContext>();
+        optionsBuilder.UseSqlServer(
+            GetAzureSqlConnectionString("ContentDb"));
+        return new ContentDbContext(optionsBuilder.Options);
+    }
+
+    private static StatisticsDbContext CreateStatisticsDbContextDelegate()
+    {
+        var optionsBuilder = new DbContextOptionsBuilder<StatisticsDbContext>();
+        optionsBuilder.UseSqlServer(
+            GetAzureSqlConnectionString("StatisticsDb"));
+        return new StatisticsDbContext(optionsBuilder.Options);
     }
 }

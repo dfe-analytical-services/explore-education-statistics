@@ -8,10 +8,3 @@
     }
   }
 }
-
-.hidePrint {
-  display: block;
-  @media print {
-    display: none;
-  }
-}

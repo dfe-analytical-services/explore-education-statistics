@@ -17,6 +17,7 @@ describe('FixedMultiHeaderDataTable', () => {
             .addChild(new Header('C', 'Col C'))
             .addChild(new Header('D', 'Col D')),
         ]}
+        footnotesId="test-footnotes-id"
         rowHeaders={[new Header('A', 'Row A'), new Header('B', 'Row B')]}
         rows={[
           ['1', '2', '3', '4'],

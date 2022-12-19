@@ -28,6 +28,7 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -64,8 +65,9 @@ const VerticalBarBlock = ({
     axes.minor === undefined ||
     data === undefined ||
     meta === undefined
-  )
+  ) {
     return <div>Unable to render chart, chart incorrectly configured</div>;
+  }
 
   const dataSetCategories: DataSetCategory[] = createDataSetCategories(
     axes.major,
@@ -92,6 +94,8 @@ const VerticalBarBlock = ({
     minorAxisUnit,
   });
   const xAxisHeight = parseNumber(axes.major.size);
+  const chartHasNegativeValues =
+    (parseNumber(minorDomainTicks.domain?.[0]) ?? 0) < 0;
 
   return (
     <ChartContainer
@@ -133,6 +137,7 @@ const VerticalBarBlock = ({
           <XAxis
             {...majorDomainTicks}
             type="category"
+            axisLine={!chartHasNegativeValues}
             dataKey="name"
             hide={!axes.major.visible}
             unit={axes.major.unit}
@@ -170,9 +175,10 @@ const VerticalBarBlock = ({
                 showDataLabels
                   ? {
                       fontSize: 14,
+                      offset: 5,
                       position:
                         dataLabelPosition === 'inside' ? 'insideTop' : 'top',
-                      formatter: value =>
+                      formatter: (value: string | number) =>
                         formatPretty(
                           value.toString(),
                           dataSet.indicator.unit,
@@ -183,6 +189,8 @@ const VerticalBarBlock = ({
               }
             />
           ))}
+
+          {chartHasNegativeValues && <ReferenceLine y={0} stroke="#666" />}
 
           {axes.major.referenceLines?.map(referenceLine =>
             createReferenceLine({

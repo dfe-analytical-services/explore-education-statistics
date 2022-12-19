@@ -129,8 +129,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IBlobCacheService? cacheService = null,
             ICacheKeyService? cacheKeyService = null)
         {
-            using var context = DbUtils.InMemoryApplicationDbContext();
-
             var service = new DataBlockService(
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
                 persistenceHelper ?? PersistenceHelperMock().Object,

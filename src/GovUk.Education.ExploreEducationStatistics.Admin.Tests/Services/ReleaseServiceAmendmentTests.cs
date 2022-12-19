@@ -80,6 +80,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Name = "Data Block 2"
             };
 
+            var embedBlockLink = new EmbedBlockLink
+            {
+                Id = Guid.NewGuid(),
+                Order = 3,
+                EmbedBlock = new EmbedBlock
+                {
+                    Title = "Test EmbedBlockTitle",
+                    Url = "https://www.test.com/embedBlock",
+                },
+                Comments = new List<Comment>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Content = "Embed block comment"
+                    },
+                },
+            };
+
             var release = new Release
             {
                 Id = releaseId,
@@ -174,7 +193,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                         }
                                     }
                                 },
-                                dataBlock1
+                                dataBlock1,
+                                embedBlockLink,
                             }
                         }
                     },
@@ -278,7 +298,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         ReleaseId = releaseId,
                         ContentBlock = dataBlock2,
                         ContentBlockId = dataBlock2.Id,
-                    }
+                    },
+                    new()
+                    {
+                        ReleaseId = releaseId,
+                        ContentBlock = embedBlockLink,
+                        ContentBlockId = embedBlockLink.Id,
+                    },
                 }
             };
 
@@ -456,6 +482,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ThenInclude(c => c.ContentSection)
                     .ThenInclude(c => c.Content)
                     .ThenInclude(c => c.Comments)
+                    .Include(r => r.Content)
+                    .ThenInclude(c => c.ContentSection)
+                    .ThenInclude(c => c.Content)
+                    .ThenInclude(c => (c as EmbedBlockLink)!.EmbedBlock)
                     .Include(r => r.Updates)
                     .Include(r => r.ContentBlocks)
                     .ThenInclude(r => r.ContentBlock)
@@ -505,8 +535,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
                 Assert.Equal(release.ContentBlocks.Count, amendment.ContentBlocks.Count);
-                var amendmentContentBlock1 = amendment.ContentBlocks[0].ContentBlock;
-                var amendmentContentBlock2 = amendment.ContentBlocks[1].ContentBlock;
+                var amendmentContentBlock1 = Assert.IsType<DataBlock>(amendment.ContentBlocks[0].ContentBlock);
+                var amendmentContentBlock2 = Assert.IsType<DataBlock>(amendment.ContentBlocks[1].ContentBlock);
+                var amendmentContentBlock3 = Assert.IsType<EmbedBlockLink>(amendment.ContentBlocks[2].ContentBlock);
                 var amendmentContentBlock1InContent = amendment.Content[0].ContentSection.Content[0];
 
                 // Check that the DataBlock that is included in this Release amendment's Content is successfully
@@ -519,7 +550,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // and check that the Data Block that is not yet included in any content is copied across OK still
                 Assert.NotEqual(dataBlock2.Id, amendmentContentBlock2.Id);
-                Assert.Equal((amendmentContentBlock2 as DataBlock)?.Name, dataBlock2.Name);
+                Assert.Equal(amendmentContentBlock2.Name, dataBlock2.Name);
+
+                Assert.NotEqual(embedBlockLink.Id, amendmentContentBlock3.Id);
+                Assert.NotEqual(embedBlockLink.EmbedBlockId, amendmentContentBlock3.EmbedBlockId);
+                Assert.Equal(embedBlockLink.EmbedBlock.Title, amendmentContentBlock3.EmbedBlock.Title);
+                Assert.Equal(embedBlockLink.EmbedBlock.Url, amendmentContentBlock3.EmbedBlock.Url);
 
                 var amendmentReleaseRoles = contentDbContext
                     .UserReleaseRoles
@@ -683,6 +719,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseFileService? releaseFileService = null,
             IDataImportService? dataImportService = null,
             IFootnoteService? footnoteService = null,
+            IFootnoteRepository? footnoteRepository = null,
             IDataBlockService? dataBlockService = null,
             IReleaseSubjectRepository? releaseSubjectRepository = null,
             IGuidGenerator? guidGenerator = null)
@@ -699,6 +736,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
                 dataImportService ?? Mock.Of<IDataImportService>(Strict),
                 footnoteService ?? Mock.Of<IFootnoteService>(Strict),
+                footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict),
                 statisticsDbContext,
                 dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
                 releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),

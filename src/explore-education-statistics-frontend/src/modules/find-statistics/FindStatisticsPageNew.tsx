@@ -1,55 +1,90 @@
 import Button from '@common/components/Button';
-import InsetText from '@common/components/InsetText';
+import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
+import WarningMessage from '@common/components/WarningMessage';
+import useToggle from '@common/hooks/useToggle';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import {
-  PublicationSummaryWithRelease,
+  publicationFilters,
+  PublicationFilter,
   PublicationSortOption,
 } from '@common/services/publicationService';
-import { Paging } from '@common/services/types/pagination';
+import { releaseTypes, ReleaseType } from '@common/services/types/releaseType';
 import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
-import useRouterLoading from '@frontend/hooks/useRouterLoading';
+import FilterClearButton from '@frontend/modules/find-statistics/components/FilterClearButton';
+import Filters from '@frontend/modules/find-statistics/components/Filters';
 import PublicationSummary from '@frontend/modules/find-statistics/components/PublicationSummary';
+import { FindStatisticsPageQuery } from '@frontend/modules/find-statistics/FindStatisticsPage';
+import SearchForm from '@frontend/modules/find-statistics/components/SearchForm';
 import SortControls from '@frontend/modules/find-statistics/components/SortControls';
+import { getParamsFromQuery } from '@frontend/modules/find-statistics/utils/createPublicationListRequest';
+import publicationQueries from '@frontend/queries/publicationQueries';
+import themeQueries from '@frontend/queries/themeQueries';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
+import compact from 'lodash/compact';
+import omit from 'lodash/omit';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import React from 'react';
+import { ParsedUrlQuery } from 'querystring';
+import React, { useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-interface Props {
-  paging: Paging;
-  publications: PublicationSummaryWithRelease[];
-  sortBy?: PublicationSortOption;
-}
-
-const FindStatisticsPageNew: NextPage<Props> = ({
-  paging,
-  publications,
-  sortBy = 'newest',
-}) => {
-  const { page = 1, totalPages, totalResults } = paging;
-
+const FindStatisticsPageNew: NextPage = () => {
   const router = useRouter();
-  const isLoading = useRouterLoading();
   const { isMedia: isMobileMedia } = useMobileMedia();
+  const mobileFilterButtonRef = useRef<HTMLButtonElement>(null);
+  const [showMobileFilters, toggleMobileFilters] = useToggle(false);
 
-  const handleSortPublications = async (nextSortBy: PublicationSortOption) => {
+  const { data: publicationsData, isError, isFetching, isLoading } = useQuery({
+    ...publicationQueries.list(router.query),
+    keepPreviousData: true,
+    staleTime: 60000,
+  });
+
+  const { data: themes = [] } = useQuery({
+    ...themeQueries.list(),
+    staleTime: Infinity,
+  });
+
+  const { paging, results: publications = [] } = publicationsData ?? {};
+  const { page, totalPages, totalResults } = paging ?? {};
+
+  const { releaseType, search, sortBy, themeId } = getParamsFromQuery(
+    router.query,
+  );
+
+  const isFiltered = !!search || !!releaseType || !!themeId;
+
+  const selectedTheme = themes.find(theme => theme.id === themeId);
+  const selectedReleaseType = releaseTypes[releaseType as ReleaseType];
+
+  const filteredByString = compact([
+    search,
+    selectedTheme?.title,
+    selectedReleaseType,
+  ]).join(', ');
+
+  const updateQueryParams = async (nextQuery: FindStatisticsPageQuery) => {
     await router.push(
       {
         pathname: '/find-statistics',
-        query: {
-          ...router.query,
-          sortBy: nextSortBy,
-        },
+        query: nextQuery as ParsedUrlQuery,
       },
       undefined,
       {
-        scroll: false,
+        shallow: true,
       },
     );
+  };
+
+  const handleSortBy = async (nextSortBy: PublicationSortOption) => {
+    await updateQueryParams({
+      ...omit(router.query, 'page'),
+      sortBy: nextSortBy,
+    });
 
     logEvent({
       category: 'Find statistics and data',
@@ -58,11 +93,62 @@ const FindStatisticsPageNew: NextPage<Props> = ({
     });
   };
 
+  const handleChangeFilter = async ({
+    filterType,
+    nextValue,
+  }: {
+    filterType: PublicationFilter;
+    nextValue: string;
+  }) => {
+    const newParams =
+      nextValue === 'all'
+        ? omit(router.query, 'page', filterType)
+        : {
+            ...omit(router.query, 'page'),
+            [filterType]: nextValue,
+            sortBy: filterType === 'search' ? 'relevance' : sortBy,
+          };
+
+    await updateQueryParams(newParams);
+
+    logEvent({
+      category: 'Find statistics and data',
+      action: `Publications filtered by ${filterType}`,
+      label: nextValue,
+    });
+  };
+
+  const handleClearFilter = async ({
+    filterType,
+  }: {
+    filterType: PublicationFilter | 'all';
+  }) => {
+    // Reset sortBy to newest if removing a search and sorting by relevance
+    const nextSortBy = search && sortBy === 'relevance' ? 'newest' : sortBy;
+
+    const newParams =
+      filterType === 'all'
+        ? {
+            ...omit(router.query, 'page', ...publicationFilters),
+            sortBy: nextSortBy,
+          }
+        : {
+            ...omit(router.query, filterType, 'page'),
+            sortBy: nextSortBy,
+          };
+    await updateQueryParams(newParams);
+
+    logEvent({
+      category: 'Find statistics and data',
+      action: `Clear ${filterType} filter`,
+    });
+  };
+
   return (
     <Page
       title="Find statistics and data"
       metaTitle={
-        totalPages > 1
+        totalPages && totalPages > 1
           ? `Find statistics and data (page ${page} of ${totalPages})`
           : undefined
       }
@@ -119,46 +205,160 @@ const FindStatisticsPageNew: NextPage<Props> = ({
       </div>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-third">
-          Search and filters here
-        </div>
-        <div className="govuk-grid-column-two-thirds">
-          <div aria-live="polite" aria-atomic="true">
-            <h2 className="govuk-!-margin-bottom-2">
-              {`${totalResults} ${totalResults !== 1 ? 'results' : 'result'}`}
-            </h2>
-
-            <p className="govuk-!-margin-top-1">
-              {`Page ${page} of ${paging.totalPages}, showing all publications`}
-              <VisuallyHidden>{` sorted by ${sortBy}`}</VisuallyHidden>
-            </p>
-          </div>
-
+          <SearchForm
+            searchTerm={search}
+            onSubmit={nextValue =>
+              handleChangeFilter({ filterType: 'search', nextValue })
+            }
+          />
           <a href="#searchResults" className="govuk-skip-link">
             Skip to search results
           </a>
+          <Filters
+            releaseType={releaseType}
+            showMobileFilters={showMobileFilters}
+            themeId={themeId}
+            themes={themes}
+            totalResults={totalResults}
+            onChange={handleChangeFilter}
+            onCloseMobileFilters={() => {
+              mobileFilterButtonRef.current?.focus();
+              toggleMobileFilters.off();
+            }}
+          />
+        </div>
+        <div className="govuk-grid-column-two-thirds">
+          <div>
+            <h2
+              aria-live="polite"
+              aria-atomic="true"
+              className="govuk-!-margin-bottom-2"
+            >
+              {`${totalResults} ${totalResults !== 1 ? 'results' : 'result'}`}
+            </h2>
 
-          {isMobileMedia && <Button>Filter results</Button>}
+            <div className="dfe-flex dfe-justify-content--space-between dfe-align-items-start">
+              <p className="govuk-!-margin-bottom-2">
+                {`${
+                  totalResults ? `Page ${page} of ${totalPages}` : '0 pages'
+                }, ${
+                  isFiltered ? 'filtered by: ' : 'showing all publications'
+                }`}
 
-          <SortControls sortBy={sortBy} onChange={handleSortPublications} />
+                {isFiltered && (
+                  <VisuallyHidden>{filteredByString}</VisuallyHidden>
+                )}
 
-          <LoadingSpinner loading={isLoading} className="govuk-!-margin-top-4">
-            {/* TODO EES-3517 show different message if search / filter returns no results  */}
-            {publications.length === 0 ? (
-              <InsetText id="searchResults">
-                No data currently published.
-              </InsetText>
-            ) : (
-              <ul className="govuk-list" id="searchResults">
-                {publications.map(publication => (
-                  <PublicationSummary
-                    key={publication.id}
-                    publication={publication}
+                <VisuallyHidden>{` Sorted by ${
+                  sortBy === 'title' ? 'A to Z' : sortBy
+                }`}</VisuallyHidden>
+              </p>
+
+              {isFiltered && (
+                <ButtonText
+                  onClick={() => handleClearFilter({ filterType: 'all' })}
+                >
+                  Clear all filters
+                </ButtonText>
+              )}
+            </div>
+
+            {isFiltered && (
+              <div className="govuk-!-margin-bottom-5">
+                {search && (
+                  <FilterClearButton
+                    name={search}
+                    onClick={() => handleClearFilter({ filterType: 'search' })}
                   />
-                ))}
-              </ul>
+                )}
+                {selectedTheme && (
+                  <FilterClearButton
+                    name={selectedTheme.title}
+                    onClick={() => handleClearFilter({ filterType: 'themeId' })}
+                  />
+                )}
+                {selectedReleaseType && (
+                  <FilterClearButton
+                    name={selectedReleaseType}
+                    onClick={() =>
+                      handleClearFilter({ filterType: 'releaseType' })
+                    }
+                  />
+                )}
+              </div>
             )}
+          </div>
 
-            <Pagination currentPage={page} totalPages={totalPages} />
+          {isMobileMedia && (
+            <Button
+              ref={mobileFilterButtonRef}
+              onClick={toggleMobileFilters.on}
+            >
+              Filter results
+            </Button>
+          )}
+
+          {publications.length > 0 && (
+            <SortControls
+              hasSearch={!!search}
+              sortBy={sortBy}
+              onChange={handleSortBy}
+            />
+          )}
+
+          <LoadingSpinner
+            loading={isLoading || isFetching}
+            className="govuk-!-margin-top-4"
+          >
+            {isError ? (
+              <WarningMessage>
+                Cannot load publications, please try again later.
+              </WarningMessage>
+            ) : (
+              <>
+                {publications.length === 0 ? (
+                  <div className="govuk-!-margin-top-5" id="searchResults">
+                    {isFiltered ? (
+                      <>
+                        <p className="govuk-!-font-weight-bold">
+                          There are no matching results.
+                        </p>
+                        <p>Improve your search results by:</p>
+                        <ul>
+                          <li>removing filters</li>
+                          <li>double-checking your spelling</li>
+                          <li>using fewer keywords</li>
+                          <li>searching for something less specific</li>
+                        </ul>
+                      </>
+                    ) : (
+                      <p>No data currently published.</p>
+                    )}
+                  </div>
+                ) : (
+                  <ul
+                    className="govuk-list"
+                    id="searchResults"
+                    data-testid="publicationsList"
+                  >
+                    {publications.map(publication => (
+                      <PublicationSummary
+                        key={publication.id}
+                        publication={publication}
+                      />
+                    ))}
+                  </ul>
+                )}
+              </>
+            )}
+            {page && totalPages && (
+              <Pagination
+                currentPage={page}
+                scroll
+                shallow
+                totalPages={totalPages}
+              />
+            )}
           </LoadingSpinner>
         </div>
       </div>

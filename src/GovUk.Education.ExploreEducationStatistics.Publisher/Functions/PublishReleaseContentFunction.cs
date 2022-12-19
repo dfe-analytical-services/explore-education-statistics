@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
@@ -22,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private readonly IContentService _contentService;
         private readonly INotificationsService _notificationsService;
         private readonly IPublicationCacheService _publicationCacheService;
-        private readonly IPublicationService _publicationService;
+        private readonly IPublicationRepository _publicationRepository;
         private readonly IReleaseService _releaseService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
 
@@ -31,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             IContentService contentService,
             INotificationsService notificationsService,
             IPublicationCacheService publicationCacheService,
-            IPublicationService publicationService,
+            IPublicationRepository publicationRepository,
             IReleaseService releaseService,
             IReleasePublishingStatusService releasePublishingStatusService)
         {
@@ -39,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             _contentService = contentService;
             _notificationsService = notificationsService;
             _publicationCacheService = publicationCacheService;
-            _publicationService = publicationService;
+            _publicationRepository = publicationRepository;
             _releaseService = releaseService;
             _releasePublishingStatusService = releasePublishingStatusService;
         }
@@ -84,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 var release = await _releaseService.Get(message.ReleaseId);
                 
                 // TODO EES-3369 (Read Replica-2) This call needs moving to the new PublishingCompletionService 
-                await _publicationService.UpdateLatestPublishedRelease(release.PublicationId);
+                await _publicationRepository.UpdateLatestPublishedRelease(release.PublicationId);
 
                 // Update the cached publication and any cached superseded publications.
                 // If this is the first live release of the publication, the superseding is now enforced

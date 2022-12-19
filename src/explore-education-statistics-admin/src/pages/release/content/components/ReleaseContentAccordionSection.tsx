@@ -2,6 +2,9 @@ import EditableAccordionSection from '@admin/components/editable/EditableAccordi
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import DataBlockSelectForm from '@admin/pages/release/content/components/DataBlockSelectForm';
+import EditableEmbedForm, {
+  EditableEmbedFormValues,
+} from '@admin/components/editable/EditableEmbedForm';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
@@ -9,6 +12,7 @@ import useReleaseContentActions from '@admin/pages/release/content/contexts/useR
 import { EditableBlock } from '@admin/services/types/content';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
+import Modal from '@common/components/Modal';
 import Tooltip from '@common/components/Tooltip';
 import useToggle from '@common/hooks/useToggle';
 import { ContentSection } from '@common/services/publicationService';
@@ -38,6 +42,7 @@ const ReleaseContentAccordionSection = ({
 
   const [isReordering, setIsReordering] = useState(false);
   const [showDataBlockForm, toggleDataBlockForm] = useToggle(false);
+  const [showEmbedDashboardForm, toggleEmbedDashboardForm] = useToggle(false);
 
   const [blocks, setBlocks] = useState<EditableBlock[]>(sectionContent);
 
@@ -70,6 +75,22 @@ const ReleaseContentAccordionSection = ({
       },
     });
   }, [actions, release.id, sectionId, sectionContent.length]);
+
+  const addEmbedBlock = useCallback(
+    async (embedBlock: EditableEmbedFormValues) => {
+      await actions.addEmbedSectionBlock({
+        releaseId: release.id,
+        sectionId,
+        sectionKey: 'content',
+        request: {
+          title: embedBlock.title,
+          url: embedBlock.url,
+          contentSectionId: sectionId,
+        },
+      });
+    },
+    [actions, release.id, sectionId],
+  );
 
   const attachDataBlock = useCallback(
     async (contentBlockId: string) => {
@@ -211,9 +232,30 @@ const ReleaseContentAccordionSection = ({
                     Add data block
                   </Button>
                 )}
+                {!showEmbedDashboardForm && (
+                  <Button
+                    variant="secondary"
+                    onClick={toggleEmbedDashboardForm.on}
+                  >
+                    Add embed block
+                  </Button>
+                )}
               </ButtonGroup>
             </>
           )}
+          <Modal
+            title="Add embed block"
+            open={showEmbedDashboardForm}
+            onExit={toggleEmbedDashboardForm.off}
+          >
+            <EditableEmbedForm
+              onCancel={toggleEmbedDashboardForm.off}
+              onSubmit={async embedBlock => {
+                await addEmbedBlock(embedBlock);
+                toggleEmbedDashboardForm.off();
+              }}
+            />
+          </Modal>
         </>
       )}
     </EditableAccordionSection>

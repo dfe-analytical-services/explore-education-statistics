@@ -14,7 +14,7 @@ Force Tags          Admin    Local    Dev
 *** Test Cases ***
 Import permissions test variables
     Import bootstrap data roles and permissions variables
-    Set suite variable    ${PUBLICATION_NAME}    ${PUBLICATION_FOR_PUBLICATION_RELEASE_APPROVER}
+    Set suite variable    ${PUBLICATION_NAME}    ${PUBLICATION_FOR_PUBLICATION_APPROVER}
 
 Validates release approver publication page is correct
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}

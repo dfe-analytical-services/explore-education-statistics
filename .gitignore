@@ -50,6 +50,8 @@ src/explore-education-statistics-frontend/*.xml
 /tests/robot-tests/scripts/permalink_snapshots/invalid-permalinks.csv
 /tests/robot-tests/scripts/permalink_snapshots/prod-permalinks.csv
 /tests/robot-tests/scripts/permalink_snapshots/checked-permalinks.csv
+/tests/robot-tests/tests/visual_testing/visually_check_tables_and_charts.dev.robot
+/tests/robot-tests/tests/visual_testing/visually_check_tables_and_charts.dev.robot.csv
 
 ## Data API Seed CSV data
 

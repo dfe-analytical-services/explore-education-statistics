@@ -60,3 +60,8 @@ export const testPaginatedReleaseSummaries: PaginatedList<ReleaseSummary> = {
     totalResults: 3,
   },
 };
+
+export const testPaginatedReleaseSummariesNoResults: PaginatedList<ReleaseSummary> = {
+  results: [],
+  paging: { page: 1, pageSize: 1, totalPages: 1, totalResults: 0 },
+};

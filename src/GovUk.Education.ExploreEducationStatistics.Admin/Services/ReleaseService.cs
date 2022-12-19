@@ -49,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseFileService _releaseFileService;
         private readonly IDataImportService _dataImportService;
         private readonly IFootnoteService _footnoteService;
+        private readonly IFootnoteRepository _footnoteRepository;
         private readonly IDataBlockService _dataBlockService;
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly IGuidGenerator _guidGenerator;
@@ -68,10 +69,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseFileService releaseFileService,
             IDataImportService dataImportService,
             IFootnoteService footnoteService,
+            IFootnoteRepository footnoteRepository,
             StatisticsDbContext statisticsDbContext,
             IDataBlockService dataBlockService,
             IReleaseSubjectRepository releaseSubjectRepository,
-            IGuidGenerator guidGenerator, 
+            IGuidGenerator guidGenerator,
             IBlobCacheService cacheService)
         {
             _context = context;
@@ -85,6 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseFileService = releaseFileService;
             _dataImportService = dataImportService;
             _footnoteService = footnoteService;
+            _footnoteRepository = footnoteRepository;
             _statisticsDbContext = statisticsDbContext;
             _dataBlockService = dataBlockService;
             _releaseSubjectRepository = releaseSubjectRepository;
@@ -114,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     if (releaseCreate.TemplateReleaseId.HasValue)
                     {
-                        CreateGenericContentFromTemplate(releaseCreate.TemplateReleaseId.Value, release);
+                        await CreateGenericContentFromTemplate(releaseCreate.TemplateReleaseId.Value, release);
                     }
                     else
                     {
@@ -155,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanDeleteRelease)
-                .OnSuccess(release =>
+                .OnSuccess(_ =>
                 {
                     var methodologiesScheduledWithRelease =
                         GetMethodologiesScheduledWithRelease(releaseId)
@@ -225,8 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendment(Guid releaseId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(HydrateReleaseForAmendment)
+                .CheckEntityExists<Release>(releaseId, HydrateReleaseForAmendment)
                 .OnSuccess(_userService.CheckCanMakeAmendmentOfRelease)
                 .OnSuccess(originalRelease =>
                     CreateBasicReleaseAmendment(originalRelease)
@@ -239,9 +241,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Release>> CreateStatisticsReleaseAmendment(Release amendment)
         {
-            var statsRelease =_statisticsDbContext
+            var statsRelease = await _statisticsDbContext
                 .Release
-                .FirstOrDefault(r => r.Id == amendment.PreviousVersionId);
+                .FirstOrDefaultAsync(r => r.Id == amendment.PreviousVersionId);
 
             // Release does not have to have stats uploaded but if it has then
             // create a link row to link back to the original subject
@@ -330,20 +332,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, IdTitleViewModel?>> GetLatestPublishedRelease(Guid publicationId)
+        public async Task<Either<ActionResult, IdTitleViewModel>> GetLatestPublishedRelease(Guid publicationId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, queryable =>
-                    queryable.Include(r => r.Releases))
+                    queryable.Include(r => r.LatestPublishedRelease))
                 .OnSuccess(_userService.CheckCanViewPublication)
                 .OnSuccess(publication =>
                 {
-                    var latestRelease = publication.LatestPublishedRelease();
-                    return latestRelease != null ? new IdTitleViewModel
+                    var latestPublishedRelease = publication.LatestPublishedRelease;
+                    return latestPublishedRelease != null ? new IdTitleViewModel
                     {
-                        Id = latestRelease.Id,
-                        Title = latestRelease.Title
-                    } : null;
+                        Id = latestPublishedRelease.Id,
+                        Title = latestPublishedRelease.Title
+                    } : new Either<ActionResult, IdTitleViewModel>(new NotFoundResult());
                 });
         }
 
@@ -435,12 +437,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return !releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
         }
 
-        private void CreateGenericContentFromTemplate(Guid releaseId, Release newRelease)
+        private async Task CreateGenericContentFromTemplate(Guid releaseId, Release newRelease)
         {
-            var templateRelease = _context.Releases.AsNoTracking()
+            var templateRelease = await _context.Releases.AsNoTracking()
                 .Include(r => r.Content)
                 .ThenInclude(c => c.ContentSection)
-                .First(r => r.Id == releaseId);
+                .FirstAsync(r => r.Id == releaseId);
 
             templateRelease.CreateGenericContentFromTemplate(newRelease);
         }
@@ -458,7 +460,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     var footnotes = subject == null
                         ? new List<Footnote>()
-                        : _footnoteService.GetFootnotes(releaseId, subject.Id);
+                        : await _footnoteRepository.GetFootnotes(releaseId, subject.Id);
 
                     return new DeleteDataFilePlan
                     {
@@ -514,9 +516,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private bool CanUpdateDataFiles(Guid releaseId)
+        private async Task<bool> CanUpdateDataFiles(Guid releaseId)
         {
-            var release = _context.Releases.First(r => r.Id == releaseId);
+            var release = await _context.Releases.FirstAsync(r => r.Id == releaseId);
             return release.ApprovalStatus != ReleaseApprovalStatus.Approved;
         }
 
@@ -530,7 +532,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(CannotRemoveDataFilesUntilImportComplete);
             }
 
-            if (!CanUpdateDataFiles(releaseId))
+            if (!await CanUpdateDataFiles(releaseId))
             {
                 return ValidationActionResult(CannotRemoveDataFilesOnceReleaseApproved);
             }
@@ -544,49 +546,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // If the release is the latest
             // The contact
             return values.Include(r => r.Publication)
-                .ThenInclude(publication => publication.Releases) // Back refs required to work out latest
-                .Include(r => r.Publication)
                 .ThenInclude(publication => publication.Contact)
                 .Include(r => r.ReleaseStatuses);
         }
 
-        private async Task<Release> HydrateReleaseForAmendment(Release release)
+        private static IQueryable<Release> HydrateReleaseForAmendment(IQueryable<Release> queryable)
         {
             // Require publication / release / contact / graph to be able to work out:
             // If the release is the latest
             // The contact
-            // TODO: EES-3164 Refactor using AsSplitQuery()
-            await _context.Entry(release)
-                .Reference(r => r.Publication)
-                .LoadAsync();
-            await _context.Entry(release)
-                .Collection(r => r.Content)
-                .LoadAsync();
-            await release.Content
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async cs =>
-                {
-                    await _context.Entry(cs)
-                        .Reference(rcs => rcs.ContentSection)
-                        .LoadAsync();
-                    await _context.Entry(cs.ContentSection)
-                        .Collection(s => s.Content)
-                        .LoadAsync();
-                });
-            await _context.Entry(release)
-                .Collection(r => r.Updates)
-                .LoadAsync();
-            await _context.Entry(release)
-                .Collection(r => r.ContentBlocks)
-                .LoadAsync();
-            await release.ContentBlocks
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async rcb =>
-                    await _context.Entry(rcb)
-                        .Reference(cb => cb.ContentBlock)
-                        .LoadAsync()
-                );
-            return release;
+            return queryable
+                .AsSplitQuery()
+                .Include(r => r.Publication)
+                .Include(r => r.Content)
+                .ThenInclude(c => c.ContentSection)
+                .ThenInclude(c => c.Content)
+                .ThenInclude(cb => (cb as EmbedBlockLink)!.EmbedBlock)
+                .Include(r => r.Updates)
+                .Include(r => r.ContentBlocks)
+                .ThenInclude(r => r.ContentBlock);
         }
 
         private IList<MethodologyVersion> GetMethodologiesScheduledWithRelease(Guid releaseId)
@@ -614,6 +592,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
     public class DeleteReleasePlan
     {
-        public List<IdTitleViewModel> ScheduledMethodologies { get; set; } = new List<IdTitleViewModel>();
+        public List<IdTitleViewModel> ScheduledMethodologies { get; set; } = new();
     }
 }

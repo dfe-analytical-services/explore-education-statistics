@@ -193,40 +193,40 @@ Validate results table column headings after reordering
     user checks table column heading contains    2    8    2012/13
 
 Validate results table row headings after reordering
-    user checks results table row heading contains    1    1    Overall absence rate
-    user checks results table row heading contains    2    1    Unauthorised absence rate
-    user checks results table row heading contains    3    1    Authorised absence rate
+    user checks table row heading contains    1    1    Overall absence rate
+    user checks table row heading contains    2    1    Unauthorised absence rate
+    user checks table row heading contains    3    1    Authorised absence rate
 
 Validate rows after reordering
     # Overall absence rate
-    user checks results table cell contains    1    1    4.5%
-    user checks results table cell contains    1    2    4.6%
-    user checks results table cell contains    1    3    4.6%
-    user checks results table cell contains    1    4    5.2%
-    user checks results table cell contains    1    5    4.5%
-    user checks results table cell contains    1    6    4.6%
-    user checks results table cell contains    1    7    4.5%
-    user checks results table cell contains    1    8    5.3%
+    user checks table cell contains    1    1    4.5%
+    user checks table cell contains    1    2    4.6%
+    user checks table cell contains    1    3    4.6%
+    user checks table cell contains    1    4    5.2%
+    user checks table cell contains    1    5    4.5%
+    user checks table cell contains    1    6    4.6%
+    user checks table cell contains    1    7    4.5%
+    user checks table cell contains    1    8    5.3%
 
     # Unauthorised absence rate
-    user checks results table cell contains    2    1    1.1%
-    user checks results table cell contains    2    2    1.1%
-    user checks results table cell contains    2    3    1.1%
-    user checks results table cell contains    2    4    1.1%
-    user checks results table cell contains    2    5    1.1%
-    user checks results table cell contains    2    6    1.1%
-    user checks results table cell contains    2    7    1.1%
-    user checks results table cell contains    2    8    1.1%
+    user checks table cell contains    2    1    1.1%
+    user checks table cell contains    2    2    1.1%
+    user checks table cell contains    2    3    1.1%
+    user checks table cell contains    2    4    1.1%
+    user checks table cell contains    2    5    1.1%
+    user checks table cell contains    2    6    1.1%
+    user checks table cell contains    2    7    1.1%
+    user checks table cell contains    2    8    1.1%
 
     # Authorised absence rate
-    user checks results table cell contains    3    1    3.4%
-    user checks results table cell contains    3    2    3.6%
-    user checks results table cell contains    3    3    3.5%
-    user checks results table cell contains    3    4    4.2%
-    user checks results table cell contains    3    5    3.5%
-    user checks results table cell contains    3    6    3.5%
-    user checks results table cell contains    3    7    3.4%
-    user checks results table cell contains    3    8    4.2%
+    user checks table cell contains    3    1    3.4%
+    user checks table cell contains    3    2    3.6%
+    user checks table cell contains    3    3    3.5%
+    user checks table cell contains    3    4    4.2%
+    user checks table cell contains    3    5    3.5%
+    user checks table cell contains    3    6    3.5%
+    user checks table cell contains    3    7    3.4%
+    user checks table cell contains    3    8    4.2%
 
 User generates a permanent link
     user waits until page contains button    Generate shareable link
@@ -251,36 +251,36 @@ User validates permalink table
     user checks table column heading contains    2    7    2015/16
     user checks table column heading contains    2    8    2012/13
 
-    user checks results table row heading contains    1    1    Overall absence rate
-    user checks results table row heading contains    2    1    Unauthorised absence rate
-    user checks results table row heading contains    3    1    Authorised absence rate
+    user checks table row heading contains    1    1    Overall absence rate
+    user checks table row heading contains    2    1    Unauthorised absence rate
+    user checks table row heading contains    3    1    Authorised absence rate
 
     # Overall absence rate
-    user checks results table cell contains    1    1    4.5%
-    user checks results table cell contains    1    2    4.6%
-    user checks results table cell contains    1    3    4.6%
-    user checks results table cell contains    1    4    5.2%
-    user checks results table cell contains    1    5    4.5%
-    user checks results table cell contains    1    6    4.6%
-    user checks results table cell contains    1    7    4.5%
-    user checks results table cell contains    1    8    5.3%
+    user checks table cell contains    1    1    4.5%
+    user checks table cell contains    1    2    4.6%
+    user checks table cell contains    1    3    4.6%
+    user checks table cell contains    1    4    5.2%
+    user checks table cell contains    1    5    4.5%
+    user checks table cell contains    1    6    4.6%
+    user checks table cell contains    1    7    4.5%
+    user checks table cell contains    1    8    5.3%
 
     # Unauthorised absence rate
-    user checks results table cell contains    2    1    1.1%
-    user checks results table cell contains    2    2    1.1%
-    user checks results table cell contains    2    3    1.1%
-    user checks results table cell contains    2    4    1.1%
-    user checks results table cell contains    2    5    1.1%
-    user checks results table cell contains    2    6    1.1%
-    user checks results table cell contains    2    7    1.1%
-    user checks results table cell contains    2    8    1.1%
+    user checks table cell contains    2    1    1.1%
+    user checks table cell contains    2    2    1.1%
+    user checks table cell contains    2    3    1.1%
+    user checks table cell contains    2    4    1.1%
+    user checks table cell contains    2    5    1.1%
+    user checks table cell contains    2    6    1.1%
+    user checks table cell contains    2    7    1.1%
+    user checks table cell contains    2    8    1.1%
 
     # Authorised absence rate
-    user checks results table cell contains    3    1    3.4%
-    user checks results table cell contains    3    2    3.6%
-    user checks results table cell contains    3    3    3.5%
-    user checks results table cell contains    3    4    4.2%
-    user checks results table cell contains    3    5    3.5%
-    user checks results table cell contains    3    6    3.5%
-    user checks results table cell contains    3    7    3.4%
-    user checks results table cell contains    3    8    4.2%
+    user checks table cell contains    3    1    3.4%
+    user checks table cell contains    3    2    3.6%
+    user checks table cell contains    3    3    3.5%
+    user checks table cell contains    3    4    4.2%
+    user checks table cell contains    3    5    3.5%
+    user checks table cell contains    3    6    3.5%
+    user checks table cell contains    3    7    3.4%
+    user checks table cell contains    3    8    4.2%

@@ -123,17 +123,19 @@ Navigate to 'Content' page
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
 
-Add two accordion sections to release
+Add three accordion sections to release
     user waits for page to finish loading
     user waits until page does not contain loading spinner
     user clicks button    Add new section
     user changes accordion section title    1    Dates data block
     user clicks button    Add new section
     user changes accordion section title    2    Test text
+    user clicks button    Add new section
+    user changes accordion section title    3    Test embedded dashboard section
 
 Add data block to first accordion section
     user adds data block to editable accordion section    Dates data block    ${DATABLOCK_NAME}
-    ...    css:#releaseMainContent
+    ...    id:releaseMainContent
     ${datablock}=    set variable    xpath://*[@data-testid="Data block - ${DATABLOCK_NAME}"]
     user waits until page contains element    ${datablock}    %{WAIT_SMALL}
     user waits until element contains infographic chart    ${datablock}
@@ -141,7 +143,7 @@ Add data block to first accordion section
     user checks infographic chart contains alt    ${datablock}    Sample alt text
 
 Verify data block table has footnotes
-    ${accordion}=    user opens accordion section    Dates data block    css:#releaseMainContent
+    ${accordion}=    user opens accordion section    Dates data block    id:releaseMainContent
     ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
 
     user checks list has x items    testid:footnotes    2    ${data_block_table}
@@ -153,9 +155,20 @@ Verify data block table has footnotes
     ...    ${data_block_table}
 
 Add test text to second accordion section
-    user adds text block to editable accordion section    Test text    css:#releaseMainContent
+    user adds text block to editable accordion section    Test text    id:releaseMainContent
     user adds content to autosaving accordion section text block    Test text    1    Some test text!
-    ...    css:#releaseMainContent
+    ...    id:releaseMainContent
+
+Add embedded dashboard to third accordion section
+    user adds embedded dashboard to editable accordion section
+    ...    Test embedded dashboard section
+    ...    Test embedded dashboard title
+    ...    https://department-for-education.shinyapps.io/dfe-shiny-template/
+    ...    id:releaseMainContent
+
+    select frame    xpath://iframe[@title="Test embedded dashboard title"]
+    user waits until h1 is visible    DfE Analytical Services R-Shiny data dashboard template (h1)    90
+    unselect frame
 
 Add public prerelease access list
     user clicks link    Pre-release access
@@ -259,16 +272,16 @@ Verify public metadata guidance document
     user checks table column heading contains    1    1    Variable name    css:table[data-testid="Variables"]
     user checks table column heading contains    1    2    Variable description    css:table[data-testid="Variables"]
 
-    user checks results table cell contains    1    1    children_attending    css:table[data-testid="Variables"]
-    user checks results table cell contains    1    2    Number of children attending
+    user checks table cell contains    1    1    children_attending    css:table[data-testid="Variables"]
+    user checks table cell contains    1    2    Number of children attending
     ...    css:table[data-testid="Variables"]
 
-    user checks results table cell contains    6    1    date    css:table[data-testid="Variables"]
-    user checks results table cell contains    6    2    Date    css:table[data-testid="Variables"]
+    user checks table cell contains    6    1    date    css:table[data-testid="Variables"]
+    user checks table cell contains    6    2    Date    css:table[data-testid="Variables"]
 
-    user checks results table cell contains    10    1    otherwise_vulnerable_children_attending
+    user checks table cell contains    10    1    otherwise_vulnerable_children_attending
     ...    css:table[data-testid="Variables"]
-    user checks results table cell contains    10    2    Number of otherwise vulnerable children attending
+    user checks table cell contains    10    2    Number of otherwise vulnerable children attending
     ...    css:table[data-testid="Variables"]
 
     user goes to release page via breadcrumb    ${PUBLICATION_NAME}    ${RELEASE_NAME}
@@ -294,9 +307,11 @@ Verify accordions are correct
     user checks there are x accordion sections    1    id:data-accordion
     user checks accordion is in position    Explore data and files    1    id:data-accordion
 
+    user checks there are x accordion sections    3    id:content
     user checks there are x accordion sections    2    id:content
     user checks accordion is in position    Dates data block    1    id:content
     user checks accordion is in position    Test text    2    id:content
+    user checks accordion is in position    Test embedded dashboard section    3    id:content
 
     user checks there are x accordion sections    2    id:help-and-support
     user checks accordion is in position    National statistics    1    id:help-and-support
@@ -338,6 +353,15 @@ Verify Test text accordion section contains correct text
     ${section}=    user gets accordion section content element    Test text    id:content
     user waits until parent contains element    ${section}    xpath:.//p[text()="Some test text!"]
     user closes accordion section    Test text    id:content
+
+Verify embedded dashboard accordion section contains dashboard
+    user opens accordion section    Test embedded dashboard section    id:content
+    ${section}=    user gets accordion section content element    Test embedded dashboard section    id:content
+    user waits until parent contains element    ${section}    xpath:.//iframe[@title="Test embedded dashboard title"]
+
+    select frame    xpath://iframe[@title="Test embedded dashboard title"]
+    user waits until h1 is visible    DfE Analytical Services R-Shiny data dashboard template (h1)    %{WAIT_SMALL}
+    unselect frame
 
 Return to Admin and Create amendment
     user navigates to admin dashboard    Bau1
@@ -478,10 +502,10 @@ Edit data block for amendment
     user waits until table is visible
 
     user checks table body has x rows    1
-    user checks results table cell contains    1    1    ${DATABLOCK_NAME}
-    user checks results table cell contains    1    2    Yes
-    user checks results table cell contains    1    3    Yes
-    user checks results table cell contains    1    4    None
+    user checks table cell contains    1    1    ${DATABLOCK_NAME}
+    user checks table cell contains    1    2    Yes
+    user checks table cell contains    1    3    Yes
+    user checks table cell contains    1    4    None
 
     user clicks link    Edit block    css:tbody > tr:first-child
 
@@ -537,27 +561,36 @@ Navigate to 'Content' page for amendment
     user waits until page contains button    Add a summary text block
 
 Verify amended Dates data block table has footnotes
-    ${accordion}=    user opens accordion section    Dates data block    css:#releaseMainContent
+    ${accordion}=    user opens accordion section    Dates data block    id:releaseMainContent
     ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
 
-    user checks list has x items    testid:footnotes    3    ${data_block_table}
+    user checks list has x items    testid:footnotes    2    ${data_block_table}
     user checks list item contains    testid:footnotes    1
     ...    Applies to all data 1
     ...    ${data_block_table}
     user checks list item contains    testid:footnotes    2
     ...    Applies to all data 2
     ...    ${data_block_table}
+
+    user clicks button    Show 1 more footnote    ${data_block_table}
+    user checks list has x items    testid:footnotes    3    ${data_block_table}
     user checks list item contains    testid:footnotes    3
     ...    Applies to all data 3
     ...    ${data_block_table}
 
-    user checks element contains button    ${data_block_table}    Show 1 more item
-    user checks list item is visually hidden    testid:footnotes    3    ${data_block_table}
-
 Update second accordion section text for amendment
-    user opens accordion section    Test text    css:#releaseMainContent
+    user opens accordion section    Test text    id:releaseMainContent
     user adds content to autosaving accordion section text block    Test text    1    Updated test text!
-    ...    css:#releaseMainContent
+    ...    id:releaseMainContent
+
+Update embedded dashboard title
+    user updates embedded dashboard in editable accordion section
+    ...    Test embedded dashboard section
+    ...    Test embedded dashboard title updated
+    ...    https://department-for-education.shinyapps.io/dfe-shiny-template/
+    ...    id:releaseMainContent
+
+    user closes accordion section    Test embedded dashboard section    id:releaseMainContent
 
 Add release note to amendment
     user clicks button    Add note
@@ -661,14 +694,14 @@ Verify amendment public metadata guidance document
     user checks table column heading contains    1    1    Variable name
     user checks table column heading contains    1    2    Variable description
 
-    user checks results table cell contains    1    1    children_attending
-    user checks results table cell contains    1    2    Number of children attending
+    user checks table cell contains    1    1    children_attending
+    user checks table cell contains    1    2    Number of children attending
 
-    user checks results table cell contains    6    1    date
-    user checks results table cell contains    6    2    Date
+    user checks table cell contains    6    1    date
+    user checks table cell contains    6    2    Date
 
-    user checks results table cell contains    10    1    otherwise_vulnerable_children_attending
-    user checks results table cell contains    10    2    Number of otherwise vulnerable children attending
+    user checks table cell contains    10    1    otherwise_vulnerable_children_attending
+    user checks table cell contains    10    2    Number of otherwise vulnerable children attending
 
     user goes to release page via breadcrumb    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
@@ -692,7 +725,7 @@ Verify amendment accordions are correct
     user goes to release page via breadcrumb    ${PUBLICATION_NAME}    ${RELEASE_NAME}
     user checks accordion is in position    Dates data block    1    id:content
     user checks accordion is in position    Test text    2    id:content
-
+    user checks accordion is in position    Test embedded dashboard section    3    id:content
     user checks accordion is in position    Experimental statistics    1    id:help-and-support
     user checks accordion is in position    Contact us    2    id:help-and-support
 
@@ -720,24 +753,32 @@ Verify amendment Dates data block table has footnotes
     ${accordion}=    user opens accordion section    Dates data block    id:content
     ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
 
-    user checks list has x items    testid:footnotes    3    ${data_block_table}
+    user checks list has x items    testid:footnotes    2    ${data_block_table}
     user checks list item contains    testid:footnotes    1
     ...    Applies to all data 1
     ...    ${data_block_table}
     user checks list item contains    testid:footnotes    2
     ...    Applies to all data 2
     ...    ${data_block_table}
+
+    user clicks button    Show 1 more footnote    ${data_block_table}
+    user checks list has x items    testid:footnotes    3    ${data_block_table}
     user checks list item contains    testid:footnotes    3
     ...    Applies to all data 3
     ...    ${data_block_table}
 
-    user checks element contains button    ${data_block_table}    Show 1 more item
-    user checks list item is visually hidden    testid:footnotes    3    ${data_block_table}
-
 Verify amendment Test text accordion section contains correct text
     user opens accordion section    Test text    id:content
     ${section}=    user gets accordion section content element    Test text    id:content
+    user checks element contains    ${section}    Updated test text!
     user closes accordion section    Test text    id:content
+
+Verify amendment embedded dashboard accordion section is correct
+    user opens accordion section    Test embedded dashboard section    id:content
+    ${section}=    user gets accordion section content element    Test embedded dashboard section    id:content
+    user checks element contains child element    ${section}
+    ...    xpath:.//iframe[@title="Test embedded dashboard title updated"]
+    user closes accordion section    Test embedded dashboard section    id:content
 
 Check next release date can be updated
     user navigates to admin dashboard    Bau1

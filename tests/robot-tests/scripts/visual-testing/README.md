@@ -23,7 +23,7 @@ their HTML.
 #### Capture "before" and "after" images
 
 After a code change is deployed, a migration applied or other change is performed on an environment whereby we want to sanity check that 
-no changes to the existing tables and charts have occurred (or that only certain expected changes have occurred), we can then run the 
+no changes to the existing tables and charts have occurred (or that only certain expected changes have occurred), we can then run the
 tests again and capture snapshot images of the "after" state of each table and chart.
 
 #### Visually compare images
@@ -76,7 +76,7 @@ WHERE ContentBlock.Type = 'DataBlock'
   AND (
     -- Include DataBlocks that are linked to Content Sections
     ContentSectionId IS NOT NULL
-    -- Include DataBlocks that are linked to Content Sections
+    -- Include DataBlocks that are used for Featured Tables
     OR (DataBlock_HighlightName IS NOT NULL
         AND DataBlock_HighlightName <> ''))
   -- Include only DataBlocks that are from the latest published Release
@@ -107,8 +107,8 @@ be generated via the `generate_tables_and_charts_test_cases.py` file.
 2. Run the following command:
    
    ```bash
-   cd tests/robot-tests/scripts/visual-testing
-   pipenv run python generate_tables_and_charts_test_cases.py --file datablocks-dev.csv --target visually_check_tables_and_charts.dev.robot 
+   cd tests/robot-tests
+   pipenv run python scripts/visual-testing/generate_tables_and_charts_test_cases.py --file scripts/visual-testing/datablocks-dev.csv --target visually_check_tables_and_charts.dev.robot 
    ```
    
    This will generate a test suite for the Data Blocks (for the Dev environment in this example). In this suite will be an individual test case
@@ -146,12 +146,10 @@ pipenv run python run_tests.py -f tests/visual_testing/visually_check_tables_and
 Now that we have a set of "before" and "after" snapshot images in the two snapshot folders, we're able to visually compare them to 
 ensure that only expected changes are present.
 
-From the `tests/robot-tests/scripts/visual-testing` folder, run:
+From the `tests/robot-tests` folder, run:
 
 ```bash
-cd tests/robot-tests/scripts/visual-testing
-pipenv install # (only need to run this the first time)
-pipenv run python compare_image_folder_trees.py --first </path/to/before/snapshots> --second </path/to/after/snapshots> --diff </path/to/diffs/folder>
+pipenv run python scripts/visual-testing/compare_image_folder_trees.py --first </path/to/before/snapshots> --second </path/to/after/snapshots> --diff </path/to/diffs/folder>
 ```
 
 This will compare the images in the `</path/to/before/snapshots>` folder with the images in the `</path/to/after/snapshots>` folder.
@@ -175,8 +173,8 @@ environment.
 To generate a test script for an environment, e.g. Dev environment using the CSV above, run:
 
 ```bash
-cd tests/robot-tests/scripts/visual-testing
-pipenv run python generate_permalink_test_cases.py --file permalinks-dev.csv --target visually_check_permalinks.dev.robot 
+cd tests/robot-tests
+pipenv run python scripts/visual-testing/generate_permalink_test_cases.py --file permalinks-dev.csv --target visually_check_permalinks.dev.robot 
 ```
 
 This test script can then be run for befores and afters and then images visually compared as per the tables and charts example. The command for running these tests 

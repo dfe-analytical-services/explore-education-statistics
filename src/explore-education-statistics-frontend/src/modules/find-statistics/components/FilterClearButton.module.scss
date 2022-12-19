@@ -1,0 +1,20 @@
+@import '~govuk-frontend/govuk/base';
+
+.button {
+  background: govuk-colour('light-grey');
+  border: 1px solid govuk-colour('mid-grey');
+  border-radius: 6px;
+  box-shadow: none;
+  line-height: 1;
+  margin: 0 govuk-spacing(1) govuk-spacing(1) 0;
+  padding: 8px;
+
+  &:focus {
+    background: $govuk-focus-colour;
+  }
+
+  &:hover {
+    background: darken(govuk-colour('light-grey'), 4);
+    cursor: pointer;
+  }
+}

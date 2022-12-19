@@ -19,7 +19,6 @@ exports[`Details renders correctly 1`] = `
     </span>
   </summary>
   <div class="govuk-details__text"
-       aria-hidden="true"
        id="test-details"
   >
     Test content
@@ -47,7 +46,6 @@ exports[`Details renders correctly with \`open\` prop set to true 1`] = `
     </span>
   </summary>
   <div class="govuk-details__text"
-       aria-hidden="false"
        id="test-details"
   >
     Test content

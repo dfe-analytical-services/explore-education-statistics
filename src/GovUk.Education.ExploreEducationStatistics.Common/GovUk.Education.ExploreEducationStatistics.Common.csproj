@@ -17,10 +17,11 @@
         <PackageReference Include="Microsoft.Azure.Storage.DataMovement" Version="2.0.4" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.2" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.2" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
         <PackageReference Include="Namotion.Reflection" Version="2.0.10" />
         <PackageReference Include="NCrontab.Signed" Version="3.3.2" />
-        <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
         <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.8" />
         <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.2.3" />
         <PackageReference Include="System.Linq.Async" Version="5.1.0" />

@@ -28,6 +28,7 @@ export interface UserPublicationRole {
   id: string;
   publication: string;
   role: string;
+  userName: string;
 }
 
 export interface UserReleaseRoleSubmission {

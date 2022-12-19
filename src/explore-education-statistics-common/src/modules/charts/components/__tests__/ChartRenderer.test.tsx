@@ -55,7 +55,7 @@ describe('ChartRenderer', () => {
   };
 
   test('renders auto-generated boundary level footnote successfully', async () => {
-    render(<ChartRenderer id="id" {...testMapChartRenderer} />);
+    render(<ChartRenderer id="test-id" {...testMapChartRenderer} />);
     const footnotes = screen.queryByTestId('footnotes');
     expect(footnotes).toBeInTheDocument();
     expect(footnotes).toHaveTextContent(
@@ -66,7 +66,7 @@ describe('ChartRenderer', () => {
   test('does not render auto-generated boundary level footnote when boundary level not provided', async () => {
     render(
       <ChartRenderer
-        id="id"
+        id="test-id"
         {...produce(testMapChartRenderer, draft => {
           draft.boundaryLevel = undefined;
         })}

@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     },
                     FilterItems = ListOf(new ObservationFilterItem
                     {
-                        FilterItem = new FilterItem("Filter Item 1", new FilterGroup())
+                        FilterItem = new FilterItem("Filter Item 1", Guid.NewGuid())
                     }),
                     Year = 2019,
                     TimeIdentifier = TimeIdentifier.AcademicYear,
@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     },
                     FilterItems = ListOf(new ObservationFilterItem
                     {
-                        FilterItem = new FilterItem("Filter Item 2", new FilterGroup())
+                        FilterItem = new FilterItem("Filter Item 2", Guid.NewGuid())
                     }),
                     Year = 2020,
                     TimeIdentifier = TimeIdentifier.AcademicYear,
@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     },
                     FilterItems = ListOf(new ObservationFilterItem
                     {
-                        FilterItem = new FilterItem("Filter Item 3", new FilterGroup())
+                        FilterItem = new FilterItem("Filter Item 3", Guid.NewGuid())
                     }),
                     Year = 2020,
                     TimeIdentifier = TimeIdentifier.AcademicYear,
@@ -457,7 +457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     },
                     FilterItems = ListOf(new ObservationFilterItem
                     {
-                        FilterItem = new FilterItem("Filter Item 1", new FilterGroup())
+                        FilterItem = new FilterItem("Filter Item 1", Guid.NewGuid())
                     }),
                     Year = 2019,
                     TimeIdentifier = TimeIdentifier.AcademicYear,
@@ -476,7 +476,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     },
                     FilterItems = ListOf(new ObservationFilterItem
                     {
-                        FilterItem = new FilterItem("Filter Item 2", new FilterGroup())
+                        FilterItem = new FilterItem("Filter Item 2", Guid.NewGuid())
                     }),
                     Year = 2020,
                     TimeIdentifier = TimeIdentifier.AcademicYear,
@@ -497,7 +497,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     },
                     FilterItems = ListOf(new ObservationFilterItem
                     {
-                        FilterItem = new FilterItem("Filter Item 3", new FilterGroup())
+                        FilterItem = new FilterItem("Filter Item 3", Guid.NewGuid())
                     }),
                     Year = 2020,
                     TimeIdentifier = TimeIdentifier.AcademicYear,

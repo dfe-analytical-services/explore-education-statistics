@@ -169,7 +169,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Content")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -830,7 +840,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
                         .WithMany("Filters")
                         .HasForeignKey("FootnoteId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Filter");
@@ -860,7 +870,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
                         .WithMany("FilterGroups")
                         .HasForeignKey("FootnoteId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("FilterGroup");
@@ -890,7 +900,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
                         .WithMany("FilterItems")
                         .HasForeignKey("FootnoteId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("FilterItem");
@@ -914,7 +924,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
                         .WithMany("Indicators")
                         .HasForeignKey("FootnoteId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Indicator", "Indicator")
@@ -1027,7 +1037,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", "Footnote")
                         .WithMany("Subjects")
                         .HasForeignKey("FootnoteId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", "Subject")

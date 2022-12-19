@@ -2173,6 +2173,36 @@
                                             "name": "Content",
                                             "type": "String"
                                         }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Order",
+                                            "type": "Int32"
+                                        },
+                                        "sink": {
+                                            "name": "Order",
+                                            "type": "Int32"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Created",
+                                            "type": "DateTime"
+                                        },
+                                        "sink": {
+                                            "name": "Created",
+                                            "type": "DateTime"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Updated",
+                                            "type": "DateTime"
+                                        },
+                                        "sink": {
+                                            "name": "Updated",
+                                            "type": "DateTime"
+                                        }
                                     }
                                 ]
                             }

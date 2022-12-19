@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Microsoft.EntityFrameworkCore;
@@ -165,10 +166,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
         private static DataImportService BuildDataImportService(
             string? contentDbContextId = null)
         {
+            var dbContextSupplier = new InMemoryDbContextSupplier(contentDbContextId ?? Guid.NewGuid().ToString());
+            
             return new DataImportService(
-                new InMemoryDbContextSupplier(contentDbContextId ?? Guid.NewGuid().ToString()),
+                dbContextSupplier,
                 Mock.Of<ILogger<DataImportService>>(Strict),
-                new InMemoryDatabaseHelper()
+                new InMemoryDatabaseHelper(dbContextSupplier)
             );
         }
     }

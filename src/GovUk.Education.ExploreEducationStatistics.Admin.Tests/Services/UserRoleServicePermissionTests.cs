@@ -25,6 +25,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class UserRoleServicePermissionTests
     {
+        private readonly Publication _publication = new()
+        {
+            Id = Guid.NewGuid(),
+        };
+        
         [Fact]
         public async Task SetGlobalRole()
         {
@@ -122,14 +127,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetPublicationRoles()
+        public async Task GetPublicationRolesForUser()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectCheckToFail(CanManageUsersOnSystem)
                 .AssertForbidden(async userService =>
                 {
                     var service = SetupUserRoleService(userService: userService.Object);
-                    return await service.GetPublicationRoles(Guid.NewGuid());
+                    return await service.GetPublicationRolesForUser(Guid.NewGuid());
+                });
+        }
+
+        [Fact]
+        public async Task GetPublicationRolesForPublication()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_publication, CanViewSpecificPublication)
+                .AssertForbidden(async userService =>
+                {
+                    await using var contentDbContext = InMemoryApplicationDbContext();
+                    await contentDbContext.AddAsync(_publication);
+                    await contentDbContext.SaveChangesAsync();
+                    
+                    var service = SetupUserRoleService(
+                        contentDbContext: contentDbContext,
+                        userService: userService.Object);
+                        
+                    return await service.GetPublicationRolesForPublication(_publication.Id);
                 });
         }
 

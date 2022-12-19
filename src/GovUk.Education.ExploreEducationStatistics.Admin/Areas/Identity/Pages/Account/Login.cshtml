@@ -7,7 +7,7 @@
 
 <span class="govuk-caption-l">Explore education statistics</span>
 
-<h1 class="govuk-heading-xl">Sign in</h1>
+<h1 class="govuk-heading-xl" data-testid="page-title">@ViewData["Title"]</h1>
 
 <p class="govuk-body">Use this service to create and publish Department for Education (DfE) official and national statistics.</p>
 <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
@@ -16,6 +16,7 @@
             @foreach (var provider in Model.ExternalLogins)
             {
                 <button
+                    id="signin-button"
                     type="submit"
                     class="govuk-button govuk-button--start"
                     name="provider"

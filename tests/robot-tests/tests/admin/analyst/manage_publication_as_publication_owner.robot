@@ -16,17 +16,31 @@ ${PUBLICATION_NAME}=    UI tests - manage publication as publication owner %{RUN
 
 *** Test Cases ***
 Create Publication as bau1
-    user creates test publication via api    ${PUBLICATION_NAME}
+    ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
+    Set suite variable    ${PUBLICATION_ID}
+
+Check that no publication roles are listed yet on the Team access page
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user waits until page contains link    Team access
+    user clicks link    Team access
+    user waits until page contains    There are no publication roles currently assigned.
 
 Assign publication owner permissions to analyst1
-    user gives analyst publication owner access    ${PUBLICATION_NAME}
+    user adds publication role to user via api
+    ...    EES-test.ANALYST1@education.gov.uk
+    ...    ${PUBLICATION_ID}
+    ...    Owner
+    user reloads page
+    user waits until page contains    To request changing the assigned publication roles
+    user checks table column heading contains    1    1    Name
+    user checks table column heading contains    1    2    Publication role
+    user checks table body has x rows    1
+    user checks table cell contains    1    1    Analyst1 User1
+    user checks table cell contains    1    2    Owner
 
-Switch to analyst1
-    user changes to analyst1
-
-Go to Manage publication page
+Sign in as analyst1 and navigate to the new publication
+    user signs in as analyst1
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user waits until page contains title caption    Manage publication
 
 Update publication contact
     user clicks link    Contact

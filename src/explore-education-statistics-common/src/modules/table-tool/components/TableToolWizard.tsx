@@ -23,7 +23,7 @@ import applyTableHeadersOrder from '@common/modules/table-tool/utils/applyTableH
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
-import publicationService from '@common/services/publicationService';
+import publicationService, { Theme } from '@common/services/publicationService';
 import tableBuilderService, {
   FeaturedTable,
   ReleaseTableDataQuery,
@@ -31,7 +31,6 @@ import tableBuilderService, {
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
-import { Theme } from '@common/services/themeService';
 import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
 import { useRouter } from 'next/router';
