@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Statistics;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -14,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces.IReleaseService;
+using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
 {
@@ -42,8 +44,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             _releaseDataFileRepository = releaseDataFileRepository;
         }
 
-        [HttpPost("releases/{releaseId}/footnotes")]
-        public async Task<ActionResult<FootnoteViewModel>> CreateFootnote(Guid releaseId, FootnoteCreateViewModel footnote)
+        [HttpPost("releases/{releaseId:guid}/footnotes")]
+        public async Task<ActionResult<FootnoteViewModel>> CreateFootnote(Guid releaseId,
+            FootnoteCreateRequest footnote)
         {
             return await _footnoteService
                 .CreateFootnote(
@@ -58,25 +61,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("releases/{releaseId}/footnotes/{id}")]
-        public async Task<ActionResult> DeleteFootnote(Guid releaseId, Guid id)
+        [HttpDelete("releases/{releaseId:guid}/footnotes/{footnoteId:guid}")]
+        public async Task<ActionResult> DeleteFootnote(Guid releaseId,
+            Guid footnoteId)
         {
             return await _footnoteService
-                .DeleteFootnote(releaseId, id)
+                .DeleteFootnote(releaseId: releaseId,
+                    footnoteId: footnoteId)
                 .HandleFailuresOrNoContent();
         }
 
-
-        [HttpGet("releases/{releaseId}/footnotes/{id}")]
-        public async Task<ActionResult<FootnoteViewModel>> GetFootnote(Guid releaseId, Guid id)
+        [HttpGet("releases/{releaseId:guid}/footnotes/{footnoteId:guid}")]
+        public async Task<ActionResult<FootnoteViewModel>> GetFootnote(Guid releaseId,
+            Guid footnoteId)
         {
             return await _footnoteService
-                .GetFootnote(releaseId, id)
+                .GetFootnote(releaseId: releaseId,
+                    footnoteId: footnoteId)
                 .OnSuccess(GatherAndBuildFootnoteViewModel)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("releases/{releaseId}/footnotes")]
+        [HttpGet("releases/{releaseId:guid}/footnotes")]
         public async Task<ActionResult<IEnumerable<FootnoteViewModel>>> GetFootnotes(Guid releaseId)
         {
             return await _footnoteService
@@ -85,32 +91,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("releases/{releaseId}/footnotes/{id}")]
-        public async Task<ActionResult<FootnoteViewModel>> UpdateFootnote(Guid releaseId, Guid id, FootnoteUpdateViewModel footnote)
+        [HttpPut("releases/{releaseId:guid}/footnotes/{footnoteId:guid}")]
+        public async Task<ActionResult<FootnoteViewModel>> UpdateFootnote(Guid releaseId,
+            Guid footnoteId,
+            FootnoteUpdateRequest footnote)
         {
             return await _footnoteService
                 .UpdateFootnote(
-                    releaseId,
-                    id,
+                    releaseId: releaseId,
+                    footnoteId: footnoteId,
                     footnote.Content,
-                    footnote.Filters,
-                    footnote.FilterGroups,
-                    footnote.FilterItems,
-                    footnote.Indicators,
-                    footnote.Subjects
+                    filterIds: footnote.Filters,
+                    filterGroupIds: footnote.FilterGroups,
+                    filterItemIds: footnote.FilterItems,
+                    indicatorIds: footnote.Indicators,
+                    subjectIds: footnote.Subjects
                 )
                 .OnSuccess(GatherAndBuildFootnoteViewModel)
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("releases/{releaseId}/footnotes-meta")]
+        [HttpGet("releases/{releaseId:guid}/footnotes-meta")]
         public async Task<ActionResult<FootnotesMetaViewModel>> GetFootnotesMeta(Guid releaseId)
         {
             return await _releaseService.ListSubjects(releaseId)
                 .OnSuccess(async subjects =>
                 {
                     var subjectMetaViewModels = await subjects
-                        .SelectAsync(async subject =>
+                        .ToAsyncEnumerable()
+                        .SelectAwait(async subject =>
                             new FootnotesSubjectMetaViewModel
                             {
                                 Filters = await GetFilters(subject.Id),
@@ -118,7 +127,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                 SubjectId = subject.Id,
                                 SubjectName = (await _releaseDataFileRepository.GetBySubject(releaseId, subject.Id)).Name,
                             }
-                        );
+                        )
+                        .ToListAsync();
 
                     return new FootnotesMetaViewModel
                     {
@@ -128,6 +138,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                 result => result)
                     };
                 })
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPatch("releases/{releaseId:guid}/footnotes")]
+        public async Task<ActionResult<Unit>> UpdateFootnotes(
+            Guid releaseId,
+            FootnotesUpdateRequest request)
+        {
+            return await _footnoteService.UpdateFootnotes(releaseId, request)
                 .HandleFailuresOrOk();
         }
 

@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                                 var dataBlocks = ValidateDataBlocks(releaseId, originalSubjectId,
                                     replacementSubjectMeta);
-                                var footnotes = ValidateFootnotes(releaseId, originalSubjectId, replacementSubjectMeta);
+                                var footnotes = await ValidateFootnotes(releaseId, originalSubjectId, replacementSubjectMeta);
 
                                 return new DataReplacementPlanViewModel(
                                     dataBlocks,
@@ -222,10 +222,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 timePeriods);
         }
 
-        private List<FootnoteReplacementPlanViewModel> ValidateFootnotes(Guid releaseId, Guid subjectId,
+        private async Task<List<FootnoteReplacementPlanViewModel>> ValidateFootnotes(Guid releaseId, Guid subjectId,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            return _footnoteRepository.GetFootnotes(releaseId, subjectId)
+            var footnotes = await _footnoteRepository.GetFootnotes(releaseId, subjectId);
+            return footnotes
                 .Select(footnote => ValidateFootnote(footnote, replacementSubjectMeta))
                 .ToList();
         }

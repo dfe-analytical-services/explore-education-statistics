@@ -266,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var cacheService = new Mock<IBlobCacheService>(Strict);
             var dataBlockService = new Mock<IDataBlockService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
-            var footnoteService = new Mock<IFootnoteService>(Strict);
+            var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
             var subjectRepository = new Mock<ISubjectRepository>(Strict);
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
@@ -287,8 +287,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Status = DataImportStatus.COMPLETE
                 });
 
-            footnoteService.Setup(service => service.GetFootnotes(release.Id, subject.Id))
-                .Returns(new List<Footnote>());
+            footnoteRepository.Setup(service => service.GetFootnotes(release.Id, subject.Id))
+                .ReturnsAsync(new List<Footnote>());
 
             subjectRepository.Setup(service => service.Get(subject.Id)).ReturnsAsync(subject);
 
@@ -304,7 +304,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     cacheService: cacheService.Object,
                     dataBlockService: dataBlockService.Object,
                     dataImportService: dataImportService.Object,
-                    footnoteService: footnoteService.Object,
+                    footnoteRepository: footnoteRepository.Object,
                     subjectRepository: subjectRepository.Object,
                     releaseDataFileService: releaseDataFileService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object);
@@ -314,8 +314,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(cacheService,
                     dataBlockService,
                     dataImportService,
-                    footnoteService,
-                    footnoteService,
+                    footnoteRepository,
                     subjectRepository,
                     releaseDataFileService,
                     releaseSubjectRepository
@@ -422,7 +421,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var cacheService = new Mock<IBlobCacheService>(Strict);
             var dataBlockService = new Mock<IDataBlockService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
-            var footnoteService = new Mock<IFootnoteService>(Strict);
+            var footnoteRepository = new Mock<IFootnoteRepository>(Strict);
             var subjectRepository = new Mock<ISubjectRepository>(Strict);
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
@@ -445,9 +444,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Status = DataImportStatus.COMPLETE
                 });
 
-            footnoteService.Setup(service =>
+            footnoteRepository.Setup(service =>
                     service.GetFootnotes(release.Id, It.IsIn(subject.Id, replacementSubject.Id)))
-                .Returns(new List<Footnote>());
+                .ReturnsAsync(new List<Footnote>());
 
             subjectRepository.Setup(service => service.Get(subject.Id)).ReturnsAsync(subject);
             subjectRepository.Setup(service => service.Get(replacementSubject.Id)).ReturnsAsync(replacementSubject);
@@ -466,7 +465,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     cacheService: cacheService.Object,
                     dataBlockService: dataBlockService.Object,
                     dataImportService: dataImportService.Object,
-                    footnoteService: footnoteService.Object,
+                    footnoteRepository: footnoteRepository.Object,
                     subjectRepository: subjectRepository.Object,
                     releaseDataFileService: releaseDataFileService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object);
@@ -476,7 +475,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(cacheService,
                     dataBlockService,
                     dataImportService,
-                    footnoteService,
+                    footnoteRepository,
                     subjectRepository,
                     releaseDataFileService,
                     releaseSubjectRepository);
@@ -1224,6 +1223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseDataFileService? releaseDataFileService = null,
             IDataImportService? dataImportService = null,
             IFootnoteService? footnoteService = null,
+            IFootnoteRepository? footnoteRepository = null,
             IDataBlockService? dataBlockService = null,
             IReleaseSubjectRepository? releaseSubjectRepository = null,
             IBlobCacheService? cacheService = null)
@@ -1246,6 +1246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
                 dataImportService ?? Mock.Of<IDataImportService>(Strict),
                 footnoteService ?? Mock.Of<IFootnoteService>(Strict),
+                footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict),
                 statisticsDbContext ?? Mock.Of<StatisticsDbContext>(Strict),
                 dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
                 releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),

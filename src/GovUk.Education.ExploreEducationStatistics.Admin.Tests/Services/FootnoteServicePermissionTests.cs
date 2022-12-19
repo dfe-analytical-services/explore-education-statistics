@@ -1,23 +1,24 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
@@ -25,129 +26,255 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class FootnoteServicePermissionTests
     {
-        private static readonly Release Release = new Release
+        private static readonly Release Release = new()
         {
             Id = Guid.NewGuid()
         };
 
-        private static readonly Subject Subject = new Subject
+        private static readonly Subject Subject = new()
         {
             Id = Guid.NewGuid()
         };
 
-        private static readonly Footnote Footnote = new Footnote
+        private static readonly Footnote Footnote = new()
         {
             Id = Guid.NewGuid(),
             Subjects = new List<SubjectFootnote>
             {
-                new SubjectFootnote
+                new()
                 {
                     SubjectId = Subject.Id
                 }
             }
         };
 
-        private static readonly IReadOnlyCollection<Guid> SubjectIdsList = new List<Guid>
+        [Fact]
+        public async Task CopyFootnotes_ViewSourceRelease()
         {
-            Subject.Id
-        };
+            var (
+                contentPersistenceHelper,
+                dataBlockService,
+                footnoteService,
+                statisticsPersistenceHelper
+                ) = Mocks();
 
-        private static readonly IReadOnlyCollection<Guid> GuidList = new List<Guid>();
+            var sourceRelease = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var destinationRelease = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+
+            SetupCall(contentPersistenceHelper, sourceRelease.Id, sourceRelease);
+            SetupCall(contentPersistenceHelper, destinationRelease.Id, destinationRelease);
+
+            await PermissionTestUtils.PolicyCheckBuilder<ContentSecurityPolicies>()
+                .SetupResourceCheck(sourceRelease, ContentSecurityPolicies.CanViewSpecificRelease, false)
+                .AssertForbidden(
+                    async userService =>
+                    {
+                        userService
+                            .Setup(s => s.MatchesPolicy(destinationRelease, SecurityPolicies.CanUpdateSpecificRelease))
+                            .ReturnsAsync(true);
+
+                        var service = new FootnoteService(
+                            InMemoryStatisticsDbContext(),
+                            contentPersistenceHelper.Object,
+                            userService.Object,
+                            dataBlockService.Object,
+                            footnoteService.Object,
+                            statisticsPersistenceHelper.Object
+                        );
+
+                        return await service.CopyFootnotes(
+                            sourceReleaseId: sourceRelease.Id,
+                            destinationReleaseId: destinationRelease.Id);
+                    }
+                );
+        }
 
         [Fact]
-        public void CreateFootnote()
+        public async Task CopyFootnotes_UpdateDestinationRelease()
         {
-            AssertSecurityPoliciesChecked(
+            var (
+                contentPersistenceHelper,
+                dataBlockService,
+                footnoteService,
+                statisticsPersistenceHelper
+                ) = Mocks();
+
+            var sourceRelease = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var destinationRelease = new Release
+            {
+                Id = Guid.NewGuid()
+            };
+
+            SetupCall(contentPersistenceHelper, sourceRelease.Id, sourceRelease);
+            SetupCall(contentPersistenceHelper, destinationRelease.Id, destinationRelease);
+
+            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheck(destinationRelease, SecurityPolicies.CanUpdateSpecificRelease, false)
+                .AssertForbidden(
+                    async userService =>
+                    {
+                        var service = new FootnoteService(
+                            InMemoryStatisticsDbContext(),
+                            contentPersistenceHelper.Object,
+                            userService.Object,
+                            dataBlockService.Object,
+                            footnoteService.Object,
+                            statisticsPersistenceHelper.Object
+                        );
+
+                        return await service.CopyFootnotes(
+                            sourceReleaseId: sourceRelease.Id,
+                            destinationReleaseId: destinationRelease.Id);
+                    }
+                );
+        }
+
+        [Fact]
+        public async Task CreateFootnote()
+        {
+            await AssertSecurityPolicyChecked(
                 service => service
                     .CreateFootnote(
                         Release.Id,
                         "",
-                        GuidList,
-                        GuidList,
-                        GuidList,
-                        GuidList,
-                        SubjectIdsList
+                        filterIds: SetOf<Guid>(),
+                        filterGroupIds: SetOf<Guid>(),
+                        filterItemIds: SetOf<Guid>(),
+                        indicatorIds: SetOf<Guid>(),
+                        subjectIds: SetOf(Subject.Id)
                     ),
-                CanUpdateSpecificRelease
+                Release,
+                SecurityPolicies.CanUpdateSpecificRelease
             );
         }
 
         [Fact]
-        public void UpdateFootnote()
+        public async Task DeleteFootnote()
         {
-            AssertSecurityPoliciesChecked(
+            await AssertSecurityPolicyChecked(
+                service => service
+                    .DeleteFootnote(
+                        releaseId: Release.Id,
+                        footnoteId: Footnote.Id),
+                Release,
+                SecurityPolicies.CanUpdateSpecificRelease
+            );
+        }
+
+        [Fact]
+        public async Task GetFootnote()
+        {
+            await AssertSecurityPolicyChecked(
+                service => service
+                    .GetFootnote(
+                        releaseId: Release.Id,
+                        footnoteId: Footnote.Id),
+                Release,
+                ContentSecurityPolicies.CanViewSpecificRelease
+            );
+        }
+
+        [Fact]
+        public async Task GetFootnotes()
+        {
+            await AssertSecurityPolicyChecked(
+                service => service
+                    .GetFootnotes(Release.Id),
+                Release,
+                ContentSecurityPolicies.CanViewSpecificRelease
+            );
+        }
+
+        [Fact]
+        public async Task UpdateFootnote()
+        {
+            await AssertSecurityPolicyChecked(
                 service => service
                     .UpdateFootnote(
-                        Release.Id,
-                        Footnote.Id,
+                        releaseId: Release.Id,
+                        footnoteId: Footnote.Id,
                         "",
-                        GuidList,
-                        GuidList,
-                        GuidList,
-                        GuidList,
-                        SubjectIdsList
+                        filterIds: SetOf<Guid>(),
+                        filterGroupIds: SetOf<Guid>(),
+                        filterItemIds: SetOf<Guid>(),
+                        indicatorIds: SetOf<Guid>(),
+                        subjectIds: SetOf(Subject.Id)
                     ),
-                CanUpdateSpecificRelease
+                Release,
+                SecurityPolicies.CanUpdateSpecificRelease
             );
         }
 
         [Fact]
-        public void DeleteFootnote()
+        public async Task UpdateFootnotes()
         {
-            AssertSecurityPoliciesChecked(
+            await AssertSecurityPolicyChecked(
                 service => service
-                    .DeleteFootnote(Release.Id, Footnote.Id),
-                CanUpdateSpecificRelease
+                    .UpdateFootnotes(
+                        Release.Id,
+                        new FootnotesUpdateRequest
+                        {
+                            FootnoteIds = new List<Guid>()
+                        }
+                    ),
+                Release,
+                SecurityPolicies.CanUpdateSpecificRelease
             );
         }
 
-        private void AssertSecurityPoliciesChecked<T>(
-            Func<FootnoteService, Task<Either<ActionResult, T>>> protectedAction, params SecurityPolicies[] policies)
+        private static Task AssertSecurityPolicyChecked<T, TResource, TPolicy>(
+            Func<FootnoteService, Task<Either<ActionResult, T>>> protectedAction,
+            TResource resource,
+            TPolicy policy) where TPolicy : Enum
         {
             var (
-                _,
-                releaseHelper,
-                userService,
+                contentPersistenceHelper,
                 dataBlockService,
                 footnoteService,
-                footnoteHelper,
-                guidGenerator
+                statisticsPersistenceHelper
                 ) = Mocks();
 
-            using var context = InMemoryStatisticsDbContext();
-            var service = new FootnoteService(
-                context,
-                releaseHelper.Object,
-                userService.Object,
-                dataBlockService.Object,
-                footnoteService.Object,
-                footnoteHelper.Object,
-                guidGenerator.Object
-            );
+            return PermissionTestUtils.PolicyCheckBuilder<TPolicy>()
+                .SetupResourceCheck(resource, policy, false)
+                .AssertForbidden(
+                    async userService =>
+                    {
+                        var service = new FootnoteService(
+                            InMemoryStatisticsDbContext(),
+                            contentPersistenceHelper.Object,
+                            userService.Object,
+                            dataBlockService.Object,
+                            footnoteService.Object,
+                            statisticsPersistenceHelper.Object
+                        );
 
-            PermissionTestUtil.AssertSecurityPoliciesChecked(protectedAction, Release, userService, service, policies);
+                        return await protectedAction.Invoke(service);
+                    }
+                );
         }
 
-        private (
-            Mock<ILogger<FootnoteService>>,
+        private static (
             Mock<IPersistenceHelper<ContentDbContext>>,
-            Mock<IUserService>,
             Mock<IDataBlockService>,
             Mock<IFootnoteRepository>,
-            Mock<IPersistenceHelper<StatisticsDbContext>>,
-            Mock<IGuidGenerator>) Mocks()
+            Mock<IPersistenceHelper<StatisticsDbContext>>) Mocks()
         {
-            var contentPersistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
-            MockUtils.SetupCall(contentPersistenceHelper, Release.Id, Release);
-
             return (
-                new Mock<ILogger<FootnoteService>>(),
-                contentPersistenceHelper,
-                new Mock<IUserService>(),
+                MockPersistenceHelper<ContentDbContext, Release>(Release.Id, Release),
                 new Mock<IDataBlockService>(),
                 new Mock<IFootnoteRepository>(),
-                MockUtils.MockPersistenceHelper<StatisticsDbContext, Footnote>(Footnote.Id, Footnote),
-                new Mock<IGuidGenerator>());
+                MockPersistenceHelper<StatisticsDbContext, Footnote>(Footnote.Id, Footnote));
         }
     }
 }

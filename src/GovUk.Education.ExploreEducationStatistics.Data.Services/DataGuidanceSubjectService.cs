@@ -123,9 +123,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ToList();
         }
 
-        private List<FootnoteViewModel> GetFootnotes(Guid releaseId, Guid subjectId)
+        private async Task<List<FootnoteViewModel>> GetFootnotes(Guid releaseId, Guid subjectId)
         {
-            return _footnoteRepository.GetFootnotes(releaseId, subjectId)
+            var footnotes = await _footnoteRepository.GetFootnotes(releaseId, subjectId);
+            return footnotes
                 .Select(footnote => new FootnoteViewModel(footnote.Id, footnote.Content))
                 .ToList();
         }
@@ -142,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var geographicLevels = await GetGeographicLevels(subject.Id);
             var timePeriods = _timePeriodService.GetTimePeriodLabels(subject.Id);
             var variables = GetVariables(subject.Id);
-            var footnotes = GetFootnotes(releaseSubject.ReleaseId, subject.Id);
+            var footnotes = await GetFootnotes(releaseSubject.ReleaseId, subject.Id);
 
             return new DataGuidanceSubjectViewModel
             {

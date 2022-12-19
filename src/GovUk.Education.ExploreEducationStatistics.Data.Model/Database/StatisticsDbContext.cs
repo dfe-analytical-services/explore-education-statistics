@@ -392,13 +392,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<FilterFootnote>()
                 .HasOne(filterFootnote => filterFootnote.Filter)
                 .WithMany(filter => filter.Footnotes)
-                .HasForeignKey(filterFootnote => filterFootnote.FilterId);
+                .HasForeignKey(filterFootnote => filterFootnote.FilterId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<FilterFootnote>()
                 .HasOne(filterFootnote => filterFootnote.Footnote)
                 .WithMany(footnote => footnote.Filters)
                 .HasForeignKey(filterFootnote => filterFootnote.FootnoteId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         private static void ConfigureFilterGroupFootnote(ModelBuilder modelBuilder)
@@ -409,13 +410,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<FilterGroupFootnote>()
                 .HasOne(filterGroupFootnote => filterGroupFootnote.FilterGroup)
                 .WithMany(filterGroup => filterGroup.Footnotes)
-                .HasForeignKey(filterGroupFootnote => filterGroupFootnote.FilterGroupId);
+                .HasForeignKey(filterGroupFootnote => filterGroupFootnote.FilterGroupId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<FilterGroupFootnote>()
                 .HasOne(filterGroupFootnote => filterGroupFootnote.Footnote)
                 .WithMany(footnote => footnote.FilterGroups)
                 .HasForeignKey(filterGroupFootnote => filterGroupFootnote.FootnoteId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         private static void ConfigureFilterItemFootnote(ModelBuilder modelBuilder)
@@ -426,13 +428,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<FilterItemFootnote>()
                 .HasOne(filterItemFootnote => filterItemFootnote.FilterItem)
                 .WithMany(filterItem => filterItem.Footnotes)
-                .HasForeignKey(filterItemFootnote => filterItemFootnote.FilterItemId);
+                .HasForeignKey(filterItemFootnote => filterItemFootnote.FilterItemId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<FilterItemFootnote>()
                 .HasOne(filterItemFootnote => filterItemFootnote.Footnote)
                 .WithMany(footnote => footnote.FilterItems)
                 .HasForeignKey(filterItemFootnote => filterItemFootnote.FootnoteId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         private static void ConfigureIdTempTable(ModelBuilder modelBuilder)
@@ -450,13 +453,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<IndicatorFootnote>()
                 .HasOne(indicatorFootnote => indicatorFootnote.Indicator)
                 .WithMany(indicator => indicator.Footnotes)
-                .HasForeignKey(indicatorFootnote => indicatorFootnote.IndicatorId);
+                .HasForeignKey(indicatorFootnote => indicatorFootnote.IndicatorId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<IndicatorFootnote>()
                 .HasOne(indicatorFootnote => indicatorFootnote.Footnote)
                 .WithMany(footnote => footnote.Indicators)
                 .HasForeignKey(indicatorFootnote => indicatorFootnote.FootnoteId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         private static void ConfigureSubjectFootnote(ModelBuilder modelBuilder)
@@ -467,13 +471,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<SubjectFootnote>()
                 .HasOne(subjectFootnote => subjectFootnote.Subject)
                 .WithMany(subject => subject.Footnotes)
-                .HasForeignKey(subjectFootnote => subjectFootnote.SubjectId);
+                .HasForeignKey(subjectFootnote => subjectFootnote.SubjectId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<SubjectFootnote>()
                 .HasOne(subjectFootnote => subjectFootnote.Footnote)
                 .WithMany(footnote => footnote.Subjects)
                 .HasForeignKey(subjectFootnote => subjectFootnote.FootnoteId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         private static void ConfigureSubject(ModelBuilder modelBuilder)
