@@ -6,8 +6,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
 {
     public interface ISubjectRepository
     {
-        Task<Subject?> Get(Guid subjectId);
+        Task<Subject?> Find(Guid subjectId);
 
-        Task<Guid> GetPublicationIdForSubject(Guid subjectId);
+        Task<Guid?> FindPublicationIdForSubject(Guid subjectId);
     }
 }

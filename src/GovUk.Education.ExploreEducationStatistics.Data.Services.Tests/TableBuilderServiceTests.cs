@@ -177,7 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var subjectRepository = new Mock<ISubjectRepository>(Strict);
 
                 subjectRepository
-                    .Setup(s => s.GetPublicationIdForSubject(query.SubjectId))
+                    .Setup(s => s.FindPublicationIdForSubject(query.SubjectId))
                     .ReturnsAsync(publicationId);
 
                 var releaseRepository = new Mock<IReleaseRepository>(Strict);
@@ -247,7 +247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var subjectRepository = new Mock<ISubjectRepository>(Strict);
 
                 subjectRepository
-                    .Setup(s => s.GetPublicationIdForSubject(query.SubjectId))
+                    .Setup(s => s.FindPublicationIdForSubject(query.SubjectId))
                     .ReturnsAsync(publicationId);
 
                 var releaseRepository = new Mock<IReleaseRepository>(Strict);
@@ -286,7 +286,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var subjectRepository = new Mock<ISubjectRepository>(Strict);
 
             subjectRepository
-                .Setup(s => s.GetPublicationIdForSubject(query.SubjectId))
+                .Setup(s => s.FindPublicationIdForSubject(query.SubjectId))
                 .ReturnsAsync(publicationId);
 
             var releaseRepository = new Mock<IReleaseRepository>(Strict);
@@ -372,7 +372,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var subjectRepository = new Mock<ISubjectRepository>(Strict);
 
                 subjectRepository
-                    .Setup(s => s.GetPublicationIdForSubject(query.SubjectId))
+                    .Setup(s => s.FindPublicationIdForSubject(query.SubjectId))
                     .ReturnsAsync(publicationId);
 
                 var releaseRepository = new Mock<IReleaseRepository>(Strict);

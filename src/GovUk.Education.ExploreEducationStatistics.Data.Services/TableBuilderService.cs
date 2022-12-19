@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -65,9 +66,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ObservationQueryContext queryContext,
             CancellationToken cancellationToken = default)
         {
-            var publicationId = await _subjectRepository.GetPublicationIdForSubject(queryContext.SubjectId);
-
-            return await _releaseRepository.GetLatestPublishedRelease(publicationId)
+            return await _subjectRepository.FindPublicationIdForSubject(queryContext.SubjectId)
+                .OrNotFound()
+                .OnSuccess(publicationId => _releaseRepository.GetLatestPublishedRelease(publicationId))
                 .OnSuccess(release => Query(release.Id, queryContext, cancellationToken));
         }
 

@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
 
                         subjectRepository
-                            .Setup(s => s.GetPublicationIdForSubject(_subject.Id))
+                            .Setup(s => s.FindPublicationIdForSubject(_subject.Id))
                             .ReturnsAsync(PublicationId);
 
                         var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
