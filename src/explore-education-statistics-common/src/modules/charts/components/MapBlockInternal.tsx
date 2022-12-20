@@ -26,6 +26,7 @@ import { Dictionary } from '@common/types';
 import generateHslColour from '@common/utils/colour/generateHslColour';
 import locationLevelsMap from '@common/utils/locationLevelsMap';
 import formatPretty from '@common/utils/number/formatPretty';
+import countDecimalPlaces from '@common/utils/number/countDecimalPlaces';
 import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, Path, PathOptions, Polyline } from 'leaflet';
@@ -567,9 +568,13 @@ function generateFeaturesAndDataGroups({
         const value = dataSets?.[selectedDataSetKey]?.value;
 
         if (Number.isFinite(value)) {
-          const matchingDataGroup = dataGroups.find(
-            dataClass => dataClass.minRaw <= value && value <= dataClass.maxRaw,
-          );
+          const matchingDataGroup = dataGroups.find(dataClass => {
+            const roundedValue = Number(value.toFixed(dataClass.decimalPlaces));
+            return (
+              dataClass.minRaw <= roundedValue &&
+              roundedValue <= dataClass.maxRaw
+            );
+          });
 
           acc.push({
             ...geoJson,

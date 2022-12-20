@@ -24,6 +24,7 @@ describe('generateLegendDataGroups', () => {
     expect(dataClasses).toEqual<LegendDataGroup[]>([
       {
         colour: 'rgba(0, 0, 0, 1)',
+        decimalPlaces: 0,
         max: '£2',
         maxRaw: 2,
         min: '£1',
@@ -43,6 +44,7 @@ describe('generateLegendDataGroups', () => {
     expect(dataClasses).toEqual<LegendDataGroup[]>([
       {
         colour: 'rgba(0, 0, 0, 1)',
+        decimalPlaces: 3,
         max: '2.389',
         maxRaw: 2.389,
         min: '1.011',
@@ -65,6 +67,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 0,
           max: '1',
           maxRaw: 1,
           min: '1',
@@ -84,6 +87,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 2,
           max: '2.39',
           maxRaw: 2.39,
           min: '1.01',
@@ -103,6 +107,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(128, 128, 128, 1)',
+          decimalPlaces: 0,
           max: '2',
           maxRaw: 2,
           min: '1',
@@ -110,6 +115,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 0,
           max: '4',
           maxRaw: 4,
           min: '3',
@@ -134,6 +140,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(128, 128, 128, 1)',
+          decimalPlaces: 0,
           max: '2',
           maxRaw: 2,
           min: '1',
@@ -141,6 +148,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 0,
           max: '5',
           maxRaw: 5,
           min: '3',
@@ -160,6 +168,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(128, 128, 128, 1)',
+          decimalPlaces: 1,
           max: '4.3',
           maxRaw: 4.3,
           min: '2.2',
@@ -167,6 +176,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 1,
           max: '6.6',
           maxRaw: 6.6,
           min: '4.4',
@@ -186,6 +196,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(128, 128, 128, 1)',
+          decimalPlaces: 2,
           max: '3.24',
           maxRaw: 3.24,
           min: '3.20',
@@ -193,6 +204,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 2,
           max: '3.30',
           maxRaw: 3.3,
           min: '3.25',
@@ -212,6 +224,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(170, 170, 170, 1)',
+          decimalPlaces: 0,
           max: '2',
           maxRaw: 2,
           min: '1',
@@ -219,6 +232,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(85, 85, 85, 1)',
+          decimalPlaces: 0,
           max: '4',
           maxRaw: 4,
           min: '3',
@@ -226,6 +240,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 0,
           max: '6',
           maxRaw: 6,
           min: '5',
@@ -245,6 +260,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(170, 170, 170, 1)',
+          decimalPlaces: 0,
           max: '2',
           maxRaw: 2,
           min: '1',
@@ -252,6 +268,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(85, 85, 85, 1)',
+          decimalPlaces: 0,
           max: '4',
           maxRaw: 4,
           min: '3',
@@ -259,6 +276,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 0,
           max: '5',
           maxRaw: 5,
           min: '5',
@@ -278,6 +296,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(170, 170, 170, 1)',
+          decimalPlaces: 1,
           max: '4.9',
           maxRaw: 4.9,
           min: '2.5',
@@ -285,6 +304,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(85, 85, 85, 1)',
+          decimalPlaces: 1,
           max: '7.4',
           maxRaw: 7.4,
           min: '5.0',
@@ -292,6 +312,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 1,
           max: '10.0',
           maxRaw: 10,
           min: '7.5',
@@ -311,6 +332,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(170, 170, 170, 1)',
+          decimalPlaces: 2,
           max: '6.65',
           maxRaw: 6.65,
           min: '3.33',
@@ -318,6 +340,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(85, 85, 85, 1)',
+          decimalPlaces: 2,
           max: '9.98',
           maxRaw: 9.98,
           min: '6.66',
@@ -325,6 +348,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 2,
           max: '13.32',
           maxRaw: 13.32,
           min: '9.99',
@@ -344,6 +368,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(204, 204, 204, 1)',
+          decimalPlaces: 0,
           max: '2',
           maxRaw: 2,
           min: '1',
@@ -351,6 +376,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(153, 153, 153, 1)',
+          decimalPlaces: 0,
           max: '4',
           maxRaw: 4,
           min: '3',
@@ -358,6 +384,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(102, 102, 102, 1)',
+          decimalPlaces: 0,
           max: '6',
           maxRaw: 6,
           min: '5',
@@ -365,6 +392,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(51, 51, 51, 1)',
+          decimalPlaces: 0,
           max: '8',
           maxRaw: 8,
           min: '7',
@@ -372,6 +400,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 0,
           max: '10',
           maxRaw: 10,
           min: '9',
@@ -391,6 +420,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(204, 204, 204, 1)',
+          decimalPlaces: 0,
           max: '2',
           maxRaw: 2,
           min: '1',
@@ -398,6 +428,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(153, 153, 153, 1)',
+          decimalPlaces: 0,
           max: '4',
           maxRaw: 4,
           min: '3',
@@ -405,6 +436,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(102, 102, 102, 1)',
+          decimalPlaces: 0,
           max: '6',
           maxRaw: 6,
           min: '5',
@@ -412,6 +444,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(51, 51, 51, 1)',
+          decimalPlaces: 0,
           max: '8',
           maxRaw: 8,
           min: '7',
@@ -419,6 +452,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 0,
           max: '9',
           maxRaw: 9,
           min: '9',
@@ -438,6 +472,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(204, 204, 204, 1)',
+          decimalPlaces: 1,
           max: '4.4',
           maxRaw: 4.4,
           min: '2.5',
@@ -445,6 +480,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(153, 153, 153, 1)',
+          decimalPlaces: 1,
           max: '6.4',
           maxRaw: 6.4,
           min: '4.5',
@@ -452,6 +488,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(102, 102, 102, 1)',
+          decimalPlaces: 1,
           max: '8.4',
           maxRaw: 8.4,
           min: '6.5',
@@ -459,6 +496,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(51, 51, 51, 1)',
+          decimalPlaces: 1,
           max: '10.4',
           maxRaw: 10.4,
           min: '8.5',
@@ -466,6 +504,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 1,
           max: '12.5',
           maxRaw: 12.5,
           min: '10.5',
@@ -485,6 +524,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(204, 204, 204, 1)',
+          decimalPlaces: 2,
           max: '7.04',
           maxRaw: 7.04,
           min: '2.45',
@@ -492,6 +532,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(153, 153, 153, 1)',
+          decimalPlaces: 2,
           max: '11.64',
           maxRaw: 11.64,
           min: '7.05',
@@ -499,6 +540,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(102, 102, 102, 1)',
+          decimalPlaces: 2,
           max: '16.24',
           maxRaw: 16.24,
           min: '11.65',
@@ -506,6 +548,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(51, 51, 51, 1)',
+          decimalPlaces: 2,
           max: '20.84',
           maxRaw: 20.84,
           min: '16.25',
@@ -513,6 +556,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 2,
           max: '25.45',
           maxRaw: 25.45,
           min: '20.85',
@@ -536,6 +580,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 0,
           max: '1',
           maxRaw: 1,
           min: '1',
@@ -555,6 +600,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 2,
           max: '2.39',
           maxRaw: 2.39,
           min: '1.01',
@@ -574,6 +620,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(128, 128, 128, 1)',
+          decimalPlaces: 0,
           max: '3',
           maxRaw: 3,
           min: '1',
@@ -581,6 +628,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 0,
           max: '4',
           maxRaw: 4,
           min: '4',
@@ -600,6 +648,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(128, 128, 128, 1)',
+          decimalPlaces: 0,
           max: '3',
           maxRaw: 3,
           min: '1',
@@ -607,6 +656,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 0,
           max: '5',
           maxRaw: 5,
           min: '4',
@@ -626,6 +676,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(128, 128, 128, 1)',
+          decimalPlaces: 1,
           max: '4.4',
           maxRaw: 4.4,
           min: '2.2',
@@ -633,6 +684,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 1,
           max: '6.6',
           maxRaw: 6.6,
           min: '4.5',
@@ -652,6 +704,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(128, 128, 128, 1)',
+          decimalPlaces: 0,
           max: '3',
           maxRaw: 3,
           min: '1',
@@ -659,6 +712,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 0,
           max: '10',
           maxRaw: 10,
           min: '4',
@@ -678,6 +732,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(128, 128, 128, 1)',
+          decimalPlaces: 1,
           max: '3.3',
           maxRaw: 3.3,
           min: '2.2',
@@ -685,6 +740,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 1,
           max: '6.6',
           maxRaw: 6.6,
           min: '3.4',
@@ -704,6 +760,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(128, 128, 128, 1)',
+          decimalPlaces: 2,
           max: '2.25',
           maxRaw: 2.25,
           min: '2.20',
@@ -711,6 +768,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 2,
           max: '2.30',
           maxRaw: 2.3,
           min: '2.26',
@@ -730,6 +788,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(170, 170, 170, 1)',
+          decimalPlaces: 0,
           max: '2',
           maxRaw: 2,
           min: '1',
@@ -737,6 +796,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(85, 85, 85, 1)',
+          decimalPlaces: 0,
           max: '4',
           maxRaw: 4,
           min: '3',
@@ -744,6 +804,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 0,
           max: '6',
           maxRaw: 6,
           min: '5',
@@ -763,6 +824,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(170, 170, 170, 1)',
+          decimalPlaces: 0,
           max: '2',
           maxRaw: 2,
           min: '1',
@@ -770,6 +832,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(85, 85, 85, 1)',
+          decimalPlaces: 0,
           max: '4',
           maxRaw: 4,
           min: '3',
@@ -777,6 +840,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 0,
           max: '5',
           maxRaw: 5,
           min: '5',
@@ -796,6 +860,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(170, 170, 170, 1)',
+          decimalPlaces: 1,
           max: '4.2',
           maxRaw: 4.2,
           min: '2.5',
@@ -803,6 +868,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(85, 85, 85, 1)',
+          decimalPlaces: 1,
           max: '6.7',
           maxRaw: 6.7,
           min: '4.3',
@@ -810,6 +876,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 1,
           max: '10.0',
           maxRaw: 10,
           min: '6.8',
@@ -829,6 +896,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(170, 170, 170, 1)',
+          decimalPlaces: 2,
           max: '7.77',
           maxRaw: 7.77,
           min: '3.33',
@@ -836,6 +904,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(85, 85, 85, 1)',
+          decimalPlaces: 2,
           max: '11.10',
           maxRaw: 11.1,
           min: '7.78',
@@ -843,6 +912,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 2,
           max: '13.32',
           maxRaw: 13.32,
           min: '11.11',
@@ -862,6 +932,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(170, 170, 170, 1)',
+          decimalPlaces: 0,
           max: '2',
           maxRaw: 2,
           min: '1',
@@ -869,6 +940,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(85, 85, 85, 1)',
+          decimalPlaces: 0,
           max: '5',
           maxRaw: 5,
           min: '3',
@@ -876,6 +948,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 0,
           max: '10',
           maxRaw: 10,
           min: '6',
@@ -895,6 +968,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(170, 170, 170, 1)',
+          decimalPlaces: 1,
           max: '2.7',
           maxRaw: 2.7,
           min: '2.5',
@@ -902,6 +976,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(85, 85, 85, 1)',
+          decimalPlaces: 1,
           max: '3.8',
           maxRaw: 3.8,
           min: '2.8',
@@ -909,6 +984,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 1,
           max: '10.0',
           maxRaw: 10,
           min: '3.9',
@@ -928,6 +1004,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(204, 204, 204, 1)',
+          decimalPlaces: 0,
           max: '3',
           maxRaw: 3,
           min: '1',
@@ -935,6 +1012,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(153, 153, 153, 1)',
+          decimalPlaces: 0,
           max: '4',
           maxRaw: 4,
           min: '4',
@@ -942,6 +1020,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(102, 102, 102, 1)',
+          decimalPlaces: 0,
           max: '6',
           maxRaw: 6,
           min: '5',
@@ -949,6 +1028,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(51, 51, 51, 1)',
+          decimalPlaces: 0,
           max: '8',
           maxRaw: 8,
           min: '7',
@@ -956,6 +1036,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 0,
           max: '10',
           maxRaw: 10,
           min: '9',
@@ -974,6 +1055,7 @@ describe('generateLegendDataGroups', () => {
 
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
+          decimalPlaces: 0,
           colour: 'rgba(204, 204, 204, 1)',
           max: '3',
           maxRaw: 3,
@@ -982,6 +1064,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(153, 153, 153, 1)',
+          decimalPlaces: 0,
           max: '4',
           maxRaw: 4,
           min: '4',
@@ -989,6 +1072,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(102, 102, 102, 1)',
+          decimalPlaces: 0,
           max: '6',
           maxRaw: 6,
           min: '5',
@@ -996,6 +1080,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(51, 51, 51, 1)',
+          decimalPlaces: 0,
           max: '7',
           maxRaw: 7,
           min: '7',
@@ -1003,6 +1088,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 0,
           max: '9',
           maxRaw: 9,
           min: '8',
@@ -1022,6 +1108,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(204, 204, 204, 1)',
+          decimalPlaces: 1,
           max: '5.7',
           maxRaw: 5.7,
           min: '2.5',
@@ -1029,6 +1116,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(153, 153, 153, 1)',
+          decimalPlaces: 1,
           max: '8.8',
           maxRaw: 8.8,
           min: '5.8',
@@ -1036,6 +1124,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(102, 102, 102, 1)',
+          decimalPlaces: 1,
           max: '10.8',
           maxRaw: 10.8,
           min: '8.9',
@@ -1043,6 +1132,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(51, 51, 51, 1)',
+          decimalPlaces: 1,
           max: '11.7',
           maxRaw: 11.7,
           min: '10.9',
@@ -1050,6 +1140,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 1,
           max: '12.5',
           maxRaw: 12.5,
           min: '11.8',
@@ -1069,6 +1160,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(204, 204, 204, 1)',
+          decimalPlaces: 1,
           max: '4.7',
           maxRaw: 4.7,
           min: '2.5',
@@ -1076,12 +1168,14 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(153, 153, 153, 1)',
+          decimalPlaces: 1,
           max: '6.5',
           maxRaw: 6.5,
           min: '4.8',
           minRaw: 4.8,
         },
         {
+          decimalPlaces: 1,
           colour: 'rgba(102, 102, 102, 1)',
           max: '8.4',
           maxRaw: 8.4,
@@ -1090,6 +1184,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(51, 51, 51, 1)',
+          decimalPlaces: 1,
           max: '10.3',
           maxRaw: 10.3,
           min: '8.5',
@@ -1097,6 +1192,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 1,
           max: '12.5',
           maxRaw: 12.5,
           min: '10.4',
@@ -1116,6 +1212,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(204, 204, 204, 1)',
+          decimalPlaces: 2,
           max: '5.60',
           maxRaw: 5.6,
           min: '2.45',
@@ -1123,6 +1220,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(153, 153, 153, 1)',
+          decimalPlaces: 2,
           max: '8.75',
           maxRaw: 8.75,
           min: '5.61',
@@ -1130,6 +1228,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(102, 102, 102, 1)',
+          decimalPlaces: 2,
           max: '13.35',
           maxRaw: 13.35,
           min: '8.76',
@@ -1137,6 +1236,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(51, 51, 51, 1)',
+          decimalPlaces: 2,
           max: '19.40',
           maxRaw: 19.4,
           min: '13.36',
@@ -1144,6 +1244,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 2,
           max: '25.45',
           maxRaw: 25.45,
           min: '19.41',
@@ -1163,6 +1264,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(204, 204, 204, 1)',
+          decimalPlaces: 1,
           max: '5.0',
           maxRaw: 5,
           min: '2.5',
@@ -1170,6 +1272,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(153, 153, 153, 1)',
+          decimalPlaces: 1,
           max: '6.6',
           maxRaw: 6.6,
           min: '5.1',
@@ -1177,6 +1280,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(102, 102, 102, 1)',
+          decimalPlaces: 1,
           max: '7.7',
           maxRaw: 7.7,
           min: '6.7',
@@ -1184,6 +1288,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(51, 51, 51, 1)',
+          decimalPlaces: 1,
           max: '9.4',
           maxRaw: 9.4,
           min: '7.8',
@@ -1191,6 +1296,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 1,
           max: '12.5',
           maxRaw: 12.5,
           min: '9.5',
@@ -1219,12 +1325,14 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(128, 128, 128, 1)',
+          decimalPlaces: 0,
           max: '45',
           maxRaw: 45,
           min: '1',
           minRaw: 1,
         },
         {
+          decimalPlaces: 0,
           colour: 'rgba(0, 0, 0, 1)',
           max: '100',
           maxRaw: 100,
@@ -1252,6 +1360,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(128, 128, 128, 1)',
+          decimalPlaces: 0,
           max: '5',
           maxRaw: 5.4,
           min: '0',
@@ -1259,6 +1368,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 0,
           max: '10',
           maxRaw: 10.4,
           min: '6',
@@ -1285,6 +1395,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(128, 128, 128, 1)',
+          decimalPlaces: 1,
           max: '5.5',
           maxRaw: 5.5,
           min: '2.2',
@@ -1292,6 +1403,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 1,
           max: '7.3',
           maxRaw: 7.3,
           min: '5.6',
@@ -1318,6 +1430,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(128, 128, 128, 1)',
+          decimalPlaces: 1,
           max: '5.5',
           maxRaw: 5.54,
           min: '2',
@@ -1325,6 +1438,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 1,
           max: '7.3',
           maxRaw: 7.34,
           min: '5.6',
@@ -1352,6 +1466,7 @@ describe('generateLegendDataGroups', () => {
       expect(dataClasses).toEqual<LegendDataGroup[]>([
         {
           colour: 'rgba(128, 128, 128, 1)',
+          decimalPlaces: 3,
           max: '4.336',
           maxRaw: 4.3364,
           min: '1.123',
@@ -1359,6 +1474,7 @@ describe('generateLegendDataGroups', () => {
         },
         {
           colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 3,
           max: '10.569',
           maxRaw: 10.5694,
           min: '6.988',
