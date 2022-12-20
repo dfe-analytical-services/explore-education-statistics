@@ -37,6 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
             public bool CanManageLegacyReleases { get; set; }
             public bool CanUpdateContact { get; set; }
             public bool CanUpdateContributorReleaseRole { get; set; }
+            public bool CanViewReleaseTeamAccess { get; set; }
         }
     }
 }
