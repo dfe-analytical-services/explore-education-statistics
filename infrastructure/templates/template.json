@@ -694,7 +694,7 @@
       "metadata": {
         "description": "Frequency with which the status of a Release undergoing publishing is polled on the Release Sign Off page"
       }
-    },
+    }
   },
   "variables": {
     "contentDbName": "content",
@@ -1732,7 +1732,7 @@
         "ReleaseApproval:PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
         "ReleaseApproval:PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
         "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]",
-        "RELEASE_STATUS_POLL_TIME_MILLIS": "[parameters('releaseStatusPollTimeMillis')]",
+        "RELEASE_STATUS_POLL_TIME_MILLIS": "[parameters('releaseStatusPollTimeMillis')]"
       }
     },
     {
