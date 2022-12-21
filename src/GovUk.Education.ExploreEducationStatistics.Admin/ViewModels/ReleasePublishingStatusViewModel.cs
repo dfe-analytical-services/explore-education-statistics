@@ -9,8 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     {
         public Guid ReleaseId { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
-        public ReleasePublishingStatusDataStage DataStage { get; set; }
-        [JsonConverter(typeof(StringEnumConverter))]
         public ReleasePublishingStatusContentStage ContentStage { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleasePublishingStatusFilesStage FilesStage { get; set; }

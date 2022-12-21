@@ -21,17 +21,9 @@ DROP TABLE Subject;
 DROP TABLE Release;
 DROP PROCEDURE FilteredObservations;
 DROP PROCEDURE FilteredFootnotes;
-DROP PROCEDURE UpsertLocation;
-DROP PROCEDURE DropAndCreateRelease;
 DROP PROCEDURE InsertObservationFilterItems;
 DROP PROCEDURE InsertObservations;
-DROP TYPE FootnoteType;
 DROP TYPE IdListGuidType;
-DROP TYPE IdListIntegerType;
-DROP TYPE IdListVarcharType;
-DROP TYPE LocationType;
-DROP TYPE ReleaseType;
-DROP TYPE TimePeriodListType;
 DROP TYPE ObservationFilterItemType;
 DROP TYPE ObservationType;
 DROP VIEW geojson

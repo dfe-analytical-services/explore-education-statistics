@@ -120,7 +120,6 @@ type TaskStage =
 
 export interface ReleaseStageStatuses {
   releaseId?: string;
-  dataStage?: TaskStage;
   contentStage?: TaskStage;
   filesStage?: TaskStage;
   publishingStage?: PublishingStage;
