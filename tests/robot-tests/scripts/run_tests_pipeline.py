@@ -34,7 +34,7 @@ def run_tests_pipeline():
         else:
             return f"pipenv run python run_tests.py --admin-pass {args.admin_pass} --analyst-pass {args.analyst_pass} --expiredinvite-pass {args.expiredinvite_pass} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes {args.processes} --enable-slack-notifications"
 
-    subprocess.run(get_test_command(), shell=True)
+    subprocess.check_call(get_test_command(), shell=True)
 
 
 if __name__ == "__main__":
