@@ -37,12 +37,31 @@
   //@function: 1px solid $govuk-border-colour;
   border-bottom: 3px solid $govuk-brand-colour;
   flex: 0 1 48.5%;
-  //padding: 1rem;
+  padding: 1rem;
+  position: relative;
 
   .prototypeCardBg & {
     background: govuk-colour('light-grey');
     padding: 1.6rem;
   }
+}
+.prototypeCardChevron {
+  //background: govuk-colour('light-grey');
+  //@function: 1px solid $govuk-border-colour;
+  border-top: 1px solid $govuk-border-colour;
+  flex: 0 1 48.5%;
+  padding: 1rem 1rem 1rem 0;
+  position: relative;
+  //padding: 1rem;
+}
+.prototypeCardChevronOneThird {
+  //background: govuk-colour('light-grey');
+  //@function: 1px solid $govuk-border-colour;
+  border-top: 1px solid $govuk-border-colour;
+  flex: 0 1 31%;
+  padding: 1rem 1.5rem 1rem 0;
+  position: relative;
+  //padding: 1rem;
 }
 .prototypeCardNoBorder {
   border: 0;
@@ -57,6 +76,38 @@
     width: fit-content;
   }
 }
+
+.prototypeCardChevronLink {
+  display: block;
+
+  &::before {
+    border-right: 3px solid #1d70b8;
+    border-top: 3px solid #1d70b8;
+    content: '';
+    display: block;
+    height: 10px;
+    position: absolute;
+    right: 0.1rem;
+    top: 1.5rem;
+    transform: translateY(0) rotate(45deg) scale(1);
+    width: 10px;
+  }
+
+  &::after {
+    bottom: 0;
+    content: '';
+    display: block;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  &:hover::before {
+    border-color: #003078;
+  }
+}
+
 .prototypeFlexContainer {
   align-items: center;
   display: flex;
@@ -206,7 +257,7 @@
 }
 
 .prototypeScrollArea {
-  border: 1px solid $govuk-border-colour;
+  border-bottom: 1px solid $govuk-border-colour;
   max-height: 60vh;
   overflow: auto;
 }
@@ -221,3 +272,9 @@
   background-color: rgba(0,0,0,0.5);
   box-shadow: 0 0 1px rgb(255 255 255 / 87%);
 }*/
+
+.prototypeGrid2col {
+  display: grid;
+  grid-gap: 2rem;
+  grid-template-columns: (1fr 1fr);
+}

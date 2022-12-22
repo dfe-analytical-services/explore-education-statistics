@@ -70,17 +70,13 @@ const PrototypeTableHighlights = () => {
                       </h2>
                     </div>
                     <div className="dfe-flex dfe-justify-content--space-between  govuk-grid-column-three-quarters">
-                      <div>
-                        <a href="https://explore-education-statistics.service.gov.uk/find-statistics/apprenticeships-and-traineeships">
-                          Apprenticeships and traineeships
-                        </a>
-                      </div>
+                      <div>Apprenticeships and traineeships</div>
                       <div>
                         <a
-                          href="https://explore-education-statistics.service.gov.uk/methodology/further-education-and-skills-statistics-methodology"
+                          href="https://explore-education-statistics.service.gov.uk/find-statistics/apprenticeships-and-traineeships"
                           className="govuk-!-margin-right-6"
                         >
-                          View methodology
+                          View publication
                         </a>
 
                         <a
@@ -119,19 +115,12 @@ const PrototypeTableHighlights = () => {
                           </div>
                           <div className="govuk-heading-s govuk-!-margin-bottom-0 govuk-!-margin-left-3">
                             {' '}
-                            Select a dataset
+                            Dataset or featured table
                           </div>
                         </h2>
                       </div>
                       <div className="dfe-flex dfe-justify-content--space-between  govuk-grid-column-three-quarters">
-                        <h3>
-                          {!datasetValue && <>No dataset selected</>}
-
-                          {datasetValue &&
-                            (datasetValue === 'All featured tables'
-                              ? 'All featured tables for this publication'
-                              : 'Dataset details')}
-                        </h3>
+                        {!datasetValue && <h3>No dataset selected</h3>}
                       </div>
                     </div>
                   </div>
@@ -139,6 +128,18 @@ const PrototypeTableHighlights = () => {
                     <div className="govuk-grid-row govuk-!-width-full">
                       <div className="govuk-grid-column-one-quarter">
                         <div>
+                          <a
+                            href="#"
+                            className="govuk-!-padding-left-3"
+                            onClick={e => {
+                              setDatasetValue('All featured tables');
+                              setDataset('subject-all');
+                              e.preventDefault();
+                            }}
+                          >
+                            View all featured tables
+                          </a>
+
                           <fieldset className="govuk-fieldset">
                             <legend
                               className={classNames(
@@ -158,10 +159,9 @@ const PrototypeTableHighlights = () => {
                                 'govuk-form-group',
                                 'govuk-!-padding-left-3',
                                 'govuk-!-padding-right-5',
-                                styles.prototypeScrollArea,
                               )}
                             >
-                              <fieldset className="govuk-fieldset govuk-!-margin-top-3">
+                              {/*<fieldset className="govuk-fieldset govuk-!-margin-top-3">
                                 <div className="govuk-radios__item">
                                   <input
                                     type="radio"
@@ -183,11 +183,11 @@ const PrototypeTableHighlights = () => {
                                     All featured tables
                                   </label>
                                 </div>
-                              </fieldset>
+                                    </fieldset>*/}
 
                               <fieldset className="govuk-fieldset govuk-!-margin-top-6">
                                 <legend className="govuk-heading-s govuk-!-margin-bottom-0 ">
-                                  <h3>Available datasets</h3>
+                                  <h3>Datasets</h3>
                                   Headlines
                                 </legend>
                                 <div className="govuk-radios__item">
@@ -466,6 +466,12 @@ const PrototypeTableHighlights = () => {
                         </div>
                       </div>
                       <div className="govuk-grid-column-three-quarters">
+                        <h3>
+                          {datasetValue &&
+                            (datasetValue === 'All featured tables'
+                              ? 'All featured tables for this publication'
+                              : 'Dataset details')}
+                        </h3>
                         {!dataset && (
                           <div className="govuk-!-margin-0">
                             <p className="govuk-body-l govuk-!-width-three-quarters">
@@ -474,10 +480,27 @@ const PrototypeTableHighlights = () => {
                               view featured tables, or download the entire data
                               file.
                             </p>
-                            <p>
-                              Selecting 'All featured tables' will show a list
-                              of featured tables from across all our datasets
-                              for this publication.
+                            <p className="govuk-body-l govuk-!-width-three-quarters">
+                              Alternatively you can browse{' '}
+                              <a
+                                href="#"
+                                onClick={e => {
+                                  setDatasetValue('All featured tables');
+                                  setDataset('subject-all');
+                                  e.preventDefault();
+                                }}
+                              >
+                                featured tables
+                              </a>{' '}
+                              from across all the datasets for this publication
+                              .
+                            </p>
+                            <p className="govuk-!-width-three-quarters">
+                              Featured tables have been created by our
+                              publication team, highlighting popular tables
+                              built from datasets available in this publication.
+                              These tables can be viewed, shared and customised
+                              to the data that you're interested in.
                             </p>
                           </div>
                         )}
