@@ -18,13 +18,13 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.FilterAndIndicatorViewModelBuilders;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.LocationViewModelBuilder;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -251,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     var filterItems = await
                         _filterItemRepository.GetFilterItemsFromMatchedObservationIds(query.SubjectId, observations);
                     var filters =
-                        FiltersViewModelBuilder.BuildFiltersFromFilterItems(filterItems,
+                        FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(filterItems,
                             releaseSubject.FilterSequence);
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
@@ -274,7 +274,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private async Task<Dictionary<string, FilterMetaViewModel>> GetFilters(ReleaseSubject releaseSubject)
         {
             var filters = await _filterRepository.GetFiltersIncludingItems(releaseSubject.SubjectId);
-            return FiltersViewModelBuilder.BuildFilters(filters, releaseSubject.FilterSequence);
+            return FiltersMetaViewModelBuilder.BuildFilters(filters, releaseSubject.FilterSequence);
         }
 
         private TimePeriodsMetaViewModel GetTimePeriods(Guid subjectId)
@@ -309,7 +309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private async Task<Dictionary<string, IndicatorGroupMetaViewModel>> GetIndicators(ReleaseSubject releaseSubject)
         {
             var indicators = await _indicatorGroupRepository.GetIndicatorGroups(releaseSubject.SubjectId);
-            return IndicatorsViewModelBuilder.BuildIndicatorGroups(indicators,
+            return IndicatorsMetaViewModelBuilder.BuildIndicatorGroups(indicators,
                 releaseSubject.IndicatorSequence);
         }
 
