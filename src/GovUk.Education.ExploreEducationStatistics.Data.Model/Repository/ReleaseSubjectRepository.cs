@@ -48,26 +48,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             }
         }
 
-        public async Task<ReleaseSubject?> GetReleaseSubjectForLatestPublishedVersion(Guid subjectId)
-        {
-            var releaseSubjects = await _statisticsDbContext
-                .ReleaseSubject
-                .Include(releaseSubject => releaseSubject.Release)
-                .Where(releaseSubject => releaseSubject.SubjectId == subjectId)
-                .ToListAsync();
-
-            var publishedReleaseSubjects = releaseSubjects
-                .Where(releaseSubject => releaseSubject.Release.Live)
-                .ToList();
-
-            var previousReleaseVersionIds = publishedReleaseSubjects
-                .Select(releaseSubject => releaseSubject.Release.PreviousVersionId)
-                .Where(previousVersionId => previousVersionId.HasValue);
-
-            return publishedReleaseSubjects.SingleOrDefault(
-                releaseSubject => !previousReleaseVersionIds.Contains(releaseSubject.ReleaseId));
-        }
-
         public async Task DeleteReleaseSubject(Guid releaseId, Guid subjectId, bool softDeleteOrphanedSubject = false)
         {
             var releaseSubject = await _statisticsDbContext
