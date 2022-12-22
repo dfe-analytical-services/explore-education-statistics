@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
-            footnoteRepository.Setup(mock => mock.DeleteAllFootnotesBySubject(
+            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
                     releaseSubject.ReleaseId,
                     releaseSubject.SubjectId))
                 .Returns(Task.CompletedTask);
@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
-            footnoteRepository.Setup(mock => mock.DeleteAllFootnotesBySubject(
+            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
                     releaseSubject.ReleaseId, releaseSubject.SubjectId))
                 .Returns(Task.CompletedTask);
 
@@ -136,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
-            footnoteRepository.Setup(mock => mock.DeleteAllFootnotesBySubject(
+            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
                     releaseSubject2.ReleaseId, releaseSubject2.SubjectId))
                 .Returns(Task.CompletedTask);
 
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
-            footnoteRepository.Setup(mock => mock.DeleteAllFootnotesBySubject(
+            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
                     It.IsAny<Guid>(), It.IsAny<Guid>()))
                 .Returns(Task.CompletedTask);
 
@@ -235,7 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
-            footnoteRepository.Setup(mock => mock.DeleteAllFootnotesBySubject(release.Id,
+            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(release.Id,
                     It.IsIn(releaseSubject1.SubjectId, releaseSubject2.SubjectId)))
                 .Returns(Task.CompletedTask);
 
@@ -299,7 +299,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
-            footnoteRepository.Setup(mock => mock.DeleteAllFootnotesBySubject(release.Id,
+            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(release.Id,
                     It.IsIn(releaseSubject1.SubjectId, releaseSubject2.SubjectId)))
                 .Returns(Task.CompletedTask);
 

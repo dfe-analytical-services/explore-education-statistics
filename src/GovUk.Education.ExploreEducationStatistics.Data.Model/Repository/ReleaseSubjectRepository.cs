@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .FirstOrDefaultAsync(rs => rs.ReleaseId == releaseId && rs.SubjectId == subjectId);
 
             await DeleteReleaseSubjectIfExists(releaseSubject);
-            await _footnoteRepository.DeleteAllFootnotesBySubject(releaseId, subjectId);
+            await _footnoteRepository.DeleteFootnotesBySubject(releaseId, subjectId);
 
             if (releaseSubject?.Subject != null)
             {
