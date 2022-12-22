@@ -30,17 +30,17 @@ Assign publication owner permissions to analyst1
     ...    EES-test.ANALYST1@education.gov.uk
     ...    ${PUBLICATION_ID}
     ...    Owner
-    user reloads page
+
+Sign in as analyst1 and check that the Team access page now contains the Publication Owner details
+    user signs in as analyst1
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user clicks link    Team access
     user waits until page contains    To request changing the assigned publication roles
     user checks table column heading contains    1    1    Name
     user checks table column heading contains    1    2    Publication role
     user checks table body has x rows    1
     user checks table cell contains    1    1    Analyst1 User1
     user checks table cell contains    1    2    Owner
-
-Sign in as analyst1 and navigate to the new publication
-    user signs in as analyst1
-    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
 
 Update publication contact
     user clicks link    Contact

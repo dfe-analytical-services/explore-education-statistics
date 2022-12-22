@@ -49,3 +49,6 @@ Check can see the "Update release access" section of the "Team access" page
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Team access
     user waits until h3 is visible    Update release access
+
+Check cannot see the "Add or remove users" functionality of the "Team access" page
+    user waits until page does not contain link    Add or remove users

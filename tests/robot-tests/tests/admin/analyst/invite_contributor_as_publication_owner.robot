@@ -47,7 +47,8 @@ Validate Invite new users page
 Assign various release access permissions to analysts
     user changes to bau1
 
-    user gives release access to analyst    ${PUBLICATION_NAME} - Academic Year 2000/01    Contributor
+    user gives analyst publication owner access    ${PUBLICATION_NAME}
+    ...    EES-test.ANALYST1@education.gov.uk
 
     user gives release access to analyst    ${PUBLICATION_NAME} - Academic Year 2000/01    Contributor
     ...    EES-test.ANALYST3@education.gov.uk
@@ -55,32 +56,15 @@ Assign various release access permissions to analysts
     user gives release access to analyst    ${PUBLICATION_NAME} - Academic Year 2001/02    Contributor
     ...    EES-test.ANALYST2@education.gov.uk
 
-Switch to analyst1
+Sign in as analyst1 and go to Manage team access page
     user changes to analyst1
-
-Check Manage team access button is not visible
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user waits until h2 is visible    Manage releases
-
-    user checks page does not contain button    Team access
-
-Assign publication owner permissions to analyst1
-    user changes to bau1
-    user gives analyst publication owner access    ${PUBLICATION_NAME}
-
-Switch to analyst1 again
-    user changes to analyst1
-
-Check Manage team access button is visible
-    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user waits until page contains link    Team access
-
-Go to Manage team access page
     user clicks link    Team access
     user waits until page contains link    Add or remove users
 
     user waits until page contains    Update release access
     user waits until h3 is visible    Academic Year 2002/03 (Not live)
+    user checks page contains    There are no approvers or pending approver invites for this release.
     user checks page contains    There are no contributors or pending contributor invites for this release.
 
 Validate Select release dropdown
@@ -114,21 +98,19 @@ Validate contributors for 2002/03 release
 
     user checks page does not contain    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
     user checks page does not contain    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
-    user checks page does not contain    There are no contributors for this release.
+    user checks page does not contain    There are no contributors or pending contributor invites for this release.
 
 Add new contributors to release
     user clicks link    Add or remove users
     user waits until page contains    Manage release contributors (Academic Year 2002/03)
 
-    user checks checkbox is not checked    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
+    user checks page does not contain    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
     user checks checkbox is checked    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
     user checks checkbox is not checked    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
 
-    user clicks checkbox    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
     user clicks checkbox    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
     user clicks checkbox    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
 
-    user checks checkbox is checked    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
     user checks checkbox is not checked    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
     user checks checkbox is checked    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
 
@@ -136,11 +118,9 @@ Add new contributors to release
     user waits until page contains    Update release access
 
 Validate contributors for 2002/03 release again
-    user waits until page contains    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
     user checks page contains    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
-
+    user checks page does not contain    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
     user checks page does not contain    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
-    user checks page does not contain    There are no contributors for this release.
 
 Remove all analyst3 contributor access to publication
     user clicks remove user button for row    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
@@ -150,9 +130,9 @@ Remove all analyst3 contributor access to publication
 
 Validate contributors for 2002/03 release for the third time
     user waits until page does not contain    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
-
-    user waits until page contains    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
+    user checks page does not contain    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
     user checks page does not contain    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
+    user checks page contains    There are no contributors or pending contributor invites for this release.
 
 Validate contributors for 2001/02 release
     user chooses select option    id:currentRelease    Academic Year 2001/02
@@ -166,7 +146,7 @@ Validate contributors for 2000/01 release
     user chooses select option    id:currentRelease    Academic Year 2000/01
     user waits until h3 is visible    Academic Year 2000/01 (Not live)
 
-    user waits until page contains    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
+    user checks page does not contain    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
     user checks page does not contain    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
     user checks page does not contain    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
 
@@ -180,7 +160,7 @@ Invite brand new user
     user waits until h3 is visible    Academic Year 2000/01 (Not live)
 
 Validate contributors for 2000/01 release again
-    user waits until page contains    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
+    user checks page does not contain    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
     user checks page does not contain    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
     user checks page does not contain    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
     user waits until page contains    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk    %{WAIT_SMALL}
