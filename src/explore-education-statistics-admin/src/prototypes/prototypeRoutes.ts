@@ -9,6 +9,10 @@ import PrototypePublicPreRelease from './PrototypePublicPreRelease';
 import PrototypeTableHighlights from './PrototypeTableHighlights';
 import PrototypeHomepage from './PrototypeHomepage';
 import PrototypeHomepage2 from './PrototypeHomepage2';
+import PrototypeHomepage3 from './PrototypeHomepage3';
+import PrototypeHomepage4 from './PrototypeHomepage4';
+import PrototypeHomepage5 from './PrototypeHomepage5';
+import PrototypeHomepage6 from './PrototypeHomepage6';
 import PrototypeRelease from './PrototypeRelease';
 import PrototypeManageUsers from './PrototypeManageUsers';
 import PrototypeAdminDashboard from './PrototypeAdminDashboard';
@@ -197,6 +201,26 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'Methodology',
     path: '/prototypes/methodology',
     component: PrototypeMethodology,
+  },
+  {
+    name: 'Homepage Refresh 1',
+    path: '/prototypes/homepage3',
+    component: PrototypeHomepage3,
+  },
+  {
+    name: 'Homepage Refresh 2',
+    path: '/prototypes/homepage4',
+    component: PrototypeHomepage4,
+  },
+  {
+    name: 'Homepage Refresh 3',
+    path: '/prototypes/homepage5',
+    component: PrototypeHomepage5,
+  },
+  {
+    name: 'Homepage Refresh 4',
+    path: '/prototypes/homepage6',
+    component: PrototypeHomepage6,
   },
 ];
 
