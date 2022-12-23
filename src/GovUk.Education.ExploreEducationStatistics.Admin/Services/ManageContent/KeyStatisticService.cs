@@ -1,13 +1,20 @@
 ﻿#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using AngleSharp.Html.Dom;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
@@ -15,47 +22,119 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 public class KeyStatisticService : IKeyStatisticService
 {
     private readonly ContentDbContext _context;
+    private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+    private readonly IUserService _userService;
     private readonly IMapper _mapper;
 
-    public KeyStatisticService(ContentDbContext context,
+    public KeyStatisticService(
+        ContentDbContext context,
+        IPersistenceHelper<ContentDbContext> persistenceHelper,
+        IUserService userService,
         IMapper mapper)
     {
         _context = context;
+        _persistenceHelper = persistenceHelper;
+        _userService = userService;
         _mapper = mapper;
     }
 
-    public async void CreateKeyStatisticDataBlock(KeyStatisticDataBlockCreateRequest request)
+    public async Task<Either<ActionResult, KeyStatisticDataBlock>> CreateKeyStatisticDataBlock(
+        Guid releaseId,
+        KeyStatisticDataBlockCreateRequest request)
     {
-        var keyStatisticDataBlock = _mapper.Map<KeyStatisticDataBlock>(request);
-        await _context.AddAsync(keyStatisticDataBlock);
-        await _context.SaveChangesAsync();
+        return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
+            .OnSuccess(_userService.CheckCanUpdateRelease)
+            .OnSuccess(async _ =>
+                await _persistenceHelper.CheckEntityExists<DataBlock>(request.DataBlockId))
+            .OnSuccess(dataBlock =>
+            {
+                if (dataBlock.ContentSectionId != null)
+                {
+                    throw new ArgumentException("Data block shouldn't be attached to a content section");
+                }
+
+                return dataBlock;
+            })
+            .OnSuccess(async _ =>
+            {
+                var keyStatisticDataBlock = _mapper.Map<KeyStatisticDataBlock>(request);
+                keyStatisticDataBlock.ReleaseId = releaseId;
+
+                var orderList = await _context.KeyStatistics
+                    .Where(ks => ks.ReleaseId == releaseId)
+                    .Select(ks => ks.Order)
+                    .ToListAsync();
+                keyStatisticDataBlock.Order = orderList.IsNullOrEmpty() ? 0 : orderList.Max() + 1;
+
+                await _context.KeyStatisticsDataBlock.AddAsync(keyStatisticDataBlock);
+                await _context.SaveChangesAsync();
+
+                return keyStatisticDataBlock;
+            });
     }
 
-    public async void UpdateKeyStatisticDataBlock(KeyStatisticDataBlockUpdateRequest request)
+    public async Task<Either<ActionResult, KeyStatisticDataBlock>> UpdateKeyStatisticDataBlock(
+        Guid releaseId,
+        Guid keyStatisticId,
+        KeyStatisticDataBlockUpdateRequest request)
     {
-        var keyStat = await _context
+        return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
+            .OnSuccess(_userService.CheckCanUpdateRelease)
+            .OnSuccess(async release =>
+                await _persistenceHelper.CheckEntityExists<KeyStatisticDataBlock>(keyStatisticId, query =>
+                    query.Where(keyStat => keyStat.ReleaseId == release.Id)))
+            .OnSuccess(async keyStat =>
+            {
+                _context.Update(keyStat);
+
+                keyStat.Trend = request.Trend;
+                keyStat.GuidanceTitle = request.GuidanceTitle;
+                keyStat.GuidanceText = request.GuidanceText;
+
+                await _context.SaveChangesAsync();
+
+                return keyStat;
+            });
+    }
+
+    public async Task<Either<ActionResult, Unit>> Delete(Guid releaseId, Guid keyStatisticId)
+    {
+        return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
+            .OnSuccess(_userService.CheckCanUpdateRelease)
+            .OnSuccess(async release =>
+                await _persistenceHelper.CheckEntityExists<KeyStatistic>(keyStatisticId, query =>
+                    query
+                        .Include(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlock) // TODO Include can be removed in EES-3988
+                        .Where(keyStat => keyStat.ReleaseId == release.Id)))
+            // NOTE: Ensure old key stats created before the new key stat work was deployed
+            // become available for selection again by setting ContentSectionId to null
+            // TODO: Remove this in EES-3988
+            .OnSuccess(async keyStat =>
+            {
+                if (keyStat.GetType() == typeof(KeyStatisticDataBlock))
+                {
+                    var dataBlock = (keyStat as KeyStatisticDataBlock)!.DataBlock;
+                    dataBlock.ContentSection = null;
+                    dataBlock.ContentSectionId = null;
+                    _context.ContentBlocks.Update(dataBlock);
+                    await _context.SaveChangesAsync();
+                }
+                return keyStat;
+            })
+            .OnSuccessVoid(async keyStat =>
+            {
+                _context.KeyStatistics.Remove(keyStat);
+                await _context.SaveChangesAsync();
+            });
+    }
+
+    public async void DeleteAnyAssociatedWithDataBlock(Guid releaseId, Guid dataBlockId)
+    {
+        var keyStats = await _context
             .KeyStatisticsDataBlock
-            .SingleAsync(ks =>
-                ks.Id == request.Id);
-
-        _context.Update(keyStat);
-
-        keyStat.Trend = request.Trend;
-        keyStat.GuidanceTitle = request.GuidanceTitle;
-        keyStat.GuidanceText = request.GuidanceText;
-
-        await _context.SaveChangesAsync();
-    }
-
-    public async void Delete(Guid releaseId, Guid keyStatisticId)
-    {
-        var keyStat = await _context
-            .KeyStatistics
-            .SingleAsync(ks =>
-                ks.Id == keyStatisticId);
-
-        _context.Remove(keyStat);
-
+            .Where(ks => ks.ReleaseId == releaseId && ks.DataBlockId == dataBlockId)
+            .ToListAsync();
+        _context.KeyStatisticsDataBlock.RemoveRange(keyStats);
         await _context.SaveChangesAsync();
     }
 

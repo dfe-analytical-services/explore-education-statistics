@@ -249,12 +249,6 @@ export const testPublicationRelease: Release = {
     content: [],
   },
   keyStatistics: [], // @MarkFix
-  keyStatisticsSection: {
-    id: '',
-    order: 0,
-    heading: '',
-    content: [],
-  },
   keyStatisticsSecondarySection: {
     id: '',
     order: 0,

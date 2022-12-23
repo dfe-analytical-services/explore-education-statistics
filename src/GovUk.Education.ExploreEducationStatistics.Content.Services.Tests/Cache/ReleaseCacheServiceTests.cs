@@ -67,7 +67,6 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
         },
         SummarySection = ContentSectionWithHtmlBlock(),
         HeadlinesSection = ContentSectionWithHtmlBlock(),
-        KeyStatisticsSection = ContentSectionWithHtmlBlock(),
         KeyStatisticsSecondarySection = ContentSectionWithHtmlBlock(),
         RelatedDashboardsSection = ContentSectionWithHtmlBlock(),
         DownloadFiles = new List<FileInfo>

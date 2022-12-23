@@ -111,6 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
                 return Content
                     .Select(join => join.ContentSection)
+                    .Where(cs => cs.Type != ContentSectionType.KeyStatistics)
                     .ToList()
                     .FindAll(section => section.Type == ContentSectionType.Generic)
                     .ToImmutableList();
@@ -144,13 +145,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 Release = this,
                 ContentBlock = contentBlock
             });
-        }
-
-        [NotMapped]
-        public ContentSection KeyStatisticsSection
-        {
-            get => FindSingleSectionByType(ContentSectionType.KeyStatistics);
-            set => ReplaceContentSectionsOfType(ContentSectionType.KeyStatistics, new List<ContentSection> { value });
         }
 
         [NotMapped]

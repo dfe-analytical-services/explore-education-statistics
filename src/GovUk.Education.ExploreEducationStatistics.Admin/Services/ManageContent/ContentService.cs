@@ -265,9 +265,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                     await _contentBlockService.DeleteContentBlockAndReorder(blockToRemove.Id);
 
-                    if (section.Type == ContentSectionType.KeyStatistics)
+                    if (blockToRemove is DataBlock) // @MarkFix this is wrong
                     {
-                        _keyStatisticService.Delete(releaseId, contentBlockId);
+                        _keyStatisticService.DeleteAnyAssociatedWithDataBlock(releaseId, blockToRemove.Id);
                     }
 
                     _context.ContentSections.Update(section);
@@ -295,18 +295,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     if (!(blockToUpdate is DataBlock dataBlock))
                     {
                         return ValidationActionResult(IncorrectContentBlockTypeForUpdate);
-                    }
-
-                    if (section.Type == ContentSectionType.KeyStatistics)
-                    {
-                        _keyStatisticService.UpdateKeyStatisticDataBlock(new KeyStatisticDataBlockUpdateRequest
-                        {
-                            Id = blockToUpdate.Id,
-                            ReleaseId = releaseId,
-                            Trend = request.DataSummary, // @MarkFix correct?
-                            GuidanceTitle = request.DataDefinitionTitle, // @MarkFix correct?
-                            GuidanceText = request.DataDefinition, // @MarkFix correct?
-                        });
                     }
 
                     return await UpdateDataBlock(dataBlock, request);
@@ -395,19 +383,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     if (dataBlock.ContentSectionId.HasValue)
                     {
                         return ValidationActionResult(ContentBlockAlreadyAttachedToContentSection);
-                    }
-
-                    if (section.Type == ContentSectionType.KeyStatistics)
-                    {
-                        _keyStatisticService.CreateKeyStatisticDataBlock(new KeyStatisticDataBlockCreateRequest
-                        {
-                            DataBlockId = blockToAttach.Id,
-                            ReleaseId = releaseId,
-                            Trend = null,
-                            GuidanceTitle = null,
-                            GuidanceText = null,
-                            Order = request.Order ?? 0, // @MarkFix ???
-                        });
                     }
 
                     return await AddContentBlockToContentSectionAndSave(request.Order, section, dataBlock);

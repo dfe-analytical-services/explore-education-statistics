@@ -152,7 +152,6 @@ export interface Release<
   slug: string;
   summarySection: ContentSection<ContentBlockType>;
   keyStatistics: KeyStatistic[];
-  keyStatisticsSection: ContentSection<DataBlockType>;
   keyStatisticsSecondarySection: ContentSection<DataBlockType>;
   headlinesSection: ContentSection<ContentBlockType>;
   relatedDashboardsSection?: ContentSection<ContentBlockType>; // optional because older releases may not have this section

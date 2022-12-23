@@ -36,7 +36,6 @@ const getContentSectionComments = (
 const getUnresolvedComments = (release: EditableRelease): BlockCommentIds => {
   return {
     ...getContentSectionComments(release.summarySection.content),
-    ...getContentSectionComments(release.keyStatisticsSection.content),
     ...getContentSectionComments(release.headlinesSection.content),
     ...release.content
       .filter(section => section.content !== undefined)

@@ -140,10 +140,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         Type = ContentSectionType.ReleaseSummary,
                     };
-                    release.KeyStatisticsSection = new ContentSection
-                    {
-                        Type = ContentSectionType.KeyStatistics,
-                    };
                     release.KeyStatisticsSecondarySection = new ContentSection
                     {
                         Type = ContentSectionType.KeyStatisticsSecondary,

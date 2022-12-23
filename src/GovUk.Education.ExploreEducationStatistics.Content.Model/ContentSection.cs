@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         Generic,
         ReleaseSummary,
-        KeyStatistics,
+        KeyStatistics, // TODO: EES-3988 Remove after KeyStatistic sections removed from DB
         KeyStatisticsSecondary,
         Headlines,
         RelatedDashboards,

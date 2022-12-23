@@ -215,18 +215,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             Type = ContentSectionType.Generic
         };
 
-        private static readonly ContentSection Release1KeyStatsSection = new()
-        {
-            Id = Guid.NewGuid(),
-            Order = 2,
-            Heading = "Release 1 key stats section",
-            Caption = "",
-            Type = ContentSectionType.KeyStatistics,
-            Content = new List<ContentBlock>
-            {
-                Release1KeyStatsDataBlock
-            }
-        };
+        // @MarkFix repurpose?
+        //private static readonly ContentSection Release1KeyStatsSection = new()
+        //{
+        //    Id = Guid.NewGuid(),
+        //    Order = 2,
+        //    Heading = "Release 1 key stats section",
+        //    Caption = "",
+        //    Type = ContentSectionType.KeyStatistics,
+        //    Content = new List<ContentBlock>
+        //    {
+        //        Release1KeyStatsDataBlock
+        //    }
+        //};
 
         private static readonly List<ReleaseContentSection> ReleaseContentSections = new()
         {
@@ -254,11 +255,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Release = Release1V1,
                 ContentSection = Release1Section3
-            },
-            new ReleaseContentSection
-            {
-                Release = Release1V1,
-                ContentSection = Release1KeyStatsSection
             },
         };
 
@@ -330,12 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal("Academic Year Q1 2018/19", viewModel.Title);
                 Assert.Equal(Release1V1.Published, viewModel.Published);
 
-                var keyStatisticsSection = viewModel.KeyStatisticsSection;
-                Assert.NotNull(keyStatisticsSection);
-                Assert.Equal(Release1KeyStatsSection.Id, keyStatisticsSection.Id);
-                var keyStatisticsSectionContent = keyStatisticsSection.Content;
-                Assert.Single(keyStatisticsSectionContent);
-                Assert.Equal(Release1KeyStatsDataBlock.Id, keyStatisticsSectionContent[0].Id);
+                // @MarkFix test KeyStatistics
 
                 var summarySection = viewModel.SummarySection;
                 Assert.NotNull(summarySection);

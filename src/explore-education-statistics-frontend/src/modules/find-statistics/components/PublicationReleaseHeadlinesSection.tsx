@@ -37,24 +37,25 @@ const PublicationReleaseHeadlinesSection = ({
   const summaryTab = (
     <TabsSection title="Summary" id="releaseHeadlines-summary">
       <KeyStatContainer>
-        {keyStatistics.map(keyStat => {
-          if ((keyStat as KeyStatisticDataBlock).dataBlockId) {
-            return (
-              <KeyStatDataBlock
-                key={keyStat.id}
-                releaseId={releaseId}
-                dataBlockId={(keyStat as KeyStatisticDataBlock).dataBlockId}
-                trend={keyStat.trend}
-                guidanceTitle={keyStat.guidanceTitle}
-                guidanceText={keyStat.guidanceText}
-              />
-            );
-          }
+        {keyStatistics &&
+          keyStatistics.map(keyStat => {
+            if ((keyStat as KeyStatisticDataBlock).dataBlockId) {
+              return (
+                <KeyStatDataBlock
+                  key={keyStat.id}
+                  releaseId={releaseId}
+                  dataBlockId={(keyStat as KeyStatisticDataBlock).dataBlockId}
+                  trend={keyStat.trend}
+                  guidanceTitle={keyStat.guidanceTitle}
+                  guidanceText={keyStat.guidanceText}
+                />
+              );
+            }
 
-          return (
-            <KeyStat key={keyStat.id} {...(keyStat as KeyStatisticText)} />
-          );
-        })}
+            return (
+              <KeyStat key={keyStat.id} {...(keyStat as KeyStatisticText)} />
+            );
+          })}
       </KeyStatContainer>
 
       {orderBy(headlinesSection.content, 'order').map(block => (

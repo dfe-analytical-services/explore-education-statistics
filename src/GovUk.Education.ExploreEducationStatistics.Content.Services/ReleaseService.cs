@@ -94,7 +94,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             // Filter content blocks to remove any non-public or unnecessary information
             releaseViewModel.HeadlinesSection?.Content.ForEach(FilterContentBlock);
             releaseViewModel.SummarySection?.Content.ForEach(FilterContentBlock);
-            releaseViewModel.KeyStatisticsSection?.Content.ForEach(FilterContentBlock);
             releaseViewModel.KeyStatisticsSecondarySection?.Content.ForEach(FilterContentBlock);
             releaseViewModel.RelatedDashboardsSection?.Content.ForEach(FilterContentBlock);
             releaseViewModel.Content.ForEach(section => section.Content.ForEach(FilterContentBlock));

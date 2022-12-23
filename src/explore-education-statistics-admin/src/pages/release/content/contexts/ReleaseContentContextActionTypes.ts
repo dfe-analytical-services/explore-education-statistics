@@ -9,7 +9,6 @@ import { DataBlock } from '@common/services/types/blocks';
 export type ContentSectionKeys = keyof Pick<
   Release<EditableContentBlock>,
   | 'summarySection'
-  | 'keyStatisticsSection'
   | 'keyStatisticsSecondarySection'
   | 'headlinesSection'
   | 'relatedDashboardsSection'

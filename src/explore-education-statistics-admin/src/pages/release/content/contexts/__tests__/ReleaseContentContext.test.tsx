@@ -83,35 +83,36 @@ describe('ReleaseContentContext', () => {
     });
   });
 
-  test('REMOVE_SECTION_BLOCK removes a block from a named section', () => {
-    const keyStatsSection = testEditableRelease.keyStatisticsSection;
-    const removingBlockId = keyStatsSection.content[0].id;
+  // @MarkFix repurpose test?
+  //test('REMOVE_SECTION_BLOCK removes a block from a named section', () => {
+  //  const keyStatsSection = testEditableRelease.keyStatisticsSection;
+  //  const removingBlockId = keyStatsSection.content[0].id;
 
-    expect(testEditableRelease.keyStatisticsSection.content.length).toEqual(3);
+  //  expect(testEditableRelease.keyStatisticsSection.content.length).toEqual(3);
 
-    const { release } = releaseReducer(
-      {
-        release: testEditableRelease,
-        canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
-      },
-      {
-        type: 'REMOVE_SECTION_BLOCK',
-        payload: {
-          meta: {
-            blockId: removingBlockId,
-            sectionId: keyStatsSection.id,
-            sectionKey: 'keyStatisticsSection',
-          },
-        },
-      },
-    );
+  //  const { release } = releaseReducer(
+  //    {
+  //      release: testEditableRelease,
+  //      canUpdateRelease: true,
+  //      availableDataBlocks: [basicDataBlock],
+  //    },
+  //    {
+  //      type: 'REMOVE_SECTION_BLOCK',
+  //      payload: {
+  //        meta: {
+  //          blockId: removingBlockId,
+  //          sectionId: keyStatsSection.id,
+  //          sectionKey: 'keyStatisticsSection',
+  //        },
+  //      },
+  //    },
+  //  );
 
-    expect(release.keyStatisticsSection.content).toEqual([
-      keyStatsSection.content[1],
-      keyStatsSection.content[2],
-    ]);
-  });
+  //  expect(release.keyStatisticsSection.content).toEqual([
+  //    keyStatsSection.content[1],
+  //    keyStatsSection.content[2],
+  //  ]);
+  //});
 
   test('REMOVE_SECTION_BLOCK removes a block from generic content section', () => {
     const contentSection = testEditableRelease.content;
@@ -443,34 +444,35 @@ describe('ReleaseContentContext', () => {
     expect(release.content[0]).toEqual(updatedSection);
   });
 
-  test('ADD_BLOCK_COMMENT adds a comment to named section block', () => {
-    const sectionId = testEditableRelease.keyStatisticsSection.id;
-    const block = testEditableRelease.keyStatisticsSection.content[0];
+  // @MarkFix repurpose test?
+  //test('ADD_BLOCK_COMMENT adds a comment to named section block', () => {
+  //  const sectionId = testEditableRelease.keyStatisticsSection.id;
+  //  const block = testEditableRelease.keyStatisticsSection.content[0];
 
-    const { release } = releaseReducer(
-      {
-        release: testEditableRelease,
-        canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
-      },
-      {
-        type: 'ADD_BLOCK_COMMENT',
-        payload: {
-          meta: {
-            blockId: block.id,
-            sectionId,
-            sectionKey: 'keyStatisticsSection',
-          },
-          comment: testComment,
-        },
-      },
-    );
+  //  const { release } = releaseReducer(
+  //    {
+  //      release: testEditableRelease,
+  //      canUpdateRelease: true,
+  //      availableDataBlocks: [basicDataBlock],
+  //    },
+  //    {
+  //      type: 'ADD_BLOCK_COMMENT',
+  //      payload: {
+  //        meta: {
+  //          blockId: block.id,
+  //          sectionId,
+  //          sectionKey: 'keyStatisticsSection',
+  //        },
+  //        comment: testComment,
+  //      },
+  //    },
+  //  );
 
-    expect(release.keyStatisticsSection.content[0].comments).toEqual([
-      ...block.comments,
-      testComment,
-    ]);
-  });
+  //  expect(release.keyStatisticsSection.content[0].comments).toEqual([
+  //    ...block.comments,
+  //    testComment,
+  //  ]);
+  //});
 
   test('ADD_BLOCK_COMMENT adds a comment to generic content section block', () => {
     const sectionId = testEditableRelease.content[0].id;
@@ -501,40 +503,41 @@ describe('ReleaseContentContext', () => {
     ]);
   });
 
-  test('UPDATE_BLOCK_COMMENT updates a comment in named section block', () => {
-    const sectionId = testEditableRelease.keyStatisticsSection.id;
-    const block = testEditableRelease.keyStatisticsSection.content[0];
+  // @MarkFix repurpose test?
+  //test('UPDATE_BLOCK_COMMENT updates a comment in named section block', () => {
+  //  const sectionId = testEditableRelease.keyStatisticsSection.id;
+  //  const block = testEditableRelease.keyStatisticsSection.content[0];
 
-    expect(block.comments).toHaveLength(1);
+  //  expect(block.comments).toHaveLength(1);
 
-    const updatedComment: Comment = {
-      ...block.comments[0],
-      content: 'Updated comment content',
-    };
+  //  const updatedComment: Comment = {
+  //    ...block.comments[0],
+  //    content: 'Updated comment content',
+  //  };
 
-    const { release } = releaseReducer(
-      {
-        release: testEditableRelease,
-        canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
-      },
-      {
-        type: 'UPDATE_BLOCK_COMMENT',
-        payload: {
-          meta: {
-            blockId: block.id,
-            sectionId,
-            sectionKey: 'keyStatisticsSection',
-          },
-          comment: updatedComment,
-        },
-      },
-    );
+  //  const { release } = releaseReducer(
+  //    {
+  //      release: testEditableRelease,
+  //      canUpdateRelease: true,
+  //      availableDataBlocks: [basicDataBlock],
+  //    },
+  //    {
+  //      type: 'UPDATE_BLOCK_COMMENT',
+  //      payload: {
+  //        meta: {
+  //          blockId: block.id,
+  //          sectionId,
+  //          sectionKey: 'keyStatisticsSection',
+  //        },
+  //        comment: updatedComment,
+  //      },
+  //    },
+  //  );
 
-    expect(release.keyStatisticsSection.content[0].comments).toEqual([
-      updatedComment,
-    ]);
-  });
+  //  expect(release.keyStatisticsSection.content[0].comments).toEqual([
+  //    updatedComment,
+  //  ]);
+  //});
 
   test('UPDATE_BLOCK_COMMENT updates a comment in generic content section block', () => {
     const sectionId = testEditableRelease.content[0].id;
@@ -572,33 +575,34 @@ describe('ReleaseContentContext', () => {
     ]);
   });
 
-  test('REMOVE_BLOCK_COMMENT removes a comment from named section block', () => {
-    const sectionId = testEditableRelease.keyStatisticsSection.id;
-    const block = testEditableRelease.keyStatisticsSection.content[0];
+  // @MarkFix repurpose test
+  //test('REMOVE_BLOCK_COMMENT removes a comment from named section block', () => {
+  //  const sectionId = testEditableRelease.keyStatisticsSection.id;
+  //  const block = testEditableRelease.keyStatisticsSection.content[0];
 
-    expect(block.comments).toHaveLength(1);
+  //  expect(block.comments).toHaveLength(1);
 
-    const { release } = releaseReducer(
-      {
-        release: testEditableRelease,
-        canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
-      },
-      {
-        type: 'REMOVE_BLOCK_COMMENT',
-        payload: {
-          meta: {
-            blockId: block.id,
-            sectionId,
-            sectionKey: 'keyStatisticsSection',
-          },
-          commentId: block.comments[0].id,
-        },
-      },
-    );
+  //  const { release } = releaseReducer(
+  //    {
+  //      release: testEditableRelease,
+  //      canUpdateRelease: true,
+  //      availableDataBlocks: [basicDataBlock],
+  //    },
+  //    {
+  //      type: 'REMOVE_BLOCK_COMMENT',
+  //      payload: {
+  //        meta: {
+  //          blockId: block.id,
+  //          sectionId,
+  //          sectionKey: 'keyStatisticsSection',
+  //        },
+  //        commentId: block.comments[0].id,
+  //      },
+  //    },
+  //  );
 
-    expect(release.keyStatisticsSection.content[0].comments).toEqual([]);
-  });
+  //  expect(release.keyStatisticsSection.content[0].comments).toEqual([]);
+  //});
 
   test('UPDATE_BLOCK_COMMENT removes a comment from generic content section block', () => {
     const sectionId = testEditableRelease.content[0].id;
