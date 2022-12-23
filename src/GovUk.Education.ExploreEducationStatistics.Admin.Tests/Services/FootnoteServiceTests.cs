@@ -759,107 +759,130 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task DeleteFootnote()
         {
-            var release = new Release();
+            var subject1 = new Subject();
+            var subject2 = new Subject();
 
-            var subject = new Subject();
-
-            var filterItem = new FilterItem();
-
-            var filterGroup = new FilterGroup
+            var subject2Filter1 = new Filter
             {
-                FilterItems = new List<FilterItem>
-                {
-                    filterItem,
-                },
+                Label = "Subject 2 filter 1",
+                Subject = subject2
             };
 
-            var filter = new Filter
+            var subject2Filter2 = new Filter
             {
-                Subject = subject,
+                Label = "Subject 2 filter 2",
+                Subject = subject2,
                 FilterGroups = new List<FilterGroup>
                 {
-                    filterGroup,
-                },
-            };
-
-            var indicator = new Indicator();
-
-            var indicatorGroup = new IndicatorGroup
-            {
-                Subject = subject,
-                Indicators = new List<Indicator>
-                {
-                    indicator,
+                    new()
+                    {
+                        Label = "Filter 2 group 1"
+                    },
+                    new()
+                    {
+                        Label = "Filter 2 group 2",
+                        FilterItems = new List<FilterItem>
+                        {
+                            new()
+                            {
+                                Label = "Filter 1 group 1 item 1"
+                            }
+                        }
+                    }
                 }
             };
 
-            var footnote = new Footnote
+            var subject2IndicatorGroup1 = new IndicatorGroup
             {
-                Content = "Test footnote 1",
-                Releases = new List<ReleaseFootnote>
+                Label = "Subject 2 indicator group 1",
+                Subject = subject2,
+                Indicators = new List<Indicator>
                 {
                     new()
                     {
-                        Release = release,
-                    },
-                },
-                Subjects = new List<SubjectFootnote>
-                {
-                    new()
-                    {
-                        Subject = subject,
+                        Label = "Indicator 1"
                     }
-                },
-                Filters = new List<FilterFootnote>
-                {
-                    new()
-                    {
-                        Filter = filter,
-                    }
-                },
-                FilterGroups = new List<FilterGroupFootnote>
-                {
-                    new()
-                    {
-                        FilterGroup = filterGroup,
-                    }
-                },
-                FilterItems = new List<FilterItemFootnote>
-                {
-                    new()
-                    {
-                        FilterItem = filterItem,
-                    }
-                },
-                Indicators = new List<IndicatorFootnote>
-                {
-                    new()
-                    {
-                        Indicator = indicator,
-                    }
-                },
-                Order = 0
+                }
             };
 
-            var releaseSubject = new ReleaseSubject
+            var release = new Release
             {
-                Release = release,
-                Subject = subject
+                Footnotes = new List<ReleaseFootnote>
+                {
+                    new()
+                    {
+                        Footnote = new Footnote
+                        {
+                            Content = "Test footnote 1",
+                            Subjects = new List<SubjectFootnote>
+                            {
+                                new()
+                                {
+                                    Subject = subject1
+                                }
+                            },
+                            Filters = new List<FilterFootnote>
+                            {
+                                new()
+                                {
+                                    Filter = subject2Filter1
+                                }
+                            },
+                            FilterGroups = new List<FilterGroupFootnote>
+                            {
+                                new()
+                                {
+                                    FilterGroup = subject2Filter2.FilterGroups[0]
+                                }
+                            },
+                            FilterItems = new List<FilterItemFootnote>
+                            {
+                                new()
+                                {
+                                    FilterItem = subject2Filter2.FilterGroups[1].FilterItems[0]
+                                }
+                            },
+                            Indicators = new List<IndicatorFootnote>
+                            {
+                                new()
+                                {
+                                    Indicator = subject2IndicatorGroup1.Indicators[0]
+                                }
+                            },
+                            Order = 0
+                        }
+                    }
+                }
+            };
+
+            var releaseSubjects = new List<ReleaseSubject>
+            {
+                new()
+                {
+                    Release = release,
+                    Subject = subject1
+                },
+                new()
+                {
+                    Release = release,
+                    Subject = subject2
+                }
             };
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.AddRangeAsync(
-                    release,
-                    footnote,
-                    filter,
-                    indicatorGroup,
-                    releaseSubject);
+                await statisticsDbContext.Subject.AddRangeAsync(subject1, subject2);
+                await statisticsDbContext.Filter.AddRangeAsync(subject2Filter1, subject2Filter2);
+                await statisticsDbContext.IndicatorGroup.AddAsync(subject2IndicatorGroup1);
+                await statisticsDbContext.Release.AddAsync(release);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubjects);
                 await statisticsDbContext.SaveChangesAsync();
+            }
 
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
                 await contentDbContext.AddAsync(new Content.Model.Release
                 {
                     Id = release.Id,
@@ -882,7 +905,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.DeleteFootnote(
                     releaseId: release.Id,
-                    footnoteId: footnote.Id);
+                    footnoteId: release.Footnotes.ToList()[0].FootnoteId);
 
                 MockUtils.VerifyAllMocks(dataBlockService);
 

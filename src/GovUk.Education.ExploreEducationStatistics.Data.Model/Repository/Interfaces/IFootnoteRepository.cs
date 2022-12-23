@@ -32,10 +32,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
 
         Task DeleteFootnote(Guid releaseId, Guid footnoteId);
 
-        Task DeleteAllFootnotesBySubject(Guid releaseId, Guid subjectId);
+        Task DeleteFootnotesBySubject(Guid releaseId, Guid subjectId);
 
         Task<bool> IsFootnoteExclusiveToRelease(Guid releaseId, Guid footnoteId);
 
-        Task DeleteReleaseFootnoteLinkAsync(Guid releaseId, Guid footnoteId);
+        Task DeleteReleaseFootnoteLink(Guid releaseId, Guid footnoteId);
     }
 }
