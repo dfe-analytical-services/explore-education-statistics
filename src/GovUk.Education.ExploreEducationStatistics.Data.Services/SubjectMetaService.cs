@@ -156,50 +156,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         
         public async Task<ReleaseSubject?> GetReleaseSubjectForLatestPublishedVersion(Guid subjectId)
         {
-            // Find all versions of the Release that this Subject is linked to.
+            // Find all versions of a Release that this Subject is linked to.
             var releaseSubjects = await _statisticsDbContext
                 .ReleaseSubject
                 .AsNoTracking()
                 .Where(releaseSubject => releaseSubject.SubjectId == subjectId)
                 .ToListAsync();
 
-            if (!releaseSubjects.Any())
-            {
-                return null;
-            }
-
             var releaseIdsLinkedToSubject = releaseSubjects
                 .Select(releaseSubject => releaseSubject.ReleaseId)
                 .ToList();
 
             // Find all versions of the Release that this Subject is linked to that are currently live
-            // or in the past have been live before being amended.
-            var linkedReleases = await _contentDbContext
+            // or in the past have been live before being amended. Order them by Version to get the latest
+            // Live one at the end of the list.
+            var latestLiveReleaseVersionLinkedToSubject = _contentDbContext
                 .Releases
                 .AsNoTracking()
                 .Where(release => releaseIdsLinkedToSubject.Contains(release.Id))
-                .ToListAsync();
-
-            var currentlyOrPreviouslyLiveReleaseVersions = linkedReleases
+                .ToList()
                 .Where(release => release.Live)
-                .ToList();
-            
-            // Get the live Release version that hasn't been amended by any other live or previously live version
-            // (that doesn't have its id referenced as a "previous version" by another Release version). 
-            var previousReleaseVersionIds = currentlyOrPreviouslyLiveReleaseVersions
-                .Select(release => release.PreviousVersionId)
-                .Where(previousVersionId => previousVersionId.HasValue);
+                .OrderBy(release => release.Version)
+                .LastOrDefault();
 
-            var latestReleaseVersionLinkedToSubject = currentlyOrPreviouslyLiveReleaseVersions
-                .SingleOrDefault(release => !previousReleaseVersionIds.Contains(release.Id));
-
-            if (latestReleaseVersionLinkedToSubject == null)
+            if (latestLiveReleaseVersionLinkedToSubject == null)
             {
                 return null;
             }
-
+            
+            // Finally, now that we have identified the latest Release version linked to this Subject, return the
+            // appropriate ReleaseSubject record.
             return releaseSubjects
-                .SingleOrDefault(releaseSubject => releaseSubject.ReleaseId == latestReleaseVersionLinkedToSubject.Id);
+                .SingleOrDefault(releaseSubject => releaseSubject.ReleaseId == latestLiveReleaseVersionLinkedToSubject.Id);
         }
 
         private async Task<SubjectMetaViewModel> GetSubjectMetaViewModel(ReleaseSubject releaseSubject)

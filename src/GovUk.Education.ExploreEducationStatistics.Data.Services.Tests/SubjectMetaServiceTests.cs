@@ -2289,21 +2289,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Id = Guid.NewGuid(),
                 Published = DateTime.UtcNow.AddDays(-2),
-                PreviousVersionId = null
+                Version = 0
             };
 
             var latestReleaseVersion = new ContentRelease
             {
                 Id = Guid.NewGuid(),
                 Published = DateTime.UtcNow.AddDays(-1),
-                PreviousVersionId = previousReleaseVersion.Id
+                Version = 1
             };
 
             var futureReleaseVersion = new ContentRelease
             {
                 Id = Guid.NewGuid(),
                 Published = DateTime.UtcNow.AddDays(1),
-                PreviousVersionId = latestReleaseVersion.Id
+                Version = 2
             };
 
             var releaseSubjectPreviousRelease = new ReleaseSubject
@@ -2340,9 +2340,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 await statisticsDbContext.Subject.AddAsync(subject);
                 await statisticsDbContext.ReleaseSubject.AddRangeAsync(
-                    releaseSubjectPreviousRelease,
                     releaseSubjectLatestRelease,
-                    releaseSubjectFutureRelease);
+                    releaseSubjectFutureRelease,
+                    releaseSubjectPreviousRelease);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -2350,9 +2350,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.Releases.AddRangeAsync(
-                    previousReleaseVersion, 
                     latestReleaseVersion, 
-                    futureReleaseVersion);
+                    futureReleaseVersion,
+                    previousReleaseVersion);
                 
                 await contentDbContext.SaveChangesAsync();
             }
