@@ -112,7 +112,7 @@ def print_to_console(text):
 
 
 def write_block_to_file(
-    block_guid, release_guid, subject_guid, request_dict, status_code, response_time, response_dict
+    url, block_guid, release_guid, subject_guid, request_dict, status_code, response_time, response_dict
 ):
     try:
         with open(f"{requests_dir}/block_{block_guid}_request", "w") as block_request_file:
@@ -120,6 +120,7 @@ def write_block_to_file(
                 f"block: {block_guid}\n"
                 f"release: {release_guid}\n"
                 f"subject: {subject_guid}\n"
+                f"url: {url}\n"
                 f"request:\n{json.dumps(request_dict, sort_keys=True, indent=2)}"
             )
 
@@ -132,7 +133,6 @@ def write_block_to_file(
                 f"time for response: {response_time}\n"
                 f"response:\n{json.dumps(response_dict, sort_keys=True, indent=2)}"
             )
-        print_to_console(f"Successfully processed block {block_guid} for subject {subject_guid}!")
     except Exception as exception:
         print_to_console(
             f"block_file.write failed with block {block_guid} subject {subject_guid}\n"
@@ -176,6 +176,7 @@ for datablock in datablocks:
 
     def write_this_block(status_code, response_time, response_dict):
         write_block_to_file(
+            url=url,
             block_guid=block_id,
             release_guid=release_id,
             subject_guid=subject_id,
@@ -198,12 +199,19 @@ for datablock in datablocks:
         print_to_console(f"request exception with block {block_id} subject {subject_id}, {e}")
         write_this_block(status_code=-1, response_time=-1, response_dict={"error": f"request exception thrown, {e}"})
         continue
+
     block_time_end = time.perf_counter()
 
-    json_response = json.loads(resp.text)
+    if resp.text is None or resp.text == "":
+        json_response = ""
+    else:
+        json_response = json.loads(resp.text)
 
     if resp.status_code == 200:
+        print_to_console(f"Successfully processed block {block_id} for subject {subject_id}!")
         processed_successfully += 1
+    else:
+        print_to_console(f"{resp.status_code} response received for block {block_id} subject {subject_id}")
 
     write_this_block(
         status_code=resp.status_code, response_time=block_time_end - block_time_start, response_dict=json_response

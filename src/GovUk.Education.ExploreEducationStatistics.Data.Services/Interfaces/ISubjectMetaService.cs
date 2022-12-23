@@ -29,5 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
         Task<Either<ActionResult, Unit>> UpdateSubjectIndicators(Guid releaseId,
             Guid subjectId,
             List<IndicatorGroupUpdateViewModel> request);
+
+        Task<ReleaseSubject?> GetReleaseSubjectForLatestPublishedVersion(Guid subjectId);
     }
 }
