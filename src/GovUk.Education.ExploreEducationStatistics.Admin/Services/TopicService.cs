@@ -245,6 +245,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessVoid(async () =>
                 {
                     _contentContext.Releases.Remove(contentRelease);
+
+                    var keyStats = _contentContext.KeyStatistics
+                        .Where(ks => ks.ReleaseId == releaseId)
+                        .ToList();
+                    _contentContext.KeyStatistics.RemoveRange(keyStats);
+
                     await _contentContext.SaveChangesAsync();
 
                     await DeleteStatsDbRelease(releaseId);
