@@ -140,7 +140,7 @@ public class SubjectMetaServicePermissionTests
     [Fact]
     public async Task GetReleaseSubjectForLatestPublishedVersion()
     {
-        // Note that there are on explicit security policy checks enforced for this method.
+        // Note that there are no explicit security policy checks enforced for this method.
         // This is because this method is very specifically returning only ReleaseSubjects for currently-live Releases
         // which are definitely publicly visible.
         await PolicyCheckBuilder<DataSecurityPolicies>()
