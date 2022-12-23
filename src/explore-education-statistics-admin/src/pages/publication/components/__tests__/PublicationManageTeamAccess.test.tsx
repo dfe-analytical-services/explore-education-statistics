@@ -1,4 +1,4 @@
-import PublicationManageTeamAccess from '@admin/pages/publication/components/PublicationManageTeamAccess';
+import PublicationManageReleaseTeamAccess from '@admin/pages/publication/components/PublicationManageReleaseTeamAccess';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import _userService from '@admin/services/userService';
 import _releasePermissionService, {
@@ -61,7 +61,7 @@ describe('PublicationManageTeamAccess', () => {
       testInvites,
     );
     render(
-      <PublicationManageTeamAccess
+      <PublicationManageReleaseTeamAccess
         publicationId={testPublicationId}
         release={testRelease}
       />,
@@ -100,7 +100,7 @@ describe('PublicationManageTeamAccess', () => {
       [],
     );
     render(
-      <PublicationManageTeamAccess
+      <PublicationManageReleaseTeamAccess
         publicationId={testPublicationId}
         release={testRelease}
       />,
@@ -125,7 +125,7 @@ describe('PublicationManageTeamAccess', () => {
       testInvites,
     );
     render(
-      <PublicationManageTeamAccess
+      <PublicationManageReleaseTeamAccess
         publicationId={testPublicationId}
         release={testRelease}
       />,
@@ -166,7 +166,7 @@ describe('PublicationManageTeamAccess', () => {
       testInvites,
     );
     render(
-      <PublicationManageTeamAccess
+      <PublicationManageReleaseTeamAccess
         publicationId={testPublicationId}
         release={testRelease}
       />,

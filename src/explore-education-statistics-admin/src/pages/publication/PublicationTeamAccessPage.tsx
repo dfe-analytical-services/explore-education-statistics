@@ -1,5 +1,3 @@
-import Link from '@admin/components/Link';
-import PublicationManageTeamAccess from '@admin/pages/publication/components/PublicationManageTeamAccess';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
 import {
   publicationInviteUsersPageRoute,
@@ -20,6 +18,8 @@ import { RouteComponentProps } from 'react-router';
 import { generatePath, useHistory } from 'react-router-dom';
 import { UserPublicationRole } from '@admin/services/userService';
 import orderBy from 'lodash/orderBy';
+import ButtonLink from '@admin/components/ButtonLink';
+import PublicationManageReleaseTeamAccess from '@admin/pages/publication/components/PublicationManageReleaseTeamAccess';
 
 interface Model {
   releases: ReleaseSummary[];
@@ -75,9 +75,23 @@ const PublicationTeamAccessPage = ({
     release => release.id === currentReleaseId,
   );
 
+  const canAmendPublicationContributors =
+    currentReleaseId != null &&
+    model.permissions.canUpdateContributorReleaseRole;
+  const canAmendReleaseContributors =
+    currentReleaseId != null &&
+    model.permissions.canUpdateContributorReleaseRole;
+
   return (
     <>
       <h2>Manage team access</h2>
+
+      <h3>
+        {canAmendPublicationContributors
+          ? 'Update publication access'
+          : 'Publication access'}
+      </h3>
+
       {model.publicationRoles.length ? (
         <>
           <table>
@@ -122,13 +136,31 @@ const PublicationTeamAccessPage = ({
         </>
       )}
 
+      {canAmendPublicationContributors && (
+        <ButtonLink
+          to={generatePath<PublicationTeamRouteParams>(
+            publicationInviteUsersPageRoute.path,
+            {
+              publicationId,
+              releaseId: currentReleaseId,
+            },
+          )}
+        >
+          Add or remove publication contributors
+        </ButtonLink>
+      )}
+
       {model.permissions.canViewReleaseTeamAccess && (
         <>
           {model?.releases.length ? (
             <>
-              <div className="govuk-grid-row govuk-!-margin-bottom-8">
-                <div className="govuk-grid-column-two-thirds">
-                  <h3>Update release access</h3>
+              <div className="govuk-grid-row govuk-!-margin-bottom-4 govuk-!-margin-top-8">
+                <div className="govuk-grid-column-full">
+                  <h3>
+                    {canAmendReleaseContributors
+                      ? 'Update release access'
+                      : 'Release access'}
+                  </h3>
 
                   <FormSelect
                     id="currentRelease"
@@ -154,28 +186,13 @@ const PublicationTeamAccessPage = ({
                     }}
                   />
                 </div>
-                {currentReleaseId && (
-                  <div className="govuk-grid-column-one-third dfe-align--right">
-                    <h3 className="govuk-!-font-size-19">Other options</h3>
-                    <Link
-                      to={generatePath<PublicationTeamRouteParams>(
-                        publicationInviteUsersPageRoute.path,
-                        {
-                          publicationId,
-                          releaseId: currentReleaseId,
-                        },
-                      )}
-                    >
-                      Invite new users
-                    </Link>
-                  </div>
-                )}
               </div>
 
               {currentRelease && (
-                <PublicationManageTeamAccess
+                <PublicationManageReleaseTeamAccess
                   publicationId={publicationId}
                   release={currentRelease}
+                  showManageContributorsButton={canAmendReleaseContributors}
                 />
               )}
             </>

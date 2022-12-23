@@ -17,13 +17,20 @@ import Tag from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
 import React from 'react';
 import { generatePath } from 'react-router-dom';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 
 interface Props {
   publicationId: string;
   release: ReleaseSummary;
+  showManageContributorsButton: boolean;
 }
 
-const PublicationManageTeamAccess = ({ publicationId, release }: Props) => {
+const PublicationManageReleaseTeamAccess = ({
+  publicationId,
+  release,
+  showManageContributorsButton,
+}: Props) => {
   const {
     value,
     isLoading,
@@ -88,15 +95,18 @@ const PublicationManageTeamAccess = ({ publicationId, release }: Props) => {
 
   return (
     <>
-      <h3>
-        {`${release.title}${!release.live ? ' (Not live)' : ''}`}
-        <Tag
-          className="govuk-!-margin-left-2"
-          colour={release.approvalStatus === 'Approved' ? 'green' : undefined}
-        >
-          {getReleaseApprovalStatusLabel(release.approvalStatus)}
-        </Tag>
-      </h3>
+      <SummaryList>
+        <SummaryListItem term="Release">
+          {`${release.title}${!release.live ? ' (Not live)' : ''}`}
+        </SummaryListItem>
+        <SummaryListItem term="Status">
+          <Tag
+            colour={release.approvalStatus === 'Approved' ? 'green' : undefined}
+          >
+            {getReleaseApprovalStatusLabel(release.approvalStatus)}
+          </Tag>
+        </SummaryListItem>
+      </SummaryList>
 
       <h4>Release approvers</h4>
       {approvers.length === 0 && approverInvites.length === 0 ? (
@@ -121,19 +131,21 @@ const PublicationManageTeamAccess = ({ publicationId, release }: Props) => {
           onUserInvitesRemove={handleUserInvitesRemove}
         />
       )}
-      <ButtonLink
-        to={generatePath<PublicationTeamRouteParams>(
-          publicationManageReleaseContributorsPageRoute.path,
-          {
-            publicationId,
-            releaseId: release.id,
-          },
-        )}
-      >
-        Add or remove users
-      </ButtonLink>
+      {showManageContributorsButton && (
+        <ButtonLink
+          to={generatePath<PublicationTeamRouteParams>(
+            publicationManageReleaseContributorsPageRoute.path,
+            {
+              publicationId,
+              releaseId: release.id,
+            },
+          )}
+        >
+          Add or remove release contributors
+        </ButtonLink>
+      )}
     </>
   );
 };
 
-export default PublicationManageTeamAccess;
+export default PublicationManageReleaseTeamAccess;
