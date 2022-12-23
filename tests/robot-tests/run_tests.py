@@ -186,7 +186,6 @@ required_env_vars = [
 for env_var in required_env_vars:
     assert os.getenv(env_var) is not None, f"Environment variable {env_var} is not set"
 
-
 if args.slack_webhook_url:
     os.environ["SLACK_WEBHOOK_URL"] = args.slack_webhook_url
 
