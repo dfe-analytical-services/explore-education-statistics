@@ -21,6 +21,10 @@ class SlackService:
         self.alert_webhook_url = os.getenv("SLACK_WEBHOOK_URL")
         self.client = WebClient(token=self.slack_bot_token)
 
+        for env_var in [self.slack_bot_token, self.report_webhook_url, self.alert_webhook_url]:
+            if env_var is None:
+                raise AssertionError(f"{env_var} is not set")
+
     def _build_attachments(self, env: str, suite: str):
         with open(f"{PATH}{os.sep}output.xml", "rb") as report:
             contents = report.read()
