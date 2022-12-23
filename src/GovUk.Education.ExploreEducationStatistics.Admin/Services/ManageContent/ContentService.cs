@@ -354,9 +354,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
             if (typeof(T) == typeof(DataBlock))
             {
-                // @MarkFix also filter data blocks that have associated KeyStatisticDataBlock row
+                var keyStatDataBlockIds = _context.KeyStatisticsDataBlock
+                    .Where(ks => ks.ReleaseId == releaseId)
+                    .Select(ks => ks.DataBlockId)
+                    .ToList();
+
                 return unattachedContentBlocks
                     .OfType<DataBlock>()
+                    .Where(dataBlock => !keyStatDataBlockIds.Contains(dataBlock.Id))
                     .OrderBy(contentBlock => contentBlock.Name)
                     .OfType<T>()
                     .ToList();
