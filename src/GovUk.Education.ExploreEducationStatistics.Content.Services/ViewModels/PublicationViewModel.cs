@@ -16,6 +16,10 @@ public record PublicationViewModel
 
     public bool IsSuperseded { get; init; }
 
+    public string? SupersededByTitle { get; init; }
+    
+    public string? SupersededBySlug { get; init; }
+
     public List<ReleaseTitleViewModel> Releases { get; init; } = new();
 
     public List<LegacyReleaseViewModel> LegacyReleases { get; init; } = new();
@@ -40,6 +44,8 @@ public record PublicationViewModel
         Slug = publication.Slug;
         LatestReleaseId = publication.LatestReleaseId;
         IsSuperseded = publication.IsSuperseded;
+        SupersededByTitle = publication.SupersededByTitle;
+        SupersededBySlug = publication.SupersededBySlug;
         Releases = publication.Releases;
         LegacyReleases = publication.LegacyReleases;
         Topic = publication.Topic;

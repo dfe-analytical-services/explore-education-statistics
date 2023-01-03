@@ -46,6 +46,7 @@ public class PublicationService : IPublicationService
                 .Include(p => p.LegacyReleases)
                 .Include(p => p.Topic)
                 .ThenInclude(topic => topic.Theme)
+                .Include(p => p.SupersededBy)
                 .Where(p => p.Slug == publicationSlug))
             .OnSuccess(async publication =>
             {
@@ -182,6 +183,8 @@ public class PublicationService : IPublicationService
                 : null,
             LatestReleaseId = publication.LatestPublishedReleaseId!.Value,
             IsSuperseded = isSuperseded,
+            SupersededBySlug = publication.SupersededBy?.Slug,
+            SupersededByTitle = publication.SupersededBy?.Title,
             Releases = ListPublishedReleases(publication)
         };
     }
@@ -223,6 +226,8 @@ public class PublicationService : IPublicationService
         var publications = await topic.Publications
             .Where(publication => publication.LatestPublishedReleaseId != null)
             .ToAsyncEnumerable()
+            .Where(publication =>
+                publication.LatestPublishedReleaseId != null || publication.LegacyPublicationUrl != null) 
             .SelectAwait(async publication =>
                 await BuildPublicationTreePublication(publication))
             .OrderBy(publication => publication.Title)
@@ -248,6 +253,9 @@ public class PublicationService : IPublicationService
             Slug = publication.Slug,
             Type = type,
             IsSuperseded = await _publicationRepository.IsSuperseded(publication.Id),
+            SupersededByTitle = publication.SupersededBy?.Title,
+            SupersededBySlug = publication.SupersededBy?.Slug,
+            HasLiveRelease = latestPublishedReleaseId != null,
             LatestReleaseHasData = latestPublishedReleaseId != null &&
                                    await HasAnyDataFiles(latestPublishedReleaseId.Value),
             AnyLiveReleaseHasData = await publication.Releases

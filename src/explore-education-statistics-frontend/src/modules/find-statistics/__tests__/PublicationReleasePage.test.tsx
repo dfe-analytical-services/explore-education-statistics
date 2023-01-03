@@ -35,6 +35,44 @@ describe('PublicationReleasePage', () => {
     ).not.toBeInTheDocument();
   });
 
+  test('renders superseded warning text when publication is superseded', () => {
+    const testReleaseSuperseded = {
+      ...testRelease,
+      publication: {
+        ...testPublication,
+        isSuperseded: true,
+        supersededByTitle: 'publication A',
+        supersededBySlug: 'publication-a',
+      },
+    };
+
+    render(<PublicationReleasePage release={testReleaseSuperseded} />);
+
+    expect(
+      screen.getByTestId('superseded-by-warning').querySelector('a'),
+    ).toHaveAttribute('href', '/find-statistics/publication-a');
+
+    expect(
+      screen.getByTestId('superseded-by-warning').querySelector('a'),
+    ).toHaveTextContent('publication A');
+  });
+
+  test("doesn't render superseded warning text when publication is superseded", () => {
+    const testReleaseSuperseded = {
+      ...testRelease,
+      publication: {
+        ...testPublication,
+        isSuperseded: false,
+      },
+    };
+
+    render(<PublicationReleasePage release={testReleaseSuperseded} />);
+
+    expect(
+      screen.queryByTestId('superseded-by-warning'),
+    ).not.toBeInTheDocument();
+  });
+
   test('renders data downloads links', async () => {
     render(
       <PublicationReleasePage

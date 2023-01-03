@@ -54,7 +54,6 @@ const ReleaseStep = ({
   return (
     <WizardStepSummary {...stepProps} goToButtonText="Change release">
       {stepHeading}
-
       <SummaryList noBorder>
         <SummaryListItem term="Release">
           {selectedRelease?.title}

@@ -40,6 +40,8 @@ export interface Publication {
   externalMethodology?: ExternalMethodology;
   supersededById?: string;
   isSuperseded?: boolean;
+  supersededByTitle?: string;
+  supersededBySlug?: string;
 }
 
 export interface PublicationSummary {
@@ -178,6 +180,8 @@ export interface PublicationTreeSummary {
   type: PublicationType;
   legacyPublicationUrl?: string;
   isSuperseded: boolean;
+  supersededByTitle?: string;
+  supersededBySlug?: string;
 }
 
 export interface Topic {

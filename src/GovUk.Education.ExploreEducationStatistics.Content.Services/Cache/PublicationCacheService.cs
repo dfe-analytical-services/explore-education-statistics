@@ -98,7 +98,7 @@ public class PublicationCacheService : IPublicationCacheService
         {
             Id = topic.Id,
             Title = topic.Title,
-            Publications = publications
+            Publications = publications,
         };
     }
 

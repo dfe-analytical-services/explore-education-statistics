@@ -221,6 +221,106 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     }
 
     [Fact]
+    public async Task GetPublicationTree_FindStatistics_NonSupersededPublicationWithLiveRelease_Included()
+    {
+        var publicationTree = new PublicationTreeThemeViewModel
+        {
+            Title = "Theme A",
+            Topics = new List<PublicationTreeTopicViewModel>
+            {
+                new()
+                {
+                    Title = "Topic A",
+                    Publications = ListOf(new PublicationTreePublicationViewModel
+                    {
+                        Title = "Publication A",
+                        IsSuperseded = false,
+                        HasLiveRelease = true
+                    })
+                }
+            }
+        };
+
+        await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.FindStatistics);
+    }
+
+    [Fact]
+    public async Task GetPublicationTree_FindStatistics_NonSupersededPublicationWithLegacyRelease_Included()
+    {
+        var publicationTree = new PublicationTreeThemeViewModel
+        {
+            Title = "Theme A",
+            Topics = new List<PublicationTreeTopicViewModel>
+            {
+                new()
+                {
+                    Title = "Topic A",
+                    Publications = ListOf(new PublicationTreePublicationViewModel
+                    {
+                        Title = "Publication A",
+                        IsSuperseded = false,
+                        Type = PublicationType.Legacy
+                    })
+                }
+            }
+        };
+
+        await AssertPublicationTreeUnfiltered(publicationTree, PublicationTreeFilter.FindStatistics);
+    }
+
+    [Fact]
+    public async Task GetPublicationTree_FindStatistics_SupersededPublicationWithLiveRelease_Excluded()
+    {
+        var publicationTree = new PublicationTreeThemeViewModel
+        {
+            Title = "Theme A",
+            Topics = new List<PublicationTreeTopicViewModel>
+            {
+                new()
+                {
+                    Title = "Topic A",
+                    Publications = ListOf(new PublicationTreePublicationViewModel
+                    {
+                        Title = "Publication A",
+                        IsSuperseded = true,
+                        HasLiveRelease = true,
+                        SupersededBySlug = "publication-b",
+                        SupersededByTitle = "Publication B"
+                    })
+                }
+            }
+        };
+
+        await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.FindStatistics);
+    }
+
+    [Fact]
+    public async Task GetPublicationTree_FindStatistics_SupersededPublicationWithLegacyRelease_Excluded()
+    {
+        var publicationTree = new PublicationTreeThemeViewModel
+        {
+            Title = "Theme A",
+            Topics = new List<PublicationTreeTopicViewModel>
+            {
+                new()
+                {
+                    Title = "Topic A",
+                    Publications = ListOf(new PublicationTreePublicationViewModel
+                    {
+                        Title = "Publication A",
+                        IsSuperseded = true,
+                        Type = PublicationType.Legacy,
+                        SupersededBySlug = "publication-b",
+                        SupersededByTitle = "Publication B"
+                    })
+                }
+            }
+        };
+
+        await AssertPublicationTreeEmpty(publicationTree, PublicationTreeFilter.FindStatistics);
+    }
+
+    [Fact]
     public async Task GetPublicationTree_DataCatalogue_SomeLiveReleaseHasData_Included()
     {
         var publicationTree = new PublicationTreeThemeViewModel

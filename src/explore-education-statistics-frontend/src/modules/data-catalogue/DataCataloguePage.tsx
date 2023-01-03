@@ -1,3 +1,4 @@
+import WarningMessage from '@common/components/WarningMessage';
 import PublicationForm, {
   PublicationFormSubmitHandler,
 } from '@common/modules/table-tool/components/PublicationForm';
@@ -15,6 +16,7 @@ import tableBuilderService, {
   Subject,
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
+import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import DownloadStep, {
   DownloadFormSubmitHandler,
@@ -80,6 +82,13 @@ const DataCataloguePage: NextPage<Props> = ({
 
   const handlePublicationStepBack = () => {
     router.push('/data-catalogue', undefined, { shallow: true });
+    updateState(s => {
+      // ensure no stale state is left in query
+      // eslint-disable-next-line no-param-reassign
+      s.query.publication = undefined;
+      // eslint-disable-next-line no-param-reassign
+      s.query.release = undefined;
+    });
   };
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
@@ -144,6 +153,22 @@ const DataCataloguePage: NextPage<Props> = ({
     );
   };
 
+  const renderSupersededWarning = (isActive: boolean) => {
+    return isActive && state.query.publication?.isSuperseded ? (
+      <WarningMessage testId="superseded-warning">
+        {' '}
+        <span>
+          This publication has been superseded by{' '}
+          <Link
+            to={`/find-statistics/${state.query.publication.supersededBySlug}`}
+          >
+            {state.query.publication.supersededByTitle}
+          </Link>
+        </span>
+      </WarningMessage>
+    ) : null;
+  };
+
   return (
     <Page
       caption="Data catalogue"
@@ -158,26 +183,33 @@ const DataCataloguePage: NextPage<Props> = ({
         <WizardStep onBack={handlePublicationStepBack}>
           {stepProps => <PublicationStep {...stepProps} />}
         </WizardStep>
+
         <WizardStep>
           {stepProps => (
-            <ReleaseStep
-              {...stepProps}
-              releases={state.releases}
-              selectedRelease={state.query.release}
-              onSubmit={handleReleaseFormSubmit}
-              hideLatestDataTag={state.query.publication?.isSuperseded}
-            />
+            <>
+              {renderSupersededWarning(stepProps.isActive)}
+              <ReleaseStep
+                {...stepProps}
+                releases={state.releases}
+                selectedRelease={state.query.release}
+                onSubmit={handleReleaseFormSubmit}
+                hideLatestDataTag={state.query.publication?.isSuperseded}
+              />
+            </>
           )}
         </WizardStep>
         <WizardStep>
           {stepProps => (
-            <DownloadStep
-              {...stepProps}
-              release={state.query.release}
-              subjects={state.subjects}
-              onSubmit={handleDownloadFormSubmit}
-              hideLatestDataTag={state.query.publication?.isSuperseded}
-            />
+            <>
+              {renderSupersededWarning(stepProps.isActive)}
+              <DownloadStep
+                {...stepProps}
+                release={state.query.release}
+                subjects={state.subjects}
+                onSubmit={handleDownloadFormSubmit}
+                hideLatestDataTag={state.query.publication?.isSuperseded}
+              />
+            </>
           )}
         </WizardStep>
       </Wizard>

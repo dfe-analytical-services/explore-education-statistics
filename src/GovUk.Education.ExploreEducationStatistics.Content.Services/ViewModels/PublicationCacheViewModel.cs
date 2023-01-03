@@ -22,6 +22,10 @@ public record PublicationCacheViewModel
 
     public TopicViewModel Topic { get; init; } = null!;
 
+    public string? SupersededByTitle { get; init; }
+
+    public string? SupersededBySlug { get; init; }
+
     public ContactViewModel Contact { get; init; } = null!;
 
     public ExternalMethodologyViewModel? ExternalMethodology { get; init; }
