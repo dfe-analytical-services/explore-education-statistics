@@ -15,7 +15,7 @@ import React, { useState } from 'react';
 
 const AdminDashboardPage = () => {
   const { user } = useAuthContext();
-  const isBauUser = user?.permissions.canAccessUserAdministrationPages ?? false;
+  const isBauUser = user?.permissions.isBauUser ?? false;
 
   const [totalDraftReleases, setTotalDraftReleases] = useState<number>(0);
 

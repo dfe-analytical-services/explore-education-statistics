@@ -1,11 +1,11 @@
 ﻿#nullable enable
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
 using static Moq.MockBehavior;
 
@@ -20,7 +20,7 @@ public class PermalinkMigrationServicePermissionTests
     public async Task MigrateAll()
     {
         await PolicyCheckBuilder()
-            .SetupCheck(CanRunReleaseMigrations, false)
+            .SetupCheck(SecurityPolicies.IsBauUser, false)
             .AssertForbidden(
                 async userService =>
                 {

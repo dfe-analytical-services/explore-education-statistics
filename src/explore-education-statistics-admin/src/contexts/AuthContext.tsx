@@ -24,9 +24,9 @@ const defaultPermissions: GlobalPermissions = {
   canAccessSystem: false,
   canAccessPrereleasePages: false,
   canAccessAnalystPages: false,
-  canAccessUserAdministrationPages: false,
   canAccessAllImports: false,
   canManageAllTaxonomy: false,
+  isBauUser: false,
 };
 
 export interface AuthContextState {

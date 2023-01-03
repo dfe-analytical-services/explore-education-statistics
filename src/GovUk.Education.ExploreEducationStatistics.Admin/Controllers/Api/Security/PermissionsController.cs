@@ -45,8 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 CanAccessAnalystPages: await _userService.CheckCanAccessAnalystPages().IsRight(),
                 CanAccessAllImports: await _userService.CheckCanViewAllImports().IsRight(),
                 CanAccessPrereleasePages: await _userService.CheckCanAccessPrereleasePages().IsRight(),
-                CanAccessUserAdministrationPages: await _userService.CheckCanManageAllUsers().IsRight(),
-                CanManageAllTaxonomy: await _userService.CheckCanManageAllTaxonomy().IsRight());
+                CanManageAllTaxonomy: await _userService.CheckCanManageAllTaxonomy().IsRight(),
+                IsBauUser: await _userService.CheckIsBauUser().IsRight());
         }
 
         [HttpGet("permissions/topic/{topicId:guid}/publication/create")]

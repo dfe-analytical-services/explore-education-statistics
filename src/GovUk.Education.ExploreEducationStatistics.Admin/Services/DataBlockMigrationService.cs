@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, List<MapMigrationResult>>> MigrateMaps(bool dryRun = true)
         {
             return await _userService
-                .CheckCanRunMigrations()
+                .CheckIsBauUser()
                 .OnSuccess(() => DoMapMigration(dryRun));
         }
 
