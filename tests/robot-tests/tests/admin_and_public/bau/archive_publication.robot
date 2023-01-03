@@ -187,6 +187,9 @@ Check public archive-publication release page displays correctly
     user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
     user checks page does not contain    This is the latest data
 
+    user checks page contains element    This publication has been superseded by
+    user checks page contains element    //a[contains(text(), '${PUBLICATION_NAME_SUPERSEDE}')]
+
 Check public data tables page contains superseding-publication's subject
     user navigates to data tables page on public frontend
 
