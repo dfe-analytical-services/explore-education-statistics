@@ -318,13 +318,6 @@
         "description": "Google Analytics tracking ID for the public app. Leave as empty string to disable Google Analytics"
       }
     },
-    "publicAppHotjarId": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Hotjar ID for the public app. Leave as empty string to disable Hotjar"
-      }
-    },
     "verificationEmailTemplateId": {
       "type": "securestring",
       "defaultValue": "",
@@ -1979,7 +1972,6 @@
         "CONTENT_API_BASE_URL": "[concat('https://', parameters('contentApiUrl'),'/api')]",
         "DATA_API_BASE_URL": "[concat('https://', parameters('dataApiUrl'),'/api')]",
         "NOTIFICATION_API_BASE_URL": "[concat('https://', variables('notificationsAppName'),'.azurewebsites.net/api')]",
-        "HOTJAR_ID": "[parameters('publicAppHotjarId')]",
         "GA_TRACKING_ID": "[parameters('publicAppGATrackingId')]",
         "NEXT_CONFIG_MODE": "server",
         "NODE_ENV": "production",

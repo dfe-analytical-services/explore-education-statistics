@@ -75,12 +75,6 @@ const App = ({ Component, pageProps, cookies }: Props) => {
       );
     }
 
-    if (process.env.HOTJAR_ID) {
-      import('@frontend/services/hotjarService').then(({ initHotJar }) => {
-        initHotJar(process.env.HOTJAR_ID);
-      });
-    }
-
     document.body.classList.add('js-enabled');
   });
 
