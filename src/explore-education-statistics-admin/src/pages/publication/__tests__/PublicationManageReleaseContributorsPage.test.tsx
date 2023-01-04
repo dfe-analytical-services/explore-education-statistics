@@ -10,7 +10,7 @@ import {
 } from '@admin/routes/publicationRoutes';
 import _releaseService, { Release } from '@admin/services/releaseService';
 import _releasePermissionService, {
-  ContributorViewModel,
+  UserReleaseRole,
 } from '@admin/services/releasePermissionService';
 import { render, screen, waitFor } from '@testing-library/react';
 import { generatePath, Route } from 'react-router';
@@ -52,38 +52,44 @@ const testRelease: Release = {
   yearTitle: '2000/01',
 };
 
-const testPublicationContributors: ContributorViewModel[] = [
+const testPublicationContributors: UserReleaseRole[] = [
   {
     userId: 'user-1',
     userDisplayName: 'User Name 1',
     userEmail: 'user1@test.com',
+    role: 'Contributor',
   },
   {
     userId: 'user-2',
     userDisplayName: 'User Name 2',
     userEmail: 'user2@test.com',
+    role: 'Contributor',
   },
   {
     userId: 'user-3',
     userDisplayName: 'User Name 3',
     userEmail: 'user3@test.com',
+    role: 'Contributor',
   },
   {
     userId: 'user-4',
     userDisplayName: 'User Name 4',
     userEmail: 'user4@test.com',
+    role: 'Contributor',
   },
 ];
-const testReleaseContributors: ContributorViewModel[] = [
+const testReleaseContributors: UserReleaseRole[] = [
   {
     userId: 'user-1',
     userDisplayName: 'User Name 1',
     userEmail: 'user1@test.com',
+    role: 'Contributor',
   },
   {
     userId: 'user-2',
     userDisplayName: 'User Name 2',
     userEmail: 'user2@test.com',
+    role: 'Contributor',
   },
 ];
 describe('PublicationManageReleaseContributorsPage', () => {
@@ -92,7 +98,7 @@ describe('PublicationManageReleaseContributorsPage', () => {
     releasePermissionService.listPublicationContributors.mockResolvedValue(
       testPublicationContributors,
     );
-    releasePermissionService.listReleaseContributors.mockResolvedValue(
+    releasePermissionService.listRoles.mockResolvedValue(
       testReleaseContributors,
     );
     renderPage();

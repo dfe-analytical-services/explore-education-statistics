@@ -1,7 +1,7 @@
 import ReleaseContributorsPermissions from '@admin/pages/publication/components/ReleaseUserTable';
 import {
-  ContributorInvite,
-  ContributorViewModel,
+  UserReleaseInvite,
+  UserReleaseRole,
 } from '@admin/services/releasePermissionService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
@@ -10,27 +10,36 @@ import userEvent from '@testing-library/user-event';
 jest.mock('@admin/services/userService');
 
 describe('ReleaseContributorTable', () => {
-  const testReleaseContributors: ContributorViewModel[] = [
+  const testReleaseContributors: UserReleaseRole[] = [
     {
       userId: 'user-1',
       userDisplayName: 'User Name 1',
       userEmail: 'user1@test.com',
+      role: 'Contributor',
     },
     {
       userId: 'user-2',
       userDisplayName: 'User Name 2',
       userEmail: 'user2@test.com',
+      role: 'Contributor',
     },
     {
       userId: 'user-3',
       userDisplayName: 'User Name 3',
       userEmail: 'user3@test.com',
+      role: 'Contributor',
     },
   ];
 
-  const testInvites: ContributorInvite[] = [
-    { email: 'user4@test.com' },
-    { email: 'user5@test.com' },
+  const testInvites: UserReleaseInvite[] = [
+    {
+      email: 'user4@test.com',
+      role: 'Contributor',
+    },
+    {
+      email: 'user5@test.com',
+      role: 'Contributor',
+    },
   ];
 
   test('renders the contributors table correctly', async () => {
@@ -39,7 +48,7 @@ describe('ReleaseContributorTable', () => {
 
     render(
       <ReleaseContributorsPermissions
-        contributors={testReleaseContributors}
+        users={testReleaseContributors}
         invites={testInvites}
         onUserRemove={onUserRemove}
         onUserInvitesRemove={onUserInvitesRemove}
@@ -95,7 +104,7 @@ describe('ReleaseContributorTable', () => {
 
     render(
       <ReleaseContributorsPermissions
-        contributors={testReleaseContributors}
+        users={testReleaseContributors}
         invites={[]}
         onUserRemove={onUserRemove}
         onUserInvitesRemove={onUserInvitesRemove}
@@ -143,7 +152,7 @@ describe('ReleaseContributorTable', () => {
 
     render(
       <ReleaseContributorsPermissions
-        contributors={[]}
+        users={[]}
         invites={testInvites}
         onUserRemove={onUserRemove}
         onUserInvitesRemove={onUserInvitesRemove}

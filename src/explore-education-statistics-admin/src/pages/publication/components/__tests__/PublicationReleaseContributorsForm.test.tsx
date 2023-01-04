@@ -2,45 +2,51 @@ import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import PublicationReleaseContributorsForm from '@admin/pages/publication/components/PublicationReleaseContributorsForm';
 import _releasePermissionService, {
-  ContributorViewModel,
+  UserReleaseRole,
 } from '@admin/services/releasePermissionService';
 import userEvent from '@testing-library/user-event';
 
 jest.mock('@admin/services/releasePermissionService');
 
 describe('PublicationReleaseContributorsForm', () => {
-  const testPublicationContributors: ContributorViewModel[] = [
+  const testPublicationContributors: UserReleaseRole[] = [
     {
       userId: 'user-1',
       userDisplayName: 'User Name 1',
       userEmail: 'user1@test.com',
+      role: 'Contributor',
     },
     {
       userId: 'user-2',
       userDisplayName: 'User Name 2',
       userEmail: 'user2@test.com',
+      role: 'Contributor',
     },
     {
       userId: 'user-3',
       userDisplayName: 'User Name 3',
       userEmail: 'user3@test.com',
+      role: 'Contributor',
     },
     {
       userId: 'user-4',
       userDisplayName: 'User Name 4',
       userEmail: 'user4@test.com',
+      role: 'Contributor',
     },
   ];
-  const testReleaseContributors: ContributorViewModel[] = [
+  const testReleaseContributors: UserReleaseRole[] = [
     {
       userId: 'user-1',
       userDisplayName: 'User Name 1',
       userEmail: 'user1@test.com',
+      role: 'Contributor',
     },
     {
       userId: 'user-3',
       userDisplayName: 'User Name 3',
       userEmail: 'user3@test.com',
+      role: 'Contributor',
     },
   ];
   test('submits correct userIds to backend', async () => {

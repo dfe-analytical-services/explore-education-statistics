@@ -6,7 +6,6 @@ import {
 } from '@admin/routes/publicationRoutes';
 import publicationService, {
   PublicationPermissions,
-  PublicationWithPermissions,
 } from '@admin/services/publicationService';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import { FormSelect } from '@common/components/form';
@@ -32,19 +31,14 @@ const PublicationTeamAccessPage = ({
 }: RouteComponentProps<PublicationTeamRouteParams>) => {
   const history = useHistory();
   const { releaseId } = match.params;
-  const { publicationId } = usePublicationContext();
-  const [currentReleaseId, setCurrentReleaseId] = useState<string>(
-    releaseId ?? '',
-  );
+  const { publicationId, permissions } = usePublicationContext();
+  const [currentReleaseId, setCurrentReleaseId] = useState(releaseId ?? '');
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const { results: releases } = await publicationService.listReleases(
       publicationId,
     );
     const publicationRoles = await publicationService.listRoles(publicationId);
-    const { permissions } = await publicationService.getPublication<
-      PublicationWithPermissions
-    >(publicationId, true);
 
     if (!releaseId && releases.length) {
       setCurrentReleaseId(releases[0].id);
@@ -75,19 +69,12 @@ const PublicationTeamAccessPage = ({
     release => release.id === currentReleaseId,
   );
 
-  const canAmendPublicationContributors =
-    currentReleaseId != null &&
-    model.permissions.canUpdateContributorReleaseRole;
-  const canAmendReleaseContributors =
-    currentReleaseId != null &&
-    model.permissions.canUpdateContributorReleaseRole;
-
   return (
     <>
       <h2>Manage team access</h2>
 
       <h3>
-        {canAmendPublicationContributors
+        {model.permissions.canUpdateContributorReleaseRole
           ? 'Update publication access'
           : 'Publication access'}
       </h3>
@@ -136,19 +123,20 @@ const PublicationTeamAccessPage = ({
         </>
       )}
 
-      {canAmendPublicationContributors && (
-        <ButtonLink
-          to={generatePath<PublicationTeamRouteParams>(
-            publicationInviteUsersPageRoute.path,
-            {
-              publicationId,
-              releaseId: currentReleaseId,
-            },
-          )}
-        >
-          Add or remove publication contributors
-        </ButtonLink>
-      )}
+      {model.permissions.canUpdateContributorReleaseRole &&
+        currentReleaseId !== '' && (
+          <ButtonLink
+            to={generatePath<PublicationTeamRouteParams>(
+              publicationInviteUsersPageRoute.path,
+              {
+                publicationId,
+                releaseId: currentReleaseId,
+              },
+            )}
+          >
+            Add or remove publication contributors
+          </ButtonLink>
+        )}
 
       {model.permissions.canViewReleaseTeamAccess && (
         <>
@@ -157,7 +145,7 @@ const PublicationTeamAccessPage = ({
               <div className="govuk-grid-row govuk-!-margin-bottom-4 govuk-!-margin-top-8">
                 <div className="govuk-grid-column-full">
                   <h3>
-                    {canAmendReleaseContributors
+                    {model.permissions.canUpdateContributorReleaseRole
                       ? 'Update release access'
                       : 'Release access'}
                   </h3>
@@ -192,7 +180,9 @@ const PublicationTeamAccessPage = ({
                 <PublicationManageReleaseTeamAccess
                   publicationId={publicationId}
                   release={currentRelease}
-                  showManageContributorsButton={canAmendReleaseContributors}
+                  showManageContributorsButton={
+                    model.permissions.canUpdateContributorReleaseRole
+                  }
                 />
               )}
             </>

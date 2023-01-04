@@ -2,8 +2,8 @@ import PublicationManageReleaseTeamAccess from '@admin/pages/publication/compone
 import { ReleaseSummary } from '@admin/services/releaseService';
 import _userService from '@admin/services/userService';
 import _releasePermissionService, {
-  ContributorInvite,
-  ContributorViewModel,
+  UserReleaseInvite,
+  UserReleaseRole,
 } from '@admin/services/releasePermissionService';
 import {
   render as baseRender,
@@ -43,41 +43,42 @@ describe('PublicationManageTeamAccess', () => {
     amendment: false,
   };
 
-  const testContributors: ContributorViewModel[] = [
+  const testContributors: UserReleaseRole[] = [
     {
       userId: 'user-1',
       userDisplayName: 'User 1',
       userEmail: 'user1@test.com',
+      role: 'Contributor',
     },
   ];
 
-  const testInvites: ContributorInvite[] = [{ email: 'user2@test.com' }];
+  const testInvites: UserReleaseInvite[] = [
+    {
+      email: 'user2@test.com',
+      role: 'Contributor',
+    },
+  ];
 
   test('renders the manage team access table correctly', async () => {
-    releasePermissionService.listReleaseContributors.mockResolvedValue(
-      testContributors,
-    );
-    releasePermissionService.listReleaseContributorInvites.mockResolvedValue(
-      testInvites,
-    );
+    releasePermissionService.listRoles.mockResolvedValue(testContributors);
+    releasePermissionService.listInvites.mockResolvedValue(testInvites);
     render(
       <PublicationManageReleaseTeamAccess
         publicationId={testPublicationId}
         release={testRelease}
+        showManageContributorsButton
       />,
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Academic Year 2000/01 (Not live)'),
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('Release-value')).toHaveTextContent(
+        'Academic Year 2000/01 (Not live)',
+      );
     });
 
-    expect(
-      screen.getByRole('heading', {
-        name: 'Academic Year 2000/01 (Not live) Draft',
-      }),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('Status-value')).toHaveTextContent('Draft');
+    });
 
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(3);
@@ -89,20 +90,37 @@ describe('PublicationManageTeamAccess', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'Add or remove users',
+        name: 'Add or remove release contributors',
       }),
     ).toBeInTheDocument();
   });
 
-  test('renders a message if there are no contributors or invites', async () => {
-    releasePermissionService.listReleaseContributors.mockResolvedValue([]);
-    releasePermissionService.listReleaseContributorInvites.mockResolvedValue(
-      [],
-    );
+  test('omits the "Add or remove release contributors" button when requested', async () => {
+    releasePermissionService.listRoles.mockResolvedValue(testContributors);
+    releasePermissionService.listInvites.mockResolvedValue(testInvites);
     render(
       <PublicationManageReleaseTeamAccess
         publicationId={testPublicationId}
         release={testRelease}
+        showManageContributorsButton={false}
+      />,
+    );
+
+    expect(
+      screen.queryByRole('link', {
+        name: 'Add or remove release contributors',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders a message if there are no contributors or invites', async () => {
+    releasePermissionService.listRoles.mockResolvedValue([]);
+    releasePermissionService.listInvites.mockResolvedValue([]);
+    render(
+      <PublicationManageReleaseTeamAccess
+        publicationId={testPublicationId}
+        release={testRelease}
+        showManageContributorsButton
       />,
     );
 
@@ -118,30 +136,25 @@ describe('PublicationManageTeamAccess', () => {
   });
 
   test('handles removing a user correctly', async () => {
-    releasePermissionService.listReleaseContributors.mockResolvedValue(
-      testContributors,
-    );
-    releasePermissionService.listReleaseContributorInvites.mockResolvedValue(
-      testInvites,
-    );
+    releasePermissionService.listRoles.mockResolvedValue(testContributors);
+    releasePermissionService.listInvites.mockResolvedValue(testInvites);
     render(
       <PublicationManageReleaseTeamAccess
         publicationId={testPublicationId}
         release={testRelease}
+        showManageContributorsButton
       />,
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Academic Year 2000/01 (Not live)'),
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('Release-value')).toHaveTextContent(
+        'Academic Year 2000/01 (Not live)',
+      );
     });
 
-    expect(
-      screen.getByRole('heading', {
-        name: 'Academic Year 2000/01 (Not live) Draft',
-      }),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('Status-value')).toHaveTextContent('Draft');
+    });
 
     userEvent.click(screen.getByRole('button', { name: 'Remove User 1' }));
 
@@ -159,30 +172,25 @@ describe('PublicationManageTeamAccess', () => {
   });
 
   test('handles cancelling an invite correctly', async () => {
-    releasePermissionService.listReleaseContributors.mockResolvedValue(
-      testContributors,
-    );
-    releasePermissionService.listReleaseContributorInvites.mockResolvedValue(
-      testInvites,
-    );
+    releasePermissionService.listRoles.mockResolvedValue(testContributors);
+    releasePermissionService.listInvites.mockResolvedValue(testInvites);
     render(
       <PublicationManageReleaseTeamAccess
         publicationId={testPublicationId}
         release={testRelease}
+        showManageContributorsButton
       />,
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Academic Year 2000/01 (Not live)'),
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('Release-value')).toHaveTextContent(
+        'Academic Year 2000/01 (Not live)',
+      );
     });
 
-    expect(
-      screen.getByRole('heading', {
-        name: 'Academic Year 2000/01 (Not live) Draft',
-      }),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('Status-value')).toHaveTextContent('Draft');
+    });
 
     userEvent.click(
       screen.getByRole('button', { name: 'Cancel invite for user2@test.com' }),

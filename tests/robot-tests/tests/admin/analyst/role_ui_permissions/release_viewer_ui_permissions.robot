@@ -50,11 +50,13 @@ Check cannot edit the release status of a Draft Release
     ...    ${DRAFT_RELEASE_TYPE}    ${THEME_NAME}    ${TOPIC_NAME}    View
     user cannot see the edit release status controls for release
 
-Check cannot see the "Update release access" section of the "Team access" page
+Check cannot see the readonly or editable version of the "Release access" section of the "Team access" page
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Team access
     user waits for page to finish loading
     user waits until h3 is not visible    Update release access
+    user waits until h3 is not visible    Release access
+    user waits until page does not contain link    Add or remove release contributors
 
-Check cannot see the "Add or remove users" functionality of the "Team access" page
-    user waits until page does not contain link    Add or remove users
+Check cannot see the "Add or remove publication contributors" functionality of the "Team access" page
+    user waits until page does not contain link    Add or remove publication contributors
