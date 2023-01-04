@@ -14,6 +14,7 @@ export type PageProps = {
   caption?: string;
   children: ReactNode;
   wide?: boolean;
+  fullWidth?: boolean;
   title?: string;
   pageBanner?: ReactNode;
 } & BreadcrumbsProps;
