@@ -1,3 +1,4 @@
+import Button from '@common/components/Button';
 import ButtonLink from '@admin/components/ButtonLink';
 import Link from '@admin/components/Link';
 import FootnotesList from '@admin/pages/release/footnotes/components/FootnotesList';
@@ -6,12 +7,14 @@ import {
   releaseFootnotesCreateRoute,
   ReleaseRouteParams,
 } from '@admin/routes/releaseRoutes';
-import footnotesService from '@admin/services/footnoteService';
+import footnoteService, { Footnote } from '@admin/services/footnoteService';
 import permissionService from '@admin/services/permissionService';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import useToggle from '@common/hooks/useToggle';
+import classNames from 'classnames';
 import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 
@@ -19,6 +22,7 @@ const ReleaseFootnotesPage = ({
   match,
 }: RouteComponentProps<ReleaseRouteParams>) => {
   const { publicationId, releaseId } = match.params;
+  const [isReordering, toggleIsReordering] = useToggle(false);
 
   const {
     value: canUpdateRelease = false,
@@ -31,7 +35,7 @@ const ReleaseFootnotesPage = ({
   const {
     value: footnoteMeta,
     isLoading: isFootnoteMetaLoading,
-  } = useAsyncHandledRetry(() => footnotesService.getFootnoteMeta(releaseId), [
+  } = useAsyncHandledRetry(() => footnoteService.getFootnoteMeta(releaseId), [
     releaseId,
   ]);
 
@@ -39,9 +43,22 @@ const ReleaseFootnotesPage = ({
     value: footnotes,
     setState: setFootnotes,
     isLoading: isFootnotesLoading,
-  } = useAsyncHandledRetry(() => footnotesService.getFootnotes(releaseId), [
+  } = useAsyncHandledRetry(() => footnoteService.getFootnotes(releaseId), [
     releaseId,
   ]);
+
+  const handleReorder = (reorderedFootnotes: Footnote[]) => {
+    setFootnotes({
+      value: reorderedFootnotes,
+    });
+  };
+
+  const handleSaveOrder = async () => {
+    await footnoteService.updateFootnotesOrder(
+      releaseId,
+      footnotes?.map(footnote => footnote.id) ?? [],
+    );
+  };
 
   const renderInner = () => {
     if (!footnotes || !footnoteMeta) {
@@ -69,17 +86,41 @@ const ReleaseFootnotesPage = ({
     return (
       <>
         {canUpdateRelease && (
-          <ButtonLink
-            to={generatePath<ReleaseRouteParams>(
-              releaseFootnotesCreateRoute.path,
-              {
-                publicationId,
-                releaseId,
-              },
-            )}
+          <div
+            className={classNames('dfe-flex', {
+              'dfe-justify-content--space-between': !isReordering,
+              'dfe-justify-content--flex-end': isReordering,
+            })}
           >
-            Create footnote
-          </ButtonLink>
+            {!isReordering && (
+              <ButtonLink
+                to={generatePath<ReleaseRouteParams>(
+                  releaseFootnotesCreateRoute.path,
+                  {
+                    publicationId,
+                    releaseId,
+                  },
+                )}
+              >
+                Create footnote
+              </ButtonLink>
+            )}
+
+            {footnotes.length > 1 && (
+              <Button
+                className="govuk-!-margin-left-auto"
+                variant={!isReordering ? 'secondary' : undefined}
+                onClick={async () => {
+                  if (isReordering) {
+                    await handleSaveOrder();
+                  }
+                  toggleIsReordering();
+                }}
+              >
+                {isReordering ? 'Save order' : 'Reorder footnotes'}
+              </Button>
+            )}
+          </div>
         )}
 
         <FootnotesList
@@ -88,13 +129,14 @@ const ReleaseFootnotesPage = ({
           footnotes={footnotes}
           footnoteMeta={footnoteMeta}
           canUpdateRelease={canUpdateRelease}
+          isReordering={isReordering}
           onDelete={async footnote => {
-            await footnotesService.deleteFootnote(releaseId, footnote.id);
-
+            await footnoteService.deleteFootnote(releaseId, footnote.id);
             setFootnotes({
               value: footnotes?.filter(f => f.id !== footnote.id),
             });
           }}
+          onReorder={handleReorder}
         />
       </>
     );

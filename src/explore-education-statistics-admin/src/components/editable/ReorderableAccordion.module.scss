@@ -1,9 +1,5 @@
 @import '~govuk-frontend/govuk/base';
 
-.dragover {
-  background: govuk-colour('light-grey');
-}
-
 // Override the default dnd style as it causes accordion sections within the dnd area to sometime open in the wrong direction.
 .container [data-rbd-droppable-context-id] {
   overflow-anchor: auto;

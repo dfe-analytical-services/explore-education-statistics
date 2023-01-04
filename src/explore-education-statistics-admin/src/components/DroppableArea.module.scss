@@ -1,0 +1,14 @@
+@import '~govuk-frontend/govuk/base';
+
+/* stylelint-disable selector-no-qualifying-type */
+ol.dropArea,
+ul.dropArea {
+  list-style: none;
+  padding: 0;
+}
+/* stylelint-enable */
+
+.dropAreaActive {
+  background: govuk-colour('light-grey');
+  outline: $govuk-focus-width solid $govuk-focus-colour;
+}
