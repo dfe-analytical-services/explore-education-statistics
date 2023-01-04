@@ -93,9 +93,7 @@ function App() {
                       {/* <Route path="/prototypes" component={PrototypesEntry} /> */}
                       <ProtectedRoute
                         path="/prototypes"
-                        protectionAction={user =>
-                          user.permissions.canAccessUserAdministrationPages
-                        }
+                        protectionAction={user => user.permissions.isBauUser}
                         component={PrototypesEntry}
                       />
 

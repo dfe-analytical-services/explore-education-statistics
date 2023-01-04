@@ -35,7 +35,7 @@ const BauDashboardPage = () => {
         Access to the service
       </h2>
       <div className="govuk-grid-row govuk-!-margin-bottom-9">
-        {user?.permissions.canAccessUserAdministrationPages && (
+        {user?.permissions.isBauUser && (
           <>
             <div className="govuk-grid-column-one-third">
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
