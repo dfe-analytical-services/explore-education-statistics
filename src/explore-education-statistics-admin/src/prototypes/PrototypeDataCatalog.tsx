@@ -18,14 +18,22 @@ import Button from '@common/components/Button';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 
-const PrototypeFindStats = () => {
+const PrototypeDataCatalogue = () => {
+  const params = new URLSearchParams(window.location.search);
+  const urlTheme = params.get('theme');
+  const urlPublication = params.get('publication');
+
   const [fullList, setFullList] = useState(true);
   const [listCompact, setListCompact] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTheme, setSelectedTheme] = useState('All themes');
+  const [selectedTheme, setSelectedTheme] = useState(
+    urlTheme === 'fe' ? 'Further education' : 'All themes',
+  );
   const [selectedPublication, setSelectedPublication] = useState(
-    'All publications',
+    urlPublication === 'traineeships'
+      ? 'Apprenticeships and traineeships'
+      : 'All publications',
   );
   const [selectedReleaseType, setSelectedReleaseType] = useState(
     'all-release-types',
@@ -94,7 +102,17 @@ const PrototypeFindStats = () => {
 
   return (
     <div className={styles.prototypePublicPage}>
-      <PrototypePage wide={false}>
+      <PrototypePage
+        wide={false}
+        breadcrumbs={[
+          {
+            name: 'Data catalogue',
+            link: '/prototypes/data-catalog?theme=clear',
+          },
+          { name: selectedTheme, link: '/prototypes/data-catalog?theme=fe' },
+          { name: selectedPublication, link: '/prototypes/data-catalog' },
+        ]}
+      >
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <h1 className="govuk-heading-xl">Data catalogue</h1>
@@ -152,6 +170,7 @@ const PrototypeFindStats = () => {
                 className="govuk-select"
                 id="theme"
                 onBlur={e => {
+                  params.delete('theme');
                   setSelectedTheme(e.target.value);
                 }}
               >
@@ -314,6 +333,8 @@ const PrototypeFindStats = () => {
                 <a
                   href="#"
                   onClick={e => {
+                    params.delete('theme');
+                    params.delete('publication');
                     setSelectedTheme('All themes');
                     setSelectedPublication('All publications');
                     e.preventDefault();
@@ -459,12 +480,22 @@ const PrototypeFindStats = () => {
                     <dt style={{ flexBasis: '200px' }}>Release</dt>
                     <dd>Academic year 2021/22 </dd>
                   </div>
-            </dl> */}
+            </dl> */}{' '}
+                <hr />
+                <Button className="govuk-!-margin-bottom-0">
+                  Download all 32 datasets for this release (.zip)
+                </Button>
                 <hr />
                 <div className="govuk-!-margin-top-0 dfe-flex dfe-justify-content--space-between dfe-align-items--center">
-                  <Button className="govuk-!-margin-bottom-0">
-                    Download all (.zip)
-                  </Button>
+                  <div>
+                    <PrototypeSortFilters
+                      sortOrder={selectedSortOrder}
+                      onSort={sortOrder => {
+                        setSelectedSortOrder(sortOrder);
+                        setCurrentPage(0);
+                      }}
+                    />
+                  </div>
                   {listCompact && (
                     <a
                       href="#"
@@ -534,7 +565,7 @@ const PrototypeFindStats = () => {
                       <h3>
                         <a href="#">
                           A1 National time series of children in need, referrals
-                          and assessments (csv, 17 Kb)
+                          and assessments
                         </a>
                       </h3>
                       <p>
@@ -544,6 +575,9 @@ const PrototypeFindStats = () => {
                       </p>
                       {!listCompact && (
                         <SummaryList noBorder>
+                          <SummaryListItem term="Filetype and size">
+                            csv, 17 Kb
+                          </SummaryListItem>
                           <SummaryListItem term="Theme">
                             Children's social care
                           </SummaryListItem>
@@ -572,13 +606,14 @@ const PrototypeFindStats = () => {
                     <li>
                       <hr />
                       <h3>
-                        <a href="#">
-                          Annual Headlines - detailed series (csv, 45Kb)
-                        </a>
+                        <a href="#">Annual Headlines - detailed series</a>
                       </h3>
                       <p>Time series of headline apprenticeship figures</p>
                       {!listCompact && (
                         <SummaryList noBorder>
+                          <SummaryListItem term="Filetype and size">
+                            csv, 45 Kb
+                          </SummaryListItem>
                           <SummaryListItem term="Theme">
                             Further education
                           </SummaryListItem>
@@ -608,9 +643,37 @@ const PrototypeFindStats = () => {
                     <li>
                       <hr />
                       <h3>
-                        <a href="#">
-                          Key stage 4 national level destinations (csv, 1 Mb)
-                        </a>
+                        <Link to="./data-selected">
+                          Apprenticeship Achievement Rates Detailed Series
+                        </Link>
+                      </h3>
+                      <p>Apprenticeship national achievement rate tables</p>
+                      {!listCompact && (
+                        <SummaryList noBorder>
+                          <SummaryListItem term="Filetype and size">
+                            csv, 2 Mb
+                          </SummaryListItem>
+                          <SummaryListItem term="Indicators">
+                            Achievement rate, Achievers, Completers, Leavers,
+                            Pass rate, Retention rate
+                          </SummaryListItem>
+                          <SummaryListItem term="Filters">
+                            Age, Level, demographic - ethnicity, gender and
+                            lldd, Standard /Framework flag
+                          </SummaryListItem>
+                          <SummaryListItem term="Geographic level">
+                            National
+                          </SummaryListItem>
+                          <SummaryListItem term="Time period">
+                            Academic years 2018/19 to 2020/21
+                          </SummaryListItem>
+                        </SummaryList>
+                      )}
+                    </li>
+                    <li>
+                      <hr />
+                      <h3>
+                        <a href="#">Key stage 4 national level destinations</a>
                       </h3>
                       <p>
                         National level destinations data for students leaving
@@ -619,6 +682,9 @@ const PrototypeFindStats = () => {
                       </p>
                       {!listCompact && (
                         <SummaryList noBorder>
+                          <SummaryListItem term="Filetype and size">
+                            csv, 1 Mb
+                          </SummaryListItem>
                           <SummaryListItem term="Theme">
                             Destination of pupils and students
                           </SummaryListItem>
@@ -650,9 +716,7 @@ const PrototypeFindStats = () => {
                     <li>
                       <hr />
                       <h3>
-                        <a href="#">
-                          School income - national rounded summary (csv, 161 Kb)
-                        </a>
+                        <a href="#">School income - national rounded summary</a>
                       </h3>
                       <p>
                         This file contains national level rounded data on income
@@ -661,6 +725,9 @@ const PrototypeFindStats = () => {
                       </p>
                       {!listCompact && (
                         <SummaryList noBorder>
+                          <SummaryListItem term="Filetype and size">
+                            csv, 161 Kb
+                          </SummaryListItem>
                           <SummaryListItem term="Theme">
                             Finance and funding
                           </SummaryListItem>
@@ -688,9 +755,7 @@ const PrototypeFindStats = () => {
                     <li>
                       <hr />
                       <h3>
-                        <a href="#">
-                          01 - Absence rates by geographic level (csv, 101 Mb)
-                        </a>
+                        <a href="#">01 - Absence rates by geographic level</a>
                       </h3>
                       <p>
                         Absence information for full academic year 2020/21 for
@@ -701,6 +766,9 @@ const PrototypeFindStats = () => {
                       </p>
                       {!listCompact && (
                         <SummaryList noBorder>
+                          <SummaryListItem term="Filetype and size">
+                            csv, 101 Mb
+                          </SummaryListItem>
                           <SummaryListItem term="Theme">
                             Pupils and schools
                           </SummaryListItem>
@@ -1004,13 +1072,14 @@ const PrototypeFindStats = () => {
                     <li>
                       <hr />
                       <h3>
-                        <a href="#">
-                          Annual Headlines - detailed series (csv, 45Kb)
-                        </a>
+                        <a href="#">Annual Headlines - detailed series</a>
                       </h3>
                       <p>Time series of headline apprenticeship figures</p>
                       {!listCompact && (
                         <SummaryList noBorder>
+                          <SummaryListItem term="Filetype and size">
+                            csv, 45 Kb
+                          </SummaryListItem>
                           <SummaryListItem term="Theme">
                             Further education
                           </SummaryListItem>
@@ -1042,7 +1111,7 @@ const PrototypeFindStats = () => {
                       <h3>
                         <a href="#">
                           Apprenticeship achievements by enterprise
-                          characteristics (csv, 84 Mb)
+                          characteristics
                         </a>
                       </h3>
                       <p>
@@ -1052,6 +1121,9 @@ const PrototypeFindStats = () => {
                       </p>
                       {!listCompact && (
                         <SummaryList noBorder>
+                          <SummaryListItem term="Filetype and size">
+                            csv, 84 Mb
+                          </SummaryListItem>
                           <SummaryListItem term="Theme">
                             Further education
                           </SummaryListItem>
@@ -1081,6 +1153,36 @@ const PrototypeFindStats = () => {
                     <li>
                       <hr />
                       <h3>
+                        <Link to="./data-selected">
+                          Apprenticeship Achievement Rates Detailed Series
+                        </Link>
+                      </h3>
+                      <p>Apprenticeship national achievement rate tables</p>
+                      {!listCompact && (
+                        <SummaryList noBorder>
+                          <SummaryListItem term="Filetype and size">
+                            csv, 2 Mb
+                          </SummaryListItem>
+                          <SummaryListItem term="Indicators">
+                            Achievement rate, Achievers, Completers, Leavers,
+                            Pass rate, Retention rate
+                          </SummaryListItem>
+                          <SummaryListItem term="Filters">
+                            Age, Level, demographic - ethnicity, gender and
+                            lldd, Standard /Framework flag
+                          </SummaryListItem>
+                          <SummaryListItem term="Geographic level">
+                            National
+                          </SummaryListItem>
+                          <SummaryListItem term="Time period">
+                            Academic years 2018/19 to 2020/21
+                          </SummaryListItem>
+                        </SummaryList>
+                      )}
+                    </li>
+                    <li>
+                      <hr />
+                      <h3>
                         <a href="#">
                           Employee numbers and median earnings by region,
                           sector, subsector, level and subject (csv, 32 Mb)
@@ -1092,6 +1194,9 @@ const PrototypeFindStats = () => {
                       </p>
                       {!listCompact && (
                         <SummaryList noBorder>
+                          <SummaryListItem term="Filetype and size">
+                            csv, 32 Mb
+                          </SummaryListItem>
                           <SummaryListItem term="Theme">
                             Further education
                           </SummaryListItem>
@@ -1131,6 +1236,9 @@ const PrototypeFindStats = () => {
                       </p>
                       {!listCompact && (
                         <SummaryList noBorder>
+                          <SummaryListItem term="Filetype and size">
+                            csv, 14 Mb
+                          </SummaryListItem>
                           <SummaryListItem term="Theme">
                             Further education
                           </SummaryListItem>
@@ -1161,7 +1269,6 @@ const PrototypeFindStats = () => {
                         <a href="#">
                           Number of FE learners going into employment and
                           learning destinations by local authority district
-                          (csv, 474 Kb)
                         </a>
                       </h3>
                       <p>
@@ -1172,6 +1279,9 @@ const PrototypeFindStats = () => {
                       </p>
                       {!listCompact && (
                         <SummaryList noBorder>
+                          <SummaryListItem term="Filetype and size">
+                            csv, 474 Kb
+                          </SummaryListItem>
                           <SummaryListItem term="Theme">
                             Further education
                           </SummaryListItem>
@@ -1420,12 +1530,15 @@ const PrototypeFindStats = () => {
                   <hr />
                   <h3>
                     <a href="#">
-                      Annual Headlines - detailed series (csv, 45Kb)
+                      Annual Headlines - detailed series (csv, 45 Kb)
                     </a>
                   </h3>
                   <p>Time series of headline apprenticeship figures</p>
                   {!listCompact && (
                     <SummaryList noBorder>
+                      <SummaryListItem term="Filetype and size">
+                        csv, 45Kb
+                      </SummaryListItem>
                       <SummaryListItem term="Indicators">
                         Starts, Achievements, Learner participation, Percentage
                         Starts, Percentage Achievements, Percentage Learner
@@ -1447,12 +1560,15 @@ const PrototypeFindStats = () => {
                   <hr />
                   <h3>
                     <a href="#">
-                      Apprenticeship Achievement Rates Demographics (csv, 28 Kb)
+                      Apprenticeship Achievement Rates Demographics
                     </a>
                   </h3>
                   <p>Apprenticeship national achievement rate tables</p>
                   {!listCompact && (
                     <SummaryList noBorder>
+                      <SummaryListItem term="Filetype and size">
+                        csv, 28 Kb
+                      </SummaryListItem>
                       <SummaryListItem term="Indicators">
                         Achievement rate, Achievers, Completers, Leavers, Pass
                         rate, Retention rate
@@ -1473,14 +1589,16 @@ const PrototypeFindStats = () => {
                 <li>
                   <hr />
                   <h3>
-                    <a href="#">
-                      Apprenticeship Achievement Rates Detailed Series (csv,
-                      2Mb)
-                    </a>
+                    <Link to="./data-selected">
+                      Apprenticeship Achievement Rates Detailed Series
+                    </Link>
                   </h3>
                   <p>Apprenticeship national achievement rate tables</p>
                   {!listCompact && (
                     <SummaryList noBorder>
+                      <SummaryListItem term="Filetype and size">
+                        csv, 2 Mb
+                      </SummaryListItem>
                       <SummaryListItem term="Indicators">
                         Achievement rate, Achievers, Completers, Leavers, Pass
                         rate, Retention rate
@@ -1501,13 +1619,14 @@ const PrototypeFindStats = () => {
                 <li>
                   <hr />
                   <h3>
-                    <a href="#">
-                      Apprenticeship Achievement Rates Headlines (csv, 9 Kb)
-                    </a>
+                    <a href="#">Apprenticeship Achievement Rates Headlines</a>
                   </h3>
                   <p>Apprenticeship national achievement rate tables</p>
                   {!listCompact && (
                     <SummaryList noBorder>
+                      <SummaryListItem term="Filetype and size">
+                        csv, 9 Kb
+                      </SummaryListItem>
                       <SummaryListItem term="Indicators">
                         Achievement rate, Leavers, Pass rate, Retention rate
                       </SummaryListItem>
@@ -1527,9 +1646,7 @@ const PrototypeFindStats = () => {
                 <li>
                   <hr />
                   <h3>
-                    <a href="#">
-                      Apprenticeship Service - incentives (csv, 18 Kb)
-                    </a>
+                    <a href="#">Apprenticeship Service - incentives</a>
                   </h3>
                   <p>
                     Incentive claims recorded on the apprenticeship service as
@@ -1537,6 +1654,9 @@ const PrototypeFindStats = () => {
                   </p>
                   {!listCompact && (
                     <SummaryList noBorder>
+                      <SummaryListItem term="Filetype and size">
+                        csv, 18 kb
+                      </SummaryListItem>
                       <SummaryListItem term="Indicators">
                         Incentive claims
                       </SummaryListItem>
@@ -1566,6 +1686,9 @@ const PrototypeFindStats = () => {
                   </p>
                   {!listCompact && (
                     <SummaryList noBorder>
+                      <SummaryListItem term="Filetype and size">
+                        csv, 2 kb
+                      </SummaryListItem>
                       <SummaryListItem term="Indicators">
                         Adult Apprenticeship, Adult Community learning, Adult
                         Education & training, Adult FE & skills, Adult FE &
@@ -1598,6 +1721,9 @@ const PrototypeFindStats = () => {
                   </p>
                   {!listCompact && (
                     <SummaryList noBorder>
+                      <SummaryListItem term="Filetype and size">
+                        csv, 28 kb
+                      </SummaryListItem>
                       <SummaryListItem term="Indicators">
                         Starts, Starts (used in duration calculations), Average
                         expected duration
@@ -1618,9 +1744,7 @@ const PrototypeFindStats = () => {
                 <li>
                   <hr />
                   <h3>
-                    <a href="#">
-                      Find an apprenticeship adverts and vacancies (csv, 20 Kb)
-                    </a>
+                    <a href="#">Find an apprenticeship adverts and vacancies</a>
                   </h3>
                   <p>
                     Adverts and vacancies as reported on the Find an
@@ -1628,6 +1752,9 @@ const PrototypeFindStats = () => {
                   </p>
                   {!listCompact && (
                     <SummaryList noBorder>
+                      <SummaryListItem term="Filetype and size">
+                        csv, 20 kb
+                      </SummaryListItem>
                       <SummaryListItem term="Indicators">
                         Adverts, Vacancies
                       </SummaryListItem>
@@ -1646,9 +1773,7 @@ const PrototypeFindStats = () => {
                 <li>
                   <hr />
                   <h3>
-                    <a href="#">
-                      Geographical breakdowns - detailed (csv, 62 Mb)
-                    </a>
+                    <a href="#">Geographical breakdowns - detailed</a>
                   </h3>
                   <p>
                     Detailed geographical breakdowns (National, Regional, Local
@@ -1657,6 +1782,9 @@ const PrototypeFindStats = () => {
                   </p>
                   {!listCompact && (
                     <SummaryList noBorder>
+                      <SummaryListItem term="Filetype and size">
+                        csv, 62 Mb
+                      </SummaryListItem>
                       <SummaryListItem term="Indicators">
                         Starts, Achievements
                       </SummaryListItem>
@@ -1677,13 +1805,15 @@ const PrototypeFindStats = () => {
                   <hr />
                   <h3>
                     <a href="#">
-                      Geographical breakdowns - latest regional summary (csv, 16
-                      Kb)
+                      Geographical breakdowns - latest regional summary
                     </a>
                   </h3>
                   <p>Headline regional breakdowns of apprenticeship starts</p>
                   {!listCompact && (
                     <SummaryList noBorder>
+                      <SummaryListItem term="Filetype and size">
+                        csv, 16 kb
+                      </SummaryListItem>
                       <SummaryListItem term="Indicators">
                         Starts
                       </SummaryListItem>
@@ -1703,10 +1833,8 @@ const PrototypeFindStats = () => {
             )}
             {totalResults !== 0 && (
               <>
-                <p>
-                  Showing page {currentPage + 1} of{' '}
-                  {filteredPublications.length}
-                </p>
+                <hr />
+                <p>Showing page {currentPage + 1} of X</p>
                 <nav
                   className="dfe-pagination"
                   role="navigation"
@@ -1763,4 +1891,4 @@ const PrototypeFindStats = () => {
   );
 };
 
-export default PrototypeFindStats;
+export default PrototypeDataCatalogue;

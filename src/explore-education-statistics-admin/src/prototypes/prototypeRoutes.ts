@@ -34,6 +34,7 @@ import PrototypeTableHighlightsV2 from './PrototypeTableHighlightsUpdateV2';
 import PrototypeTableHighlightsV2b from './PrototypeTableHighlightsUpdateV2-b';
 import PrototypeTableHighlightsV2c from './PrototypeTableHighlightsUpdateV2-c';
 import PrototypeDataCatalog from './PrototypeDataCatalog';
+import PrototypeDataSelected from './PrototypeDataSelected';
 import PrototypeMethodology from './PrototypeMethodology';
 
 interface PrototypeRoute extends RouteProps {
@@ -196,6 +197,11 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'Data catalog',
     path: '/prototypes/data-catalog',
     component: PrototypeDataCatalog,
+  },
+  {
+    name: 'Dataset selected',
+    path: '/prototypes/data-selected',
+    component: PrototypeDataSelected,
   },
   {
     name: 'Methodology',

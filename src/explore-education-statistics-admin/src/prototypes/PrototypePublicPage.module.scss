@@ -278,3 +278,9 @@
   grid-gap: 2rem;
   grid-template-columns: (1fr 1fr);
 }
+
+.prototypeFullWidthOveride {
+  :global(.dfe-width-container--wide) {
+    max-width: 95vw;
+  }
+}
