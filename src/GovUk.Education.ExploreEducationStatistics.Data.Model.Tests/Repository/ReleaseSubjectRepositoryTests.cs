@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
-            footnoteRepository.Setup(mock => mock.DeleteAllFootnotesBySubject(
+            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
                     releaseSubject.ReleaseId,
                     releaseSubject.SubjectId))
                 .Returns(Task.CompletedTask);
@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
-            footnoteRepository.Setup(mock => mock.DeleteAllFootnotesBySubject(
+            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
                     releaseSubject.ReleaseId, releaseSubject.SubjectId))
                 .Returns(Task.CompletedTask);
 
@@ -136,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
-            footnoteRepository.Setup(mock => mock.DeleteAllFootnotesBySubject(
+            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
                     releaseSubject2.ReleaseId, releaseSubject2.SubjectId))
                 .Returns(Task.CompletedTask);
 
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
-            footnoteRepository.Setup(mock => mock.DeleteAllFootnotesBySubject(
+            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(
                     It.IsAny<Guid>(), It.IsAny<Guid>()))
                 .Returns(Task.CompletedTask);
 
@@ -235,7 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
-            footnoteRepository.Setup(mock => mock.DeleteAllFootnotesBySubject(release.Id,
+            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(release.Id,
                     It.IsIn(releaseSubject1.SubjectId, releaseSubject2.SubjectId)))
                 .Returns(Task.CompletedTask);
 
@@ -299,7 +299,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
 
-            footnoteRepository.Setup(mock => mock.DeleteAllFootnotesBySubject(release.Id,
+            footnoteRepository.Setup(mock => mock.DeleteFootnotesBySubject(release.Id,
                     It.IsIn(releaseSubject1.SubjectId, releaseSubject2.SubjectId)))
                 .Returns(Task.CompletedTask);
 
@@ -323,116 +323,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
                 Assert.Equal(releaseSubject2.SubjectId, subjects[1].Id);
                 Assert.True(subjects[1].SoftDeleted);
-            }
-        }
-
-        [Fact]
-        public async Task GetReleaseSubjectForLatestPublishedVersion()
-        {
-            var subject = new Subject();
-
-            var releaseSubjectPreviousRelease = new ReleaseSubject
-            {
-                Subject = subject,
-                Release = new Release
-                {
-                    Id = Guid.NewGuid(),
-                    Published = DateTime.UtcNow.AddDays(-2),
-                    PreviousVersionId = null
-                }
-            };
-
-            var releaseSubjectLatestRelease = new ReleaseSubject
-            {
-                Subject = subject,
-                Release = new Release
-                {
-                    Id = Guid.NewGuid(),
-                    Published = DateTime.UtcNow.AddDays(-1),
-                    PreviousVersionId = releaseSubjectPreviousRelease.Release.Id
-                }
-            };
-
-            // Link the Subject to the next version of the Release with a future Published date/time
-            // that should not be considered Live
-            var releaseSubjectFutureRelease = new ReleaseSubject
-            {
-                Subject = subject,
-                Release = new Release
-                {
-                    Id = Guid.NewGuid(),
-                    Published = DateTime.UtcNow.AddDays(1),
-                    PreviousVersionId = releaseSubjectLatestRelease.Release.Id
-                }
-            };
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.Subject.AddAsync(subject);
-                await statisticsDbContext.ReleaseSubject.AddRangeAsync(
-                    releaseSubjectPreviousRelease,
-                    releaseSubjectLatestRelease,
-                    releaseSubjectFutureRelease);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = BuildReleaseSubjectRepository(statisticsDbContext);
-
-                var result = await service.GetReleaseSubjectForLatestPublishedVersion(subject.Id);
-
-                Assert.NotNull(result);
-                Assert.Equal(releaseSubjectLatestRelease.ReleaseId, result!.ReleaseId);
-                Assert.Equal(releaseSubjectLatestRelease.SubjectId, result.SubjectId);
-            }
-        }
-
-        [Fact]
-        public async Task GetReleaseSubjectForLatestPublishedVersion_NoReleases()
-        {
-            var subject = new Subject();
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.Subject.AddAsync(subject);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = BuildReleaseSubjectRepository(statisticsDbContext);
-                Assert.Null(await service.GetReleaseSubjectForLatestPublishedVersion(subject.Id));
-            }
-        }
-
-        [Fact]
-        public async Task GetReleaseSubjectForLatestPublishedVersion_NoPublishedReleases()
-        {
-            // Link the Subject to a Release with a future Published date/time that should not be considered Live
-            var releaseSubjectFutureRelease = new ReleaseSubject
-            {
-                Subject = new Subject(),
-                Release = new Release
-                {
-                    Published = DateTime.UtcNow.AddDays(1)
-                }
-            };
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubjectFutureRelease);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = BuildReleaseSubjectRepository(statisticsDbContext);
-                Assert.Null(
-                    await service.GetReleaseSubjectForLatestPublishedVersion(releaseSubjectFutureRelease.SubjectId));
             }
         }
 

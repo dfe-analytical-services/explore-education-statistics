@@ -1,10 +1,10 @@
+import DroppableArea from '@admin/components/DroppableArea';
 import Accordion, { AccordionProps } from '@common/components/Accordion';
 import Button from '@common/components/Button';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
 import { OmitStrict } from '@common/types';
 import reorder from '@common/utils/reorder';
-import classNames from 'classnames';
 import React, {
   cloneElement,
   isValidElement,
@@ -119,18 +119,13 @@ const ReorderableAccordion = (props: ReorderableAccordionProps) => {
           isDropDisabled={!isReordering}
           type="accordion"
         >
-          {(droppableProvided, snapshot) => (
-            <div
-              // eslint-disable-next-line react/jsx-props-no-spreading
-              {...droppableProvided.droppableProps}
-              ref={droppableProvided.innerRef}
-              className={classNames({
-                [styles.dragover]: snapshot.isDraggingOver && isReordering,
-              })}
+          {(droppableProvided, droppableSnapshot) => (
+            <DroppableArea
+              droppableProvided={droppableProvided}
+              droppableSnapshot={droppableSnapshot}
             >
               {accordion}
-              {droppableProvided.placeholder}
-            </div>
+            </DroppableArea>
           )}
         </Droppable>
       </DragDropContext>

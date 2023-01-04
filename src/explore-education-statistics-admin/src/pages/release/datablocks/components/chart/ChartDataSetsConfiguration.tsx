@@ -1,3 +1,5 @@
+import DroppableArea from '@admin/components/DroppableArea';
+import DraggableItem, { DragHandle } from '@admin/components/DraggableItem';
 import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/chart/ChartBuilderSaveActions';
 import styles from '@admin/pages/release/datablocks/components/chart/ChartDataSetsConfiguration.module.scss';
 import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
@@ -23,7 +25,7 @@ import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
 import React, { ReactNode, useEffect, useMemo } from 'react';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import classNames from 'classnames';
 
 const formId = 'chartDataSetsConfigurationForm';
@@ -258,13 +260,10 @@ const ChartDataSetsConfiguration = ({
                   )}
                 </tr>
               </thead>
-              <tbody
-                // eslint-disable-next-line react/jsx-props-no-spreading
-                {...droppableProvided.droppableProps}
-                ref={droppableProvided.innerRef}
-                className={classNames({
-                  [styles.dropArea]: droppableSnapshot.isDraggingOver,
-                })}
+              <DroppableArea
+                droppableProvided={droppableProvided}
+                droppableSnapshot={droppableSnapshot}
+                tag="tbody"
               >
                 {orderBy(dataSets, 'order').map((dataSet, index) => {
                   const expandedDataSet = expandDataSet(dataSet, meta);
@@ -272,52 +271,43 @@ const ChartDataSetsConfiguration = ({
                   const key = generateDataSetKey(dataSet);
 
                   return (
-                    <Draggable
-                      draggableId={key}
-                      isDragDisabled={!isReordering}
-                      key={key}
+                    <DraggableItem
+                      hideDragHandle
+                      id={key}
                       index={index}
+                      isReordering={isReordering}
+                      key={key}
+                      tag="tr"
                     >
-                      {(draggableProvided, draggableSnapshot) => (
-                        <tr
-                          // eslint-disable-next-line react/jsx-props-no-spreading
-                          {...draggableProvided.draggableProps}
-                          // eslint-disable-next-line react/jsx-props-no-spreading
-                          {...draggableProvided.dragHandleProps}
-                          className={classNames(styles.item, {
-                            [styles.isDragging]: draggableSnapshot.isDragging,
-                            [styles.isReordering]: isReordering,
-                          })}
-                          ref={draggableProvided.innerRef}
-                        >
-                          <td
-                            className={classNames({
-                              [styles.labelReordering]: isReordering,
-                            })}
+                      <td
+                        className={classNames({
+                          [styles.labelReordering]: isReordering,
+                        })}
+                      >
+                        {label}
+
+                        {isReordering && (
+                          <DragHandle className={styles.dragHandle} />
+                        )}
+                      </td>
+                      {!isReordering && (
+                        <td className="dfe-align--right">
+                          <ButtonText
+                            className="govuk-!-margin-bottom-0"
+                            onClick={() => {
+                              const nextDataSets = [...dataSets];
+                              nextDataSets.splice(index, 1);
+                              onChange(nextDataSets);
+                            }}
                           >
-                            {label}
-                          </td>
-                          {!isReordering && (
-                            <td className="dfe-align--right">
-                              <ButtonText
-                                className="govuk-!-margin-bottom-0"
-                                onClick={() => {
-                                  const nextDataSets = [...dataSets];
-                                  nextDataSets.splice(index, 1);
-                                  onChange(nextDataSets);
-                                }}
-                              >
-                                Remove
-                              </ButtonText>
-                            </td>
-                          )}
-                        </tr>
+                            Remove
+                          </ButtonText>
+                        </td>
                       )}
-                    </Draggable>
+                    </DraggableItem>
                   );
                 })}
-                {droppableProvided.placeholder}
-              </tbody>
+              </DroppableArea>
             </table>
           )}
         </Droppable>

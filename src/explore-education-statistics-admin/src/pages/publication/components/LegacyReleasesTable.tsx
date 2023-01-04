@@ -1,3 +1,5 @@
+import DraggableItem from '@admin/components/DraggableItem';
+import DroppableArea from '@admin/components/DroppableArea';
 import {
   publicationCreateLegacyReleaseRoute,
   PublicationRouteParams,
@@ -17,7 +19,7 @@ import reorder from '@common/utils/reorder';
 import styles from '@admin/pages/publication/components/LegacyReleasesTable.module.scss';
 import classNames from 'classnames';
 import React, { useState } from 'react';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { generatePath } from 'react-router';
 import { useHistory } from 'react-router-dom';
 import ButtonText from '@common/components/ButtonText';
@@ -65,8 +67,6 @@ const LegacyReleasesTable = ({
         publication.
       </p>
 
-      <h3>Legacy release order</h3>
-
       {legacyReleases.length > 0 ? (
         <DragDropContext
           onDragEnd={result => {
@@ -102,89 +102,76 @@ const LegacyReleasesTable = ({
                     {!isReordering && <th>Actions</th>}
                   </tr>
                 </thead>
-                <tbody>
+                <DroppableArea
+                  droppableProvided={droppableProvided}
+                  droppableSnapshot={droppableSnapshot}
+                  tag="tbody"
+                >
                   {legacyReleases.map((release, index) => (
-                    <Draggable
-                      draggableId={release.id}
-                      isDragDisabled={!isReordering}
-                      key={release.id}
+                    <DraggableItem
+                      hideDragHandle
+                      id={release.id}
                       index={index}
+                      isReordering={isReordering}
+                      key={release.id}
+                      tag="tr"
                     >
-                      {(draggableProvided, draggableSnapshot) => (
-                        <tr
-                          // eslint-disable-next-line react/jsx-props-no-spreading
-                          {...draggableProvided.draggableProps}
-                          // eslint-disable-next-line react/jsx-props-no-spreading
-                          {...draggableProvided.dragHandleProps}
-                          ref={draggableProvided.innerRef}
-                          className={classNames({
-                            [styles.reorderingRow]: isReordering,
-                            [styles.reorderingRowDragging]:
-                              draggableSnapshot.isDragging,
-                          })}
+                      {isReordering && <td className={styles.dragHandle}>⬍</td>}
+
+                      <td>{release.order}</td>
+
+                      <td>{release.description}</td>
+                      <td
+                        className={classNames({
+                          'govuk-!-width-one-half': isReordering,
+                        })}
+                      >
+                        <a
+                          className="govuk-link--no-visited-state"
+                          href={release.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          tabIndex={isReordering ? -1 : undefined}
                         >
-                          {isReordering && (
-                            <td className={styles.dragHandle}>⬍</td>
-                          )}
+                          {release.url}
+                        </a>
+                      </td>
 
-                          <td>{release.order}</td>
-
-                          <td>{release.description}</td>
-                          <td
-                            className={classNames({
-                              'govuk-!-width-one-half': isReordering,
-                            })}
-                          >
-                            <a
-                              className="govuk-link--no-visited-state"
-                              href={release.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              tabIndex={isReordering ? -1 : undefined}
+                      {!isReordering && (
+                        <td>
+                          <ButtonGroup className="govuk-!-margin-bottom-0">
+                            <ButtonText
+                              onClick={() =>
+                                setConfirmAction({
+                                  type: 'edit',
+                                  id: release.id,
+                                })
+                              }
                             >
-                              {release.url}
-                            </a>
-                          </td>
-
-                          {!isReordering && (
-                            <td>
-                              <ButtonGroup className="govuk-!-margin-bottom-0">
-                                <ButtonText
-                                  onClick={() =>
-                                    setConfirmAction({
-                                      type: 'edit',
-                                      id: release.id,
-                                    })
-                                  }
-                                >
-                                  Edit
-                                  <VisuallyHidden>
-                                    {' '}
-                                    {release.description}
-                                  </VisuallyHidden>
-                                </ButtonText>
-                                <ButtonText
-                                  variant="warning"
-                                  onClick={() => {
-                                    setDeleteLegacyRelease(release);
-                                  }}
-                                >
-                                  Delete
-                                  <VisuallyHidden>
-                                    {' '}
-                                    {release.description}
-                                  </VisuallyHidden>
-                                </ButtonText>
-                              </ButtonGroup>
-                            </td>
-                          )}
-                        </tr>
+                              Edit
+                              <VisuallyHidden>
+                                {' '}
+                                {release.description}
+                              </VisuallyHidden>
+                            </ButtonText>
+                            <ButtonText
+                              variant="warning"
+                              onClick={() => {
+                                setDeleteLegacyRelease(release);
+                              }}
+                            >
+                              Delete
+                              <VisuallyHidden>
+                                {' '}
+                                {release.description}
+                              </VisuallyHidden>
+                            </ButtonText>
+                          </ButtonGroup>
+                        </td>
                       )}
-                    </Draggable>
+                    </DraggableItem>
                   ))}
-
-                  {droppableProvided.placeholder}
-                </tbody>
+                </DroppableArea>
               </table>
             )}
           </Droppable>

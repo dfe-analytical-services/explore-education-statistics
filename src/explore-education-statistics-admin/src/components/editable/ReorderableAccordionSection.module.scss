@@ -1,21 +1,16 @@
 @import '~govuk-frontend/govuk/base';
 
-.dragContainer {
+.draggable {
+  background: govuk-colour('white');
   position: relative;
 
-  &::before {
-    color: govuk-colour('dark-grey');
-    content: '\2630';
-    cursor: grab;
-    font-size: 2.25rem;
-    height: 2.25rem;
-    position: absolute;
-    right: 0;
-    top: govuk-spacing(1);
+  &:hover {
+    background: govuk-colour('light-grey');
   }
 
   &:focus {
     @include govuk-focused-text;
+    z-index: 1;
   }
 
   :global(.govuk-accordion__section-header) {
@@ -24,14 +19,15 @@
 
   :global(.govuk-accordion__section-heading) {
     font-size: 1.5rem;
+    font-weight: $govuk-font-weight-bold;
   }
 }
 
-.isDragging {
-  @include govuk-focused-text;
-
-  :global(.govuk-accordion__section-header) {
-    cursor: grabbing;
-    font-size: 1.5rem;
-  }
+.dragHandle {
+  color: govuk-colour('dark-grey');
+  font-size: 2.25rem;
+  height: 2.25rem;
+  position: absolute;
+  right: 0;
+  top: govuk-spacing(1);
 }

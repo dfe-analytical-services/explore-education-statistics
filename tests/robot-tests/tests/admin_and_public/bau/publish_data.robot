@@ -402,6 +402,28 @@ Check footnote was updated on data block
     user checks list has x items    testid:footnotes    3
     user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
+Reorder footnotes
+    user clicks link    Footnotes
+    user waits until h2 is visible    Footnotes
+    user clicks button    Reorder footnotes
+    user sets focus to element    testid:Footnote - ${FOOTNOTE_ALL}
+    user presses keys    ${SPACE}
+    user presses keys    ARROW_DOWN
+    user presses keys    ${SPACE}
+    user clicks button    Save order
+
+Check footnotes were reordered on data block
+    user sets focus to element    //a[text()="Data blocks"]    //*[@aria-label="Release"]
+    user clicks link    Data blocks
+
+    user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
+
+    user clicks link    Edit block    css:tbody > tr:first-child
+    user waits until table is visible
+    user checks list has x items    testid:footnotes    2
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL}
+
 Add public prerelease access list for release
     user clicks link    Pre-release access
     user creates public prerelease access list    Test public access list
@@ -504,8 +526,8 @@ Validate table
 
 Validate table has footnotes
     user checks list has x items    testid:footnotes    2
-    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
-    user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL}
 
     user clicks button    Show 1 more footnote
     user checks list has x items    testid:footnotes    3
@@ -579,8 +601,8 @@ Validate table rows for featured table
 
 Validate featured table has footnotes
     user checks list has x items    testid:footnotes    2
-    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
-    user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL}
 
     user clicks button    Show 1 more footnote
     user checks list has x items    testid:footnotes    3
@@ -670,9 +692,9 @@ Validate data guidance document footnotes
     user opens details dropdown    Footnotes    ${subject_1_content}
 
     user checks list has x items    testid:Footnotes    9    ${subject_1_content}
-    user checks list item contains    testid:Footnotes    1    ${FOOTNOTE_ALL}    ${subject_1_content}
-    user checks list item contains    testid:Footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user checks list item contains    testid:Footnotes    1    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
     ...    ${subject_1_content}
+    user checks list item contains    testid:Footnotes    2    ${FOOTNOTE_ALL}    ${subject_1_content}
     user checks list item contains    testid:Footnotes    3    ${FOOTNOTE_ALL_FILTER}    ${subject_1_content}
     user checks list item contains    testid:Footnotes    4    ${FOOTNOTE_SUBJECT_1}    ${subject_1_content}
     user checks list item contains    testid:Footnotes    5    ${FOOTNOTE_SUBJECT_1_INDICATOR}    ${subject_1_content}
@@ -687,7 +709,7 @@ Validate data guidance document footnotes
     user opens details dropdown    Footnotes    ${subject_2_content}
 
     user checks list has x items    testid:Footnotes    3    ${subject_2_content}
-    user checks list item contains    testid:Footnotes    1    ${FOOTNOTE_ALL}    ${subject_2_content}
-    user checks list item contains    testid:Footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user checks list item contains    testid:Footnotes    1    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
     ...    ${subject_2_content}
+    user checks list item contains    testid:Footnotes    2    ${FOOTNOTE_ALL}    ${subject_2_content}
     user checks list item contains    testid:Footnotes    3    ${FOOTNOTE_ALL_FILTER}    ${subject_2_content}

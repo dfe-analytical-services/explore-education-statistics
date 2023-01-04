@@ -516,14 +516,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var statsReleaseVersion1 = new Data.Model.Release
             {
-                Id = contentReleaseVersion1.Id,
-                PreviousVersionId = contentReleaseVersion1.PreviousVersionId
+                Id = contentReleaseVersion1.Id
             };
 
             var statsReleaseVersion2 = new Data.Model.Release
             {
-                Id = contentReleaseVersion2.Id,
-                PreviousVersionId = contentReleaseVersion2.PreviousVersionId
+                Id = contentReleaseVersion2.Id
             };
 
             var subject1 = new Subject

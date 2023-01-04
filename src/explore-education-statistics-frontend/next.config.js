@@ -14,7 +14,6 @@ const nextConfig = {
     NOTIFICATION_API_BASE_URL: process.env.NOTIFICATION_API_BASE_URL,
     APPINSIGHTS_INSTRUMENTATIONKEY: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
     GA_TRACKING_ID: process.env.GA_TRACKING_ID,
-    HOTJAR_ID: process.env.HOTJAR_ID,
     PUBLIC_URL: process.env.PUBLIC_URL,
   },
   async redirects() {

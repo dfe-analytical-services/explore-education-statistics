@@ -130,7 +130,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(footnoteId)
                 .OnSuccessVoid(async footnote =>
                 {
-                    await _footnoteRepository.DeleteFootnote(releaseId, footnote.Id);
+                    await _footnoteRepository.DeleteFootnote(releaseId: releaseId,
+                        footnoteId: footnote.Id);
 
                     await _dataBlockService.InvalidateCachedDataBlocks(releaseId);
                 }));
@@ -174,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     // TODO EES-2979 Remove this delete link and create call once all footnotes only belong to one release
                     // If this amendment of the footnote affects other release then break the link with the old
                     // and create a new one
-                    await _footnoteRepository.DeleteReleaseFootnoteLinkAsync(releaseId, footnote.Id);
+                    await _footnoteRepository.DeleteReleaseFootnoteLink(releaseId, footnote.Id);
 
                     return await _footnoteRepository.CreateFootnote(
                         releaseId,

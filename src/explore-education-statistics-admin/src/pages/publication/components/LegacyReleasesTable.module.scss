@@ -1,32 +1,6 @@
 @import '~govuk-frontend/govuk/base';
 
-.tableDraggingOver {
-  tbody tr {
-    background: govuk-colour('light-grey');
-  }
-}
-
-.reorderingRow {
-  &:focus {
-    background: govuk-colour('white');
-    outline: $govuk-focus-width solid $govuk-focus-colour;
-    outline-offset: 0;
-  }
-
-  &:hover {
-    background: govuk-colour('light-grey');
-  }
-}
-
-.reorderingRowDragging {
-  background: govuk-colour('white') !important;
-  display: table;
-  outline: $govuk-focus-width solid $govuk-focus-colour;
-  outline-offset: 0;
-}
-
 .dragHandle {
-  font-size: 1.6rem;
   text-align: center;
   width: 1.6rem;
 }

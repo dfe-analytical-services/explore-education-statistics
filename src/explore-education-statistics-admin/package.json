@@ -183,6 +183,7 @@
       "^@common/(.*)$": "<rootDir>/../explore-education-statistics-common/src/$1",
       "^@common-test/(.*)$": "<rootDir>/../explore-education-statistics-common/test/$1",
       "^react$": "<rootDir>/node_modules/react",
+      "^react-dom$": "<rootDir>/node_modules/react-dom",
       "^formik$": "<rootDir>/node_modules/formik",
       "^@tanstack/react-query$": "<rootDir>/node_modules/@tanstack/react-query",
       "\\.worker.js":"<rootDir>/../explore-education-statistics-common/__mocks__/mock.worker.ts"

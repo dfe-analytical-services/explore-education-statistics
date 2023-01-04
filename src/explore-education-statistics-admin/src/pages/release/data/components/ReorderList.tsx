@@ -1,9 +1,11 @@
+import DroppableArea from '@admin/components/DroppableArea';
+import DraggableItem from '@admin/components/DraggableItem';
 import styles from '@admin/pages/release/data/components/ReorderList.module.scss';
 import ButtonText from '@common/components/ButtonText';
 import reorder from '@common/utils/reorder';
 import classNames from 'classnames';
 import React, { useState } from 'react';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 
 export interface FormattedOption {
   id: string;
@@ -127,86 +129,79 @@ const ReorderList = ({
     >
       <Droppable droppableId="droppablegroups">
         {(droppableProvided, droppableSnapshot) => (
-          <ol
-            className={classNames(styles.dropArea, {
-              [styles.dropAreaActive]: droppableSnapshot.isDraggingOver,
-            })}
-            data-testid={testId ? `${testId}-reorder-list` : 'reorder-list'}
-            ref={droppableProvided.innerRef}
+          <DroppableArea
+            className={styles.dropArea}
+            droppableProvided={droppableProvided}
+            droppableSnapshot={droppableSnapshot}
+            tag="ol"
+            testId={testId ? `${testId}-reorder-list` : 'reorder-list'}
           >
             {options.map((option, index) => {
               const key = option.id || `key-${index}`;
               const isExpanded = reorderingGroups.includes(key);
               const { childOptions, parentGroupId } = getChildItems(option);
               return (
-                <Draggable
-                  draggableId={key}
-                  isDragDisabled={reorderingGroups.length !== 0}
-                  key={key}
+                <DraggableItem
+                  className={classNames({
+                    [styles.isExpandedItem]: isExpanded,
+                  })}
+                  hideDragHandle={reorderingGroups.length > 0 && !isExpanded}
+                  dragHandle={
+                    isExpanded ? (
+                      <span aria-hidden className={styles.dragHandle}>
+                        ▼
+                      </span>
+                    ) : undefined
+                  }
+                  id={key}
                   index={index}
+                  isDisabled={reorderingGroups.length !== 0}
+                  isReordering
+                  key={key}
+                  tag="li"
                 >
-                  {(draggableProvided, draggableSnapshot) => {
-                    return (
-                      <li
-                        // eslint-disable-next-line react/jsx-props-no-spreading
-                        {...draggableProvided.draggableProps}
-                        // eslint-disable-next-line react/jsx-props-no-spreading
-                        {...draggableProvided.dragHandleProps}
-                        className={classNames(styles.draggable, {
-                          [styles.isDisabled]:
-                            reorderingGroups.length && !isExpanded,
+                  <div className={styles.inner}>
+                    <span className={styles.draggableInner}>
+                      <span
+                        className={classNames(styles.optionLabel, {
                           [styles.isExpanded]: isExpanded,
-                          [styles.isDragging]: draggableSnapshot.isDragging,
-                          [styles.isDraggedOutside]:
-                            draggableSnapshot.isDragging &&
-                            !draggableSnapshot.draggingOver,
+                          [styles.hideDragHandle]:
+                            reorderingGroups.length > 0 && !isExpanded,
                         })}
-                        ref={draggableProvided.innerRef}
                       >
-                        <span className={styles.draggableInner}>
-                          <span
-                            className={classNames(styles.optionLabel, {
-                              [styles.isExpanded]: isExpanded,
-                            })}
-                          >
-                            {option.label}
-                          </span>
-                          {childOptions && (
-                            <ButtonText
-                              className="govuk-!-margin-bottom-0"
-                              onClick={() => {
-                                setReorderingGroups(
-                                  isExpanded
-                                    ? reorderingGroups.filter(
-                                        item => item !== key,
-                                      )
-                                    : [...reorderingGroups, key],
-                                );
-                              }}
-                            >
-                              {isExpanded
-                                ? 'Done'
-                                : 'Reorder options within this group'}
-                            </ButtonText>
-                          )}
-                        </span>
-                        {childOptions && isExpanded && (
-                          <ReorderList
-                            listItems={childOptions}
-                            categoryId={categoryId || option.id}
-                            groupId={parentGroupId}
-                            testId={option.label}
-                            onReorder={onReorder}
-                          />
-                        )}
-                      </li>
-                    );
-                  }}
-                </Draggable>
+                        {option.label}
+                      </span>
+                      {childOptions && (
+                        <ButtonText
+                          className="govuk-!-margin-bottom-0"
+                          onClick={() => {
+                            setReorderingGroups(
+                              isExpanded
+                                ? reorderingGroups.filter(item => item !== key)
+                                : [...reorderingGroups, key],
+                            );
+                          }}
+                        >
+                          {isExpanded
+                            ? 'Done'
+                            : 'Reorder options within this group'}
+                        </ButtonText>
+                      )}
+                    </span>
+                    {childOptions && isExpanded && (
+                      <ReorderList
+                        listItems={childOptions}
+                        categoryId={categoryId || option.id}
+                        groupId={parentGroupId}
+                        testId={option.label}
+                        onReorder={onReorder}
+                      />
+                    )}
+                  </div>
+                </DraggableItem>
               );
             })}
-            {droppableProvided.placeholder}
-          </ol>
+          </DroppableArea>
         )}
       </Droppable>
     </DragDropContext>
