@@ -1,9 +1,11 @@
+import { AuthContextTestProvider } from '@admin/contexts/AuthContext';
 import EditableAccordion from '@admin/components/editable/EditableAccordion';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import { ReleaseContentHubContextProvider } from '@admin/contexts/ReleaseContentHubContext';
 import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
 import ReleaseContentAccordionSection from '@admin/pages/release/content/components/ReleaseContentAccordionSection';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
+import { GlobalPermissions } from '@admin/services/permissionService';
 import {
   EditableBlock,
   EditableContentBlock,
@@ -78,6 +80,68 @@ describe('ReleaseContentAccordionSection', () => {
           </ReleaseContentHubContextProvider>
         </ReleaseContentProvider>
       </EditingContextProvider>,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Edit section title' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Reorder this section' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Remove this section' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Add text block' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Add data block' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Add embed block' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders the add embed block button for BAU users', () => {
+    render(
+      <AuthContextTestProvider
+        user={{
+          id: 'user-1',
+          name: 'Jane Doe',
+          permissions: {
+            isBauUser: true,
+          } as GlobalPermissions,
+        }}
+      >
+        <EditingContextProvider editingMode="edit">
+          <ReleaseContentProvider
+            value={{
+              release: testEditableRelease,
+              canUpdateRelease: true,
+              availableDataBlocks: [],
+            }}
+          >
+            <ReleaseContentHubContextProvider
+              releaseId={testEditableRelease.id}
+            >
+              <EditableAccordion
+                onAddSection={noop}
+                id="test-accordion"
+                onReorder={noop}
+              >
+                <ReleaseContentAccordionSection
+                  id="test-section-1"
+                  section={{
+                    ...testSection,
+                    content: [testBlock],
+                  }}
+                />
+              </EditableAccordion>
+            </ReleaseContentHubContextProvider>
+          </ReleaseContentProvider>
+        </EditingContextProvider>
+      </AuthContextTestProvider>,
     );
 
     expect(

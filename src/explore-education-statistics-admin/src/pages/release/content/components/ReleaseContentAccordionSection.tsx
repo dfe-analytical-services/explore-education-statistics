@@ -1,5 +1,6 @@
 import EditableAccordionSection from '@admin/components/editable/EditableAccordionSection';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import DataBlockSelectForm from '@admin/pages/release/content/components/DataBlockSelectForm';
 import EditableEmbedForm, {
@@ -39,6 +40,8 @@ const ReleaseContentAccordionSection = ({
 
   const { release } = useReleaseContentState();
   const actions = useReleaseContentActions();
+
+  const { user } = useAuthContext();
 
   const [isReordering, setIsReordering] = useState(false);
   const [showDataBlockForm, toggleDataBlockForm] = useToggle(false);
@@ -232,13 +235,17 @@ const ReleaseContentAccordionSection = ({
                     Add data block
                   </Button>
                 )}
-                {!showEmbedDashboardForm && (
-                  <Button
-                    variant="secondary"
-                    onClick={toggleEmbedDashboardForm.on}
-                  >
-                    Add embed block
-                  </Button>
+                {user?.permissions.isBauUser && (
+                  <>
+                    {!showEmbedDashboardForm && (
+                      <Button
+                        variant="secondary"
+                        onClick={toggleEmbedDashboardForm.on}
+                      >
+                        Add embed block
+                      </Button>
+                    )}
+                  </>
                 )}
               </ButtonGroup>
             </>

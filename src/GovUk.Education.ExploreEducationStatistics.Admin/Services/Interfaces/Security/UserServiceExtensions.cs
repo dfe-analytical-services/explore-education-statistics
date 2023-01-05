@@ -18,6 +18,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(SecurityPolicies.CanAccessSystem);
         }
 
+        public static Task<Either<ActionResult, Unit>> CheckIsBauUser(this IUserService userService)
+        {
+            return userService.CheckPolicy(SecurityPolicies.IsBauUser);
+        }
+
         public static Task<Either<ActionResult, Unit>> CheckCanAccessAnalystPages(this IUserService userService)
         {
             return userService.CheckPolicy(SecurityPolicies.CanAccessAnalystPages);
@@ -246,12 +251,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             this IUserService userService, Release release)
         {
             return userService.CheckPolicy(release, SecurityPolicies.CanMakeAmendmentOfSpecificRelease);
-        }
-
-        public static Task<Either<ActionResult, Unit>> CheckCanRunMigrations(
-            this IUserService userService)
-        {
-            return userService.CheckPolicy(SecurityPolicies.CanRunReleaseMigrations);
         }
 
         public static Task<Either<ActionResult, Unit>> CheckCanViewPrereleaseContactsList(

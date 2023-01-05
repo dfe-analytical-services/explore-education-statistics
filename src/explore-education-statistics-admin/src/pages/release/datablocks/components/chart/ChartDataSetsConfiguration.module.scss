@@ -24,30 +24,14 @@
   }
 }
 
-.dropArea {
-  background: govuk-colour('light-grey');
-  outline: $govuk-focus-width solid $govuk-focus-colour;
-}
-
-.item {
-  background: govuk-colour('white');
-
-  &:focus,
-  &.isDragging {
-    @include govuk-focused-text;
-  }
-}
-
 .labelReordering {
-  cursor: grab;
-  cursor: move;
   display: flex;
   justify-content: space-between;
+}
 
-  &::after {
-    color: govuk-colour('dark-grey');
-    content: '\2630';
-    font-size: 1.6rem;
-    line-height: 1;
-  }
+.dragHandle {
+  color: govuk-colour('dark-grey');
+  font-size: 1.6rem;
+  line-height: 1;
+  margin-right: govuk-spacing(1);
 }

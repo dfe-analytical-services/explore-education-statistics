@@ -14,7 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public DateTime? Publish { get; set; }
         public string ReleaseSlug { get; set; }
         public string ContentStage { get; set; }
-        public string DataStage { get; set; }
         public string FilesStage { get; set; }
         public string PublishingStage { get; set; }
         public string OverallStage { get; set; }
@@ -55,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             {
                 if (_state == null)
                 {
-                    _state = new ReleasePublishingStatusState(ContentStage, FilesStage, DataStage, PublishingStage, OverallStage);
+                    _state = new ReleasePublishingStatusState(ContentStage, FilesStage, PublishingStage, OverallStage);
                     _state.PropertyChanged += StateChangedCallback;
                 }
 
@@ -64,12 +63,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             set
             {
                 ContentStage = value.Content.ToString();
-                DataStage = value.Data.ToString();
                 FilesStage = value.Files.ToString();
                 PublishingStage = value.Publishing.ToString();
                 OverallStage = value.Overall.ToString();
 
-                _state = new ReleasePublishingStatusState(value.Content, value.Files, value.Data, value.Publishing,
+                _state = new ReleasePublishingStatusState(value.Content, value.Files, value.Publishing,
                     value.Overall);
                 _state.PropertyChanged += StateChangedCallback;
             }
@@ -102,9 +100,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
                 case nameof(ReleasePublishingStatusState.Content):
                     ContentStage = _state.Content.ToString();
                     break;
-                case nameof(ReleasePublishingStatusState.Data):
-                    DataStage = _state.Data.ToString();
-                    break;
                 case nameof(ReleasePublishingStatusState.Files):
                     FilesStage = _state.Files.ToString();
                     break;
@@ -114,6 +109,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             }
 
             OverallStage = _state.Overall.ToString();
+        }
+
+        public bool AllStagesPriorToPublishingComplete()
+        {
+            return State.Content == ReleasePublishingStatusContentStage.Complete &&
+                   State.Files == ReleasePublishingStatusFilesStage.Complete;
         }
     }
 }

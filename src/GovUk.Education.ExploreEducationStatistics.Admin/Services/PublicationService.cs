@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, List<PublicationSummaryViewModel>>> ListPublicationSummaries()
         {
             return await _userService
-                .CheckCanManageAllUsers()
+                .CheckCanViewAllPublications()
                 .OnSuccess(_ =>
                 {
                     return _context.Publications

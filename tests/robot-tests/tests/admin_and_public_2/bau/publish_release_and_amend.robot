@@ -308,7 +308,6 @@ Verify accordions are correct
     user checks accordion is in position    Explore data and files    1    id:data-accordion
 
     user checks there are x accordion sections    3    id:content
-    user checks there are x accordion sections    2    id:content
     user checks accordion is in position    Dates data block    1    id:content
     user checks accordion is in position    Test text    2    id:content
     user checks accordion is in position    Test embedded dashboard section    3    id:content

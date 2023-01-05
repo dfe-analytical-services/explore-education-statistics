@@ -128,6 +128,19 @@
             "publication_type_heading": "Management information",
             "publications": [
               {
+                "publication_heading": "Vulnerable children and young people survey"
+              }
+            ]
+          }
+        ],
+        "topic_heading": "Children's social care"
+      },
+      {
+        "publication_types": [
+          {
+            "publication_type_heading": "Management information",
+            "publications": [
+              {
                 "publication_heading": "CO2 monitors: cumulative delivery statistics"
               }
             ]
@@ -270,15 +283,10 @@
             "publication_type_heading": "National and official statistics",
             "publications": [
               {
-                "publication_heading": "Childcare and early years survey of parents"
-              }
-            ]
-          },
-          {
-            "publication_type_heading": "Not yet on this service",
-            "publications": [
-              {
                 "publication_heading": "Childcare and early years provider survey"
+              },
+              {
+                "publication_heading": "Childcare and early years survey of parents"
               }
             ]
           }
@@ -417,12 +425,6 @@
             "publications": [
               {
                 "publication_heading": "Graduate labour market statistics"
-              },
-              {
-                "publication_heading": "Graduate outcomes (LEO)"
-              },
-              {
-                "publication_heading": "Graduate outcomes (LEO): postgraduate outcomes"
               },
               {
                 "publication_heading": "LEO Graduate and Postgraduate Outcomes"

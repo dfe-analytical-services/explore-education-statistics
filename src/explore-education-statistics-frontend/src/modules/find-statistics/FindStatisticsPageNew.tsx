@@ -233,6 +233,7 @@ const FindStatisticsPageNew: NextPage = () => {
               aria-live="polite"
               aria-atomic="true"
               className="govuk-!-margin-bottom-2"
+              data-testid="total-results"
             >
               {`${totalResults} ${totalResults !== 1 ? 'results' : 'result'}`}
             </h2>

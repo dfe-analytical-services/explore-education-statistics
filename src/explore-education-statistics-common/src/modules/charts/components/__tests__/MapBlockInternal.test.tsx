@@ -351,6 +351,63 @@ describe('MapBlockInternal', () => {
     expect(paths[3]).not.toHaveClass('selected');
   });
 
+  test('ensure values with decimal places go are assigned the correct colour when the legend values are set to 0 decimal places', async () => {
+    const fullTable = mapFullTable(
+      produce(testMapTableData, draft => {
+        draft.results[0].measures['authorised-absence-rate'] =
+          '16388.4329758565';
+        draft.results[1].measures['authorised-absence-rate'] =
+          '-1395.33948144574';
+        draft.results[2].measures['authorised-absence-rate'] =
+          '6059.30533950346';
+        draft.subjectMeta.indicators[0].decimalPlaces = 0;
+        draft.subjectMeta.indicators[0].unit = '£';
+      }),
+    );
+
+    const { container } = render(
+      <MapBlockInternal
+        {...testBlockProps}
+        meta={fullTable.subjectMeta}
+        data={fullTable.results}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByLabelText('1. Select data to view'),
+      ).toBeInTheDocument();
+    });
+
+    const paths = container.querySelectorAll<HTMLElement>(
+      '.leaflet-container svg path',
+    );
+
+    expect(paths).toHaveLength(4);
+    // UK polygon
+    expect(paths[0]).toHaveAttribute('fill', '#3388ff');
+    // Location polygon
+    expect(paths[1]).toHaveAttribute('fill', 'rgba(71, 99, 165, 1)');
+    expect(paths[2]).toHaveAttribute('fill', 'rgba(218, 224, 237, 1)');
+    expect(paths[3]).toHaveAttribute('fill', 'rgba(145, 161, 201, 1)');
+
+    const legendItems = screen.getAllByTestId('mapBlock-legend-item');
+
+    expect(legendItems[0]).toHaveTextContent('-£1,395 to £2,161');
+    expect(legendItems[1]).toHaveTextContent('£2,162 to £5,718');
+    expect(legendItems[2]).toHaveTextContent('£5,719 to £9,275');
+    expect(legendItems[3]).toHaveTextContent('£9,276 to £12,832');
+    expect(legendItems[4]).toHaveTextContent('£12,833 to £16,388');
+
+    const legendColours = screen.getAllByTestId('mapBlock-legend-colour');
+
+    expect(legendColours[0].style.backgroundColor).toBe('rgb(218, 224, 237)');
+    expect(legendColours[1].style.backgroundColor).toBe('rgb(181, 193, 219)');
+    expect(legendColours[2].style.backgroundColor).toBe('rgb(145, 161, 201)');
+    expect(legendColours[3].style.backgroundColor).toBe('rgb(108, 130, 183)');
+    expect(legendColours[4].style.backgroundColor).toBe('rgb(71, 99, 165)');
+  });
+
   describe('Location dropdown', () => {
     test('shows the data set location type in the label', async () => {
       const testFullTableRegion = mapFullTable(testMapTableDataRegion);

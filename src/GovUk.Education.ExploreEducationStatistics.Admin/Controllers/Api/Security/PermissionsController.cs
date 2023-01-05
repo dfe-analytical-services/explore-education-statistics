@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -15,7 +16,7 @@ using static System.DateTime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Security
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
     [Authorize]
     public class PermissionsController : ControllerBase
@@ -36,43 +37,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             _preReleaseService = preReleaseService;
         }
 
-        public class GlobalPermissions
+        [HttpGet("permissions/access")]
+        public async Task<ActionResult<GlobalPermissionsViewModel>> GetGlobalPermissions()
         {
-            public bool CanAccessSystem { get; set; }
-            public bool CanAccessPrereleasePages { get; set; }
-            public bool CanAccessAnalystPages { get; set; }
-            public bool CanAccessAllImports { get; set; }
-            public bool CanAccessUserAdministrationPages { get; set; }
-            public bool CanManageAllTaxonomy { get; set; }
+            return new GlobalPermissionsViewModel(
+                CanAccessSystem: await _userService.CheckCanAccessSystem().IsRight(),
+                CanAccessAnalystPages: await _userService.CheckCanAccessAnalystPages().IsRight(),
+                CanAccessAllImports: await _userService.CheckCanViewAllImports().IsRight(),
+                CanAccessPrereleasePages: await _userService.CheckCanAccessPrereleasePages().IsRight(),
+                CanManageAllTaxonomy: await _userService.CheckCanManageAllTaxonomy().IsRight(),
+                IsBauUser: await _userService.CheckIsBauUser().IsRight());
         }
 
-        [HttpGet("access")]
-        public ActionResult<GlobalPermissions> CanAccessSystem()
-        {
-            return new GlobalPermissions
-            {
-                CanAccessSystem = _userService.CheckCanAccessSystem().Result.IsRight,
-                CanAccessAnalystPages = _userService.CheckCanAccessAnalystPages().Result.IsRight,
-                CanAccessAllImports = _userService.CheckCanViewAllImports().Result.IsRight,
-                CanAccessPrereleasePages = _userService.CheckCanAccessPrereleasePages().Result.IsRight,
-                CanAccessUserAdministrationPages = _userService.CheckCanManageAllUsers().Result.IsRight,
-                CanManageAllTaxonomy = _userService.CheckCanManageAllTaxonomy().Result.IsRight
-            };
-        }
-
-        [HttpGet("topic/{topicId}/publication/create")]
+        [HttpGet("permissions/topic/{topicId:guid}/publication/create")]
         public Task<ActionResult<bool>> CanCreatePublicationForTopic(Guid topicId)
         {
             return CheckPolicyAgainstEntity<Topic>(topicId, _userService.CheckCanCreatePublicationForTopic);
         }
 
-        [HttpGet("publication/{publicationId}/release/create")]
+        [HttpGet("permissions/publication/{publicationId:guid}/release/create")]
         public Task<ActionResult<bool>> CanCreateReleaseForPublication(Guid publicationId)
         {
             return CheckPolicyAgainstEntity<Publication>(publicationId, _userService.CheckCanCreateReleaseForPublication);
         }
 
-        [HttpGet("release/{releaseId}/update")]
+        [HttpGet("permissions/release/{releaseId:guid}/update")]
         public Task<ActionResult<bool>> CanUpdateRelease(Guid releaseId)
         {
             return CheckPolicyAgainstEntity<Release>(releaseId, _userService.CheckCanUpdateRelease);
@@ -85,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             public bool CanMarkApproved = false;
         }
 
-        [HttpGet("release/{releaseId}/status")]
+        [HttpGet("permissions/release/{releaseId:guid}/status")]
         public async Task<ActionResult<ReleaseStatusPermissionsViewModel>> GetReleaseStatusPermissions(Guid releaseId)
         {
             return await _persistenceHelper.CheckEntityExists<Release, Guid>(releaseId)
@@ -98,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 .OrElse(() => new ReleaseStatusPermissionsViewModel());
         }
 
-        [HttpGet("release/{releaseId}/data/{fileId}")]
+        [HttpGet("permissions/release/{releaseId:guid}/data/{fileId:guid}")]
         public async Task<ActionResult<DataFilePermissions>> GetDataFilePermissions(Guid releaseId, Guid fileId)
         {
             return await _releaseFileService
@@ -110,13 +99,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId}/amend")]
+        [HttpGet("permissions/release/{releaseId:guid}/amend")]
         public Task<ActionResult<bool>> CanMakeAmendmentOfRelease(Guid releaseId)
         {
             return CheckPolicyAgainstEntity<Release>(releaseId, _userService.CheckCanMakeAmendmentOfRelease);
         }
 
-        [HttpGet("release/{releaseId}/prerelease/status")]
+        [HttpGet("permissions/release/{releaseId:guid}/prerelease/status")]
         public async Task<ActionResult<PreReleaseWindowStatus>> GetPreReleaseWindowStatus(Guid releaseId)
         {
             return await _persistenceHelper
@@ -126,21 +115,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("methodology/{methodologyId}/update")]
+        [HttpGet("permissions/methodology/{methodologyId:guid}/update")]
         public Task<ActionResult<bool>> CanUpdateMethodology(Guid methodologyId)
         {
             return CheckPolicyAgainstEntity<MethodologyVersion>(methodologyId,
                 _userService.CheckCanUpdateMethodologyVersion);
         }
 
-        [HttpGet("methodology/{methodologyId}/status/draft")]
+        [HttpGet("permissions/methodology/{methodologyId:guid}/status/draft")]
         public Task<ActionResult<bool>> CanMarkMethodologyAsDraft(Guid methodologyId)
         {
             return CheckPolicyAgainstEntity<MethodologyVersion>(methodologyId,
                 _userService.CheckCanMarkMethodologyVersionAsDraft);
         }
 
-        [HttpGet("methodology/{methodologyId}/status/approve")]
+        [HttpGet("permissions/methodology/{methodologyId:guid}/status/approve")]
         public Task<ActionResult<bool>> CanApproveMethodology(Guid methodologyId)
         {
             return CheckPolicyAgainstEntity<MethodologyVersion>(methodologyId,

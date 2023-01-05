@@ -59,6 +59,12 @@
       },
       {
         "methodologies": [
+          "Vulnerable children and young people survey"
+        ],
+        "topic_heading": "Children's social care"
+      },
+      {
+        "methodologies": [
           "Coronavirus (COVID-19) Reporting in Higher Education Providers"
         ],
         "topic_heading": "Confirmed cases reported by Higher Education providers"
@@ -88,7 +94,8 @@
         "methodologies": [
           "NEET age 16 to 24",
           "Participation in education, training and NEET age 16 to 17 by local authority",
-          "Participation in education, training and employment age 16 to 18"
+          "Participation in education, training and employment age 16 to 18",
+          "September Guarantee: offers of education and training for young people age 16 and 17"
         ],
         "topic_heading": "NEET and participation"
       }

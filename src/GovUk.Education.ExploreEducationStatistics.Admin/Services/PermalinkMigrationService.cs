@@ -30,7 +30,7 @@ public class PermalinkMigrationService : IPermalinkMigrationService
 
     public async Task<Either<ActionResult, Unit>> MigrateAll()
     {
-        return await _userService.CheckCanRunMigrations()
+        return await _userService.CheckIsBauUser()
             .OnSuccess<ActionResult, Unit, Unit>(async () =>
             {
                 var messageCount = await _storageQueueService.GetApproximateMessageCount(PermalinksMigrationQueue);

@@ -12,6 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanAccessPrereleasePages,
         CanManageUsersOnSystem,
         CanAccessAllImports,
+        IsBauUser,
 
         /**
          * Publication management
@@ -34,7 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanSubmitSpecificReleaseToHigherReview,
         CanApproveSpecificRelease,
         CanMakeAmendmentOfSpecificRelease,
-        CanRunReleaseMigrations,
         CanPublishSpecificRelease,
         CanDeleteSpecificRelease,
         CanViewSpecificPreReleaseSummary,

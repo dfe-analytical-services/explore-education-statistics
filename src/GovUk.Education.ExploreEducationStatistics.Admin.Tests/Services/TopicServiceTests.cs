@@ -506,19 +506,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             new Release
             {
                 Id = releaseVersion2Id,
-                PreviousVersionId = releaseVersion1Id,
                 PublicationId = publicationId
             },
             new Release
             {
                 Id = releaseVersion3Id,
-                PreviousVersionId = releaseVersion2Id,
                 PublicationId = publicationId
             },
             new Release
             {
                 Id = releaseVersion4Id,
-                PreviousVersionId = releaseVersion3Id,
                 PublicationId = publicationId
             });
 

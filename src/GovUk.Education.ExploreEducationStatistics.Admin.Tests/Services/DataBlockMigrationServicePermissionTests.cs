@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Migrate()
         {
             await PolicyCheckBuilder()
-                .SetupCheck(SecurityPolicies.CanRunReleaseMigrations, false)
+                .SetupCheck(SecurityPolicies.IsBauUser, false)
                 .AssertForbidden(
                     async userService =>
                     {

@@ -6,9 +6,9 @@ export interface GlobalPermissions {
   canAccessSystem: boolean;
   canAccessPrereleasePages: boolean;
   canAccessAnalystPages: boolean;
-  canAccessUserAdministrationPages: boolean;
   canAccessAllImports: boolean;
   canManageAllTaxonomy: boolean;
+  isBauUser: boolean;
 }
 
 export interface ReleaseStatusPermissions {

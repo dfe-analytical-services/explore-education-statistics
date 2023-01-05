@@ -15,26 +15,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class PublishReleaseFilesFunction
     {
         private readonly IPublishingService _publishingService;
-        private readonly IQueueService _queueService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
+        private readonly IPublishingCompletionService _publishingCompletionService;
 
         public PublishReleaseFilesFunction(
             IPublishingService publishingService,
-            IQueueService queueService,
-            IReleasePublishingStatusService releasePublishingStatusService)
+            IReleasePublishingStatusService releasePublishingStatusService, 
+            IPublishingCompletionService publishingCompletionService)
         {
             _publishingService = publishingService;
-            _queueService = queueService;
             _releasePublishingStatusService = releasePublishingStatusService;
+            _publishingCompletionService = publishingCompletionService;
         }
 
         /// <summary>
         /// Azure function which publishes the files for a Release by copying them between storage accounts.
         /// </summary>
-        /// <remarks>
-        /// Triggers publishing statistics data for the Release if publishing is immediate.
-        /// Triggers generating staged content for the Release if publishing is not immediate.
-        /// </remarks>
         /// <param name="message"></param>
         /// <param name="executionContext"></param>
         /// <param name="logger"></param>
@@ -47,75 +43,88 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation("{0} triggered: {1}",
+            logger.LogInformation("{FunctionName} triggered: {Message}",
                 executionContext.FunctionName,
                 message);
 
-            var immediate = await IsImmediate(message);
-            var published = new List<(Guid ReleaseId, Guid ReleaseStatusId)>();
-            foreach (var (releaseId, releaseStatusId) in message.Releases)
-            {
-                await UpdateStage(releaseId, releaseStatusId, Started);
-                try
-                {
-                    await _publishingService.PublishMethodologyFilesIfApplicableForRelease(releaseId);
-                    await _publishingService.PublishReleaseFiles(releaseId);
-                    published.Add((releaseId, releaseStatusId));
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(e, "Exception occured while executing {0}",
-                        executionContext.FunctionName);
-                    logger.LogError("{StackTrace}", e.StackTrace);
+            await UpdateFilesStage(message.Releases, Started);
 
-                    await UpdateStage(releaseId, releaseStatusId, Failed,
-                        new ReleasePublishingStatusLogMessage($"Exception in files stage: {e.Message}"));
-                }
-            }
+            var successfulReleases = await message
+                .Releases
+                .ToAsyncEnumerable()
+                .WhereAwait(async releaseStatus =>
+                {
+                    try
+                    {
+                        await _publishingService.PublishMethodologyFilesIfApplicableForRelease(releaseStatus.ReleaseId);
+                        await _publishingService.PublishReleaseFiles(releaseStatus.ReleaseId);
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogError(e, "Exception occured while executing {FunctionName}",
+                            executionContext.FunctionName);
+
+                        return false;
+                    }
+                })
+                .ToListAsync();
+
+            var unsuccessfulReleases = message
+                .Releases
+                .Except(successfulReleases);
+
+            await UpdateFilesStage(successfulReleases, Complete);
+            await UpdateFilesStage(unsuccessfulReleases, Failed);
 
             try
             {
-                if (immediate)
-                {
-                    await _queueService.QueuePublishReleaseDataMessagesAsync(published);
-                }
-                else
-                {
-                    await _queueService.QueueGenerateReleaseContentMessageAsync(published);
-                }
-
-                foreach (var (releaseId, releaseStatusId) in published)
-                {
-                    await UpdateStage(releaseId, releaseStatusId, Complete);
-                }
+                await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
+                    successfulReleases,
+                    DateTime.UtcNow);
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Exception occured while executing {0}",
+                logger.LogError(e, "Exception occured while completing publishing in {FunctionName}",
                     executionContext.FunctionName);
-                logger.LogError("{0}", e.StackTrace);
+                
+                await UpdatePublishingStage(
+                    successfulReleases, 
+                    ReleasePublishingStatusPublishingStage.Failed,
+                    new ReleasePublishingStatusLogMessage($"Failed during completion of the Publishing process: {e.Message}"));
             }
-
-            logger.LogInformation("{0} completed",
-                executionContext.FunctionName);
+            
+            logger.LogInformation("{FunctionName} completed", executionContext.FunctionName);
         }
 
-        private async Task<bool> IsImmediate(PublishReleaseFilesMessage message)
-        {
-            if (message.Releases.Count() > 1)
-            {
-                // If there's more than one Release this invocation couldn't have been triggered for immediate publishing
-                return false;
-            }
-
-            var (releaseId, releaseStatusId) = message.Releases.Single();
-            return await _releasePublishingStatusService.IsImmediate(releaseId, releaseStatusId);
-        }
-
-        private async Task UpdateStage(Guid releaseId, Guid releaseStatusId, ReleasePublishingStatusFilesStage stage,
+        private async Task UpdateFilesStage(
+            IEnumerable<(Guid releaseId, Guid releaseStatusId)> releaseStatuses, 
+            ReleasePublishingStatusFilesStage stage,
             ReleasePublishingStatusLogMessage logMessage = null)
         {
-            await _releasePublishingStatusService.UpdateFilesStageAsync(releaseId, releaseStatusId, stage, logMessage);
+            await releaseStatuses
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(status => 
+                    _releasePublishingStatusService.UpdateFilesStageAsync(
+                        status.releaseId, 
+                        status.releaseStatusId, 
+                        stage, 
+                        logMessage));
+        }
+        
+        private async Task UpdatePublishingStage(
+            IEnumerable<(Guid releaseId, Guid releaseStatusId)> releaseStatuses, 
+            ReleasePublishingStatusPublishingStage stage,
+            ReleasePublishingStatusLogMessage logMessage = null)
+        {
+            await releaseStatuses
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(status => 
+                    _releasePublishingStatusService.UpdatePublishingStageAsync(
+                        status.releaseId, 
+                        status.releaseStatusId, 
+                        stage, 
+                        logMessage));
         }
     }
 }
