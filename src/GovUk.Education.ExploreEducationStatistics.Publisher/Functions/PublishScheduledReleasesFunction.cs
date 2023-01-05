@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusPublishingStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -55,10 +54,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 // Move all cached releases in the staging directory of the public content container to the root
                 await _publishingService.PublishStagedReleaseContent();
+                
+                await scheduled
+                    .ToAsyncEnumerable()
+                    .ForEachAwaitAsync(async message => 
+                        await UpdateContentStage(message, ReleasePublishingStatusContentStage.Complete));
 
                 // Finalise publishing of these releases
                 await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
-                    scheduled,
+                    scheduled.Select(status => (status.ReleaseId, status.Id)),
                     DateTime.UtcNow);
             }
 
@@ -71,8 +75,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private async Task<IEnumerable<ReleasePublishingStatus>> QueryScheduledReleases()
         {
             return await _releasePublishingStatusService.GetWherePublishingDueTodayWithStages(
-                content: ReleasePublishingStatusContentStage.Complete,
-                publishing: Scheduled);
+                content: ReleasePublishingStatusContentStage.Scheduled,
+                files: ReleasePublishingStatusFilesStage.Complete,
+                publishing: ReleasePublishingStatusPublishingStage.Scheduled);
+        }
+
+        private async Task UpdateContentStage(
+            ReleasePublishingStatus status, 
+            ReleasePublishingStatusContentStage stage,
+            ReleasePublishingStatusLogMessage logMessage = null)
+        {
+            await _releasePublishingStatusService.UpdateContentStageAsync(
+                status.ReleaseId, 
+                status.Id, 
+                stage, 
+                logMessage);
         }
     }
 }

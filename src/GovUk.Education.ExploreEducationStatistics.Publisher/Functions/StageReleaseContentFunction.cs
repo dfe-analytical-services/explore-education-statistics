@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 }).GetNextOccurrence(DateTime.UtcNow);
                 var context = new PublishContext(nextScheduledPublishingTime, true);
                 await _contentService.UpdateContent(context, message.Releases.Select(tuple => tuple.ReleaseId).ToArray());
-                await UpdateContentStage(message, Complete);
+                await UpdateContentStage(message, Scheduled);
             }
             catch (Exception e)
             {
