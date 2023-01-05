@@ -116,7 +116,8 @@ type TaskStage =
   | 'Failed'
   | 'Queued'
   | 'NotStarted'
-  | 'Started';
+  | 'Started'
+  | 'Scheduled';
 
 export interface ReleaseStageStatuses {
   releaseId?: string;
