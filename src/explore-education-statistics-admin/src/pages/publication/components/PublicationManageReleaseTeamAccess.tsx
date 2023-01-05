@@ -95,7 +95,7 @@ const PublicationManageReleaseTeamAccess = ({
 
   return (
     <>
-      <SummaryList>
+      <SummaryList className="govuk-!-margin-bottom-8">
         <SummaryListItem term="Release">
           {`${release.title}${!release.live ? ' (Not live)' : ''}`}
         </SummaryListItem>
@@ -108,7 +108,7 @@ const PublicationManageReleaseTeamAccess = ({
         </SummaryListItem>
       </SummaryList>
 
-      <h4>Release approvers</h4>
+      <h4 className="govuk-!-margin-bottom-0">Release approvers</h4>
       {approvers.length === 0 && approverInvites.length === 0 ? (
         <WarningMessage>
           There are no approvers or pending approver invites for this release.
@@ -117,7 +117,7 @@ const PublicationManageReleaseTeamAccess = ({
         <UserReleaseRoleTable users={approvers} invites={approverInvites} />
       )}
 
-      <h4>Release contributors</h4>
+      <h4 className="govuk-!-margin-bottom-0">Release contributors</h4>
       {contributors.length === 0 && contributorInvites.length === 0 ? (
         <WarningMessage>
           There are no contributors or pending contributor invites for this
