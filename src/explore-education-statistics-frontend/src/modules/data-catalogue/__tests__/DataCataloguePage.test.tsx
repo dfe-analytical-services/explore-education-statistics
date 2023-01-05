@@ -327,7 +327,7 @@ describe('DataCataloguePage', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders superseded warning text if on step 2 isSuperseded is true', async () => {
+  test('renders superseded warning text if on step 2 if isSuperseded is true', async () => {
     publicationService.listReleases.mockResolvedValue(testReleases);
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
 
@@ -386,7 +386,7 @@ describe('DataCataloguePage', () => {
       'Test publication 2',
     );
   });
-  test("doesn't render superseded warning text on step 2 isSuperseded is false", async () => {
+  test("doesn't render superseded warning text on step 2 if isSuperseded is false", async () => {
     publicationService.listReleases.mockResolvedValue(testReleases);
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
 
@@ -427,7 +427,7 @@ describe('DataCataloguePage', () => {
     expect(() => screen.getByTestId('superseded-warning')).toThrow();
   });
 
-  test('renders superseded warning text on step 3 isSuperseded is true', async () => {
+  test('renders superseded warning text on step 3 if isSuperseded is true', async () => {
     publicationService.listReleases.mockResolvedValue(testReleases);
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
 
@@ -534,7 +534,7 @@ describe('DataCataloguePage', () => {
       'Test publication 2',
     );
   });
-  test("doesn't render superseded warning text on step 3 isSuperseded is false", async () => {
+  test("doesn't render superseded warning text on step 3 if isSuperseded is false", async () => {
     publicationService.listReleases.mockResolvedValue(testReleases);
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
 
