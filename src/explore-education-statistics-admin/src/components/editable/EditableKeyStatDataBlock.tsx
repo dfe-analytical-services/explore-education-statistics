@@ -11,7 +11,7 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import EditableKeyStatDataBlockForm from '@admin/components/editable/EditableKeyStatDataBlockForm';
 
-interface KeyStatsDataFormFormValues {
+interface KeyStatsDataFormValues {
   trend: string;
   guidanceTitle: string;
   guidanceText: string;
@@ -29,7 +29,7 @@ interface EditableKeyStatDataBlockProps {
   isEditing?: boolean;
   isReordering?: boolean;
   onRemove?: () => void;
-  onSubmit: (values: KeyStatsDataFormFormValues) => void;
+  onSubmit: (values: KeyStatsDataFormValues) => void;
   testId?: string;
 }
 

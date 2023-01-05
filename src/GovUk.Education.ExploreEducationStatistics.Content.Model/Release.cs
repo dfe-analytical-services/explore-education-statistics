@@ -246,7 +246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             // shouldn't have to deal with the same content blocks being
             // referenced in multiple places.
             // TODO: EES-1306 may be possible to remove this as part of this ticket
-            public Dictionary<ContentBlock, ContentBlock> ContentBlocks { get; } = new();
+            public Dictionary<ContentBlock, ContentBlock> OriginalToAmendmentContentBlockMap { get; } = new();
 
             public Release NewRelease { get; }
 

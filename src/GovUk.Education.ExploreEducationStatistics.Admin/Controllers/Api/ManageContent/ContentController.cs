@@ -23,14 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             _contentService = contentService;
         }
 
-        [HttpGet("release/{releaseId}/content/sections")]
-        public async Task<ActionResult<List<ContentSectionViewModel>>> GetContentSections(Guid releaseId)
-        {
-            return await _contentService
-                .GetContentSections(releaseId)
-                .HandleFailuresOrOk();
-        }
-
         [HttpPut("release/{releaseId}/content/sections/order")]
         public async Task<ActionResult<List<ContentSectionViewModel>>> ReorderSections(
             Guid releaseId, Dictionary<Guid, int> newSectionOrder)
@@ -67,14 +59,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId}/content/section/{contentSectionId}")]
-        public async Task<ActionResult<ContentSectionViewModel>> GetContentSection(Guid releaseId, Guid contentSectionId)
-        {
-            return await _contentService
-                .GetContentSection(releaseId, contentSectionId)
-                .HandleFailuresOrOk();
-        }
-
         [HttpPut("release/{releaseId}/content/section/{contentSectionId}/blocks/order")]
         public async Task<ActionResult<List<IContentBlockViewModel>>> ReorderContentBlocks(
             Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
@@ -99,15 +83,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         {
             return await _contentService
                 .RemoveContentBlock(releaseId, contentSectionId, contentBlockId)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPut("release/{releaseId}/content/section/{contentSectionId}/data-block/{contentBlockId}")]
-        public async Task<ActionResult<DataBlockViewModel>> UpdateDataBlock(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, DataBlockUpdateRequest request)
-        {
-            return await _contentService
-                .UpdateDataBlock(releaseId, contentSectionId, contentBlockId, request)
                 .HandleFailuresOrOk();
         }
 

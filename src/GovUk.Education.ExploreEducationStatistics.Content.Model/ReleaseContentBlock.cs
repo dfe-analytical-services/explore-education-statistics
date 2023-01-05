@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             copy.ReleaseId = context.NewRelease.Id;
 
             var clonedContentBlock =
-                context.ContentBlocks.GetValueOrDefault(ContentBlock)
+                context.OriginalToAmendmentContentBlockMap.GetValueOrDefault(ContentBlock)
                 ?? ContentBlock.Clone(context);
 
             copy.ContentBlock = clonedContentBlock;

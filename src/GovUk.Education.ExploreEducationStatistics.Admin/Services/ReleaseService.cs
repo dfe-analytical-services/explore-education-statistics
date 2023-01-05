@@ -605,9 +605,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static IQueryable<Release> HydrateReleaseForAmendment(IQueryable<Release> queryable)
         {
-            // Require publication / release / contact / graph to be able to work out:
-            // If the release is the latest
-            // The contact
             return queryable
                 .AsSplitQuery()
                 .Include(r => r.Publication)
@@ -617,7 +614,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ThenInclude(cb => (cb as EmbedBlockLink)!.EmbedBlock)
                 .Include(r => r.Updates)
                 .Include(r => r.ContentBlocks)
-                .ThenInclude(r => r.ContentBlock);
+                .ThenInclude(r => r.ContentBlock)
+                .Include(r => r.KeyStatistics)
+                .ThenInclude(ks => (ks as KeyStatisticDataBlock)!.DataBlock);
         }
 
         private IList<MethodologyVersion> GetMethodologiesScheduledWithRelease(Guid releaseId)

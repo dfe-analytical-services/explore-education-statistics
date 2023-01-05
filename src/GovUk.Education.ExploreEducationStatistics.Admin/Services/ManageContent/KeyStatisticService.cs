@@ -128,7 +128,7 @@ public class KeyStatisticService : IKeyStatisticService
             });
     }
 
-    public async void DeleteAnyAssociatedWithDataBlock(Guid releaseId, Guid dataBlockId)
+    public async Task DeleteAnyAssociatedWithDataBlock(Guid releaseId, Guid dataBlockId)
     {
         var keyStats = await _context
             .KeyStatisticsDataBlock

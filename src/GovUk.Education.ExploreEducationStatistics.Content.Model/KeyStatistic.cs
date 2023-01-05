@@ -27,6 +27,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public DateTime? Updated { get; set; }
 
         public Guid ContentBlockIdTemp { get; set; }
+
+        public KeyStatistic Clone(Release newRelease)
+        {
+            var copy = MemberwiseClone() as KeyStatistic;
+            copy.Id = Guid.NewGuid();
+            copy.Release = newRelease;
+            copy.ReleaseId = newRelease.Id;
+
+            return copy;
+        }
     }
 
     public class KeyStatisticDataBlock : KeyStatistic

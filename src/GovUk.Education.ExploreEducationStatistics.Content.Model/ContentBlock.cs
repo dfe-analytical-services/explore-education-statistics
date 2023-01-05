@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             // start a new amendment with no comments
             copy.Comments = new List<Comment>();
 
-            context.ContentBlocks.Add(this, copy);
+            context.OriginalToAmendmentContentBlockMap.Add(this, copy);
 
             return copy;
         }

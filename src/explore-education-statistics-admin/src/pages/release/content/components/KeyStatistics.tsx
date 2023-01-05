@@ -19,7 +19,6 @@ import {
   KeyStatisticDataBlock,
   KeyStatisticText,
 } from '@common/services/publicationService';
-import keyStatisticService from '@admin/services/keyStatisticService';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 
 export interface KeyStatisticsProps {
@@ -28,6 +27,10 @@ export interface KeyStatisticsProps {
 }
 
 const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
+  const {
+    updateAvailableDataBlocks,
+    deleteKeyStatistic,
+  } = useReleaseContentActions();
   const [keyStatisticsBlocks, setKeyStatisticsBlocks] = useState(
     release.keyStatistics,
   );
@@ -151,8 +154,13 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                           isEditing={isEditing}
                           isReordering={isReordering}
                           onRemove={async () => {
-                            // @MarkFix call keyStatisticService.Delete here
-                            // @MarkFix call useReleaseContentActions#updateAvailableDataBlocks too
+                            await deleteKeyStatistic({
+                              releaseId: release.id,
+                              keyStatisticId: keyStat.id,
+                            });
+                            await updateAvailableDataBlocks({
+                              releaseId: release.id,
+                            });
                           }}
                         />
                       </div>
@@ -170,19 +178,20 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
 
 const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
-  const { updateAvailableDataBlocks } = useReleaseContentActions();
+  const {
+    updateAvailableDataBlocks,
+    addKeyStatisticDataBlock,
+  } = useReleaseContentActions();
 
   const { keyStatistics } = release;
 
-  const addKeyStatToSection = useCallback(
+  const addKeyStatDataBlockToSection = useCallback(
     async (dataBlockId: string) => {
-      await keyStatisticService.createKeyStatisticDataBlock(release.id, {
-        dataBlockId,
-      });
+      await addKeyStatisticDataBlock({ releaseId: release.id, dataBlockId });
       await updateAvailableDataBlocks({ releaseId: release.id });
       setIsFormOpen(false);
     },
-    [release.id, release.keyStatistics],
+    [release.id],
   );
 
   return (
@@ -191,7 +200,7 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
         <div className={styles.formContainer}>
           <KeyStatDataBlockSelectForm
             releaseId={release.id}
-            onSelect={addKeyStatToSection}
+            onSelect={addKeyStatDataBlockToSection}
             onCancel={() => setIsFormOpen(false)}
           />
         </div>

@@ -3,7 +3,12 @@ import {
   EditableBlock,
   EditableContentBlock,
 } from '@admin/services/types/content';
-import { ContentSection, Release } from '@common/services/publicationService';
+import {
+  ContentSection,
+  KeyStatistic,
+  KeyStatisticDataBlock,
+  Release,
+} from '@common/services/publicationService';
 import { DataBlock } from '@common/services/types/blocks';
 
 export type ContentSectionKeys = keyof Pick<
@@ -105,15 +110,33 @@ export type RemoveBlockComment = {
   };
 };
 
+export type AddKeyStatistic = {
+  type: 'ADD_KEY_STATISTIC';
+  payload: { keyStatistic: KeyStatistic };
+};
+
+export type UpdateKeyStatistic = {
+  type: 'UPDATE_KEY_STATISTIC';
+  payload: { keyStatistic: KeyStatistic };
+};
+
+export type RemoveKeyStatistic = {
+  type: 'REMOVE_KEY_STATISTIC';
+  payload: { releaseId: string; keyStatisticId: string };
+};
+
 export type ReleaseDispatchAction =
   | AddBlockComment
   | AddSectionBlock
   | AddContentSection
+  | AddKeyStatistic
   | SetAvailableDataBlocks
   | SetReleaseContent
   | RemoveBlockComment
   | RemoveSectionBlock
+  | RemoveKeyStatistic
   | UpdateBlockComment
   | UpdateSectionBlock
   | UpdateContentSection
-  | UpdateSectionContent;
+  | UpdateSectionContent
+  | UpdateKeyStatistic;

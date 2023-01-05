@@ -64,14 +64,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .OnSuccess(release => _releaseContentSectionRepository.GetAllContentBlocks<T>(release.Id));
         }
 
-        public Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSections(
-            Guid releaseId)
-        {
-            return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
-                .OnSuccess(OrderedContentSections);
-        }
-
         public Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSections(
             Guid releaseId,
             Dictionary<Guid, int> newSectionOrder)
@@ -180,12 +172,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     });
         }
 
-        public Task<Either<ActionResult, ContentSectionViewModel>> GetContentSection(Guid releaseId, Guid contentSectionId)
-        {
-            return CheckContentSectionExists(releaseId, contentSectionId)
-                    .OnSuccess(tuple => _mapper.Map<ContentSectionViewModel>(tuple.Item2));
-        }
-
         public Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocks(
             Guid releaseId,
             Guid contentSectionId,
@@ -265,39 +251,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                     await _contentBlockService.DeleteContentBlockAndReorder(blockToRemove.Id);
 
-                    if (blockToRemove is DataBlock) // @MarkFix this is wrong
+                    if (blockToRemove is DataBlock)
                     {
-                        _keyStatisticService.DeleteAnyAssociatedWithDataBlock(releaseId, blockToRemove.Id);
+                        await _keyStatisticService.DeleteAnyAssociatedWithDataBlock(releaseId, blockToRemove.Id);
                     }
 
                     _context.ContentSections.Update(section);
                     await _context.SaveChangesAsync();
                     return OrderedContentBlocks(section);
-                });
-        }
-
-        public Task<Either<ActionResult, DataBlockViewModel>> UpdateDataBlock(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, DataBlockUpdateRequest request)
-        {
-            return CheckContentSectionExists(releaseId, contentSectionId)
-                .OnSuccess(CheckCanUpdateRelease)
-                .OnSuccess(async tuple =>
-                {
-                    var (_, section) = tuple;
-
-                    var blockToUpdate = section.Content.Find(block => block.Id == contentBlockId);
-
-                    if (blockToUpdate == null)
-                    {
-                        return NotFound<DataBlockViewModel>();
-                    }
-
-                    if (!(blockToUpdate is DataBlock dataBlock))
-                    {
-                        return ValidationActionResult(IncorrectContentBlockTypeForUpdate);
-                    }
-
-                    return await UpdateDataBlock(dataBlock, request);
                 });
         }
 
@@ -328,6 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .OnSuccessDo(block => _hubContext.Clients.Group(releaseId.ToString()).ContentBlockUpdated(block));
         }
 
+        // TODO: EES-1568 - Can be specific to data blocks?
         public async Task<Either<ActionResult, List<T>>> GetUnattachedContentBlocks<T>(Guid releaseId)
             where T : ContentBlock
         {
@@ -448,32 +410,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             blockToUpdate.Body = body;
             return await SaveContentBlock<HtmlBlockViewModel>(blockToUpdate);
-        }
-
-        private async Task<Either<ActionResult, DataBlockViewModel>> UpdateDataBlock(DataBlock blockToUpdate,
-            DataBlockUpdateRequest request)
-        {
-            if (blockToUpdate.Summary == null)
-            {
-                blockToUpdate.Summary = new DataBlockSummary();
-            }
-
-            blockToUpdate.Summary.DataDefinitionTitle = new List<string>
-            {
-                request.DataDefinitionTitle
-            };
-
-            blockToUpdate.Summary.DataDefinition = new List<string>
-            {
-                request.DataDefinition
-            };
-
-            blockToUpdate.Summary.DataSummary = new List<string>
-            {
-                request.DataSummary
-            };
-
-            return await SaveContentBlock<DataBlockViewModel>(blockToUpdate);
         }
 
         private async Task<T> SaveContentBlock<T>(ContentBlock blockToUpdate)

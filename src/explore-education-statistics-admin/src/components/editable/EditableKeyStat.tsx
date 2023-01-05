@@ -1,6 +1,8 @@
 import React from 'react';
 import EditableKeyStatDataBlock from '@admin/components/editable/EditableKeyStatDataBlock';
 import EditableKeyStatText from '@admin/components/editable/EditableKeyStatText';
+import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
+import { KeyStatisticDataBlockUpdateRequest } from '@admin/services/keyStatisticService';
 
 export interface KeyStatsFormValues {
   trend: string;
@@ -38,6 +40,7 @@ const EditableKeyStat = ({
   testId = 'keyStat',
   onRemove,
 }: EditableKeyStatProps) => {
+  const { updateKeyStatisticDataBlock } = useReleaseContentActions();
   if (dataBlockId && releaseId) {
     return (
       <EditableKeyStatDataBlock
@@ -52,8 +55,16 @@ const EditableKeyStat = ({
         isReordering={isReordering}
         onRemove={onRemove}
         onSubmit={async values => {
-          // @MarkFix call keyStatisticService.Update here
-          // previously used useReleaseContentActions#updateContentSectionDataBlock
+          const request: KeyStatisticDataBlockUpdateRequest = {
+            trend: values.trend,
+            guidanceTitle: values.guidanceTitle,
+            guidanceText: values.guidanceText,
+          };
+          await updateKeyStatisticDataBlock({
+            releaseId,
+            keyStatisticId: keyStatId,
+            request,
+          });
         }}
       />
     );

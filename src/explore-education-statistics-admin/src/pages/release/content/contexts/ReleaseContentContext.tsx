@@ -190,7 +190,6 @@ export const releaseReducer: Reducer<
 
       return draft;
     }
-
     case 'UPDATE_CONTENT_SECTION': {
       const { section, meta } = action.payload;
       const { sectionId } = meta;
@@ -204,6 +203,29 @@ export const releaseReducer: Reducer<
           draft.release.content[sectionIndex] = section;
         }
       }
+      return draft;
+    }
+    case 'ADD_KEY_STATISTIC': {
+      const { keyStatistic } = action.payload;
+      draft.release.keyStatistics.push(keyStatistic);
+      return draft;
+    }
+    case 'UPDATE_KEY_STATISTIC': {
+      const { keyStatistic } = action.payload;
+      const keyStatisticIndex = draft.release.keyStatistics.findIndex(
+        ks =>
+          ks.id === keyStatistic.id && ks.releaseId === keyStatistic.releaseId,
+      );
+      if (keyStatisticIndex !== -1) {
+        draft.release.keyStatistics[keyStatisticIndex] = keyStatistic;
+      }
+      return draft;
+    }
+    case 'REMOVE_KEY_STATISTIC': {
+      const { releaseId, keyStatisticId } = action.payload;
+      draft.release.keyStatistics = draft.release.keyStatistics.filter(
+        ks => ks.id !== keyStatisticId || ks.releaseId !== releaseId,
+      );
       return draft;
     }
     default: {

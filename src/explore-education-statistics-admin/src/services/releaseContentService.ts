@@ -41,11 +41,6 @@ const releaseContentService = {
   getContent(releaseId: string): Promise<ReleaseContent> {
     return client.get<ReleaseContent>(`/release/${releaseId}/content`);
   },
-  getContentSections(releaseId: string): Promise<ContentSectionViewModel[]> {
-    return client.get<ContentSectionViewModel[]>(
-      `/release/${releaseId}/content/sections`,
-    );
-  },
   addContentSection(
     releaseId: string,
     order: number,
@@ -69,15 +64,6 @@ const releaseContentService = {
     sectionId: string,
   ): Promise<ContentSectionViewModel[]> {
     return client.delete<ContentSectionViewModel[]>(
-      `/release/${releaseId}/content/section/${sectionId}`,
-    );
-  },
-
-  getContentSection(
-    releaseId: string,
-    sectionId: string,
-  ): Promise<ContentSectionViewModel> {
-    return client.get<ContentSectionViewModel>(
       `/release/${releaseId}/content/section/${sectionId}`,
     );
   },
@@ -138,18 +124,6 @@ const releaseContentService = {
     return client.put<EditableContentBlock>(
       `/release/${releaseId}/content/section/${sectionId}/block/${blockId}`,
       block,
-    );
-  },
-
-  updateContentSectionDataBlock(
-    releaseId: string,
-    contentSectionId: string,
-    contentBlockId: string,
-    newSummary: KeyStatsFormValues,
-  ): Promise<EditableDataBlock> {
-    return client.put<EditableDataBlock>(
-      `/release/${releaseId}/content/section/${contentSectionId}/data-block/${contentBlockId}`,
-      newSummary,
     );
   },
 
