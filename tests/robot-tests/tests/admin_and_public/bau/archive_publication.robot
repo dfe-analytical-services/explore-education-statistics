@@ -76,9 +76,7 @@ Validate archive warning is on Admin dashboard for archive-publication release
 
 Validate that archive-publication appears correctly on Find stats page
     user checks publication is on find statistics page    ${PUBLICATION_NAME_ARCHIVE}
-    user checks publication bullet contains link    ${PUBLICATION_NAME_ARCHIVE}    View statistics and data
-
-    user clicks element    testid:View stats link for ${PUBLICATION_NAME_ARCHIVE}
+    user clicks link    ${PUBLICATION_NAME_ARCHIVE}
 
     user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
     user waits until page contains    This is the latest data
@@ -175,20 +173,11 @@ Go to "Sign off" page and approve superseding-publication release
 
 Check archive-publication is now archived and superseding-publication now appears on Find stats page
     sleep    1    # Prevent intermittent failure where Find Stats page loads before cache is cleared
-    user navigates to find statistics page on public frontend
-
-    user waits until page contains accordion section    %{TEST_THEME_NAME}
-    user opens accordion section    %{TEST_THEME_NAME}
-    user waits until accordion section contains text    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
-
-    user opens details dropdown    %{TEST_TOPIC_NAME}
+    user checks publication is on find statistics page    ${PUBLICATION_NAME_SUPERSEDE}
     user checks page does not contain    ${PUBLICATION_NAME_ARCHIVE}
 
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME_SUPERSEDE}
-    user checks publication bullet contains link    ${PUBLICATION_NAME_SUPERSEDE}    View statistics and data
-
 Check public superseding-publication release page displays correctly
-    user clicks element    testid:View stats link for ${PUBLICATION_NAME_SUPERSEDE}
+    user clicks link    ${PUBLICATION_NAME_SUPERSEDE}
 
     user waits until h1 is visible    ${PUBLICATION_NAME_SUPERSEDE}    %{WAIT_MEDIUM}
     user waits until page contains    This is the latest data
@@ -281,22 +270,11 @@ Set archive-publication to be no longer be superseded
     sleep    %{WAIT_MEMORY_CACHE_EXPIRY}
 
 Check public Find stats page and check archive-publication is no longer archived
-    user navigates to find statistics page on public frontend
-
-    user waits until page contains accordion section    %{TEST_THEME_NAME}
-    user opens accordion section    %{TEST_THEME_NAME}
-    user waits until accordion section contains text    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
-
-    user opens details dropdown    %{TEST_TOPIC_NAME}
-
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME_SUPERSEDE}
-    user checks publication bullet contains link    ${PUBLICATION_NAME_SUPERSEDE}    View statistics and data
-
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME_ARCHIVE}
-    user checks publication bullet contains link    ${PUBLICATION_NAME_ARCHIVE}    View statistics and data
+    user checks publication is on find statistics page    ${PUBLICATION_NAME_SUPERSEDE}
+    user checks publication is on find statistics page    ${PUBLICATION_NAME_ARCHIVE}
 
 Check public archive-publication release page displays correctly after being unarchived
-    user clicks element    testid:View stats link for ${PUBLICATION_NAME_ARCHIVE}
+    user clicks link    ${PUBLICATION_NAME_ARCHIVE}
 
     user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
     user waits until page contains    This is the latest data

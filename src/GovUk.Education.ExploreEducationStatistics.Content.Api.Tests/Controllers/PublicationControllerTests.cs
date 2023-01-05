@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var controller = BuildPublicationController(publicationCacheService: publicationCacheService.Object);
 
             publicationCacheService
-                .Setup(s => s.GetPublicationTree(PublicationTreeFilter.FindStatistics))
+                .Setup(s => s.GetPublicationTree(PublicationTreeFilter.DataCatalogue))
                 .ReturnsAsync(new List<PublicationTreeThemeViewModel>
                 {
                     new()
@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                     }
                 });
 
-            var result = await controller.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+            var result = await controller.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
 
             VerifyAllMocks(publicationCacheService);
 

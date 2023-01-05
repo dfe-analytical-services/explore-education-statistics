@@ -87,9 +87,6 @@ Approve release
 
 Verify newly published release is on Find Statistics page
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
-    user checks publication bullet contains link    ${PUBLICATION_NAME}    View statistics and data
-    user checks publication bullet contains link    ${PUBLICATION_NAME}    Create your own tables
-    user checks publication bullet does not contain link    ${PUBLICATION_NAME}    Statistics at DfE
 
 User navigates to /data-catalogue page
     user navigates to data catalogue page on public frontend

@@ -16,12 +16,12 @@ Navigate to Absence publication
 
     user clicks link    Explore
     user waits until page contains
-    ...    Browse to find the statistics and data you’re looking for and open the section to get links to:
+    ...    Find statistics and data
     ...    %{WAIT_MEDIUM}
 
-    user opens accordion section    Pupils and schools
-    user opens details dropdown    Pupil absence
-    user clicks element    testid:View stats link for Pupil absence in schools in England
+    user clicks radio    Oldest
+    user waits until page contains link    Pupil absence in schools in England
+    user clicks link    Pupil absence in schools in England
     user waits until h1 is visible    Pupil absence in schools in England    %{WAIT_MEDIUM}
 
 Validate title

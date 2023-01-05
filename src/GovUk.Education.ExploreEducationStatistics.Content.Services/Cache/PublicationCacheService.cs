@@ -108,10 +108,6 @@ public class PublicationCacheService : IPublicationCacheService
     {
         switch (filter)
         {
-            case PublicationTreeFilter.FindStatistics:
-                return !publication.IsSuperseded
-                       && (publication.HasLiveRelease
-                           || publication.Type == PublicationType.Legacy);
             case PublicationTreeFilter.DataTables:
                 return publication.LatestReleaseHasData
                        && !publication.IsSuperseded;
