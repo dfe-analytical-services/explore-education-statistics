@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusPublishingStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -77,7 +76,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         {
             return await _releasePublishingStatusService.GetWherePublishingDueTodayWithStages(
                 content: ReleasePublishingStatusContentStage.Scheduled,
-                publishing: Scheduled);
+                files: ReleasePublishingStatusFilesStage.Complete,
+                publishing: ReleasePublishingStatusPublishingStage.Scheduled);
         }
 
         private async Task UpdateContentStage(
