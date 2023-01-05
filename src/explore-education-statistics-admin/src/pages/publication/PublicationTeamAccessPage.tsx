@@ -23,6 +23,8 @@ import PublicationManageReleaseTeamAccess from '@admin/pages/publication/compone
 interface Model {
   releases: ReleaseSummary[];
   publicationRoles: UserPublicationRole[];
+  publicationOwners: UserPublicationRole[];
+  publicationApprovers: UserPublicationRole[];
   permissions: PublicationPermissions;
 }
 
@@ -57,6 +59,12 @@ const PublicationTeamAccessPage = ({
     return {
       releases,
       publicationRoles,
+      publicationApprovers: publicationRoles.filter(
+        publicationRole => publicationRole.role === 'Approver',
+      ),
+      publicationOwners: publicationRoles.filter(
+        publicationRole => publicationRole.role === 'Owner',
+      ),
       permissions,
     };
   });
@@ -101,8 +109,27 @@ const PublicationTeamAccessPage = ({
             </tbody>
           </table>
           <p>
-            To request changing the assigned publication roles, contact the
-            Explore education statistics team at{' '}
+            {!model.publicationOwners.length && (
+              <>
+                There are no publication owners assigned to this publication, to
+                assign someone as an owner of this publication, or to edit the
+                approver/s please contact{' '}
+              </>
+            )}
+            {!model.publicationApprovers.length && (
+              <>
+                There are no publication approvers assigned to this publication,
+                to assign someone as an approver of this publication, or to edit
+                the owner/s please contact{' '}
+              </>
+            )}
+            {model.publicationOwners.length &&
+              model.publicationApprovers.length && (
+                <>
+                  To edit the owner/s and approver/s for this publication please
+                  contact{' '}
+                </>
+              )}
             <a href="mailto:explore.statistics@education.gov.uk">
               explore.statistics@education.gov.uk
             </a>
@@ -110,17 +137,15 @@ const PublicationTeamAccessPage = ({
           </p>
         </>
       ) : (
-        <>
-          <p>There are no publication roles currently assigned.</p>
-          <p>
-            To request assigning publication roles, contact the Explore
-            education statistics team at{' '}
-            <a href="mailto:explore.statistics@education.gov.uk">
-              explore.statistics@education.gov.uk
-            </a>
-            .
-          </p>
-        </>
+        <p>
+          There are no publication owners or approvers assigned to this
+          publication, to assign someone as owner or approver of this
+          publication please contact{' '}
+          <a href="mailto:explore.statistics@education.gov.uk">
+            explore.statistics@education.gov.uk
+          </a>
+          .
+        </p>
       )}
 
       {model.permissions.canUpdateContributorReleaseRole &&

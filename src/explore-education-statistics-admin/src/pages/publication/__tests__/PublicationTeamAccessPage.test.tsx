@@ -72,15 +72,35 @@ describe('PublicationTeamAccessPage', () => {
     });
 
     expect(
-      screen.getByText('There are no publication roles currently assigned.'),
+      screen.getByText(
+        /There are no publication owners or approvers assigned to this publication/,
+      ),
     ).toBeInTheDocument();
+
+    expect(
+      screen.queryByText(
+        /To edit the owner\/s and approver\/s for this publication please contact/,
+      ),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByText(
+        /There are no publication approvers assigned to this publication/,
+      ),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByText(
+        /There are no publication owners assigned to this publication/,
+      ),
+    ).not.toBeInTheDocument();
 
     expect(
       screen.getByText('explore.statistics@education.gov.uk'),
     ).toHaveAttribute('href', 'mailto:explore.statistics@education.gov.uk');
   });
 
-  test('renders the page correctly with publication roles assigned', async () => {
+  test('renders the page correctly with a mix of publication roles assigned', async () => {
     publicationService.listReleases.mockResolvedValue(
       testPaginatedReleaseSummariesNoResults,
     );
@@ -115,8 +135,28 @@ describe('PublicationTeamAccessPage', () => {
     });
 
     expect(
-      screen.getByText(/To request changing the assigned publication roles/),
+      screen.getByText(
+        /To edit the owner\/s and approver\/s for this publication please contact/,
+      ),
     ).toBeInTheDocument();
+
+    expect(
+      screen.queryByText(
+        /There are no publication owners or approvers assigned to this publication/,
+      ),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByText(
+        /There are no publication approvers assigned to this publication/,
+      ),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByText(
+        /There are no publication owners assigned to this publication/,
+      ),
+    ).not.toBeInTheDocument();
 
     expect(
       screen.getByText('explore.statistics@education.gov.uk'),
@@ -142,6 +182,160 @@ describe('PublicationTeamAccessPage', () => {
     const row3Cells = within(rows[3]).getAllByRole('cell');
     expect(row3Cells[0]).toHaveTextContent('Analyst2 User2');
     expect(row3Cells[1]).toHaveTextContent('Owner');
+  });
+
+  test('renders the page correctly with only publication owners assigned', async () => {
+    publicationService.listReleases.mockResolvedValue(
+      testPaginatedReleaseSummariesNoResults,
+    );
+    publicationService.listRoles.mockClear();
+    publicationService.listRoles.mockResolvedValue([
+      {
+        id: 'role-1',
+        publication: 'publication',
+        role: 'Owner',
+        userName: 'Analyst1 User1',
+      },
+      {
+        id: 'role-2',
+        publication: 'publication',
+        role: 'Owner',
+        userName: 'Analyst2 User2',
+      },
+    ]);
+
+    await renderPage({});
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', { name: 'Update publication access' }),
+      ).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByText(
+        /There are no publication approvers assigned to this publication/,
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByText(
+        /There are no publication owners or approvers assigned to this publication/,
+      ),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByText(
+        /To edit the owner\/s and approver\/s for this publication please contact/,
+      ),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByText(
+        /There are no publication owners assigned to this publication/,
+      ),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByText('explore.statistics@education.gov.uk'),
+    ).toHaveAttribute('href', 'mailto:explore.statistics@education.gov.uk');
+
+    expect(screen.getByRole('table')).toBeInTheDocument();
+
+    const rows = screen.getAllByRole('row');
+    expect(rows).toHaveLength(3);
+
+    const headerCells = within(rows[0]).getAllByRole('columnheader');
+    expect(headerCells[0]).toHaveTextContent('Name');
+    expect(headerCells[1]).toHaveTextContent('Publication role');
+
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+    expect(row1Cells[0]).toHaveTextContent('Analyst1 User1');
+    expect(row1Cells[1]).toHaveTextContent('Owner');
+
+    const row2Cells = within(rows[2]).getAllByRole('cell');
+    expect(row2Cells[0]).toHaveTextContent('Analyst2 User2');
+    expect(row2Cells[1]).toHaveTextContent('Owner');
+  });
+
+  test('renders the page correctly with only publication approvers assigned', async () => {
+    publicationService.listReleases.mockResolvedValue(
+      testPaginatedReleaseSummariesNoResults,
+    );
+    publicationService.listRoles.mockClear();
+    publicationService.listRoles.mockResolvedValue([
+      {
+        id: 'role-1',
+        publication: 'publication',
+        role: 'Approver',
+        userName: 'Analyst1 User1',
+      },
+      {
+        id: 'role-2',
+        publication: 'publication',
+        role: 'Approver',
+        userName: 'Analyst2 User2',
+      },
+    ]);
+
+    await renderPage({});
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', { name: 'Update publication access' }),
+      ).toBeInTheDocument();
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', { name: 'Update publication access' }),
+      ).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByText(
+        /There are no publication owners assigned to this publication/,
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByText(
+        /There are no publication approvers or approvers assigned to this publication/,
+      ),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByText(
+        /To edit the owner\/s and approver\/s for this publication please contact/,
+      ),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByText(
+        /There are no publication approvers assigned to this publication/,
+      ),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByText('explore.statistics@education.gov.uk'),
+    ).toHaveAttribute('href', 'mailto:explore.statistics@education.gov.uk');
+
+    expect(screen.getByRole('table')).toBeInTheDocument();
+
+    const rows = screen.getAllByRole('row');
+    expect(rows).toHaveLength(3);
+
+    const headerCells = within(rows[0]).getAllByRole('columnheader');
+    expect(headerCells[0]).toHaveTextContent('Name');
+    expect(headerCells[1]).toHaveTextContent('Publication role');
+
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+    expect(row1Cells[0]).toHaveTextContent('Analyst1 User1');
+    expect(row1Cells[1]).toHaveTextContent('Approver');
+
+    const row2Cells = within(rows[2]).getAllByRole('cell');
+    expect(row2Cells[0]).toHaveTextContent('Analyst2 User2');
+    expect(row2Cells[1]).toHaveTextContent('Approver');
   });
 
   test('renders the page correctly with no releases', async () => {
