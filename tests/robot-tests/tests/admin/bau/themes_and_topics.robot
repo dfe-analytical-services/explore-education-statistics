@@ -24,19 +24,18 @@ Go to 'Manage themes and topics'
     user waits until h1 is visible    Manage themes and topics
 
 Verify existing theme and topics
-    user waits until page contains accordion section    Children, early years and social care
-    user opens accordion section    Children, early years and social care
+    user waits until page contains accordion section    Pupils and schools
+    user opens accordion section    Pupils and schools
     user checks summary list contains    Summary
-    ...    Including children in need, EYFS, and looked after children and social workforce statistics
-    user checks topic is in correct position    Children, early years and social care    1    Childcare and early years
-    user checks topic is in correct position    Children, early years and social care    2
-    ...    Children in need and child protection
-    user checks topic is in correct position    Children, early years and social care    3
-    ...    Children's social work workforce
-    user checks topic is in correct position    Children, early years and social care    4
-    ...    Early years foundation stage profile
-    user checks topic is in correct position    Children, early years and social care    5    Looked-after children
-    user checks topic is in correct position    Children, early years and social care    6    Secure children's homes
+    ...    Including absence, application and offers, capacity exclusion and special educational needs (SEN) statistics
+    user checks topic is in correct position    Pupils and schools    1
+    ...    Exclusions
+    user checks topic is in correct position    Pupils and schools    2
+    ...    Pupil absence
+    user checks topic is in correct position    Pupils and schools    3
+    ...    School and pupil numbers
+    user checks topic is in correct position    Pupils and schools    4
+    ...    School applications
 
 Create theme
     user clicks link    Create theme
