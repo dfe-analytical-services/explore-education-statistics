@@ -109,22 +109,22 @@ const PublicationTeamAccessPage = ({
             </tbody>
           </table>
           <p>
-            {!model.publicationOwners.length && (
+            {model.publicationOwners.length === 0 && (
               <>
                 There are no publication owners assigned to this publication, to
                 assign someone as an owner of this publication, or to edit the
                 approver/s please contact{' '}
               </>
             )}
-            {!model.publicationApprovers.length && (
+            {model.publicationApprovers.length === 0 && (
               <>
                 There are no publication approvers assigned to this publication,
                 to assign someone as an approver of this publication, or to edit
                 the owner/s please contact{' '}
               </>
             )}
-            {model.publicationOwners.length &&
-              model.publicationApprovers.length && (
+            {model.publicationOwners.length > 0 &&
+              model.publicationApprovers.length > 0 && (
                 <>
                   To edit the owner/s and approver/s for this publication please
                   contact{' '}
