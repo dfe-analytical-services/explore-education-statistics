@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public ContentSectionViewModel? HeadlinesSection { get; }
 
-        public List<KeyStatistic> KeyStatistics { get; } // @MarkFix switch to view model
+        public List<KeyStatisticViewModel> KeyStatistics { get; }
 
         public ContentSectionViewModel? KeyStatisticsSecondarySection { get; }
 

@@ -4,17 +4,17 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 
 public interface IKeyStatisticService
 {
-    Task<Either<ActionResult, KeyStatisticDataBlock>> CreateKeyStatisticDataBlock(
+    Task<Either<ActionResult, KeyStatisticDataBlockViewModel>> CreateKeyStatisticDataBlock(
         Guid releaseId, KeyStatisticDataBlockCreateRequest request);
 
-    Task<Either<ActionResult, KeyStatisticDataBlock>> UpdateKeyStatisticDataBlock(
+    Task<Either<ActionResult, KeyStatisticDataBlockViewModel>> UpdateKeyStatisticDataBlock(
         Guid releaseId,
         Guid keyStatisticId,
         KeyStatisticDataBlockUpdateRequest request);

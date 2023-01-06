@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Manag
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("release/{releaseId}/key-statistic-data-block")]
-        public async Task<ActionResult<KeyStatisticDataBlock>> CreateKeyStatisticDataBlock(
+        public async Task<ActionResult<KeyStatisticDataBlockViewModel>> CreateKeyStatisticDataBlock(
             Guid releaseId,
             KeyStatisticDataBlockCreateRequest request)
         {
@@ -34,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPut("release/{releaseId}/key-statistic-data-block/{keyStatisticId}")]
-        public async Task<ActionResult<KeyStatisticDataBlock>> UpdateKeyStatisticDataBlock(
+        public async Task<ActionResult<KeyStatisticDataBlockViewModel>> UpdateKeyStatisticDataBlock(
             Guid releaseId,
             Guid keyStatisticId,
             KeyStatisticDataBlockUpdateRequest request)

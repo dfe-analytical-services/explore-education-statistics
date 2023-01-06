@@ -319,7 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock1.HighlightDescription, listResult[0].HighlightDescription);
                 Assert.Equal(dataBlock1.Source, listResult[0].Source);
                 Assert.Equal(1, listResult[0].ChartsCount);
-                Assert.Equal(dataBlock1.ContentSectionId, listResult[0].ContentSectionId);
+                // @MarkFix test InContent
 
                 Assert.Equal(dataBlock2.Heading, listResult[1].Heading);
                 Assert.Equal(dataBlock2.Name, listResult[1].Name);
@@ -328,7 +328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock2.HighlightDescription, listResult[1].HighlightDescription);
                 Assert.Equal(dataBlock2.Source, listResult[1].Source);
                 Assert.Equal(0, listResult[1].ChartsCount);
-                Assert.Null(listResult[1].ContentSectionId);
+                // @MarkFix test InContent
             }
         }
 
@@ -421,7 +421,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock1.HighlightDescription, listResult.HighlightDescription);
                 Assert.Equal(dataBlock1.Source, listResult.Source);
                 Assert.Equal(1, listResult.ChartsCount);
-                Assert.Equal(dataBlock1.ContentSectionId, listResult.ContentSectionId);
+                // @MarkFix test InContent
             }
         }
 

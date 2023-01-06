@@ -13,7 +13,7 @@ export interface ReleaseDataBlockSummary {
   heading: string;
   source: string;
   chartsCount: number;
-  contentSectionId?: string;
+  inContent: boolean;
 }
 
 export type UpdateReleaseDataBlock = ReleaseDataBlock;

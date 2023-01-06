@@ -8,11 +8,13 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using ContactViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContactViewModel;
 using ContentSectionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContentSectionViewModel;
 using DataBlockSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.DataBlockSummaryViewModel;
 using DataBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.DataBlockViewModel;
+using EmbedBlockLinkViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.EmbedBlockLinkViewModel;
 using HtmlBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.HtmlBlockViewModel;
 using IContentBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.IContentBlockViewModel;
 using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
@@ -91,10 +93,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateContentBlockMap();
             CreateMap<DataBlockCreateViewModel, DataBlock>();
             CreateMap<DataBlockUpdateViewModel, DataBlock>();
-            CreateMap<DataBlock, DataBlockSummaryViewModel>()
+            CreateMap<DataBlock, DataBlockSummaryViewModel>() // @MarkFix is this used?
                 .ForMember(
                     dest => dest.ChartsCount,
                     m => m.MapFrom(d => d.Charts.Count));
+
+            CreateMap<KeyStatisticDataBlock, KeyStatisticDataBlockViewModel>();
+            CreateMap<KeyStatisticText, KeyStatisticTextViewModel>();
+            CreateMap<KeyStatistic, KeyStatisticViewModel>()
+                .IncludeAllDerived();
 
             CreateMap<KeyStatisticDataBlockCreateRequest, KeyStatisticDataBlock>();
 
@@ -192,8 +199,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<ContentSection, ContentSectionViewModel>()
                 .ForMember(dest => dest.Content,
-                m => m.MapFrom(section =>
-                    section.Content.OrderBy(contentBlock => contentBlock.Order)));
+                    m => m.MapFrom(section =>
+                        section.Content.OrderBy(contentBlock => contentBlock.Order)));
 
             CreateMap<MethodologyVersion, ManageMethodologyContentViewModel>()
                 .ForMember(dest => dest.Content,

@@ -19,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -127,7 +128,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         var dataBlocks = await _releaseContentBlockRepository.GetAll<DataBlock>(release.Id);
 
-                        return _mapper.Map<List<DataBlockSummaryViewModel>>(dataBlocks)
+                        return (await dataBlocks.SelectAsync(async block =>
+                            {
+                                var inContent = block.ContentSectionId != null
+                                                || await _context.KeyStatisticsDataBlock.AnyAsync(
+                                                    ks => ks.DataBlockId == block.Id);
+                                return new DataBlockSummaryViewModel
+                                {
+                                    Id = block.Id,
+                                    Heading = block.Heading,
+                                    Name = block.Name,
+                                    Created = block.Created,
+                                    HighlightName = block.HighlightName,
+                                    HighlightDescription = block.HighlightDescription,
+                                    Source = block.Source,
+                                    ChartsCount = block.Charts.Count,
+                                    InContent = inContent,
+                                };
+
+                            }))
                             .OrderBy(model => model.Name)
                             .ToList();
                     }
@@ -349,7 +368,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var dataBlocks = GetDataBlocks(releaseId);
             foreach (var dataBlock in dataBlocks)
             {
-                 await InvalidateCachedDataBlock(releaseId, dataBlock.Id);
+                await InvalidateCachedDataBlock(releaseId, dataBlock.Id);
             }
         }
 

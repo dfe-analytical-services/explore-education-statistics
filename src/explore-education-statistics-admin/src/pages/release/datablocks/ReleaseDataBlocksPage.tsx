@@ -152,8 +152,7 @@ const ReleaseDataBlocksPage = ({
                 <tr key={dataBlock.id}>
                   <td>{dataBlock.name}</td>
                   <td>{dataBlock.chartsCount > 0 ? 'Yes' : 'No'}</td>
-                  <td>{dataBlock.contentSectionId ? 'Yes' : 'No'}</td>{' '}
-                  {/* @MarkFix doesn't work with KeyStatisticDataBlocks as they have no ContentSection - backend returns InContent bool? */}
+                  <td>{dataBlock.inContent ? 'Yes' : 'No'}</td>{' '}
                   <td>{dataBlock.highlightName || 'None'}</td>
                   <td>
                     {dataBlock.created ? (
