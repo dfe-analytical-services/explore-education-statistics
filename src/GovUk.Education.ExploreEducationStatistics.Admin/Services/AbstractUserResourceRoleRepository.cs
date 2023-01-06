@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -138,12 +139,16 @@ public abstract class AbstractUserResourceRoleRepository<TResourceRole, TResourc
                 r.Role.Equals(role));
     }
 
-    protected async Task<List<TResourceRole>> ListResourceRoles(Guid resourceId, params TRoleEnum[] rolesToInclude)
+    protected async Task<List<TResourceRole>> ListResourceRoles(
+        Guid resourceId, 
+        TRoleEnum[]? rolesToInclude)
     {
+        var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumValuesAsArray<TRoleEnum>();
+        
         return await 
             GetResourceRolesQueryByResourceId(resourceId)
             .Include(urr => urr.User)
-            .Where(urr => rolesToInclude.Contains(urr.Role))
+            .Where(urr => rolesToCheck.Contains(urr.Role))
             .ToListAsync();
     }
 

@@ -24,25 +24,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releasePermissionService = releasePermissionService;
         }
 
-        [HttpGet("releases/{releaseId}/roles")]
+        [HttpGet("releases/{releaseId:guid}/roles")]
         public async Task<ActionResult<List<UserReleaseRoleSummaryViewModel>>> ListReleaseRoles(
             Guid releaseId)
         {
             return await _releasePermissionService
-                .ListReleaseRoles(releaseId, ReleaseRole.Contributor, ReleaseRole.Approver)
+                .ListReleaseRoles(releaseId, new [] { ReleaseRole.Contributor, ReleaseRole.Approver })
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("releases/{releaseId}/invites")]
-        public async Task<ActionResult<List<UserReleaseInviteViewModel>>> ListReleaseRoleInvites(
+        [HttpGet("releases/{releaseId:guid}/invites")]
+        public async Task<ActionResult<List<UserReleaseInviteViewModel>>> ListReleaseInvites(
             Guid releaseId)
         {
             return await _releasePermissionService
-                .ListReleaseInvites(releaseId, ReleaseRole.Contributor, ReleaseRole.Approver)
+                .ListReleaseInvites(releaseId, new [] { ReleaseRole.Contributor, ReleaseRole.Approver })
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("publications/{publicationId}/contributors")]
+        [HttpGet("publications/{publicationId:guid}/contributors")]
         public async Task<ActionResult<List<UserReleaseRoleSummaryViewModel>>> ListPublicationContributors(
             Guid publicationId)
         {
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("releases/{releaseId}/contributors")]
+        [HttpPut("releases/{releaseId:guid}/contributors")]
         public async Task<ActionResult> UpdateReleaseContributors(Guid releaseId, UpdateReleaseContributorsViewModel request)
         {
             return await _releasePermissionService
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOr(result => new AcceptedResult());
         }
 
-        [HttpDelete("publications/{publicationId}/users/{userId}/contributors")]
+        [HttpDelete("publications/{publicationId:guid}/users/{userId:guid}/contributors")]
         public async Task<ActionResult> RemoveAllUserContributorPermissionsForPublication(
             Guid publicationId, Guid userId)
         {

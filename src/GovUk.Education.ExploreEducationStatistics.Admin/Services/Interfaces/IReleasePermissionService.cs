@@ -12,10 +12,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     public interface IReleasePermissionService
     {
         Task<Either<ActionResult, List<UserReleaseRoleSummaryViewModel>>>
-            ListReleaseRoles(Guid releaseId, params ReleaseRole[] rolesToInclude);
+            ListReleaseRoles(Guid releaseId, ReleaseRole[]? rolesToInclude);
 
         Task<Either<ActionResult, List<UserReleaseInviteViewModel>>>
-            ListReleaseInvites(Guid releaseId, params ReleaseRole[] rolesToInclude);
+            ListReleaseInvites(Guid releaseId, ReleaseRole[]? rolesToInclude = null);
 
         Task<Either<ActionResult, List<UserReleaseRoleSummaryViewModel>>>
             ListPublicationContributors(Guid releaseId);

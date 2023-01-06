@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -40,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, List<UserReleaseRoleSummaryViewModel>>>
-            ListReleaseRoles(Guid releaseId, params ReleaseRole[] rolesToInclude)
+            ListReleaseRoles(Guid releaseId, ReleaseRole[]? rolesToInclude = null)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId,
@@ -53,21 +54,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ListUserReleaseRoles(releaseId, rolesToInclude);
 
                    return users
-                        .Select(userReleaseRole => new UserReleaseRoleSummaryViewModel
-                        {
-                            UserId = userReleaseRole.UserId,
-                            UserDisplayName = userReleaseRole.User.DisplayName,
-                            UserEmail = userReleaseRole.User.Email,
-                            Role = userReleaseRole.Role,
-                        })
+                        .Select(userReleaseRole => 
+                            new UserReleaseRoleSummaryViewModel(
+                                userReleaseRole.UserId,
+                                userReleaseRole.User.DisplayName,
+                                userReleaseRole.User.Email,
+                                userReleaseRole.Role))
                         .OrderBy(model => model.UserDisplayName)
                         .ToList();
                 });
         }
 
         public async Task<Either<ActionResult, List<UserReleaseInviteViewModel>>>
-            ListReleaseInvites(Guid releaseId, params ReleaseRole[] rolesToInclude)
+            ListReleaseInvites(Guid releaseId, ReleaseRole[]? rolesToInclude = null)
         {
+            var rolesToCheck = rolesToInclude ?? EnumUtil.GetEnumValuesAsArray<ReleaseRole>();
+            
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId,
                     query =>
@@ -77,18 +79,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var invites = await _contentDbContext
                         .UserReleaseInvites
-                        .AsQueryable()
                         .Where(i =>
                             i.ReleaseId == releaseId
-                            && rolesToInclude.Contains(i.Role))
+                            && rolesToCheck.Contains(i.Role))
                         .ToListAsync();
 
                     return invites
-                        .Select(i => new UserReleaseInviteViewModel
-                        {
-                            Email = i.Email,
-                            Role = i.Role
-                        })
+                        .Select(i => new UserReleaseInviteViewModel(i.Email, i.Role))
                         .OrderBy(model => model.Email)
                         .ToList();
                 });
@@ -110,8 +107,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Select(r => r.Id)
                         .ToList();
 
-                    var users = await _contentDbContext.UserReleaseRoles
-                        .AsQueryable()
+                    var users = await _contentDbContext
+                        .UserReleaseRoles
                         .Include(releaseRole => releaseRole.User)
                         .Where(userReleaseRole =>
                             allLatestReleaseIds.Contains(userReleaseRole.ReleaseId)
@@ -123,14 +120,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     return users
                         .Select(user =>
-                            new UserReleaseRoleSummaryViewModel
-                            {
-                                UserId = user.Id,
-                                UserDisplayName = user.DisplayName,
-                                UserEmail = user.Email,
-                                Role = Contributor
-                            }
-                        )
+                            new UserReleaseRoleSummaryViewModel(
+                                user.Id, 
+                                user.DisplayName, 
+                                user.Email, 
+                                Contributor))
                         .OrderBy(model => model.UserDisplayName)
                         .ToList();
                 });
@@ -195,7 +189,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var user = _contentDbContext
                         .Users
-                        .AsQueryable()
                         .Single(u => u.Id == userId);
 
                     await _userReleaseRoleRepository.RemoveAllForPublication(

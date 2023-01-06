@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return UserHasRoleOnResource(email, releaseId, role);
         }
 
-        public Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseId, params ReleaseRole[] rolesToInclude)
+        public Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseId, ReleaseRole[]? rolesToInclude)
         {
             return ListResourceRoles(releaseId, rolesToInclude);
         }

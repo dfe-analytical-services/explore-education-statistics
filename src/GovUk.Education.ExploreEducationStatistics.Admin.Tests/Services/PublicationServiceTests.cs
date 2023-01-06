@@ -615,6 +615,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor),
                         CanUpdateSpecificReleaseRole))
                     .ReturnsAsync(false);
+                userService.Setup(s => s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        CanViewReleaseTeamAccess))
+                    .ReturnsAsync(false);
 
                 var publicationService = BuildPublicationService(context,
                     userService: userService.Object);

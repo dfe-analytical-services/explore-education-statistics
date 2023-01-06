@@ -571,14 +571,6 @@ user waits until h3 is not visible
     [Arguments]    ${text}    ${wait}=${timeout}
     user waits until element is not visible    xpath://h3[text()="${text}"]    ${wait}
 
-user waits until h4 is visible
-    [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until element is visible    xpath://h3[text()="${text}"]    ${wait}
-
-user waits until h4 is not visible
-    [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until element is not visible    xpath://h3[text()="${text}"]    ${wait}
-
 user waits until legend is visible
     [Arguments]    ${text}    ${wait}=${timeout}
     user waits until element is visible    xpath://legend[text()="${text}"]    ${wait}
