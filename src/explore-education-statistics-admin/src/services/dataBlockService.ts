@@ -26,6 +26,7 @@ export interface DependentDataBlock {
   name: string;
   contentSectionHeading?: string;
   infographicFilesInfo: InfographicFileInfo[];
+  isKeyStatistic: boolean;
 }
 
 export interface InfographicFileInfo {

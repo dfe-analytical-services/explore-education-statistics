@@ -185,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     DependentDataBlocks = new List<DependentDataBlock>()
                                     {
                                         await CreateDependentDataBlock(dataBlock)
-                                    }
+                                    },
                                 }
                         )
                 );
@@ -229,7 +229,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     Id = f.Id,
                     Filename = f.Filename
-                }).ToList()
+                }).ToList(),
+                IsKeyStatistic = await _context.KeyStatisticsDataBlock
+                    .AnyAsync(ks => ks.DataBlockId == block.Id),
             };
         }
 
@@ -365,7 +367,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public string Name { get; set; } = "";
         public string? ContentSectionHeading { get; set; }
-        public List<InfographicFileInfo> InfographicFilesInfo { get; set; } = new List<InfographicFileInfo>();
+        public List<InfographicFileInfo> InfographicFilesInfo { get; set; } = new();
+
+        public bool IsKeyStatistic { get; set; }
     }
 
     public class InfographicFileInfo
