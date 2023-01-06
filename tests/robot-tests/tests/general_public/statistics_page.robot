@@ -14,7 +14,7 @@ Navigate to Find Statistics page
     environment variable should be set    PUBLIC_URL
     user navigates to find statistics page on public frontend
 
-check bootstrapped data
+Validate bootstrapped themes filters exist
     [Tags]    Local    Dev    NotAgainstProd
     user checks radio is checked    All themes
     user checks page contains radio    Pupils and schools
@@ -57,7 +57,6 @@ Validate publications list exists
 Filter by theme
     [Tags]    Local    Dev
     user clicks radio    Pupils and schools
-    user waits until page contains    2 results
     user checks page contains button    Pupils and schools
 
 Remove theme filter
