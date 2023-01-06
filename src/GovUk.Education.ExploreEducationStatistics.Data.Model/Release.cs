@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using static System.DateTime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
-    // TODO EES-3763 - Read Replica cleanup - remove unused "Published" and "PreviousVersionId" columns from
-    // statistics' "Release" table. 
     public class Release
     {
         public Guid Id { get; set; }
@@ -17,6 +14,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public TimeIdentifier TimeIdentifier { get; set; }
         public int Year { get; set; }
         public ICollection<ReleaseFootnote> Footnotes { get; set; }
+
+        // TODO EES-3763 - Read Replica cleanup - remove unused "Published" and "PreviousVersionId" columns from
+        // statistics' "Release" table. 
+        public DateTime? Published { get; set; }
+        public Guid? PreviousVersionId { get; set; }
 
         public string Title =>
             TimePeriodLabelFormatter.Format(Year, TimeIdentifier, TimePeriodLabelFormat.FullLabelBeforeYear);

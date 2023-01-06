@@ -298,6 +298,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .Property(r => r.TimeIdentifier)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
                 .HasMaxLength(6);
+
+            // TODO EES-3763 - Read Replica cleanup - remove "PreviousVersionId" columns from
+            // statistics' "Release" table.
+            modelBuilder.Entity<Release>()
+                .HasIndex(data => data.PreviousVersionId);
         }
 
         private static void ConfigureReleaseSubject(ModelBuilder modelBuilder)
