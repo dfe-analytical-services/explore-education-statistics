@@ -53,9 +53,6 @@ const KeyStatDataBlockSelectForm = ({
           <KeyStatDataBlock
             releaseId={releaseId}
             dataBlockId={selectedDataBlock.id}
-            trend={selectedDataBlock.summary?.dataSummary[0]} // @MarkFix
-            guidanceTitle={selectedDataBlock.summary?.dataDefinitionTitle[0]}
-            guidanceText={selectedDataBlock.summary?.dataDefinition[0]}
           />
         </Details>
       </section>

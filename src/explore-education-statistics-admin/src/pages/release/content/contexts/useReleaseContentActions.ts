@@ -1,4 +1,3 @@
-import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStat';
 import { useReleaseContentDispatch } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { ContentSectionKeys } from '@admin/pages/release/content/contexts/ReleaseContentContextActionTypes';
 import releaseContentCommentService, {
@@ -15,8 +14,10 @@ import {
 } from '@admin/services/types/content';
 import { Dictionary } from '@admin/types';
 import { useCallback, useMemo } from 'react';
-import keyStatisticService from '@admin/services/keyStatisticService';
-import keyStat from '@common/modules/find-statistics/components/KeyStat';
+import keyStatisticService, {
+  KeyStatisticDataBlockUpdateRequest,
+} from '@admin/services/keyStatisticService';
+import { KeyStatistic } from '@common/services/publicationService';
 
 export default function useReleaseContentActions() {
   const dispatch = useReleaseContentDispatch();
@@ -448,7 +449,15 @@ export default function useReleaseContentActions() {
   );
 
   const updateKeyStatisticDataBlock = useCallback(
-    async ({ releaseId, keyStatisticId, request }) => {
+    async ({
+      releaseId,
+      keyStatisticId,
+      request,
+    }: {
+      releaseId: string;
+      keyStatisticId: string;
+      request: KeyStatisticDataBlockUpdateRequest;
+    }) => {
       const updatedKeyStatisticDataBlock = await keyStatisticService.updateKeyStatisticDataBlock(
         releaseId,
         keyStatisticId,
@@ -463,12 +472,47 @@ export default function useReleaseContentActions() {
   );
 
   const deleteKeyStatistic = useCallback(
-    async ({ releaseId, keyStatisticId }) => {
+    async ({
+      releaseId,
+      keyStatisticId,
+    }: {
+      releaseId: string;
+      keyStatisticId: string;
+    }) => {
       await keyStatisticService.deleteKeyStatistic(releaseId, keyStatisticId);
 
       dispatch({
         type: 'REMOVE_KEY_STATISTIC',
         payload: { releaseId, keyStatisticId },
+      });
+    },
+    [dispatch],
+  );
+
+  const reorderKeyStatistics = useCallback(
+    async ({
+      releaseId,
+      keyStatistics,
+    }: {
+      releaseId: string;
+      keyStatistics: KeyStatistic[];
+    }) => {
+      const order = keyStatistics.reduce<Dictionary<number>>(
+        (acc, keyStat, index) => {
+          acc[keyStat.id] = index;
+          return acc;
+        },
+        {},
+      );
+
+      const reorderedKeyStatistics = await keyStatisticService.reorderKeyStatistics(
+        releaseId,
+        order,
+      );
+
+      dispatch({
+        type: 'SET_KEY_STATISTICS',
+        payload: { keyStatistics: reorderedKeyStatistics },
       });
     },
     [dispatch],
@@ -487,6 +531,7 @@ export default function useReleaseContentActions() {
       deleteEmbedSectionBlock,
       deleteKeyStatistic,
       removeContentSection,
+      reorderKeyStatistics,
       updateAvailableDataBlocks,
       updateBlockComment,
       updateContentSectionBlock,
@@ -508,6 +553,7 @@ export default function useReleaseContentActions() {
       deleteEmbedSectionBlock,
       deleteKeyStatistic,
       removeContentSection,
+      reorderKeyStatistics,
       updateAvailableDataBlocks,
       updateBlockComment,
       updateContentSectionBlock,

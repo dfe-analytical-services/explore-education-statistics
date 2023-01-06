@@ -93,10 +93,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateContentBlockMap();
             CreateMap<DataBlockCreateViewModel, DataBlock>();
             CreateMap<DataBlockUpdateViewModel, DataBlock>();
-            CreateMap<DataBlock, DataBlockSummaryViewModel>() // @MarkFix is this used?
-                .ForMember(
-                    dest => dest.ChartsCount,
-                    m => m.MapFrom(d => d.Charts.Count));
 
             CreateMap<KeyStatisticDataBlock, KeyStatisticDataBlockViewModel>();
             CreateMap<KeyStatisticText, KeyStatisticTextViewModel>();

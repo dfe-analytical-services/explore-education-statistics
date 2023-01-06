@@ -138,31 +138,38 @@ public class KeyStatisticService : IKeyStatisticService
         await _context.SaveChangesAsync();
     }
 
-    public async void Reorder(Guid releaseId, Dictionary<Guid, int> newKeyStatisticOrder)
+    public async Task<Either<ActionResult, List<KeyStatisticViewModel>>> Reorder(Guid releaseId, Dictionary<Guid, int> newKeyStatisticOrder)
     {
-        var keyStatistics = _context.KeyStatistics
-            .Where(ks => ks.ReleaseId == releaseId)
-            .ToList();
-
-        var keyValuePairs = newKeyStatisticOrder.ToList();
-
-        if (keyStatistics.Count != keyValuePairs.Count)
-        {
-            throw new ArgumentException("newKeyStatisticOrder.Count must equal release's key statistics count");
-        }
-
-        // @MarkFix make this better - don't find one at a time
-        keyValuePairs.ForEach(kvp =>
-        {
-            var (keyStatisticId, newOrder) = kvp;
-            var matchingKeyStat = keyStatistics.Find(ks => ks.Id == keyStatisticId);
-            if (matchingKeyStat is not null)
+        return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
+            .OnSuccess(_userService.CheckCanUpdateRelease)
+            .OnSuccess(async release =>
             {
-                matchingKeyStat.Order = newOrder;
-                _context.Update(matchingKeyStat);
-            }
-        });
+                var keyStatistics = _context.KeyStatistics
+                    .Where(ks => ks.ReleaseId == release.Id)
+                    .ToList();
 
-        await _context.SaveChangesAsync();
+                var idOrderPairList = newKeyStatisticOrder.ToList();
+
+                if (keyStatistics.Count != idOrderPairList.Count)
+                {
+                    throw new ArgumentException("newKeyStatisticOrder.Count must equal release's key statistics count");
+                }
+
+                idOrderPairList.ForEach(idOrderPair =>
+                {
+                    var (keyStatisticId, newOrder) = idOrderPair;
+                    var matchingKeyStat = keyStatistics.Find(ks => ks.Id == keyStatisticId);
+                    if (matchingKeyStat != null)
+                    {
+                        matchingKeyStat.Order = newOrder;
+                    }
+                });
+
+                _context.UpdateRange(keyStatistics);
+                await _context.SaveChangesAsync();
+
+                return _mapper.Map<List<KeyStatisticViewModel>>(
+                    keyStatistics.OrderBy(ks => ks.Order));
+            });
     }
 }

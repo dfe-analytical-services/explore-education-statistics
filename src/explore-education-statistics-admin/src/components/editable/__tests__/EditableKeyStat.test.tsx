@@ -86,9 +86,9 @@ describe('EditableKeyStat', () => {
         name="Key Stat 1"
         onSubmit={noop}
         summary={{
-          dataSummary: ['Down from 620,330 in 2017'],
-          dataDefinitionTitle: ['What is the number of applications received?'],
-          dataDefinition: [
+          trend: ['Down from 620,330 in 2017'],
+          guidanceTitle: ['What is the number of applications received?'],
+          guidanceText: [
             'Total number of applications received for places at primary and secondary schools.',
           ],
           dataKeys: [],
@@ -135,9 +135,9 @@ describe('EditableKeyStat', () => {
         name="Key Stat 1"
         onSubmit={noop}
         summary={{
-          dataSummary: ['Down from 620,330 in 2017'],
-          dataDefinitionTitle: ['Help'],
-          dataDefinition: [
+          trend: ['Down from 620,330 in 2017'],
+          guidanceTitle: ['Help'],
+          guidanceText: [
             'Total number of applications received for places at primary and secondary schools.',
           ],
           dataKeys: [],
@@ -184,9 +184,9 @@ describe('EditableKeyStat', () => {
         name="Key Stat 1"
         onSubmit={noop}
         summary={{
-          dataSummary: ['Down from 620,330 in 2017'],
-          dataDefinitionTitle: [''],
-          dataDefinition: [
+          trend: ['Down from 620,330 in 2017'],
+          guidanceTitle: [''],
+          guidanceText: [
             'Total number of applications received for places at primary and secondary schools.',
           ],
           dataKeys: [],
@@ -301,9 +301,9 @@ describe('EditableKeyStat', () => {
         name="Key Stat 1"
         onSubmit={noop}
         summary={{
-          dataSummary: ['Down from 620,330 in 2017'],
-          dataDefinitionTitle: ['What is the number of applications received?'],
-          dataDefinition: [
+          trend: ['Down from 620,330 in 2017'],
+          guidanceTitle: ['What is the number of applications received?'],
+          guidanceText: [
             'Total number of applications received for places at primary and secondary schools.',
           ],
           dataKeys: [],
@@ -353,9 +353,9 @@ describe('EditableKeyStat', () => {
         onRemove={handleRemove}
         onSubmit={noop}
         summary={{
-          dataSummary: ['Down from 620,330 in 2017'],
-          dataDefinitionTitle: ['What is the number of applications received?'],
-          dataDefinition: [
+          trend: ['Down from 620,330 in 2017'],
+          guidanceTitle: ['What is the number of applications received?'],
+          guidanceText: [
             'Total number of applications received for places at primary and secondary schools.',
           ],
           dataKeys: [],
@@ -389,9 +389,9 @@ describe('EditableKeyStat', () => {
         name="Key Stat 1"
         onSubmit={noop}
         summary={{
-          dataSummary: ['Down from 620,330 in 2017'],
-          dataDefinitionTitle: ['What is the number of applications received?'],
-          dataDefinition: [
+          trend: ['Down from 620,330 in 2017'],
+          guidanceTitle: ['What is the number of applications received?'],
+          guidanceText: [
             'Total number of applications received for places at primary and secondary schools.',
           ],
           dataKeys: [],
@@ -504,9 +504,9 @@ describe('EditableKeyStat', () => {
         onRemove={noop}
         onSubmit={noop}
         summary={{
-          dataSummary: ['Down from 620,330 in 2017'],
-          dataDefinitionTitle: ['What is the number of applications received?'],
-          dataDefinition: [
+          trend: ['Down from 620,330 in 2017'],
+          guidanceTitle: ['What is the number of applications received?'],
+          guidanceText: [
             'Total number of applications received for places at primary and secondary schools.',
           ],
           dataKeys: [],
@@ -560,9 +560,9 @@ describe('EditableKeyStat', () => {
         onRemove={noop}
         onSubmit={noop}
         summary={{
-          dataSummary: ['Down from 620,330 in 2017'],
-          dataDefinitionTitle: ['What is the number of applications received?'],
-          dataDefinition: [
+          trend: ['Down from 620,330 in 2017'],
+          guidanceTitle: ['What is the number of applications received?'],
+          guidanceText: [
             'Total number of applications received for places at primary and secondary schools.',
           ],
           dataKeys: [],
@@ -606,9 +606,9 @@ describe('EditableKeyStat', () => {
         onRemove={handleRemove}
         onSubmit={noop}
         summary={{
-          dataSummary: ['Down from 620,330 in 2017'],
-          dataDefinitionTitle: ['What is the number of applications received?'],
-          dataDefinition: [
+          trend: ['Down from 620,330 in 2017'],
+          guidanceTitle: ['What is the number of applications received?'],
+          guidanceText: [
             'Total number of applications received for places at primary and secondary schools.',
           ],
           dataKeys: [],

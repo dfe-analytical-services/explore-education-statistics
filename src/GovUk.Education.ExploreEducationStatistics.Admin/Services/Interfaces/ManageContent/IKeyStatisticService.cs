@@ -23,7 +23,7 @@ public interface IKeyStatisticService
 
     Task DeleteAnyAssociatedWithDataBlock(Guid releaseId, Guid dataBlockId);
 
-    void Reorder(Guid releaseId, Dictionary<Guid, int> newKeyStatisticOrder);
-
-
+    Task<Either<ActionResult, List<KeyStatisticViewModel>>> Reorder(
+        Guid releaseId,
+        Dictionary<Guid, int> newKeyStatisticOrder);
 }

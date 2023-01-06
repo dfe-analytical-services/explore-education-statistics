@@ -10,6 +10,7 @@ import useKeyStatQuery from '@common/modules/find-statistics/hooks/useKeyStatQue
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import EditableKeyStatDataBlockForm from '@admin/components/editable/EditableKeyStatDataBlockForm';
+import { KeyStatisticDataBlock } from '@common/services/publicationService';
 
 interface KeyStatsDataFormValues {
   trend: string;
@@ -18,13 +19,7 @@ interface KeyStatsDataFormValues {
 }
 
 interface EditableKeyStatDataBlockProps {
-  // NOTE: Cannot accept KeyStatistic as a prop because KeyStatSelectForm keystat preview
-  keyStatId: string;
-  releaseId: string;
-  dataBlockId: string;
-  trend?: string;
-  guidanceTitle?: string;
-  guidanceText?: string;
+  keyStat: KeyStatisticDataBlock;
 
   isEditing?: boolean;
   isReordering?: boolean;
@@ -36,12 +31,14 @@ interface EditableKeyStatDataBlockProps {
 const EditableKeyStatDataBlock = ({
   isEditing = false,
   isReordering = false,
-  releaseId,
-  dataBlockId,
-  keyStatId,
-  trend,
-  guidanceTitle = 'Help',
-  guidanceText,
+  keyStat: {
+    id: keyStatId,
+    releaseId,
+    dataBlockId,
+    trend,
+    guidanceTitle = 'Help',
+    guidanceText,
+  },
   testId = 'keyStat',
   onRemove,
   onSubmit,
@@ -58,7 +55,10 @@ const EditableKeyStatDataBlock = ({
     return <LoadingSpinner />;
   }
 
-  if (error) {
+  const fetchedTitle = dataBlockValues?.title;
+  const fetchedStatistic = dataBlockValues?.value;
+
+  if (error || fetchedTitle === undefined || fetchedStatistic === undefined) {
     return (
       <>
         <WarningMessage>Could not load key statistic</WarningMessage>
@@ -79,13 +79,6 @@ const EditableKeyStatDataBlock = ({
         </ButtonGroup>
       </>
     );
-  }
-
-  const fetchedTitle = dataBlockValues?.title;
-  const fetchedStatistic = dataBlockValues?.value;
-
-  if (fetchedTitle === undefined || fetchedStatistic === undefined) {
-    return null; // @MarkFix
   }
 
   if (showForm) {

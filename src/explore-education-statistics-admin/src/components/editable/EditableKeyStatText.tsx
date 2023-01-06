@@ -7,6 +7,7 @@ import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile'
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import EditableKeyStatTextForm from '@admin/components/editable/EditableKeyStatTextForm';
+import { KeyStatisticText } from '@common/services/publicationService';
 
 interface KeyStatsFormValues {
   trend: string;
@@ -15,12 +16,7 @@ interface KeyStatsFormValues {
 }
 
 interface EditableKeyStatTextProps {
-  keyStatId: string;
-  title: string;
-  statistic: string;
-  trend?: string;
-  guidanceTitle?: string;
-  guidanceText?: string;
+  keyStat: KeyStatisticText;
   isEditing?: boolean;
   isReordering?: boolean;
   onRemove?: () => void;
@@ -31,12 +27,7 @@ interface EditableKeyStatTextProps {
 const EditableKeyStatText = ({
   isEditing = false,
   isReordering = false,
-  keyStatId,
-  title,
-  statistic,
-  trend,
-  guidanceTitle = 'Help',
-  guidanceText,
+  keyStat,
   testId = 'keyStat',
   onRemove,
   onSubmit,
@@ -47,12 +38,7 @@ const EditableKeyStatText = ({
   if (showForm) {
     return (
       <EditableKeyStatTextForm
-        keyStatId={keyStatId}
-        title={title}
-        statistic={statistic}
-        trend={trend}
-        guidanceTitle={guidanceTitle}
-        guidanceText={guidanceText}
+        keyStat={keyStat}
         isReordering={isReordering}
         onSubmit={onSubmit}
         toggleShowFormOff={toggleShowForm.off}
@@ -64,26 +50,32 @@ const EditableKeyStatText = ({
   return (
     <>
       <KeyStatTile
-        title={title}
-        value={statistic}
+        title={keyStat.title}
+        value={keyStat.statistic}
         testId={testId}
         isReordering={isReordering}
       >
-        {trend && (
+        {keyStat.trend && (
           <p className="govuk-body-s" data-testid={`${testId}-summary`}>
-            {trend}
+            {keyStat.trend}
           </p>
         )}
       </KeyStatTile>
 
-      {guidanceTitle && !isReordering && (
+      {keyStat.guidanceTitle && !isReordering && (
         <Details
-          summary={guidanceTitle}
+          summary={keyStat.guidanceTitle}
           className={styles.definition}
-          hiddenText={guidanceTitle === 'Help' ? `for ${title}` : undefined}
+          hiddenText={
+            keyStat.guidanceTitle === 'Help'
+              ? `for ${keyStat.title}`
+              : undefined
+          }
         >
           <div data-testid={`${testId}-definition`}>
-            <ReactMarkdown key={guidanceText}>{guidanceText}</ReactMarkdown>
+            <ReactMarkdown key={keyStat.guidanceText}>
+              {keyStat.guidanceText}
+            </ReactMarkdown>
           </div>
         </Details>
       )}

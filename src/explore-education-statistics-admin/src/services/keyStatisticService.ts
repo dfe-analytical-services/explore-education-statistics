@@ -1,5 +1,9 @@
 import client from '@admin/services/utils/service';
-import { KeyStatisticDataBlock } from '@common/services/publicationService';
+import {
+  KeyStatistic,
+  KeyStatisticDataBlock,
+} from '@common/services/publicationService';
+import { Dictionary } from '@common/types';
 
 export interface KeyStatisticDataBlockCreateRequest {
   dataBlockId: string;
@@ -40,6 +44,13 @@ const keyStatisticService = {
     return client.delete(
       `/release/${releaseId}/key-statistic/${keyStatisticId}`,
     );
+  },
+
+  reorderKeyStatistics(
+    releaseId: string,
+    order: Dictionary<number>,
+  ): Promise<KeyStatistic[]> {
+    return client.put(`/release/${releaseId}/key-statistic/order`, order);
   },
 };
 

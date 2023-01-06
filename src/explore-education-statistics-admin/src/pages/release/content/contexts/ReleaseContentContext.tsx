@@ -228,6 +228,11 @@ export const releaseReducer: Reducer<
       );
       return draft;
     }
+    case 'SET_KEY_STATISTICS': {
+      const { keyStatistics } = action.payload;
+      draft.release.keyStatistics = keyStatistics;
+      return draft;
+    }
     default: {
       return draft;
     }

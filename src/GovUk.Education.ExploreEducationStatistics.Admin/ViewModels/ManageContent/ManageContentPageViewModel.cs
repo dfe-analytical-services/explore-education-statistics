@@ -4,6 +4,7 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -51,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
             public ContentSectionViewModel HeadlinesSection { get; set; } = new();
 
-            public List<KeyStatistic> KeyStatistics { get; set; } = new();
+            public List<KeyStatisticViewModel> KeyStatistics { get; set; } = new();
 
             public ContentSectionViewModel KeyStatisticsSecondarySection { get; set; } = new();
 

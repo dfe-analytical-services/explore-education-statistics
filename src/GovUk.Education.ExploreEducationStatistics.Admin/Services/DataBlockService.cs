@@ -19,7 +19,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -145,7 +144,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     ChartsCount = block.Charts.Count,
                                     InContent = inContent,
                                 };
-
                             }))
                             .OrderBy(model => model.Name)
                             .ToList();

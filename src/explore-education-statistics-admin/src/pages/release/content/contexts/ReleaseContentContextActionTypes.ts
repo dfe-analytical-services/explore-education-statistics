@@ -6,7 +6,6 @@ import {
 import {
   ContentSection,
   KeyStatistic,
-  KeyStatisticDataBlock,
   Release,
 } from '@common/services/publicationService';
 import { DataBlock } from '@common/services/types/blocks';
@@ -28,7 +27,7 @@ export interface BlockMeta {
 
 type SectionMeta = Omit<BlockMeta, 'blockId'>;
 
-type SetAvailableDataBlocks = {
+export type SetAvailableDataBlocks = {
   type: 'SET_AVAILABLE_DATABLOCKS';
   payload: DataBlock[];
 };
@@ -125,6 +124,11 @@ export type RemoveKeyStatistic = {
   payload: { releaseId: string; keyStatisticId: string };
 };
 
+export type SetKeyStatistics = {
+  type: 'SET_KEY_STATISTICS';
+  payload: { keyStatistics: KeyStatistic[] };
+};
+
 export type ReleaseDispatchAction =
   | AddBlockComment
   | AddSectionBlock
@@ -132,6 +136,7 @@ export type ReleaseDispatchAction =
   | AddKeyStatistic
   | SetAvailableDataBlocks
   | SetReleaseContent
+  | SetKeyStatistics
   | RemoveBlockComment
   | RemoveSectionBlock
   | RemoveKeyStatistic

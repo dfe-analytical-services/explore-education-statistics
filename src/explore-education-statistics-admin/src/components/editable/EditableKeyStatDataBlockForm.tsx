@@ -54,8 +54,6 @@ const EditableKeyStatDataBlockForm = ({
     >
       {form => (
         <Form id={`editableKeyStatForm-${keyStatId}`}>
-          {/* // @MarkFix? <h3 className="govuk-heading-s">{data_block_name_went_here}</h3>*/}
-
           <KeyStatTile
             title={title}
             titleTag="h4"

@@ -3,6 +3,11 @@ import EditableKeyStatDataBlock from '@admin/components/editable/EditableKeyStat
 import EditableKeyStatText from '@admin/components/editable/EditableKeyStatText';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { KeyStatisticDataBlockUpdateRequest } from '@admin/services/keyStatisticService';
+import {
+  KeyStatistic,
+  KeyStatisticDataBlock,
+  KeyStatisticText,
+} from '@common/services/publicationService';
 
 export interface KeyStatsFormValues {
   trend: string;
@@ -11,14 +16,7 @@ export interface KeyStatsFormValues {
 }
 
 interface EditableKeyStatProps {
-  releaseId?: string;
-  dataBlockId?: string;
-  keyStatId: string;
-  title?: string;
-  statistic?: string;
-  trend?: string;
-  guidanceTitle?: string;
-  guidanceText?: string;
+  keyStat: KeyStatistic;
 
   isEditing?: boolean;
   isReordering?: boolean;
@@ -29,27 +27,15 @@ interface EditableKeyStatProps {
 const EditableKeyStat = ({
   isEditing = false,
   isReordering = false,
-  releaseId,
-  dataBlockId,
-  keyStatId,
-  title,
-  statistic,
-  trend,
-  guidanceTitle = 'Help',
-  guidanceText,
+  keyStat,
   testId = 'keyStat',
   onRemove,
 }: EditableKeyStatProps) => {
   const { updateKeyStatisticDataBlock } = useReleaseContentActions();
-  if (dataBlockId && releaseId) {
+  if ((keyStat as KeyStatisticDataBlock).dataBlockId) {
     return (
       <EditableKeyStatDataBlock
-        releaseId={releaseId}
-        dataBlockId={dataBlockId}
-        keyStatId={keyStatId}
-        trend={trend}
-        guidanceTitle={guidanceTitle}
-        guidanceText={guidanceText}
+        keyStat={keyStat as KeyStatisticDataBlock}
         testId={testId}
         isEditing={isEditing}
         isReordering={isReordering}
@@ -61,8 +47,8 @@ const EditableKeyStat = ({
             guidanceText: values.guidanceText,
           };
           await updateKeyStatisticDataBlock({
-            releaseId,
-            keyStatisticId: keyStatId,
+            releaseId: keyStat.releaseId,
+            keyStatisticId: keyStat.id,
             request,
           });
         }}
@@ -70,27 +56,26 @@ const EditableKeyStat = ({
     );
   }
 
-  if (title && statistic) {
+  if (
+    (keyStat as KeyStatisticText).title &&
+    (keyStat as KeyStatisticText).statistic
+  ) {
     return (
       <EditableKeyStatText
-        keyStatId={keyStatId}
-        title={title}
-        statistic={statistic}
-        trend={trend}
-        guidanceTitle={guidanceTitle}
-        guidanceText={guidanceText}
+        keyStat={keyStat as KeyStatisticText}
         testId={testId}
         isEditing={isEditing}
         isReordering={isReordering}
         onRemove={onRemove}
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         onSubmit={async values => {
-          // @MarkFix call keyStatisticService.Update here
+          // EES-3913
         }}
       />
     );
   }
 
-  return null; // @MarkFix throw error or something
+  return null;
 };
 
 export default EditableKeyStat;

@@ -9,6 +9,7 @@ import styles from '@common/modules/find-statistics/components/KeyStat.module.sc
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import { Formik } from 'formik';
 import React from 'react';
+import { KeyStatisticText } from '@common/services/publicationService';
 
 interface KeyStatTextFormValues {
   title: string;
@@ -19,12 +20,7 @@ interface KeyStatTextFormValues {
 }
 
 interface EditableKeyStatTextFormProps {
-  keyStatId: string;
-  title: string;
-  statistic: string;
-  trend?: string;
-  guidanceTitle?: string;
-  guidanceText?: string;
+  keyStat: KeyStatisticText;
   isReordering?: boolean;
   onSubmit: (values: KeyStatTextFormValues) => void;
   toggleShowFormOff: () => void;
@@ -32,12 +28,14 @@ interface EditableKeyStatTextFormProps {
 }
 
 const EditableKeyStatTextForm = ({
-  keyStatId,
-  title,
-  statistic,
-  trend,
-  guidanceTitle,
-  guidanceText,
+  keyStat: {
+    id: keyStatId,
+    title,
+    statistic,
+    trend,
+    guidanceTitle = 'Help',
+    guidanceText,
+  },
   isReordering,
   onSubmit,
   toggleShowFormOff,
@@ -63,13 +61,11 @@ const EditableKeyStatTextForm = ({
     >
       {form => (
         <Form id={`editableKeyStatForm-${keyStatId}`}>
-          {/* TODO: EES-3919  <h3 className="govuk-heading-s">{data_block_name_went_here}</h3>*/}
-
           <KeyStatTile
             title={title}
+            value={statistic}
             titleTag="h4"
             testId={testId}
-            value={statistic}
             isReordering={isReordering}
           >
             {/* TODO: EES-3919 Add inputs for title and statistic */}

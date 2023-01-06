@@ -55,7 +55,7 @@ const KeyStatDataBlock = ({
       </KeyStat>
     );
   }
-  return null; // @MarkFix something else?
+  return null;
 };
 
 export default KeyStatDataBlock;

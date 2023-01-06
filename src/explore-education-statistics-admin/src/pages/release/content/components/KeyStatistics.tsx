@@ -13,12 +13,6 @@ import React, { useCallback, useState, useEffect } from 'react';
 import { Draggable, DragDropContext, DropResult } from 'react-beautiful-dnd';
 import classNames from 'classnames';
 import reorder from '@common/utils/reorder';
-import { Dictionary } from '@admin/types';
-import {
-  KeyStatistic,
-  KeyStatisticDataBlock,
-  KeyStatisticText,
-} from '@common/services/publicationService';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 
 export interface KeyStatisticsProps {
@@ -30,14 +24,12 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
   const {
     updateAvailableDataBlocks,
     deleteKeyStatistic,
+    reorderKeyStatistics,
   } = useReleaseContentActions();
-  const [keyStatisticsBlocks, setKeyStatisticsBlocks] = useState(
-    release.keyStatistics,
-  );
+  const [keyStatistics, setKeyStatistics] = useState(release.keyStatistics);
 
   useEffect(() => {
-    // @MarkFix needed?
-    setKeyStatisticsBlocks(release.keyStatistics);
+    setKeyStatistics(release.keyStatistics);
   }, [release]);
 
   const [isReordering, toggleReordering] = useToggle(false);
@@ -54,36 +46,25 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
     );
   };
 
-  const reorderKeyStatistics = useCallback(
-    async (keyStatistics: KeyStatistic[]) => {
-      const order = keyStatistics.reduce<Dictionary<number>>(
-        (acc, keyStat, index) => {
-          acc[keyStat.id] = index;
-          return acc;
-        },
-        {},
-      );
-      // @MarkFix reorder KeyStatisticBase here
-    },
-    [release.id],
-  );
-
   const saveOrder = useCallback(async () => {
     if (reorderKeyStatistics) {
-      await reorderKeyStatistics(keyStatisticsBlocks);
+      await reorderKeyStatistics({
+        releaseId: release.id,
+        keyStatistics,
+      });
       toggleReordering.off();
     }
-  }, [reorderKeyStatistics, keyStatisticsBlocks, toggleReordering]);
+  }, [reorderKeyStatistics, release.id, keyStatistics, toggleReordering]);
 
   const handleDragEnd = useCallback(
     ({ source, destination }: DropResult) => {
       if (source && destination) {
-        setKeyStatisticsBlocks(
-          reorder(keyStatisticsBlocks, source.index, destination.index),
+        setKeyStatistics(
+          reorder(keyStatistics, source.index, destination.index),
         );
       }
     },
-    [keyStatisticsBlocks],
+    [keyStatistics],
   );
 
   return (
@@ -99,7 +80,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
           </WarningMessage>
           <ButtonGroup className={styles.buttons}>
             <AddKeyStatistics release={release} />
-            {keyStatisticsBlocks.length > 1 && <ReorderKeyStatisticsButton />}
+            {keyStatistics.length > 1 && <ReorderKeyStatisticsButton />}
           </ButtonGroup>
         </>
       )}
@@ -110,7 +91,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
         >
           <div className="govuk-!-margin-bottom-9">
             <KeyStatContainer>
-              {keyStatisticsBlocks.map((keyStat, index) => {
+              {keyStatistics.map((keyStat, index) => {
                 return (
                   <Draggable
                     draggableId={keyStat.id}
@@ -141,16 +122,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                         )}
                         <EditableKeyStat
                           key={keyStat.id}
-                          releaseId={release.id}
-                          keyStatId={keyStat.id}
-                          dataBlockId={
-                            (keyStat as KeyStatisticDataBlock).dataBlockId
-                          }
-                          title={(keyStat as KeyStatisticText).title}
-                          statistic={(keyStat as KeyStatisticText).statistic}
-                          trend={keyStat.trend}
-                          guidanceTitle={keyStat.guidanceTitle}
-                          guidanceText={keyStat.guidanceText}
+                          keyStat={keyStat}
                           isEditing={isEditing}
                           isReordering={isReordering}
                           onRemove={async () => {
@@ -185,13 +157,13 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
 
   const { keyStatistics } = release;
 
-  const addKeyStatDataBlockToSection = useCallback(
+  const addKeyStatDataBlock = useCallback(
     async (dataBlockId: string) => {
       await addKeyStatisticDataBlock({ releaseId: release.id, dataBlockId });
       await updateAvailableDataBlocks({ releaseId: release.id });
       setIsFormOpen(false);
     },
-    [release.id],
+    [release.id, addKeyStatisticDataBlock, updateAvailableDataBlocks],
   );
 
   return (
@@ -200,7 +172,7 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
         <div className={styles.formContainer}>
           <KeyStatDataBlockSelectForm
             releaseId={release.id}
-            onSelect={addKeyStatDataBlockToSection}
+            onSelect={addKeyStatDataBlock}
             onCancel={() => setIsFormOpen(false)}
           />
         </div>
