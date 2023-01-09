@@ -587,7 +587,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: '89869bba-0c00-40f7-b7d6-e28cb904ad37',
             title: 'Characteristics of children in need',
             slug: 'characteristics-of-children-in-need',
@@ -601,7 +600,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: '3260801d-601a-48c6-93b7-cf51680323d1',
             title: 'Children looked after in England including adoptions',
             slug: 'children-looked-after-in-england-including-adoptions',
@@ -615,7 +613,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: 'd8baee79-3c88-45f4-b12a-07b91e9b5c11',
             title: "Children's social work workforce",
             slug: 'children-s-social-work-workforce',
@@ -629,7 +626,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: 'f51895df-c682-45e6-b23e-3138ddbfdaeb',
             title:
               'Outcomes for children in need, including children looked after by local authorities in England',
@@ -638,7 +634,6 @@ export const themes: Theme[] = [
             isSuperseded: false,
           },
           {
-            type: 'AdHoc',
             id: 'ea42de23-80c0-4609-89fe-91df00c4f249',
             title:
               'Outcomes of children in need, including looked after children',
@@ -654,7 +649,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: 'd7bd5d9d-dc65-4b1d-99b1-4d815b7369a3',
             title: "Children accommodated in secure children's homes",
             slug: 'children-accommodated-in-secure-childrens-homes',
@@ -668,7 +662,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'Experimental',
             id: '0c2da30b-0210-49d4-cac0-08d87696e25e',
             title: 'Serious incident notifications',
             slug: 'serious-incident-notifications',
@@ -690,7 +683,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: '036e2c36-7c48-4a29-8419-a3939be9e173',
             title:
               'Attendance in education and early years settings during the coronavirus (COVID-19) pandemic',
@@ -706,7 +698,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'ManagementInformation',
             id: '4b2e6dfd-69c8-42d7-8fac-08d999fbf656',
             title: 'CO2 monitors: cumulative delivery statistics',
             slug: 'co2-monitors-cumulative-delivery-statistics',
@@ -720,7 +711,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'AdHoc',
             id: '359958a5-b28a-4ab3-508a-08d88f97dffc',
             title:
               'Coronavirus (COVID-19) Reporting in Higher Education Providers',
@@ -736,14 +726,12 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'ManagementInformation',
             id: '1c45fcd7-e1ca-44d2-b4c8-08d9ec8bbabe',
             title: 'Delivery of air cleaning units',
             slug: 'delivery-of-air-cleaning-units',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: '4d747ecd-10cc-4660-bcdc-08d8b9339e60',
             title: 'Laptops and tablets data',
             slug: 'laptops-and-tablets-data',
@@ -757,7 +745,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'AdHoc',
             id: '6d2ff07c-7ea9-43c0-6937-08d8cddbb024',
             title: 'COVID mass testing data in education',
             slug: 'covid-mass-testing-data-in-education',
@@ -779,28 +766,24 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: '657a20f6-13ef-494f-c9c0-08d82a49a1d0',
             title: '16-18 destination measures',
             slug: '16-18-destination-measures',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: 'b70e71fa-5767-4fb5-c9bf-08d82a49a1d0',
             title: 'Key stage 4 destination measures',
             slug: 'key-stage-4-destination-measures',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: '2ee2b32a-3fa0-42bb-c9c2-08d82a49a1d0',
             title: 'Longer term destinations',
             slug: 'longer-term-destinations',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: '61784b00-d1e7-4dbd-c9c1-08d82a49a1d0',
             title: 'Progression to higher education or training',
             slug: 'progression-to-higher-education-or-training',
@@ -814,14 +797,12 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: '2e510281-ca8c-41bf-bbe0-fd15fcc81aae',
             title: 'NEET age 16 to 24',
             slug: 'neet-statistics-annual-brief',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: 'a0eb117e-44a8-4732-adf1-8fbc890cbb62',
             title: 'Participation in education and training and employment',
             slug: 'participation-in-education-and-training-and-employment',
@@ -843,7 +824,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: '0ce6a6c6-5451-4967-8dd4-2f4fa8131982',
             title: 'Education provision: children under 5 years of age',
             slug: 'education-provision-children-under-5',
@@ -857,7 +837,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: 'fcda2962-82a6-4052-afa2-ea398c53c85f',
             title: 'Early years foundation stage profile results',
             slug: 'early-years-foundation-stage-profile-results',
@@ -873,7 +852,6 @@ export const themes: Theme[] = [
           {
             legacyPublicationUrl:
               'https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-providers-survey',
-            type: 'Legacy',
             id: '79a08466-dace-4ff0-94b6-59c5528c9262',
             title: 'Childcare and early years provider survey',
             slug: 'childcare-and-early-years-provider-survey',
@@ -882,7 +860,6 @@ export const themes: Theme[] = [
           {
             legacyPublicationUrl:
               'https://www.gov.uk/government/collections/statistics-childcare-and-early-years#childcare-and-early-years-providers-survey',
-            type: 'Legacy',
             id: '060c5376-35d8-420b-8266-517a9339b7bc',
             title: 'Childcare and early years survey of parents',
             slug: 'childcare-and-early-years-survey-of-parents',
@@ -903,21 +880,18 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: 'dcb8b32b-4e50-4fe2-a539-58f9b6b3a366',
             title: 'LA and school expenditure',
             slug: 'la-and-school-expenditure',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: '94d16c6e-1e5f-48d5-8195-8ea770f1b0d4',
             title: 'Planned LA and school expenditure',
             slug: 'planned-la-and-school-expenditure',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: '39dce2e3-4976-41ac-cb95-08d8bdf1a994',
             title: 'School funding statistics',
             slug: 'school-funding-statistics',
@@ -931,7 +905,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: 'fd68e147-b7ee-464f-8b02-dcd917dc362d',
             title: 'Student loan forecasts for England',
             slug: 'student-loan-forecasts-for-england',
@@ -955,7 +928,6 @@ export const themes: Theme[] = [
           {
             legacyPublicationUrl:
               'https://www.gov.uk/government/collections/fe-choices#learner-satisfaction-survey-data',
-            type: 'Legacy',
             id: '657b1484-0369-4a0e-873a-367b79a48c35',
             title: 'FE choices learner satisfaction survey',
             slug: 'fe-choices-learner-satisfaction-survey',
@@ -969,28 +941,24 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: 'cf0ec981-3583-42a5-b21b-3f2f32008f1b',
             title: 'Apprenticeships and traineeships',
             slug: 'apprenticeships-and-traineeships',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: 'c858107c-1b98-4818-2731-08d8a11fd8ef',
             title: 'Apprenticeships in England by industry characteristics ',
             slug: 'apprenticeships-in-england-by-industry-characteristics',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: '13b81bcb-e8cd-4431-9807-ca588fd1d02a',
             title: 'Further education and skills',
             slug: 'further-education-and-skills',
             isSuperseded: false,
           },
           {
-            type: 'AdHoc',
             id: 'ce8ef30f-1b14-45d4-4854-08d99eeed35d',
             title: 'Skills Bootcamps outcomes',
             slug: 'skills-bootcamps-outcomes',
@@ -1004,7 +972,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'AdHoc',
             id: '1aa10012-ee64-4ece-f4b1-08d8b7d3c33b',
             title:
               'FE learners going into employment and learning destinations by local authority district',
@@ -1013,14 +980,12 @@ export const themes: Theme[] = [
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: 'b2eed9e7-3845-47ab-e9a9-08d9a8ec2f9e',
             title: 'Further education skills index',
             slug: 'further-education-skills-index',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: '8b12776b-3d36-4475-8115-00974d7de1d0',
             title: 'Further education: outcome-based success measures',
             slug: 'further-education-outcome-based-success-measures',
@@ -1042,7 +1007,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'Experimental',
             id: '04b59c44-bfb8-4d7d-841d-08d9a365444f',
             title:
               'UK revenue from education related exports and transnational education activity',
@@ -1058,28 +1022,24 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: '42a888c4-9ee7-40fd-9128-f5de546780b3',
             title: 'Graduate labour market statistics',
             slug: 'graduate-labour-markets',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: '2d629fad-d66d-46d8-849d-08d8b249ed05',
             title: 'Graduate outcomes (LEO)',
             slug: 'graduate-outcomes-leo',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: '4d29c28c-efd1-4245-a80c-b55c6a50e3f7',
             title: 'Graduate outcomes (LEO): postgraduate outcomes',
             slug: 'graduate-outcomes-leo-postgraduate-outcomes',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: 'f27b380e-98a6-4b1a-9d98-f7b7a5392032',
             title: 'Graduate outcomes (LEO): Provider level data',
             slug: 'graduate-outcomes-leo-provider-level-data',
@@ -1093,7 +1053,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'AdHoc',
             id: 'e926dcde-e610-4721-ea39-08d968ac9105',
             title: 'Higher Level Learners in England',
             slug: 'higher-level-learners-in-england',
@@ -1107,7 +1066,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: '0c67bbdb-4eb0-41cf-a62e-2589cee58538',
             title: 'Participation measures in higher education',
             slug: 'participation-measures-in-higher-education',
@@ -1121,7 +1079,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: 'c28f7aca-f1e8-4916-8ce3-fc177b140695',
             title: 'Widening participation in higher education',
             slug: 'widening-participation-in-higher-education',
@@ -1143,7 +1100,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: '4e9eb1f5-8440-4e39-2d3e-08d93a1d8d28',
             title: 'Academy transfers and funding',
             slug: 'academy-transfers-and-funding',
@@ -1157,7 +1113,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: '123461ab-50be-45d9-8523-c5241a2c9c5b',
             title: 'Admission appeals in England',
             slug: 'admission-appeals-in-england',
@@ -1171,7 +1126,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: 'bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9',
             title: 'Permanent exclusions and suspensions in England',
             slug: 'permanent-and-fixed-period-exclusions-in-england',
@@ -1185,7 +1139,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: '86af24dc-67c4-47f0-a849-e94c7a1cfe9b',
             title: 'Parental responsibility measures',
             slug: 'parental-responsibility-measures',
@@ -1199,14 +1152,12 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: 'cbbd299f-8297-44bc-92ac-558bcf51f8ad',
             title: 'Pupil absence in schools in England',
             slug: 'pupil-absence-in-schools-in-england',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: '14953fda-02ff-45ed-9573-3a7a0ad8cb10',
             title:
               'Pupil absence in schools in England: autumn and spring terms',
@@ -1214,7 +1165,6 @@ export const themes: Theme[] = [
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: '6c388293-d027-4f74-8d74-29a42e02231c',
             title: 'Pupil absence in schools in England: autumn term',
             slug: 'pupil-absence-in-schools-in-england-autumn-term',
@@ -1228,7 +1178,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: 'aa545525-9ffe-496c-a5b3-974ace56746e',
             title: 'National pupil projections',
             slug: 'national-pupil-projections',
@@ -1242,21 +1191,18 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'AdHoc',
             id: '346a6978-9ee5-4b63-0ce1-08d88fd5ace1',
             title: 'Free school meals: Autumn term',
             slug: 'free-school-meals-autumn-term',
             isSuperseded: false,
           },
           {
-            type: 'Experimental',
             id: '71cfcea3-359c-4089-722e-08da07fcb6c9',
             title: 'National Tutoring Programme',
             slug: 'national-tutoring-programme',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: 'a91d9e05-be82-474c-85ae-4913158406d0',
             title: 'Schools, pupils and their characteristics',
             slug: 'school-pupils-and-their-characteristics',
@@ -1270,7 +1216,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: '66c8e9db-8bf2-4b0b-b094-cfab25c20b05',
             title: 'Secondary and primary school applications and offers',
             slug: 'secondary-and-primary-school-applications-and-offers',
@@ -1284,21 +1229,18 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'AdHoc',
             id: '4cd161ca-468f-4023-9b91-08d8d4cdc4e0',
             title: ' School places sufficiency survey',
             slug: 'school-places-sufficiency-survey',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: '5c066362-9e14-4688-4f8a-08d83303033f',
             title: 'Local authority school places scorecards',
             slug: 'local-authority-school-places-scorecards',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: 'fa591a15-ae37-41b5-98f6-4ce06e5225f4',
             title: 'School capacity',
             slug: 'school-capacity',
@@ -1312,14 +1254,12 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: '88312cc0-fe1d-4ab5-81df-33fd708185cb',
             title: 'Education, health and care plans',
             slug: 'education-health-and-care-plans',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: 'f657afb4-8f4a-427d-a683-15f11a2aefb5',
             title: 'Special educational needs in England',
             slug: 'special-educational-needs-in-england',
@@ -1328,7 +1268,6 @@ export const themes: Theme[] = [
           {
             legacyPublicationUrl:
               'https://www.gov.uk/government/collections/statistics-special-educational-needs-sen#analysis-of-children-with-special-educational-needs',
-            type: 'Legacy',
             id: '30874b87-483a-427e-8916-43cf9020d9a1',
             title:
               'Special educational needs: analysis and summary of data sources',
@@ -1351,14 +1290,12 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: '3f3a66ec-5777-42ee-b427-8102a14ce0c5',
             title: 'A level and other 16 to 18 results',
             slug: 'a-level-and-other-16-to-18-results',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: '2e95f880-629c-417b-981f-0901e97776ff',
             title: 'Level 2 and 3 attainment age 16 to 25',
             slug: 'level-2-and-3-attainment-by-young-people-aged-19',
@@ -1372,7 +1309,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: 'c8756008-ed50-4632-9b96-01b5ca002a43',
             title: 'Key stage 4 performance',
             slug: 'key-stage-4-performance-revised',
@@ -1381,7 +1317,6 @@ export const themes: Theme[] = [
           {
             legacyPublicationUrl:
               'https://www.gov.uk/government/collections/statistics-gcses-key-stage-4#multi-academy-trust-performance-measures',
-            type: 'Legacy',
             id: '1d0e4263-3d70-433e-bd95-f29754db5888',
             title: 'Multi-academy trust performance measures at key stage 4',
             slug: 'multi-academy-trust-performance-measures-at-ks4',
@@ -1397,7 +1332,6 @@ export const themes: Theme[] = [
           {
             legacyPublicationUrl:
               'https://www.gov.uk/government/collections/statistics-key-stage-1#phonics-screening-check-and-key-stage-1-assessment',
-            type: 'Legacy',
             id: '441a13f6-877c-4f18-828f-119dbd401a5b',
             title: 'Phonics screening check and key stage 1 assessments',
             slug: 'phonics-screening-check-and-key-stage-1-assessments',
@@ -1411,7 +1345,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: 'eab51107-4ef0-4926-8f8b-c8bd7f5a21d5',
             title: 'Multi-academy trust performance measures at key stage 2',
             slug: 'multi-academy-trust-performance-measures-at-ks2',
@@ -1420,7 +1353,6 @@ export const themes: Theme[] = [
           {
             legacyPublicationUrl:
               'https://www.gov.uk/government/collections/statistics-key-stage-2#national-curriculum-assessments-at-key-stage-2',
-            type: 'Legacy',
             id: '10370062-93b0-4dde-9097-5a56bf5b3064',
             title: 'National curriculum assessments at key stage 2',
             slug: 'national-curriculum-assessments-at-key-stage-2',
@@ -1441,14 +1373,12 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: '465d5a87-dba8-49ee-b7e3-08d86b7beb8f',
             title: 'Initial Teacher Training Census',
             slug: 'initial-teacher-training-census',
             isSuperseded: false,
           },
           {
-            type: 'NationalAndOfficial',
             id: 'd34978d5-0317-46bc-9258-13412270ac4d',
             title: 'Initial teacher training performance profiles',
             slug: 'initial-teacher-training-performance-profiles',
@@ -1457,7 +1387,6 @@ export const themes: Theme[] = [
           {
             legacyPublicationUrl:
               'https://www.gov.uk/government/collections/statistics-teacher-training#teacher-supply-model-and-itt-allocations',
-            type: 'Legacy',
             id: '3ceb43d0-e705-4cb9-aeb9-cb8638fcbf3d',
             title: 'TSM and initial teacher training allocations',
             slug: 'tsm-and-initial-teacher-training-allocations',
@@ -1471,7 +1400,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: 'b318967f-2931-472a-93f2-fbed1e181e6a',
             title: 'School workforce in England',
             slug: 'school-workforce-in-england',
@@ -1493,7 +1421,6 @@ export const themes: Theme[] = [
         summary: '',
         publications: [
           {
-            type: 'NationalAndOfficial',
             id: '2ffbc8d3-eb53-4c4b-a6fb-219a5b95ebc8',
             title: 'Education and training statistics for the UK',
             slug: 'education-and-training-statistics-for-the-uk',

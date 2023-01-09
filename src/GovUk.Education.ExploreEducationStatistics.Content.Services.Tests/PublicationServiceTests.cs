@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using MockQueryable.Moq;
 using Moq;
 using Xunit;
@@ -352,21 +351,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 ReleaseName = "2020",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = OfficialStatistics,
                 Published = DateTime.UtcNow
             };
             var releaseB = new Release
             {
                 ReleaseName = "2020",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = NationalStatistics,
                 Published = DateTime.UtcNow
             };
             var releaseC = new Release
             {
                 ReleaseName = "2022",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = NationalStatistics,
                 Published = DateTime.UtcNow
             };
 
@@ -470,7 +466,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Single(topicAPublications);
                 Assert.Equal("publication-a", topicAPublications[0].Slug);
                 Assert.Equal("Publication A", topicAPublications[0].Title);
-                Assert.Equal(PublicationType.NationalAndOfficial, topicAPublications[0].Type);
                 Assert.False(topicAPublications[0].LatestReleaseHasData);
                 Assert.False(topicAPublications[0].AnyLiveReleaseHasData);
 
@@ -479,7 +474,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Single(topicBPublications);
                 Assert.Equal("publication-b", topicBPublications[0].Slug);
                 Assert.Equal("Publication B", topicBPublications[0].Title);
-                Assert.Equal(PublicationType.NationalAndOfficial, topicBPublications[0].Type);
                 Assert.False(topicBPublications[0].LatestReleaseHasData);
                 Assert.False(topicBPublications[0].AnyLiveReleaseHasData);
 
@@ -488,7 +482,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Single(topicCPublications);
                 Assert.Equal("publication-c", topicCPublications[0].Slug);
                 Assert.Equal("Publication C", topicCPublications[0].Title);
-                Assert.Equal(PublicationType.NationalAndOfficial, topicCPublications[0].Type);
                 Assert.False(topicCPublications[0].LatestReleaseHasData);
                 Assert.False(topicCPublications[0].AnyLiveReleaseHasData);
             }
@@ -501,7 +494,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 ReleaseName = "2020",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = OfficialStatistics,
                 Published = DateTime.UtcNow,
             };
 
@@ -581,7 +573,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 ReleaseName = "2022",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = NationalStatistics,
                 Published = DateTime.UtcNow
             };
 
@@ -589,7 +580,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 ReleaseName = "2022",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = NationalStatistics,
                 Published = DateTime.UtcNow
             };
 
@@ -641,7 +631,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                                         {
                                             ReleaseName = "2021",
                                             TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                                            Type = NationalStatistics,
                                             Published = null
                                         }
                                     }
@@ -690,7 +679,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                                         {
                                             ReleaseName = "2022",
                                             TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                                            Type = NationalStatistics,
                                             Published = null
                                         }
                                     }
@@ -732,7 +720,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Single(topicAPublications);
                 Assert.Equal("Publication A", topicAPublications[0].Title);
-                Assert.Equal(PublicationType.NationalAndOfficial, topicAPublications[0].Type);
 
                 Assert.Single(publicationTree[1].Topics);
                 Assert.Equal("Topic B", publicationTree[1].Topics[0].Title);
@@ -741,7 +728,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Single(topicBPublications);
                 Assert.Equal("Publication B", topicBPublications[0].Title);
-                Assert.Equal(PublicationType.NationalAndOfficial, topicBPublications[0].Type);
             }
         }
 
@@ -752,7 +738,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 ReleaseName = "2020",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = OfficialStatistics,
                 Published = DateTime.UtcNow
             };
 
@@ -805,91 +790,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Single(publications);
                 Assert.Equal("Publication A", publications[0].Title);
-                Assert.Equal(PublicationType.NationalAndOfficial, publications[0].Type);
-            }
-        }
-
-        [Fact]
-        public async Task GetPublicationTree_PublicationWithMultipleReleasesHasCorrectLatestReleaseType()
-        {
-            var previousRelease = new Release
-            {
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = OfficialStatistics,
-                Published = DateTime.UtcNow,
-            };
-
-            var latestRelease = new Release
-            {
-                ReleaseName = "2021",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = NationalStatistics,
-                Published = DateTime.UtcNow,
-            };
-
-            var unpublishedRelease = new Release
-            {
-                ReleaseName = "2022",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = AdHocStatistics,
-                Published = null,
-            };
-
-            var theme = new Theme
-            {
-                Title = "Theme A",
-                Summary = "Theme A summary",
-                Topics = new List<Topic>
-                {
-                    new()
-                    {
-                        Title = "Topic A",
-                        Publications = new List<Publication>
-                        {
-                            new()
-                            {
-                                Title = "Publication A",
-                                Slug = "publication-a",
-                                LatestPublishedRelease = latestRelease,
-                                Releases = new List<Release>
-                                {
-                                    previousRelease,
-                                    latestRelease,
-                                    unpublishedRelease
-                                }
-                            }
-                        }
-                    },
-                },
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                await context.Themes.AddAsync(theme);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var service = SetupPublicationService(context);
-
-                var publicationTree = await service.GetPublicationTree();
-
-                Assert.Single(publicationTree);
-                Assert.Equal("Theme A", publicationTree[0].Title);
-                Assert.Equal("Theme A summary", publicationTree[0].Summary);
-
-                Assert.Single(publicationTree[0].Topics);
-                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
-
-                var publications = publicationTree[0].Topics[0].Publications;
-
-                Assert.Single(publications);
-                Assert.Equal("publication-a", publications[0].Slug);
-                Assert.Equal("Publication A", publications[0].Title);
-                Assert.Equal(PublicationType.NationalAndOfficial, publications[0].Type);
             }
         }
 
@@ -900,7 +800,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
                 ReleaseName = "2020",
-                Type = OfficialStatistics,
                 Published = new DateTime(2020, 1, 1),
             };
 
@@ -944,8 +843,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                                         new()
                                         {
                                             TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                                            ReleaseName = "2020",
-                                            Type = NationalStatistics
+                                            ReleaseName = "2020"
                                         }
                                     }
                                 }
@@ -982,7 +880,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var topicAPublications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Single(topicAPublications);
-                Assert.Equal(PublicationType.NationalAndOfficial, topicAPublications[0].Type);
                 Assert.Equal("Publication A", topicAPublications[0].Title);
             }
         }
@@ -994,7 +891,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 ReleaseName = "2021",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = OfficialStatistics,
                 Published = DateTime.UtcNow,
             };
 
@@ -1009,7 +905,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     {
                         ReleaseName = "2020",
                         TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        Type = OfficialStatistics,
                         Published = new DateTime(2020, 1, 1),
                     }
                 }
@@ -1089,7 +984,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 ReleaseName = "2021",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = OfficialStatistics,
                 Published = DateTime.UtcNow,
             };
 
@@ -1104,7 +998,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     {
                         ReleaseName = "2020",
                         TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        Type = OfficialStatistics,
                         Published = new DateTime(2020, 1, 1),
                     }
                 }
@@ -1184,7 +1077,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 ReleaseName = "2020",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = OfficialStatistics,
                 Published = DateTime.UtcNow,
             };
 
@@ -1192,7 +1084,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 ReleaseName = "2020",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = OfficialStatistics,
                 Published = null,
             };
 
@@ -1278,14 +1169,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 ReleaseName = "2020",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = OfficialStatistics,
                 Published = DateTime.UtcNow,
             };
             var releaseB = new Release
             {
                 ReleaseName = "2020",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = NationalStatistics,
                 Published = DateTime.UtcNow,
             };
 

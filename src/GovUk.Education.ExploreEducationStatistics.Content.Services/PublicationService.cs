@@ -238,7 +238,6 @@ public class PublicationService : IPublicationService
 
     private async Task<PublicationTreePublicationViewModel> BuildPublicationTreePublication(Publication publication)
     {
-        var type = await GetPublicationType(publication);
         var latestPublishedReleaseId = publication.LatestPublishedReleaseId;
 
         return new PublicationTreePublicationViewModel
@@ -246,7 +245,6 @@ public class PublicationService : IPublicationService
             Id = publication.Id,
             Title = publication.Title,
             Slug = publication.Slug,
-            Type = type,
             IsSuperseded = await _publicationRepository.IsSuperseded(publication.Id),
             LatestReleaseHasData = latestPublishedReleaseId != null &&
                                    await HasAnyDataFiles(latestPublishedReleaseId.Value),
@@ -263,28 +261,4 @@ public class PublicationService : IPublicationService
             .Include(rf => rf.File)
             .AnyAsync(rf => rf.ReleaseId == releaseId && rf.File.Type == FileType.Data);
     }
-
-    private async Task<PublicationType> GetPublicationType(Publication publication)
-    {
-        if (publication.LatestPublishedReleaseId == null)
-        {
-            throw new ArgumentException($"Publication must have a published release", nameof(publication));
-        }
-
-        await _contentDbContext.Entry(publication)
-            .Reference(p => p.LatestPublishedRelease)
-            .LoadAsync();
-
-        return GetPublicationType(publication.LatestPublishedRelease!.Type);
-    }
-
-    private static PublicationType GetPublicationType(ReleaseType releaseType) => releaseType switch
-    {
-        ReleaseType.AdHocStatistics => PublicationType.AdHoc,
-        ReleaseType.NationalStatistics => PublicationType.NationalAndOfficial,
-        ReleaseType.ExperimentalStatistics => PublicationType.Experimental,
-        ReleaseType.ManagementInformation => PublicationType.ManagementInformation,
-        ReleaseType.OfficialStatistics => PublicationType.NationalAndOfficial,
-        _ => throw new ArgumentOutOfRangeException(nameof(releaseType), releaseType, message: null)
-    };
 }
