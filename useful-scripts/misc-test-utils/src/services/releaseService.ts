@@ -1,24 +1,28 @@
+/* eslint-disable no-shadow */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-console */
 import chalk from 'chalk';
 import spinner from '../utils/spinner';
 import { ReleaseProgressResponse } from '../types/ReleaseProgressResponse';
 import sleep from '../utils/sleep';
-import { ReleaseData } from '../types/ReleaseData';
+import { Release } from '../types/Release';
 import adminApi from '../utils/adminApi';
+import logger from '../utils/logger';
 
 const { ADMIN_URL } = process.env;
 const releaseService = {
   createRelease: async (publicationId: string): Promise<string> => {
     spinner.start();
     console.time('createRelease');
+
     const res = await adminApi.post(
       `/api/publications/${publicationId}/releases`,
       {
-        timePeriodCoverage: { value: 'AY' },
-        releaseName: 2222,
-        type: 'AdHocStatistics',
+        publicationId,
         templateReleaseId: '',
+        timePeriodCoverage: { value: 'AY' },
+        type: 'AdHocStatistics',
+        year: Math.floor(Math.random() * (9999 - 1000 + 1) + 1000),
       },
     );
     console.timeEnd('createRelease');
@@ -60,22 +64,38 @@ const releaseService = {
     }
     return res.data;
   },
-  publishRelease: async (obj: ReleaseData, releaseId: string) => {
-    await adminApi.post(`/api/releases/${releaseId}/status`, obj);
+  publishRelease: async (release: Release, releaseId: string) => {
+    await adminApi.post(`/api/releases/${releaseId}/status`, release);
   },
   getRelease: async (releaseId: string) => {
     spinner.start();
     const res = await adminApi.get(`/api/releases/${releaseId}`);
-    const releaseData: ReleaseData = res.data;
+    const release: Release = res.data;
     await sleep(1000);
+    spinner.stop();
     return {
-      ...releaseData,
+      ...release,
       approvalstatus: 'Approved',
       amendment: 'false',
       latestInternalReleaseNote: 'Approved by publisher testing',
       publishMethod: 'Immediate',
     };
-    spinner.succeed();
+  },
+
+  getAllReleases: async (publicationId: string): Promise<Release[]> => {
+    const res = await adminApi.get(
+      `/api/publication/${publicationId}/releases?live=false&pageSize=500&includePermissions=true`,
+    );
+
+    const releases: Release[] = res.data.results;
+
+    logger.info(
+      `Found ${releases.length} ${
+        releases.length > 1 ? 'releases' : 'release'
+      } for publication ${publicationId}`,
+    );
+
+    return releases;
   },
 
   addContentSection: async (releaseId: string): Promise<string> => {

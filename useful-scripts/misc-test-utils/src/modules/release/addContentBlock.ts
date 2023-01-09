@@ -23,6 +23,6 @@ const addReleaseTextContentBlock = async (releaseId: string) => {
     );
   }
   await releaseService.addTextContent(releaseId, sectionId, blockId);
-  logger.info(chalk.green('Succesfully added release content block'));
+  logger.info(chalk.green('Successfully added release content block'));
 };
 export default addReleaseTextContentBlock;
