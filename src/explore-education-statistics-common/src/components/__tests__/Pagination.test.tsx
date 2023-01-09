@@ -493,7 +493,7 @@ function render({
       baseUrl="/test-url"
       currentPage={currentPage}
       // eslint-disable-next-line jsx-a11y/anchor-has-content, react/jsx-props-no-spreading
-      renderLink={({ ...props }) => <a {...props} href={props.to} />}
+      renderLink={props => <a {...props} href={props.to} />}
       totalPages={totalPages}
     />,
   );

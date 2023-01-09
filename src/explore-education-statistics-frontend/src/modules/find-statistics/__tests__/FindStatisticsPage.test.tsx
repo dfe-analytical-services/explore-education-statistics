@@ -232,6 +232,7 @@ describe('FindStatisticsPage', () => {
       results: [testPublications[1], testPublications[2]],
       paging: { ...testPaging, totalPages: 1, totalResults: 2 },
     });
+
     render(<FindStatisticsPage />);
 
     await waitFor(() => {
@@ -270,6 +271,7 @@ describe('FindStatisticsPage', () => {
       results: [],
       paging: { ...testPaging, totalPages: 0, totalResults: 0 },
     });
+
     render(<FindStatisticsPage />);
 
     await waitFor(() => {
@@ -299,6 +301,7 @@ describe('FindStatisticsPage', () => {
       results: [testPublications[1], testPublications[2]],
       paging: { ...testPaging, totalPages: 1, totalResults: 2 },
     });
+
     render(<FindStatisticsPage />);
 
     await waitFor(() => {
@@ -337,10 +340,13 @@ describe('FindStatisticsPage', () => {
       results: [],
       paging: { ...testPaging, totalPages: 0, totalResults: 0 },
     });
+
     render(<FindStatisticsPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('0 results')).toBeInTheDocument();
+      expect(
+        screen.getByText('There are no matching results.'),
+      ).toBeInTheDocument();
     });
 
     expect(
@@ -357,10 +363,6 @@ describe('FindStatisticsPage', () => {
       screen.getByRole('button', { name: 'Clear all filters' }),
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByText('There are no matching results.'),
-    ).toBeInTheDocument();
-
     expect(screen.queryByTestId('publicationsList')).not.toBeInTheDocument();
   });
 
@@ -370,6 +372,7 @@ describe('FindStatisticsPage', () => {
       results: [testPublications[1], testPublications[2]],
       paging: { ...testPaging, totalPages: 1, totalResults: 2 },
     });
+
     render(<FindStatisticsPage />);
 
     await waitFor(() => {
@@ -410,10 +413,13 @@ describe('FindStatisticsPage', () => {
       results: [],
       paging: { ...testPaging, totalPages: 0, totalResults: 0 },
     });
+
     render(<FindStatisticsPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('0 results')).toBeInTheDocument();
+      expect(
+        screen.getByText('There are no matching results.'),
+      ).toBeInTheDocument();
     });
 
     expect(screen.getByText('0 pages, filtered by:')).toBeInTheDocument();
@@ -428,10 +434,6 @@ describe('FindStatisticsPage', () => {
       screen.getByRole('button', { name: 'Clear all filters' }),
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByText('There are no matching results.'),
-    ).toBeInTheDocument();
-
     expect(screen.queryByTestId('publicationsList')).not.toBeInTheDocument();
   });
 
@@ -443,6 +445,7 @@ describe('FindStatisticsPage', () => {
       results: [testPublications[1], testPublications[2]],
       paging: { ...testPaging, totalPages: 1, totalResults: 2 },
     });
+
     render(<FindStatisticsPage />);
 
     await waitFor(() => {
@@ -477,10 +480,6 @@ describe('FindStatisticsPage', () => {
     expect(
       publicationsList.getByRole('heading', { name: 'Publication 3' }),
     ).toBeInTheDocument();
-
-    expect(
-      screen.queryByText('There are no matching results.'),
-    ).not.toBeInTheDocument();
   });
 
   test('adding filters', async () => {
@@ -941,6 +940,7 @@ describe('FindStatisticsPage', () => {
         results: testPublications,
         paging: testPaging,
       });
+
     render(<FindStatisticsPage />);
 
     await waitFor(() => {
