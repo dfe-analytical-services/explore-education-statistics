@@ -683,7 +683,7 @@
     },
     "releaseStatusPollTimeMillis": {
       "type": "int",
-      "defaultValue": 10000,
+      "defaultValue": "10000",
       "metadata": {
         "description": "Frequency with which the status of a Release undergoing publishing is polled on the Release Sign Off page"
       }
