@@ -420,6 +420,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Id = release.Id,
                     PublicationId = release.PublicationId,
+                    Published = release.Published,
                     Slug = release.Slug,
                     Year = release.Year,
                     TimeIdentifier = release.TimePeriodCoverage

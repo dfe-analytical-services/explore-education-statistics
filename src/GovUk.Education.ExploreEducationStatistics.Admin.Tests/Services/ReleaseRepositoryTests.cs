@@ -335,10 +335,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var statsRelease = await statisticsDbContext.Release.FindAsync(release.Id);
                 Assert.NotNull(statsRelease);
-                Assert.Equal(release.Slug, statsRelease!.Slug);
+                Assert.Equal(release.Published, statsRelease!.Published);
+                Assert.Equal(release.Slug, statsRelease.Slug);
                 Assert.Equal(release.PublicationId, statsRelease.PublicationId);
                 Assert.Equal(release.TimePeriodCoverage, statsRelease.TimeIdentifier);
                 Assert.Equal(release.Year, statsRelease.Year);
+                Assert.Equal(release.PreviousVersionId, statsRelease.PreviousVersionId);
             }
             
         }
@@ -396,7 +398,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var statsRelease = await statisticsDbContext.Release.FindAsync(release.Id);
                 Assert.NotNull(statsRelease);
-                Assert.Equal(release.Year, statsRelease!.Year);
+                Assert.Equal(release.Year, statsRelease.Year);
                 Assert.Equal(release.TimePeriodCoverage, statsRelease.TimeIdentifier);
                 Assert.Equal(release.PublicationId, statsRelease.PublicationId);
             }

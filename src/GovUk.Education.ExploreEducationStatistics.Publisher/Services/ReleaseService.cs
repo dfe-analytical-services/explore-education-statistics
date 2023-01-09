@@ -104,6 +104,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _methodologyService.SetPublishedDatesByPublication(contentRelease.PublicationId, published);
 
             await _contentDbContext.SaveChangesAsync();
+
+            var statisticsRelease = await _statisticsDbContext.Release
+                .AsQueryable()
+                .SingleOrDefaultAsync(r => r.Id == id);
+
+            // The Release in the statistics database can be absent if no data files were ever created
+            if (statisticsRelease != null)
+            {
+                statisticsRelease.Published ??= published;
+                _statisticsDbContext.Release.Update(statisticsRelease);
+                await _statisticsDbContext.SaveChangesAsync();
+            }
         }
 
         public async Task<List<File>> GetFiles(Guid releaseId, params FileType[] types)

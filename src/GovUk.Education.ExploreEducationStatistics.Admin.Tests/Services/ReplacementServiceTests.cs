@@ -70,12 +70,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var statsReleaseVersion1 = new Release
             {
-                Id = contentReleaseVersion1.Id
+                Id = contentReleaseVersion1.Id,
+                PreviousVersionId = contentReleaseVersion1.PreviousVersionId
             };
 
             var statsReleaseVersion2 = new Release
             {
-                Id = contentReleaseVersion2.Id
+                Id = contentReleaseVersion2.Id,
+                PreviousVersionId = contentReleaseVersion2.PreviousVersionId
             };
 
             // Use a FileType that is not Data
@@ -182,17 +184,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var statsRelease1Version1 = new Release
             {
-                Id = contentRelease1Version1.Id
+                Id = contentRelease1Version1.Id,
+                PreviousVersionId = contentRelease1Version1.PreviousVersionId
             };
 
             var statsRelease1Version2 = new Release
             {
-                Id = contentRelease1Version2.Id
+                Id = contentRelease1Version2.Id,
+                PreviousVersionId = contentRelease1Version2.PreviousVersionId
             };
 
             var statsRelease2 = new Release
             {
-                Id = contentRelease2.Id
+                Id = contentRelease2.Id,
+                PreviousVersionId = contentRelease2.PreviousVersionId
             };
 
             var originalFile = new File
@@ -292,12 +297,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var statsReleaseVersion1 = new Release
             {
-                Id = contentReleaseVersion1.Id
+                Id = contentReleaseVersion1.Id,
+                PreviousVersionId = contentReleaseVersion1.PreviousVersionId
             };
 
             var statsReleaseVersion2 = new Release
             {
-                Id = contentReleaseVersion2.Id
+                Id = contentReleaseVersion2.Id,
+                PreviousVersionId = contentReleaseVersion2.PreviousVersionId
             };
 
             var originalFile = new File
@@ -409,12 +416,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var statsReleaseVersion1 = new Release
             {
-                Id = contentReleaseVersion1.Id
+                Id = contentReleaseVersion1.Id,
+                PreviousVersionId = contentReleaseVersion1.PreviousVersionId
             };
 
             var statsReleaseVersion2 = new Release
             {
-                Id = contentReleaseVersion2.Id
+                Id = contentReleaseVersion2.Id,
+                PreviousVersionId = contentReleaseVersion2.PreviousVersionId
             };
 
             var originalFile = new File
@@ -872,7 +881,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var statsRelease = new Release
             {
-                Id = contentRelease.Id
+                Id = contentRelease.Id,
+                PreviousVersionId = contentRelease.PreviousVersionId
             };
 
             var originalFile = new File
@@ -1112,7 +1122,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var statsRelease = new Release
             {
-                Id = contentRelease.Id
+                Id = contentRelease.Id,
+                PreviousVersionId = contentRelease.PreviousVersionId
             };
 
             var originalFile = new File
@@ -1344,7 +1355,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var statsRelease = new Release
             {
-                Id = contentRelease.Id
+                Id = contentRelease.Id,
+                PreviousVersionId = contentRelease.PreviousVersionId
             };
 
             var originalFile = new File
@@ -1860,12 +1872,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var statsReleaseVersion1 = new Release
             {
-                Id = contentReleaseVersion1.Id
+                Id = contentReleaseVersion1.Id,
+                PreviousVersionId = contentReleaseVersion1.PreviousVersionId
             };
 
             var statsReleaseVersion2 = new Release
             {
-                Id = contentReleaseVersion2.Id
+                Id = contentReleaseVersion2.Id,
+                PreviousVersionId = contentReleaseVersion2.PreviousVersionId
             };
 
             var originalFile = new File
@@ -2455,7 +2469,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var statsRelease = new Release
             {
-                Id = contentRelease.Id
+                Id = contentRelease.Id,
+                PreviousVersionId = contentRelease.PreviousVersionId
             };
 
             var originalFile = new File
@@ -2621,12 +2636,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var statsReleaseVersion1 = new Release
             {
-                Id = contentReleaseVersion1.Id
+                Id = contentReleaseVersion1.Id,
+                PreviousVersionId = contentReleaseVersion1.PreviousVersionId
             };
 
             var statsReleaseVersion2 = new Release
             {
-                Id = contentReleaseVersion2.Id
+                Id = contentReleaseVersion2.Id,
+                PreviousVersionId = contentReleaseVersion2.PreviousVersionId
             };
 
             var originalFile = new File

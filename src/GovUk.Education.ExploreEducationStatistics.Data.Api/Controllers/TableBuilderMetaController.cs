@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
@@ -26,15 +27,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     {
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
+        private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly ISubjectMetaService _subjectMetaService;
 
-        public TableBuilderMetaController(
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
+        public TableBuilderMetaController(IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
+            IReleaseSubjectRepository releaseSubjectRepository,
             ISubjectMetaService subjectMetaService)
         {
             _contentPersistenceHelper = contentPersistenceHelper;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
+            _releaseSubjectRepository = releaseSubjectRepository;
             _subjectMetaService = subjectMetaService;
         }
 
@@ -100,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                     query => query
                         .Where(rs => rs.ReleaseId == releaseId && rs.SubjectId == subjectId)
                 )
-                : await _subjectMetaService.GetReleaseSubjectForLatestPublishedVersion(subjectId) ??
+                : await _releaseSubjectRepository.GetReleaseSubjectForLatestPublishedVersion(subjectId) ??
                   new Either<ActionResult, ReleaseSubject>(new NotFoundResult());
         }
     }

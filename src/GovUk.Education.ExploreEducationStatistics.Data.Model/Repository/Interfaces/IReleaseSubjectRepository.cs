@@ -2,13 +2,16 @@
 using System;
 using System.Threading.Tasks;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-
-public interface IReleaseSubjectRepository
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces
 {
-    Task SoftDeleteAllReleaseSubjects(Guid releaseId);
+    public interface IReleaseSubjectRepository
+    {
+        Task SoftDeleteAllReleaseSubjects(Guid releaseId);
 
-    Task SoftDeleteReleaseSubject(Guid releaseId, Guid subjectId);
+        Task SoftDeleteReleaseSubject(Guid releaseId, Guid subjectId);
 
-    Task DeleteAllReleaseSubjects(Guid releaseId, bool softDeleteOrphanedSubjects = false);
+        Task DeleteAllReleaseSubjects(Guid releaseId, bool softDeleteOrphanedSubjects = false);
+
+        Task<ReleaseSubject?> GetReleaseSubjectForLatestPublishedVersion(Guid subjectId);
+    }
 }

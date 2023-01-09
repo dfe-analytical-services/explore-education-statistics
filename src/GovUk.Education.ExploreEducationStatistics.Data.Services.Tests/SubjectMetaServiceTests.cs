@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -24,12 +23,10 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using Unit = GovUk.Education.ExploreEducationStatistics.Data.Model.Unit;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
-using ContentRelease = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
@@ -388,45 +385,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task FilterSubjectMeta_LatestRelease_EmptyModelReturned()
         {
-            var release = new ContentRelease
-            {
-                Id = Guid.NewGuid(),
-                Published = DateTime.UtcNow.AddDays(-1)
-            };
-            
             var releaseSubject = new ReleaseSubject
             {
-                Release = new Release
-                {
-                    Id = release.Id
-                },
+                Release = new Release(),
                 Subject = new Subject()
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
+
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Releases.AddAsync(release);
-                await contentDbContext.SaveChangesAsync();
-            }
-
+            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
             var cancellationToken = new CancellationTokenSource().Token;
+
+            releaseSubjectRepository
+                .Setup(s => s.GetReleaseSubjectForLatestPublishedVersion(releaseSubject.SubjectId))
+                .ReturnsAsync(releaseSubject);
 
             timePeriodService
                 .Setup(s => s.GetTimePeriods(It.IsAny<IQueryable<Observation>>()))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var query = new ObservationQueryContext
                 {
@@ -436,14 +422,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var service = BuildSubjectMetaService(
                     statisticsDbContext,
-                    contentDbContext,
+                    releaseSubjectRepository: releaseSubjectRepository.Object,
                     timePeriodService: timePeriodService.Object
                 );
 
                 var result = (await service.FilterSubjectMeta(null, query, cancellationToken))
                     .AssertRight();
 
-                VerifyAllMocks(timePeriodService);
+                VerifyAllMocks(
+                    releaseSubjectRepository,
+                    timePeriodService);
 
                 var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
 
@@ -687,7 +675,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 filterItemRepository
                     .Setup(s => s.GetFilterItemsFromMatchedObservationIds(
-                        // ReSharper disable once AccessToDisposedClosure
                         subject.Id, statisticsDbContext.MatchedObservations))
                     .ReturnsAsync(allFilterItems);
 
@@ -2279,159 +2266,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Null(savedReleaseSubject.IndicatorSequence);
             }
         }
-        
-        [Fact]
-        public async Task GetReleaseSubjectForLatestPublishedVersion()
-        {
-            var subject = new Subject();
-            
-            var previousReleaseVersion = new ContentRelease
-            {
-                Id = Guid.NewGuid(),
-                Published = DateTime.UtcNow.AddDays(-2),
-                Version = 0
-            };
-
-            var latestReleaseVersion = new ContentRelease
-            {
-                Id = Guid.NewGuid(),
-                Published = DateTime.UtcNow.AddDays(-1),
-                Version = 1
-            };
-
-            var futureReleaseVersion = new ContentRelease
-            {
-                Id = Guid.NewGuid(),
-                Published = DateTime.UtcNow.AddDays(1),
-                Version = 2
-            };
-
-            var releaseSubjectPreviousRelease = new ReleaseSubject
-            {
-                Subject = subject,
-                Release = new Release
-                {
-                    Id = previousReleaseVersion.Id,
-                }
-            };
-
-            var releaseSubjectLatestRelease = new ReleaseSubject
-            {
-                Subject = subject,
-                Release = new Release
-                {
-                    Id = latestReleaseVersion.Id
-                }
-            };
-
-            // Link the Subject to the next version of the Release with a future Published date/time
-            // that should not be considered Live
-            var releaseSubjectFutureRelease = new ReleaseSubject
-            {
-                Subject = subject,
-                Release = new Release
-                {
-                    Id = futureReleaseVersion.Id
-                }
-            };
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.Subject.AddAsync(subject);
-                await statisticsDbContext.ReleaseSubject.AddRangeAsync(
-                    releaseSubjectLatestRelease,
-                    releaseSubjectFutureRelease,
-                    releaseSubjectPreviousRelease);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Releases.AddRangeAsync(
-                    latestReleaseVersion, 
-                    futureReleaseVersion,
-                    previousReleaseVersion);
-                
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildSubjectMetaService(statisticsDbContext, contentDbContext);
-
-                var result = await service.GetReleaseSubjectForLatestPublishedVersion(subject.Id);
-
-                Assert.NotNull(result);
-                Assert.Equal(releaseSubjectLatestRelease.ReleaseId, result!.ReleaseId);
-                Assert.Equal(releaseSubjectLatestRelease.SubjectId, result.SubjectId);
-            }
-        }
-
-        [Fact]
-        public async Task GetReleaseSubjectForLatestPublishedVersion_NoReleases()
-        {
-            var subject = new Subject();
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.Subject.AddAsync(subject);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-            
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildSubjectMetaService(statisticsDbContext, contentDbContext);
-                Assert.Null(await service.GetReleaseSubjectForLatestPublishedVersion(subject.Id));
-            }
-        }
-
-        [Fact]
-        public async Task GetReleaseSubjectForLatestPublishedVersion_NoPublishedReleases()
-        {
-            var futureReleaseVersion = new ContentRelease
-            {
-                Id = Guid.NewGuid(),
-                Published = DateTime.UtcNow.AddDays(1)
-            };
-            
-            // Link the Subject to a Release with a future Published date/time that should not be considered Live
-            var releaseSubjectFutureRelease = new ReleaseSubject
-            {
-                Subject = new Subject(),
-                Release = new Release
-                {
-                    Id = futureReleaseVersion.Id
-                }
-            };
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubjectFutureRelease);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Releases.AddRangeAsync(futureReleaseVersion);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildSubjectMetaService(statisticsDbContext, contentDbContext);
-                Assert.Null(
-                    await service.GetReleaseSubjectForLatestPublishedVersion(releaseSubjectFutureRelease.SubjectId));
-            }
-        }
 
         private static IOptions<LocationsOptions> DefaultLocationOptions()
         {
@@ -2469,7 +2303,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
         private static SubjectMetaService BuildSubjectMetaService(
             StatisticsDbContext statisticsDbContext,
-            ContentDbContext? contentDbContext = null,
             IBlobCacheService? cacheService = null,
             IFilterRepository? filterRepository = null,
             IFilterItemRepository? filterItemRepository = null,
@@ -2477,6 +2310,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             ILocationRepository? locationRepository = null,
             IObservationService? observationService = null,
             IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
+            IReleaseSubjectRepository? releaseSubjectRepository = null,
             ITimePeriodService? timePeriodService = null,
             IUserService? userService = null,
             IOptions<LocationsOptions>? options = null)
@@ -2484,7 +2318,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             return new(
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 statisticsDbContext,
-                contentDbContext ?? InMemoryContentDbContext(),
                 cacheService ?? Mock.Of<IBlobCacheService>(MockBehavior.Strict),
                 filterRepository ?? Mock.Of<IFilterRepository>(MockBehavior.Strict),
                 filterItemRepository ?? Mock.Of<IFilterItemRepository>(MockBehavior.Strict),
@@ -2492,6 +2325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 locationRepository ?? Mock.Of<ILocationRepository>(MockBehavior.Strict),
                 Mock.Of<ILogger<SubjectMetaService>>(),
                 observationService ?? Mock.Of<IObservationService>(MockBehavior.Strict),
+                releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(MockBehavior.Strict),
                 timePeriodService ?? Mock.Of<ITimePeriodService>(MockBehavior.Strict),
                 userService ?? AlwaysTrueUserService().Object,
                 options ?? DefaultLocationOptions()

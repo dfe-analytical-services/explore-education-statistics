@@ -7,16 +7,17 @@ using static System.DateTime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
-    // TODO EES-3763 - Read Replica cleanup - remove unused "Published" and "PreviousVersionId" columns from
-    // statistics' "Release" table. 
     public class Release
     {
         public Guid Id { get; set; }
+        public DateTime? Published { get; set; }
         public string Slug { get; set; }
         public Guid PublicationId { get; set; }
         public TimeIdentifier TimeIdentifier { get; set; }
         public int Year { get; set; }
         public ICollection<ReleaseFootnote> Footnotes { get; set; }
+        public bool Live => Published.HasValue && UtcNow >= Published.Value;
+        public Guid? PreviousVersionId { get; set; }
 
         public string Title =>
             TimePeriodLabelFormatter.Format(Year, TimeIdentifier, TimePeriodLabelFormat.FullLabelBeforeYear);
@@ -25,6 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         {
             var copy = MemberwiseClone() as Release;
             copy.Id = contentAmendmentId;
+            copy.Published = null;
+            copy.PreviousVersionId = amendmentPreviousVersionId;
             return copy;
         }
     }

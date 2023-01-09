@@ -89,11 +89,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
             Assert.NotNull(result);
             Assert.True(result.IsRight);
         }
-
-        public async Task AssertSuccess<T>(Func<Mock<IUserService>, Task<T>> action)
-        {
-            await action.Invoke(_userService);
-            MockUtils.VerifyAllMocks(_userService);
-        }
     }
 }

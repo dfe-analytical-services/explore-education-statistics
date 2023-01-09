@@ -633,12 +633,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             var releaseVersion1 = new Release
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                PreviousVersionId = null
             };
 
             var releaseVersion2 = new Release
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                PreviousVersionId = releaseVersion1.Id
             };
 
             var subject1 = new Subject();

@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,6 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task GetSubjectMeta_LatestRelease()
         {
-            var contentRelease = new Release
+            var contentRelease = new Content.Model.Release
             {
                 Id = ReleaseId,
                 Slug = "release-slug",
@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .Setup(s => s.SetItem<object>(cacheKey, subjectMetaViewModel))
                 .Returns(Task.CompletedTask);
 
-            mocks.subjectMetaService
+            mocks.releaseSubjectRepository
                 .Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(SubjectId))
                 .ReturnsAsync(releaseSubject);
 
@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task GetSubjectMeta_SpecificRelease()
         {
-            var contentRelease = new Release
+            var contentRelease = new Content.Model.Release
             {
                 Id = ReleaseId,
                 Slug = "release-slug",
@@ -136,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         {
             var (controller, mocks) = BuildControllerAndMocks();
 
-            mocks.subjectMetaService
+            mocks.releaseSubjectRepository
                 .Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(SubjectId))
                 .ReturnsAsync((ReleaseSubject?) null);
 
@@ -200,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             result.AssertOkResult(subjectMetaViewModel);
         }
 
-        private static SubjectMetaCacheKey GetCacheKey(Release release, ReleaseSubject releaseSubject)
+        private static SubjectMetaCacheKey GetCacheKey(Content.Model.Release release, ReleaseSubject releaseSubject)
         {
             return new SubjectMetaCacheKey(release.Publication.Slug, release.Slug, releaseSubject.SubjectId);
         }
@@ -209,22 +209,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             (
             Mock<IPersistenceHelper<ContentDbContext>> contentPersistenceHelper,
             Mock<IPersistenceHelper<StatisticsDbContext>> statisticsPersistenceHelper,
+            Mock<IReleaseSubjectRepository> releaseSubjectRepository,
             Mock<ISubjectMetaService> subjectMetaService,
             Mock<IBlobCacheService> cacheService) mocks)
             BuildControllerAndMocks()
         {
             var contentPersistenceHelper = MockPersistenceHelper<ContentDbContext>();
             var statisticsPersistenceHelper = MockPersistenceHelper<StatisticsDbContext>();
+            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var subjectMetaService = new Mock<ISubjectMetaService>(Strict);
 
-            var controller = new TableBuilderMetaController(
-                contentPersistenceHelper.Object,
+            var controller = new TableBuilderMetaController(contentPersistenceHelper.Object,
                 statisticsPersistenceHelper.Object,
+                releaseSubjectRepository.Object,
                 subjectMetaService.Object);
 
             return (controller, (
                 contentPersistenceHelper,
                 statisticsPersistenceHelper,
+                releaseSubjectRepository,
                 subjectMetaService,
                 BlobCacheService));
         }
