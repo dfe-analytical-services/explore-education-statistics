@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusOverallStage;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusStates;
@@ -50,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation("{FunctionName} triggered: {Message}",
+            logger.LogInformation("{0} triggered: {1}",
                 executionContext.FunctionName,
                 message);
             var lease = await _fileStorageService.AcquireLease(message.ReleaseId.ToString());
@@ -59,22 +58,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 await MarkScheduledReleaseStatusAsSuperseded(message);
                 if (await _validationService.ValidatePublishingState(message.ReleaseId))
                 {
-                    await _validationService
-                        .ValidateRelease(message.ReleaseId)
+                    await _validationService.ValidateRelease(message.ReleaseId)
                         .OnSuccessDo(async () =>
                         {
                             if (message.Immediate)
                             {
                                 var releaseStatus =
                                     await CreateReleaseStatusAsync(message, ImmediateReleaseStartedState);
-                                await _queueService.QueuePublishReleaseFilesMessage(releaseStatus.ReleaseId,
+                                await _queueService.QueuePublishReleaseFilesMessageAsync(releaseStatus.ReleaseId,
                                     releaseStatus.Id);
-                                await _queueService.QueuePublishReleaseContentMessage(message.ReleaseId,
-                                    message.ReleaseStatusId);
                             }
                             else
                             {
-                                // Create a Release Status entry here for the midnight job to pick up.
                                 await CreateReleaseStatusAsync(message, ScheduledState);
                             }
                         })
@@ -89,7 +84,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 await lease.Release();
             }
 
-            logger.LogInformation("{FunctionName} completed", executionContext.FunctionName);
+            logger.LogInformation("{0} completed",
+                executionContext.FunctionName);
         }
 
         private async Task<ReleasePublishingStatus> CreateReleaseStatusAsync(NotifyChangeMessage message,

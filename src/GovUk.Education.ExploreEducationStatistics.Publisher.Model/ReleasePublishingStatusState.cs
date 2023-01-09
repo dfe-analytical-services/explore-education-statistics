@@ -8,24 +8,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
     {
         private ReleasePublishingStatusContentStage _content;
         private ReleasePublishingStatusFilesStage _files;
+        private ReleasePublishingStatusDataStage _data;
         private ReleasePublishingStatusPublishingStage _publishing;
         private ReleasePublishingStatusOverallStage _overall;
 
         public ReleasePublishingStatusState(
             ReleasePublishingStatusContentStage content,
             ReleasePublishingStatusFilesStage files,
+            ReleasePublishingStatusDataStage data,
             ReleasePublishingStatusPublishingStage publishing,
             ReleasePublishingStatusOverallStage overall)
         {
             _content = content;
             _files = files;
+            _data = data;
             _publishing = publishing;
             _overall = overall;
         }
 
-        public ReleasePublishingStatusState(string content, string files, string publishing, string overall) : this(
+        public ReleasePublishingStatusState(string content, string files, string data, string publishing, string overall) : this(
             Enum.Parse<ReleasePublishingStatusContentStage>(content),
             Enum.Parse<ReleasePublishingStatusFilesStage>(files),
+            Enum.Parse<ReleasePublishingStatusDataStage>(data),
             Enum.Parse<ReleasePublishingStatusPublishingStage>(publishing),
             Enum.Parse<ReleasePublishingStatusOverallStage>(overall))
         {
@@ -57,6 +61,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
                 }
 
                 _files = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public ReleasePublishingStatusDataStage Data
+        {
+            get => _data;
+            set
+            {
+                if (value == _data)
+                {
+                    return;
+                }
+
+                _data = value;
                 NotifyPropertyChanged();
             }
         }
@@ -94,6 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             if (Content == ReleasePublishingStatusContentStage.Complete
+                && Data == ReleasePublishingStatusDataStage.Complete
                 && Files == ReleasePublishingStatusFilesStage.Complete
                 && Publishing == ReleasePublishingStatusPublishingStage.Complete)
             {
@@ -101,10 +121,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
             }
 
             if (Content == ReleasePublishingStatusContentStage.Failed
+                || Data == ReleasePublishingStatusDataStage.Failed
                 || Files == ReleasePublishingStatusFilesStage.Failed
                 || Publishing == ReleasePublishingStatusPublishingStage.Failed)
             {
                 if (Content == ReleasePublishingStatusContentStage.Failed
+                    || Data == ReleasePublishingStatusDataStage.Failed
                     || Files == ReleasePublishingStatusFilesStage.Failed)
                 {
                     Publishing = ReleasePublishingStatusPublishingStage.Cancelled;
@@ -127,6 +149,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         NotStarted,
         Started,
         Scheduled
+    }
+
+    public enum ReleasePublishingStatusDataStage
+    {
+        Cancelled,
+        Complete,
+        Failed,
+        Queued,
+        NotStarted,
+        Started
     }
 
     public enum ReleasePublishingStatusFilesStage

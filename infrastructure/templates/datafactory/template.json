@@ -67,6 +67,35 @@
       "dependsOn": []
     },
     {
+      "name": "datafactory-components",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "properties": {
+        "mode": "incremental",
+        "templateLink": {
+          "uri": "[concat(variables('templateBaseUrl'), 'datafactory/components/template.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "factoryName": {
+            "value": "[parameters('dataFactoryName')]"
+          },
+          "publisherAppName": {
+            "value": "[parameters('publisherAppName')]"
+          },
+          "keyVaultName": {
+            "value": "[parameters('keyVaultName')]"
+          },
+          "factoryConcurrency": {
+            "value": "[parameters('dataFactoryConcurrency')]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
+      ]
+    },
+    {
       "name": "datafactory-housekeeping",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",

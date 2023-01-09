@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -12,16 +13,17 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.RetryStage;
+using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class PublishingServiceTests
     {
         [Fact]
-        public async Task RetryReleasePublishing()
+        public async Task RetryReleaseStage()
         {
             var release = new Release
             {
@@ -39,9 +41,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var storageQueueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
 
             storageQueueService.Setup(
-                    mock => mock.AddMessageAsync(RetryReleasePublishingQueue,
-                        It.Is<RetryReleasePublishingMessage>(message =>
-                            message.ReleaseId == release.Id)))
+                    mock => mock.AddMessageAsync(RetryStageQueue,
+                        It.Is<RetryStageMessage>(message =>
+                            message.ReleaseId == release.Id
+                            && message.Stage == ContentAndPublishing)))
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -49,21 +52,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publishingService = BuildPublishingService(contentDbContext: context,
                     storageQueueService: storageQueueService.Object);
 
-                var result = await publishingService.RetryReleasePublishing(release.Id);
+                var result = await publishingService.RetryReleaseStage(release.Id, ContentAndPublishing);
 
                 storageQueueService.Verify(
-                    mock => mock.AddMessageAsync(RetryReleasePublishingQueue,
-                        It.Is<RetryReleasePublishingMessage>(message =>
-                            message.ReleaseId == release.Id)), Times.Once());
+                    mock => mock.AddMessageAsync(RetryStageQueue,
+                        It.Is<RetryStageMessage>(message =>
+                            message.ReleaseId == release.Id
+                            && message.Stage == ContentAndPublishing)), Times.Once());
 
                 result.AssertRight();
             }
 
-            VerifyAllMocks(storageQueueService);
+            MockUtils.VerifyAllMocks(storageQueueService);
         }
 
         [Fact]
-        public async Task RetryReleasePublishing_ReleaseNotFound()
+        public async Task RetryReleaseStage_ReleaseNotFound()
         {
             var storageQueueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
 
@@ -72,12 +76,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publishingService = BuildPublishingService(contentDbContext: context,
                     storageQueueService: storageQueueService.Object);
 
-                var result = await publishingService.RetryReleasePublishing(Guid.NewGuid());
+                var result = await publishingService.RetryReleaseStage(Guid.NewGuid(), ContentAndPublishing);
 
                 result.AssertNotFound();
             }
 
-            VerifyAllMocks(storageQueueService);
+            MockUtils.VerifyAllMocks(storageQueueService);
         }
 
         [Fact]
@@ -126,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 result.AssertRight();
             }
 
-            VerifyAllMocks(storageQueueService);
+            MockUtils.VerifyAllMocks(storageQueueService);
         }
 
         [Fact]
@@ -145,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 result.AssertNotFound();
             }
 
-            VerifyAllMocks(storageQueueService);
+            MockUtils.VerifyAllMocks(storageQueueService);
         }
 
         [Fact]
@@ -185,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 result.AssertRight();
             }
 
-            VerifyAllMocks(storageQueueService);
+            MockUtils.VerifyAllMocks(storageQueueService);
         }
 
         [Fact]
@@ -204,7 +208,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 result.AssertNotFound();
             }
 
-            VerifyAllMocks(storageQueueService);
+            MockUtils.VerifyAllMocks(storageQueueService);
         }
 
         private static PublishingService BuildPublishingService(ContentDbContext contentDbContext,
@@ -215,7 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new PublishingService(
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
                 storageQueueService ?? new Mock<IStorageQueueService>().Object,
-                userService ?? AlwaysTrueUserService().Object,
+                userService ?? MockUtils.AlwaysTrueUserService().Object,
                 logger ?? new Mock<ILogger<PublishingService>>().Object);
         }
     }

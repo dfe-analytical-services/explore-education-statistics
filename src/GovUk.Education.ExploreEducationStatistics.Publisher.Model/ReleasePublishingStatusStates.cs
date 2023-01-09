@@ -9,6 +9,7 @@
             new (
                 ReleasePublishingStatusContentStage.Cancelled,
                 ReleasePublishingStatusFilesStage.Cancelled,
+                ReleasePublishingStatusDataStage.Cancelled,
                 ReleasePublishingStatusPublishingStage.Cancelled,
                 ReleasePublishingStatusOverallStage.Invalid);
 
@@ -19,6 +20,7 @@
             new (
                 ReleasePublishingStatusContentStage.NotStarted,
                 ReleasePublishingStatusFilesStage.NotStarted,
+                ReleasePublishingStatusDataStage.NotStarted,
                 ReleasePublishingStatusPublishingStage.NotStarted,
                 ReleasePublishingStatusOverallStage.Scheduled);
 
@@ -29,6 +31,7 @@
             new (
                 ReleasePublishingStatusContentStage.NotStarted,
                 ReleasePublishingStatusFilesStage.NotStarted,
+                ReleasePublishingStatusDataStage.NotStarted,
                 ReleasePublishingStatusPublishingStage.Scheduled,
                 ReleasePublishingStatusOverallStage.Started);
 
@@ -39,6 +42,7 @@
             new (
                 ReleasePublishingStatusContentStage.NotStarted,
                 ReleasePublishingStatusFilesStage.NotStarted,
+                ReleasePublishingStatusDataStage.NotStarted,
                 ReleasePublishingStatusPublishingStage.NotStarted,
                 ReleasePublishingStatusOverallStage.Started);
 
@@ -49,6 +53,7 @@
             new (
                 ReleasePublishingStatusContentStage.Cancelled,
                 ReleasePublishingStatusFilesStage.Cancelled,
+                ReleasePublishingStatusDataStage.Cancelled,
                 ReleasePublishingStatusPublishingStage.Cancelled,
                 ReleasePublishingStatusOverallStage.Superseded);
     }

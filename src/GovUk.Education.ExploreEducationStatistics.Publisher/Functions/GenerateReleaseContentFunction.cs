@@ -14,12 +14,12 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseP
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     // ReSharper disable once UnusedType.Global
-    public class StageReleaseContentFunction
+    public class GenerateReleaseContentFunction
     {
         private readonly IContentService _contentService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
 
-        public StageReleaseContentFunction(IContentService contentService,
+        public GenerateReleaseContentFunction(IContentService contentService,
             IReleasePublishingStatusService releasePublishingStatusService)
         {
             _contentService = contentService;
@@ -29,21 +29,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <summary>
         /// Azure function which generates the content for a Release into a staging directory.
         /// </summary>
+        /// <remarks>
+        /// Depends on the download files existing.
+        /// </remarks>
         /// <param name="message"></param>
         /// <param name="executionContext"></param>
         /// <param name="logger"></param>
         /// <returns></returns>
-        [FunctionName("StageReleaseContent")]
+        [FunctionName("GenerateReleaseContent")]
         // ReSharper disable once UnusedMember.Global
-        public async Task StageReleaseContent(
-            [QueueTrigger(StageReleaseContentQueue)] StageReleaseContentMessage message,
+        public async Task GenerateReleaseContent(
+            [QueueTrigger(GenerateReleaseContentQueue)] GenerateReleaseContentMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation("{FunctionName} triggered: {Message}",
+            logger.LogInformation("{0} triggered: {1}",
                 executionContext.FunctionName,
                 message);
-            await UpdateContentStage(message, Started);
+            await UpdateStage(message, Started);
             try
             {
                 var publishStagedReleasesCronExpression = Environment.GetEnvironmentVariable("PublishReleaseContentCronSchedule") ?? "";
@@ -53,23 +56,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 }).GetNextOccurrence(DateTime.UtcNow);
                 var context = new PublishContext(nextScheduledPublishingTime, true);
                 await _contentService.UpdateContent(context, message.Releases.Select(tuple => tuple.ReleaseId).ToArray());
-                await UpdateContentStage(message, Scheduled);
+                await UpdateStage(message, Complete);
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Exception occured while executing {FunctionName}",
+                logger.LogError(e, "Exception occured while executing {0}",
                     executionContext.FunctionName);
-                
-                await UpdateContentStage(message, Failed,
+                logger.LogError("{0}", e.StackTrace);
+                await UpdateStage(message, Failed,
                     new ReleasePublishingStatusLogMessage($"Exception in content stage: {e.Message}"));
             }
 
-            logger.LogInformation("{FunctionName} completed", executionContext.FunctionName);
+            logger.LogInformation("{0} completed",
+                executionContext.FunctionName);
         }
 
-        private async Task UpdateContentStage(
-            StageReleaseContentMessage message, 
-            ReleasePublishingStatusContentStage stage,
+        private async Task UpdateStage(GenerateReleaseContentMessage message, ReleasePublishingStatusContentStage stage,
             ReleasePublishingStatusLogMessage logMessage = null)
         {
             foreach (var (releaseId, releaseStatusId) in message.Releases)

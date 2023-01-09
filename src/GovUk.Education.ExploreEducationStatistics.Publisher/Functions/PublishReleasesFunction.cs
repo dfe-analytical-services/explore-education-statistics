@@ -11,27 +11,29 @@ using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseP
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     // ReSharper disable once UnusedType.Global
-    public class StageScheduledReleasesFunction
+    public class PublishReleasesFunction
     {
         private readonly IQueueService _queueService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
 
-        public StageScheduledReleasesFunction(IQueueService queueService, IReleasePublishingStatusService releasePublishingStatusService)
+        public PublishReleasesFunction(IQueueService queueService, IReleasePublishingStatusService releasePublishingStatusService)
         {
             _queueService = queueService;
             _releasePublishingStatusService = releasePublishingStatusService;
         }
 
         /// <summary>
-        /// Azure function which triggers publishing files and staging content for all Releases that are scheduled to
-        /// be published later during the day.
+        /// Azure function which triggers tasks for all Releases that are scheduled to be published later during the day.
         /// </summary>
+        /// <remarks>
+        /// Triggers publishing files and statistics data.
+        /// </remarks>
         /// <param name="timer"></param>
         /// <param name="executionContext"></param>
         /// <param name="logger"></param>
-        [FunctionName("StageScheduledReleases")]
+        [FunctionName("PublishReleases")]
         // ReSharper disable once UnusedMember.Global
-        public async Task StageScheduledReleases([TimerTrigger("%PublishReleasesCronSchedule%")]
+        public async Task PublishReleases([TimerTrigger("%PublishReleasesCronSchedule%")]
             TimerInfo timer,
             ExecutionContext executionContext,
             ILogger logger)
@@ -40,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName,
                 DateTime.UtcNow);
 
-            await PublishReleaseFilesAndStageContent();
+            await PublishReleases();
 
             logger.LogInformation(
                 "{0} completed. {1}",
@@ -48,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 timer.FormatNextOccurrences(1));
         }
 
-        private async Task PublishReleaseFilesAndStageContent()
+        private async Task PublishReleases()
         {
             var scheduled = (await QueryScheduledReleases()).Select(status => (status.ReleaseId, status.Id)).ToList();
             if (scheduled.Any())
@@ -59,8 +61,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                         ScheduledReleaseStartedState);
                 }
 
-                await _queueService.QueuePublishReleaseFilesMessage(scheduled);
-                await _queueService.QueueGenerateStagedReleaseContentMessage(scheduled);
+                await _queueService.QueuePublishReleaseFilesMessageAsync(scheduled);
+                await _queueService.QueuePublishReleaseDataMessagesAsync(scheduled);
             }
         }
 

@@ -90,10 +90,6 @@ const ReleaseStatusPage = () => {
     );
   }
 
-  const refreshPeriod =
-    parseInt(process.env.RELEASE_STATUS_POLL_TIME_MILLIS ?? '', 10) ||
-    undefined;
-
   return (
     <>
       <h2>Sign off</h2>
@@ -117,10 +113,7 @@ const ReleaseStatusPage = () => {
         </SummaryListItem>
         {release.approvalStatus === 'Approved' && (
           <SummaryListItem term="Release process status">
-            <ReleasePublishingStatus
-              releaseId={releaseId}
-              refreshPeriod={refreshPeriod}
-            />
+            <ReleasePublishingStatus releaseId={releaseId} />
           </SummaryListItem>
         )}
         <SummaryListItem term="Scheduled release">

@@ -36,14 +36,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         /// <summary>
-        /// Retry the publishing of a Release.
+        /// Retry a stage of the publishing workflow
         /// </summary>
         /// <remarks>
         /// This results in the Publisher updating the latest ReleaseStatus for this Release rather than creating a new one.
         /// </remarks>
         /// <param name="releaseId"></param>
+        /// <param name="stage"></param>
         /// <returns></returns>
-        public async Task<Either<ActionResult, Unit>> RetryReleasePublishing(Guid releaseId)
+        public async Task<Either<ActionResult, Unit>> RetryReleaseStage(Guid releaseId, RetryStage stage)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -56,9 +57,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }
 
                     await _storageQueueService.AddMessageAsync(
-                        RetryReleasePublishingQueue, new RetryReleasePublishingMessage(releaseId));
+                        RetryStageQueue, new RetryStageMessage(releaseId, stage));
 
-                    _logger.LogTrace("Sent publishing retry message for Release: {0}", releaseId);
+                    _logger.LogTrace("Sent retry stage message for Release: {0}", releaseId);
                     return new Either<ActionResult, Unit>(Unit.Instance);
                 });
         }

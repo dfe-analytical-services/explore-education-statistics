@@ -6,11 +6,12 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.RetryStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     // ReSharper disable once UnusedType.Global
-    public class RetryReleasePublishingFunction
+    public class RetryStageFunction
     {
         private readonly IQueueService _queueService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
@@ -20,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ReleasePublishingStatusOverallStage.Complete, ReleasePublishingStatusOverallStage.Failed
         };
 
-        public RetryReleasePublishingFunction(
+        public RetryStageFunction(
             IQueueService queueService,
             IReleasePublishingStatusService releasePublishingStatusService)
         {
@@ -29,18 +30,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         /// <summary>
-        /// BAU Azure function which retries the publishing of a Release by enqueueing a message to publish its
-        /// content.  Note that this does not attempt to copy any Release files.
+        /// BAU Azure function which retries stage of the publishing workflow, updating the latest ReleaseStatus.
         /// </summary>
         /// <param name="message"></param>
         /// <param name="executionContext"></param>
         /// <param name="logger"></param>
         /// <returns></returns>
-        [FunctionName("RetryReleasePublishing")]
+        [FunctionName("RetryStage")]
         // ReSharper disable once UnusedMember.Global
-        public async Task RetryReleasePublishing(
-            [QueueTrigger(RetryReleasePublishingQueue)]
-            RetryReleasePublishingMessage message,
+        public async Task RetryStage(
+            [QueueTrigger(RetryStageQueue)]
+            RetryStageMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {
@@ -68,7 +68,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 }
                 else
                 {
-                    await _queueService.QueuePublishReleaseContentMessage(message.ReleaseId, releaseStatus.Id);
+                    switch (message.Stage)
+                    {
+                        case ContentAndPublishing:
+                            await _queueService.QueuePublishReleaseContentMessageAsync(message.ReleaseId,
+                                releaseStatus.Id);
+                            break;
+                        case StatisticsData:
+                            await _queueService.QueuePublishReleaseDataMessageAsync(message.ReleaseId,
+                                releaseStatus.Id);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
                 }
             }
 

@@ -11,6 +11,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.RetryStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -25,13 +26,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
-        public void RetryReleasePublishing()
+        public void RetryStage()
         {
             var mocks = Mocks();
             var publishingService = BuildPublishingService(mocks);
 
             AssertSecurityPoliciesChecked(service =>
-                    service.RetryReleasePublishing(_release.Id),
+                    service.RetryReleaseStage(_release.Id, ContentAndPublishing),
                 _release,
                 mocks.UserService,
                 publishingService,

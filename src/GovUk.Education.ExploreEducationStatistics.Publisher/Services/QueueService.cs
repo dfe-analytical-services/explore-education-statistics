@@ -25,15 +25,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _logger = logger;
         }
 
-        public async Task QueueGenerateStagedReleaseContentMessage(
+        public async Task QueueGenerateReleaseContentMessageAsync(
             IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases)
         {
             var releasesList = releases.ToList();
             _logger.LogInformation(
-                "Queuing generate content message for releases: {ReleaseIds}",
+                "Queuing generate content message for releases: {0}",
                 string.Join(", ", releasesList.Select(tuple => tuple.ReleaseId)));
             await _storageQueueService.AddMessageAsync(
-                StageReleaseContentQueue, new StageReleaseContentMessage(releasesList));
+                GenerateReleaseContentQueue, new GenerateReleaseContentMessage(releasesList));
             foreach (var (releaseId, releaseStatusId) in releasesList)
             {
                 await _releasePublishingStatusService.UpdateContentStageAsync(releaseId, releaseStatusId,
@@ -41,37 +41,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        public async Task QueuePublishReleaseContentMessage(Guid releaseId, Guid releaseStatusId)
+        public async Task QueuePublishReleaseContentMessageAsync(Guid releaseId, Guid releaseStatusId)
         {
-            await QueuePublishReleaseContentMessage(new[] {(releaseId, releaseStatusId)});
-        }
-        
-        private async Task QueuePublishReleaseContentMessage(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases)
-        {
-            await releases
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async ids =>
-                {
-                    var (releaseId, releaseStatusId) = ids;
-                    _logger.LogInformation("Queuing publish content message for release: {ReleaseId}", releaseId);
-                    await _storageQueueService.AddMessageAsync(
-                        PublishReleaseContentQueue, new PublishReleaseContentMessage(releaseId, releaseStatusId));
-                    await _releasePublishingStatusService.UpdateContentStageAsync(releaseId, releaseStatusId,
-                        ReleasePublishingStatusContentStage.Queued);
-                });
+            _logger.LogInformation("Queuing publish content message for release: {0}", releaseId);
+            await _storageQueueService.AddMessageAsync(
+                PublishReleaseContentQueue, new PublishReleaseContentMessage(releaseId, releaseStatusId));
+            await _releasePublishingStatusService.UpdateContentStageAsync(releaseId, releaseStatusId,
+                ReleasePublishingStatusContentStage.Queued);
         }
 
-        public Task QueuePublishReleaseFilesMessage(Guid releaseId, Guid releaseStatusId)
+        public Task QueuePublishReleaseDataMessageAsync(Guid releaseId, Guid releaseStatusId)
         {
-            return QueuePublishReleaseFilesMessage(new[] {(releaseId, releaseStatusId)});
+            return QueuePublishReleaseDataMessagesAsync(new[] {(releaseId, releaseStatusId)});
         }
 
-        public async Task QueuePublishReleaseFilesMessage(
+        public async Task QueuePublishReleaseDataMessagesAsync(
+            IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases)
+        {
+            foreach (var (releaseId, releaseStatusId) in releases)
+            {
+                _logger.LogInformation("Queuing data message for release: {0}", releaseId);
+                await _storageQueueService.AddMessageAsync(
+                    PublishReleaseDataQueue, new PublishReleaseDataMessage(releaseId, releaseStatusId));
+                await _releasePublishingStatusService.UpdateDataStageAsync(releaseId, releaseStatusId,
+                    ReleasePublishingStatusDataStage.Queued);
+            }
+        }
+
+        public Task QueuePublishReleaseFilesMessageAsync(Guid releaseId, Guid releaseStatusId)
+        {
+            return QueuePublishReleaseFilesMessageAsync(new[] {(releaseId, releaseStatusId)});
+        }
+
+        public async Task QueuePublishReleaseFilesMessageAsync(
             IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases)
         {
             var releasesList = releases.ToList();
             _logger.LogInformation(
-                "Queuing files message for releases: {ReleaseIds}",
+                "Queuing files message for releases: {0}",
                 string.Join(", ", releasesList.Select(tuple => tuple.ReleaseId)));
             await _storageQueueService.AddMessageAsync(
                 PublishReleaseFilesQueue, new PublishReleaseFilesMessage(releasesList));

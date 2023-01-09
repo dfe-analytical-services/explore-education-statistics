@@ -410,9 +410,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              * Services
              */
 
-            var coreStorageConnectionString = Configuration.GetValue<string>("CoreStorage");
-            var publisherStorageConnectionString = Configuration.GetValue<string>("PublisherStorage");
-
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
@@ -442,7 +439,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 new PublishingService(
                     provider.GetService<IPersistenceHelper<ContentDbContext>>(),
                     new StorageQueueService(
-                        publisherStorageConnectionString,
+                        Configuration.GetValue<string>("PublisherStorage"),
                         new StorageInstanceCreationUtil()),
                     provider.GetService<IUserService>(),
                     provider.GetRequiredService<ILogger<PublishingService>>()));
@@ -452,12 +449,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     s.GetService<IUserService>(),
                     s.GetService<IPersistenceHelper<ContentDbContext>>(),
                     new TableStorageService(
-                        publisherStorageConnectionString,
+                        Configuration.GetValue<string>("PublisherStorage"),
                         new StorageInstanceCreationUtil())));
-            services.AddTransient<IReleasePublishingStatusRepository, ReleasePublishingStatusRepository>(_ =>
+            services.AddTransient<IReleasePublishingStatusRepository, ReleasePublishingStatusRepository>(s =>
                 new ReleasePublishingStatusRepository(
                     new TableStorageService(
-                        publisherStorageConnectionString,
+                        Configuration.GetValue<string>("PublisherStorage"),
                         new StorageInstanceCreationUtil())
                 )
             );
@@ -479,10 +476,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<ILegacyReleaseService, LegacyReleaseService>(provider =>
                 new LegacyReleaseService(
-                    context: provider.GetRequiredService<ContentDbContext>(),
-                    mapper: provider.GetRequiredService<IMapper>(),
-                    userService: provider.GetRequiredService<IUserService>(),
-                    persistenceHelper: provider.GetRequiredService<IPersistenceHelper<ContentDbContext>>(),
+                    context: provider.GetService<ContentDbContext>(),
+                    mapper: provider.GetService<IMapper>(),
+                    userService: provider.GetService<IUserService>(),
+                    persistenceHelper: provider.GetService<IPersistenceHelper<ContentDbContext>>(),
                     publicationCacheService: provider.GetRequiredService<IPublicationCacheService>())
                 );
             services.AddTransient<IReleaseService, ReleaseService>();
@@ -586,13 +583,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserInviteRepository, UserInviteRepository>();
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
             services.AddTransient(provider => GetBlobStorageService(provider, "CoreStorage"));
-            services.AddTransient<ITableStorageService, TableStorageService>(_ =>
+            services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(
-                    coreStorageConnectionString,
+                    Configuration.GetValue<string>("CoreStorage"),
                     new StorageInstanceCreationUtil()));
-            services.AddTransient<IStorageQueueService, StorageQueueService>(_ =>
+            services.AddTransient<IStorageQueueService, StorageQueueService>(s =>
                 new StorageQueueService(
-                    coreStorageConnectionString,
+                    Configuration.GetValue<string>("CoreStorage"),
                     new StorageInstanceCreationUtil()));
             services.AddTransient<IDataBlockMigrationService, DataBlockMigrationService>();
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
@@ -824,7 +821,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     .CreateScope();
 
                 serviceScope.ServiceProvider
-                    .GetRequiredService<BootstrapUsersService>()
+                    .GetService<BootstrapUsersService>()
                     .AddBootstrapUsers();
             }
         }
