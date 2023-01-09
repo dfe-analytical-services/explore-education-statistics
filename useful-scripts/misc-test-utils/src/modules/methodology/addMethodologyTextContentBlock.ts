@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import spinner from '../../utils/spinner';
 import methodologyService from '../../services/methodologyService';
 
-const addMethodlogyTextContentBlock = async (methodologyId: string) => {
+const addMethodologyTextContentBlock = async (methodologyId: string) => {
   spinner.start();
   const sectionId = await methodologyService.addContentSection(methodologyId);
   if (!sectionId) {
@@ -29,4 +29,4 @@ const addMethodlogyTextContentBlock = async (methodologyId: string) => {
   await methodologyService.addContent(methodologyId, sectionId, blockId);
   spinner.succeed('successfully added methodology content block');
 };
-export default addMethodlogyTextContentBlock;
+export default addMethodologyTextContentBlock;

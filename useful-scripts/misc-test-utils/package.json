@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "start": "esr src/index.ts",
-    "tsc": "tsc -p tsconfig.json",
+    "tsc": "tsc --noEmit",
     "clean": "rm -rf *.zip test-files/*.csv zip-files/*.zip node_modules && npm ci && npm run start",
     "test": "jest",
     "gen-env": "gen-env-types .env -o src/types/env.d.ts -e ."

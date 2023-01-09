@@ -29,6 +29,7 @@ import RelatedAside from '@common/components/RelatedAside';
 import ReleaseDataAccordion from '@common/modules/release/components/ReleaseDataAccordion';
 import React, { useCallback, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
+import ScrollableContainer from '@common/components/ScrollableContainer';
 
 interface MethodologyLink {
   key: string;
@@ -265,28 +266,30 @@ const ReleaseContent = () => {
                   {release.coverageTitle} <strong>{release.yearTitle}</strong>
                 </p>
                 <Details summary={`See other releases (${releaseCount})`}>
-                  <ul className="govuk-list">
-                    {[
-                      ...release.publication.releases.map(
-                        ({ id, title, slug }) => (
-                          <li key={id} data-testid="other-release-item">
-                            <Link
-                              to={`${config?.PublicAppUrl}/find-statistics/${release.publication.slug}/${slug}`}
-                            >
-                              {title}
-                            </Link>
-                          </li>
+                  <ScrollableContainer maxHeight={300}>
+                    <ul className="govuk-list">
+                      {[
+                        ...release.publication.releases.map(
+                          ({ id, title, slug }) => (
+                            <li key={id} data-testid="other-release-item">
+                              <Link
+                                to={`${config?.PublicAppUrl}/find-statistics/${release.publication.slug}/${slug}`}
+                              >
+                                {title}
+                              </Link>
+                            </li>
+                          ),
                         ),
-                      ),
-                      ...release.publication.legacyReleases.map(
-                        ({ id, description, url }) => (
-                          <li key={id} data-testid="other-release-item">
-                            <Link to={url}>{description}</Link>
-                          </li>
+                        ...release.publication.legacyReleases.map(
+                          ({ id, description, url }) => (
+                            <li key={id} data-testid="other-release-item">
+                              <Link to={url}>{description}</Link>
+                            </li>
+                          ),
                         ),
-                      ),
-                    ]}
-                  </ul>
+                      ]}
+                    </ul>
+                  </ScrollableContainer>
                 </Details>
               </>
             )}

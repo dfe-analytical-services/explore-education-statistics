@@ -20,10 +20,17 @@ const subjectService = {
     spinner.start('Uploading subject \n');
     const finalZipFileGlob = await globby(
       `${cwd}/zip-files/clean-test-zip-*.zip`,
+      {
+        concurrency: 32,
+      },
     );
     const oldPath = finalZipFileGlob[0];
     const newPath = path.resolve(oldPath, '..', path.basename(oldPath));
-    fs.renameSync(oldPath, newPath);
+
+    fs.rename(oldPath, newPath, (err: NodeJS.ErrnoException | null): void => {
+      if (err) throw err;
+    });
+
     const form = new FormData();
     form.append('zipFile', fs.createReadStream(newPath));
     const res = await adminApi.post(
@@ -61,11 +68,12 @@ const subjectService = {
     const res = await adminApi.get(
       `/api/release/${releaseId}/data/${subjectId}/import/status`,
     );
+
     if (!res.data.status) {
       spinner.info(
         'No import status available. Waiting 3 seconds before polling the API',
       );
-      await sleep(parseInt(SUBJECT_POLL_TIME, 12));
+      await sleep(parseInt(SUBJECT_POLL_TIME, 10));
     }
 
     spinner.stop();

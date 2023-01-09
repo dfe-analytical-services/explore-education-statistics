@@ -13,6 +13,8 @@ const start = async () => {
     'upload subject',
     'create new methodology',
     'generate lorem ipsum content text block (methodology & release)',
+    'publish all releases',
+    'upload many subjects & publish',
   ] as const;
 
   getAnswers(choices);
