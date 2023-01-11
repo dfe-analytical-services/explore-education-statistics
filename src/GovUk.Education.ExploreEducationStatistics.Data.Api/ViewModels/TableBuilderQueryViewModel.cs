@@ -5,15 +5,26 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 
-public record TableBuilderQueryViewModel(Guid PublicationId,
-    Guid SubjectId,
-    TimePeriodQuery TimePeriod,
-    IEnumerable<Guid> Filters,
-    IEnumerable<Guid> Indicators,
-    IEnumerable<Guid> LocationIds)
+public record TableBuilderQueryViewModel
 {
-    public TableBuilderQueryViewModel(Guid publicationId, ObservationQueryContext query) :
-        this(publicationId, query.SubjectId, query.TimePeriod, query.Filters, query.Indicators, query.LocationIds)
+    public Guid PublicationId { get; init; }
+    public Guid SubjectId { get; init; }
+    public TimePeriodQuery TimePeriod { get; init; }
+    public IEnumerable<Guid> Filters { get; init; }
+    public IEnumerable<Guid> Indicators { get; init; }
+    public IEnumerable<Guid> LocationIds { get; init; }
+
+    public TableBuilderQueryViewModel()
     {
+    }
+
+    public TableBuilderQueryViewModel(Guid publicationId, ObservationQueryContext query)
+    {
+        PublicationId = publicationId;
+        SubjectId = query.SubjectId;
+        TimePeriod = query.TimePeriod;
+        Filters = query.Filters;
+        Indicators = query.Indicators;
+        LocationIds = query.LocationIds;
     }
 }
