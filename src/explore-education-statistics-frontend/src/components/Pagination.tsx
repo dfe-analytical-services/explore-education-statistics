@@ -12,8 +12,8 @@ interface Props extends Omit<PaginationProps, 'renderLink'> {
 const Pagination = ({
   baseUrl,
   queryParams,
-  scroll = false,
-  shallow = false,
+  scroll,
+  shallow,
   ...props
 }: Props) => {
   const router = useRouter();
