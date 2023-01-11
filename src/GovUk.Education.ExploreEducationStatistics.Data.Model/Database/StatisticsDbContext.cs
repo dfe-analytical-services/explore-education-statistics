@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;
             }
 
-            if (timeout.HasValue)
+            if (timeout.HasValue && Database.IsRelational())
             {
                 Database.SetCommandTimeout(timeout);
             }
