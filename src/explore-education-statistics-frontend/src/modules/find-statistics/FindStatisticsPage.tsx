@@ -360,12 +360,7 @@ const FindStatisticsPage: NextPage = () => {
               </>
             )}
             {page && totalPages && (
-              <Pagination
-                currentPage={page}
-                scroll
-                shallow
-                totalPages={totalPages}
-              />
+              <Pagination currentPage={page} shallow totalPages={totalPages} />
             )}
           </LoadingSpinner>
         </div>
