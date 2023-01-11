@@ -1,8 +1,13 @@
-import React, { FunctionComponent } from 'react';
+import classNames from 'classnames';
+import React from 'react';
 
-const GoToTopLink: FunctionComponent = () => {
+interface Props {
+  className?: string;
+}
+
+export default function GoToTopLink({ className }: Props) {
   return (
-    <div className="dfe-print-hidden">
+    <div className={classNames('dfe-print-hidden', className)}>
       <a
         href="#main-content"
         className="govuk-link govuk-link--no-visited-state"
@@ -11,6 +16,4 @@ const GoToTopLink: FunctionComponent = () => {
       </a>
     </div>
   );
-};
-
-export default GoToTopLink;
+}

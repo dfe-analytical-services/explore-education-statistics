@@ -1,3 +1,4 @@
+import GoToTopLink from '@common/components/GoToTopLink';
 import {
   publicationFilters,
   PublicationFilter,
@@ -363,6 +364,10 @@ const FindStatisticsPage: NextPage = () => {
               <Pagination currentPage={page} shallow totalPages={totalPages} />
             )}
           </LoadingSpinner>
+
+          {publications.length > 0 && (
+            <GoToTopLink className="govuk-!-margin-top-7" />
+          )}
         </div>
       </div>
     </Page>
