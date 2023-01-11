@@ -549,7 +549,7 @@
                             "source": {
                                 "type": "AzureSqlSource",
                                 "sqlReaderQuery": {
-                                    "value": "SELECT * FROM dbo.FilterGroup WITH (NOLOCK) WHERE FilterId IN (SELECT Id FROM dbo.Filter WHERE SubjectId IN (SELECT SubjectId FROM dbo.ReleaseSubject RS JOIN Release R ON R.Id = RS.ReleaseId WHERE RS.ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject RS2 JOIN Release R2 ON R2.Id = RS2.Id WHERE RS2.SubjectId = RS.SubjectId AND R2.Version < R.Version)))",
+                                    "value": "SELECT * FROM dbo.FilterGroup WITH (NOLOCK) WHERE FilterId IN (SELECT Id FROM dbo.Filter WHERE SubjectId IN (SELECT SubjectId FROM dbo.ReleaseSubject RS JOIN Release R ON R.Id = RS.ReleaseId WHERE RS.ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject RS2 JOIN Release R2 ON R2.Id = RS2.ReleaseId WHERE RS2.SubjectId = RS.SubjectId AND R2.Version < R.Version)))",
                                     "type": "Expression"
                                 }
                             },
