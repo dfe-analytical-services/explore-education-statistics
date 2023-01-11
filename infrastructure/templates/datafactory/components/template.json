@@ -387,6 +387,16 @@
                                             "name": "PreviousVersionId",
                                             "type": "Guid"
                                         }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Version",
+                                            "type": "Int32"
+                                        },
+                                        "sink": {
+                                            "name": "Version",
+                                            "type": "Int32"
+                                        }
                                     }
                                 ]
                             }
