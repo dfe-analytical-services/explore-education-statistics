@@ -433,7 +433,7 @@
                             "source": {
                                 "type": "AzureSqlSource",
                                 "sqlReaderQuery": {
-                                    "value": "SELECT * FROM dbo.Filter WITH (NOLOCK) WHERE SubjectId IN (SELECT SubjectId FROM dbo.ReleaseSubject RS WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject WHERE ReleaseId != RS.ReleaseId AND SubjectId = RS.SubjectId))",
+                                    "value": "SELECT * FROM dbo.Filter WITH (NOLOCK) WHERE SubjectId IN (SELECT SubjectId FROM dbo.ReleaseSubject RS JOIN Release R ON R.Id = RS.ReleaseId WHERE RS.ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject RS2 JOIN Release R2 ON R2.Id = RS2.ReleaseId WHERE RS2.SubjectId = RS.SubjectId AND R2.Version < R.Version))",
                                     "type": "Expression"
                                 }
                             },
@@ -539,7 +539,7 @@
                             "source": {
                                 "type": "AzureSqlSource",
                                 "sqlReaderQuery": {
-                                    "value": "SELECT * FROM dbo.FilterGroup WITH (NOLOCK) WHERE FilterId IN (SELECT Id FROM dbo.Filter WHERE SubjectId IN (SELECT SubjectId FROM dbo.ReleaseSubject RS WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject WHERE ReleaseId != RS.ReleaseId AND SubjectId = RS.SubjectId)))",
+                                    "value": "SELECT * FROM dbo.FilterGroup WITH (NOLOCK) WHERE FilterId IN (SELECT Id FROM dbo.Filter WHERE SubjectId IN (SELECT SubjectId FROM dbo.ReleaseSubject RS JOIN Release R ON R.Id = RS.ReleaseId WHERE RS.ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject RS2 JOIN Release R2 ON R2.Id = RS2.Id WHERE RS2.SubjectId = RS.SubjectId AND R2.Version < R.Version)))",
                                     "type": "Expression"
                                 }
                             },
@@ -625,7 +625,7 @@
                             "source": {
                                 "type": "AzureSqlSource",
                                 "sqlReaderQuery": {
-                                    "value": "SELECT * FROM dbo.FilterItem WITH (NOLOCK) WHERE FilterGroupId IN (\nSELECT Id FROM dbo.FilterGroup WHERE FilterId IN (\nSELECT Id FROM dbo.Filter WHERE SubjectId IN (SELECT SubjectId FROM dbo.ReleaseSubject RS WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject WHERE ReleaseId != RS.ReleaseId AND SubjectId = RS.SubjectId))))",
+                                    "value": "SELECT * FROM dbo.FilterItem WITH (NOLOCK) WHERE FilterGroupId IN (\nSELECT Id FROM dbo.FilterGroup WHERE FilterId IN (\nSELECT Id FROM dbo.Filter WHERE SubjectId IN (SELECT SubjectId FROM dbo.ReleaseSubject RS JOIN Release R ON R.Id = RS.ReleaseId WHERE RS.ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject RS2 JOIN Release R2 ON R2.Id = RS2.ReleaseId WHERE RS2.SubjectId = RS.SubjectId AND R2.Version < R.Version))))",
                                     "type": "Expression"
                                 }
                             },
@@ -1228,7 +1228,7 @@
                             "source": {
                                 "type": "AzureSqlSource",
                                 "sqlReaderQuery": {
-                                    "value": "SELECT * FROM dbo.Location WITH (NOLOCK) WHERE Id IN (SELECT LocationId FROM dbo.Observation WHERE SubjectId in (SELECT SubjectId FROM dbo.ReleaseSubject RS WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject WHERE ReleaseId != RS.ReleaseId AND SubjectId = RS.SubjectId)))",
+                                    "value": "SELECT * FROM dbo.Location WITH (NOLOCK) WHERE Id IN (SELECT LocationId FROM dbo.Observation WHERE SubjectId in (SELECT SubjectId FROM dbo.ReleaseSubject RS JOIN Release R ON R.Id = RS.ReleaseId WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject RS2 JOIN Release R2 ON R2.Id = RS2.ReleaseId WHERE RS2.SubjectId = RS.SubjectId AND R2.Version < R.Version)))",
                                     "type": "Expression"
                                 }
                             },
@@ -1682,7 +1682,7 @@
                             "source": {
                                 "type": "AzureSqlSource",
                                 "sqlReaderQuery": {
-                                    "value": "SELECT * FROM dbo.Subject WITH (NOLOCK) WHERE Id IN (SELECT SubjectId FROM dbo.ReleaseSubject RS WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject WHERE ReleaseId != RS.ReleaseId AND SubjectId = RS.SubjectId))",
+                                    "value": "SELECT * FROM dbo.Subject WITH (NOLOCK) WHERE Id IN (SELECT SubjectId FROM dbo.ReleaseSubject RS JOIN Release R ON R.Id = RS.ReleaseId WHERE RS.ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM dbo.ReleaseSubject RS2 JOIN dbo.Release R2 ON R2.Id = RS2.ReleaseId WHERE RS2.SubjectId = RS.SubjectId AND R2.Version < R.Version))",
                                     "type": "Expression"
                                 }
                             },
@@ -1748,7 +1748,7 @@
                             "source": {
                                 "type": "AzureSqlSource",
                                 "sqlReaderQuery": {
-                                    "value": "SELECT * FROM dbo.Observation WITH (NOLOCK) WHERE SubjectId IN (SELECT SubjectId FROM dbo.ReleaseSubject RS WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject WHERE ReleaseId != RS.ReleaseId AND SubjectId = RS.SubjectId))",
+                                    "value": "SELECT * FROM dbo.Observation WITH (NOLOCK) WHERE SubjectId IN (SELECT SubjectId FROM dbo.ReleaseSubject RS JOIN Release R ON R.Id = RS.ReleaseId WHERE RS.ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject RS2 JOIN Release R2 ON R2.Id = RS2.ReleaseId WHERE RS2.SubjectId = RS.SubjectId AND R2.Version < R.Version))",
                                     "type": "Expression"
                                 }
                             },
@@ -1875,7 +1875,7 @@
                             "source": {
                                 "type": "AzureSqlSource",
                                 "sqlReaderQuery": {
-                                    "value": "SELECT * FROM dbo.ObservationFilterItem WITH (NOLOCK) WHERE ObservationId IN (SELECT Id FROM Observation WHERE SubjectId IN (SELECT SubjectId FROM dbo.ReleaseSubject RS WHERE ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject WHERE ReleaseId != RS.ReleaseId AND SubjectId = RS.SubjectId)))",
+                                    "value": "SELECT * FROM dbo.ObservationFilterItem WITH (NOLOCK) WHERE ObservationId IN (SELECT Id FROM Observation WHERE SubjectId IN (SELECT SubjectId FROM dbo.ReleaseSubject RS JOIN Release R ON R.Id = RS.ReleaseId WHERE RS.ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}') AND NOT EXISTS (SELECT * FROM ReleaseSubject RS2 JOIN Release R2 ON R2.Id = RS2.ReleaseId WHERE RS2.SubjectId = RS.SubjectId AND R2.Version < R.Version)))",
                                     "type": "Expression"
                                 }
                             },

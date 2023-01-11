@@ -18,16 +18,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public ICollection<ReleaseFootnote> Footnotes { get; set; }
         public bool Live => Published.HasValue && UtcNow >= Published.Value;
         public Guid? PreviousVersionId { get; set; }
-
+        public int Version { get; set; }
+        
         public string Title =>
             TimePeriodLabelFormatter.Format(Year, TimeIdentifier, TimePeriodLabelFormat.FullLabelBeforeYear);
 
-        public Release CreateReleaseAmendment(Guid contentAmendmentId, Guid? amendmentPreviousVersionId)
+        public Release CreateReleaseAmendment(Guid contentAmendmentId, int amendmentVersion, Guid? amendmentPreviousVersionId)
         {
             var copy = MemberwiseClone() as Release;
             copy.Id = contentAmendmentId;
             copy.Published = null;
             copy.PreviousVersionId = amendmentPreviousVersionId;
+            copy.Version = amendmentVersion;
             return copy;
         }
     }
