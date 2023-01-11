@@ -14,6 +14,8 @@ import PrototypeHomepage4 from './PrototypeHomepage4';
 import PrototypeHomepage5 from './PrototypeHomepage5';
 import PrototypeHomepage6 from './PrototypeHomepage6';
 import PrototypeRelease from './PrototypeRelease';
+import PrototypeReleaseData from './PrototypeReleaseData';
+import PrototypeReleaseData2 from './PrototypeReleaseData2';
 import PrototypeManageUsers from './PrototypeManageUsers';
 import PrototypeAdminDashboard from './PrototypeAdminDashboard';
 import PrototypeAdminPublication from './PrototypeAdminPublication';
@@ -97,6 +99,11 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'Release',
     path: '/prototypes/release',
     component: PrototypeRelease,
+  },
+  {
+    name: 'ReleaseData',
+    path: '/prototypes/releaseData2',
+    component: PrototypeReleaseData2,
   },
   {
     name: 'Manage users',
@@ -227,6 +234,11 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'Homepage Refresh 4',
     path: '/prototypes/homepage6',
     component: PrototypeHomepage6,
+  },
+  {
+    name: 'ReleaseData',
+    path: '/prototypes/releaseData',
+    component: PrototypeReleaseData,
   },
 ];
 

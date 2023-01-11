@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import Link from '@admin/components/Link';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import PageTitle from '@admin/components/PageTitle';
@@ -23,9 +24,25 @@ const styles = {
 };
 
 const PrototypeTableHighlights = () => {
-  const [dataset, setDataset] = useState('');
-  const [datasetValue, setDatasetValue] = useState('');
+  const params = new URLSearchParams(window.location.search);
+  const urlSource = params.get('source');
+  const urlDataset = params.get('dataset');
+
+  const [dataset, setDataset] = useState(
+    urlDataset === 'ratesDetailed' ? 'subject-3' : '',
+  );
+  const [datasetValue, setDatasetValue] = useState(
+    urlDataset === 'ratesDetailed'
+      ? 'Apprenticeship Achievement Rates  Detailed series'
+      : '',
+  );
   const publication = 'pub-1';
+
+  const [sourcePublication, setSourcePublication] = useState(
+    urlSource === 'publicationPage',
+  );
+
+  const [sourceDataCat, setDataCat] = useState(urlSource === 'dataCat');
 
   return (
     <div
@@ -37,7 +54,29 @@ const PrototypeTableHighlights = () => {
       <PrototypePage wide>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            <PageTitle title="Explore our datasets" caption="Table tool" />
+            <h1
+              className={classNames('govuk-heading-xl', [
+                sourcePublication && 'govuk-!-margin-bottom-0',
+              ])}
+            >
+              <span className="govuk-caption-xl">Table tool</span>
+              Explore our datasets
+            </h1>
+            {sourcePublication && (
+              <div className="govuk-!-margin-bottom-4">
+                <Link to="./releaseData#exploreData" back>
+                  Back to apprenticeships and traineeships, academic year
+                  2021/22
+                </Link>
+              </div>
+            )}
+            {sourceDataCat && (
+              <div className="govuk-!-margin-bottom-4">
+                <Link to="./data-selected" back>
+                  Back to data catalogue
+                </Link>
+              </div>
+            )}
           </div>
         </div>
         <div className="govuk-!-margin-bottom-9">
@@ -248,6 +287,7 @@ const PrototypeTableHighlights = () => {
                                     className="govuk-radios__input"
                                     name="subject"
                                     id="subject-3"
+                                    checked={dataset === 'subject-3'}
                                     onClick={() => {
                                       setDatasetValue(
                                         'Apprenticeship Achievement Rates  Detailed series',

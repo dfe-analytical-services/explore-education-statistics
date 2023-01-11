@@ -22,6 +22,7 @@ const PrototypeDataCatalogue = () => {
   const params = new URLSearchParams(window.location.search);
   const urlTheme = params.get('theme');
   const urlPublication = params.get('publication');
+  const urlSource = params.get('source');
 
   const [fullList, setFullList] = useState(true);
   const [listCompact, setListCompact] = useState(false);
@@ -42,6 +43,9 @@ const PrototypeDataCatalogue = () => {
   const [totalResults, setTotalResults] = useState<number>();
   const [selectedSortOrder, setSelectedSortOrder] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
+  const [sourcePublication, setSourcePublication] = useState(
+    urlSource === 'publicationPage',
+  );
 
   const generateSlug = (title: string) => {
     const slug = title.toLowerCase();
@@ -115,10 +119,24 @@ const PrototypeDataCatalogue = () => {
       >
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            <h1 className="govuk-heading-xl">Data catalogue</h1>
+            <h1
+              className={classNames('govuk-heading-xl', [
+                sourcePublication && 'govuk-!-margin-bottom-0',
+              ])}
+            >
+              Data catalogue
+            </h1>
+            {sourcePublication && (
+              <div className="govuk-!-margin-bottom-4">
+                <Link to="./releaseData#exploreData" back>
+                  Back to apprenticeships and traineeships, academic year
+                  2021/22
+                </Link>
+              </div>
+            )}
             <p className="govuk-body-l">
               View all of the open data available and choose files to download.
-            </p>
+            </p>{' '}
           </div>
           <div className="govuk-grid-column-one-third">
             <RelatedInformation heading="Related information">
@@ -130,13 +148,14 @@ const PrototypeDataCatalogue = () => {
                 </li>
                 <li>
                   <Link to="#" target="_blank">
-                    Education statistics: glossary
+                    Glossary
                   </Link>
                 </li>
               </ul>
             </RelatedInformation>
           </div>
         </div>
+        <hr />
 
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-one-third">
@@ -384,7 +403,7 @@ const PrototypeDataCatalogue = () => {
                             e.preventDefault();
                           }}
                         >
-                          Back to all themes
+                          All themes
                         </a>
                       </div>
                     )}
@@ -427,7 +446,7 @@ const PrototypeDataCatalogue = () => {
                         e.preventDefault();
                       }}
                     >
-                      Back to all publications
+                      All publications
                     </a>
                   </div>
                 </div>
@@ -437,21 +456,12 @@ const PrototypeDataCatalogue = () => {
                     <span className="govuk-tag">latest data</span>
                   </SummaryListItem>
                   <SummaryListItem term="Theme">
-                    <a
-                      href="#"
-                      onClick={e => {
-                        setSelectedTheme('Further education');
-                        setSelectedPublication('All publications');
-                        e.preventDefault();
-                      }}
-                    >
-                      Further education
-                    </a>
+                    Further education
                   </SummaryListItem>
                   <SummaryListItem term="Publication">
-                    <a href="https://explore-education-statistics.service.gov.uk/find-statistics/apprenticeships-and-traineeships">
+                    <Link to="./releaseData#exploreData">
                       Apprenticeships and traineeships
-                    </a>
+                    </Link>
                   </SummaryListItem>
                   <SummaryListItem term="Release">
                     Academic year 2021/22
@@ -1529,9 +1539,7 @@ const PrototypeDataCatalogue = () => {
                 <li>
                   <hr />
                   <h3>
-                    <a href="#">
-                      Annual Headlines - detailed series (csv, 45 Kb)
-                    </a>
+                    <a href="#">Annual Headlines - detailed series</a>
                   </h3>
                   <p>Time series of headline apprenticeship figures</p>
                   {!listCompact && (
@@ -1676,7 +1684,7 @@ const PrototypeDataCatalogue = () => {
                 <li>
                   <hr />
                   <h3>
-                    <a href="#">Charts data (csv, 2 Kb)</a>
+                    <a href="#">Charts data</a>
                   </h3>
                   <p>
                     Historical time series of headline adult (19+) further
@@ -1712,7 +1720,6 @@ const PrototypeDataCatalogue = () => {
                   <h3>
                     <a href="#">
                       Duration, planned length of stay and length of employment
-                      (csv, 28 Kb)
                     </a>
                   </h3>
                   <p>
