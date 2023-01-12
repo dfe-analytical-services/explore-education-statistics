@@ -35,7 +35,6 @@ class PublisherFunctionsClient:
     @staticmethod
     def __request(self, method: str, url: str, body: object = None):
         assert method and url, f"Method and URL must be provided, got method {method} and url {url}"
-        logger.warn(f"got method {method} and url {url}")
         headers = {
             "Content-Type": "application/json",
         }

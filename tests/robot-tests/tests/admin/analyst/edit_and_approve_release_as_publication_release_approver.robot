@@ -129,7 +129,7 @@ Put release back into draft
     user puts release into draft
 
 Approve release for scheduled release
-    user approves release for scheduled release    2    12    3001
+    user approves release for scheduled publication    2    12    3001
 
 Verify release is scheduled
     user checks summary list contains    Current status    Approved

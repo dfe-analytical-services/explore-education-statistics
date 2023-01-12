@@ -496,7 +496,7 @@ user approves amended release for immediate publication
     user approves release for immediate publication    amendment
 
 user approves release for immediate publication
-    [Arguments]    ${release_type}=original
+    [Arguments]    ${release_type}=original    ${NEXT_RELEASE_MONTH}=01    ${NEXT_RELEASE_YEAR}=2200
     user clicks link    Sign off
     user waits until page does not contain loading spinner
     user waits until h2 is visible    Sign off
@@ -510,6 +510,8 @@ user approves release for immediate publication
     END
     user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    Approved by UI tests
     user clicks radio    Immediately
+    user enters text into element    id:releaseStatusForm-nextReleaseDate-month    ${NEXT_RELEASE_MONTH}
+    user enters text into element    id:releaseStatusForm-nextReleaseDate-year    ${NEXT_RELEASE_YEAR}
     user clicks button    Update status
     user waits until h2 is visible    Sign off    %{RELEASE_COMPLETE_WAIT}
     user checks summary list contains    Current status    Approved
@@ -576,7 +578,7 @@ user puts release into higher level review
     user clicks button    Update status
     user waits until element is visible    id:CurrentReleaseStatus-Awaiting higher review    %{WAIT_SMALL}
 
-user approves release for scheduled release
+user approves release for scheduled publication
     [Arguments]    ${DAYS_UNTIL_RELEASE}    ${NEXT_RELEASE_MONTH}=01    ${NEXT_RELEASE_YEAR}=2200
     ${PUBLISH_DATE_DAY}=    get current datetime    %-d    ${DAYS_UNTIL_RELEASE}
     ${PUBLISH_DATE_MONTH}=    get current datetime    %-m    ${DAYS_UNTIL_RELEASE}
@@ -609,21 +611,17 @@ user approves release for scheduled release
     user waits until h2 is visible    Confirm publish date    %{WAIT_SMALL}
     user clicks button    Confirm
 
-user waits for scheduled release to be published
+user waits for scheduled release to be published immediately
+    # It's possible that the actual scheduled "stage scheduled releases" function might pick up the staging of this
+    # scheduled Release before we get a chance to manually trigger the "stage scheduled releases immediately" function
+    # ourselves - hence we need to account for it going into "Started" state while it stages before we've manually
+    # triggered the function, as well as the standard "Scheduled" state that we would normally expect a scheduled
+    # Release to fall into.
     user waits until page contains element
-    ...    xpath://*[@id='release-process-status-Scheduled' or @id='release-process-status-Started']    %{WAIT_MEDIUM}
+    ...    xpath://*[@id='release-process-status-Scheduled' or @id='release-process-status-Started']    %{WAIT_SMALL}
     trigger immediate staging of scheduled release
-    FOR    ${Index}    IN RANGE    1    20
-        sleep    5
-        user reloads page
-        ${stages_present}=    Run Keyword And Return Status    user checks page for details dropdown    View stages
-        capture large screenshot and html
-        IF    "${stages_present}" == "${TRUE}"
-            Exit For Loop
-        END
-        log to console    try again ${stages_present}
-        sleep    1
-    END
+    user reloads page
+    user waits until page contains details dropdown    View stages    %{WAIT_SMALL}
     user opens details dropdown    View stages
     user waits until page contains    content - Scheduled    %{WAIT_MEDIUM}
     user waits until page contains    files - Complete    %{WAIT_MEDIUM}
