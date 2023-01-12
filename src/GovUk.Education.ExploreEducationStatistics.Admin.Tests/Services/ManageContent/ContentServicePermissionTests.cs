@@ -217,6 +217,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 );
         }
 
+        [Fact]
+        public async Task GetAvailableDataBlocks()
+        {
+            await PolicyCheckBuilder<ContentSecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanViewSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupContentService(userService: userService.Object);
+                        return service.GetAvailableDataBlocks(_release.Id);
+                    }
+                );
+        }
+
         private ContentService SetupContentService(
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
@@ -229,7 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             return new ContentService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                keyStatisticService ?? Mock.Of<IKeyStatisticService>(), // @MarkFix Strict?
+                keyStatisticService ?? Mock.Of<IKeyStatisticService>(),
                 releaseContentSectionRepository ?? new ReleaseContentSectionRepository(contentDbContext),
                 contentBlockService ?? Mock.Of<IContentBlockService>(),
                 hubContext ?? Mock.Of<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(),

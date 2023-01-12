@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
         public async Task<ActionResult<List<DataBlock>>> GetAvailableDataBlocks(Guid releaseId)
         {
             return await _contentService
-                .GetUnattachedContentBlocks<DataBlock>(releaseId)
+                .GetAvailableDataBlocks(releaseId)
                 .HandleFailuresOrOk();
         }
 

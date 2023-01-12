@@ -319,7 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock1.HighlightDescription, listResult[0].HighlightDescription);
                 Assert.Equal(dataBlock1.Source, listResult[0].Source);
                 Assert.Equal(1, listResult[0].ChartsCount);
-                // @MarkFix test InContent
+                Assert.True(listResult[0].InContent);
 
                 Assert.Equal(dataBlock2.Heading, listResult[1].Heading);
                 Assert.Equal(dataBlock2.Name, listResult[1].Name);
@@ -328,7 +328,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock2.HighlightDescription, listResult[1].HighlightDescription);
                 Assert.Equal(dataBlock2.Source, listResult[1].Source);
                 Assert.Equal(0, listResult[1].ChartsCount);
-                // @MarkFix test InContent
+                Assert.False(listResult[1].InContent);
+            }
+        }
+
+        [Fact]
+        public async Task List_KeyStatisticInContent()
+        {
+            var release = new Release();
+
+            var dataBlock = new DataBlock
+            {
+                ContentSectionId = null,
+            };
+
+            var keyStatistic = new KeyStatisticDataBlock
+            {
+                DataBlock = dataBlock,
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddRangeAsync(
+                    new ReleaseContentBlock
+                    {
+                        Release = release,
+                        ContentBlock = dataBlock,
+                    }
+                );
+                await context.KeyStatisticsDataBlock.AddAsync(keyStatistic);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildDataBlockService(context);
+                var result = await service.List(release.Id);
+
+                var listResult = result.AssertRight();
+
+                var responseDataBlock = Assert.Single(listResult);
+
+                Assert.Equal(dataBlock.Id, responseDataBlock.Id);
+                Assert.True(responseDataBlock.InContent);
             }
         }
 
@@ -412,16 +456,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildDataBlockService(context);
                 var result = await service.List(release.Id);
 
-                var listResult = Assert.Single(result.AssertRight());
+                var viewModel = Assert.Single(result.AssertRight());
 
-                Assert.Equal(dataBlock1.Heading, listResult.Heading);
-                Assert.Equal(dataBlock1.Name, listResult.Name);
-                Assert.Equal(dataBlock1.Created, listResult.Created);
-                Assert.Equal(dataBlock1.HighlightName, listResult.HighlightName);
-                Assert.Equal(dataBlock1.HighlightDescription, listResult.HighlightDescription);
-                Assert.Equal(dataBlock1.Source, listResult.Source);
-                Assert.Equal(1, listResult.ChartsCount);
-                // @MarkFix test InContent
+                Assert.Equal(dataBlock1.Heading, viewModel.Heading);
+                Assert.Equal(dataBlock1.Name, viewModel.Name);
+                Assert.Equal(dataBlock1.Created, viewModel.Created);
+                Assert.Equal(dataBlock1.HighlightName, viewModel.HighlightName);
+                Assert.Equal(dataBlock1.HighlightDescription, viewModel.HighlightDescription);
+                Assert.Equal(dataBlock1.Source, viewModel.Source);
+                Assert.Equal(1, viewModel.ChartsCount);
+                Assert.True(viewModel.InContent);
             }
         }
 
@@ -486,11 +530,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock.Id, dependentBlocks[0].Id);
                 Assert.Equal(dataBlock.Name, dependentBlocks[0].Name);
                 Assert.Equal(dataBlock.ContentSection.Heading, dependentBlocks[0].ContentSectionHeading);
+                Assert.False(dependentBlocks[0].IsKeyStatistic);
 
                 Assert.Single(dependentBlocks[0].InfographicFilesInfo);
 
                 Assert.Equal(file.Id, dependentBlocks[0].InfographicFilesInfo[0].Id);
                 Assert.Equal(file.Filename, dependentBlocks[0].InfographicFilesInfo[0].Filename);
+            }
+        }
+
+        [Fact]
+        public async Task GetDeletePlan_DependentDataBlockIsKeyStatistic()
+        {
+            var release = new Release();
+
+            var dataBlock = new DataBlock();
+
+            var keyStatistic = new KeyStatisticDataBlock
+            {
+                DataBlock = dataBlock,
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddAsync(
+                    new ReleaseContentBlock
+                    {
+                        Release = release,
+                        ContentBlock = dataBlock
+                    }
+                );
+                await context.KeyStatisticsDataBlock.AddAsync(keyStatistic);
+                    await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildDataBlockService(context);
+                var result = await service.GetDeletePlan(release.Id, dataBlock.Id);
+
+                var deletePlan = result.AssertRight();
+
+                Assert.Equal(release.Id, deletePlan.ReleaseId);
+
+                var dependentBlocks = deletePlan.DependentDataBlocks;
+
+                Assert.Single(dependentBlocks);
+
+                Assert.Equal(dataBlock.Id, dependentBlocks[0].Id);
+                Assert.Equal(dataBlock.Name, dependentBlocks[0].Name);
+                Assert.Null(dataBlock.ContentSection);
+                Assert.True(dependentBlocks[0].IsKeyStatistic);
             }
         }
 
@@ -573,20 +664,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Delete()
         {
+            var dataBlockId = Guid.NewGuid();
+            var keyStatId = Guid.NewGuid();
+
             var release = new Release
             {
                 Id = Guid.NewGuid(),
                 Publication    = new Publication
                 {
                     Id = Guid.NewGuid(),
-                }
+                },
+                KeyStatistics = new List<KeyStatistic>
+                {
+                    new KeyStatisticDataBlock
+                    {
+                        Id = keyStatId,
+                        DataBlockId = dataBlockId,
+                    },
+                },
             };
-            
+
             var fileId = Guid.NewGuid();
 
             var dataBlock = new DataBlock
             {
-                Id = Guid.NewGuid(),
+                Id = dataBlockId,
                 Name = "Test name",
                 Charts = new List<IChart>
                 {
@@ -668,6 +770,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Empty(context.DataBlocks.ToList());
                 Assert.Empty(context.ContentBlocks.ToList());
                 Assert.Empty(context.ReleaseContentBlocks.ToList());
+                Assert.Empty(context.KeyStatistics.ToList());
             }
         }
 

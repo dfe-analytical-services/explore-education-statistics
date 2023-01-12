@@ -8,7 +8,6 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -16,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -23,6 +23,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using HtmlBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.HtmlBlockViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ManageContent
 {
@@ -86,7 +87,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Slug = "2020-21",
                 TimePeriodCoverage = AcademicYear,
                 Type = ReleaseType.OfficialStatistics,
-                Updates = new List<Update>()
+                Updates = new List<Update>(),
+                KeyStatistics = new List<KeyStatistic>
+                {
+                    new KeyStatisticText { Order = 1 },
+                    new KeyStatisticDataBlock
+                    {
+                        Order = 0,
+                        DataBlockId = Guid.NewGuid(),
+                    },
+                },
             };
 
             var otherRelease = new Release
@@ -206,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
             contentService.Setup(mock =>
-                    mock.GetUnattachedContentBlocks<DataBlock>(release.Id))
+                    mock.GetAvailableDataBlocks(release.Id))
                 .ReturnsAsync(availableDataBlocks);
 
             methodologyVersionRepository.Setup(mock =>
@@ -229,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.True(result.IsRight);
 
                 contentService.Verify(mock =>
-                    mock.GetUnattachedContentBlocks<DataBlock>(release.Id), Times.Once);
+                    mock.GetAvailableDataBlocks(release.Id), Times.Once);
 
                 releaseFileService.Verify(mock =>
                     mock.ListAll(release.Id, Ancillary, FileType.Data), Times.Once);
@@ -243,6 +253,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal("Academic Year", contentRelease.CoverageTitle);
                 Assert.True(contentRelease.HasDataGuidance);
                 Assert.True(contentRelease.HasPreReleaseAccessList);
+
+                Assert.Equal(2, contentRelease.KeyStatistics.Count);
+                Assert.Equal(release.KeyStatistics[1].Id, contentRelease.KeyStatistics[0].Id);
+                Assert.Equal(0, contentRelease.KeyStatistics[0].Order);
+                var keyStatDataBlock = Assert.IsType<KeyStatisticDataBlockViewModel>(contentRelease.KeyStatistics[0]);
+                Assert.Equal(
+                    (release.KeyStatistics[1] as KeyStatisticDataBlock)!.DataBlockId,
+                    keyStatDataBlock.DataBlockId);
+
+                Assert.Equal(release.KeyStatistics[0].Id, contentRelease.KeyStatistics[1].Id);
+                Assert.Equal(1, contentRelease.KeyStatistics[1].Order);
+                Assert.IsType<KeyStatisticTextViewModel>(contentRelease.KeyStatistics[1]);
+
                 Assert.Equal(release.KeyStatisticsSecondarySection.Id,
                     contentRelease.KeyStatisticsSecondarySection.Id);
                 Assert.Equal(release.HeadlinesSection.Id, contentRelease.HeadlinesSection.Id);
@@ -450,7 +473,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
             contentService.Setup(mock =>
-                    mock.GetUnattachedContentBlocks<DataBlock>(release.Id))
+                    mock.GetAvailableDataBlocks(release.Id))
                 .ReturnsAsync(availableDataBlocks);
 
             methodologyVersionRepository.Setup(mock =>
@@ -474,7 +497,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.True(result.IsRight);
 
                 contentService.Verify(mock =>
-                    mock.GetUnattachedContentBlocks<DataBlock>(release.Id), Times.Once);
+                    mock.GetAvailableDataBlocks(release.Id), Times.Once);
 
                 releaseFileService.Verify(mock =>
                     mock.ListAll(release.Id, Ancillary, FileType.Data), Times.Once);

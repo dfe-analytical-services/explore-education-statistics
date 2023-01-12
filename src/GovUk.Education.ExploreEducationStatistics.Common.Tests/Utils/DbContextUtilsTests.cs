@@ -147,6 +147,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                 {
                     var saved = await context.CreatedDateTimeEntity.FindAsync(entity.Id);
 
+                    Assert.NotNull(saved);
+                    Assert.NotEqual(default, saved!.Created);
                     Assert.True(DateTime.UtcNow > saved.Created);
                 }
             }
@@ -169,6 +171,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                 {
                     var saved = await context.CreatedDateTimeOffsetEntity.FindAsync(entity.Id);
 
+                    Assert.NotNull(saved);
+                    Assert.NotEqual(default, saved!.Created);
                     Assert.True(DateTime.UtcNow > saved.Created);
                 }
             }

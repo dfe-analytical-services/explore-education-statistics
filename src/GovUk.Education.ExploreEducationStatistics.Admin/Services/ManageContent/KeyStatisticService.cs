@@ -23,17 +23,20 @@ public class KeyStatisticService : IKeyStatisticService
 {
     private readonly ContentDbContext _context;
     private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+    private readonly IContentService _contentService;
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
 
     public KeyStatisticService(
         ContentDbContext context,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
+        IContentService contentService,
         IUserService userService,
         IMapper mapper)
     {
         _context = context;
         _persistenceHelper = persistenceHelper;
+        _contentService = contentService;
         _userService = userService;
         _mapper = mapper;
     }
@@ -46,14 +49,21 @@ public class KeyStatisticService : IKeyStatisticService
             .OnSuccess(_userService.CheckCanUpdateRelease)
             .OnSuccess(async _ =>
                 await _persistenceHelper.CheckEntityExists<DataBlock>(request.DataBlockId))
-            .OnSuccess(dataBlock =>
+            .OnSuccessVoid(async dataBlock =>
             {
-                if (dataBlock.ContentSectionId != null)
+                var either = await _contentService.GetAvailableDataBlocks(releaseId);
+                if (either.IsLeft)
                 {
-                    throw new ArgumentException("Data block shouldn't be attached to a content section");
+                    throw new Exception("ContentService#GetAvailableDataBlocks error");
                 }
 
-                return dataBlock;
+                var availableDataBlocks = either.Right;
+                if (!availableDataBlocks
+                        .Select(available => available.Id)
+                        .Contains(dataBlock.Id))
+                {
+                    throw new ArgumentException("Data block should be available");
+                }
             })
             .OnSuccess(async _ =>
             {
@@ -106,9 +116,11 @@ public class KeyStatisticService : IKeyStatisticService
                     query
                         .Include(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlock) // TODO Include can be removed in EES-3988
                         .Where(keyStat => keyStat.ReleaseId == release.Id)))
-            // NOTE: Ensure old key stats created before the new key stat work was deployed
-            // become available for selection again by setting ContentSectionId to null
-            // TODO: Remove this in EES-3988
+            // TODO: Can remove the below OnSuccess in EES-3988
+            // Key stats were previously associated with a KeyStatistic content section,
+            // which meant their data blocks had a ContentSectionId set. The below code
+            // ensures ContentSectionId is unset when a key stat is removed. If it isn't
+            // unset, that data block won't become available for selection again.
             .OnSuccess(async keyStat =>
             {
                 if (keyStat.GetType() == typeof(KeyStatisticDataBlock))
@@ -138,7 +150,9 @@ public class KeyStatisticService : IKeyStatisticService
         await _context.SaveChangesAsync();
     }
 
-    public async Task<Either<ActionResult, List<KeyStatisticViewModel>>> Reorder(Guid releaseId, Dictionary<Guid, int> newKeyStatisticOrder)
+    public async Task<Either<ActionResult, List<KeyStatisticViewModel>>> Reorder(
+        Guid releaseId,
+        Dictionary<Guid, int> newKeyStatisticOrder)
     {
         return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
             .OnSuccess(_userService.CheckCanUpdateRelease)
@@ -159,10 +173,12 @@ public class KeyStatisticService : IKeyStatisticService
                 {
                     var (keyStatisticId, newOrder) = idOrderPair;
                     var matchingKeyStat = keyStatistics.Find(ks => ks.Id == keyStatisticId);
-                    if (matchingKeyStat != null)
+                    if (matchingKeyStat == null)
                     {
-                        matchingKeyStat.Order = newOrder;
+                        throw new ArgumentException(
+                            $"keyStatistic {keyStatisticId} not attached to release {releaseId}");
                     }
+                    matchingKeyStat.Order = newOrder;
                 });
 
                 _context.UpdateRange(keyStatistics);

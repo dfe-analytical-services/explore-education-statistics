@@ -239,20 +239,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return NotFound<List<IContentBlockViewModel>>();
                     }
 
-                    if (!blockToRemove.ContentSectionId.HasValue)
-                    {
-                        return ValidationActionResult(ContentBlockAlreadyDetached);
-                    }
-
-                    if (blockToRemove.ContentSectionId != contentSectionId)
-                    {
-                        return ValidationActionResult(ContentBlockNotAttachedToThisContentSection);
-                    }
-
                     await _contentBlockService.DeleteContentBlockAndReorder(blockToRemove.Id);
 
                     if (blockToRemove is DataBlock)
                     {
+                        // NOTE: Should never be necessary, as data blocks attached to key stats don't have ContentSectionId set
+                        // and we are guaranteed the data block has a ContentSectionId set here
+                        // Remove in EES-3988?
                         await _keyStatisticService.DeleteAnyAssociatedWithDataBlock(releaseId, blockToRemove.Id);
                     }
 
@@ -289,35 +282,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .OnSuccessDo(block => _hubContext.Clients.Group(releaseId.ToString()).ContentBlockUpdated(block));
         }
 
-        // TODO: EES-1568 - Can be specific to data blocks?
-        public async Task<Either<ActionResult, List<T>>> GetUnattachedContentBlocks<T>(Guid releaseId)
-            where T : ContentBlock
+        public async Task<Either<ActionResult, List<DataBlock>>> GetAvailableDataBlocks(Guid releaseId)
         {
-            var unattachedContentBlocks = await _context
-                .ReleaseContentBlocks
-                .Include(join => join.ContentBlock)
-                .Where(join => join.ReleaseId == releaseId)
-                .Select(join => join.ContentBlock)
-                .Where(contentBlock => contentBlock.ContentSectionId == null)
-                .OfType<T>()
-                .ToListAsync();
+            return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanViewRelease)
+                .OnSuccess(async release =>
+                {
+                    var keyStatDataBlockIds = _context.KeyStatisticsDataBlock
+                        .Where(ks => ks.ReleaseId == release.Id)
+                        .Select(ks => ks.DataBlockId)
+                        .ToList();
 
-            if (typeof(T) == typeof(DataBlock))
-            {
-                var keyStatDataBlockIds = _context.KeyStatisticsDataBlock
-                    .Where(ks => ks.ReleaseId == releaseId)
-                    .Select(ks => ks.DataBlockId)
-                    .ToList();
-
-                return unattachedContentBlocks
-                    .OfType<DataBlock>()
-                    .Where(dataBlock => !keyStatDataBlockIds.Contains(dataBlock.Id))
-                    .OrderBy(contentBlock => contentBlock.Name)
-                    .OfType<T>()
-                    .ToList();
-            }
-
-            return unattachedContentBlocks;
+                    return await _context
+                        .ReleaseContentBlocks
+                        .Include(releaseContentBlock => releaseContentBlock.ContentBlock)
+                        .Where(releaseContentBlock => releaseContentBlock.ReleaseId == release.Id)
+                        .Select(releaseContentBlock => releaseContentBlock.ContentBlock)
+                        .OfType<DataBlock>()
+                        .Where(dataBlock =>
+                            dataBlock.ContentSectionId == null
+                            && !keyStatDataBlockIds.Contains(dataBlock.Id))
+                        .OrderBy(contentBlock => contentBlock.Name)
+                        .ToListAsync();
+                });
         }
 
         public Task<Either<ActionResult, IContentBlockViewModel>> AttachDataBlock(Guid releaseId, Guid contentSectionId,

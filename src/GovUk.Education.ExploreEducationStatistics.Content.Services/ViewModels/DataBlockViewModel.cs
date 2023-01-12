@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public ObservationQueryContext Query { get; set; }
 
-        private List<IChart> ChartsInternal;
+        private List<IChart> ChartsInternal = new();
 
         // TODO EES-3319 - remove backwards-compatibility for Map Configuration without its
         // own Boundary Level selection
@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
                 {
                     if (chart is MapChart { BoundaryLevel: null } mapChart)
                     {
-                        mapChart.BoundaryLevel = Query.BoundaryLevel;       
+                        mapChart.BoundaryLevel = Query.BoundaryLevel;
                     }
                 });
                 ChartsInternal = value;

@@ -117,9 +117,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 RegexOptions.Compiled
             );
 
-            foreach (var contentBlock in context.OriginalToAmendmentContentBlockMap.Values)
+            foreach (var amendmentBlock in context.OriginalToAmendmentContentBlockMap.Values)
             {
-                switch (contentBlock)
+                switch (amendmentBlock)
                 {
                     case HtmlBlock block:
                         block.Body = ReplaceContent(block.Body, regex, replacements);

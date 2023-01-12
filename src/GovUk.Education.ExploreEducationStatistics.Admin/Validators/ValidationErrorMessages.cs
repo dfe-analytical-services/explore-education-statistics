@@ -16,8 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         IncorrectContentBlockTypeForUpdate,
         ContentBlockAlreadyAttachedToContentSection,
         IncorrectContentBlockTypeForAttach,
-        ContentBlockAlreadyDetached,
-        ContentBlockNotAttachedToThisContentSection,
         ContentSectionNotAttachedToRelease,
         ContentBlockNotAttachedToRelease,
         EmbedBlockUrlDomainNotPermitted,

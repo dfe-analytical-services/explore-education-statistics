@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Clients;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -355,6 +354,407 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task RemoveContentBlock()
+        {
+            var contentSectionId = Guid.NewGuid();
+            var contentBlockId = Guid.NewGuid();
+            var releaseContentSection = new ReleaseContentSection
+            {
+                Release = new Release(),
+                ContentSection = new ContentSection
+                {
+                    Id = contentSectionId,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Id = contentBlockId,
+                            Order = 0,
+                        },
+                        new DataBlock { Order = 1 },
+                        new HtmlBlock { Order = 2 },
+                    },
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseContentSections.AddRangeAsync(releaseContentSection);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupContentService(contentDbContext: contentDbContext);
+                var result = await service.RemoveContentBlock(
+                    releaseContentSection.ReleaseId,
+                    contentSectionId,
+                    contentBlockId);
+
+                var viewModelList = result.AssertRight();
+
+                Assert.Equal(2, viewModelList.Count);
+                Assert.Null(viewModelList.Find(viewModel => viewModel.Id == contentBlockId));
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var contentBlocks = contentDbContext.ContentBlocks
+                    .OrderBy(cb => cb.Order)
+                    .ToList();
+
+                Assert.Equal(2, contentBlocks.Count);
+
+                Assert.Equal(0, contentBlocks[0].Order);
+                Assert.IsType<DataBlock>(contentBlocks[0]);
+                Assert.Equal(1, contentBlocks[1].Order);
+                Assert.IsType<HtmlBlock>(contentBlocks[1]);
+            }
+        }
+
+        [Fact]
+        public async Task RemoveContentBlock_NoRelease()
+        {
+            var contentBlockId = Guid.NewGuid();
+            var releaseContentSection = new ReleaseContentSection
+            {
+                Release = new Release(),
+                ContentSection = new ContentSection
+                {
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Id = contentBlockId,
+                        },
+                        new DataBlock(),
+                        new HtmlBlock(),
+                    },
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseContentSections.AddRangeAsync(releaseContentSection);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupContentService(contentDbContext: contentDbContext);
+                var result = await service.RemoveContentBlock(
+                    Guid.NewGuid(),
+                    releaseContentSection.ContentSectionId,
+                    contentBlockId);
+
+                result.AssertNotFound();
+            }
+        }
+
+        [Fact]
+        public async Task RemoveContentBlock_NoContentSection()
+        {
+            var contentBlockId = Guid.NewGuid();
+            var releaseContentSection = new ReleaseContentSection
+            {
+                Release = new Release(),
+                ContentSection = new ContentSection
+                {
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Id = contentBlockId,
+                        },
+                        new DataBlock(),
+                        new HtmlBlock(),
+                    },
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseContentSections.AddRangeAsync(releaseContentSection);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupContentService(contentDbContext: contentDbContext);
+                var result = await service.RemoveContentBlock(
+                    releaseContentSection.ReleaseId,
+                    Guid.NewGuid(),
+                    contentBlockId);
+
+                result.AssertNotFound();
+            }
+        }
+
+        [Fact]
+        public async Task RemoveContentBlock_NoContentBlock()
+        {
+            var contentBlockId = Guid.NewGuid();
+            var releaseContentSection = new ReleaseContentSection
+            {
+                Release = new Release(),
+                ContentSection = new ContentSection
+                {
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Id = contentBlockId,
+                        },
+                        new DataBlock(),
+                        new HtmlBlock(),
+                    },
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseContentSections.AddRangeAsync(releaseContentSection);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupContentService(contentDbContext: contentDbContext);
+                var result = await service.RemoveContentBlock(
+                    releaseContentSection.ReleaseId,
+                    releaseContentSection.ContentSectionId,
+                    Guid.NewGuid());
+
+                result.AssertNotFound();
+            }
+        }
+
+        [Fact]
+        public async Task RemoveContentBlock_BlockAttachedToIncorrectSection()
+        {
+            var release = new Release();
+
+            var incorrectContentBlockId = Guid.NewGuid();
+            var incorrectReleaseContentSection = new ReleaseContentSection()
+            {
+                Release = release,
+                ContentSection = new ContentSection
+                {
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock { Id = incorrectContentBlockId },
+                    },
+                },
+            };
+
+            var releaseContentSection = new ReleaseContentSection
+            {
+                Release = release,
+                ContentSection = new ContentSection
+                {
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock(),
+                    },
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseContentSections.AddRangeAsync(
+                    releaseContentSection, incorrectReleaseContentSection);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupContentService(contentDbContext: contentDbContext);
+                var result = await service.RemoveContentBlock(
+                    releaseContentSection.ReleaseId,
+                    releaseContentSection.ContentSectionId,
+                    incorrectContentBlockId);
+
+                result.AssertNotFound();
+            }
+        }
+
+        [Fact]
+        public async Task RemoveContentBlock_AssociatedWithKeyStat()
+        {
+            var dataBlockId = Guid.NewGuid();
+
+            var release = new Release
+            {
+                KeyStatistics = new List<KeyStatistic>
+                {
+                    new KeyStatisticDataBlock
+                    {
+                        DataBlockId = dataBlockId,
+                    },
+                },
+            };
+
+            var releaseContentSection = new ReleaseContentSection()
+            {
+                Release = release,
+                ContentSection = new ContentSection
+                {
+                    Content = new List<ContentBlock>
+                    {
+                        new DataBlock { Id = dataBlockId },
+                    },
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseContentSections.AddRangeAsync(
+                    releaseContentSection, releaseContentSection);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var keyStatisticService = new Mock<IKeyStatisticService>(MockBehavior.Strict);
+                keyStatisticService
+                    .Setup(s =>
+                        s.DeleteAnyAssociatedWithDataBlock(release.Id, dataBlockId))
+                    .Returns(Task.CompletedTask);
+
+                var service = SetupContentService(
+                    contentDbContext: contentDbContext,
+                    keyStatisticService: keyStatisticService.Object);
+                var result = await service.RemoveContentBlock(
+                    releaseContentSection.ReleaseId,
+                    releaseContentSection.ContentSectionId,
+                    dataBlockId);
+
+                var contentBlockViewModel = result.AssertRight();
+
+                MockUtils.VerifyAllMocks(keyStatisticService);
+
+                Assert.Empty(contentBlockViewModel);
+            }
+        }
+
+        [Fact]
+        public async Task GetAvailableDataBlocks()
+        {
+            var release = new Release();
+
+            var availableDataBlock1Id = Guid.NewGuid();
+            var availableDataBlock2Id = Guid.NewGuid();
+
+            var unavailableDataBlock1Id = Guid.NewGuid();
+            var keyStat = new KeyStatisticDataBlock
+            {
+                Release = release,
+                DataBlockId = unavailableDataBlock1Id,
+            };
+
+            var releaseContentBlocks = new List<ReleaseContentBlock>
+            {
+                new()
+                {
+                    Release = release,
+                    ContentBlock = new DataBlock
+                    {
+                        Id = unavailableDataBlock1Id, // unavailable because has key stat
+                        Name = "Unavailable 1",
+                        ContentSectionId = null,
+                    },
+                },
+                new()
+                {
+                    Release = release,
+                    ContentBlock = new DataBlock
+                    {
+                        Id = availableDataBlock1Id,
+                        Name = "Available 1",
+                        ContentSection = null,
+                    },
+                },
+                new()
+                {
+                    Release = release,
+                    ContentBlock = new HtmlBlock(),
+                },
+                new()
+                {
+                    Release = release,
+                    ContentBlock = new DataBlock
+                    {
+                        Id = availableDataBlock2Id,
+                        Name = "Available 2",
+                        ContentSection = null,
+                    },
+                },
+                new()
+                {
+                    Release = release,
+                    ContentBlock = new DataBlock
+                    {
+                        Name = "Unavailable 2", // because has content section
+                        ContentSection = new ContentSection(),
+                    },
+                },
+                new()
+                {
+                    Release = new Release(),
+                    ContentBlock = new DataBlock
+                    {
+                        Name = "Unavailable 3", // because different release
+                        ContentSection = null,
+                    }
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseContentBlocks.AddRangeAsync(releaseContentBlocks);
+                await contentDbContext.KeyStatisticsDataBlock.AddRangeAsync(keyStat);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupContentService(contentDbContext: contentDbContext);
+                var result = await service.GetAvailableDataBlocks(
+                    release.Id);
+
+                var availableDataBlocks = result.AssertRight();
+
+                Assert.Equal(2, availableDataBlocks.Count);
+
+                Assert.Equal(availableDataBlock1Id, availableDataBlocks[0].Id);
+                Assert.Equal("Available 1", availableDataBlocks[0].Name);
+                Assert.Equal(availableDataBlock2Id, availableDataBlocks[1].Id);
+                Assert.Equal("Available 2", availableDataBlocks[1].Name);
+            }
+        }
+
+        [Fact]
+        public async Task GetAvailableDataBlocks_NoRelease()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupContentService(contentDbContext: contentDbContext);
+                var result = await service.GetAvailableDataBlocks(
+                    Guid.NewGuid());
+
+                result.AssertNotFound();
+            }
+        }
+
         private static ContentService SetupContentService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
@@ -367,10 +767,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new ContentService(
                 contentDbContext,
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                keyStatisticService ?? Mock.Of<IKeyStatisticService>(), // @MarkFix strict?
+                keyStatisticService ?? Mock.Of<IKeyStatisticService>(MockBehavior.Strict),
                 releaseContentSectionRepository ?? new ReleaseContentSectionRepository(contentDbContext),
                 contentBlockService ?? new ContentBlockService(contentDbContext),
-                hubContext ?? Mock.Of<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(),
+                hubContext ?? Mock.Of<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(MockBehavior.Strict),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 AdminMapper()
             );

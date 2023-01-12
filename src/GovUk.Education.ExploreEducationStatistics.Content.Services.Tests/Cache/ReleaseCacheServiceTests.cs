@@ -61,12 +61,17 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
                         {
                             new LineChart()
                         }
-                    }
+                    },
                 }
             }
         },
         SummarySection = ContentSectionWithHtmlBlock(),
         HeadlinesSection = ContentSectionWithHtmlBlock(),
+        KeyStatistics = new List<KeyStatisticViewModel>
+        {
+            new KeyStatisticTextViewModel(),
+            new KeyStatisticDataBlockViewModel(),
+        },
         KeyStatisticsSecondarySection = ContentSectionWithHtmlBlock(),
         RelatedDashboardsSection = ContentSectionWithHtmlBlock(),
         DownloadFiles = new List<FileInfo>
@@ -343,7 +348,8 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public void ReleaseCacheViewModel_SerializeAndDeserialize()
     {
-        var converted = DeserializeObject<ReleaseCacheViewModel>(SerializeObject(_releaseViewModel));
+        var serializedObject = SerializeObject(_releaseViewModel);
+        var converted = DeserializeObject<ReleaseCacheViewModel>(serializedObject);
         converted.AssertDeepEqualTo(_releaseViewModel);
     }
 

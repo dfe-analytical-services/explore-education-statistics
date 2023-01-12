@@ -53,14 +53,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateReleaseQuery)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccessCombineWith(release => _contentService.GetUnattachedContentBlocks<DataBlock>(releaseId))
+                .OnSuccessCombineWith(release => _contentService.GetAvailableDataBlocks(releaseId))
                 .OnSuccessCombineWith(releaseAndBlocks => _releaseFileService.ListAll(
                     releaseId,
                     Ancillary,
                     FileType.Data))
                 .OnSuccess(async releaseBlocksAndFiles =>
                 {
-                    var (release, blocks, files) = releaseBlocksAndFiles;
+                    var (release, availableDataBlocks, files) = releaseBlocksAndFiles;
 
                     var methodologies = await _methodologyVersionRepository.GetLatestVersionByPublication(release.PublicationId);
 
@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     return new ManageContentPageViewModel
                     {
                         Release = releaseViewModel,
-                        AvailableDataBlocks = blocks
+                        AvailableDataBlocks = availableDataBlocks
                     };
                 });
         }

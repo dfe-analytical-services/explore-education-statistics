@@ -516,6 +516,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         }
 
         [Fact]
+        public void CreateAmendment_RemovesKeyStatistics()
+        {
+            var dataBlock = new DataBlock();
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                Version = 1,
+                Published = DateTime.Parse("2020-10-10T13:00:00"),
+                PublishScheduled = DateTime.Parse("2020-10-09T12:00:00"),
+                KeyStatistics = new List<KeyStatistic>
+                {
+                    new KeyStatisticText { Id = Guid.NewGuid() },
+                    new KeyStatisticDataBlock
+                    {
+                        Id = Guid.NewGuid(),
+                        DataBlock = dataBlock,
+                    },
+                },
+                ContentBlocks = new List<ReleaseContentBlock>
+                {
+                    new ReleaseContentBlock
+                    {
+                        ContentBlock = dataBlock,
+                    },
+                },
+            };
+
+            var createdDate = DateTime.Now;
+            var createdById = Guid.NewGuid();
+
+            var amendment = release.CreateAmendment(createdDate, createdById);
+
+            Assert.NotEqual(release.Id, amendment.Id);
+            Assert.Equal(2, amendment.Version);
+            Assert.Equal(release.Id, amendment.PreviousVersionId);
+
+            Assert.Null(amendment.Published);
+            Assert.Null(amendment.PublishScheduled);
+            Assert.Equal(ReleaseApprovalStatus.Draft, amendment.ApprovalStatus);
+
+            Assert.Equal(2, amendment.KeyStatistics.Count);
+
+            var amendmentKeyStatText = Assert.IsType<KeyStatisticText>(amendment.KeyStatistics[0]);
+            Assert.NotEqual(release.KeyStatistics[0].Id, amendmentKeyStatText.Id);
+
+            var amendmentKeyStatDataBlock = Assert.IsType<KeyStatisticDataBlock>(amendment.KeyStatistics[1]);
+            Assert.NotEqual(release.KeyStatistics[1].Id, amendmentKeyStatDataBlock.Id);
+            var amendmentDataBlock = Assert.IsType<DataBlock>(amendment.ContentBlocks[0].ContentBlock);
+            Assert.NotEqual(
+                release.ContentBlocks[0].ContentBlockId,
+                amendment.ContentBlocks[0].ContentBlockId);
+            Assert.Equal(
+                amendment.ContentBlocks[0].ContentBlockId,
+                amendmentKeyStatDataBlock.DataBlockId);
+        }
+
+
+        [Fact]
         public void CreateAmendment_UpdatesFastTrackLinkIds()
         {
             var release = new Release
@@ -678,7 +736,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void CreateAmendment_FiltersContent()
         {
-              var release = new Release
+            var release = new Release
             {
                 Id = Guid.NewGuid(),
             };

@@ -4,27 +4,27 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Newtonsoft.Json;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
+
+public abstract class KeyStatistic : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 {
-    public abstract class KeyStatistic : ICreatedUpdatedTimestamps<DateTime, DateTime?>
-    {
-        public Guid Id { get; set; }
+    public Guid Id { get; set; }
 
-        public Guid ReleaseId { get; set; }
+    public Guid ReleaseId { get; set; }
 
-        [JsonIgnore, IgnoreMap] public Release Release { get; set; } = null!;
+    [JsonIgnore, IgnoreMap] public Release Release { get; set; } = null!;
 
-        public string? Trend { get; set; } = string.Empty;
+    public string? Trend { get; set; } = string.Empty;
 
-        public string? GuidanceTitle { get; set; } = string.Empty;
+    public string? GuidanceTitle { get; set; } = string.Empty;
 
-        public string? GuidanceText { get; set; } = string.Empty;
+    public string? GuidanceText { get; set; } = string.Empty;
 
-        public int Order { get; set; }
+    public int Order { get; set; }
 
-        public DateTime Created { get; set; }
+    public DateTime Created { get; set; }
 
-        public DateTime? Updated { get; set; }
+    public DateTime? Updated { get; set; }
 
         public Guid ContentBlockIdTemp { get; set; }
 
@@ -35,21 +35,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             copy.Release = newRelease;
             copy.ReleaseId = newRelease.Id;
 
-            return copy;
-        }
+        return copy;
     }
+}
 
-    public class KeyStatisticDataBlock : KeyStatistic
-    {
-        public Guid DataBlockId { get; set; }
+public class KeyStatisticDataBlock : KeyStatistic
+{
+    public Guid DataBlockId { get; set; }
 
-        [JsonIgnore, IgnoreMap] public DataBlock DataBlock { get; set; } = null!;
-    }
+    [JsonIgnore, IgnoreMap] public DataBlock DataBlock { get; set; } = null!;
+}
 
-    public class KeyStatisticText : KeyStatistic
-    {
-        public string Title { get; set; } = string.Empty;
+public class KeyStatisticText : KeyStatistic
+{
+    public string Title { get; set; } = string.Empty;
 
-        public string Statistic { get; set; } = string.Empty;
-    }
+    public string Statistic { get; set; } = string.Empty;
 }

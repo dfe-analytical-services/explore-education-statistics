@@ -1,8 +1,15 @@
 #nullable enable
 using System;
+using System.Runtime.Serialization;
+using JsonKnownTypes;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 
+[JsonConverter(typeof(JsonKnownTypesConverter<KeyStatisticViewModel>))]
+[JsonDiscriminator(Name = "Type")]
+[KnownType(typeof(KeyStatisticTextViewModel))]
+[KnownType(typeof(KeyStatisticDataBlockViewModel))]
 public abstract class KeyStatisticViewModel
 {
     public Guid Id { get; set; }

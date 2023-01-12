@@ -381,11 +381,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class DependentDataBlock
     {
         [JsonIgnore] public Guid Id { get; set; }
-
         public string Name { get; set; } = "";
         public string? ContentSectionHeading { get; set; }
         public List<InfographicFileInfo> InfographicFilesInfo { get; set; } = new();
-
         public bool IsKeyStatistic { get; set; }
     }
 
@@ -398,7 +396,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class DeleteDataBlockPlan
     {
         [JsonIgnore] public Guid ReleaseId { get; set; }
-
         public List<DependentDataBlock> DependentDataBlocks { get; set; } = new List<DependentDataBlock>();
     }
 }
