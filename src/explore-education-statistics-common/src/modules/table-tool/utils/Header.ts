@@ -39,6 +39,7 @@ export default class Header {
     let child = this.getFirstChild();
 
     while (child) {
+      // note LH: && child.text === this.text' - calculating whether to add to crossSpan
       if (child.text === this.text && child.span === this.span) {
         crossSpan += 1;
       }

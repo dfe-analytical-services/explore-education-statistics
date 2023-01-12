@@ -11,11 +11,12 @@ exports[`TableToolFinalStep renders the final step successfully 1`] = `
   >
     <tr>
       <td
-        class="borderBottom"
+        class=""
         colspan="2"
         rowspan="1"
       />
       <th
+        class=""
         colspan="1"
         rowspan="1"
         scope="col"
@@ -27,7 +28,7 @@ exports[`TableToolFinalStep renders the final step successfully 1`] = `
   <tbody>
     <tr>
       <th
-        class="borderBottom"
+        class=""
         colspan="1"
         rowspan="1"
         scope="rowgroup"
@@ -50,7 +51,7 @@ exports[`TableToolFinalStep renders the final step successfully 1`] = `
     </tr>
     <tr>
       <th
-        class="borderBottom"
+        class=""
         colspan="1"
         rowspan="1"
         scope="rowgroup"
@@ -66,7 +67,7 @@ exports[`TableToolFinalStep renders the final step successfully 1`] = `
         2020 Week 23
       </th>
       <td
-        class="govuk-table__cell--numeric borderBottom"
+        class="govuk-table__cell--numeric"
       >
         1%
       </td>

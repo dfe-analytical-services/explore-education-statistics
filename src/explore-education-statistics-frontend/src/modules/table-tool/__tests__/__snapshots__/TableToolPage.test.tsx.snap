@@ -11,11 +11,12 @@ exports[`TableToolPage renders the page correctly with pre-built table when a fa
   >
     <tr>
       <td
-        class="borderBottom"
+        class=""
         colspan="2"
         rowspan="1"
       />
       <th
+        class=""
         colspan="1"
         rowspan="1"
         scope="col"
@@ -27,7 +28,7 @@ exports[`TableToolPage renders the page correctly with pre-built table when a fa
   <tbody>
     <tr>
       <th
-        class="borderBottom"
+        class=""
         colspan="1"
         rowspan="2"
         scope="rowgroup"
@@ -58,14 +59,14 @@ exports[`TableToolPage renders the page correctly with pre-built table when a fa
         Graduates included in earnings figures
       </th>
       <td
-        class="govuk-table__cell--numeric borderBottom"
+        class="govuk-table__cell--numeric"
       >
         2
       </td>
     </tr>
     <tr>
       <th
-        class="borderBottom"
+        class=""
         colspan="1"
         rowspan="2"
         scope="rowgroup"
@@ -96,7 +97,7 @@ exports[`TableToolPage renders the page correctly with pre-built table when a fa
         Graduates included in earnings figures
       </th>
       <td
-        class="govuk-table__cell--numeric borderBottom"
+        class="govuk-table__cell--numeric"
       >
         2
       </td>
