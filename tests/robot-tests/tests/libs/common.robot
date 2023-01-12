@@ -723,12 +723,16 @@ user gets details content element
     [Return]    ${content}
 
 user waits until page contains details dropdown
-    [Arguments]    ${text}
-    user waits until page contains element    xpath:.//details/summary[contains(., "${text}")]
+    [Arguments]    ${text}    ${wait}=${timeout}
+    user waits until page contains element    xpath:.//details/summary[contains(., "${text}")]    ${wait}
 
 user checks page for details dropdown
     [Arguments]    ${text}
     user checks page contains element    xpath:.//details/summary[contains(., "${text}")]
+
+user scrolls to details dropdown
+    [Arguments]    ${text}    ${wait}=${timeout}
+    user scrolls to element    xpath:.//details/summary[contains(., "${text}")]
 
 user checks publication bullet contains link
     [Arguments]    ${publication}    ${link}

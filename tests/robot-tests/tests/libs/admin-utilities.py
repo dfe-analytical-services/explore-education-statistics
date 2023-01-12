@@ -1,18 +1,53 @@
 import os
 import time
 
+import requests
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
+from tests.libs.logger import get_logger
 from tests.libs.setup_auth_variables import setup_auth_variables
 from tests.libs.utilities import set_cookie_from_json, set_to_local_storage
+
+logger = get_logger(__name__)
 
 sl = BuiltIn().get_library_instance("SeleniumLibrary")
 
 
-def raise_assertion_error(err_msg):
+def raise_assertion_error(self, err_msg):
     sl.failure_occurred()
+    self.logger.warn(err_msg)
     raise AssertionError(err_msg)
+
+
+class PublisherFunctionsClient:
+    ROBOT_AUTO_KEYWORDS = False
+
+    def __init__(self):
+        assert (
+            os.getenv("PUBLISHER_FUNCTIONS_URL") is not None
+        ), "Environment variable PUBLISHER_FUNCTIONS_URL must be provided"
+
+        requests.sessions.HTTPAdapter(pool_connections=50, pool_maxsize=50, max_retries=3)
+        self.session = requests.Session()
+        self.base_url = os.getenv("PUBLISHER_FUNCTIONS_URL")
+
+    @staticmethod
+    def __request(self, method: str, url: str, body: object = None):
+        assert method and url, f"Method and URL must be provided, got method {method} and url {url}"
+        logger.warn(f"got method {method} and url {url}")
+        headers = {
+            "Content-Type": "application/json",
+        }
+        return self.session.request(
+            method, url=f"{self.base_url}{url}", headers=headers, stream=True, json=body, verify=False
+        )
+
+    def post(self, url: str, body: object = None):
+        return self.__request(self, "POST", url, body)
+
+
+publisher_functions_client = PublisherFunctionsClient()
 
 
 def user_signs_in_as(user: str):
@@ -101,3 +136,17 @@ def user_checks_dashboard_theme_topic_dropdowns_exist():
         return False
 
     return True
+
+
+def trigger_immediate_staging_of_scheduled_release():
+    stage_release_response = publisher_functions_client.post(f"/api/StageScheduledReleasesImmediately")
+    assert (
+        stage_release_response.status_code < 300
+    ), f"Immediate staging of scheduled release API request failed with {stage_release_response.status_code} and {stage_release_response.text}"
+
+
+def trigger_immediate_publishing_of_scheduled_release():
+    stage_release_response = publisher_functions_client.post(f"/api/PublishStagedReleaseContentImmediately")
+    assert (
+        stage_release_response.status_code < 300
+    ), f"Immediate publishing of staged release API request failed with {stage_release_response.status_code} and {stage_release_response.text}"

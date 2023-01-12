@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
@@ -49,15 +50,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName,
                 DateTime.UtcNow);
 
+            await PublishScheduledReleases();
+
+            logger.LogInformation(
+                "{FunctionName} completed. {Count}",
+                executionContext.FunctionName,
+                timer.FormatNextOccurrences(1));
+        }
+
+        /// <summary>
+        /// Azure function which publishes the content for a Release immediately by moving it from a staging
+        /// directory. This function is manually triggered by an HTTP POST, and is disabled by default in production
+        /// environments. 
+        /// </summary>
+        /// <remarks>
+        /// It will then call PublishingCompletionService in order to complete the publishing process for that Release.
+        /// </remarks>
+        /// <param name="executionContext"></param>
+        /// <param name="logger"></param>
+        /// <returns></returns>
+        [FunctionName("PublishStagedReleaseContentImmediately")]
+        // ReSharper disable once UnusedMember.Global
+        public async Task PublishScheduledReleasesImmediately(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
+            ExecutionContext executionContext,
+            ILogger logger)
+        {
+            logger.LogInformation("{FunctionName} triggered at: {DateTime}",
+                executionContext.FunctionName,
+                DateTime.UtcNow);
+
+            await PublishScheduledReleases();
+
+            logger.LogInformation("{FunctionName} completed.", executionContext.FunctionName);
+        }
+
+        private async Task PublishScheduledReleases()
+        {
             var scheduled = (await QueryScheduledReleases()).ToArray();
             if (scheduled.Any())
             {
                 // Move all cached releases in the staging directory of the public content container to the root
                 await _publishingService.PublishStagedReleaseContent();
-                
+
                 await scheduled
                     .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(async message => 
+                    .ForEachAwaitAsync(async message =>
                         await UpdateContentStage(message, ReleasePublishingStatusContentStage.Complete));
 
                 // Finalise publishing of these releases
@@ -65,11 +103,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     scheduled.Select(status => (status.ReleaseId, status.Id)),
                     DateTime.UtcNow);
             }
-
-            logger.LogInformation(
-                "{FunctionName} completed. {Count}",
-                executionContext.FunctionName,
-                timer.FormatNextOccurrences(1));
         }
 
         private async Task<IEnumerable<ReleasePublishingStatus>> QueryScheduledReleases()

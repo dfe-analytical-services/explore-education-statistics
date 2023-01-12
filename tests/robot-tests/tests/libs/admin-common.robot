@@ -609,6 +609,27 @@ user approves release for scheduled release
     user waits until h2 is visible    Confirm publish date    %{WAIT_SMALL}
     user clicks button    Confirm
 
+user waits for scheduled release to be published
+    user waits until page contains element
+    ...    xpath://*[@id='release-process-status-Scheduled' or @id='release-process-status-Started']    %{WAIT_MEDIUM}
+    trigger immediate staging of scheduled release
+    FOR    ${Index}    IN RANGE    1    20
+        sleep    5
+        user reloads page
+        ${stages_present}=    Run Keyword And Return Status    user checks page for details dropdown    View stages
+        capture large screenshot and html
+        IF    "${stages_present}" == "${TRUE}"
+            Exit For Loop
+        END
+        log to console    try again ${stages_present}
+        sleep    1
+    END
+    user opens details dropdown    View stages
+    user waits until page contains    content - Scheduled    %{WAIT_MEDIUM}
+    user waits until page contains    files - Complete    %{WAIT_MEDIUM}
+    trigger immediate publishing of scheduled release
+    user waits until page contains element    id:release-process-status-Complete    %{WAIT_MEDIUM}
+
 user verifies release summary
     [Arguments]    ${PUBLICATION_NAME}    ${PUBLICATION_SUMMARY}    ${TIME_PERIOD}    ${RELEASE_PERIOD}    ${LEAD_STATISTICIAN}    ${RELEASE_TYPE}
     user waits until h2 is visible    Release summary
@@ -658,7 +679,7 @@ user gives analyst publication owner access
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user gives publication access to analyst    ${PUBLICATION_NAME}    Owner    ${ANALYST_EMAIL}
 
-user gives analyst publication release approver access
+user gives analyst publication approver access
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user gives publication access to analyst    ${PUBLICATION_NAME}    Approver    ${ANALYST_EMAIL}
 
