@@ -18,6 +18,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useMobileMedia } from '@common/hooks/useMedia';
+import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
 import FilterClearButton from '@frontend/modules/find-statistics/components/FilterClearButton';
@@ -172,40 +173,15 @@ const FindStatisticsPage: NextPage = () => {
           <RelatedInformation heading="Related information">
             <ul className="govuk-list">
               <li>
-                <a
-                  href="https://www.gov.uk/government/organisations/ofsted/about/statistics"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Ofsted statistics
-                </a>
+                <Link to="/data-catalogue">
+                  Education statistics: data catalogue
+                </Link>
               </li>
               <li>
-                <a
-                  href="https://www.education-ni.gov.uk/topics/statistics-and-research/statistics"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Educational statistics for Northern Ireland
-                </a>
+                <Link to="/methodology">Education statistics: methodology</Link>
               </li>
               <li>
-                <a
-                  href="https://www.gov.scot/statistics-and-research/?cat=filter&amp;topics=Education"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Educational statistics for Scotland
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://statswales.gov.wales/Catalogue/Education-and-Skills"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Educational statistics for Wales
-                </a>
+                <Link to="/glossary">Education statistics: glossary</Link>
               </li>
             </ul>
           </RelatedInformation>
