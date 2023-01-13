@@ -74,6 +74,16 @@ Validate archive warning is on Admin dashboard for archive-publication release
     user waits until page contains
     ...    This publication will be archived when its superseding publication has a live release published.
 
+Check cannot create a release for archive-publication
+    user clicks link    Releases
+    user waits until h2 is visible    Manage releases
+    user checks page does not contain    link:Create new release
+
+Check cannot create a methodology for archive-publication
+    user clicks link    Methodologies
+    user waits until h2 is visible    Manage methodologies
+    user checks page does not contain button    Create new methodology
+
 Validate that archive-publication appears correctly on Find stats page
     user checks publication is on find statistics page    ${PUBLICATION_NAME_ARCHIVE}
     user clicks link    ${PUBLICATION_NAME_ARCHIVE}
@@ -268,6 +278,16 @@ Set archive-publication to be no longer be superseded
     user waits until modal is not visible    Confirm publication changes
 
     sleep    %{WAIT_MEMORY_CACHE_EXPIRY}
+
+Check can create a release for archive-publication which is no longer archived
+    user clicks link    Releases
+    user waits until h2 is visible    Manage releases
+    user waits until page contains link    Create new release
+
+Check can create a methodology for archive-publication which is no longer archived
+    user clicks link    Methodologies
+    user waits until h2 is visible    Manage methodologies
+    user checks page contains button    Create new methodology
 
 Check public Find stats page and check archive-publication is no longer archived
     user checks publication is on find statistics page    ${PUBLICATION_NAME_SUPERSEDE}
