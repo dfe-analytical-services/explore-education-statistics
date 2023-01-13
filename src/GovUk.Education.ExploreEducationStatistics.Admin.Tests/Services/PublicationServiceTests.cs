@@ -604,6 +604,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(false);
                 userService.Setup(s => s.MatchesPolicy(
                         It.Is<Publication>(p => p.Id == publication.Id),
+                        CanManageLegacyReleases))
+                    .ReturnsAsync(true);
+                userService.Setup(s => s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
                         CanUpdateContact))
                     .ReturnsAsync(true);
                 userService.Setup(s => s.MatchesPolicy(
@@ -626,6 +630,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(result.Permissions.CanAdoptMethodologies);
                 Assert.False(result.Permissions.CanCreateMethodologies);
                 Assert.False(result.Permissions.CanManageExternalMethodology);
+                Assert.True(result.Permissions.CanManageLegacyReleases);
                 Assert.True(result.Permissions.CanUpdateContact);
                 Assert.False(result.Permissions.CanUpdateContributorReleaseRole);
             }

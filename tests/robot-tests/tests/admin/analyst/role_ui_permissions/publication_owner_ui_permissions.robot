@@ -25,6 +25,11 @@ Navigate to Publication where analyst has Publication Owner role
     user waits until page contains link    Team access
     user waits until page contains link    Legacy releases
 
+Check can create a legacy release
+    user clicks link    Legacy releases
+    user waits until h2 is visible    Legacy releases
+    user checks page contains button    Create legacy release
+
 Check can create a Methodology for the owned Publication
     user clicks link    Methodologies
     user waits until h2 is visible    Manage methodologies

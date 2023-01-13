@@ -42,6 +42,7 @@ export interface PublicationPermissions {
   canAdoptMethodologies: boolean;
   canCreateMethodologies: boolean;
   canManageExternalMethodology: boolean;
+  canManageLegacyReleases: boolean;
   canUpdateContact: boolean;
   canUpdateContributorReleaseRole: boolean;
 }

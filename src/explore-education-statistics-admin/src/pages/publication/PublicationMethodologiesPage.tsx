@@ -94,9 +94,10 @@ const PublicationMethodologiesPage = () => {
       <div className="govuk-grid-row  govuk-!-margin-bottom-6">
         <div className="govuk-grid-column-three-quarters">
           <p>
-            Create a new methodology, view or amend an existing methodology,
-            select an existing methodology used in another publication or link
-            to an external file that contains methodology details.
+            Create a new methodology, view, edit or amend an existing
+            methodology, select an existing methodology used in another
+            publication or link to an external file that contains methodology
+            details.
           </p>
 
           {permissions.canCreateMethodologies && (
