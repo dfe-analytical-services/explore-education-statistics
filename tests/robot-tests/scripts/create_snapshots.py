@@ -1,179 +1,226 @@
 import argparse
+import base64
 import json
 import os
 
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.common import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 
 """
 Script to check find statistics, table tool, methodologies and data catalogue snapshots.
+By default, the script will run against production
 
-Usage: python create_snapshots.py <public_url>
-by default, the script will run against production
+Usage: pipenv run python scripts/create_snapshots.py
+Optional flags:
+  * --basic-auth-user "username" --basic-auth-pass "password"
+  * --public-url "public URL"
 """
 
 
-def _gets_parsed_html_from_page(url):
+class SnapshotService:
     requests.sessions.HTTPAdapter(pool_connections=50, pool_maxsize=50, max_retries=3)
-    session = requests.Session()
-    response = session.get(url, stream=True)
-    assert response.status_code == 200, f"Requests response wasn't 200!\nResponse: {response}"
-    return BeautifulSoup(response.text, "html.parser")
 
+    def __init__(self):
+        self.session = requests.Session()
+        self.public_url = args.public_url
+        self.timeout = 10
+        self.page_size = 10
 
-def create_find_statistics_snapshot(public_url: str) -> str:
-    find_stats_url = f"{public_url.rstrip('/')}/find-statistics"
-    parsed_html = _gets_parsed_html_from_page(find_stats_url)
+    def _gets_parsed_html_from_page(self, url: str) -> BeautifulSoup:
+        response = self.session.get(url, stream=True)
+        assert response.status_code == 200, f"Requests response wasn't 200!\nResponse: {response}"
+        return BeautifulSoup(response.text, "html.parser")
 
-    themes_accordion = parsed_html.find(id="themes")
-    if themes_accordion is None:
-        return []
+    def _write_to_file(self, name: str, snapshot: list) -> None:
+        path = "tests/snapshots"
+        if not os.path.exists(path):
+            os.makedirs(path)
 
-    theme_sections = themes_accordion.select('[data-testid="accordionSection"]') or []
+        path_to_file = os.path.join(os.getcwd(), path, name)
 
-    result = []
-    for theme_index, theme_html in enumerate(theme_sections):
-        theme = {
-            "theme_heading": theme_html.select_one(f"#themes-{theme_index + 1}-heading").string,
-            "topics": [],
-        }
+        with open(path_to_file, "w") as file:
+            file.write(snapshot)
 
-        topics = theme_html.select('[id^="topic-details-"]') or []
-        for topic_html in topics:
-            topic = {
-                "topic_heading": topic_html.select_one('[id^="topic-heading-"]').string,
-                "publication_types": [],
-            }
+    def create_find_statistics_snapshot(self) -> None:
+        driver.get(f"{self.public_url}/find-statistics")
 
-            publication_types = topic_html.select('[data-testid="publication-type"]') or []
-            for publication_type_html in publication_types:
-                publication_type = {
-                    "publication_type_heading": publication_type_html.select_one(
-                        '[data-testid^="type-heading-"]'
-                    ).string,
-                    "publications": [],
-                }
+        total_results = driver.find_element(By.XPATH, "//*[@data-testid='total-results']").text.split(" ")[0]
 
-                publications = publication_type_html.select("li") or []
-                for publication_html in publications:
-                    publication = {
-                        "publication_heading": publication_html.select_one('[id^="publication-heading-"]').string,
+        total_pages = int(total_results) // self.page_size
+
+        # A-Z sort in order to get all the publications
+        driver.find_element(By.CSS_SELECTOR, "input[value='title']").click()
+        driver.find_element(By.CSS_SELECTOR, "body").click()
+        publications = []
+
+        for page in range(total_pages):
+            print(f"Adding page {page + 1} of {total_pages} to find statistics snapshot")
+
+            WebDriverWait(driver, self.timeout).until(
+                lambda driver: driver.find_element(By.CSS_SELECTOR, "form[id='sortControlsForm']")
+            )
+
+            WebDriverWait(driver, self.timeout).until(
+                lambda driver: driver.find_element(By.XPATH, "//*[@data-testid='publicationsList']")
+            )
+
+            publications_list = driver.find_element(By.XPATH, "//*[@data-testid='publicationsList']")
+
+            all_publications = publications_list.find_elements(By.CSS_SELECTOR, "li")
+
+            for publication in all_publications:
+                publication.click()
+
+                publication_details = publication.find_element(By.CSS_SELECTOR, "dl")
+
+                publication_title = publication.find_element(By.CSS_SELECTOR, "h3").text
+
+                try:
+                    publication_summary = publication.find_element(By.CSS_SELECTOR, "p").text
+                except NoSuchElementException:
+                    publication_summary = ""
+
+                release_type = publication_details.find_element(
+                    By.XPATH, "//*[dl]//div//dd[@data-testid='release-type']"
+                ).text
+
+                theme = publication_details.find_element(By.XPATH, "//*[dl]//div//dd[@data-testid='theme']").text
+
+                published = publication_details.find_element(
+                    By.XPATH, "//*[dl]//div//dd[@data-testid='published']"
+                ).text
+
+                publications.append(
+                    {
+                        "publication_title": publication_title,
+                        "publication_summary": publication_summary,
+                        "release_type": release_type,
+                        "published": published,
+                        "theme": theme,
                     }
+                )
 
-                    publication_type["publications"].append(publication)
+                WebDriverWait(driver, self.timeout).until(
+                    lambda driver: driver.find_element(By.XPATH, "//*[@data-testid='publicationsList']")
+                )
 
-                topic["publication_types"].append(publication_type)
+            try:
+                driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                driver.find_element(By.XPATH, "//*[@data-testid='pagination-next']").click()
+            except NoSuchElementException:
+                self._write_to_file("find_statistics_snapshot.json", json.dumps(publications, sort_keys=True, indent=2))
+                break
 
-            theme["topics"].append(topic)
+    def create_table_tool_snapshot(self) -> None:
+        driver.get(f"{self.public_url}/data-tables")
 
-        result.append(theme)
+        theme_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-themes-"]')
 
-    return json.dumps(result, sort_keys=True, indent=2)
+        themes = []
 
+        for theme_label in theme_labels:
+            theme_label.click()
+            theme = {"theme_heading": theme_label.text, "publications": []}
 
-def create_table_tool_snapshot(public_url: str, driver: webdriver) -> str:
-    table_tool_url = f"{public_url.rstrip('/')}/data-tables"
-    driver.get(table_tool_url)
+            publication_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-publications-"]')
 
-    theme_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-themes-"]')
+            for publication_label in publication_labels:
+                theme["publications"].append(publication_label.text)
 
-    result = []
-    for theme_label in theme_labels:
-        theme_label.click()
-        theme = {
-            "theme_heading": theme_label.text,
-            "publications": [],
-        }
+            themes.append(theme)
 
-        publication_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-publications-"]')
-        for publication_label in publication_labels:
-            theme["publications"].append(publication_label.text)
+        self._write_to_file("table_tool_snapshot.json", json.dumps(themes, sort_keys=True, indent=2))
 
-        result.append(theme)
+    def create_data_catalogue_snapshot(self) -> None:
+        driver.get(f"{self.public_url}/data-catalogue")
 
-    return json.dumps(result, sort_keys=True, indent=2)
+        theme_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-themes-"]')
 
+        themes = []
 
-def create_data_catalogue_snapshot(public_url: str, driver: webdriver) -> str:
-    data_catalogue_url = f"{public_url.rstrip('/')}/data-catalogue"
-    driver.get(data_catalogue_url)
+        for theme_label in theme_labels:
+            theme_label.click()
+            theme = {"theme_heading": theme_label.text, "publications": []}
 
-    theme_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-themes-"]')
+            publication_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-publications-"]')
 
-    result = []
-    for theme_label in theme_labels:
-        theme_label.click()
-        theme = {
-            "theme_heading": theme_label.text,
-            "publications": [],
-        }
+            for publication_label in publication_labels:
+                theme["publications"].append(publication_label.text)
 
-        publication_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-publications-"]')
-        for publication_label in publication_labels:
-            theme["publications"].append(publication_label.text)
+            themes.append(theme)
 
-        result.append(theme)
+        self._write_to_file("data_catalogue_snapshot.json", json.dumps(themes, sort_keys=True, indent=2))
 
-    return json.dumps(result, sort_keys=True, indent=2)
+    def create_methodologies_snapshot(self) -> None:
+        parsed_html = self._gets_parsed_html_from_page(f"{self.public_url}/methodology")
 
+        methodologies_accordion = parsed_html.find(id="themes")
 
-def create_all_methodologies_snapshot(public_url: str) -> str:
-    all_methodologies_url = f"{public_url.rstrip('/')}/methodology"
-    parsed_html = _gets_parsed_html_from_page(all_methodologies_url)
+        if methodologies_accordion is None:
+            return []
 
-    methodologies_accordion = parsed_html.find(id="themes")
-    if methodologies_accordion is None:
-        return []
+        theme_sections = methodologies_accordion.select('[data-testid="accordionSection"]') or []
 
-    theme_sections = methodologies_accordion.select('[data-testid="accordionSection"]') or []
+        themes = []
 
-    result = []
+        for theme_index, theme_html in enumerate(theme_sections):
+            theme = {"theme_heading": theme_html.select_one(f"#themes-{theme_index + 1}-heading").string, "topics": []}
 
-    for theme_index, theme_html in enumerate(theme_sections):
-        theme = {"theme_heading": theme_html.select_one(f"#themes-{theme_index + 1}-heading").string, "topics": []}
-        topics = theme_html.select('[id^="topic-details-"]') or []
+            topics = theme_html.select('[id^="topic-details-"]') or []
 
-        for topic_html in topics:
-            topic = {"topic_heading": topic_html.select_one('[id^="topic-heading-"]').string, "methodologies": []}
+            for topic_html in topics:
+                topic = {"topic_heading": topic_html.select_one('[id^="topic-heading-"]').string, "methodologies": []}
 
-            methodologies = topic_html.select('[id^="methodology-heading-"]') or []
+                methodologies = topic_html.select('[id^="methodology-heading-"]') or []
 
-            for methodology_heading in methodologies:
-                topic["methodologies"].append(methodology_heading.string)
+                for methodology_heading in methodologies:
+                    topic["methodologies"].append(methodology_heading.string)
 
-            theme["topics"].append(topic)
+                theme["topics"].append(topic)
 
-        result.append(theme)
-
-    return json.dumps(result, sort_keys=True, indent=2)
-
-
-def _write_to_file(file_name: str, snapshot: str):
-    snapshots_path = "tests/snapshots"
-    if not os.path.exists(snapshots_path):
-        os.makedirs(snapshots_path)
-
-    path_to_file = os.path.join(os.getcwd(), snapshots_path, file_name)
-    with open(path_to_file, "w") as file:
-        file.write(snapshot)
+            themes.append(theme)
+        self._write_to_file("methodologies_snapshot.json", json.dumps(themes, sort_keys=True, indent=2))
 
 
 if __name__ == "__main__":
     from get_webdriver import get_webdriver
 
-    parser = argparse.ArgumentParser(
+    ap = argparse.ArgumentParser(
         prog=f"python {os.path.basename(__file__)}", description="To create snapshots of specific public frontend pages"
     )
-    parser.add_argument(
+
+    ap.add_argument(
+        "--public-url",
         dest="public_url",
         default="https://explore-education-statistics.service.gov.uk",
         nargs="?",
         help="URL of public frontend you wish to create snapshots for",
+        type=str,
+        required=False,
     )
-    args = parser.parse_args()
+
+    ap.add_argument(
+        "--basic-auth-user",
+        dest="basic_auth_user",
+        help="Username for basic auth",
+        type=str,
+        required=False,
+    )
+
+    ap.add_argument(
+        "--basic-auth-pass",
+        dest="basic_auth_pass",
+        help="Password for basic auth",
+        type=str,
+        required=False,
+    )
+
+    args = ap.parse_args()
 
     assert os.path.basename(os.getcwd()) == "robot-tests", "Must run from the robot-tests directory!"
 
@@ -182,14 +229,15 @@ if __name__ == "__main__":
     chrome_options.add_argument("--headless")
     driver = webdriver.Chrome(options=chrome_options)
 
-    find_stats_snapshot = create_find_statistics_snapshot(args.public_url)
-    _write_to_file("find_stats_snapshot.json", find_stats_snapshot)
+    if args.basic_auth_user and args.basic_auth_pass:
+        driver.execute_cdp_cmd("Network.enable", {})
+        token = base64.b64encode(f"{args.basic_auth_user}:{args.basic_auth_pass}".encode())
+        driver.execute_cdp_cmd("Network.setExtraHTTPHeaders", {"headers": {"Authorization": f"Basic {token.decode()}"}})
 
-    table_tool_snapshot = create_table_tool_snapshot(args.public_url, driver)
-    _write_to_file("table_tool_snapshot.json", table_tool_snapshot)
+    snapshot_service = SnapshotService()
 
-    data_catalogue_snapshot = create_data_catalogue_snapshot(args.public_url, driver)
-    _write_to_file("data_catalogue_snapshot.json", data_catalogue_snapshot)
-
-    all_methodologies_snapshot = create_all_methodologies_snapshot(args.public_url)
-    _write_to_file("all_methodologies_snapshot.json", all_methodologies_snapshot)
+    snapshot_service.create_find_statistics_snapshot()
+    snapshot_service.create_table_tool_snapshot()
+    snapshot_service.create_data_catalogue_snapshot()
+    snapshot_service.create_methodologies_snapshot()
+    driver.quit()
