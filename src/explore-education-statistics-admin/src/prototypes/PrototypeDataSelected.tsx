@@ -120,7 +120,7 @@ const PrototypeHomepage = () => {
               )}
             </div>
             <div className="govuk-grid-column-one-third">
-              <RelatedInformation heading="Download options">
+              <RelatedInformation heading="Quick links">
                 <a
                   href="/prototypes/find-statistics6"
                   className={classNames(
@@ -135,20 +135,12 @@ const PrototypeHomepage = () => {
                   <>
                     <ul className="govuk-list govuk-list--spaced">
                       <li>
-                        <Link
-                          to="./table-highlights-2?source=dataCat&dataset=ratesDetailed"
+                        <a
+                          href="./table-highlights-2?source=dataCat&dataset=ratesDetailed"
                           target="_blank"
                         >
-                          Create your own tables
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="./table-highlights-2?source=dataCat&dataset=ratesDetailed"
-                          target="_blank"
-                        >
-                          Pre-built featured tables
-                        </Link>
+                          View or create your own tables
+                        </a>
                       </li>
                     </ul>
 
@@ -157,10 +149,9 @@ const PrototypeHomepage = () => {
                     </h3>
                     <ul className="govuk-list">
                       <li>
-                        <Link to="./releaseData">
-                          Apprenticeships and traineeships, Academic Year
-                          2021/22
-                        </Link>
+                        <a href="./releaseData">
+                          Apprenticeships and traineeships
+                        </a>
                       </li>
                     </ul>
                     <h3 className="govuk-heading-s govuk-!-margin-bottom-0">

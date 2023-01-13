@@ -154,8 +154,19 @@ const PrototypeReleaseData = () => {
                   </a>
                 </li>
                 <li>
+                  <Link to="#contents">Release contents</Link>
+                </li>
+                <li>
+                  <Link to="#exploreData">Explore data</Link>
+                </li>
+                <li>
                   <Link to="./table-highlights-2?source=publicationPage">
                     View or create tables
+                  </Link>
+                </li>
+                <li>
+                  <Link to="./data-catalog?theme=fe&amp;publication=traineeships&amp;source=publicationPage">
+                    Data catalogue
                   </Link>
                 </li>
                 <li>
@@ -269,7 +280,7 @@ const PrototypeReleaseData = () => {
           <div className={classNames(styles.prototypeCardChevron)}>
             <h2
               className={classNames(
-                'govuk-heading-m',
+                'govuk-heading-s',
                 'govuk-!-margin-bottom-2',
               )}
             >
@@ -283,7 +294,7 @@ const PrototypeReleaseData = () => {
                 Download all data (.zip)
               </a>
             </h2>
-            <p className="govuk-body-l govuk-!-margin-bottom-0">
+            <p className="govuk-body govuk-!-margin-bottom-0">
               All data used in this release is available as open data for
               download
             </p>
@@ -291,7 +302,7 @@ const PrototypeReleaseData = () => {
           <div className={classNames(styles.prototypeCardChevron)}>
             <h2
               className={classNames(
-                'govuk-heading-m',
+                'govuk-heading-s',
                 'govuk-!-margin-bottom-2',
               )}
             >
@@ -305,7 +316,7 @@ const PrototypeReleaseData = () => {
                 Data catalogue
               </a>
             </h2>
-            <p className="govuk-body-l govuk-!-margin-bottom-0">
+            <p className="govuk-body govuk-!-margin-bottom-0">
               Browse and download individual open data files from this release
               in our data catalogue
             </p>
@@ -320,7 +331,7 @@ const PrototypeReleaseData = () => {
           <div className={classNames(styles.prototypeCardChevron)}>
             <h2
               className={classNames(
-                'govuk-heading-m',
+                'govuk-heading-s',
                 'govuk-!-margin-bottom-2',
               )}
             >
@@ -334,7 +345,7 @@ const PrototypeReleaseData = () => {
                 View or create your own tables
               </a>
             </h2>
-            <p className="govuk-body-l govuk-!-margin-bottom-0">
+            <p className="govuk-body govuk-!-margin-bottom-0">
               You can view featured tables that we have built for you, or create
               your own tables from the open data using our table tool
             </p>
@@ -342,7 +353,7 @@ const PrototypeReleaseData = () => {
           <div className={classNames(styles.prototypeCardChevron)}>
             <h2
               className={classNames(
-                'govuk-heading-m',
+                'govuk-heading-s',
                 'govuk-!-margin-bottom-2',
               )}
             >
@@ -356,7 +367,7 @@ const PrototypeReleaseData = () => {
                 Data guidance
               </a>
             </h2>
-            <p className="govuk-body-l govuk-!-margin-bottom-0">
+            <p className="govuk-body govuk-!-margin-bottom-0">
               Learn more about the data files used in this release using our
               online guidance
             </p>
@@ -479,7 +490,9 @@ const PrototypeReleaseData = () => {
             </ul>
           </AccordionSection>
         </Accordion>
-        <h2 className="govuk-heading-l">Release content</h2>
+        <h2 className="govuk-heading-l" id="contents">
+          Release contents
+        </h2>
         <Accordion id="content">
           <AccordionSection heading="About these statistics" goToTop={false}>
             This is a test

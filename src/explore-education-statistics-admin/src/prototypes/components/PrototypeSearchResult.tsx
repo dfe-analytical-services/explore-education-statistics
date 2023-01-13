@@ -1,5 +1,5 @@
 import FormattedDate from '@common/components/FormattedDate';
-import React from 'react';
+import React, { useState } from 'react';
 
 interface Props {
   title: string;
@@ -24,6 +24,8 @@ const PrototypeSearchResult = ({
   methodologyTitle2,
   data,
 }: Props) => {
+  const [protoSlug, setProtoSlug] = useState(true);
+
   return (
     <>
       {searchType === 'data' && (
@@ -69,7 +71,11 @@ const PrototypeSearchResult = ({
         <>
           <h3 className="govuk-heading-m govuk-!-margin-bottom-2">
             <a
-              href={`https://explore-education-statistics.service.gov.uk/find-statistics/${slug}`}
+              href={
+                protoSlug
+                  ? '/prototypes/releaseData'
+                  : `https://explore-education-statistics.service.gov.uk/find-statistics/${slug}`
+              }
             >
               {title}
             </a>
