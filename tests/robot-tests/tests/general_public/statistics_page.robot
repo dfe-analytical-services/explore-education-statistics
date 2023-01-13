@@ -14,6 +14,24 @@ Navigate to Find Statistics page
     environment variable should be set    PUBLIC_URL
     user navigates to find statistics page on public frontend
 
+Validate Related information section and links exist
+    ${relatedInformation}=    get webelement    css:[aria-labelledby="related-information"]
+
+    user checks element contains child element    ${relatedInformation}    xpath://h2[text()="Related information"]
+
+    user checks page contains link with text and url
+    ...    Education statistics: data catalogue
+    ...    /data-catalogue
+    ...    ${relatedInformation}
+    user checks page contains link with text and url
+    ...    Education statistics: methodology
+    ...    /methodology
+    ...    ${relatedInformation}
+    user checks page contains link with text and url
+    ...    Education statistics: glossary
+    ...    /glossary
+    ...    ${relatedInformation}
+
 Validate bootstrapped themes filters exist
     [Tags]    Local    Dev    NotAgainstProd
     user checks radio is checked    All themes

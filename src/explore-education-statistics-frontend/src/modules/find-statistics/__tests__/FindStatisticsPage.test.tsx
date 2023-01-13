@@ -55,16 +55,15 @@ describe('FindStatisticsPage', () => {
       'link',
     );
 
-    expect(relatedInformationLinks).toHaveLength(4);
-    expect(relatedInformationLinks[0]).toHaveTextContent('Ofsted statistics');
+    expect(relatedInformationLinks).toHaveLength(3);
+    expect(relatedInformationLinks[0]).toHaveTextContent(
+      'Education statistics: data catalogue',
+    );
     expect(relatedInformationLinks[1]).toHaveTextContent(
-      'Educational statistics for Northern Ireland',
+      'Education statistics: methodology',
     );
     expect(relatedInformationLinks[2]).toHaveTextContent(
-      'Educational statistics for Scotland',
-    );
-    expect(relatedInformationLinks[3]).toHaveTextContent(
-      'Educational statistics for Wales',
+      'Education statistics: glossary',
     );
   });
 
