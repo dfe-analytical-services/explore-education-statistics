@@ -54,7 +54,8 @@ const PrototypeHomepage = () => {
               </a>
             </h2>
             <p className="govuk-body-l govuk-!-margin-bottom-0">
-              Explore our range of data and build your own tables from it.
+              Explore our range of data and build your own tables from it. You
+              can also view featured tables that we have built for you.
             </p>
           </div>
         </div>
@@ -68,7 +69,7 @@ const PrototypeHomepage = () => {
               )}
             >
               <a
-                href="#"
+                href="./data-catalog"
                 className={classNames(
                   styles.prototypeCardChevronLink,
                   'govuk-link--no-visited-state',

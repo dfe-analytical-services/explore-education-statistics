@@ -56,7 +56,8 @@ const PrototypeTableHighlights = () => {
           <div className="govuk-grid-column-two-thirds">
             <h1
               className={classNames('govuk-heading-xl', [
-                sourcePublication && 'govuk-!-margin-bottom-0',
+                (sourcePublication || sourceDataCat) &&
+                  'govuk-!-margin-bottom-0',
               ])}
             >
               <span className="govuk-caption-xl">Table tool</span>
@@ -112,7 +113,7 @@ const PrototypeTableHighlights = () => {
                       <div>Apprenticeships and traineeships</div>
                       <div>
                         <a
-                          href="https://explore-education-statistics.service.gov.uk/find-statistics/apprenticeships-and-traineeships"
+                          href="./releaseData"
                           className="govuk-!-margin-right-6"
                         >
                           View publication
@@ -644,22 +645,16 @@ const PrototypeTableHighlights = () => {
                                 <p>
                                   Apprenticeship national achievement rate
                                   tables{' '}
-                                  <Details
-                                    summary="View more details"
-                                    className="govuk-!-margin-bottom-0"
-                                  >
-                                    <p>
-                                      Indicators: Achievement rate, Achievers,
-                                      Completers, Leavers, Pass rate, Retention
-                                      rate
-                                    </p>
-                                    <p>
-                                      Filters: Age, Level, demographic -
-                                      ethnicity, gender and lldd, Sector Subject
-                                      Area, Standard /Framework flag
-                                    </p>
-                                  </Details>
                                 </p>
+                              </SummaryListItem>
+                              <SummaryListItem term="Indicators">
+                                Achievement rate, Achievers, Completers,
+                                Leavers, Pass rate, Retention rate
+                              </SummaryListItem>
+                              <SummaryListItem term="filters">
+                                Age, Level, demographic - ethnicity, gender and
+                                lldd, Sector Subject Area, Standard /Framework
+                                flag
                               </SummaryListItem>
                             </SummaryList>
 

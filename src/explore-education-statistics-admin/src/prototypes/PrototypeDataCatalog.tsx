@@ -46,6 +46,8 @@ const PrototypeDataCatalogue = () => {
   const [sourcePublication, setSourcePublication] = useState(
     urlSource === 'publicationPage',
   );
+  const latestRelease = 'Academic year 2021/22';
+  const [selectedRelease, setSelectedRelease] = useState(latestRelease);
 
   const generateSlug = (title: string) => {
     const slug = title.toLowerCase();
@@ -152,6 +154,21 @@ const PrototypeDataCatalogue = () => {
                   </Link>
                 </li>
               </ul>
+
+              {selectedPublication === 'Apprenticeships and traineeships' && (
+                <>
+                  <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+                    Publication
+                  </h3>
+                  <ul className="govuk-list">
+                    <li>
+                      <Link to="./releaseData#exploreData">
+                        Apprenticeships and traineeships
+                      </Link>
+                    </li>
+                  </ul>
+                </>
+              )}
             </RelatedInformation>
           </div>
         </div>
@@ -306,11 +323,25 @@ const PrototypeDataCatalogue = () => {
                 /* eslint-disable-next-line react/jsx-props-no-spreading */
                 {...(selectedPublication !==
                   'Apprenticeships and traineeships' && { disabled: true })}
+                onBlur={e => {
+                  setSelectedRelease(e.target.value);
+                }}
               >
-                <option value="">Latest release</option>
-                <option value="">Academic year 2021/22</option>
-                <option value="">Academic year 2020/21</option>
-                <option value="">Academic year 2019/20</option>
+                <option
+                  value={selectedRelease}
+                  selected={selectedRelease !== ''}
+                >
+                  {selectedRelease}
+                </option>
+                <option value="Academic year 2020/21">
+                  Academic year 2020/21
+                </option>
+                <option value="Academic year 2019/20">
+                  Academic year 2019/20
+                </option>
+                <option value="Academic year 2019/20">
+                  Academic year 2018/19
+                </option>
               </select>
             </div>
             <hr />
@@ -453,15 +484,32 @@ const PrototypeDataCatalogue = () => {
                 <SummaryList noBorder>
                   <SummaryListItem term="Type">
                     <span className="govuk-tag">National statistics</span>{' '}
-                    <span className="govuk-tag">latest data</span>
+                    {selectedRelease === latestRelease && (
+                      <span className="govuk-tag">latest data</span>
+                    )}
+                    {selectedRelease !== latestRelease && (
+                      <span className="govuk-tag govuk-tag--red">
+                        Not the latest data
+                      </span>
+                    )}
+                    {selectedRelease !== latestRelease && (
+                      <p className="govuk-!-margin-top-3">
+                        <a
+                          href="#"
+                          onClick={e => {
+                            setSelectedRelease(latestRelease);
+                          }}
+                        >
+                          View the latest data: {latestRelease}
+                        </a>
+                      </p>
+                    )}
                   </SummaryListItem>
                   <SummaryListItem term="Theme">
                     Further education
                   </SummaryListItem>
                   <SummaryListItem term="Publication">
-                    <Link to="./releaseData#exploreData">
-                      Apprenticeships and traineeships
-                    </Link>
+                    Apprenticeships and traineeships
                   </SummaryListItem>
                   <SummaryListItem term="Release">
                     Academic year 2021/22
@@ -653,9 +701,9 @@ const PrototypeDataCatalogue = () => {
                     <li>
                       <hr />
                       <h3>
-                        <Link to="./data-selected">
+                        <a href="./data-selected">
                           Apprenticeship Achievement Rates Detailed Series
-                        </Link>
+                        </a>
                       </h3>
                       <p>Apprenticeship national achievement rate tables</p>
                       {!listCompact && (
@@ -1163,9 +1211,9 @@ const PrototypeDataCatalogue = () => {
                     <li>
                       <hr />
                       <h3>
-                        <Link to="./data-selected">
+                        <a href="./data-selected">
                           Apprenticeship Achievement Rates Detailed Series
-                        </Link>
+                        </a>
                       </h3>
                       <p>Apprenticeship national achievement rate tables</p>
                       {!listCompact && (
@@ -1597,9 +1645,9 @@ const PrototypeDataCatalogue = () => {
                 <li>
                   <hr />
                   <h3>
-                    <Link to="./data-selected">
+                    <a href="./data-selected">
                       Apprenticeship Achievement Rates Detailed Series
-                    </Link>
+                    </a>
                   </h3>
                   <p>Apprenticeship national achievement rate tables</p>
                   {!listCompact && (
