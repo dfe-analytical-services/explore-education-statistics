@@ -31,6 +31,9 @@ import compact from 'lodash/compact';
 import omit from 'lodash/omit';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
+import InsetText from '@common/components/InsetText';
+import classNames from 'classnames';
+import Link from '@frontend/components/Link';
 
 export interface FindStatisticsPageQuery {
   page?: number;
@@ -161,6 +164,21 @@ const FindStatisticsPage: NextPage = () => {
           : undefined
       }
     >
+      <InsetText>
+        <h2 className="govuk-heading-m">This page has changed</h2>
+        <p className={classNames('govuk-body', 'govuk-warning-text')}>
+          Following user feedback we’ve made some changes to this page to make
+          our publications easier to find, if you have any comments on the new
+          design please let us know via the{' '}
+          <Link
+            to="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-XMiKzsnr8xJoWM_DeGwIu9UNDJHOEJDRklTNVA1SDdLOFJITEwyWU1OQS4u"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            survey
+          </Link>
+        </p>
+      </InsetText>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-body-l">

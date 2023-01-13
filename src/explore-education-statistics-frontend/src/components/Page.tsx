@@ -37,7 +37,6 @@ const Page = ({
   breadcrumbs = [],
 }: Props) => {
   const router = useRouter();
-
   return (
     <>
       <CookieBanner wide={wide} />
