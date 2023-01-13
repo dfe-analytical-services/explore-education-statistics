@@ -153,11 +153,11 @@ Create new release for publication
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverageStartYear
 
 Verify Release type options
-    user checks page contains radio    Ad hoc statistics
-    user checks page contains radio    Experimental statistics
-    user checks page contains radio    Management information
     user checks page contains radio    National statistics
     user checks page contains radio    Official statistics
+    user checks page contains radio    Experimental statistics
+    user checks page contains radio    Ad hoc statistics
+    user checks page contains radio    Management information
 
 Create new release
     user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    Spring Term

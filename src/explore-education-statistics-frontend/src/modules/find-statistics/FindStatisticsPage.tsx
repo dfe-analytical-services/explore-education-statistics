@@ -34,7 +34,6 @@ import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import InsetText from '@common/components/InsetText';
 import classNames from 'classnames';
-import Link from '@frontend/components/Link';
 
 export interface FindStatisticsPageQuery {
   page?: number;

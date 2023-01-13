@@ -56,11 +56,11 @@ Validate release type filters exist
     [Tags]    Local    Dev
     user clicks button    Release type
     user checks radio is checked    Show all
-    user checks page contains radio    Ad hoc statistics
-    user checks page contains radio    Experimental statistics
-    user checks page contains radio    Management information
     user checks page contains radio    National statistics
     user checks page contains radio    Official statistics
+    user checks page contains radio    Experimental statistics
+    user checks page contains radio    Ad hoc statistics
+    user checks page contains radio    Management information
 
 Validate sort controls exist
     [Tags]    Local    Dev
