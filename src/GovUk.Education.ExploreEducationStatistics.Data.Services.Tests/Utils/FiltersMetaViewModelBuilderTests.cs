@@ -1,30 +1,30 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.FilterAndIndicatorViewModelBuilders.
-    FiltersViewModelBuilder;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.Utils.FiltersMetaViewModelBuilder;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils;
 
-public class FiltersViewModelBuilderTests
+public class FiltersMetaViewModelBuilderTests
 {
     [Fact]
-    public void GetFiltersFromFilterItems_NoFilterItems()
+    public void BuildFiltersFromFilterItems_NoFilterItems()
     {
         Assert.Empty(BuildFiltersFromFilterItems(new List<FilterItem>()));
     }
 
     [Fact]
-    public void GetFilters_NoFilters()
+    public void BuildFilters_NoFilters()
     {
         Assert.Empty(BuildFilters(new List<Filter>()));
     }
 
     [Fact]
-    public void GetFilters_BuildsViewModel()
+    public void BuildFilters_BuildsViewModel()
     {
         var filters = new List<Filter>
         {
@@ -212,7 +212,7 @@ public class FiltersViewModelBuilderTests
     }
 
     [Fact]
-    public void GetFilters_GetsTotalFilterItemId_TotalItemExistsAndSingleGroup()
+    public void BuildFilters_GetsTotalFilterItemId_TotalItemExistsAndSingleGroup()
     {
         var filter = new Filter
         {
@@ -251,7 +251,7 @@ public class FiltersViewModelBuilderTests
     }
 
     [Fact]
-    public void GetFilters_GetsTotalFilterItemId_TotalItemExistsAndMultipleGroups()
+    public void BuildFilters_GetsTotalFilterItemId_TotalItemExistsAndMultipleGroups()
     {
         var filter = new Filter
         {
@@ -309,7 +309,7 @@ public class FiltersViewModelBuilderTests
     }
 
     [Fact]
-    public void GetFilters_GetsTotalFilterItemId_TotalItemExistsInTotalGroup()
+    public void BuildFilters_GetsTotalFilterItemId_TotalItemExistsInTotalGroup()
     {
         var filter = new Filter
         {
@@ -367,7 +367,7 @@ public class FiltersViewModelBuilderTests
     }
 
     [Fact]
-    public void GetFilters_GetsTotalFilterItemId_TotalGroupExistsWithoutTotalItem()
+    public void BuildFilters_GetsTotalFilterItemId_TotalGroupExistsWithoutTotalItem()
     {
         var filter = new Filter
         {
@@ -425,7 +425,7 @@ public class FiltersViewModelBuilderTests
     }
 
     [Fact]
-    public void GetFilters_OrdersByLabel()
+    public void BuildFilters_OrdersByLabel()
     {
         var filters = new List<Filter>
         {
@@ -518,7 +518,7 @@ public class FiltersViewModelBuilderTests
     }
 
     [Fact]
-    public void GetFilters_OrdersByLabel_TotalFirst()
+    public void BuildFilters_OrdersByLabel_TotalFirst()
     {
         var filter = new Filter
         {
@@ -593,7 +593,7 @@ public class FiltersViewModelBuilderTests
     }
 
     [Fact]
-    public void GetFilters_OrdersBySequence()
+    public void BuildFilters_OrdersBySequence()
     {
         var filters = new List<Filter>
         {

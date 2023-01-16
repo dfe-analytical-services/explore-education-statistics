@@ -221,9 +221,8 @@ public class PublicationService : IPublicationService
     private async Task<PublicationTreeTopicViewModel> BuildPublicationTreeTopic(Topic topic)
     {
         var publications = await topic.Publications
+            .Where(publication => publication.LatestPublishedReleaseId != null)
             .ToAsyncEnumerable()
-            .Where(publication =>
-                publication.LatestPublishedReleaseId != null || publication.LegacyPublicationUrl != null)
             .SelectAwait(async publication =>
                 await BuildPublicationTreePublication(publication))
             .OrderBy(publication => publication.Title)
@@ -239,7 +238,6 @@ public class PublicationService : IPublicationService
 
     private async Task<PublicationTreePublicationViewModel> BuildPublicationTreePublication(Publication publication)
     {
-        var type = await GetPublicationType(publication);
         var latestPublishedReleaseId = publication.LatestPublishedReleaseId;
 
         return new PublicationTreePublicationViewModel
@@ -247,12 +245,7 @@ public class PublicationService : IPublicationService
             Id = publication.Id,
             Title = publication.Title,
             Slug = publication.Slug,
-            Type = type,
-            LegacyPublicationUrl = type == PublicationType.Legacy
-                ? publication.LegacyPublicationUrl?.ToString()
-                : null,
             IsSuperseded = await _publicationRepository.IsSuperseded(publication.Id),
-            HasLiveRelease = latestPublishedReleaseId != null,
             LatestReleaseHasData = latestPublishedReleaseId != null &&
                                    await HasAnyDataFiles(latestPublishedReleaseId.Value),
             AnyLiveReleaseHasData = await publication.Releases
@@ -268,28 +261,4 @@ public class PublicationService : IPublicationService
             .Include(rf => rf.File)
             .AnyAsync(rf => rf.ReleaseId == releaseId && rf.File.Type == FileType.Data);
     }
-
-    private async Task<PublicationType> GetPublicationType(Publication publication)
-    {
-        if (publication.LatestPublishedReleaseId == null)
-        {
-            return PublicationType.Legacy;
-        }
-
-        await _contentDbContext.Entry(publication)
-            .Reference(p => p.LatestPublishedRelease)
-            .LoadAsync();
-
-        return GetPublicationType(publication.LatestPublishedRelease!.Type);
-    }
-
-    private static PublicationType GetPublicationType(ReleaseType releaseType) => releaseType switch
-    {
-        ReleaseType.AdHocStatistics => PublicationType.AdHoc,
-        ReleaseType.NationalStatistics => PublicationType.NationalAndOfficial,
-        ReleaseType.ExperimentalStatistics => PublicationType.Experimental,
-        ReleaseType.ManagementInformation => PublicationType.ManagementInformation,
-        ReleaseType.OfficialStatistics => PublicationType.NationalAndOfficial,
-        _ => throw new ArgumentOutOfRangeException(nameof(releaseType), releaseType, message: null)
-    };
 }

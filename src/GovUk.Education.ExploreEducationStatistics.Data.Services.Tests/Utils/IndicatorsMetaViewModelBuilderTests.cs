@@ -1,23 +1,23 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.FilterAndIndicatorViewModelBuilders.
-    IndicatorsViewModelBuilder;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.Utils.IndicatorsMetaViewModelBuilder;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils;
 
-public class IndicatorsViewModelBuilderTests
+public class IndicatorsMetaViewModelBuilderTests
 {
     [Fact]
-    public void GetIndicatorGroups_NoIndicatorGroups()
+    public void BuildIndicatorGroups_NoIndicatorGroups()
     {
         Assert.Empty(BuildIndicatorGroups(new List<IndicatorGroup>()));
     }
 
     [Fact]
-    public void GetIndicatorGroups_BuildsViewModel()
+    public void BuildIndicatorGroups_BuildsViewModel()
     {
         var indicatorGroups = new List<IndicatorGroup>
         {
@@ -119,7 +119,7 @@ public class IndicatorsViewModelBuilderTests
     }
 
     [Fact]
-    public void GetIndicatorGroups_OrdersByLabel()
+    public void BuildIndicatorGroups_OrdersByLabel()
     {
         var indicatorGroups = new List<IndicatorGroup>
         {
@@ -227,7 +227,7 @@ public class IndicatorsViewModelBuilderTests
     }
 
     [Fact]
-    public void GetIndicatorGroups_OrdersBySequence()
+    public void BuildIndicatorGroups_OrdersBySequence()
     {
         var indicatorGroups = new List<IndicatorGroup>
         {
@@ -404,13 +404,13 @@ public class IndicatorsViewModelBuilderTests
     }
 
     [Fact]
-    public void GetIndicators_NoIndicators()
+    public void BuildIndicators_NoIndicators()
     {
         Assert.Empty(BuildIndicators(new List<Indicator>()));
     }
 
     [Fact]
-    public void GetIndicators_BuildsViewModel()
+    public void BuildIndicators_BuildsViewModel()
     {
         var indicators = new List<Indicator>
         {
@@ -450,7 +450,7 @@ public class IndicatorsViewModelBuilderTests
     }
 
     [Fact]
-    public void GetIndicators_OrdersByLabel()
+    public void BuildIndicators_OrdersByLabel()
     {
         var indicators = new List<Indicator>
         {
@@ -482,7 +482,7 @@ public class IndicatorsViewModelBuilderTests
     }
 
     [Fact]
-    public void GetIndicators_OrdersBySequence()
+    public void BuildIndicators_OrdersBySequence()
     {
         var indicators = new List<Indicator>
         {

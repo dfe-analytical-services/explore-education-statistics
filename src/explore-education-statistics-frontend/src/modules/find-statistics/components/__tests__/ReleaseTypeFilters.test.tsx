@@ -18,23 +18,23 @@ describe('ReleaseTypeFilters', () => {
     );
     expect(releaseTypeOptions[0]).toBeChecked();
     expect(releaseTypeOptions[1]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('Ad hoc statistics'),
+      releaseTypeFilterGroup.getByLabelText('National statistics'),
     );
     expect(releaseTypeOptions[1]).not.toBeChecked();
     expect(releaseTypeOptions[2]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('Experimental statistics'),
+      releaseTypeFilterGroup.getByLabelText('Official statistics'),
     );
     expect(releaseTypeOptions[2]).not.toBeChecked();
     expect(releaseTypeOptions[3]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('Management information'),
+      releaseTypeFilterGroup.getByLabelText('Experimental statistics'),
     );
     expect(releaseTypeOptions[3]).not.toBeChecked();
     expect(releaseTypeOptions[4]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('National statistics'),
+      releaseTypeFilterGroup.getByLabelText('Ad hoc statistics'),
     );
     expect(releaseTypeOptions[4]).not.toBeChecked();
     expect(releaseTypeOptions[5]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('Official statistics'),
+      releaseTypeFilterGroup.getByLabelText('Management information'),
     );
     expect(releaseTypeOptions[5]).not.toBeChecked();
 

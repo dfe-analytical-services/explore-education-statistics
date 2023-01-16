@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using MockQueryable.Moq;
 using Moq;
 using Xunit;
@@ -352,15 +351,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 ReleaseName = "2020",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = ReleaseType.OfficialStatistics,
-                Published = DateTime.UtcNow,
+                Published = DateTime.UtcNow
             };
             var releaseB = new Release
             {
                 ReleaseName = "2020",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = ReleaseType.NationalStatistics,
-                Published = DateTime.UtcNow,
+                Published = DateTime.UtcNow
+            };
+            var releaseC = new Release
+            {
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Published = DateTime.UtcNow
             };
 
             var publicationA = new Publication
@@ -387,7 +390,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Title = "Publication C",
                 Slug = "publication-c",
-                LegacyPublicationUrl = new Uri("https://legacy.url/")
+                LatestPublishedRelease = releaseC,
+                Releases = new List<Release>
+                {
+                    releaseC
+                }
             };
 
             var themes = new List<Theme>
@@ -459,8 +466,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Single(topicAPublications);
                 Assert.Equal("publication-a", topicAPublications[0].Slug);
                 Assert.Equal("Publication A", topicAPublications[0].Title);
-                Assert.Equal(PublicationType.NationalAndOfficial, topicAPublications[0].Type);
-                Assert.True(topicAPublications[0].HasLiveRelease);
                 Assert.False(topicAPublications[0].LatestReleaseHasData);
                 Assert.False(topicAPublications[0].AnyLiveReleaseHasData);
 
@@ -469,8 +474,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Single(topicBPublications);
                 Assert.Equal("publication-b", topicBPublications[0].Slug);
                 Assert.Equal("Publication B", topicBPublications[0].Title);
-                Assert.Equal(PublicationType.NationalAndOfficial, topicBPublications[0].Type);
-                Assert.True(topicBPublications[0].HasLiveRelease);
                 Assert.False(topicBPublications[0].LatestReleaseHasData);
                 Assert.False(topicBPublications[0].AnyLiveReleaseHasData);
 
@@ -479,11 +482,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Single(topicCPublications);
                 Assert.Equal("publication-c", topicCPublications[0].Slug);
                 Assert.Equal("Publication C", topicCPublications[0].Title);
-                Assert.Equal(PublicationType.Legacy, topicCPublications[0].Type);
-                Assert.False(topicCPublications[0].HasLiveRelease);
                 Assert.False(topicCPublications[0].LatestReleaseHasData);
                 Assert.False(topicCPublications[0].AnyLiveReleaseHasData);
-                Assert.Equal("https://legacy.url/", topicCPublications[0].LegacyPublicationUrl);
             }
         }
 
@@ -494,7 +494,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 ReleaseName = "2020",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = ReleaseType.OfficialStatistics,
                 Published = DateTime.UtcNow,
             };
 
@@ -570,46 +569,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task GetPublicationTree_ThemesWithNoVisiblePublications_Excluded()
         {
-            var releaseB = new Release
+            var releaseA = new Release
             {
-                ReleaseName = "2020",
+                ReleaseName = "2022",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = ReleaseType.OfficialStatistics,
-                Published = DateTime.UtcNow,
+                Published = DateTime.UtcNow
             };
 
-            var publicationA = new Publication
+            var releaseB = new Release
             {
-                Title = "Publication A",
-            };
-            var publicationB = new Publication
-            {
-                Title = "Publication B",
-                LatestPublishedRelease = releaseB,
-                Releases = new List<Release>
-                {
-                    releaseB
-                }
-            };
-            var publicationC = new Publication
-            {
-                Title = "Publication C",
-                LegacyPublicationUrl = new Uri("https://legacy.url/")
-            };
-            var publicationD = new Publication
-            {
-                Title = "Publication D",
-                Releases = new List<Release>
-                {
-                    // Not published
-                    new()
-                    {
-                        ReleaseName = "2020",
-                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        Type = ReleaseType.NationalStatistics,
-                        Published = null,
-                    }
-                }
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Published = DateTime.UtcNow
             };
 
             var themes = new List<Theme>
@@ -622,8 +593,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         new()
                         {
                             Title = "Topic A",
-                            Publications = ListOf(publicationA)
-                        },
+                            Publications = new List<Publication>
+                            {
+                                // Publication has a published release
+                                new()
+                                {
+                                    Title = "Publication A",
+                                    LatestPublishedRelease = releaseB,
+                                    Releases = new List<Release>
+                                    {
+                                        releaseB
+                                    }
+                                }
+                            }
+                        }
                     }
                 },
                 new()
@@ -634,9 +617,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         new()
                         {
                             Title = "Topic B",
-                            Publications = ListOf(publicationB)
-                        },
-                    },
+                            Publications = new List<Publication>
+                            {
+                                // Publication has a published and an unpublished release
+                                new()
+                                {
+                                    Title = "Publication B",
+                                    LatestPublishedRelease = releaseA,
+                                    Releases = new List<Release>
+                                    {
+                                        releaseA,
+                                        new()
+                                        {
+                                            ReleaseName = "2021",
+                                            TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                                            Published = null
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 },
                 new()
                 {
@@ -646,9 +647,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         new()
                         {
                             Title = "Topic C",
-                            Publications = ListOf(publicationC)
-                        },
-                    },
+                            Publications = new List<Publication>
+                            {
+                                // Publication has no releases
+                                new()
+                                {
+                                    Title = "Publication C",
+                                }
+                            }
+                        }
+                    }
                 },
                 new()
                 {
@@ -658,372 +666,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         new()
                         {
                             Title = "Topic D",
-                            Publications = ListOf(publicationD)
-                        },
-                    },
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                await context.AddRangeAsync(themes);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var service = SetupPublicationService(context);
-
-                var publicationTree = await service.GetPublicationTree();
-
-                Assert.Equal(2, publicationTree.Count);
-                Assert.Equal("Theme B", publicationTree[0].Title);
-                Assert.Equal("Theme C", publicationTree[1].Title);
-
-                Assert.Single(publicationTree[0].Topics);
-                Assert.Equal("Topic B", publicationTree[0].Topics[0].Title);
-
-                Assert.Single(publicationTree[1].Topics);
-                Assert.Equal("Topic C", publicationTree[1].Topics[0].Title);
-
-                var topicBPublications = publicationTree[0].Topics[0].Publications;
-
-                // Publication has a published release, hence it is visible
-                Assert.Single(topicBPublications);
-                Assert.Equal("Publication B", topicBPublications[0].Title);
-                Assert.Equal(PublicationType.NationalAndOfficial, topicBPublications[0].Type);
-                Assert.Null(topicBPublications[0].LegacyPublicationUrl);
-
-                var topicCPublications = publicationTree[1].Topics[0].Publications;
-
-                // Publication has a legacy URL, hence it is visible
-                Assert.Single(topicCPublications);
-                Assert.Equal("Publication C", topicCPublications[0].Title);
-                Assert.Equal(PublicationType.Legacy, topicCPublications[0].Type);
-                Assert.Equal("https://legacy.url/", topicCPublications[0].LegacyPublicationUrl);
-            }
-        }
-
-        [Fact]
-        public async Task GetPublicationTree_LegacyPublicationUrl()
-        {
-            var releaseA = new Release
-            {
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = ReleaseType.NationalStatistics,
-                Published = DateTime.UtcNow,
-            };
-            var releaseB = new Release
-            {
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = ReleaseType.NationalStatistics,
-                Published = DateTime.UtcNow,
-            };
-
-            var publicationA = new Publication
-            {
-                Title = "Publication A",
-                Slug = "publication-a",
-                LatestPublishedRelease = releaseA,
-                Releases = new List<Release>
-                {
-                    releaseA
-                },
-                LegacyPublicationUrl = new Uri("https://legacy.url/")
-            };
-            var publicationB = new Publication
-            {
-                Title = "Publication B",
-                Slug = "publication-b",
-                LatestPublishedRelease = releaseB,
-                Releases = new List<Release>
-                {
-                    releaseB
-                }
-            };
-            var publicationC = new Publication
-            {
-                Title = "Publication C",
-                Slug = "publication-c",
-                LegacyPublicationUrl = new Uri("https://legacy.url/")
-            };
-
-            var theme = new Theme
-            {
-                Title = "Theme A",
-                Summary = "Theme A summary",
-                Topics = new List<Topic>
-                {
-                    new()
-                    {
-                        Title = "Topic A",
-                        // Publications are in random order
-                        // to check that ordering is done by title
-                        Publications = ListOf(publicationB, publicationC, publicationA)
-                    },
-                },
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                await context.Themes.AddRangeAsync(theme);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var service = SetupPublicationService(context);
-
-                var publicationTree = await service.GetPublicationTree();
-
-                Assert.Single(publicationTree);
-                Assert.Equal("Theme A", publicationTree[0].Title);
-                Assert.Equal("Theme A summary", publicationTree[0].Summary);
-
-                Assert.Single(publicationTree[0].Topics);
-                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
-
-                var publications = publicationTree[0].Topics[0].Publications;
-
-                Assert.Equal(3, publications.Count);
-                Assert.Equal("publication-a", publications[0].Slug);
-                Assert.Equal("Publication A", publications[0].Title);
-                Assert.Equal(PublicationType.NationalAndOfficial, publications[0].Type);
-                // Publication has a legacy url but it's not set because Releases exist
-                Assert.Null(publications[0].LegacyPublicationUrl);
-
-                Assert.Equal("publication-b", publications[1].Slug);
-                Assert.Equal("Publication B", publications[1].Title);
-                Assert.Equal(PublicationType.NationalAndOfficial, publications[1].Type);
-                Assert.Null(publications[1].LegacyPublicationUrl);
-
-                Assert.Equal("publication-c", publications[2].Slug);
-                Assert.Equal("Publication C", publications[2].Title);
-                Assert.Equal(PublicationType.Legacy, publications[2].Type);
-                Assert.Equal("https://legacy.url/", publications[2].LegacyPublicationUrl);
-            }
-        }
-
-        [Fact]
-        public async Task GetPublicationTree_PublicationsWithNoReleasesAndNoLegacyUrl_Excluded()
-        {
-            var releaseA = new Release
-            {
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = ReleaseType.OfficialStatistics,
-                Published = new DateTime(2020, 1, 1),
-            };
-
-            var publicationA = new Publication
-            {
-                Title = "Publication A",
-                LatestPublishedRelease = releaseA,
-                Releases = new List<Release>
-                {
-                    releaseA
-                }
-            };
-            var publicationB = new Publication
-            {
-                Title = "Publication B",
-            };
-            var publicationC = new Publication
-            {
-                Title = "Publication C",
-                LegacyPublicationUrl = new Uri("https://legacy.url/")
-            };
-
-            var theme = new Theme
-            {
-                Title = "Theme A",
-                Topics = new List<Topic>
-                {
-                    new()
-                    {
-                        Title = "Topic A",
-                        Publications = new List<Publication>
-                        {
-                            publicationA,
-                            publicationB,
-                            publicationC
-                        }
-                    }
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                await context.Themes.AddRangeAsync(theme);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var service = SetupPublicationService(context);
-
-                var publicationTree = await service.GetPublicationTree();
-
-                var publications = publicationTree[0].Topics[0].Publications;
-
-                Assert.Equal(2, publications.Count);
-                Assert.Equal("Publication A", publications[0].Title);
-                Assert.Equal(PublicationType.NationalAndOfficial, publications[0].Type);
-                Assert.Null(publications[0].LegacyPublicationUrl);
-
-                Assert.Equal("Publication C", publications[1].Title);
-                Assert.Equal(PublicationType.Legacy, publications[1].Type);
-                Assert.Equal("https://legacy.url/", publications[1].LegacyPublicationUrl);
-            }
-        }
-
-        [Fact]
-        public async Task GetPublicationTree_PublicationWithMultipleReleasesHasCorrectLatestReleaseType()
-        {
-            var previousRelease = new Release
-            {
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = ReleaseType.OfficialStatistics,
-                Published = DateTime.UtcNow,
-            };
-
-            var latestRelease = new Release
-            {
-                ReleaseName = "2021",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = ReleaseType.NationalStatistics,
-                Published = DateTime.UtcNow,
-            };
-
-            var unpublishedRelease = new Release
-            {
-                ReleaseName = "2022",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = ReleaseType.AdHocStatistics,
-                Published = null,
-            };
-
-            var theme = new Theme
-            {
-                Title = "Theme A",
-                Summary = "Theme A summary",
-                Topics = new List<Topic>
-                {
-                    new()
-                    {
-                        Title = "Topic A",
-                        Publications = new List<Publication>
-                        {
-                            new()
+                            Publications = new List<Publication>
                             {
-                                Title = "Publication A",
-                                Slug = "publication-a",
-                                LatestPublishedRelease = latestRelease,
-                                Releases = new List<Release>
+                                // Publication has no published releases
+                                new()
                                 {
-                                    previousRelease,
-                                    latestRelease,
-                                    unpublishedRelease
+                                    Title = "Publication D",
+                                    LatestPublishedRelease = null,
+                                    Releases = new List<Release>
+                                    {
+                                        new()
+                                        {
+                                            ReleaseName = "2022",
+                                            TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                                            Published = null
+                                        }
+                                    }
                                 }
                             }
                         }
-                    },
-                },
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                await context.Themes.AddAsync(theme);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var service = SetupPublicationService(context);
-
-                var publicationTree = await service.GetPublicationTree();
-
-                Assert.Single(publicationTree);
-                Assert.Equal("Theme A", publicationTree[0].Title);
-                Assert.Equal("Theme A summary", publicationTree[0].Summary);
-
-                Assert.Single(publicationTree[0].Topics);
-                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
-
-                var publications = publicationTree[0].Topics[0].Publications;
-
-                Assert.Single(publications);
-                Assert.Equal("publication-a", publications[0].Slug);
-                Assert.Equal("Publication A", publications[0].Title);
-                Assert.Equal(PublicationType.NationalAndOfficial, publications[0].Type);
-            }
-        }
-
-        [Fact]
-        public async Task GetPublicationTree_TopicsWithNoVisiblePublications_Excluded()
-        {
-            var releaseA = new Release
-            {
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                ReleaseName = "2020",
-                Type = ReleaseType.OfficialStatistics,
-                Published = new DateTime(2020, 1, 1),
-            };
-
-            // Not published
-            var releaseB = new Release
-            {
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                ReleaseName = "2020",
-                Type = ReleaseType.NationalStatistics
-            };
-
-            var publicationA = new Publication
-            {
-                Title = "Publication A",
-                LatestPublishedRelease = releaseA,
-                Releases = new List<Release>
-                {
-                    releaseA
-                }
-            };
-            var publicationB = new Publication
-            {
-                Title = "Publication B",
-                LatestPublishedRelease = null,
-                Releases = new List<Release>
-                {
-                    releaseB
-                }
-            };
-
-            var themes = new List<Theme>
-            {
-                new()
-                {
-                    Title = "Theme A",
-                    Topics = new List<Topic>
-                    {
-                        new()
-                        {
-                            Title = "Topic A",
-                            Publications = ListOf(publicationA)
-                        },
-                        new()
-                        {
-                            Title = "Topic B",
-                            Publications = ListOf(publicationB),
-                        },
                     }
                 }
             };
@@ -1032,6 +693,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
+                await context.Releases.AddRangeAsync(releaseA, releaseB);
                 await context.Themes.AddRangeAsync(themes);
                 await context.SaveChangesAsync();
             }
@@ -1042,6 +704,173 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var publicationTree = await service.GetPublicationTree();
 
+                // Theme A / Topic A should be included as Publication A has a published release
+                // Theme B / Topic B should be included as Publication B has a published and unpublished releases
+                // Theme C / Topic C should be excluded as Publication C has no releases
+                // Theme D / Topic D should be excluded as Publication D only has an unpublished release
+
+                Assert.Equal(2, publicationTree.Count);
+                Assert.Equal("Theme A", publicationTree[0].Title);
+                Assert.Equal("Theme B", publicationTree[1].Title);
+
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
+
+                var topicAPublications = publicationTree[0].Topics[0].Publications;
+
+                Assert.Single(topicAPublications);
+                Assert.Equal("Publication A", topicAPublications[0].Title);
+
+                Assert.Single(publicationTree[1].Topics);
+                Assert.Equal("Topic B", publicationTree[1].Topics[0].Title);
+
+                var topicBPublications = publicationTree[1].Topics[0].Publications;
+
+                Assert.Single(topicBPublications);
+                Assert.Equal("Publication B", topicBPublications[0].Title);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationTree_PublicationsWithNoReleases_Excluded()
+        {
+            var releaseA = new Release
+            {
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Published = DateTime.UtcNow
+            };
+
+            var theme = new Theme
+            {
+                Title = "Theme A",
+                Topics = new List<Topic>
+                {
+                    new()
+                    {
+                        Title = "Topic A",
+                        Publications = new List<Publication>
+                        {
+                            // Publication has a published release
+                            new()
+                            {
+                                Title = "Publication A",
+                                LatestPublishedRelease = releaseA,
+                                Releases = new List<Release>
+                                {
+                                    releaseA
+                                }
+                            },
+                            // Publication has no releases
+                            new()
+                            {
+                                Title = "Publication B",
+                                Releases = new List<Release>()
+                            }
+                        }
+                    }
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.Themes.AddRangeAsync(theme);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = SetupPublicationService(context);
+
+                var publicationTree = await service.GetPublicationTree();
+
+                var publications = publicationTree[0].Topics[0].Publications;
+
+                Assert.Single(publications);
+                Assert.Equal("Publication A", publications[0].Title);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationTree_TopicsWithNoVisiblePublications_Excluded()
+        {
+            var releaseA = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                ReleaseName = "2020",
+                Published = new DateTime(2020, 1, 1),
+            };
+
+            var themes = new List<Theme>
+            {
+                new()
+                {
+                    Title = "Theme A",
+                    Topics = new List<Topic>
+                    {
+                        // Topic has a publication with a published release
+                        new()
+                        {
+                            Title = "Topic A",
+                            Publications = new List<Publication>
+                            {
+                                // Publication has a published release
+                                new()
+                                {
+                                    Title = "Publication A",
+                                    LatestPublishedRelease = releaseA,
+                                    Releases = new List<Release>
+                                    {
+                                        releaseA
+                                    }
+                                }
+                            }
+                        },
+                        // Topic only has a publication with no published release
+                        new()
+                        {
+                            Title = "Topic B",
+                            Publications = new List<Publication>
+                            {
+                                new()
+                                {
+                                    Title = "Publication B",
+                                    LatestPublishedRelease = null,
+                                    Releases = new List<Release>
+                                    {
+                                        new()
+                                        {
+                                            TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                                            ReleaseName = "2020"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                    }
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.Releases.AddAsync(releaseA);
+                await context.Themes.AddRangeAsync(themes);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = SetupPublicationService(context);
+
+                var publicationTree = await service.GetPublicationTree();
+
+                // Topic A should be included as Publication A has a published release
+                // Topic B should be excluded as Publication B only has an unpublished release
+                
                 Assert.Single(publicationTree);
                 Assert.Equal("Theme A", publicationTree[0].Title);
 
@@ -1050,9 +879,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var topicAPublications = publicationTree[0].Topics[0].Publications;
 
-                // Publication has a published release, hence it is visible
                 Assert.Single(topicAPublications);
-                Assert.Equal(PublicationType.NationalAndOfficial, topicAPublications[0].Type);
                 Assert.Equal("Publication A", topicAPublications[0].Title);
             }
         }
@@ -1064,7 +891,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 ReleaseName = "2021",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = ReleaseType.OfficialStatistics,
                 Published = DateTime.UtcNow,
             };
 
@@ -1079,7 +905,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     {
                         ReleaseName = "2020",
                         TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        Type = ReleaseType.OfficialStatistics,
                         Published = new DateTime(2020, 1, 1),
                     }
                 }
@@ -1159,7 +984,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 ReleaseName = "2021",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = ReleaseType.OfficialStatistics,
                 Published = DateTime.UtcNow,
             };
 
@@ -1174,7 +998,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     {
                         ReleaseName = "2020",
                         TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        Type = ReleaseType.OfficialStatistics,
                         Published = new DateTime(2020, 1, 1),
                     }
                 }
@@ -1254,7 +1077,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 ReleaseName = "2020",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = ReleaseType.OfficialStatistics,
                 Published = DateTime.UtcNow,
             };
 
@@ -1262,7 +1084,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 ReleaseName = "2020",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = ReleaseType.OfficialStatistics,
                 Published = null,
             };
 
@@ -1348,14 +1169,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 ReleaseName = "2020",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = ReleaseType.OfficialStatistics,
                 Published = DateTime.UtcNow,
             };
             var releaseB = new Release
             {
                 ReleaseName = "2020",
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Type = ReleaseType.NationalStatistics,
                 Published = DateTime.UtcNow,
             };
 

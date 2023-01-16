@@ -209,12 +209,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .IsRequired(false);
 
             modelBuilder.Entity<Publication>()
-                .Property(p => p.LegacyPublicationUrl)
-                .HasConversion(
-                    p => p.ToString(),
-                    p => new Uri(p));
-
-            modelBuilder.Entity<Publication>()
                 .OwnsOne(p => p.ExternalMethodology)
                 .ToTable("ExternalMethodology");
 

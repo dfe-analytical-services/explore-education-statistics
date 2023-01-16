@@ -18,6 +18,7 @@ const publicationService = {
         contactName: 'John Doe',
         contactTelNo: '123456789',
       },
+      summary: 'testing',
     });
     console.timeEnd('createPublication');
     spinner.succeed(`Created publication ${res.data.id}`);

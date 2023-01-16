@@ -434,12 +434,9 @@ Approve release
 
 Verify newly published release is on Find Statistics page
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
-    user checks publication bullet contains link    ${PUBLICATION_NAME}    View statistics and data
-    user checks publication bullet contains link    ${PUBLICATION_NAME}    Create your own tables
-    user checks publication bullet does not contain link    ${PUBLICATION_NAME}    Statistics at DfE
 
 Navigate to published release page
-    user clicks element    testid:View stats link for ${PUBLICATION_NAME}
+    user clicks link    ${PUBLICATION_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
 
 Check latest release is correct

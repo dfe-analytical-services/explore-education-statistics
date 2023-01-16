@@ -17,13 +17,13 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.FilterAndIndicatorViewModelBuilders;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.LocationViewModelBuilder;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                     var filterItems =
                         _filterItemRepository.GetFilterItemsFromObservationList(observations);
-                    var filterViewModels = FiltersViewModelBuilder.BuildFiltersFromFilterItems(filterItems,
+                    var filterViewModels = FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(filterItems,
                         releaseSubject.FilterSequence);
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
@@ -176,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .SelectMany(groupOrdering => groupOrdering.ChildSequence)
                 .ToList();
 
-            return IndicatorsViewModelBuilder.BuildIndicators(indicators, indicatorsOrdering);
+            return IndicatorsMetaViewModelBuilder.BuildIndicators(indicators, indicatorsOrdering);
         }
 
         private async Task<List<FootnoteViewModel>> GetFootnoteViewModels(

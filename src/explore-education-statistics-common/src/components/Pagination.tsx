@@ -17,7 +17,7 @@ type Params = {
 interface LinkRenderProps {
   'aria-current'?: 'page' | undefined;
   'aria-label'?: string;
-  testId?: string;
+  'data-testid'?: string;
   children: ReactNode;
   className: string;
   rel?: 'next' | 'prev';
@@ -60,7 +60,7 @@ const Pagination = ({
           {renderLink({
             className: paginationLinkClassName,
             rel: 'prev',
-            testId: 'pagination-previous',
+            'data-testid': 'pagination-previous',
             to: appendQuery<Params>(baseUrl, {
               ...queryParams,
               page: currentPage - 1,
@@ -115,7 +115,7 @@ const Pagination = ({
           {renderLink({
             className: paginationLinkClassName,
             rel: 'next',
-            testId: 'pagination-next',
+            'data-testid': 'pagination-next',
             to: appendQuery<Params>(baseUrl, {
               ...queryParams,
               page: currentPage + 1,

@@ -34,6 +34,10 @@ const getAnswers = async (choices: readonly string[]) => {
         await promptService.createReleaseAndPublish();
         break;
 
+      case 'publish all releases':
+        await promptService.publishAllReleases();
+        break;
+
       case 'upload subject':
         await promptService.uploadSubject();
         break;
@@ -44,7 +48,10 @@ const getAnswers = async (choices: readonly string[]) => {
 
       case 'generate lorem ipsum content text block (methodology & release)':
         await promptService.generateLoremIpsumContentTextBlock();
+        break;
 
+      case 'upload many subjects & publish':
+        await promptService.uploadManySubjectsAndPublish();
         break;
 
       default:

@@ -44,7 +44,6 @@ describe('DataCataloguePage', () => {
               id: 'publication-1',
               title: 'Test publication',
               slug: 'test-publication',
-              type: 'NationalAndOfficial',
               isSuperseded: false,
             },
           ],

@@ -9,7 +9,6 @@ import {
   MethodologySummary,
   ExternalMethodology,
 } from '@common/services/types/methodology';
-import { PublicationType } from '@common/services/types/publicationType';
 import { PaginatedList } from '@common/services/types/pagination';
 import { PartialDate } from '@common/utils/date/partialDate';
 import { contentApi } from './api';
@@ -175,7 +174,6 @@ export interface PublicationTreeSummary {
   id: string;
   title: string;
   slug: string;
-  type: PublicationType;
   legacyPublicationUrl?: string;
   isSuperseded: boolean;
 }
@@ -195,11 +193,7 @@ export interface Theme {
 }
 
 interface PublicationTreeOptions {
-  publicationFilter?:
-    | 'FindStatistics'
-    | 'DataTables'
-    | 'DataCatalogue'
-    | 'FastTrack';
+  publicationFilter?: 'DataTables' | 'DataCatalogue' | 'FastTrack';
 }
 
 export default {

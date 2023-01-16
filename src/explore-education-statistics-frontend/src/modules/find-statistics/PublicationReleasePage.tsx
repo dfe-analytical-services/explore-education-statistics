@@ -34,6 +34,7 @@ import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import ScrollableContainer from '@common/components/ScrollableContainer';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 
@@ -313,26 +314,30 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     })
                   }
                 >
-                  <ul className="govuk-list">
-                    {[
-                      ...otherPublicationReleases.map(({ id, slug, title }) => (
-                        <li key={id} data-testid="other-release-item">
-                          <Link
-                            to={`/find-statistics/${release.publication.slug}/${slug}`}
-                          >
-                            {title}
-                          </Link>
-                        </li>
-                      )),
-                      ...release.publication.legacyReleases.map(
-                        ({ id, description, url }) => (
-                          <li key={id} data-testid="other-release-item">
-                            <a href={url}>{description}</a>
-                          </li>
+                  <ScrollableContainer maxHeight={300}>
+                    <ul className="govuk-list">
+                      {[
+                        ...otherPublicationReleases.map(
+                          ({ id, slug, title }) => (
+                            <li key={id} data-testid="other-release-item">
+                              <Link
+                                to={`/find-statistics/${release.publication.slug}/${slug}`}
+                              >
+                                {title}
+                              </Link>
+                            </li>
+                          ),
                         ),
-                      ),
-                    ]}
-                  </ul>
+                        ...release.publication.legacyReleases.map(
+                          ({ id, description, url }) => (
+                            <li key={id} data-testid="other-release-item">
+                              <a href={url}>{description}</a>
+                            </li>
+                          ),
+                        ),
+                      ]}
+                    </ul>
+                  </ScrollableContainer>
                 </Details>
               </>
             )}

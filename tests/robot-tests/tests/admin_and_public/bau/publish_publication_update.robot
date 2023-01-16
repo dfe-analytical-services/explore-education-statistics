@@ -74,7 +74,7 @@ Check publication is updated on dashboard
 
 Go to public release page
     user checks publication is on find statistics page    ${PUBLICATION_NAME_UPDATED}
-    user clicks element    testid:View stats link for ${PUBLICATION_NAME_UPDATED}
+    user clicks link    ${PUBLICATION_NAME_UPDATED}
     user waits until h1 is visible    ${PUBLICATION_NAME_UPDATED}    %{WAIT_MEDIUM}
 
 Validate publication details are updated on public page
