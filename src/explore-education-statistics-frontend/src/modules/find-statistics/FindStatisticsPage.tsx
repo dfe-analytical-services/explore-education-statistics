@@ -33,7 +33,6 @@ import omit from 'lodash/omit';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import InsetText from '@common/components/InsetText';
-import classNames from 'classnames';
 
 export interface FindStatisticsPageQuery {
   page?: number;
@@ -166,7 +165,7 @@ const FindStatisticsPage: NextPage = () => {
     >
       <InsetText>
         <h2 className="govuk-heading-m">This page has changed</h2>
-        <p className={classNames('govuk-body', 'govuk-warning-text')}>
+        <p className="govuk-body">
           Following user feedback we’ve made some changes to this page to make
           our publications easier to find, if you have any comments on the new
           design please let us know via the{' '}
