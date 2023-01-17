@@ -376,6 +376,13 @@
         "description": "Gov UK Notify service template ID for approver notifications"
       }
     },
+    "immediatePublicationOfScheduledReleasesEnabled": {
+      "type": "string",
+      "defaultValue": "false",
+      "metadata": {
+        "description": "Disable the Functions in the Publisher App which allow scheduled Releases to be published immediately"
+      }
+    },
     "teamEmailAddresses": {
       "type": "array",
       "defaultValue": [
@@ -3117,6 +3124,8 @@
       "properties": {
         "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
         "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
+        "AzureWebJobs.StageScheduledReleasesImmediately.Disabled": "[not(parameters('immediatePublicationOfScheduledReleasesEnabled'))]",
+        "AzureWebJobs.PublishStagedReleaseContentImmediately.Disabled": "[not(parameters('immediatePublicationOfScheduledReleasesEnabled'))]",
         "PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
         "PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
         "WEBSITE_TIME_ZONE": "[parameters('timeZone')]",
