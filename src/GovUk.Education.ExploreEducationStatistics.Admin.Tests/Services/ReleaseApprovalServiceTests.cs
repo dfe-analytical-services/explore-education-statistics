@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
@@ -89,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         amendedRelease.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.Draft
@@ -156,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await releaseService
                     .CreateReleaseStatus(
                         releaseId,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
@@ -241,7 +242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
                             LatestInternalReleaseNote = "Test note",
@@ -287,7 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
                             LatestInternalReleaseNote = "Test note",
@@ -329,7 +330,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
                             LatestInternalReleaseNote = "Test note",
@@ -385,7 +386,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
                             LatestInternalReleaseNote = "Test note",
@@ -446,7 +447,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
                             LatestInternalReleaseNote = "Test note",
@@ -504,7 +505,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
                             LatestInternalReleaseNote = "Test note",
@@ -565,7 +566,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
                             LatestInternalReleaseNote = "Test note",
@@ -623,7 +624,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
                             LatestInternalReleaseNote = "Test note",
@@ -682,7 +683,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
                             LatestInternalReleaseNote = "Test note",
@@ -731,7 +732,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Draft,
                         }
@@ -800,7 +801,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
                             LatestInternalReleaseNote = "Test note",
@@ -875,7 +876,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
                             LatestInternalReleaseNote = "Test note",
@@ -980,7 +981,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         amendedRelease.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -1081,7 +1082,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         amendedRelease.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -1138,7 +1139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Draft,
                             LatestInternalReleaseNote = "Test note",
@@ -1232,7 +1233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         releaseId,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             PublishScheduled = "2051-06-30",
                             NextReleaseDate = nextReleaseDateEdited,
@@ -1354,7 +1355,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         releaseId,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             PublishScheduled = "2051-06-30",
                             NextReleaseDate = nextReleaseDateEdited,
@@ -1685,7 +1686,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id, new ReleaseStatusCreateViewModel
+                        release.Id, new ReleaseStatusCreateRequest
                         {
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
@@ -1762,7 +1763,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id, new ReleaseStatusCreateViewModel
+                        release.Id, new ReleaseStatusCreateRequest
                         {
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
@@ -1831,7 +1832,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id, new ReleaseStatusCreateViewModel
+                        release.Id, new ReleaseStatusCreateRequest
                         {
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",

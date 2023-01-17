@@ -146,44 +146,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public int Year { get; init; }
     }
 
-    public class ReleaseStatusCreateViewModel
-    {
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ReleaseApprovalStatus ApprovalStatus { get; init; }
-
-        public string LatestInternalReleaseNote { get; init; } = string.Empty;
-
-        public bool? NotifySubscribers { get; init; }
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        public PublishMethod? PublishMethod { get; init; }
-
-        [DateTimeFormatValidator("yyyy-MM-dd")]
-        public string? PublishScheduled { get; init; }
-
-        public DateTime? PublishScheduledDate
-        {
-            get
-            {
-                if (PublishScheduled.IsNullOrEmpty())
-                {
-                    return null;
-                }
-
-                DateTime.TryParseExact(
-                    PublishScheduled,
-                    "yyyy-MM-dd",
-                    InvariantCulture,
-                    DateTimeStyles.None,
-                    out var dateTime
-                );
-                return dateTime.AsStartOfDayUtcForTimeZone();
-            }
-        }
-
-        [PartialDateValidator] public PartialDate? NextReleaseDate { get; init; }
-    }
-
     public class ReleaseSummaryViewModel
     {
         public Guid Id { get; init; }

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Cronos;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -109,7 +110,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, Unit>> CreateReleaseStatus(
-            Guid releaseId, ReleaseStatusCreateViewModel request)
+            Guid releaseId,
+            ReleaseStatusCreateRequest request)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, ReleaseChecklistService.HydrateReleaseForChecklist)
@@ -229,7 +231,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private Either<ActionResult, Unit> ValidatePublishDate(ReleaseStatusCreateViewModel request)
+        private Either<ActionResult, Unit> ValidatePublishDate(ReleaseStatusCreateRequest request)
         {
             if (request.ApprovalStatus == ReleaseApprovalStatus.Approved
                 && request.PublishMethod == PublishMethod.Scheduled)
