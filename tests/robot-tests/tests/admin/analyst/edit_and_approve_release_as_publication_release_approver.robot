@@ -22,7 +22,7 @@ ${DATABLOCK_NAME}=      Dates data block name
 Create new publication and release for "UI tests topic" topic
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     Set suite variable    ${PUBLICATION_ID}
-    user create test release via api    ${PUBLICATION_ID}    FY    3000
+    user creates test release via api    ${PUBLICATION_ID}    FY    3000
 
 Check that no publication roles are listed yet on the Team access page
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}

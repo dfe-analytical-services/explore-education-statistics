@@ -17,7 +17,7 @@ ${PUBLICATION_NAME}=    UI tests - public release visibility %{RUN_IDENTIFIER}
 *** Test Cases ***
 Create test publication and release via API
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    user create test release via api    ${PUBLICATION_ID}    CY    2000
+    user creates test release via api    ${PUBLICATION_ID}    CY    2000
 
 Verify release summary
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}

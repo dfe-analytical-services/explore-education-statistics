@@ -21,7 +21,7 @@ ${DATABLOCK_NAME}=      Dates data block name
 *** Test Cases ***
 Create new publication for "UI tests topic" topic
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    user create test release via api    ${PUBLICATION_ID}    FY    3000
+    user creates test release via api    ${PUBLICATION_ID}    FY    3000
 
 Go to "Release summary" page
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
@@ -601,7 +601,6 @@ Update public prerelease access list for amendment
     user updates public prerelease access list    Updated public access list
 
 Approve amendment for scheduled release
-    user clicks link    Sign off
     user approves release for scheduled publication    0    12    3001
     user waits for scheduled release to be published immediately
 

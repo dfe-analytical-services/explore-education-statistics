@@ -23,7 +23,7 @@ ${SUBJECT_NAME_SUPERSEDE}=          Subject for superseding publication
 *** Test Cases ***
 Create new publication to be archived and release via API
     ${PUBLICATION_ID_ARCHIVE}=    user creates test publication via api    ${PUBLICATION_NAME_ARCHIVE}
-    user create test release via api    ${PUBLICATION_ID_ARCHIVE}    FY    3000
+    user creates test release via api    ${PUBLICATION_ID_ARCHIVE}    FY    3000
 
 Navigate to archive-publication release
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME_ARCHIVE}
@@ -50,7 +50,7 @@ Go to "Sign off" page and approve archive-publication release
 
 Create new publication to supersede other publication and release via API
     ${PUBLICATION_ID_SUPERSEDE}=    user creates test publication via api    ${PUBLICATION_NAME_SUPERSEDE}
-    user create test release via api    ${PUBLICATION_ID_SUPERSEDE}    FY    2000
+    user creates test release via api    ${PUBLICATION_ID_SUPERSEDE}    FY    2000
 
 Set archive-publication to be superseded by superseding-publication
     user navigates to publication page from dashboard    ${PUBLICATION_NAME_ARCHIVE}

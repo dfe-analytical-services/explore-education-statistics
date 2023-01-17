@@ -2,7 +2,6 @@
 Library     SeleniumLibrary    timeout=%{TIMEOUT}    implicit_wait=%{IMPLICIT_WAIT}    run_on_failure=do this on failure
 Library     OperatingSystem
 Library     Collections
-#Library    XvfbRobot    # sudo apt install xvfb + pip install robotframework-xvfb
 Library     file_operations.py
 Library     utilities.py
 Library     fail_fast.py

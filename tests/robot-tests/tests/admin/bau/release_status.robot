@@ -17,7 +17,7 @@ ${ADOPTED_PUBLICATION_NAME}     UI tests - release status publication with adopt
 *** Test Cases ***
 Create new publication and release via API
     ${PUBLICATION_ID}    user creates test publication via api    ${PUBLICATION_NAME}
-    user create test release via api    ${PUBLICATION_ID}    FY    3000
+    user creates test release via api    ${PUBLICATION_ID}    FY    3000
 
 Go to release sign off page and verify initial release checklist
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
