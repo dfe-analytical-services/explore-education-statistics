@@ -1,6 +1,7 @@
 import argparse
 import base64
 import json
+import math
 import os
 
 import requests
@@ -51,7 +52,7 @@ class SnapshotService:
 
         total_results = driver.find_element(By.XPATH, "//*[@data-testid='total-results']").text.split(" ")[0]
 
-        total_pages = int(total_results) // self.page_size
+        total_pages = math.ceil(int(total_results) / self.page_size)
 
         # A-Z sort in order to get all the publications
         driver.find_element(By.CSS_SELECTOR, "input[value='title']").click()
