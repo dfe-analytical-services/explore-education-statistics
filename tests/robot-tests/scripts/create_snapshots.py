@@ -118,6 +118,7 @@ class SnapshotService:
                 break
 
     def create_table_tool_snapshot(self) -> None:
+        print("Creating table tool snapshot")
         driver.get(f"{self.public_url}/data-tables")
 
         theme_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-themes-"]')
@@ -138,6 +139,7 @@ class SnapshotService:
         self._write_to_file("table_tool_snapshot.json", json.dumps(themes, sort_keys=True, indent=2))
 
     def create_data_catalogue_snapshot(self) -> None:
+        print("Creating data catalogue snapshot")
         driver.get(f"{self.public_url}/data-catalogue")
 
         theme_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-themes-"]')
@@ -158,6 +160,7 @@ class SnapshotService:
         self._write_to_file("data_catalogue_snapshot.json", json.dumps(themes, sort_keys=True, indent=2))
 
     def create_methodologies_snapshot(self) -> None:
+        print("Creating methodologies snapshot")
         parsed_html = self._gets_parsed_html_from_page(f"{self.public_url}/methodology")
 
         methodologies_accordion = parsed_html.find(id="themes")
@@ -221,13 +224,22 @@ if __name__ == "__main__":
         required=False,
     )
 
+    ap.add_argument(
+        "-v", "--visual", dest="visual", action="store_true", help="display browser window that the tests run in",
+        required=False
+    )
+
+
     args = ap.parse_args()
 
     assert os.path.basename(os.getcwd()) == "robot-tests", "Must run from the robot-tests directory!"
 
     get_webdriver("latest")
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+
+    if not args.visual:
+        chrome_options.add_argument("--headless")
+
     driver = webdriver.Chrome(options=chrome_options)
 
     if args.basic_auth_user and args.basic_auth_pass:
