@@ -3,8 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
@@ -50,11 +53,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName,
                 DateTime.UtcNow);
 
-            await PublishScheduledReleases();
+            var publishedReleaseIds = await PublishScheduledReleases();
 
             logger.LogInformation(
-                "{FunctionName} completed. {Count}",
+                "{FunctionName} completed.  Published Releases {ReleaseIds}.  " +
+                "Will be scheduled again to run at {NextDateTime}",
                 executionContext.FunctionName,
+                publishedReleaseIds.JoinToString(','),
                 timer.FormatNextOccurrences(1));
         }
 
@@ -66,6 +71,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <remarks>
         /// It will then call PublishingCompletionService in order to complete the publishing process for that Release.
         /// </remarks>
+        /// <param name="request">
+        /// An optional JSON request body with a "ReleaseIds" array can be included in the POST request to limit the
+        /// scope of the Function to only operate upon the provided Release Ids.
+        /// </param>
         /// <param name="executionContext"></param>
         /// <param name="logger"></param>
         /// <returns></returns>
@@ -73,6 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         // ReSharper disable once UnusedMember.Global
         public async Task PublishScheduledReleasesImmediately(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
+            HttpRequest request,
             ExecutionContext executionContext,
             ILogger logger)
         {
@@ -80,29 +90,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName,
                 DateTime.UtcNow);
 
-            await PublishScheduledReleases();
+            var releaseIds = (await request.GetJsonBody<ManualTriggerRequest>())?.ReleaseIds;
 
-            logger.LogInformation("{FunctionName} completed.", executionContext.FunctionName);
+            var publishedReleaseIds = await PublishScheduledReleases(releaseIds);
+
+            logger.LogInformation("{FunctionName} completed.  Published Releases {ReleaseIds}", 
+                executionContext.FunctionName,
+                publishedReleaseIds.JoinToString(','));
         }
 
-        private async Task PublishScheduledReleases()
+        private async Task<Guid[]> PublishScheduledReleases(Guid[]? specificReleaseIds = null)
         {
             var scheduled = (await QueryScheduledReleases()).ToArray();
-            if (scheduled.Any())
+
+            var toProcess = scheduled.IsNullOrEmpty()
+                ? scheduled
+                : scheduled.Where(releaseStatus => specificReleaseIds!.Contains(releaseStatus.ReleaseId)).ToArray();
+
+            if (!toProcess.Any())
             {
-                // Move all cached releases in the staging directory of the public content container to the root
-                await _publishingService.PublishStagedReleaseContent();
-
-                await scheduled
-                    .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(async message =>
-                        await UpdateContentStage(message, ReleasePublishingStatusContentStage.Complete));
-
-                // Finalise publishing of these releases
-                await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
-                    scheduled.Select(status => (status.ReleaseId, status.Id)),
-                    DateTime.UtcNow);
+                return Array.Empty<Guid>();
             }
+            
+            await _publishingService.PublishStagedReleaseContent();
+
+            await toProcess
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async message =>
+                    await UpdateContentStage(message, ReleasePublishingStatusContentStage.Complete));
+
+            // Finalise publishing of these releases
+            await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
+                toProcess.Select(status => (status.ReleaseId, status.Id)),
+                DateTime.UtcNow);
+
+            return toProcess
+                .Select(releaseStatus => releaseStatus.ReleaseId)
+                .ToArray();
         }
 
         private async Task<IEnumerable<ReleasePublishingStatus>> QueryScheduledReleases()
@@ -116,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private async Task UpdateContentStage(
             ReleasePublishingStatus status, 
             ReleasePublishingStatusContentStage stage,
-            ReleasePublishingStatusLogMessage logMessage = null)
+            ReleasePublishingStatusLogMessage? logMessage = null)
         {
             await _releasePublishingStatusService.UpdateContentStageAsync(
                 status.ReleaseId, 
@@ -124,5 +148,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 stage, 
                 logMessage);
         }
+        
+        // ReSharper disable once ClassNeverInstantiated.Local
+        private record ManualTriggerRequest(Guid[] ReleaseIds);
     }
 }

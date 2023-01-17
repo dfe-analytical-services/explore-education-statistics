@@ -1,6 +1,7 @@
 *** Settings ***
 Resource    ./common.robot
 Library     admin-utilities.py
+Library     String
 
 
 *** Variables ***
@@ -617,15 +618,16 @@ user waits for scheduled release to be published immediately
     # ourselves - hence we need to account for it going into "Started" state while it stages before we've manually
     # triggered the function, as well as the standard "Scheduled" state that we would normally expect a scheduled
     # Release to fall into.
+    ${release_id}=    get release id from url
     user waits until page contains element
     ...    xpath://*[@id='release-process-status-Scheduled' or @id='release-process-status-Started']    %{WAIT_SMALL}
-    trigger immediate staging of scheduled release
+    trigger immediate staging of scheduled release    ${release_id}
     user reloads page
     user waits until page contains details dropdown    View stages    %{WAIT_SMALL}
     user opens details dropdown    View stages
     user waits until page contains    content - Scheduled    %{WAIT_MEDIUM}
     user waits until page contains    files - Complete    %{WAIT_MEDIUM}
-    trigger immediate publishing of scheduled release
+    trigger immediate publishing of scheduled release    ${release_id}
     user waits until page contains element    id:release-process-status-Complete    %{WAIT_MEDIUM}
 
 user verifies release summary
@@ -792,3 +794,14 @@ user gets resolved comment
 user closes Set Page View box
     user clicks element    id:pageViewToggleButton
     user waits until element is not visible    id:editingMode    %{WAIT_SMALL}
+
+# This keyword will work for any URL containing the pattern release/<guid>.    This keyword will return the matched
+# guid.    For example, in the URL https://localhost/publication/<publication id>/release/<release id>/status, this
+# keyword would return the <release id> segment of the URL.
+
+get release id from url
+    ${current_url}=    Get Location
+    @{release_id_match}=    Get Regexp Matches    ${current_url}
+    ...    release\/([0-9A-Fa-f]{8}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{12})    1
+    ${release_id}=    Get From List    ${release_id_match}    0
+    [Return]    ${release_id}
