@@ -26,9 +26,10 @@ Optional flags:
 class SnapshotService:
     requests.sessions.HTTPAdapter(pool_connections=50, pool_maxsize=50, max_retries=3)
 
-    def __init__(self):
+    def __init__(self, public_url, driver):
         self.session = requests.Session()
-        self.public_url = args.public_url
+        self.driver = driver
+        self.public_url = public_url
         self.timeout = 10
         self.page_size = 10
 
@@ -48,6 +49,7 @@ class SnapshotService:
             file.write(snapshot)
 
     def create_find_statistics_snapshot(self) -> None:
+        driver = self.driver
         driver.get(f"{self.public_url}/find-statistics")
 
         total_results = driver.find_element(By.XPATH, "//*[@data-testid='total-results']").text.split(" ")[0]
@@ -118,6 +120,7 @@ class SnapshotService:
                 break
 
     def create_table_tool_snapshot(self) -> None:
+        driver = self.driver
         driver.get(f"{self.public_url}/data-tables")
 
         theme_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-themes-"]')
@@ -138,6 +141,7 @@ class SnapshotService:
         self._write_to_file("table_tool_snapshot.json", json.dumps(themes, sort_keys=True, indent=2))
 
     def create_data_catalogue_snapshot(self) -> None:
+        driver = self.driver
         driver.get(f"{self.public_url}/data-catalogue")
 
         theme_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-themes-"]')
@@ -235,7 +239,7 @@ if __name__ == "__main__":
         token = base64.b64encode(f"{args.basic_auth_user}:{args.basic_auth_pass}".encode())
         driver.execute_cdp_cmd("Network.setExtraHTTPHeaders", {"headers": {"Authorization": f"Basic {token.decode()}"}})
 
-    snapshot_service = SnapshotService()
+    snapshot_service = SnapshotService(args.public_url, driver)
 
     snapshot_service.create_find_statistics_snapshot()
     snapshot_service.create_table_tool_snapshot()

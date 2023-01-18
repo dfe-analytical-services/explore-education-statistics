@@ -1,11 +1,6 @@
 import os
 
-from scripts.create_snapshots import (
-    create_all_methodologies_snapshot,
-    create_data_catalogue_snapshot,
-    create_find_statistics_snapshot,
-    create_table_tool_snapshot,
-)
+from scripts.create_snapshots import SnapshotService
 from scripts.get_webdriver import get_webdriver
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -17,16 +12,16 @@ chrome_options = Options()
 chrome_options.add_argument("--headless")
 driver = webdriver.Chrome(options=chrome_options)
 
+public_url = os.getenv("PUBLIC_URL")
 
 slack_service = SlackService()
-
-public_url = os.getenv("PUBLIC_URL")
+snapshot_service = SnapshotService(public_url=public_url, driver=driver)
 
 
 def validate_find_stats_snapshot():
-    with open("tests/snapshots/find_stats_snapshot.json", "r") as file:
+    with open("tests/snapshots/find_statistics_snapshot.json", "r") as file:
         snapshot = file.read()
-    new_snapshot = create_find_statistics_snapshot(public_url)
+    new_snapshot = snapshot_service.create_find_statistics_snapshot()
     if snapshot != new_snapshot:
         slack_service.send_snapshot_alert(f"Find Statistics page snapshot doesn't match current page on {public_url}")
         raise_assertion_error(f"Find Statistics page snapshot doesn't match current page on {public_url}")
@@ -35,7 +30,7 @@ def validate_find_stats_snapshot():
 def validate_table_tool_snapshot():
     with open("tests/snapshots/table_tool_snapshot.json", "r") as file:
         snapshot = file.read()
-    new_snapshot = create_table_tool_snapshot(public_url, driver)
+    new_snapshot = snapshot_service.create_table_tool_snapshot()
     if snapshot != new_snapshot:
         slack_service.send_snapshot_alert(f"Table tool page snapshot doesn't match current page on {public_url}")
         raise_assertion_error(f"Table tool page snapshot doesn't match current page on {public_url}")
@@ -45,7 +40,7 @@ def validate_table_tool_snapshot():
 def validate_data_catalogue_snapshot():
     with open("tests/snapshots/data_catalogue_snapshot.json", "r") as file:
         snapshot = file.read()
-    new_snapshot = create_data_catalogue_snapshot(public_url, driver)
+    new_snapshot = snapshot_service.create_data_catalogue_snapshot()
     if snapshot != new_snapshot:
         slack_service.send_snapshot_alert(
             f"Data catalogue page snapshot doesn't match current page on {os.getenv('PUBLIC_URL')}"
@@ -54,9 +49,9 @@ def validate_data_catalogue_snapshot():
 
 
 def validate_all_methodologies_snapshot():
-    with open("tests/snapshots/all_methodologies_snapshot.json", "r") as file:
+    with open("tests/snapshots/methodologies_snapshot.json", "r") as file:
         snapshot = file.read()
-    new_snapshot = create_all_methodologies_snapshot(public_url)
+    new_snapshot = snapshot_service.create_methodologies_snapshot()
     if snapshot != new_snapshot:
-        slack_service.send_snapshot_alert(f"All methodologies page snapshot doesn't match current page on {public_url}")
-        raise_assertion_error(f"All methodologies page snapshot doesn't match current page on {public_url}")
+        slack_service.send_snapshot_alert(f"Methodologies page snapshot doesn't match current page on {public_url}")
+        raise_assertion_error(f"Methodologies page snapshot doesn't match current page on {public_url}")
