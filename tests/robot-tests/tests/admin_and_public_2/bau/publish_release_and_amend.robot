@@ -170,6 +170,45 @@ Add embedded dashboard to third accordion section
     user waits until h1 is visible    DfE Analytical Services R-Shiny data dashboard template (h1)    90
     unselect frame
 
+User navigates to Data blocks page to edit block
+    [Documentation]    EES-3009
+    user clicks link    Data blocks
+    user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
+
+Edit data block
+    #just updating the table title and source
+    user waits until table is visible
+    user clicks link    Edit block    css:tbody > tr:first-child
+    user waits until h2 is visible    ${DATABLOCK_NAME}
+    user waits until h2 is visible    Data block details
+
+    user enters text into element    id:dataBlockDetailsForm-name    ${DATABLOCK_NAME}
+    user clears element text    id:dataBlockDetailsForm-heading
+    user enters text into element    id:dataBlockDetailsForm-heading    Updated dates table title
+    user clears element text    id:dataBlockDetailsForm-source
+    user enters text into element    id:dataBlockDetailsForm-source    Updated dates source
+
+    user clicks button    Save data block
+    user waits until page contains button    Delete this data block
+
+Navigate to the 'Content' page
+    user clicks link    Content
+    user waits until h2 is visible    ${PUBLICATION_NAME}
+    user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
+
+Verify data block is updated correctly
+    #checking if data block cache has been invalidated by verifying the updates on the block
+    user scrolls to accordion section content    Dates data block    id:releaseMainContent
+    user opens accordion section    Dates data block    id:releaseMainContent
+    ${section}=    user gets accordion section content element    Dates data block    id:releaseMainContent
+
+    user checks chart title contains    ${section}    Updated dates table title
+    user clicks link by visible text    Table    ${section}
+    user waits until parent contains element    ${section}
+    ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Updated dates table title"]
+    user waits until parent contains element    ${section}    xpath:.//*[.="Source: Updated dates source"]
+    user closes accordion section    Dates data block    id:releaseMainContent
+
 Add public prerelease access list
     user clicks link    Pre-release access
     user creates public prerelease access list    Test public access list
@@ -318,13 +357,13 @@ Verify Dates data block accordion section
     user scrolls to accordion section content    Dates data block    id:content
     ${section}=    user gets accordion section content element    Dates data block    id:content
 
-    user checks chart title contains    ${section}    Dates table title
+    user checks chart title contains    ${section}    Updated dates table title
     user checks infographic chart contains alt    ${section}    Sample alt text
 
     user clicks link by visible text    Table    ${section}
     user waits until parent contains element    ${section}
-    ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Dates table title"]
-    user waits until parent contains element    ${section}    xpath:.//*[.="Source: Dates source"]
+    ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Updated dates table title"]
+    user waits until parent contains element    ${section}    xpath:.//*[.="Source: Updated dates source"]
 
     user checks table column heading contains    1    1    2020 Week 13    ${section}
     user checks headed table body row cell contains    Number of open settings    1    22,900    ${section}
@@ -442,9 +481,9 @@ Verify existing data guidance for amendment
     user waits until element contains    ${editor}    Dates test subject test data guidance content
 
 Update existing data guidance for amendment
-    user enters text into element    id:dataGuidanceForm-content    Updated test data guidance content
+    user enters text into element    id:dataGuidanceForm-content    Amended test data guidance content
     user enters text into data guidance data file content editor    Dates test subject
-    ...    Updated Dates test subject test data guidance content
+    ...    Amended Dates test subject test data guidance content
 
     user clicks button    Save guidance
 
@@ -526,8 +565,8 @@ Edit data block for amendment
 
 Save data block for amendment
     user enters text into element    id:dataBlockDetailsForm-name    ${DATABLOCK_NAME}
-    user enters text into element    id:dataBlockDetailsForm-heading    Updated dates table title
-    user enters text into element    id:dataBlockDetailsForm-source    Updated dates source
+    user enters text into element    id:dataBlockDetailsForm-heading    Amended dates table title
+    user enters text into element    id:dataBlockDetailsForm-source    Amended dates source
 
     user clicks button    Save data block
     user waits until page contains button    Delete this data block
@@ -541,15 +580,15 @@ Update data block chart for amendment
 
     user checks radio is checked    Use table title
     user clicks radio    Set an alternative title
-    user enters text into element    id:chartConfigurationForm-title    Updated sample title
-    user checks input field contains    id:chartConfigurationForm-title    Updated sample title
-    user enters text into element    id:chartConfigurationForm-alt    Updated sample alt text
-    user checks textarea contains    id:chartConfigurationForm-alt    Updated sample alt text
+    user enters text into element    id:chartConfigurationForm-title    Amended sample title
+    user checks input field contains    id:chartConfigurationForm-title    Amended sample title
+    user enters text into element    id:chartConfigurationForm-alt    Amended sample alt text
+    user checks textarea contains    id:chartConfigurationForm-alt    Amended sample alt text
 
     user clicks button    Save chart options
     user waits until page does not contain loading spinner
     user waits until page contains element    id:chartBuilderPreview
-    user checks infographic chart contains alt    id:chartBuilderPreview    Updated sample alt text
+    user checks infographic chart contains alt    id:chartBuilderPreview    Amended sample alt text
 
 Navigate to 'Content' page for amendment
     user clicks link    Content
@@ -576,13 +615,13 @@ Verify amended Dates data block table has footnotes
 
 Update second accordion section text for amendment
     user opens accordion section    Test text    id:releaseMainContent
-    user adds content to autosaving accordion section text block    Test text    1    Updated test text!
+    user adds content to autosaving accordion section text block    Test text    1    Amended test text!
     ...    id:releaseMainContent
 
 Update embedded dashboard title
     user updates embedded dashboard in editable accordion section
     ...    Test embedded dashboard section
-    ...    Test embedded dashboard title updated
+    ...    Test embedded dashboard title Amended
     ...    https://department-for-education.shinyapps.io/dfe-shiny-template/
     ...    id:releaseMainContent
 
@@ -598,7 +637,7 @@ Add release note to amendment
 
 Update public prerelease access list for amendment
     user clicks link    Pre-release access
-    user updates public prerelease access list    Updated public access list
+    user updates public prerelease access list    Amended public access list
 
 Approve amendment for immediate release
     user clicks link    Sign off
@@ -670,7 +709,7 @@ Verify amendment public metadata guidance document
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
     user waits until h2 is visible    Data guidance
-    user waits until page contains    Updated test data guidance content
+    user waits until page contains    Amended test data guidance content
 
     user waits until page contains accordion section    Dates test subject
     user checks there are x accordion sections    1
@@ -679,7 +718,7 @@ Verify amendment public metadata guidance document
     user checks summary list contains    Filename    dates-replacement.csv
     user checks summary list contains    Geographic levels    National
     user checks summary list contains    Time period    2020 Week 13 to 2021 Week 24
-    user checks summary list contains    Content    Updated Dates test subject test data guidance content
+    user checks summary list contains    Content    Amended Dates test subject test data guidance content
 
     user opens details dropdown    Variable names and descriptions
 
@@ -711,7 +750,7 @@ Verify amendment public pre-release access list
 
     user waits until h2 is visible    Pre-release access list
     user waits until page contains    Published ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
-    user waits until page contains    Updated public access list
+    user waits until page contains    Amended public access list
 
 Verify amendment accordions are correct
     user goes to release page via breadcrumb    ${PUBLICATION_NAME}    ${RELEASE_NAME}
@@ -726,13 +765,13 @@ Verify amendment Dates data block accordion section
     user scrolls to accordion section content    Dates data block    id:content
     ${section}=    user gets accordion section content element    Dates data block    id:content
 
-    user checks chart title contains    ${section}    Updated sample title
-    user checks infographic chart contains alt    ${section}    Updated sample alt text
+    user checks chart title contains    ${section}    Amended sample title
+    user checks infographic chart contains alt    ${section}    Amended sample alt text
 
     user clicks link by visible text    Table    ${section}
     user waits until parent contains element    ${section}
-    ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Updated dates table title"]
-    user waits until parent contains element    ${section}    xpath:.//*[.="Source: Updated dates source"]
+    ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Amended dates table title"]
+    user waits until parent contains element    ${section}    xpath:.//*[.="Source: Amended dates source"]
 
     user checks table column heading contains    1    1    2020 Week 13    ${section}
     user checks headed table body row cell contains    Number of open settings    1    23,000    ${section}
@@ -762,14 +801,14 @@ Verify amendment Dates data block table has footnotes
 Verify amendment Test text accordion section contains correct text
     user opens accordion section    Test text    id:content
     ${section}=    user gets accordion section content element    Test text    id:content
-    user checks element contains    ${section}    Updated test text!
+    user checks element contains    ${section}    Amended test text!
     user closes accordion section    Test text    id:content
 
 Verify amendment embedded dashboard accordion section is correct
     user opens accordion section    Test embedded dashboard section    id:content
     ${section}=    user gets accordion section content element    Test embedded dashboard section    id:content
     user checks element contains child element    ${section}
-    ...    xpath:.//iframe[@title="Test embedded dashboard title updated"]
+    ...    xpath:.//iframe[@title="Test embedded dashboard title Amended"]
     user closes accordion section    Test embedded dashboard section    id:content
 
 Check next release date can be updated
