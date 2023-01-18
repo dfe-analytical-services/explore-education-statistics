@@ -125,7 +125,7 @@ parser.add_argument(
     "--enable-slack-notifications",
     dest="enable_slack_notifications",
     action="store_true",
-    help="enable Slack notifications to be sent for test-results & snapshot test alerts",
+    help="enable Slack notifications to be sent for test reports",
 )
 parser.add_argument(
     "--prompt-to-continue",
@@ -145,11 +145,10 @@ parser.add_argument(
 )
 
 """
-NOTE(mark): The slack webhook url, and admin and analyst passwords to access to Admin app are
+NOTE(mark): The admin and analyst passwords to access the Admin app are
 stored in the CI pipeline as secret variables, which means they cannot be accessed as normal
 environment variables, and instead must be passed as an argument to this script.
 """
-parser.add_argument("--slack-webhook-url", dest="slack_webhook_url", default=None, help="URL for Slack webhook")
 parser.add_argument("--admin-pass", dest="admin_pass", default=None, help="manually specify the admin password")
 parser.add_argument("--analyst-pass", dest="analyst_pass", default=None, help="manually specify the analyst password")
 parser.add_argument(
@@ -185,9 +184,6 @@ required_env_vars = [
 
 for env_var in required_env_vars:
     assert os.getenv(env_var) is not None, f"Environment variable {env_var} is not set"
-
-if args.slack_webhook_url:
-    os.environ["SLACK_WEBHOOK_URL"] = args.slack_webhook_url
 
 if args.admin_pass:
     os.environ["ADMIN_PASSWORD"] = args.admin_pass

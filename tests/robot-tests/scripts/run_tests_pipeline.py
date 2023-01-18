@@ -1,7 +1,7 @@
 import argparse
 import subprocess
 
-# NOTE(mark): The slack webhook url, and admin and analyst passwords to access to Admin app are
+# NOTE(mark): The admin and analyst passwords to access the Admin app are
 # stored in the CI pipeline as secret variables, which means they cannot be accessed as normal
 # environment variables, and instead must be passed as an argument to this script.
 
@@ -14,7 +14,6 @@ def run_tests_pipeline():
     assert args.admin_pass, "Provide an admin password with an '--admin-pass PASS' argument"
     assert args.analyst_pass, "Provide an analyst password with an '--analyst-pass PASS' argument"
     assert args.expiredinvite_pass, "Provide an expiredinvite password with an '--expiredinvite-pass PASS' argument"
-    assert args.slack_webhook_url, "Please provide slack webhook URL"
     assert args.env, "Provide an environment with an '--env ENV' argument"
     assert args.file, "Provide a file/dir to run with an '--file FILE/DIR' argument"
     assert args.processes, "Provide a number of processes to run with the '--processes NUM' argument"
@@ -27,14 +26,10 @@ def run_tests_pipeline():
     subprocess.check_call("python -m pip install --upgrade pip", shell=True)
     subprocess.check_call("pip install pipenv", shell=True)
     subprocess.check_call("pipenv install", shell=True)
-
-    def get_test_command() -> str:
-        if args.file == "tests/general_public/check_snapshots.robot":
-            return f"pipenv run python run_tests.py --admin-pass {args.admin_pass} --analyst-pass {args.analyst_pass} --expiredinvite-pass {args.expiredinvite_pass} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes {args.processes}"
-        else:
-            return f"pipenv run python run_tests.py --admin-pass {args.admin_pass} --analyst-pass {args.analyst_pass} --expiredinvite-pass {args.expiredinvite_pass} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes {args.processes} --enable-slack-notifications"
-
-    subprocess.check_call(get_test_command(), shell=True)
+    subprocess.check_call(
+        f"pipenv run python run_tests.py --admin-pass {args.admin_pass} --analyst-pass {args.analyst_pass} --expiredinvite-pass {args.expiredinvite_pass} --env {args.env} --file {args.file} --ci --processes {args.processes} --enable-slack-notifications",
+        shell=True,
+    )
 
 
 if __name__ == "__main__":
@@ -49,13 +44,6 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--expiredinvite-pass", dest="expiredinvite_pass", help="ExpiredInvite account password", required=True
-    )
-
-    parser.add_argument(
-        "--slack-webhook-url",
-        dest="slack_webhook_url",
-        help="slack webhook URL for sending test reports",
-        required=True,
     )
 
     parser.add_argument(
