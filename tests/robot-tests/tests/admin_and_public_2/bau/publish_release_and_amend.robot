@@ -601,7 +601,7 @@ Update public prerelease access list for amendment
     user updates public prerelease access list    Updated public access list
 
 Approve amendment for scheduled release
-    user approves release for scheduled publication    0    12    3001
+    user approves release for scheduled publication    1    12    3001
     user waits for scheduled release to be published immediately
 
 Verify amendment is on Find Statistics page again
@@ -789,7 +789,7 @@ Leave release note for amendment
     user clicks button    Save note
 
 Approve release amendment for scheduled publication
-    user approves release for scheduled publication    0    8    4001
+    user approves release for scheduled publication    2    8    4001
     user waits for scheduled release to be published immediately
 
 Save public release link for later use

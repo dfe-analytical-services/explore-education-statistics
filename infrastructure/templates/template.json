@@ -380,7 +380,7 @@
       "type": "string",
       "defaultValue": "false",
       "metadata": {
-        "description": "Disable the Functions in the Publisher App which allow scheduled Releases to be published immediately"
+        "description": "Enables the Functions in the Publisher App which allow scheduled Releases to be published immediately"
       }
     },
     "teamEmailAddresses": {
