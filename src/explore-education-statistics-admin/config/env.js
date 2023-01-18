@@ -91,10 +91,6 @@ function getClientEnvironment(publicUrl) {
         // Whether or not react-refresh is enabled.
         // It is defined here so it is available in the webpackHotDevClient.
         FAST_REFRESH: process.env.FAST_REFRESH !== 'false',
-        // Polling frequency for the Release Status on the Release Sing-off page.
-        // Smaller values will result in faster feedback, but more server requests.
-        RELEASE_STATUS_POLL_TIME_MILLIS:
-          process.env.RELEASE_STATUS_POLL_TIME_MILLIS,
       },
     );
   // Stringify all values so we can feed into Webpack DefinePlugin
