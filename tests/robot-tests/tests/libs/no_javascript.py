@@ -23,9 +23,7 @@ def user_gets_publications_list(parsed_page):
 
 
 def user_checks_list_contains_publication(list, publication):
-    publication_tag = list.select_one(".govuk-link")
-    if not publication_tag:
-        raise AssertionError("No publication found!")
-    if publication_tag.string == publication:
-        return list
+    for publication_link in list.select(".govuk-link"):
+        if publication_link.string == publication:
+            return list
     raise AssertionError(f'Could not find publication "{publication}"')

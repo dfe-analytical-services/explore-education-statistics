@@ -11,20 +11,8 @@ Test Setup          fail test fast if required
 *** Test Cases ***
 Navigate to Absence publication
     [Tags]    Local
-    user navigates to public frontend
-    user waits until page contains    Explore our statistics and data
-
-    user clicks link    Explore
-    user waits until page contains
-    ...    Find statistics and data
-    ...    %{WAIT_MEDIUM}
-    user waits for page to finish loading
-
-    user clicks radio    Oldest
-    user waits until page contains link    Pupil absence in schools in England
-    user clicks link    Pupil absence in schools in England
+    user navigates to public frontend    %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
     user waits until h1 is visible    Pupil absence in schools in England    %{WAIT_MEDIUM}
-    user checks url contains    %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
 
 Go to Notify me page for Absence publication
     [Tags]    Local
