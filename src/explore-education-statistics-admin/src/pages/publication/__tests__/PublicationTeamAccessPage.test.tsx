@@ -72,27 +72,21 @@ describe('PublicationTeamAccessPage', () => {
     });
 
     expect(
-      screen.getByText(
-        /There are no publication owners or approvers assigned to this publication/,
-      ),
+      screen.getByText(/There are no publication owners or approvers\./),
     ).toBeInTheDocument();
 
     expect(
       screen.queryByText(
-        /To edit the owner\/s and approver\/s for this publication please contact/,
+        /To edit the publication's owners or approvers please contact/,
       ),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByText(
-        /There are no publication approvers assigned to this publication/,
-      ),
+      screen.queryByText(/There are no publication approvers\./),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByText(
-        /There are no publication owners assigned to this publication/,
-      ),
+      screen.queryByText(/There are no publication owners\./),
     ).not.toBeInTheDocument();
 
     expect(
@@ -136,26 +130,20 @@ describe('PublicationTeamAccessPage', () => {
 
     expect(
       screen.getByText(
-        /To edit the owner\/s and approver\/s for this publication please contact/,
+        /To edit the publication's owners or approvers please contact/,
       ),
     ).toBeInTheDocument();
 
     expect(
-      screen.queryByText(
-        /There are no publication owners or approvers assigned to this publication/,
-      ),
+      screen.queryByText(/There are no publication owners or approvers\./),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByText(
-        /There are no publication approvers assigned to this publication/,
-      ),
+      screen.queryByText(/There are no publication approvers\./),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByText(
-        /There are no publication owners assigned to this publication/,
-      ),
+      screen.queryByText(/There are no publication owners\./),
     ).not.toBeInTheDocument();
 
     expect(
@@ -213,27 +201,19 @@ describe('PublicationTeamAccessPage', () => {
     });
 
     expect(
-      screen.getByText(
-        /There are no publication approvers assigned to this publication/,
-      ),
+      screen.getByText(/There are no publication approvers\./),
     ).toBeInTheDocument();
 
     expect(
-      screen.queryByText(
-        /There are no publication owners or approvers assigned to this publication/,
-      ),
+      screen.queryByText(/There are no publication owners or approvers\./),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByText(
-        /To edit the owner\/s and approver\/s for this publication please contact/,
-      ),
+      screen.queryByText(/To edit the publication's owners or approvers\./),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByText(
-        /There are no publication owners assigned to this publication/,
-      ),
+      screen.queryByText(/There are no publication owners\./),
     ).not.toBeInTheDocument();
 
     expect(
@@ -293,27 +273,21 @@ describe('PublicationTeamAccessPage', () => {
     });
 
     expect(
-      screen.getByText(
-        /There are no publication owners assigned to this publication/,
-      ),
+      screen.getByText(/There are no publication owners\./),
     ).toBeInTheDocument();
 
     expect(
-      screen.queryByText(
-        /There are no publication approvers or approvers assigned to this publication/,
-      ),
+      screen.queryByText(/There are no publication owners or approvers\./),
     ).not.toBeInTheDocument();
 
     expect(
       screen.queryByText(
-        /To edit the owner\/s and approver\/s for this publication please contact/,
+        /To edit the publication's owners or approvers please contact/,
       ),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByText(
-        /There are no publication approvers assigned to this publication/,
-      ),
+      screen.queryByText(/There are no publication approvers\./),
     ).not.toBeInTheDocument();
 
     expect(
@@ -402,13 +376,13 @@ describe('PublicationTeamAccessPage', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'Add or remove release contributors',
+        name: 'Manage release contributors',
       }),
     ).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
-        name: 'Add or remove publication contributors',
+        name: 'Manage publication contributors',
       }),
     ).toBeInTheDocument();
   });
@@ -457,13 +431,13 @@ describe('PublicationTeamAccessPage', () => {
 
     expect(
       screen.queryByRole('link', {
-        name: 'Add or remove release contributors',
+        name: 'Manage release contributors',
       }),
     ).not.toBeInTheDocument();
 
     expect(
       screen.queryByRole('link', {
-        name: 'Add or remove publication contributors',
+        name: 'Manage publication contributors',
       }),
     ).not.toBeInTheDocument();
   });
@@ -495,13 +469,13 @@ describe('PublicationTeamAccessPage', () => {
 
     expect(
       screen.queryByRole('link', {
-        name: 'Add or remove release contributors',
+        name: 'Manage release contributors',
       }),
     ).not.toBeInTheDocument();
 
     expect(
       screen.queryByRole('link', {
-        name: 'Add or remove publication contributors',
+        name: 'Manage publication contributors',
       }),
     ).toBeInTheDocument();
   });

@@ -50,7 +50,7 @@ Check can see the readonly "Release access" section of the "Team access" page
     user clicks link    Team access
     user waits until h3 is visible    Release access
     user waits until h3 is not visible    Update release access
-    user waits until page does not contain link    Add or remove release contributors
+    user waits until page does not contain link    Manage release contributors
 
-Check cannot see the "Add or remove publication contributors" functionality of the "Team access" page
-    user waits until page does not contain link    Add or remove publication contributors
+Check cannot see the "Manage publication contributors" functionality of the "Team access" page
+    user waits until page does not contain link    Manage publication contributors

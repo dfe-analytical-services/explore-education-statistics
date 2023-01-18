@@ -111,23 +111,19 @@ const PublicationTeamAccessPage = ({
           <p>
             {model.publicationOwners.length === 0 && (
               <>
-                There are no publication owners assigned to this publication, to
-                assign someone as an owner of this publication, or to edit the
-                approver/s please contact{' '}
+                There are no publication owners. To change this please contact{' '}
               </>
             )}
             {model.publicationApprovers.length === 0 && (
               <>
-                There are no publication approvers assigned to this publication,
-                to assign someone as an approver of this publication, or to edit
-                the owner/s please contact{' '}
+                There are no publication approvers. To change this please
+                contact{' '}
               </>
             )}
             {model.publicationOwners.length > 0 &&
               model.publicationApprovers.length > 0 && (
                 <>
-                  To edit the owner/s and approver/s for this publication please
-                  contact{' '}
+                  To edit the publication's owners or approvers please contact{' '}
                 </>
               )}
             <a href="mailto:explore.statistics@education.gov.uk">
@@ -138,9 +134,8 @@ const PublicationTeamAccessPage = ({
         </>
       ) : (
         <p>
-          There are no publication owners or approvers assigned to this
-          publication, to assign someone as owner or approver of this
-          publication please contact{' '}
+          There are no publication owners or approvers. To change this please
+          contact{' '}
           <a href="mailto:explore.statistics@education.gov.uk">
             explore.statistics@education.gov.uk
           </a>
@@ -159,7 +154,7 @@ const PublicationTeamAccessPage = ({
               },
             )}
           >
-            Add or remove publication contributors
+            Manage publication contributors
           </ButtonLink>
         )}
 

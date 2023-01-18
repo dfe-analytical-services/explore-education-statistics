@@ -90,12 +90,12 @@ describe('PublicationManageTeamAccess', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'Add or remove release contributors',
+        name: 'Manage release contributors',
       }),
     ).toBeInTheDocument();
   });
 
-  test('omits the "Add or remove release contributors" button when requested', async () => {
+  test('omits the "Manage release contributors" button when requested', async () => {
     releasePermissionService.listRoles.mockResolvedValue(testContributors);
     releasePermissionService.listInvites.mockResolvedValue(testInvites);
     render(
@@ -108,7 +108,7 @@ describe('PublicationManageTeamAccess', () => {
 
     expect(
       screen.queryByRole('link', {
-        name: 'Add or remove release contributors',
+        name: 'Manage release contributors',
       }),
     ).not.toBeInTheDocument();
   });

@@ -141,7 +141,7 @@ const PublicationManageReleaseTeamAccess = ({
             },
           )}
         >
-          Add or remove release contributors
+          Manage release contributors
         </ButtonLink>
       )}
     </>

@@ -39,7 +39,7 @@ Sign in as analyst1 and check that the Team access page now contains the Publica
     user signs in as analyst1
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Team access
-    user waits until page contains    There are no publication owners assigned to this publication
+    user waits until page contains    There are no publication owners
     user checks table column heading contains    1    1    Name
     user checks table column heading contains    1    2    Publication role
     user checks table body has x rows    1
