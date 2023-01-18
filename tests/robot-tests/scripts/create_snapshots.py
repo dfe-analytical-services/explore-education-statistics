@@ -38,7 +38,7 @@ class SnapshotService:
         assert response.status_code == 200, f"Requests response wasn't 200!\nResponse: {response}"
         return BeautifulSoup(response.text, "html.parser")
 
-    def _write_to_file(self, name: str, snapshot: list) -> None:
+    def write_to_file(self, name: str, snapshot: list) -> None:
         path = "tests/snapshots"
         if not os.path.exists(path):
             os.makedirs(path)
@@ -48,7 +48,7 @@ class SnapshotService:
         with open(path_to_file, "w") as file:
             file.write(snapshot)
 
-    def create_find_statistics_snapshot(self) -> None:
+    def create_find_statistics_snapshot(self) -> str:
         driver = self.driver
         driver.get(f"{self.public_url}/find-statistics")
 
@@ -116,10 +116,10 @@ class SnapshotService:
                 driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 driver.find_element(By.XPATH, "//*[@data-testid='pagination-next']").click()
             except NoSuchElementException:
-                self._write_to_file("find_statistics_snapshot.json", json.dumps(publications, sort_keys=True, indent=2))
                 break
+        return json.dumps(publications, sort_keys=True, indent=2)
 
-    def create_table_tool_snapshot(self) -> None:
+    def create_table_tool_snapshot(self) -> str:
         driver = self.driver
         driver.get(f"{self.public_url}/data-tables")
 
@@ -138,9 +138,9 @@ class SnapshotService:
 
             themes.append(theme)
 
-        self._write_to_file("table_tool_snapshot.json", json.dumps(themes, sort_keys=True, indent=2))
+        return json.dumps(themes, sort_keys=True, indent=2)
 
-    def create_data_catalogue_snapshot(self) -> None:
+    def create_data_catalogue_snapshot(self) -> str:
         driver = self.driver
         driver.get(f"{self.public_url}/data-catalogue")
 
@@ -159,9 +159,9 @@ class SnapshotService:
 
             themes.append(theme)
 
-        self._write_to_file("data_catalogue_snapshot.json", json.dumps(themes, sort_keys=True, indent=2))
+        return json.dumps(themes, sort_keys=True, indent=2)
 
-    def create_methodologies_snapshot(self) -> None:
+    def create_methodologies_snapshot(self) -> str:
         parsed_html = self._gets_parsed_html_from_page(f"{self.public_url}/methodology")
 
         methodologies_accordion = parsed_html.find(id="themes")
@@ -189,7 +189,7 @@ class SnapshotService:
                 theme["topics"].append(topic)
 
             themes.append(theme)
-        self._write_to_file("methodologies_snapshot.json", json.dumps(themes, sort_keys=True, indent=2))
+        return json.dumps(themes, sort_keys=True, indent=2)
 
 
 if __name__ == "__main__":
@@ -241,8 +241,16 @@ if __name__ == "__main__":
 
     snapshot_service = SnapshotService(args.public_url, driver)
 
-    snapshot_service.create_find_statistics_snapshot()
-    snapshot_service.create_table_tool_snapshot()
-    snapshot_service.create_data_catalogue_snapshot()
-    snapshot_service.create_methodologies_snapshot()
+    find_statistics_snapshot = snapshot_service.create_find_statistics_snapshot()
+    snapshot_service.write_to_file("find_statistics_snapshot.json", find_statistics_snapshot)
+
+    table_tool_snapshot = snapshot_service.create_table_tool_snapshot()
+    snapshot_service.write_to_file("table_tool_snapshot.json", table_tool_snapshot)
+
+    data_catalogue_snapshot = snapshot_service.create_data_catalogue_snapshot()
+    snapshot_service.write_to_file("data_catalogue_snapshot.json", data_catalogue_snapshot)
+
+    methodologies_snapshot = snapshot_service.create_methodologies_snapshot()
+    snapshot_service.write_to_file("methodologies_snapshot.json", methodologies_snapshot)
+
     driver.quit()
