@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             CreateMethodologyForSpecificPublicationRequirement requirement,
             Publication publication)
         {
-            // No user is allowed to create a new methodology of an archived publication
+            // No user is allowed to create a new methodology of an archived or to-be-archived publication
             if (publication.SupersededById.HasValue)
             {
                 return;
