@@ -94,9 +94,10 @@ const PublicationMethodologiesPage = () => {
       <div className="govuk-grid-row  govuk-!-margin-bottom-6">
         <div className="govuk-grid-column-three-quarters">
           <p>
-            Create a new methodology, view or amend an existing methodology,
-            select an existing methodology used in another publication or link
-            to an external file that contains methodology details.
+            Create a new methodology, view, edit or amend an existing
+            methodology, select an existing methodology used in another
+            publication or link to an external file that contains methodology
+            details.
           </p>
 
           {permissions.canCreateMethodologies && (
@@ -350,39 +351,45 @@ const PublicationMethodologiesPage = () => {
         <p>There are no methodologies for this publication yet.</p>
       )}
 
-      <h3>Other options</h3>
-
-      {permissions.canManageExternalMethodology && !externalMethodology && (
+      {((permissions.canManageExternalMethodology && !externalMethodology) ||
+        permissions.canAdoptMethodologies) && (
         <>
-          <Link
-            to={generatePath<PublicationRouteParams>(
-              publicationExternalMethodologyRoute.path,
-              {
-                publicationId: publication.id,
-              },
-            )}
-          >
-            Add external methodology
-          </Link>
-          <p>
-            This is a link to an existing methodology that is hosted externally
-          </p>
-        </>
-      )}
+          <h3>Other options</h3>
 
-      {permissions.canAdoptMethodologies && (
-        <>
-          <Link
-            to={generatePath<PublicationRouteParams>(
-              publicationAdoptMethodologyRoute.path,
-              {
-                publicationId: publication.id,
-              },
-            )}
-          >
-            Adopt an existing methodology
-          </Link>
-          <p>This is a methodology that is owned by another publication</p>
+          {permissions.canManageExternalMethodology && !externalMethodology && (
+            <>
+              <Link
+                to={generatePath<PublicationRouteParams>(
+                  publicationExternalMethodologyRoute.path,
+                  {
+                    publicationId: publication.id,
+                  },
+                )}
+              >
+                Add external methodology
+              </Link>
+              <p>
+                This is a link to an existing methodology that is hosted
+                externally
+              </p>
+            </>
+          )}
+
+          {permissions.canAdoptMethodologies && (
+            <>
+              <Link
+                to={generatePath<PublicationRouteParams>(
+                  publicationAdoptMethodologyRoute.path,
+                  {
+                    publicationId: publication.id,
+                  },
+                )}
+              >
+                Adopt an existing methodology
+              </Link>
+              <p>This is a methodology that is owned by another publication</p>
+            </>
+          )}
         </>
       )}
 

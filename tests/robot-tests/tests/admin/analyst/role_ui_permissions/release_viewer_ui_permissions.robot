@@ -16,16 +16,21 @@ Import permissions test variables
     Import bootstrap data roles and permissions variables
     Set suite variable    ${PUBLICATION_NAME}    ${PUBLICATION_FOR_RELEASE_VIEWER}
 
-Validates release approver publication page is correct
+Validates release viewer publication page is correct
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
 
     user waits until page contains link    Releases
     user waits until page contains link    Methodologies
-    user waits until page contains link    Legacy releases    # remove as part of EES-3794
+    user waits until page contains link    Legacy releases
 
     user checks page does not contain link    Details
     user checks page does not contain link    Contact
     user checks page does not contain link    Team access
+
+Check cannot create a legacy release
+    user clicks link    Legacy releases
+    user waits until h2 is visible    Legacy releases
+    user checks page does not contain button    Create legacy release
 
 Check cannot create a Methodology for a Publication if they don't have Publication Owner role
     user goes to methodologies and checks cannot create methodologies for publication    ${PUBLICATION_NAME}

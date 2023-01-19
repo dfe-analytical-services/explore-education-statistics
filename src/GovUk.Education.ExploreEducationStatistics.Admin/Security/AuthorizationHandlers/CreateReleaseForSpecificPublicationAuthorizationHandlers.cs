@@ -1,3 +1,4 @@
+#nullable enable
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -9,9 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 {
     public class CreateReleaseForSpecificPublicationRequirement : IAuthorizationRequirement
     {
-    }	
+    }
 
-    public class CreateReleaseForSpecificPublicationAuthorizationHandler 
+    public class CreateReleaseForSpecificPublicationAuthorizationHandler
         : AuthorizationHandler<CreateReleaseForSpecificPublicationRequirement, Publication>
     {
         private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
@@ -26,12 +27,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             CreateReleaseForSpecificPublicationRequirement requirement,
             Publication publication)
         {
+            // No user is allowed to create a new release of an archived publication
+            if (publication.SupersededById.HasValue)
+            {
+                return;
+            }
+
             if (SecurityUtils.HasClaim(context.User, CreateAnyRelease))
             {
                 context.Succeed(requirement);
                 return;
             }
-            
+
             if (await _authorizationHandlerResourceRoleService
                     .HasRolesOnPublication(
                         context.User.GetUserId(),

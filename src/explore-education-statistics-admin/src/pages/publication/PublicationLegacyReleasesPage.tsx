@@ -8,7 +8,7 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 
 const PublicationLegacyReleasesPage = () => {
-  const { publicationId } = usePublicationContext();
+  const { publicationId, publication } = usePublicationContext();
 
   const { value: legacyReleases = [], isLoading } = useAsyncHandledRetry<
     LegacyRelease[]
@@ -24,6 +24,9 @@ const PublicationLegacyReleasesPage = () => {
     <>
       <h2>Legacy releases</h2>
       <LegacyReleasesTable
+        canManageLegacyReleases={
+          publication.permissions.canManageLegacyReleases
+        }
         legacyReleases={legacyReleases}
         publicationId={publicationId}
       />

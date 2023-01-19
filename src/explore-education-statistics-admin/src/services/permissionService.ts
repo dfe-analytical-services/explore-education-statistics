@@ -50,11 +50,6 @@ const permissionService = {
   canCreatePublicationForTopic(topicId: string): Promise<boolean> {
     return client.get(`/permissions/topic/${topicId}/publication/create`);
   },
-  canCreateReleaseForPublication(publicationId: string): Promise<boolean> {
-    return client.get(
-      `/permissions/publication/${publicationId}/release/create`,
-    );
-  },
   canUpdateMethodology(methodologyId: string): Promise<boolean> {
     return client.get(`/permissions/methodology/${methodologyId}/update`);
   },

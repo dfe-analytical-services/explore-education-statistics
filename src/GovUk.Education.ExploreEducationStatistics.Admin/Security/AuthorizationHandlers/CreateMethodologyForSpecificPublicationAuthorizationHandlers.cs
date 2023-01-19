@@ -1,3 +1,4 @@
+#nullable enable
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -20,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
         public CreateMethodologyForSpecificPublicationAuthorizationHandler(
-            ContentDbContext context, 
+            ContentDbContext context,
             AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
         {
             _context = context;
@@ -32,7 +33,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             CreateMethodologyForSpecificPublicationRequirement requirement,
             Publication publication)
         {
-            // If a Publication owns a Methodology already, they cannot own another.
+            // No user is allowed to create a new methodology of an archived or to-be-archived publication
+            if (publication.SupersededById.HasValue)
+            {
+                return;
+            }
+
+            // If a publication owns a methodology already, they cannot own another
             if (await _context.PublicationMethodologies
                 .AnyAsync(pm => pm.PublicationId == publication.Id && pm.Owner))
             {

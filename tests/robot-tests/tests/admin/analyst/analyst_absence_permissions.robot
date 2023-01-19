@@ -32,7 +32,60 @@ Navigate to Pupil absence Publication page
     user clicks link    Pupil absence in schools in England
     user waits until h1 is visible    Pupil absence in schools in England
 
-Validate Analyst1 cannot create a release for Pupil absence topic
+Navigate to legacy releases
+    user clicks link    Legacy releases
+    user waits until h2 is visible    Legacy releases
+
+Validate Analyst1 can see correct legacy releases
+    user checks element count is x    css:tbody tr    6
+
+    user checks table cell contains    1    1    5
+    user checks table cell contains    1    2    Academic Year 2014/15
+    user checks table cell contains    1    3
+    ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015
+
+    user checks table cell contains    2    1    4
+    user checks table cell contains    2    2    Academic Year 2013/14
+    user checks table cell contains    2    3
+    ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014
+
+    user checks table cell contains    3    1    3
+    user checks table cell contains    3    2    Academic Year 2012/13
+    user checks table cell contains    3    3
+    ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013
+
+    user checks table cell contains    4    1    2
+    user checks table cell contains    4    2    Academic Year 2011/12
+    user checks table cell contains    4    3
+    ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics
+
+    user checks table cell contains    5    1    1
+    user checks table cell contains    5    2    Academic Year 2010/11
+    user checks table cell contains    5    3
+    ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011
+
+    user checks table cell contains    6    1    0
+    user checks table cell contains    6    2    Academic Year 2009/10
+    user checks table cell contains    6    3
+    ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010
+
+Check Analyst1 cannot create a legacy release
+    user checks page does not contain button    Create legacy release
+
+Check Analyst1 cannot reorder legacy releases
+    user checks page does not contain button    Reorder legacy releases
+
+Check Analyst1 cannot edit a legacy release
+    user checks page does not contain button    Edit
+
+Check Analyst1 cannot delete a legacy release
+    user checks page does not contain button    Delete
+
+Navigate to releases
+    user clicks link    Releases
+    user waits until h2 is visible    Manage releases
+
+Validate Analyst1 cannot create a release for Pupil absence publication
     user checks page does not contain    link:Create new release
 
 Navigate to Absence release

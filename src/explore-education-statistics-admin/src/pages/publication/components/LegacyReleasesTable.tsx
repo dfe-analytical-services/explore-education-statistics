@@ -44,10 +44,12 @@ const getModalTitle = (confirmAction?: ConfirmAction): string => {
 };
 
 interface Props {
+  canManageLegacyReleases: boolean;
   legacyReleases: LegacyRelease[];
   publicationId: string;
 }
 const LegacyReleasesTable = ({
+  canManageLegacyReleases,
   legacyReleases: initialLegacyReleases,
   publicationId,
 }: Props) => {
@@ -99,7 +101,9 @@ const LegacyReleasesTable = ({
                     <th>Order</th>
                     <th>Description</th>
                     <th>URL</th>
-                    {!isReordering && <th>Actions</th>}
+                    {canManageLegacyReleases && !isReordering && (
+                      <th>Actions</th>
+                    )}
                   </tr>
                 </thead>
                 <DroppableArea
@@ -137,7 +141,7 @@ const LegacyReleasesTable = ({
                         </a>
                       </td>
 
-                      {!isReordering && (
+                      {canManageLegacyReleases && !isReordering && (
                         <td>
                           <ButtonGroup className="govuk-!-margin-bottom-0">
                             <ButtonText
@@ -180,7 +184,7 @@ const LegacyReleasesTable = ({
         <p>No legacy releases for this publication.</p>
       )}
 
-      {!isReordering ? (
+      {canManageLegacyReleases && !isReordering && (
         <ButtonGroup>
           <Button onClick={() => setConfirmAction({ type: 'create' })}>
             Create legacy release
@@ -195,7 +199,9 @@ const LegacyReleasesTable = ({
             </Button>
           )}
         </ButtonGroup>
-      ) : (
+      )}
+
+      {isReordering && (
         <ButtonGroup>
           <Button
             onClick={async () => {
