@@ -52,5 +52,5 @@ Check can see the readonly "Release access" section of the "Team access" page
     user waits until h3 is not visible    Update release access
     user waits until page does not contain link    Manage release contributors
 
-Check cannot see the "Manage publication contributors" functionality of the "Team access" page
-    user waits until page does not contain link    Manage publication contributors
+Check cannot see the "Invite publication contributors" functionality of the "Team access" page
+    user waits until page does not contain link    Invite publication contributors

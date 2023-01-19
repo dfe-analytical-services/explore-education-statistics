@@ -18,7 +18,7 @@ import { generatePath, useHistory } from 'react-router-dom';
 import { UserPublicationRole } from '@admin/services/userService';
 import orderBy from 'lodash/orderBy';
 import ButtonLink from '@admin/components/ButtonLink';
-import PublicationManageReleaseTeamAccess from '@admin/pages/publication/components/PublicationManageReleaseTeamAccess';
+import PublicationReleaseAccess from '@admin/pages/publication/components/PublicationReleaseAccess';
 
 interface Model {
   releases: ReleaseSummary[];
@@ -89,11 +89,12 @@ const PublicationTeamAccessPage = ({
 
       {model.publicationRoles.length ? (
         <>
-          <table>
+          <table data-testid="publicationRoles">
             <thead>
               <tr>
-                <th className="govuk-!-width-one-half">Name</th>
-                <th>Publication role</th>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Publication role</th>
               </tr>
             </thead>
             <tbody>
@@ -103,6 +104,7 @@ const PublicationTeamAccessPage = ({
               ]).map(role => (
                 <tr key={`${role.id}_${role.role}`}>
                   <td>{role.userName}</td>
+                  <td>{role.email}</td>
                   <td>{role.role}</td>
                 </tr>
               ))}
@@ -154,7 +156,7 @@ const PublicationTeamAccessPage = ({
               },
             )}
           >
-            Manage publication contributors
+            Invite publication contributors
           </ButtonLink>
         )}
 
@@ -162,45 +164,43 @@ const PublicationTeamAccessPage = ({
         <>
           {model?.releases.length ? (
             <>
-              <div className="govuk-grid-row govuk-!-margin-bottom-4 govuk-!-margin-top-8">
-                <div className="govuk-grid-column-full">
-                  <h3>
-                    {model.permissions.canUpdateContributorReleaseRole
-                      ? 'Update release access'
-                      : 'Release access'}
-                  </h3>
+              <div>
+                <h3>
+                  {model.permissions.canUpdateContributorReleaseRole
+                    ? 'Update release access'
+                    : 'Release access'}
+                </h3>
 
-                  <FormSelect
-                    id="currentRelease"
-                    name="release"
-                    label="Select release"
-                    options={model?.releases.map(release => ({
-                      label: release.title,
-                      value: release.id,
-                    }))}
-                    order={[]}
-                    value={currentReleaseId}
-                    onChange={e => {
-                      setCurrentReleaseId(e.target.value);
-                      history.replace(
-                        generatePath<PublicationTeamRouteParams>(
-                          publicationTeamAccessRoute.path,
-                          {
-                            publicationId,
-                            releaseId: e.target.value,
-                          },
-                        ),
-                      );
-                    }}
-                  />
-                </div>
+                <FormSelect
+                  id="currentRelease"
+                  name="release"
+                  label="Select release"
+                  options={model?.releases.map(release => ({
+                    label: release.title,
+                    value: release.id,
+                  }))}
+                  order={[]}
+                  value={currentReleaseId}
+                  onChange={e => {
+                    setCurrentReleaseId(e.target.value);
+                    history.replace(
+                      generatePath<PublicationTeamRouteParams>(
+                        publicationTeamAccessRoute.path,
+                        {
+                          publicationId,
+                          releaseId: e.target.value,
+                        },
+                      ),
+                    );
+                  }}
+                />
               </div>
 
               {currentRelease && (
-                <PublicationManageReleaseTeamAccess
+                <PublicationReleaseAccess
                   publicationId={publicationId}
                   release={currentRelease}
-                  showManageContributorsButton={
+                  hasReleaseTeamManagementPermission={
                     model.permissions.canUpdateContributorReleaseRole
                   }
                 />

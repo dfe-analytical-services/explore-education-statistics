@@ -105,18 +105,21 @@ describe('PublicationTeamAccessPage', () => {
         publication: 'publication',
         role: 'Owner',
         userName: 'Analyst1 User1',
+        email: 'analyst1@example.com',
       },
       {
         id: 'role-2',
         publication: 'publication',
         role: 'Owner',
         userName: 'Analyst2 User2',
+        email: 'analyst2@example.com',
       },
       {
         id: 'role-3',
         publication: 'publication',
         role: 'Approver',
         userName: 'Analyst2 User2',
+        email: 'analyst2@example.com',
       },
     ]);
 
@@ -156,20 +159,25 @@ describe('PublicationTeamAccessPage', () => {
     expect(rows).toHaveLength(4);
 
     const headerCells = within(rows[0]).getAllByRole('columnheader');
+    expect(headerCells).toHaveLength(3);
     expect(headerCells[0]).toHaveTextContent('Name');
-    expect(headerCells[1]).toHaveTextContent('Publication role');
+    expect(headerCells[1]).toHaveTextContent('Email');
+    expect(headerCells[2]).toHaveTextContent('Publication role');
 
     const row1Cells = within(rows[1]).getAllByRole('cell');
     expect(row1Cells[0]).toHaveTextContent('Analyst1 User1');
-    expect(row1Cells[1]).toHaveTextContent('Owner');
+    expect(row1Cells[1]).toHaveTextContent('analyst1@example.com');
+    expect(row1Cells[2]).toHaveTextContent('Owner');
 
     const row2Cells = within(rows[2]).getAllByRole('cell');
     expect(row2Cells[0]).toHaveTextContent('Analyst2 User2');
-    expect(row2Cells[1]).toHaveTextContent('Approver');
+    expect(row2Cells[1]).toHaveTextContent('analyst2@example.com');
+    expect(row2Cells[2]).toHaveTextContent('Approver');
 
     const row3Cells = within(rows[3]).getAllByRole('cell');
     expect(row3Cells[0]).toHaveTextContent('Analyst2 User2');
-    expect(row3Cells[1]).toHaveTextContent('Owner');
+    expect(row2Cells[1]).toHaveTextContent('analyst2@example.com');
+    expect(row3Cells[2]).toHaveTextContent('Owner');
   });
 
   test('renders the page correctly with only publication owners assigned', async () => {
@@ -183,12 +191,14 @@ describe('PublicationTeamAccessPage', () => {
         publication: 'publication',
         role: 'Owner',
         userName: 'Analyst1 User1',
+        email: 'analyst1@example.com',
       },
       {
         id: 'role-2',
         publication: 'publication',
         role: 'Owner',
         userName: 'Analyst2 User2',
+        email: 'analyst2@example.com',
       },
     ]);
 
@@ -227,15 +237,18 @@ describe('PublicationTeamAccessPage', () => {
 
     const headerCells = within(rows[0]).getAllByRole('columnheader');
     expect(headerCells[0]).toHaveTextContent('Name');
-    expect(headerCells[1]).toHaveTextContent('Publication role');
+    expect(headerCells[1]).toHaveTextContent('Email');
+    expect(headerCells[2]).toHaveTextContent('Publication role');
 
     const row1Cells = within(rows[1]).getAllByRole('cell');
     expect(row1Cells[0]).toHaveTextContent('Analyst1 User1');
-    expect(row1Cells[1]).toHaveTextContent('Owner');
+    expect(row1Cells[1]).toHaveTextContent('analyst1@example.com');
+    expect(row1Cells[2]).toHaveTextContent('Owner');
 
     const row2Cells = within(rows[2]).getAllByRole('cell');
     expect(row2Cells[0]).toHaveTextContent('Analyst2 User2');
-    expect(row2Cells[1]).toHaveTextContent('Owner');
+    expect(row2Cells[1]).toHaveTextContent('analyst2@example.com');
+    expect(row2Cells[2]).toHaveTextContent('Owner');
   });
 
   test('renders the page correctly with only publication approvers assigned', async () => {
@@ -249,12 +262,14 @@ describe('PublicationTeamAccessPage', () => {
         publication: 'publication',
         role: 'Approver',
         userName: 'Analyst1 User1',
+        email: 'analyst1@example.com',
       },
       {
         id: 'role-2',
         publication: 'publication',
         role: 'Approver',
         userName: 'Analyst2 User2',
+        email: 'analyst2@example.com',
       },
     ]);
 
@@ -301,15 +316,18 @@ describe('PublicationTeamAccessPage', () => {
 
     const headerCells = within(rows[0]).getAllByRole('columnheader');
     expect(headerCells[0]).toHaveTextContent('Name');
-    expect(headerCells[1]).toHaveTextContent('Publication role');
+    expect(headerCells[1]).toHaveTextContent('Email');
+    expect(headerCells[2]).toHaveTextContent('Publication role');
 
     const row1Cells = within(rows[1]).getAllByRole('cell');
     expect(row1Cells[0]).toHaveTextContent('Analyst1 User1');
-    expect(row1Cells[1]).toHaveTextContent('Approver');
+    expect(row1Cells[1]).toHaveTextContent('analyst1@example.com');
+    expect(row1Cells[2]).toHaveTextContent('Approver');
 
     const row2Cells = within(rows[2]).getAllByRole('cell');
     expect(row2Cells[0]).toHaveTextContent('Analyst2 User2');
-    expect(row2Cells[1]).toHaveTextContent('Approver');
+    expect(row2Cells[1]).toHaveTextContent('analyst2@example.com');
+    expect(row2Cells[2]).toHaveTextContent('Approver');
   });
 
   test('renders the page correctly with no releases', async () => {
@@ -364,15 +382,31 @@ describe('PublicationTeamAccessPage', () => {
     expect(releases[2]).toHaveTextContent('Academic Year 2021/22');
     expect(releases[2]).toHaveValue('release-3');
 
-    expect(screen.getByTestId('Release-value')).toHaveTextContent(
+    expect(screen.getByTestId('Release')).toHaveTextContent(
       'Academic Year 2023/24 (Not live)',
     );
-    expect(screen.getByTestId('Status-value')).toHaveTextContent('Draft');
+    expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
 
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(3);
-    expect(within(rows[1]).getByText('User 1')).toBeInTheDocument();
-    expect(within(rows[2]).getByText('user2@test.com')).toBeInTheDocument();
+
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+    expect(within(row1Cells[0]).getByText('User 1')).toBeInTheDocument();
+    expect(
+      within(row1Cells[1]).getByText('user1@test.com'),
+    ).toBeInTheDocument();
+    expect(
+      within(row1Cells[2]).getByRole('button', { name: 'Remove User 1' }),
+    ).toBeInTheDocument();
+
+    const row2Cells = within(rows[2]).getAllByRole('cell');
+    expect(row2Cells[0]).toHaveTextContent('');
+    expect(row2Cells[1]).toHaveTextContent('user2@test.com');
+    expect(
+      within(row2Cells[2]).getByRole('button', {
+        name: 'Cancel invite for user2@test.com',
+      }),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
@@ -382,7 +416,7 @@ describe('PublicationTeamAccessPage', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'Manage publication contributors',
+        name: 'Invite publication contributors',
       }),
     ).toBeInTheDocument();
   });
@@ -419,15 +453,30 @@ describe('PublicationTeamAccessPage', () => {
     expect(releases[2]).toHaveTextContent('Academic Year 2021/22');
     expect(releases[2]).toHaveValue('release-3');
 
-    expect(screen.getByTestId('Release-value')).toHaveTextContent(
+    expect(screen.getByTestId('Release')).toHaveTextContent(
       'Academic Year 2023/24 (Not live)',
     );
-    expect(screen.getByTestId('Status-value')).toHaveTextContent('Draft');
+    expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
 
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(3);
-    expect(within(rows[1]).getByText('User 1')).toBeInTheDocument();
-    expect(within(rows[2]).getByText('user2@test.com')).toBeInTheDocument();
+
+    const headerCells = within(rows[0]).getAllByRole('columnheader');
+    expect(headerCells).toHaveLength(2);
+    expect(headerCells[0]).toHaveTextContent('Name');
+    expect(headerCells[1]).toHaveTextContent('Email');
+
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+    expect(row1Cells).toHaveLength(2);
+    expect(within(row1Cells[0]).getByText('User 1')).toBeInTheDocument();
+    expect(
+      within(row1Cells[1]).getByText('user1@test.com'),
+    ).toBeInTheDocument();
+
+    const row2Cells = within(rows[2]).getAllByRole('cell');
+    expect(row2Cells[0]).toHaveTextContent('');
+    expect(row2Cells[1]).toHaveTextContent('user2@test.com');
+    expect(row2Cells[1]).toHaveTextContent('Pending invite');
 
     expect(
       screen.queryByRole('link', {
@@ -437,7 +486,7 @@ describe('PublicationTeamAccessPage', () => {
 
     expect(
       screen.queryByRole('link', {
-        name: 'Manage publication contributors',
+        name: 'Invite publication contributors',
       }),
     ).not.toBeInTheDocument();
   });
@@ -475,7 +524,7 @@ describe('PublicationTeamAccessPage', () => {
 
     expect(
       screen.queryByRole('link', {
-        name: 'Manage publication contributors',
+        name: 'Invite publication contributors',
       }),
     ).toBeInTheDocument();
   });
@@ -500,10 +549,10 @@ describe('PublicationTeamAccessPage', () => {
     ).toBeInTheDocument();
 
     expect(screen.getByLabelText('Select release')).toHaveValue('release-3');
-    expect(screen.getByTestId('Release-value')).toHaveTextContent(
+    expect(screen.getByTestId('Release')).toHaveTextContent(
       'Academic Year 2021/22',
     );
-    expect(screen.getByTestId('Status-value')).toHaveTextContent('Approved');
+    expect(screen.getByTestId('Status')).toHaveTextContent('Approved');
   });
 
   test('selects the first release if no release is set in the url', async () => {
@@ -523,10 +572,10 @@ describe('PublicationTeamAccessPage', () => {
     expect(screen.getByText('Update release access')).toBeInTheDocument();
 
     expect(screen.getByLabelText('Select release')).toHaveValue('release-1');
-    expect(screen.getByTestId('Release-value')).toHaveTextContent(
+    expect(screen.getByTestId('Release')).toHaveTextContent(
       'Academic Year 2023/24 (Not live)',
     );
-    expect(screen.getByTestId('Status-value')).toHaveTextContent('Draft');
+    expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
 
     expect(history.location.pathname).toBe(
       `/publication/publication-1/team/release-1`,
@@ -552,10 +601,10 @@ describe('PublicationTeamAccessPage', () => {
     ).toBeInTheDocument();
 
     expect(screen.getByLabelText('Select release')).toHaveValue('release-1');
-    expect(screen.getByTestId('Release-value')).toHaveTextContent(
+    expect(screen.getByTestId('Release')).toHaveTextContent(
       'Academic Year 2023/24 (Not live)',
     );
-    expect(screen.getByTestId('Status-value')).toHaveTextContent('Draft');
+    expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
 
     expect(history.location.pathname).toBe(
       `/publication/publication-1/team/release-1`,
@@ -569,11 +618,11 @@ describe('PublicationTeamAccessPage', () => {
     expect(screen.getByLabelText('Select release')).toHaveValue('release-2');
 
     await waitFor(() => {
-      expect(screen.getByTestId('Release-value')).toHaveTextContent(
+      expect(screen.getByTestId('Release')).toHaveTextContent(
         'Academic Year 2022/23 (Not live)',
       );
     });
-    expect(screen.getByTestId('Status-value')).toHaveTextContent('Draft');
+    expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
 
     expect(history.location.pathname).toBe(
       `/publication/publication-1/team/release-2`,

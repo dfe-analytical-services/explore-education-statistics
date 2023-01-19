@@ -1,4 +1,4 @@
-import PublicationManageReleaseTeamAccess from '@admin/pages/publication/components/PublicationManageReleaseTeamAccess';
+import PublicationReleaseAccess from '@admin/pages/publication/components/PublicationReleaseAccess';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import _userService from '@admin/services/userService';
 import _releasePermissionService, {
@@ -23,7 +23,7 @@ const releasePermissionService = _releasePermissionService as jest.Mocked<
 jest.mock('@admin/services/userService');
 const userService = _userService as jest.Mocked<typeof _userService>;
 
-describe('PublicationManageTeamAccess', () => {
+describe('PublicationReleaseAccess', () => {
   const testPublicationId = 'publication-1';
 
   const testRelease: ReleaseSummary = {
@@ -63,30 +63,34 @@ describe('PublicationManageTeamAccess', () => {
     releasePermissionService.listRoles.mockResolvedValue(testContributors);
     releasePermissionService.listInvites.mockResolvedValue(testInvites);
     render(
-      <PublicationManageReleaseTeamAccess
+      <PublicationReleaseAccess
         publicationId={testPublicationId}
         release={testRelease}
-        showManageContributorsButton
+        hasReleaseTeamManagementPermission
       />,
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('Release-value')).toHaveTextContent(
+      expect(screen.getByTestId('Release')).toHaveTextContent(
         'Academic Year 2000/01 (Not live)',
       );
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId('Status-value')).toHaveTextContent('Draft');
+      expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
     });
 
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(3);
 
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+    expect(within(row1Cells[0]).getByText('User 1')).toBeInTheDocument();
     expect(
-      within(rows[1]).getByText('User 1 (user1@test.com)'),
+      within(row1Cells[1]).getByText('user1@test.com'),
     ).toBeInTheDocument();
-    expect(within(rows[2]).getByText('user2@test.com')).toBeInTheDocument();
+    expect(
+      within(row1Cells[2]).getByRole('button', { name: 'Remove User 1' }),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
@@ -99,10 +103,10 @@ describe('PublicationManageTeamAccess', () => {
     releasePermissionService.listRoles.mockResolvedValue(testContributors);
     releasePermissionService.listInvites.mockResolvedValue(testInvites);
     render(
-      <PublicationManageReleaseTeamAccess
+      <PublicationReleaseAccess
         publicationId={testPublicationId}
         release={testRelease}
-        showManageContributorsButton={false}
+        hasReleaseTeamManagementPermission={false}
       />,
     );
 
@@ -117,10 +121,10 @@ describe('PublicationManageTeamAccess', () => {
     releasePermissionService.listRoles.mockResolvedValue([]);
     releasePermissionService.listInvites.mockResolvedValue([]);
     render(
-      <PublicationManageReleaseTeamAccess
+      <PublicationReleaseAccess
         publicationId={testPublicationId}
         release={testRelease}
-        showManageContributorsButton
+        hasReleaseTeamManagementPermission
       />,
     );
 
@@ -139,21 +143,21 @@ describe('PublicationManageTeamAccess', () => {
     releasePermissionService.listRoles.mockResolvedValue(testContributors);
     releasePermissionService.listInvites.mockResolvedValue(testInvites);
     render(
-      <PublicationManageReleaseTeamAccess
+      <PublicationReleaseAccess
         publicationId={testPublicationId}
         release={testRelease}
-        showManageContributorsButton
+        hasReleaseTeamManagementPermission
       />,
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('Release-value')).toHaveTextContent(
+      expect(screen.getByTestId('Release')).toHaveTextContent(
         'Academic Year 2000/01 (Not live)',
       );
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId('Status-value')).toHaveTextContent('Draft');
+      expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
     });
 
     userEvent.click(screen.getByRole('button', { name: 'Remove User 1' }));
@@ -175,21 +179,21 @@ describe('PublicationManageTeamAccess', () => {
     releasePermissionService.listRoles.mockResolvedValue(testContributors);
     releasePermissionService.listInvites.mockResolvedValue(testInvites);
     render(
-      <PublicationManageReleaseTeamAccess
+      <PublicationReleaseAccess
         publicationId={testPublicationId}
         release={testRelease}
-        showManageContributorsButton
+        hasReleaseTeamManagementPermission
       />,
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('Release-value')).toHaveTextContent(
+      expect(screen.getByTestId('Release')).toHaveTextContent(
         'Academic Year 2000/01 (Not live)',
       );
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId('Status-value')).toHaveTextContent('Draft');
+      expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
     });
 
     userEvent.click(

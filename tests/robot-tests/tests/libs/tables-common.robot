@@ -27,6 +27,12 @@ user checks table cell contains
     user waits until parent contains element    ${parent}
     ...    xpath:.//tbody/tr[${row}]/td[${column}][contains(., "${expected}")]
 
+user checks table cell contains element
+    [Arguments]    ${row}    ${column}    ${element}    ${parent}=css:table
+    user waits until parent contains element    ${parent}    xpath:.//tbody/tr[${row}]/td[${column}]
+    ${cell}=    get child element    ${parent}    xpath:.//tbody/tr[${row}]/td[${column}]
+    user waits until parent contains element    ${cell}    ${element}
+
 user checks table heading in offset row contains
     [Arguments]    ${row}    ${offset}    ${column}    ${expected}    ${parent}=css:table
     ${offset_row}=    evaluate    int(${row}) + int(${offset})

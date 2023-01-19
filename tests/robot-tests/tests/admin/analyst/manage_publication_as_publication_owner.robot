@@ -23,7 +23,7 @@ Check that no publication roles are listed yet on the Team access page
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user waits until page contains link    Team access
     user clicks link    Team access
-    user waits until page contains    There are no publication owners or approvers assigned to this publication
+    user waits until page contains    There are no publication owners or approvers.
 
 Assign publication owner permissions to analyst1
     user adds publication role to user via api
@@ -36,11 +36,13 @@ Sign in as analyst1 and check that the Team access page now contains the Publica
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Team access
     user waits until page contains    There are no publication approvers
-    user checks table column heading contains    1    1    Name
-    user checks table column heading contains    1    2    Publication role
-    user checks table body has x rows    1
-    user checks table cell contains    1    1    Analyst1 User1
-    user checks table cell contains    1    2    Owner
+    user checks table column heading contains    1    1    Name    testid:publicationRoles
+    user checks table column heading contains    1    2    Email    testid:publicationRoles
+    user checks table column heading contains    1    3    Publication role    testid:publicationRoles
+    user checks table body has x rows    1    testid:publicationRoles
+    user checks table cell contains    1    1    Analyst1 User1    testid:publicationRoles
+    user checks table cell contains    1    2    ees-test.analyst1@education.gov.uk    testid:publicationRoles
+    user checks table cell contains    1    3    Owner    testid:publicationRoles
 
 Update publication contact
     user clicks link    Contact

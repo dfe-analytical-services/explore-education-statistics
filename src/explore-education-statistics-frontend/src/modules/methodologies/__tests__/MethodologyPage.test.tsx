@@ -18,7 +18,7 @@ describe('MethodologyPage', () => {
       }),
     ).toBeInTheDocument();
 
-    expect(screen.getByTestId('Published-value')).toHaveTextContent(
+    expect(screen.getByTestId('Published')).toHaveTextContent(
       '16 February 2021',
     );
 
@@ -159,7 +159,7 @@ describe('MethodologyPage', () => {
     test(`renders 'Last updated' with the date of the most recent note`, () => {
       render(<MethodologyPage data={testMethodology} />);
 
-      expect(screen.getByTestId('Last updated-value')).toHaveTextContent(
+      expect(screen.getByTestId('Last updated')).toHaveTextContent(
         '15 September 2021',
       );
     });

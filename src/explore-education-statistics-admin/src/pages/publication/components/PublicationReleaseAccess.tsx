@@ -1,5 +1,5 @@
 import ButtonLink from '@admin/components/ButtonLink';
-import UserReleaseRoleTable from '@admin/pages/publication/components/ReleaseUserTable';
+import ReleaseUserTable from '@admin/pages/publication/components/ReleaseUserTable';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import {
   PublicationTeamRouteParams,
@@ -23,13 +23,13 @@ import SummaryListItem from '@common/components/SummaryListItem';
 interface Props {
   publicationId: string;
   release: ReleaseSummary;
-  showManageContributorsButton: boolean;
+  hasReleaseTeamManagementPermission: boolean;
 }
 
-const PublicationManageReleaseTeamAccess = ({
+const PublicationReleaseAccess = ({
   publicationId,
   release,
-  showManageContributorsButton,
+  hasReleaseTeamManagementPermission = false,
 }: Props) => {
   const {
     value,
@@ -55,36 +55,38 @@ const PublicationManageReleaseTeamAccess = ({
     };
   }, [release]);
 
-  const handleUserRemove = async (userId: string) => {
-    await releasePermissionService.removeAllUserContributorPermissionsForPublication(
-      publicationId,
-      userId,
-    );
-    setUsersAndInvites({
-      value: {
-        contributors: contributors.filter(c => c.userId !== userId),
-        contributorInvites,
-        approvers,
-        approverInvites,
-      },
-    });
-  };
+  const handleUserRemove = hasReleaseTeamManagementPermission
+    ? async (userId: string) => {
+        await releasePermissionService.removeAllUserContributorPermissionsForPublication(
+          publicationId,
+          userId,
+        );
+        setUsersAndInvites({
+          value: {
+            contributors: contributors.filter(c => c.userId !== userId),
+            contributorInvites,
+            approvers,
+            approverInvites,
+          },
+        });
+      }
+    : undefined;
 
-  const handleUserInvitesRemove = async (email: string) => {
-    await userService.removeContributorReleaseInvites(email, publicationId);
-    setUsersAndInvites({
-      value: {
-        contributors,
-        contributorInvites: contributorInvites.filter(i => i.email !== email),
-        approvers,
-        approverInvites,
-      },
-    });
-  };
-
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
+  const handleUserInvitesRemove = hasReleaseTeamManagementPermission
+    ? async (email: string) => {
+        await userService.removeContributorReleaseInvites(email, publicationId);
+        setUsersAndInvites({
+          value: {
+            contributors,
+            contributorInvites: contributorInvites.filter(
+              i => i.email !== email,
+            ),
+            approvers,
+            approverInvites,
+          },
+        });
+      }
+    : undefined;
 
   const {
     approvers = [],
@@ -94,7 +96,7 @@ const PublicationManageReleaseTeamAccess = ({
   } = value ?? {};
 
   return (
-    <>
+    <LoadingSpinner loading={isLoading}>
       <SummaryList className="govuk-!-margin-bottom-8">
         <SummaryListItem term="Release">
           {`${release.title}${!release.live ? ' (Not live)' : ''}`}
@@ -114,7 +116,11 @@ const PublicationManageReleaseTeamAccess = ({
           There are no approvers or pending approver invites for this release.
         </WarningMessage>
       ) : (
-        <UserReleaseRoleTable users={approvers} invites={approverInvites} />
+        <ReleaseUserTable
+          data-testid="releaseApprovers"
+          users={approvers}
+          invites={approverInvites}
+        />
       )}
 
       <h4 className="govuk-!-margin-bottom-0">Release contributors</h4>
@@ -124,14 +130,15 @@ const PublicationManageReleaseTeamAccess = ({
           release.
         </WarningMessage>
       ) : (
-        <UserReleaseRoleTable
+        <ReleaseUserTable
+          data-testid="releaseContributors"
           users={contributors}
           invites={contributorInvites}
           onUserRemove={handleUserRemove}
           onUserInvitesRemove={handleUserInvitesRemove}
         />
       )}
-      {showManageContributorsButton && (
+      {hasReleaseTeamManagementPermission && (
         <ButtonLink
           to={generatePath<PublicationTeamRouteParams>(
             publicationManageReleaseContributorsPageRoute.path,
@@ -144,8 +151,8 @@ const PublicationManageReleaseTeamAccess = ({
           Manage release contributors
         </ButtonLink>
       )}
-    </>
+    </LoadingSpinner>
   );
 };
 
-export default PublicationManageReleaseTeamAccess;
+export default PublicationReleaseAccess;

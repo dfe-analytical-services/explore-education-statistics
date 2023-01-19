@@ -7,7 +7,7 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class UserViewModel
+    public record UserViewModel
     {
         public Guid Id { get; set; }
 
@@ -22,19 +22,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public List<UserReleaseRoleViewModel> UserReleaseRoles { get; set; } = new();
     }
 
-    public class UserPublicationRoleViewModel
+    public record UserPublicationRoleViewModel
     {
         public Guid Id { get; set; }
         
-        public string Publication { get; set; } = null!;
+        public string Publication { get; set; } = string.Empty;
         
         [JsonConverter(typeof(StringEnumConverter))]
         public PublicationRole Role { get; set; }
         
-        public string UserName { get; set; } = null!;
+        public string UserName { get; set; } = string.Empty;
+        
+        public string Email { get; set; } = string.Empty;
     }
     
-    public class UserReleaseRoleViewModel
+    public record UserReleaseRoleViewModel
     {
         public Guid Id { get; set; }
         

@@ -10,15 +10,17 @@ import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 
 interface Props {
-  users: UserReleaseRole[];
+  'data-testid'?: string;
   invites: UserReleaseInvite[];
+  users: UserReleaseRole[];
   onUserRemove?: (userId: string) => void;
   onUserInvitesRemove?: (email: string) => void;
 }
 
 const ReleaseUserTable = ({
-  users,
+  'data-testid': testId,
   invites,
+  users,
   onUserRemove,
   onUserInvitesRemove,
 }: Props) => {
@@ -27,19 +29,23 @@ const ReleaseUserTable = ({
 
   return (
     <>
-      <table>
+      <table data-testid={testId}>
         <thead>
           <tr>
-            <th>Name</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
             {(onUserRemove || onUserInvitesRemove) && (
-              <th className={styles.actions}>Actions</th>
+              <th className={styles.actions} scope="col">
+                Actions
+              </th>
             )}
           </tr>
         </thead>
         <tbody>
           {users.map(user => (
             <tr key={user.userId}>
-              <td>{`${user.userDisplayName} (${user.userEmail})`}</td>
+              <td>{user.userDisplayName}</td>
+              <td>{user.userEmail}</td>
               {onUserRemove && (
                 <td>
                   <ButtonText
@@ -55,9 +61,10 @@ const ReleaseUserTable = ({
           ))}
           {invites.map(invite => (
             <tr key={invite.email}>
+              <td />
               <td>
                 {invite.email}
-                <Tag className="govuk-!-margin-left-3">Pending Invite</Tag>
+                <Tag className="govuk-!-margin-left-3">Pending invite</Tag>
               </td>
               {onUserInvitesRemove && (
                 <td>
@@ -81,7 +88,7 @@ const ReleaseUserTable = ({
           open={!!removeUser}
           onConfirm={async () => {
             if (removeUser) {
-              onUserRemove(removeUser.userId);
+              await onUserRemove(removeUser.userId);
               setRemoveUser(undefined);
             }
           }}
@@ -102,7 +109,7 @@ const ReleaseUserTable = ({
           open={!!removeInvite}
           onConfirm={async () => {
             if (removeInvite) {
-              onUserInvitesRemove(removeInvite.email);
+              await onUserInvitesRemove(removeInvite.email);
               setRemoveInvite(undefined);
             }
           }}

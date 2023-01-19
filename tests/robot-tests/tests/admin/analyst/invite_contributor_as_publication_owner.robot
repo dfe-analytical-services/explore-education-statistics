@@ -36,7 +36,7 @@ Validate "Manage release contributors" page
 Validate Invite new users page
     user clicks button    Go back
 
-    user clicks link    Manage publication contributors
+    user clicks link    Invite publication contributors
 
     user waits until page contains element    id:email
     user checks checkbox is checked    Academic Year 2002/03
@@ -74,7 +74,7 @@ Validate Select release dropdown
     user checks select contains option    id:currentRelease    Academic Year 2000/01
 
 Invite existing user analyst2 to be a contributor for 2002/03 release
-    user clicks link    Manage publication contributors
+    user clicks link    Invite publication contributors
     user waits until page contains    Invite a user to edit this publication
     user enters text into element    id:email    EES-test.ANALYST2@education.gov.uk
 
@@ -94,11 +94,9 @@ Invite existing user analyst2 to be a contributor for 2002/03 release
     user checks summary list contains    Release    Academic Year 2002/03 (Not live)
 
 Validate contributors for 2002/03 release
-    user waits until page contains    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
-
-    user checks page does not contain    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
-    user checks page does not contain    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
-    user checks page does not contain    There are no contributors or pending contributor invites for this release.
+    user checks table body has x rows    1    testid:releaseContributors
+    user checks table cell contains    1    1    Analyst2 User2    testid:releaseContributors
+    user checks table cell contains    1    2    ees-test.analyst2@education.gov.uk    testid:releaseContributors
 
 Add new contributors to release
     user clicks link    Manage release contributors
@@ -118,40 +116,37 @@ Add new contributors to release
     user waits until page contains    Update release access
 
 Validate contributors for 2002/03 release again
-    user checks page contains    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
-    user checks page does not contain    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
-    user checks page does not contain    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
+    user checks table body has x rows    1    testid:releaseContributors
+    user checks table cell contains    1    1    Analyst3 User3    testid:releaseContributors
+    user checks table cell contains    1    2    ees-test.analyst3@education.gov.uk    testid:releaseContributors
 
 Remove all analyst3 contributor access to publication
-    user clicks remove user button for row    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
+    user clicks remove user button for row    Analyst3 User3
     user waits until modal is visible    Confirm user removal
     user clicks button    Confirm
     user waits until modal is not visible    Confirm user removal
 
 Validate contributors for 2002/03 release for the third time
-    user waits until page does not contain    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
-    user checks page does not contain    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
-    user checks page does not contain    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
+    user waits until page does not contain element    testid:releaseContributors
     user checks page contains    There are no contributors or pending contributor invites for this release.
 
 Validate contributors for 2001/02 release
     user chooses select option    id:currentRelease    Academic Year 2001/02
     user checks summary list contains    Release    Academic Year 2001/02 (Not live)
 
-    user waits until page contains    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
-    user checks page does not contain    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
-    user checks page does not contain    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
+    user checks table body has x rows    1    testid:releaseContributors
+    user checks table cell contains    1    1    Analyst2 User2    testid:releaseContributors
+    user checks table cell contains    1    2    ees-test.analyst2@education.gov.uk    testid:releaseContributors
 
 Validate contributors for 2000/01 release
     user chooses select option    id:currentRelease    Academic Year 2000/01
     user checks summary list contains    Release    Academic Year 2000/01 (Not live)
 
-    user checks page does not contain    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
-    user checks page does not contain    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
-    user checks page does not contain    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
+    user waits until page does not contain element    testid:releaseContributors
+    user checks page contains    There are no contributors or pending contributor invites for this release.
 
 Invite brand new user
-    user clicks link    Manage publication contributors
+    user clicks link    Invite publication contributors
     user waits until page contains    Invite a user to edit this publication
     user enters text into element    id:email    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk
 
@@ -160,11 +155,23 @@ Invite brand new user
     user checks summary list contains    Release    Academic Year 2000/01 (Not live)
 
 Validate contributors for 2000/01 release again
-    user checks page does not contain    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
-    user checks page does not contain    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
-    user checks page does not contain    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
-    user waits until page contains    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk    %{WAIT_SMALL}
-    user checks page contains tag    Pending Invite
+    user checks page contains element    testid:releaseContributors
+
+    user checks table body has x rows    1    testid:releaseContributors
+    user checks table cell contains    1    1    ${EMPTY}    testid:releaseContributors
+    user checks table cell contains    1    2    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk
+    ...    testid:releaseContributors
+    user checks table cell contains    1    2    Pending invite    testid:releaseContributors
+    user checks table cell contains    1    3    Cancel invite    testid:releaseContributors
+
+Cancel contributor invite
+    user clicks button in table cell    1    3    Cancel invite    testid:releaseContributors
+    user waits until modal is visible    Confirm cancelling of user invites
+    ...    Are you sure you want to cancel all invites to releases under this publication for email address ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk?
+    user clicks button    Confirm
+    user waits until modal is not visible    Confirm cancelling of user invites
+    user waits until page does not contain element    testid:releaseContributors
+    user checks page contains    There are no contributors or pending contributor invites for this release.
 
 
 *** Keywords ***

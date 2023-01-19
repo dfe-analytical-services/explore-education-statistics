@@ -85,5 +85,5 @@ Check can see the editable "Update release access" section of the "Team access" 
     user waits until h3 is not visible    Release access
     user waits until page contains link    Manage release contributors
 
-Check can see the "Manage publication contributors" functionality of the "Team access" page
-    user waits until page contains link    Manage publication contributors
+Check can see the "Invite publication contributors" functionality of the "Team access" page
+    user waits until page contains link    Invite publication contributors
