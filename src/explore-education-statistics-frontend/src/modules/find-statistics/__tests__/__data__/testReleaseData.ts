@@ -1,4 +1,8 @@
-import { Publication, Release } from '@common/services/publicationService';
+import {
+  KeyStatisticText,
+  Publication,
+  Release,
+} from '@common/services/publicationService';
 
 export const testPublication: Publication = {
   id: 'publication-1',
@@ -187,7 +191,7 @@ export const testRelease: Release = {
       },
     ],
   },
-  keyStatistics: [], // @MarkFix
+  keyStatistics: [],
   keyStatisticsSecondarySection: {
     id: 'key-stats-secondary-id',
     order: 1,

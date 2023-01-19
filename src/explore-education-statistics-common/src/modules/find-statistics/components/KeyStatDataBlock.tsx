@@ -7,7 +7,6 @@ export interface KeyStatDataBlockProps {
   children?: ReactNode;
   releaseId: string;
 
-  // NOTE: Cannot accept KeyStatistic as a prop because KeyStatSelectForm keystat preview
   dataBlockId: string;
   trend?: string;
   guidanceTitle?: string;
@@ -41,21 +40,18 @@ const KeyStatDataBlock = ({
   const title = dataBlockResults?.title;
   const statistic = dataBlockResults?.value;
 
-  if (title && statistic) {
-    return (
-      <KeyStat
-        title={title}
-        statistic={statistic}
-        trend={trend}
-        guidanceTitle={guidanceTitle}
-        guidanceText={guidanceText}
-        testId={testId}
-      >
-        {children}
-      </KeyStat>
-    );
-  }
-  return null;
+  return (
+    <KeyStat
+      title={title}
+      statistic={statistic}
+      trend={trend}
+      guidanceTitle={guidanceTitle}
+      guidanceText={guidanceText}
+      testId={testId}
+    >
+      {children}
+    </KeyStat>
+  );
 };
 
 export default KeyStatDataBlock;

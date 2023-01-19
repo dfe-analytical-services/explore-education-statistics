@@ -34,7 +34,7 @@ describe('ReleaseDataBlocksPage', () => {
       highlightName: 'Block 1 highlight name',
       heading: 'Block 1 heading',
       source: 'Block 1 source',
-      contentSectionId: 'section-1',
+      inContent: true,
       chartsCount: 1,
     },
     {
@@ -43,7 +43,7 @@ describe('ReleaseDataBlocksPage', () => {
       created: '2021-01-01T15:00:00.0000000',
       heading: 'Block 2 heading',
       source: 'Block 2 source',
-      contentSectionId: '',
+      inContent: false,
       chartsCount: 0,
     },
   ];
@@ -54,6 +54,7 @@ describe('ReleaseDataBlocksPage', () => {
         name: 'Block 1',
         contentSectionHeading: 'Section 1',
         infographicFilesInfo: [],
+        isKeyStatistic: true,
       },
     ],
   };

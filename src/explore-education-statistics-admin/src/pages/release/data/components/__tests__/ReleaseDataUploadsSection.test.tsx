@@ -308,11 +308,13 @@ describe('ReleaseDataUploadsSection', () => {
               contentSectionHeading: 'Test section 1',
               name: 'Test data block 1',
               infographicFilesInfo: [],
+              isKeyStatistic: true,
             },
             {
               contentSectionHeading: 'Test section 2',
               name: 'Test data block 2',
               infographicFilesInfo: [],
+              isKeyStatistic: false,
             },
           ],
         },

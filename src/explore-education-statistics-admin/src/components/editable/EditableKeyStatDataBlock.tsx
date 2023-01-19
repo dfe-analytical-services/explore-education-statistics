@@ -1,16 +1,13 @@
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
-import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
-import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import useKeyStatQuery from '@common/modules/find-statistics/hooks/useKeyStatQuery';
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
 import EditableKeyStatDataBlockForm from '@admin/components/editable/EditableKeyStatDataBlockForm';
 import { KeyStatisticDataBlock } from '@common/services/publicationService';
+import EditableKeyStatDisplay from '@admin/components/editable/EditableKeyStatDisplay';
 
 interface KeyStatsDataFormValues {
   trend: string;
@@ -18,7 +15,7 @@ interface KeyStatsDataFormValues {
   guidanceText: string;
 }
 
-interface EditableKeyStatDataBlockProps {
+export interface EditableKeyStatDataBlockProps {
   keyStat: KeyStatisticDataBlock;
 
   isEditing?: boolean;
@@ -99,53 +96,18 @@ const EditableKeyStatDataBlock = ({
   }
 
   return (
-    <>
-      <KeyStatTile
-        title={fetchedTitle}
-        value={fetchedStatistic}
-        testId={testId}
-        isReordering={isReordering}
-      >
-        {trend && (
-          <p className="govuk-body-s" data-testid={`${testId}-summary`}>
-            {trend}
-          </p>
-        )}
-      </KeyStatTile>
-
-      {guidanceTitle && !isReordering && (
-        <Details
-          summary={guidanceTitle}
-          className={styles.definition}
-          hiddenText={
-            guidanceTitle === 'Help' ? `for ${fetchedTitle}` : undefined
-          }
-        >
-          <div data-testid={`${testId}-definition`}>
-            <ReactMarkdown key={guidanceText}>{guidanceText}</ReactMarkdown>
-          </div>
-        </Details>
-      )}
-
-      {isEditing && !isReordering && (
-        <ButtonGroup className="govuk-!-margin-top-2">
-          <Button onClick={toggleShowForm.on}>Edit</Button>
-
-          {onRemove && (
-            <Button
-              disabled={removing}
-              variant="secondary"
-              onClick={() => {
-                toggleRemoving.on();
-                onRemove();
-              }}
-            >
-              Remove
-            </Button>
-          )}
-        </ButtonGroup>
-      )}
-    </>
+    <EditableKeyStatDisplay
+      title={fetchedTitle}
+      statistic={fetchedStatistic}
+      trend={trend}
+      guidanceTitle={guidanceTitle}
+      guidanceText={guidanceText}
+      testId={testId}
+      isReordering={isReordering}
+      isEditing={isEditing}
+      onRemove={onRemove}
+      toggleShowForm={toggleShowForm}
+    />
   );
 };
 

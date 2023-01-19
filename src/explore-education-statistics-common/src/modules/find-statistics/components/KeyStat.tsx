@@ -28,9 +28,8 @@ export const KeyStatColumn = ({ children, testId }: KeyStatColumnProps) => {
 export interface KeyStatProps {
   children?: ReactNode;
 
-  // NOTE: Cannot accept KeyStatistic as a prop because KeyStatSelectForm keystat preview
-  title: string;
-  statistic: string;
+  title?: string;
+  statistic?: string;
   trend?: string;
   guidanceTitle?: string;
   guidanceText?: string;
@@ -53,7 +52,7 @@ const KeyStat = ({
         <>
           <KeyStatTile title={title} value={statistic} testId={testId}>
             {trend && (
-              <p className="govuk-body-s" data-testid={`${testId}-summary`}>
+              <p className="govuk-body-s" data-testid={`${testId}-trend`}>
                 {trend}
               </p>
             )}
@@ -62,10 +61,10 @@ const KeyStat = ({
           {guidanceText && guidanceTitle && (
             <Details
               summary={guidanceTitle}
-              className={styles.definition}
+              className={styles.guidanceTitle}
               hiddenText={guidanceTitle === 'Help' ? `for ${title}` : undefined}
             >
-              <div data-testid={`${testId}-definition`}>
+              <div data-testid={`${testId}-guidanceText`}>
                 <ReactMarkdown key={guidanceText}>{guidanceText}</ReactMarkdown>
               </div>
             </Details>
@@ -75,8 +74,6 @@ const KeyStat = ({
       )}
     </KeyStatColumn>
   );
-
-  return null;
 };
 
 export default KeyStat;

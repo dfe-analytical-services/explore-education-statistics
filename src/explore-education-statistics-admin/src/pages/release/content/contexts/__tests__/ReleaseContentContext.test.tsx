@@ -10,7 +10,11 @@ import {
   EditableBlock,
   EditableContentBlock,
 } from '@admin/services/types/content';
-import { ContentSection } from '@common/services/publicationService';
+import {
+  ContentSection,
+  KeyStatisticDataBlock,
+  KeyStatisticText,
+} from '@common/services/publicationService';
 import { DataBlock, Table } from '@common/services/types/blocks';
 import { produce } from 'immer';
 
@@ -83,36 +87,32 @@ describe('ReleaseContentContext', () => {
     });
   });
 
-  // @MarkFix repurpose test?
-  //test('REMOVE_SECTION_BLOCK removes a block from a named section', () => {
-  //  const keyStatsSection = testEditableRelease.keyStatisticsSection;
-  //  const removingBlockId = keyStatsSection.content[0].id;
+  test('REMOVE_SECTION_BLOCK removes a block from a named section', () => {
+    const keyStatsSection = testEditableRelease.headlinesSection;
+    const removingBlockId = keyStatsSection.content[0].id;
 
-  //  expect(testEditableRelease.keyStatisticsSection.content.length).toEqual(3);
+    expect(testEditableRelease.headlinesSection.content.length).toEqual(1);
 
-  //  const { release } = releaseReducer(
-  //    {
-  //      release: testEditableRelease,
-  //      canUpdateRelease: true,
-  //      availableDataBlocks: [basicDataBlock],
-  //    },
-  //    {
-  //      type: 'REMOVE_SECTION_BLOCK',
-  //      payload: {
-  //        meta: {
-  //          blockId: removingBlockId,
-  //          sectionId: keyStatsSection.id,
-  //          sectionKey: 'keyStatisticsSection',
-  //        },
-  //      },
-  //    },
-  //  );
+    const { release } = releaseReducer(
+      {
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        availableDataBlocks: [basicDataBlock],
+      },
+      {
+        type: 'REMOVE_SECTION_BLOCK',
+        payload: {
+          meta: {
+            blockId: removingBlockId,
+            sectionId: keyStatsSection.id,
+            sectionKey: 'headlinesSection',
+          },
+        },
+      },
+    );
 
-  //  expect(release.keyStatisticsSection.content).toEqual([
-  //    keyStatsSection.content[1],
-  //    keyStatsSection.content[2],
-  //  ]);
-  //});
+    expect(release.headlinesSection.content).toEqual([]);
+  });
 
   test('REMOVE_SECTION_BLOCK removes a block from generic content section', () => {
     const contentSection = testEditableRelease.content;
@@ -444,35 +444,34 @@ describe('ReleaseContentContext', () => {
     expect(release.content[0]).toEqual(updatedSection);
   });
 
-  // @MarkFix repurpose test?
-  //test('ADD_BLOCK_COMMENT adds a comment to named section block', () => {
-  //  const sectionId = testEditableRelease.keyStatisticsSection.id;
-  //  const block = testEditableRelease.keyStatisticsSection.content[0];
+  test('ADD_BLOCK_COMMENT adds a comment to named section block', () => {
+    const sectionId = testEditableRelease.headlinesSection.id;
+    const block = testEditableRelease.headlinesSection.content[0];
 
-  //  const { release } = releaseReducer(
-  //    {
-  //      release: testEditableRelease,
-  //      canUpdateRelease: true,
-  //      availableDataBlocks: [basicDataBlock],
-  //    },
-  //    {
-  //      type: 'ADD_BLOCK_COMMENT',
-  //      payload: {
-  //        meta: {
-  //          blockId: block.id,
-  //          sectionId,
-  //          sectionKey: 'keyStatisticsSection',
-  //        },
-  //        comment: testComment,
-  //      },
-  //    },
-  //  );
+    const { release } = releaseReducer(
+      {
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        availableDataBlocks: [basicDataBlock],
+      },
+      {
+        type: 'ADD_BLOCK_COMMENT',
+        payload: {
+          meta: {
+            blockId: block.id,
+            sectionId,
+            sectionKey: 'headlinesSection',
+          },
+          comment: testComment,
+        },
+      },
+    );
 
-  //  expect(release.keyStatisticsSection.content[0].comments).toEqual([
-  //    ...block.comments,
-  //    testComment,
-  //  ]);
-  //});
+    expect(release.headlinesSection.content[0].comments).toEqual([
+      ...block.comments,
+      testComment,
+    ]);
+  });
 
   test('ADD_BLOCK_COMMENT adds a comment to generic content section block', () => {
     const sectionId = testEditableRelease.content[0].id;
@@ -503,41 +502,40 @@ describe('ReleaseContentContext', () => {
     ]);
   });
 
-  // @MarkFix repurpose test?
-  //test('UPDATE_BLOCK_COMMENT updates a comment in named section block', () => {
-  //  const sectionId = testEditableRelease.keyStatisticsSection.id;
-  //  const block = testEditableRelease.keyStatisticsSection.content[0];
+  test('UPDATE_BLOCK_COMMENT updates a comment in named section block', () => {
+    const sectionId = testEditableRelease.headlinesSection.id;
+    const block = testEditableRelease.headlinesSection.content[0];
 
-  //  expect(block.comments).toHaveLength(1);
+    expect(block.comments).toHaveLength(1);
 
-  //  const updatedComment: Comment = {
-  //    ...block.comments[0],
-  //    content: 'Updated comment content',
-  //  };
+    const updatedComment: Comment = {
+      ...block.comments[0],
+      content: 'Updated comment content',
+    };
 
-  //  const { release } = releaseReducer(
-  //    {
-  //      release: testEditableRelease,
-  //      canUpdateRelease: true,
-  //      availableDataBlocks: [basicDataBlock],
-  //    },
-  //    {
-  //      type: 'UPDATE_BLOCK_COMMENT',
-  //      payload: {
-  //        meta: {
-  //          blockId: block.id,
-  //          sectionId,
-  //          sectionKey: 'keyStatisticsSection',
-  //        },
-  //        comment: updatedComment,
-  //      },
-  //    },
-  //  );
+    const { release } = releaseReducer(
+      {
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        availableDataBlocks: [basicDataBlock],
+      },
+      {
+        type: 'UPDATE_BLOCK_COMMENT',
+        payload: {
+          meta: {
+            blockId: block.id,
+            sectionId,
+            sectionKey: 'headlinesSection',
+          },
+          comment: updatedComment,
+        },
+      },
+    );
 
-  //  expect(release.keyStatisticsSection.content[0].comments).toEqual([
-  //    updatedComment,
-  //  ]);
-  //});
+    expect(release.headlinesSection.content[0].comments).toEqual([
+      updatedComment,
+    ]);
+  });
 
   test('UPDATE_BLOCK_COMMENT updates a comment in generic content section block', () => {
     const sectionId = testEditableRelease.content[0].id;
@@ -575,34 +573,33 @@ describe('ReleaseContentContext', () => {
     ]);
   });
 
-  // @MarkFix repurpose test
-  //test('REMOVE_BLOCK_COMMENT removes a comment from named section block', () => {
-  //  const sectionId = testEditableRelease.keyStatisticsSection.id;
-  //  const block = testEditableRelease.keyStatisticsSection.content[0];
+  test('REMOVE_BLOCK_COMMENT removes a comment from named section block', () => {
+    const sectionId = testEditableRelease.headlinesSection.id;
+    const block = testEditableRelease.headlinesSection.content[0];
 
-  //  expect(block.comments).toHaveLength(1);
+    expect(block.comments).toHaveLength(1);
 
-  //  const { release } = releaseReducer(
-  //    {
-  //      release: testEditableRelease,
-  //      canUpdateRelease: true,
-  //      availableDataBlocks: [basicDataBlock],
-  //    },
-  //    {
-  //      type: 'REMOVE_BLOCK_COMMENT',
-  //      payload: {
-  //        meta: {
-  //          blockId: block.id,
-  //          sectionId,
-  //          sectionKey: 'keyStatisticsSection',
-  //        },
-  //        commentId: block.comments[0].id,
-  //      },
-  //    },
-  //  );
+    const { release } = releaseReducer(
+      {
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        availableDataBlocks: [basicDataBlock],
+      },
+      {
+        type: 'REMOVE_BLOCK_COMMENT',
+        payload: {
+          meta: {
+            blockId: block.id,
+            sectionId,
+            sectionKey: 'headlinesSection',
+          },
+          commentId: block.comments[0].id,
+        },
+      },
+    );
 
-  //  expect(release.keyStatisticsSection.content[0].comments).toEqual([]);
-  //});
+    expect(release.headlinesSection.content[0].comments).toEqual([]);
+  });
 
   test('UPDATE_BLOCK_COMMENT removes a comment from generic content section block', () => {
     const sectionId = testEditableRelease.content[0].id;
@@ -630,5 +627,111 @@ describe('ReleaseContentContext', () => {
     );
 
     expect(release.content[0].content[0].comments).toEqual([block.comments[1]]);
+  });
+
+  test('ADD_KEY_STATISTIC adds a key statistic to release.keyStatistics array', () => {
+    expect(testEditableRelease.keyStatistics).toHaveLength(3);
+    const newKeyStat = {
+      id: 'keyStat-4',
+      dataBlockId: 'dataBlock-0',
+      trend: 'keyStat-4 trend',
+      guidanceTitle: 'keyStat-4 guidanceTitle',
+      guidanceText: 'keyStat-4 guidanceText',
+    } as KeyStatisticDataBlock;
+    const { release } = releaseReducer(
+      {
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        availableDataBlocks: [basicDataBlock],
+      },
+      {
+        type: 'ADD_KEY_STATISTIC',
+        payload: {
+          keyStatistic: newKeyStat,
+        },
+      },
+    );
+
+    expect(release.keyStatistics).toEqual([
+      ...testEditableRelease.keyStatistics,
+      newKeyStat,
+    ]);
+  });
+
+  test('UPDATE_KEY_STATISTIC updates a key statistic in release.keyStatistics array', () => {
+    expect(testEditableRelease.keyStatistics).toHaveLength(3);
+    const updatedKeyStat1 = {
+      ...testEditableRelease.keyStatistics[0],
+      trend: 'keyStat-1 trend updated',
+      guidanceTitle: 'keyStat-1 new guidance title',
+      guidanceText: 'keyStat-1 new guidance text',
+    };
+    const { release } = releaseReducer(
+      {
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        availableDataBlocks: [basicDataBlock],
+      },
+      {
+        type: 'UPDATE_KEY_STATISTIC',
+        payload: { keyStatistic: updatedKeyStat1 },
+      },
+    );
+
+    expect(release.keyStatistics).toEqual([
+      updatedKeyStat1,
+      testEditableRelease.keyStatistics[1],
+      testEditableRelease.keyStatistics[2],
+    ]);
+  });
+
+  test('REMOVE_KEY_STATISTIC removes a key statistic from release.keyStatistics array', () => {
+    expect(testEditableRelease.keyStatistics).toHaveLength(3);
+    const { release } = releaseReducer(
+      {
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        availableDataBlocks: [basicDataBlock],
+      },
+      {
+        type: 'REMOVE_KEY_STATISTIC',
+        payload: {
+          releaseId: '6a97c9b6-eaa2-4d22-7ba9-08d7bec1ba1a',
+          keyStatisticId: 'keyStat-2',
+        },
+      },
+    );
+
+    expect(release.keyStatistics).toEqual([
+      testEditableRelease.keyStatistics[0],
+      testEditableRelease.keyStatistics[2],
+    ]);
+  });
+
+  test('SET_KEY_STATISTICS used to reorder existing key stats', () => {
+    expect(testEditableRelease.keyStatistics).toHaveLength(3);
+    const { release } = releaseReducer(
+      {
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        availableDataBlocks: [basicDataBlock],
+      },
+      {
+        type: 'SET_KEY_STATISTICS',
+        payload: {
+          keyStatistics: [
+            testEditableRelease.keyStatistics[2],
+            testEditableRelease.keyStatistics[1],
+            testEditableRelease.keyStatistics[0],
+          ],
+        },
+      },
+    );
+
+    expect(release.keyStatistics).toEqual([
+      testEditableRelease.keyStatistics[2],
+      testEditableRelease.keyStatistics[1],
+      testEditableRelease.keyStatistics[0],
+    ]);
   });
 });
