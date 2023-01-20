@@ -15,7 +15,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null)
         {
-            var filter = FilterPublishLessThanEndOfToday();
+            return QueryPublishByDateWithStages(FilterPublishLessThanEndOfToday(), content, files, publishing, overall);
+        }
+
+        public static TableQuery<ReleasePublishingStatus> QueryPublishTodayOrInFutureWithStages(
+            ReleasePublishingStatusContentStage? content = null,
+            ReleasePublishingStatusFilesStage? files = null,
+            ReleasePublishingStatusPublishingStage? publishing = null,
+            ReleasePublishingStatusOverallStage? overall = null)
+        {
+            return QueryPublishByDateWithStages(FilterPublishTodayOrInFuture(), content, files, publishing, overall);
+        }
+
+        private static TableQuery<ReleasePublishingStatus> QueryPublishByDateWithStages(
+            string dateFilter,
+            ReleasePublishingStatusContentStage? content = null,
+            ReleasePublishingStatusFilesStage? files = null,
+            ReleasePublishingStatusPublishingStage? publishing = null,
+            ReleasePublishingStatusOverallStage? overall = null)
+        {
+            var filter = dateFilter;
 
             if (content.HasValue)
             {
@@ -42,6 +61,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private static string FilterPublishLessThanEndOfToday() =>
             GenerateFilterConditionForDate(nameof(ReleasePublishingStatus.Publish), LessThan, DateTime.Today.AddDays(1));
+
+        private static string FilterPublishTodayOrInFuture() =>
+            GenerateFilterConditionForDate(nameof(ReleasePublishingStatus.Publish), GreaterThanOrEqual, DateTime.Today);
 
         private static string FilterContentStageEquals(ReleasePublishingStatusContentStage stage) =>
             GenerateFilterCondition(nameof(ReleasePublishingStatus.ContentStage), Equal, stage.ToString());

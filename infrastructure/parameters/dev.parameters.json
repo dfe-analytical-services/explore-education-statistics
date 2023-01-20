@@ -100,6 +100,9 @@
     },
     "releaseStatusPollTimeMillis": {
       "value": 500
+    },
+    "immediatePublicationOfScheduledReleasesEnabled": {
+      "value": true
     }
   }
 }

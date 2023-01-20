@@ -21,7 +21,7 @@ ${DATABLOCK_NAME}=      Dates data block name
 *** Test Cases ***
 Create new publication for "UI tests topic" topic
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    user create test release via api    ${PUBLICATION_ID}    FY    3000
+    user creates test release via api    ${PUBLICATION_ID}    FY    3000
 
 Go to "Release summary" page
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
@@ -174,8 +174,8 @@ Add public prerelease access list
     user clicks link    Pre-release access
     user creates public prerelease access list    Test public access list
 
-Approve release
-    user approves release for scheduled release    2    12    3001
+Approve release for scheduled publication
+    user approves release for scheduled publication    0    12    3001
 
 Verify release is scheduled
     user checks summary list contains    Current status    Approved
@@ -183,8 +183,8 @@ Verify release is scheduled
     ...    ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
     user checks summary list contains    Next release expected    December 3001
 
-Approve release for immediate publication
-    user approves original release for immediate publication
+Publish the scheduled release
+    user waits for scheduled release to be published immediately
 
 Verify newly published release is on Find Statistics page
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
@@ -600,9 +600,9 @@ Update public prerelease access list for amendment
     user clicks link    Pre-release access
     user updates public prerelease access list    Updated public access list
 
-Approve amendment for immediate release
-    user clicks link    Sign off
-    user approves amended release for immediate publication
+Approve amendment for scheduled release
+    user approves release for scheduled publication    1    12    3001
+    user waits for scheduled release to be published immediately
 
 Verify amendment is on Find Statistics page again
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
@@ -788,8 +788,9 @@ Leave release note for amendment
     user enters text into element    testid:comment-textarea    updated amendment
     user clicks button    Save note
 
-Approve release amendment for immedate publication
-    user approves amended release for immediate publication
+Approve release amendment for scheduled publication
+    user approves release for scheduled publication    2    8    4001
+    user waits for scheduled release to be published immediately
 
 Save public release link for later use
     user waits until page contains element    testid:public-release-url

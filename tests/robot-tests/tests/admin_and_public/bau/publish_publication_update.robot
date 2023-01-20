@@ -18,7 +18,7 @@ ${PUBLICATION_NAME_UPDATED}=    ${PUBLICATION_NAME} updated
 *** Test Cases ***
 Create Publication as bau1
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    user create test release via api    ${PUBLICATION_ID}    AY    2046
+    user creates test release via api    ${PUBLICATION_ID}    AY    2046
 
 Publish release
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}

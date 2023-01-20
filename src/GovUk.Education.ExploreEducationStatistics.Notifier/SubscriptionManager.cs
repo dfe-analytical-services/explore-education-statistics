@@ -1,10 +1,10 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +13,6 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
-using Newtonsoft.Json;
 using Notify.Exceptions;
 using static GovUk.Education.ExploreEducationStatistics.Notifier.Utils.ConfigKeys;
 using static GovUk.Education.ExploreEducationStatistics.Notifier.Utils.NotifierUtils;
@@ -59,8 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             string? title = req.Query["title"];
 
             var subscriptionPending = false;
-            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic? data = JsonConvert.DeserializeObject(requestBody);
+            var data = await req.GetJsonBody();
 
             id ??= data?.id;
             email ??= data?.email;

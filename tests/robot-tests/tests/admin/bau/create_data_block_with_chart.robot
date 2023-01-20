@@ -24,7 +24,7 @@ ${FOOTNOTE_UPDATED}=        Updated test footnote from bau
 *** Test Cases ***
 Create test publication and release via API
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    user create test release via api    ${PUBLICATION_ID}    AY    2025
+    user creates test release via api    ${PUBLICATION_ID}    AY    2025
 
 Upload subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}

@@ -19,6 +19,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
             ReleasePublishingStatusFilesStage? files = null,
             ReleasePublishingStatusPublishingStage? publishing = null,
             ReleasePublishingStatusOverallStage? overall = null);
+        
+        Task<IEnumerable<ReleasePublishingStatus>> GetWherePublishingDueTodayOrInFutureWithStages(
+            ReleasePublishingStatusContentStage? content = null,
+            ReleasePublishingStatusFilesStage? files = null,
+            ReleasePublishingStatusPublishingStage? publishing = null,
+            ReleasePublishingStatusOverallStage? overall = null);
 
         Task<IEnumerable<ReleasePublishingStatus>> GetAllByOverallStage(
             Guid releaseId, 

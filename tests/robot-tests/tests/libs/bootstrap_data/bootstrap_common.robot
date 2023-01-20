@@ -45,7 +45,7 @@ user creates a fully populated approved release
     ...    ${RELEASE_TIME_PERIOD}
     ...    ${RELEASE_YEAR}
     ...    ${RELEASE_TYPE}
-    user approves release for scheduled release    10000
+    user approves release for scheduled publication    10000
 
 user creates a fully populated published release
     [Arguments]
@@ -75,7 +75,7 @@ user creates a fully populated draft release
     ...    ${RELEASE_TIME_PERIOD}=AY
     ...    ${RELEASE_YEAR}=2022
     ...    ${RELEASE_TYPE}=Academic Year 2022/23
-    user create test release via api    ${PUBLICATION_ID}    ${RELEASE_TIME_PERIOD}    ${RELEASE_YEAR}
+    user creates test release via api    ${PUBLICATION_ID}    ${RELEASE_TIME_PERIOD}    ${RELEASE_YEAR}
     user navigates to draft release page from dashboard
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_TYPE}
