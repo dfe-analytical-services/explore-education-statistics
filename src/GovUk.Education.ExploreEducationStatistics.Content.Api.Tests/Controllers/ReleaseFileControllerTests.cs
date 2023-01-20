@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -21,53 +20,34 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
-    public class ReleaseFileControllerTests : IClassFixture<TestApplicationFactory<TestStartup>>, IDisposable
+    public class ReleaseFileControllerTests : IClassFixture<TestApplicationFactory<TestStartup>>
     {
         private readonly WebApplicationFactory<TestStartup> _testApp;
-        private readonly Mock<IReleaseFileService> _releaseFileService = new(MockBehavior.Strict);
 
         private readonly Release _release = new()
         {
+            Id = Guid.NewGuid(),
             Publication = new Publication()
         };
 
         public ReleaseFileControllerTests(TestApplicationFactory<TestStartup> testApp)
         {
-            _testApp = testApp.WithWebHostBuilder(
-                builder =>
-                {
-                    builder.AddTestData<ContentDbContext>(
-                        context =>
-                        {
-                            context.Releases.Add(_release);
-                            context.SaveChanges();
-                        }
-                    );
-
-                    builder.ConfigureServices(
-                        services => { services.AddTransient(_ => _releaseFileService.Object); }
-                    );
-                }
-            );
-        }
-
-        public void Dispose()
-        {
-            _releaseFileService.Reset();
+            _testApp = testApp;
         }
 
         [Fact]
         public async Task Stream()
         {
-            var client = _testApp.CreateClient();
-
             await using var stream = "Test file".ToStream();
             var fileId = Guid.NewGuid();
 
-            _releaseFileService
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
+
+            releaseFileService
                 .Setup(s => s.StreamFile(_release.Id, fileId))
                 .ReturnsAsync(
                     new FileStreamResult(stream, MediaTypeNames.Application.Pdf)
@@ -76,24 +56,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                     }
                 );
 
+            var client = SetupApp(releaseFileService: releaseFileService.Object)
+                .AddContentDbTestData(context => context.Releases.Add(_release))
+                .CreateClient();
+
             var response = await client
                 .GetAsync($"/api/releases/{_release.Id}/files/{fileId}");
 
-            MockUtils.VerifyAllMocks(_releaseFileService);
+            MockUtils.VerifyAllMocks(releaseFileService);
 
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Equal("Test file", await response.Content.ReadAsStringAsync());
+            response.AssertOk("Test file");
         }
 
         [Fact]
         public async Task StreamFilesToZip()
         {
-            var client = _testApp.CreateClient();
-
             var fileId1 = Guid.NewGuid();
             var fileId2 = Guid.NewGuid();
 
-            _releaseFileService
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
+
+            releaseFileService
                 .Setup(
                     s => s.ZipFilesToStream(
                         _release.Id,
@@ -108,21 +91,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                     (_, stream, _, _) => { stream.WriteText("Test zip"); }
                 );
 
+            var client = SetupApp(releaseFileService: releaseFileService.Object)
+                .AddContentDbTestData(context => context.Releases.Add(_release))
+                .CreateClient();
+
             var response = await client
                 .GetAsync($"/api/releases/{_release.Id}/files?fileIds={fileId1},{fileId2}");
 
-            MockUtils.VerifyAllMocks(_releaseFileService);
+            MockUtils.VerifyAllMocks(releaseFileService);
 
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Equal("Test zip", await response.Content.ReadAsStringAsync());
+            response.AssertOk("Test zip");
         }
 
         [Fact]
         public async Task StreamFilesToZip_NoFileIds()
         {
-            var client = _testApp.CreateClient();
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
-            _releaseFileService
+            releaseFileService
                 .Setup(
                     s => s.ZipFilesToStream(
                         _release.Id,
@@ -136,13 +122,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                     (_, stream, _, _) => { stream.WriteText("Test zip"); }
                 );
 
+            var client = SetupApp(releaseFileService: releaseFileService.Object)
+                .AddContentDbTestData(context => context.Releases.Add(_release))
+                .CreateClient();
+
             var response = await client
                 .GetAsync($"/api/releases/{_release.Id}/files");
 
-            MockUtils.VerifyAllMocks(_releaseFileService);
+            MockUtils.VerifyAllMocks(releaseFileService);
 
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Equal("Test zip", await response.Content.ReadAsStringAsync());
+            response.AssertOk("Test zip");
+        }
+
+        private WebApplicationFactory<TestStartup> SetupApp(IReleaseFileService? releaseFileService = null)
+        {
+            return _testApp
+                .ResetDbContexts()
+                .ConfigureServices(
+                    services =>
+                        {
+                            services.AddTransient(_ => releaseFileService ?? Mock.Of<IReleaseFileService>());
+                        }
+                    );
         }
     }
 }
