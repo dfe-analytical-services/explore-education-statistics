@@ -173,6 +173,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 LatestPublishedReleaseId = releaseId,
                 SupersededBy = new Publication
                 {
+                    Id = Guid.NewGuid(),
+                    Title = "Superseding Publication Title",
+                    Slug = "superseding-publication",
                     LatestPublishedReleaseId = Guid.NewGuid()
                 },
                 Releases = new List<Release>
@@ -222,6 +225,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Equal(publication.Id, publicationViewModel.Id);
                 Assert.True(publicationViewModel.IsSuperseded);
+                
+                Assert.NotNull(publicationViewModel.SupersededBy);
+                Assert.Equal(publication.SupersededBy.Id, publicationViewModel.SupersededBy!.Id);
+                Assert.Equal(publication.SupersededBy.Title, publicationViewModel.SupersededBy.Title);
+                Assert.Equal(publication.SupersededBy.Slug, publicationViewModel.SupersededBy.Slug);
             }
         }
 
@@ -285,6 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Equal(publication.Id, publicationViewModel.Id);
                 Assert.False(publicationViewModel.IsSuperseded);
+                Assert.Null(publicationViewModel.SupersededBy);
             }
         }
 
@@ -1246,6 +1255,69 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Equal("Publication B", publications[1].Title);
                 Assert.True(publications[1].IsSuperseded);
+            }
+        }
+        
+        [Fact]
+        public async Task GetPublicationTree_SupersedingPublicationBuildsSupersededViewModel()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var publication = new Publication
+            {
+                Title = "Publication A",
+                Slug = "publication-a",
+                LatestPublishedReleaseId = releaseId,
+                SupersededBy = new Publication
+                {
+                    Id = Guid.NewGuid(),
+                    Title = "Publication B",
+                    Slug = "publication-b",
+                    LatestPublishedReleaseId = Guid.NewGuid()
+                }
+            };
+            
+            var themes = new List<Theme>
+            {
+                new()
+                {
+                    Title = "Theme A",
+                    Summary = "Theme A summary",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Title = "Topic A",
+                            Publications = ListOf(publication)
+                        },
+                    },
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.Themes.AddRangeAsync(themes);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = SetupPublicationService(context);
+
+                var publicationTree = await service.GetPublicationTree();
+
+                var testTopicPublications = publicationTree[0].Topics[0].Publications;
+                
+                var testTopicPublication = Assert.Single(testTopicPublications);
+                
+                Assert.True(testTopicPublication.IsSuperseded);
+                
+                Assert.NotNull(testTopicPublication.SupersededBy);
+                Assert.Equal(publication.SupersededBy.Id, testTopicPublication.SupersededBy!.Id);
+                Assert.Equal(publication.SupersededBy.Title, testTopicPublication.SupersededBy.Title);
+                Assert.Equal(publication.SupersededBy.Slug, testTopicPublication.SupersededBy.Slug);
             }
         }
 
