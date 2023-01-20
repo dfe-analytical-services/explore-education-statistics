@@ -183,9 +183,7 @@ Edit data block
     user waits until h2 is visible    Data block details
 
     user enters text into element    id:dataBlockDetailsForm-name    ${DATABLOCK_NAME}
-    user clears element text    id:dataBlockDetailsForm-heading
     user enters text into element    id:dataBlockDetailsForm-heading    Updated dates table title
-    user clears element text    id:dataBlockDetailsForm-source
     user enters text into element    id:dataBlockDetailsForm-source    Updated dates source
 
     user clicks button    Save data block
@@ -621,7 +619,7 @@ Update second accordion section text for amendment
 Update embedded dashboard title
     user updates embedded dashboard in editable accordion section
     ...    Test embedded dashboard section
-    ...    Test embedded dashboard title Amended
+    ...    Amended Test embedded dashboard title
     ...    https://department-for-education.shinyapps.io/dfe-shiny-template/
     ...    id:releaseMainContent
 
@@ -808,7 +806,7 @@ Verify amendment embedded dashboard accordion section is correct
     user opens accordion section    Test embedded dashboard section    id:content
     ${section}=    user gets accordion section content element    Test embedded dashboard section    id:content
     user checks element contains child element    ${section}
-    ...    xpath:.//iframe[@title="Test embedded dashboard title Amended"]
+    ...    xpath:.//iframe[@title="Amended Test embedded dashboard title"]
     user closes accordion section    Test embedded dashboard section    id:content
 
 Check next release date can be updated
