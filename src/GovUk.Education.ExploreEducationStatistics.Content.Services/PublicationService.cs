@@ -46,6 +46,7 @@ public class PublicationService : IPublicationService
                 .Include(p => p.LegacyReleases)
                 .Include(p => p.Topic)
                 .ThenInclude(topic => topic.Theme)
+                .Include(p => p.SupersededBy)
                 .Where(p => p.Slug == publicationSlug))
             .OnSuccess(async publication =>
             {
@@ -65,6 +66,10 @@ public class PublicationService : IPublicationService
             .Include(theme => theme.Topics)
             .ThenInclude(topic => topic.Publications)
             .ThenInclude(publication => publication.Releases)
+        
+            .Include(theme => theme.Topics)
+            .ThenInclude(topic => topic.Publications)
+            .ThenInclude(publication => publication.SupersededBy)
             .ToListAsync();
 
         return await themes
@@ -182,6 +187,14 @@ public class PublicationService : IPublicationService
                 : null,
             LatestReleaseId = publication.LatestPublishedReleaseId!.Value,
             IsSuperseded = isSuperseded,
+            SupersededBy = isSuperseded
+                ? new PublicationSupersededByViewModel
+                {
+                    Id = publication.SupersededBy!.Id,
+                    Slug = publication.SupersededBy.Slug,
+                    Title = publication.SupersededBy.Title
+                }
+                : null,
             Releases = ListPublishedReleases(publication)
         };
     }
@@ -239,13 +252,22 @@ public class PublicationService : IPublicationService
     private async Task<PublicationTreePublicationViewModel> BuildPublicationTreePublication(Publication publication)
     {
         var latestPublishedReleaseId = publication.LatestPublishedReleaseId;
-
+        var isSuperseded = await _publicationRepository.IsSuperseded(publication.Id);
+        
         return new PublicationTreePublicationViewModel
         {
             Id = publication.Id,
             Title = publication.Title,
             Slug = publication.Slug,
-            IsSuperseded = await _publicationRepository.IsSuperseded(publication.Id),
+            IsSuperseded = isSuperseded,
+            SupersededBy = isSuperseded
+                ? new PublicationSupersededByViewModel
+                {
+                    Id = publication.SupersededBy!.Id,
+                    Slug = publication.SupersededBy.Slug,
+                    Title = publication.SupersededBy.Title
+                }
+                : null,
             LatestReleaseHasData = latestPublishedReleaseId != null &&
                                    await HasAnyDataFiles(latestPublishedReleaseId.Value),
             AnyLiveReleaseHasData = await publication.Releases

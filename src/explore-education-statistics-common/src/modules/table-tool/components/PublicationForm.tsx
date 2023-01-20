@@ -21,7 +21,7 @@ import WizardStepHeading from '@common/modules/table-tool/components/WizardStepH
 import styles from '@common/modules/table-tool/components/PublicationForm.module.scss';
 import { orderBy } from 'lodash';
 import { Formik } from 'formik';
-import React, { useMemo, useState } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 
 export interface PublicationFormValues {
   publicationId: string;
@@ -37,6 +37,7 @@ interface Props extends InjectedWizardProps {
   initialValues?: PublicationFormValues;
   themes: Theme[];
   onSubmit: PublicationFormSubmitHandler;
+  renderSummaryAfter?: ReactNode;
 }
 
 const PublicationForm = ({
@@ -45,6 +46,7 @@ const PublicationForm = ({
   },
   themes,
   onSubmit,
+  renderSummaryAfter,
   ...stepProps
 }: Props) => {
   const { isActive, goToNextStep } = stepProps;
@@ -233,15 +235,22 @@ const PublicationForm = ({
         }
 
         return (
-          <WizardStepSummary {...stepProps} goToButtonText="Change publication">
-            {stepHeading}
+          <>
+            <WizardStepSummary
+              {...stepProps}
+              goToButtonText="Change publication"
+            >
+              {stepHeading}
 
-            <SummaryList noBorder>
-              <SummaryListItem term="Publication">
-                {getSelectedPublication(form.values.publicationId)?.title}
-              </SummaryListItem>
-            </SummaryList>
-          </WizardStepSummary>
+              <SummaryList noBorder>
+                <SummaryListItem term="Publication">
+                  {getSelectedPublication(form.values.publicationId)?.title}
+                </SummaryListItem>
+              </SummaryList>
+            </WizardStepSummary>
+
+            {renderSummaryAfter}
+          </>
         );
       }}
     </Formik>

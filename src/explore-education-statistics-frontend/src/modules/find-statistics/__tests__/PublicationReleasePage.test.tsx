@@ -1,3 +1,4 @@
+import { Release } from '@common/services/publicationService';
 import PublicationReleasePage from '@frontend/modules/find-statistics/PublicationReleasePage';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -24,7 +25,7 @@ describe('PublicationReleasePage', () => {
   });
 
   test('does not render latest data tag when publication is superseded', () => {
-    const testReleaseSuperseded = {
+    const testReleaseSuperseded: Release = {
       ...testRelease,
       publication: { ...testPublication, isSuperseded: true },
     };
@@ -33,6 +34,48 @@ describe('PublicationReleasePage', () => {
     expect(
       screen.queryByText('This is the latest data'),
     ).not.toBeInTheDocument();
+  });
+
+  test('renders superseded warning text when publication is superseded', () => {
+    const testReleaseSuperseded: Release = {
+      ...testRelease,
+      publication: {
+        ...testPublication,
+        isSuperseded: true,
+        supersededBy: {
+          id: 'publication-a',
+          title: 'publication A',
+          slug: 'publication-a',
+        },
+      },
+    };
+
+    render(<PublicationReleasePage release={testReleaseSuperseded} />);
+
+    const supersededWarningLink = within(
+      screen.getByTestId('superseded-warning'),
+    ).getByRole('link', {
+      name: 'publication A',
+    });
+
+    expect(supersededWarningLink).toHaveAttribute(
+      'href',
+      '/find-statistics/publication-a',
+    );
+  });
+
+  test('does not render superseded warning text when publication is superseded', () => {
+    const testReleaseSuperseded: Release = {
+      ...testRelease,
+      publication: {
+        ...testPublication,
+        isSuperseded: false,
+      },
+    };
+
+    render(<PublicationReleasePage release={testReleaseSuperseded} />);
+
+    expect(screen.queryByTestId('superseded-warning')).not.toBeInTheDocument();
   });
 
   test('renders data downloads links', async () => {
@@ -340,7 +383,7 @@ describe('PublicationReleasePage', () => {
   });
 
   test('renders link to an external methodology', () => {
-    const testReleaseWithExternalMethodology = {
+    const testReleaseWithExternalMethodology: Release = {
       ...testRelease,
       publication: {
         ...testRelease.publication,
@@ -368,7 +411,7 @@ describe('PublicationReleasePage', () => {
   });
 
   test('renders links to internal and external methodologies', () => {
-    const testReleaseWithInternalAndExternalMethodologies = {
+    const testReleaseWithInternalAndExternalMethodologies: Release = {
       ...testRelease,
       publication: {
         ...testRelease.publication,

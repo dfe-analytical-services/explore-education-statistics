@@ -98,7 +98,9 @@ Check that archive-publication subject appears correctly on Data tables page
 
     user clicks radio    %{TEST_THEME_NAME}
 
-    user checks page does not contain    ${PUBLICATION_NAME_SUPERSEDE}
+    user waits until page contains    Select a publication    %{WAIT_SMALL}
+
+    user checks page does not contain element    Radio item for UI tests - ${PUBLICATION_NAME_SUPERSEDE}
 
     user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
     user clicks element    id:publicationForm-submit
@@ -147,8 +149,10 @@ Check that archive-publication subject appears correctly on Data catalogue page
 
     user clicks radio    %{TEST_THEME_NAME}
 
-    user checks page contains    ${PUBLICATION_NAME_ARCHIVE}
-    user checks page does not contain    ${PUBLICATION_NAME_SUPERSEDE}
+    user waits until element is visible    id:publicationForm-publications    %{WAIT_SMALL}
+
+    user checks page contains radio    ${PUBLICATION_NAME_ARCHIVE}
+    user checks page does not contain element    //*[@data-testid="Radio item for ${PUBLICATION_NAME_SUPERSEDE}"]
 
     user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
     user clicks button    Next step
@@ -197,6 +201,22 @@ Check public archive-publication release page displays correctly
     user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
     user checks page does not contain    This is the latest data
 
+Check public archive-publication release page displays superseded warning
+    user checks page contains element    testid:superseded-warning
+    user checks page contains element    testid:superseded-by-link
+
+    ${SUPERSDED_BY_LINK_TEXT}=    get text    testid:superseded-by-link
+    should contain    ${SUPERSDED_BY_LINK_TEXT}    ${PUBLICATION_NAME_SUPERSEDE}
+
+Check superseded warning link takes user to superseding-publication release page
+    user clicks element    testid:superseded-by-link
+
+    user waits until h1 is visible    ${PUBLICATION_NAME_SUPERSEDE}    %{WAIT_MEDIUM}
+    user checks page contains    This is the latest data
+
+    user checks page does not contain element    testid:superseded-warning
+    user checks page does not contain element    testid:superseded-by-link
+
 Check public data tables page contains superseding-publication's subject
     user navigates to data tables page on public frontend
 
@@ -216,11 +236,12 @@ Check data catalogue page contains archive and superseding publication subjects
 
     user clicks radio    %{TEST_THEME_NAME}
 
-    user checks page contains    ${PUBLICATION_NAME_ARCHIVE}
-    user checks page contains    ${PUBLICATION_NAME_SUPERSEDE}
+    user checks page contains radio    ${PUBLICATION_NAME_ARCHIVE}
+    user checks page contains radio    ${PUBLICATION_NAME_SUPERSEDE}
 
     user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
     user clicks button    Next step
+
     user waits until page contains    Choose a release
     user waits until page contains    ${RELEASE_NAME_ARCHIVE}
 
@@ -252,6 +273,66 @@ Check data catalogue page contains archive and superseding publication subjects
 
     user checks page contains    This is the latest data
     user checks page does not contain    This is not the latest data
+
+Check data catalogue page contains superseded warning for archived publication (step one and two)
+    user navigates to data catalogue page on public frontend
+
+    user clicks radio    %{TEST_THEME_NAME}
+
+    user checks page contains radio    ${PUBLICATION_NAME_ARCHIVE}
+    user checks page contains radio    ${PUBLICATION_NAME_SUPERSEDE}
+
+    user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
+    user clicks button    Next step
+    user waits for page to finish loading
+
+    user waits until page contains    Choose a release
+    user waits until page contains    ${RELEASE_NAME_ARCHIVE}
+
+    user checks page contains radio    ${RELEASE_NAME_ARCHIVE}
+    user checks page does not contain    This is the latest data
+    user checks page contains element    testid:superseded-warning
+    user checks page contains element    testid:superseded-by-link
+
+    # step 2
+    user clicks button    Next step
+    user checks page contains element    testid:superseded-warning
+    user checks page contains element    testid:superseded-by-link
+
+Check that superseded warning link takes user to superseding-publication data-catalogue step 1
+    user navigates to data catalogue page on public frontend
+
+    user clicks radio    %{TEST_THEME_NAME}
+
+    user checks page contains radio    ${PUBLICATION_NAME_ARCHIVE}
+    user checks page contains radio    ${PUBLICATION_NAME_SUPERSEDE}
+
+    user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
+    user clicks button    Next step
+
+    user waits until page contains    Choose a release
+    user waits until page contains    ${RELEASE_NAME_ARCHIVE}
+
+    user checks page contains radio    ${RELEASE_NAME_ARCHIVE}
+
+    user checks page contains element    testid:superseded-warning
+    user checks page contains element    testid:superseded-by-link
+
+    # step 2
+    user clicks button    Next step
+
+    user checks page contains element    testid:superseded-warning
+    user checks page contains element    testid:superseded-by-link
+
+    user clicks element    testid:superseded-by-link
+
+    user waits until page contains    Browse our open data    %{WAIT_SMALL}
+
+    user waits until page contains    ${PUBLICATION_NAME_SUPERSEDE}    %{WAIT_SMALL}
+
+    user checks page does not contain    ${PUBLICATION_NAME_ARCHIVE}
+
+    user checks page for details dropdown    ${PUBLICATION_NAME_ARCHIVE}
 
 Check archive-publication permalink has out-of-date warning
     user navigates to public frontend    ${PERMALINK_URL}

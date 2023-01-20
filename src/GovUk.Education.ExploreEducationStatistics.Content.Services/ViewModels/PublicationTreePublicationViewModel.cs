@@ -1,7 +1,5 @@
 #nullable enable
 using System;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
@@ -14,6 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
         public string Slug { get; init; } = string.Empty;
 
         public bool IsSuperseded { get; set; }
+
+        public PublicationSupersededByViewModel? SupersededBy { get; set; }
 
         public bool LatestReleaseHasData { get; set; }
 
