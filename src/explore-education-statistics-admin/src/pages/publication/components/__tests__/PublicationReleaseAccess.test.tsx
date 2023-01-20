@@ -1,3 +1,4 @@
+import baseRender from '@common-test/render';
 import PublicationReleaseAccess from '@admin/pages/publication/components/PublicationReleaseAccess';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import _userService from '@admin/services/userService';
@@ -5,12 +6,7 @@ import _releasePermissionService, {
   UserReleaseInvite,
   UserReleaseRole,
 } from '@admin/services/releasePermissionService';
-import {
-  render as baseRender,
-  screen,
-  waitFor,
-  within,
-} from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import React, { ReactElement } from 'react';
@@ -216,5 +212,5 @@ describe('PublicationReleaseAccess', () => {
 });
 
 function render(element: ReactElement) {
-  baseRender(<MemoryRouter>{element}</MemoryRouter>);
+  return baseRender(<MemoryRouter>{element}</MemoryRouter>);
 }

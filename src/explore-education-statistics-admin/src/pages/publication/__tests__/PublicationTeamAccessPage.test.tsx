@@ -16,14 +16,15 @@ import _releasePermissionService, {
   UserReleaseInvite,
   UserReleaseRole,
 } from '@admin/services/releasePermissionService';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { generatePath, Route } from 'react-router';
-import React from 'react';
+import { generatePath, MemoryRouter, Route } from 'react-router';
+import React, { ReactElement } from 'react';
 import { Router } from 'react-router-dom';
 import noop from 'lodash/noop';
 import { createMemoryHistory, MemoryHistory } from 'history';
 import { produce } from 'immer';
+import baseRender from '@common-test/render';
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<
@@ -362,10 +363,12 @@ describe('PublicationTeamAccessPage', () => {
     await renderPage({});
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('heading', { name: 'Update publication access' }),
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('Release')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('heading', { name: 'Update publication access' }),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('heading', { name: 'Update release access' }),
@@ -433,10 +436,12 @@ describe('PublicationTeamAccessPage', () => {
     });
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('heading', { name: 'Publication access' }),
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('Release')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('heading', { name: 'Publication access' }),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('heading', { name: 'Release access' }),
@@ -539,10 +544,12 @@ describe('PublicationTeamAccessPage', () => {
     });
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('heading', { name: 'Update publication access' }),
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('Release')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('heading', { name: 'Update publication access' }),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('heading', { name: 'Update release access' }),
@@ -564,10 +571,12 @@ describe('PublicationTeamAccessPage', () => {
     await renderPage({ history });
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('heading', { name: 'Update publication access' }),
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('Release')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('heading', { name: 'Update publication access' }),
+    ).toBeInTheDocument();
 
     expect(screen.getByText('Update release access')).toBeInTheDocument();
 
@@ -591,10 +600,12 @@ describe('PublicationTeamAccessPage', () => {
     await renderPage({ history });
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('heading', { name: 'Update publication access' }),
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('Release')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('heading', { name: 'Update publication access' }),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('heading', { name: 'Update release access' }),
@@ -660,4 +671,8 @@ async function renderPage({
       </PublicationContextProvider>
     </Router>,
   );
+}
+
+function render(element: ReactElement) {
+  return baseRender(<MemoryRouter>{element}</MemoryRouter>);
 }

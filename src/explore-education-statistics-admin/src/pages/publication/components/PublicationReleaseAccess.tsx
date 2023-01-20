@@ -2,16 +2,12 @@ import ButtonLink from '@admin/components/ButtonLink';
 import ReleaseUserTable from '@admin/pages/publication/components/ReleaseUserTable';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import {
-  PublicationTeamRouteParams,
   publicationManageReleaseContributorsPageRoute,
+  PublicationTeamRouteParams,
 } from '@admin/routes/publicationRoutes';
 import { ReleaseSummary } from '@admin/services/releaseService';
-import releasePermissionService, {
-  UserReleaseRole,
-  UserReleaseInvite,
-} from '@admin/services/releasePermissionService';
+import releasePermissionService from '@admin/services/releasePermissionService';
 import userService from '@admin/services/userService';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
@@ -19,6 +15,8 @@ import React from 'react';
 import { generatePath } from 'react-router-dom';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import { useQuery } from '@tanstack/react-query';
+import releasePermissionQueries from '@admin/queries/releasePermissionQueries';
 
 interface Props {
   publicationId: string;
@@ -32,28 +30,27 @@ const PublicationReleaseAccess = ({
   hasReleaseTeamManagementPermission = false,
 }: Props) => {
   const {
-    value,
-    isLoading,
-    setState: setUsersAndInvites,
-  } = useAsyncHandledRetry<{
-    approvers: UserReleaseRole[];
-    approverInvites: UserReleaseInvite[];
-    contributors: UserReleaseRole[];
-    contributorInvites: UserReleaseInvite[];
-  }>(async () => {
-    const [roles, invites] = await Promise.all([
-      releasePermissionService.listRoles(release.id),
-      releasePermissionService.listInvites(release.id),
-    ]);
-    return {
-      approvers: roles.filter(role => role.role === 'Approver'),
-      approverInvites: invites.filter(invite => invite.role === 'Approver'),
-      contributors: roles.filter(role => role.role === 'Contributor'),
-      contributorInvites: invites.filter(
-        invite => invite.role === 'Contributor',
-      ),
-    };
-  }, [release]);
+    data: roles = [],
+    isLoading: rolesLoading,
+    refetch: refetchRoles,
+  } = useQuery({
+    ...releasePermissionQueries.listRoles(release.id),
+  });
+
+  const {
+    data: invites = [],
+    isLoading: invitesLoading,
+    refetch: refetchInvites,
+  } = useQuery({
+    ...releasePermissionQueries.listInvites(release.id),
+  });
+
+  const approvers = roles.filter(role => role.role === 'Approver');
+  const approverInvites = invites.filter(invite => invite.role === 'Approver');
+  const contributors = roles.filter(role => role.role === 'Contributor');
+  const contributorInvites = invites.filter(
+    invite => invite.role === 'Contributor',
+  );
 
   const handleUserRemove = hasReleaseTeamManagementPermission
     ? async (userId: string) => {
@@ -61,42 +58,19 @@ const PublicationReleaseAccess = ({
           publicationId,
           userId,
         );
-        setUsersAndInvites({
-          value: {
-            contributors: contributors.filter(c => c.userId !== userId),
-            contributorInvites,
-            approvers,
-            approverInvites,
-          },
-        });
+        await refetchRoles();
       }
     : undefined;
 
   const handleUserInvitesRemove = hasReleaseTeamManagementPermission
     ? async (email: string) => {
         await userService.removeContributorReleaseInvites(email, publicationId);
-        setUsersAndInvites({
-          value: {
-            contributors,
-            contributorInvites: contributorInvites.filter(
-              i => i.email !== email,
-            ),
-            approvers,
-            approverInvites,
-          },
-        });
+        await refetchInvites();
       }
     : undefined;
 
-  const {
-    approvers = [],
-    approverInvites = [],
-    contributors = [],
-    contributorInvites = [],
-  } = value ?? {};
-
   return (
-    <LoadingSpinner loading={isLoading}>
+    <LoadingSpinner loading={rolesLoading || invitesLoading}>
       <SummaryList className="govuk-!-margin-bottom-8">
         <SummaryListItem term="Release">
           {`${release.title}${!release.live ? ' (Not live)' : ''}`}
