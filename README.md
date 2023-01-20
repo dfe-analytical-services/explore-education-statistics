@@ -591,7 +591,7 @@ realm configuration.
 
 ### Forcing immediate publishing of scheduled Releases in test environments
 
-During manual or automated testing, it is handy to have a way to schedule Releases for publishing but to trigger that process to occur on demand, rather than having to wait for a lengthly
+During manual or automated testing, it is handy to have a way to schedule releases for publishing but to trigger that process to occur on demand, rather than having to wait for a lengthly
 period before the scheduled Publisher Functions run. For this, we provide 2 Functions that can be triggered by HTTP requests; one stages scheduled Releases, whilst the other completes the
 publishing process for any staged Releases and makes them live.
 

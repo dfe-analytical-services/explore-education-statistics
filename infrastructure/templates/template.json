@@ -377,8 +377,8 @@
       }
     },
     "immediatePublicationOfScheduledReleasesEnabled": {
-      "type": "string",
-      "defaultValue": "false",
+      "type": "bool",
+      "defaultValue": false,
       "metadata": {
         "description": "Enables the Functions in the Publisher App which allow scheduled Releases to be published immediately"
       }

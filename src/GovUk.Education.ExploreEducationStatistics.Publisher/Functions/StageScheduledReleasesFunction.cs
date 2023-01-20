@@ -1,9 +1,7 @@
 ﻿#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -89,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             
             var stagingReleaseIds = await PublishReleaseFilesAndStageContent(scheduled.ToArray());
 
-            logger.LogInformation("{FunctionName} completed - staged Releases {ReleaseIds}", 
+            logger.LogInformation("{FunctionName} completed. Staged Releases [{ReleaseIds}]", 
                 executionContext.FunctionName,
                 stagingReleaseIds.JoinToString(','));
 

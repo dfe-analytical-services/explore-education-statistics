@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             var publishedReleaseIds = await PublishScheduledReleases(scheduled.ToArray());
 
-            logger.LogInformation("{FunctionName} completed.  Published Releases {ReleaseIds}", 
+            logger.LogInformation("{FunctionName} completed. Published Releases [{ReleaseIds}]", 
                 executionContext.FunctionName,
                 publishedReleaseIds.JoinToString(','));
             

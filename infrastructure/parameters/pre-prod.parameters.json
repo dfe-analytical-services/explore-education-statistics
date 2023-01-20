@@ -63,7 +63,7 @@
       "value": 268435456000
     },
     "immediatePublicationOfScheduledReleasesEnabled": {
-      "value": "true"
+      "value": true
     }
   }
 }
