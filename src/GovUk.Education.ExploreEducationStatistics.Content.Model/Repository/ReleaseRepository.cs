@@ -34,8 +34,8 @@ public class ReleaseRepository : IReleaseRepository
     {
         var publication = await _contentDbContext.Publications
             .Include(p => p.LatestPublishedRelease)
-            .SingleAsync(p => p.Id == publicationId);
+            .SingleOrDefaultAsync(p => p.Id == publicationId);
 
-        return publication.LatestPublishedRelease ?? new Either<ActionResult, Release>(new NotFoundResult());
+        return publication?.LatestPublishedRelease ?? new Either<ActionResult, Release>(new NotFoundResult());
     }
 }

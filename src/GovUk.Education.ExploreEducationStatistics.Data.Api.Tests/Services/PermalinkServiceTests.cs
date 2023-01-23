@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .ReturnsAsync(new NotFoundResult());
 
             subjectRepository
-                .Setup(s => s.GetPublicationIdForSubject(request.Query.SubjectId))
+                .Setup(s => s.FindPublicationIdForSubject(request.Query.SubjectId))
                 .ReturnsAsync(_publicationId);
 
             var service = BuildService(releaseRepository: releaseRepository.Object,
@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .ReturnsAsync(release);
 
             subjectRepository
-                .Setup(s => s.GetPublicationIdForSubject(subject.Id))
+                .Setup(s => s.FindPublicationIdForSubject(subject.Id))
                 .ReturnsAsync(_publicationId);
 
             tableBuilderService

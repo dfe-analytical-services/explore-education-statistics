@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var publicationId = await _subjectRepository.GetPublicationIdForSubject(releaseSubject.SubjectId);
+                    var publicationId = await _subjectRepository.FindPublicationIdForSubject(releaseSubject.SubjectId);
                     var publicationTitle = (await _contentDbContext.Publications.FindAsync(publicationId))!.Title;
 
                     var releaseFile =

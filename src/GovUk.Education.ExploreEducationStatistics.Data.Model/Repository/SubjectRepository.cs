@@ -17,20 +17,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             _context = context;
         }
 
-        public async Task<Subject?> Get(Guid subjectId)
+        public async Task<Subject?> Find(Guid subjectId)
         {
             return await _context
                 .Subject
                 .FindAsync(subjectId);
         }
 
-        public async Task<Guid> GetPublicationIdForSubject(Guid subjectId)
+        public async Task<Guid?> FindPublicationIdForSubject(Guid subjectId)
         {
-            var firstReleaseSubject = await _context.ReleaseSubject
+            var releaseSubject = await _context.ReleaseSubject
                 .Include(rs => rs.Release)
                 .Where(rs => rs.SubjectId == subjectId)
-                .FirstAsync();
-            return firstReleaseSubject.Release.PublicationId;
+                .FirstOrDefaultAsync();
+            
+            return releaseSubject?.Release.PublicationId;
         }
     }
 }
