@@ -49,10 +49,16 @@ Assign various release access permissions to analysts
     user gives analyst publication owner access    ${PUBLICATION_NAME}
     ...    EES-test.ANALYST1@education.gov.uk
 
-    user gives release access to analyst    ${PUBLICATION_NAME} - Academic Year 2000/01    Contributor
+    user gives release access to analyst
+    ...    ${PUBLICATION_NAME}
+    ...    Academic Year 2000/01
+    ...    Contributor
     ...    EES-test.ANALYST3@education.gov.uk
 
-    user gives release access to analyst    ${PUBLICATION_NAME} - Academic Year 2001/02    Contributor
+    user gives release access to analyst
+    ...    ${PUBLICATION_NAME}
+    ...    Academic Year 2001/02
+    ...    Contributor
     ...    EES-test.ANALYST2@education.gov.uk
 
 Sign in as analyst1 and go to Manage team access page

@@ -448,6 +448,12 @@ user checks element has class
     ${classes}=    get element attribute    ${element}    class
     should contain    ${classes}    ${class}
 
+user checks element does not have class
+    [Arguments]    ${selector}    ${class}    ${parent}=css:body
+    ${element}=    lookup or return webelement    ${selector}    ${parent}
+    ${classes}=    get element attribute    ${element}    class
+    should not contain    ${classes}    ${class}
+
 user waits until element is enabled
     [Arguments]    ${element}    ${wait}=${timeout}
     wait until element is enabled    ${element}    ${wait}

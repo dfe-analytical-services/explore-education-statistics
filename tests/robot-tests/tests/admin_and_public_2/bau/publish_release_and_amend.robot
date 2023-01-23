@@ -415,6 +415,7 @@ Return to Admin and Create amendment
 Change the Release type
     user waits until page contains link    Edit release summary
     user clicks link    Edit release summary
+    user waits until page does not contain loading spinner
     user waits until h2 is visible    Edit release summary
     user checks page contains radio    Experimental statistics
     user clicks radio    Experimental statistics

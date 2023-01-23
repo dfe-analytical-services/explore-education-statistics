@@ -91,7 +91,7 @@ user gives release access to all releases of publication to analyst
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${ROLE}
-    user gives release access to analyst    ${PUBLICATION_NAME} - ${DRAFT_RELEASE_TYPE}    ${ROLE}
-    user gives release access to analyst    ${PUBLICATION_NAME} - ${HIGHER_REVIEW_RELEASE_TYPE}    ${ROLE}
-    user gives release access to analyst    ${PUBLICATION_NAME} - ${APPROVED_RELEASE_TYPE}    ${ROLE}
-    user gives release access to analyst    ${PUBLICATION_NAME} - ${PUBLISHED_RELEASE_TYPE}    ${ROLE}
+    user gives release access to analyst    ${PUBLICATION_NAME}    ${DRAFT_RELEASE_TYPE}    ${ROLE}
+    user gives release access to analyst    ${PUBLICATION_NAME}    ${HIGHER_REVIEW_RELEASE_TYPE}    ${ROLE}
+    user gives release access to analyst    ${PUBLICATION_NAME}    ${APPROVED_RELEASE_TYPE}    ${ROLE}
+    user gives release access to analyst    ${PUBLICATION_NAME}    ${PUBLISHED_RELEASE_TYPE}    ${ROLE}

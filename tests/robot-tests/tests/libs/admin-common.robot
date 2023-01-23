@@ -192,6 +192,7 @@ user navigates to publication page from dashboard
     user clicks link    ${publication}
     user waits until h1 is visible    ${publication}
     user waits until h2 is visible    Manage releases
+    user waits until page does not contain loading spinner
 
 user creates methodology for publication
     [Arguments]
@@ -697,7 +698,8 @@ user gives publication access to analyst
     user waits until element is enabled    css:[name="selectedPublicationRole"]
     user chooses select option    css:[name="selectedPublicationRole"]    ${ROLE}
     user clicks button    Add publication access
-    user waits until page does not contain loading spinner
+    user waits until parent contains element    testid:publicationAccessTable
+    ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Role"] and text()="${ROLE}"]]
 
 user removes publication access from analyst
     [Arguments]
@@ -712,14 +714,19 @@ user removes publication access from analyst
     user waits until page does not contain loading spinner
 
 user gives release access to analyst
-    [Arguments]    ${RELEASE_NAME}    ${ROLE}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    [Arguments]
+    ...    ${PUBLICATION_NAME}
+    ...    ${RELEASE_NAME}
+    ...    ${ROLE}
+    ...    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
     user scrolls to element    css:[name="selectedReleaseId"]
-    user chooses select option    css:[name="selectedReleaseId"]    ${RELEASE_NAME}
+    user chooses select option    css:[name="selectedReleaseId"]    ${PUBLICATION_NAME} - ${RELEASE_NAME}
     user waits until element is enabled    css:[name="selectedReleaseRole"]
     user chooses select option    css:[name="selectedReleaseRole"]    ${ROLE}
     user clicks button    Add release access
-    user waits until page does not contain loading spinner
+    user waits until parent contains element    testid:releaseAccessTable
+    ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Release"] and text()="${RELEASE_NAME}"] and td[//th[text()="Role"] and text()="${ROLE}"]]
 
 user removes release access from analyst
     [Arguments]    ${PUBLICATION_NAME}    ${RELEASE_NAME}    ${ROLE}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
