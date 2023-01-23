@@ -212,16 +212,35 @@ Add public prerelease access list
     user creates public prerelease access list    Test public access list
 
 Approve release for scheduled publication
-    user approves release for scheduled publication    0    12    3001
+    ${days_until_release}=    set variable    0
+    ${publish_date_day}=    get current datetime    %-d    ${days_until_release}
+    ${publish_date_month}=    get current datetime    %-m    ${days_until_release}
+    ${publish_date_month_word}=    get current datetime    %B    ${days_until_release}
+    ${publish_date_year}=    get current datetime    %Y    ${days_until_release}
+
+    user approves release for scheduled publication
+    ...    ${publish_date_day}
+    ...    ${publish_date_month}
+    ...    ${publish_date_year}
+    ...    12
+    ...    3001
+
+    set suite variable    ${EXPECTED_SCHEDULED_DATE}
+    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
 
 Verify release is scheduled
     user checks summary list contains    Current status    Approved
-    user checks summary list contains    Scheduled release
-    ...    ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
+    user checks summary list contains    Scheduled release    ${EXPECTED_SCHEDULED_DATE}
     user checks summary list contains    Next release expected    December 3001
 
 Publish the scheduled release
     user waits for scheduled release to be published immediately
+
+    ${publish_date_day}=    get current datetime    %-d
+    ${publish_date_month_word}=    get current datetime    %B
+    ${publish_date_year}=    get current datetime    %Y
+    set suite variable    ${EXPECTED_PUBLISHED_DATE}
+    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
 
 Verify newly published release is on Find Statistics page
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
@@ -235,14 +254,7 @@ Verify release URL and page caption
     user waits until page contains title caption    ${RELEASE_NAME}
 
 Verify publish and update dates
-    ${PUBLISH_DATE_DAY}=    get current datetime    %-d
-    ${PUBLISH_DATE_MONTH_WORD}=    get current datetime    %B
-    ${PUBLISH_DATE_YEAR}=    get current datetime    %Y
-    set suite variable    ${PUBLISH_DATE_DAY}
-    set suite variable    ${PUBLISH_DATE_MONTH_WORD}
-    set suite variable    ${PUBLISH_DATE_YEAR}
-    user checks summary list contains    Published
-    ...    ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
+    user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
     user checks summary list contains    Next update    December 3001
 
 Verify release associated files
@@ -333,7 +345,7 @@ Verify public pre-release access list
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
     user waits until h2 is visible    Pre-release access list
-    user waits until page contains    Published ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
+    user waits until page contains    Published ${EXPECTED_PUBLISHED_DATE}
     user waits until page contains    Test public access list
 
 Verify accordions are correct
@@ -638,8 +650,27 @@ Update public prerelease access list for amendment
     user updates public prerelease access list    Amended public access list
 
 Approve amendment for scheduled release
-    user approves release for scheduled publication    1    12    3001
+    ${days_until_release}=    set variable    1
+    ${publish_date_day}=    get current datetime    %-d    ${days_until_release}
+    ${publish_date_month}=    get current datetime    %-m    ${days_until_release}
+    ${publish_date_month_word}=    get current datetime    %B    ${days_until_release}
+    ${publish_date_year}=    get current datetime    %Y    ${days_until_release}
+
+    user approves release for scheduled publication
+    ...    ${publish_date_day}
+    ...    ${publish_date_month}
+    ...    ${publish_date_year}
+    ...    12
+    ...    3001
+
     user waits for scheduled release to be published immediately
+
+    ${publish_date_day}=    get current datetime    %-d
+    ${publish_date_month}=    get current datetime    %-m
+    ${publish_date_month_word}=    get current datetime    %B
+    ${publish_date_year}=    get current datetime    %Y
+    set suite variable    ${EXPECTED_PUBLISHED_DATE}
+    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
 
 Verify amendment is on Find Statistics page again
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
@@ -661,8 +692,7 @@ Verify amendment is displayed as the latest release
     user checks page does not contain    See other releases (1)
 
 Verify amendment is published
-    user checks summary list contains    Published
-    ...    ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
+    user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
     user checks summary list contains    Next update    December 3001
 
 Verify amendment files
@@ -747,7 +777,7 @@ Verify amendment public pre-release access list
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
     user waits until h2 is visible    Pre-release access list
-    user waits until page contains    Published ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
+    user waits until page contains    Published ${EXPECTED_PUBLISHED_DATE}
     user waits until page contains    Amended public access list
 
 Verify amendment accordions are correct
@@ -826,7 +856,16 @@ Leave release note for amendment
     user clicks button    Save note
 
 Approve release amendment for scheduled publication
-    user approves release for scheduled publication    2    8    4001
+    ${days_until_release}=    set variable    2
+    ${publish_date_day}=    get current datetime    %-d    ${days_until_release}
+    ${publish_date_month}=    get current datetime    %-m    ${days_until_release}
+    ${publish_date_year}=    get current datetime    %Y    ${days_until_release}
+    user approves release for scheduled publication
+    ...    ${publish_date_day}
+    ...    ${publish_date_month}
+    ...    ${publish_date_year}
+    ...    8
+    ...    4001
     user waits for scheduled release to be published immediately
 
 Save public release link for later use

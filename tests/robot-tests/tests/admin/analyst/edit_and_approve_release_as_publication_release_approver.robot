@@ -129,12 +129,25 @@ Put release back into draft
     user puts release into draft
 
 Approve release for scheduled release
-    user approves release for scheduled publication    2    12    3001
+    ${days_until_release}=    set variable    2
+    ${publish_date_day}=    get current datetime    %-d    ${days_until_release}
+    ${publish_date_month}=    get current datetime    %-m    ${days_until_release}
+    ${publish_date_month_word}=    get current datetime    %B    ${days_until_release}
+    ${publish_date_year}=    get current datetime    %Y    ${days_until_release}
+
+    user approves release for scheduled publication
+    ...    ${publish_date_day}
+    ...    ${publish_date_month}
+    ...    ${publish_date_year}
+    ...    12
+    ...    3001
+
+    set suite variable    ${EXPECTED_SCHEDULED_DATE}
+    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
 
 Verify release is scheduled
     user checks summary list contains    Current status    Approved
-    user checks summary list contains    Scheduled release
-    ...    ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
+    user checks summary list contains    Scheduled release    ${EXPECTED_SCHEDULED_DATE}
     user checks summary list contains    Next release expected    December 3001
 
 Put release back into draft again
