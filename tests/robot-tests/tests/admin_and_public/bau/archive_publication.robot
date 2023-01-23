@@ -286,10 +286,11 @@ Check data catalogue page contains superseded warning for archived publication (
     user clicks button    Next step
     user waits for page to finish loading
 
-    user waits until page contains    Choose a release
-    user waits until page contains    ${RELEASE_NAME_ARCHIVE}
+    user checks summary list contains    Publication    ${PUBLICATION_NAME_ARCHIVE}
 
+    user waits until page contains    Choose a release
     user checks page contains radio    ${RELEASE_NAME_ARCHIVE}
+
     user checks page does not contain    This is the latest data
     user checks page contains element    testid:superseded-warning
     user checks page contains element    testid:superseded-by-link
@@ -310,9 +311,9 @@ Check that superseded warning link takes user to superseding-publication data-ca
     user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
     user clicks button    Next step
 
-    user waits until page contains    Choose a release
-    user waits until page contains    ${RELEASE_NAME_ARCHIVE}
+    user checks summary list contains    Publication    ${PUBLICATION_NAME_ARCHIVE}
 
+    user waits until page contains    Choose a release
     user checks page contains radio    ${RELEASE_NAME_ARCHIVE}
 
     user checks page contains element    testid:superseded-warning
@@ -326,13 +327,13 @@ Check that superseded warning link takes user to superseding-publication data-ca
 
     user clicks element    testid:superseded-by-link
 
-    user waits until page contains    Browse our open data    %{WAIT_SMALL}
+    user waits until h1 is visible    Browse our open data
 
-    user waits until page contains    ${PUBLICATION_NAME_SUPERSEDE}    %{WAIT_SMALL}
+    user checks summary list contains    Publication    ${PUBLICATION_NAME_SUPERSEDE}
+    user checks page contains radio    ${RELEASE_NAME_SUPERSEDE}
 
-    user checks page does not contain    ${PUBLICATION_NAME_ARCHIVE}
-
-    user checks page for details dropdown    ${PUBLICATION_NAME_ARCHIVE}
+    user checks page does not contain element    testid:superseded-warning
+    user checks page does not contain element    testid:superseded-by-link
 
 Check archive-publication permalink has out-of-date warning
     user navigates to public frontend    ${PERMALINK_URL}
