@@ -95,14 +95,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId}/content/available-datablocks")]
-        public async Task<ActionResult<List<DataBlock>>> GetAvailableDataBlocks(Guid releaseId)
-        {
-            return await _contentService
-                .GetAvailableDataBlocks(releaseId)
-                .HandleFailuresOrOk();
-        }
-
         [HttpPost("release/{releaseId}/content/section/{contentSectionId}/blocks/attach")]
         public async Task<ActionResult<IContentBlockViewModel>> AttachDataBlock(
             Guid releaseId, Guid contentSectionId, ContentBlockAttachRequest request)

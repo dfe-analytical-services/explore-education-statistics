@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -23,20 +24,20 @@ public class KeyStatisticService : IKeyStatisticService
 {
     private readonly ContentDbContext _context;
     private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-    private readonly IContentService _contentService;
+    private readonly IDataBlockService _dataBlockService;
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
 
     public KeyStatisticService(
         ContentDbContext context,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
-        IContentService contentService,
+        IDataBlockService dataBlockService,
         IUserService userService,
         IMapper mapper)
     {
         _context = context;
         _persistenceHelper = persistenceHelper;
-        _contentService = contentService;
+        _dataBlockService = dataBlockService;
         _userService = userService;
         _mapper = mapper;
     }
@@ -51,7 +52,7 @@ public class KeyStatisticService : IKeyStatisticService
                 await _persistenceHelper.CheckEntityExists<DataBlock>(request.DataBlockId))
             .OnSuccessVoid(async dataBlock =>
             {
-                var either = await _contentService.GetAvailableDataBlocks(releaseId);
+                var either = await _dataBlockService.GetAvailableDataBlocks(releaseId);
                 if (either.IsLeft)
                 {
                     throw new Exception("ContentService#GetAvailableDataBlocks error");

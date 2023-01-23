@@ -211,11 +211,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
-            contentService.Setup(mock =>
+            dataBlockService.Setup(mock =>
                     mock.GetAvailableDataBlocks(release.Id))
                 .ReturnsAsync(availableDataBlocks);
 
@@ -230,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupManageContentPageService(contentDbContext: contentDbContext,
-                    contentService: contentService.Object,
+                    dataBlockService: dataBlockService.Object,
                     methodologyVersionRepository: methodologyVersionRepository.Object,
                     releaseFileService: releaseFileService.Object);
 
@@ -238,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
                 Assert.True(result.IsRight);
 
-                contentService.Verify(mock =>
+                dataBlockService.Verify(mock =>
                     mock.GetAvailableDataBlocks(release.Id), Times.Once);
 
                 releaseFileService.Verify(mock =>
@@ -351,7 +351,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal("Methodology 2 title", contentPublication.Methodologies[1].Title);
             }
 
-            MockUtils.VerifyAllMocks(contentService, methodologyVersionRepository, releaseFileService);
+            MockUtils.VerifyAllMocks(dataBlockService, methodologyVersionRepository, releaseFileService);
         }
 
         [Fact]
@@ -468,11 +468,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
-            contentService.Setup(mock =>
+            dataBlockService.Setup(mock =>
                     mock.GetAvailableDataBlocks(release.Id))
                 .ReturnsAsync(availableDataBlocks);
 
@@ -488,7 +488,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             {
                 var service = SetupManageContentPageService(
                     contentDbContext: contentDbContext,
-                    contentService: contentService.Object,
+                    dataBlockService: dataBlockService.Object,
                     methodologyVersionRepository: methodologyVersionRepository.Object,
                     releaseFileService: releaseFileService.Object);
 
@@ -496,7 +496,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
                 Assert.True(result.IsRight);
 
-                contentService.Verify(mock =>
+                dataBlockService.Verify(mock =>
                     mock.GetAvailableDataBlocks(release.Id), Times.Once);
 
                 releaseFileService.Verify(mock =>
@@ -555,14 +555,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal("jane@test.com", contentBlock.LockedBy!.Email);
             }
 
-            MockUtils.VerifyAllMocks(contentService, methodologyVersionRepository, releaseFileService);
+            MockUtils.VerifyAllMocks(dataBlockService, methodologyVersionRepository, releaseFileService);
         }
 
         private static ManageContentPageService SetupManageContentPageService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IMapper? mapper = null,
-            IContentService? contentService = null,
+            IDataBlockService? dataBlockService = null,
             IMethodologyVersionRepository? methodologyVersionRepository = null,
             IReleaseFileService? releaseFileService = null,
             IUserService? userService = null)
@@ -570,7 +570,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             return new(
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 mapper ?? MapperUtils.AdminMapper(),
-                contentService ?? new Mock<IContentService>().Object,
+                dataBlockService ?? new Mock<IDataBlockService>().Object,
                 methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object,
                 releaseFileService ?? new Mock<IReleaseFileService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object

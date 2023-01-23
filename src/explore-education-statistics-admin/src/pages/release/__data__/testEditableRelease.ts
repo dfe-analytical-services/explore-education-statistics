@@ -191,9 +191,6 @@ export const testEditableRelease: EditableRelease = {
       },
     ],
   },
-  // @MarkFix repurpose as data blocks and keyStatisticDataBlocks?
-  //keyStatisticsSection: {
-  //},
   keyStatisticsSecondarySection: {
     heading: '',
     id: '5509024d-9389-40d1-d1b5-08d7bec1ba1b',

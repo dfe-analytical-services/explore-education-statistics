@@ -152,7 +152,6 @@ describe('EditableKeyStat', () => {
     });
   });
 
-  // Text blank trend
   test('KeyStatisticText without trend renders correctly when read-only', async () => {
     render(
       <EditableKeyStatText
@@ -584,7 +583,7 @@ describe('EditableKeyStat', () => {
     await userEvent.clear(screen.getByLabelText('Guidance title'));
     await userEvent.type(
       screen.getByLabelText('Guidance title'),
-      'New guidance title',
+      '  New guidance title  ', // Whitespace should be trimmed
     );
 
     await userEvent.clear(screen.getByLabelText('Guidance text'));

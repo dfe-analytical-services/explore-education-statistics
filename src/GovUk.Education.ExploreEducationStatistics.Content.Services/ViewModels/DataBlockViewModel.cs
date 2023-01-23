@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public ObservationQueryContext Query { get; set; }
 
-        private List<IChart> ChartsInternal = new();
+        private List<IChart> ChartsInternal;
 
         // TODO EES-3319 - remove backwards-compatibility for Map Configuration without its
         // own Boundary Level selection

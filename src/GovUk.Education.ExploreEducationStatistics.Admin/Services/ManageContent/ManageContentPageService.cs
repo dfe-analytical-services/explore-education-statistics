@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     {
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IMapper _mapper;
-        private readonly IContentService _contentService;
+        private readonly IDataBlockService _dataBlockService;
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IReleaseFileService _releaseFileService;
         private readonly IUserService _userService;
@@ -34,14 +34,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public ManageContentPageService(
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IMapper mapper,
-            IContentService contentService,
+            IDataBlockService dataBlockService,
             IMethodologyVersionRepository methodologyVersionRepository,
             IReleaseFileService releaseFileService,
             IUserService userService)
         {
             _persistenceHelper = persistenceHelper;
             _mapper = mapper;
-            _contentService = contentService;
+            _dataBlockService = dataBlockService;
             _methodologyVersionRepository = methodologyVersionRepository;
             _releaseFileService = releaseFileService;
             _userService = userService;
@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateReleaseQuery)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccessCombineWith(release => _contentService.GetAvailableDataBlocks(releaseId))
+                .OnSuccessCombineWith(release => _dataBlockService.GetAvailableDataBlocks(releaseId))
                 .OnSuccessCombineWith(releaseAndBlocks => _releaseFileService.ListAll(
                     releaseId,
                     Ancillary,

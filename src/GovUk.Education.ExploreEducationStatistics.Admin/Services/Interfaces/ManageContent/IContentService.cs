@@ -39,8 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         Task<Either<ActionResult, IContentBlockViewModel>> UpdateTextBasedContentBlock(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request);
 
-        Task<Either<ActionResult, List<DataBlock>>> GetAvailableDataBlocks(Guid releaseId);
-
         Task<Either<ActionResult, IContentBlockViewModel>> AttachDataBlock(
             Guid releaseId, Guid contentSectionId, ContentBlockAttachRequest request);
     }

@@ -17,7 +17,6 @@ interface KeyStatsDataFormValues {
 
 export interface EditableKeyStatDataBlockProps {
   keyStat: KeyStatisticDataBlock;
-
   isEditing?: boolean;
   isReordering?: boolean;
   onRemove?: () => void;
@@ -26,8 +25,6 @@ export interface EditableKeyStatDataBlockProps {
 }
 
 const EditableKeyStatDataBlock = ({
-  isEditing = false,
-  isReordering = false,
   keyStat: {
     id: keyStatId,
     releaseId,
@@ -36,6 +33,8 @@ const EditableKeyStatDataBlock = ({
     guidanceTitle = 'Help',
     guidanceText,
   },
+  isEditing = false,
+  isReordering = false,
   testId = 'keyStat',
   onRemove,
   onSubmit,

@@ -217,20 +217,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 );
         }
 
-        [Fact]
-        public async Task GetAvailableDataBlocks()
-        {
-            await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanViewSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupContentService(userService: userService.Object);
-                        return service.GetAvailableDataBlocks(_release.Id);
-                    }
-                );
-        }
-
         private ContentService SetupContentService(
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,

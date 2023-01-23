@@ -58,7 +58,7 @@ const KeyStat = ({
             )}
           </KeyStatTile>
 
-          {guidanceText && guidanceTitle && (
+          {guidanceText && (
             <Details
               summary={guidanceTitle}
               className={styles.guidanceTitle}

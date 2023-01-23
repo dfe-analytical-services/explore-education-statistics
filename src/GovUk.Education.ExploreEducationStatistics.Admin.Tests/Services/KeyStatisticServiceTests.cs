@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -47,8 +48,8 @@ public class KeyStatisticServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var contentService = new Mock<IContentService>();
-            contentService.Setup(s => s.GetAvailableDataBlocks(release.Id))
+            var dataBlockService = new Mock<IDataBlockService>();
+            dataBlockService.Setup(s => s.GetAvailableDataBlocks(release.Id))
                 .ReturnsAsync(new Either<ActionResult, List<DataBlock>>(
                     new List<DataBlock>
                     {
@@ -56,7 +57,7 @@ public class KeyStatisticServiceTests
                     }));
 
             var keyStatisticService = SetupKeyStatisticService(context,
-                contentService: contentService.Object);
+                dataBlockService: dataBlockService.Object);
 
             var result = await keyStatisticService.CreateKeyStatisticDataBlock(
                 release.Id,
@@ -129,8 +130,8 @@ public class KeyStatisticServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var contentService = new Mock<IContentService>();
-            contentService.Setup(s => s.GetAvailableDataBlocks(release.Id))
+            var dataBlockService = new Mock<IDataBlockService>();
+            dataBlockService.Setup(s => s.GetAvailableDataBlocks(release.Id))
                 .ReturnsAsync(new Either<ActionResult, List<DataBlock>>(
                     new List<DataBlock>
                     {
@@ -138,7 +139,7 @@ public class KeyStatisticServiceTests
                     }));
 
             var keyStatisticService = SetupKeyStatisticService(context,
-                contentService: contentService.Object);
+                dataBlockService: dataBlockService.Object);
 
             var result = await keyStatisticService.CreateKeyStatisticDataBlock(
                 release.Id,
@@ -294,8 +295,8 @@ public class KeyStatisticServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var contentService = new Mock<IContentService>();
-            contentService.Setup(s => s.GetAvailableDataBlocks(release.Id))
+            var dataBlockService = new Mock<IDataBlockService>();
+            dataBlockService.Setup(s => s.GetAvailableDataBlocks(release.Id))
                 .ReturnsAsync(new Either<ActionResult, List<DataBlock>>(
                     new List<DataBlock>
                     {
@@ -304,7 +305,7 @@ public class KeyStatisticServiceTests
                     }));
 
             var keyStatisticService = SetupKeyStatisticService(context,
-                contentService: contentService.Object);
+                dataBlockService: dataBlockService.Object);
 
             var exception = await Assert.ThrowsAsync<ArgumentException>(async () =>
                 await keyStatisticService.CreateKeyStatisticDataBlock(
@@ -1112,13 +1113,13 @@ public class KeyStatisticServiceTests
 
     private static KeyStatisticService SetupKeyStatisticService(
         ContentDbContext contentDbContext,
-        IContentService? contentService = null,
+        IDataBlockService? dataBlockService = null,
         IUserService? userService = null)
     {
         return new KeyStatisticService(
             contentDbContext,
             new PersistenceHelper<ContentDbContext>(contentDbContext),
-            contentService ?? Mock.Of<IContentService>(MockBehavior.Strict),
+            dataBlockService ?? Mock.Of<IDataBlockService>(MockBehavior.Strict),
             userService ?? MockUtils.AlwaysTrueUserService().Object,
             AdminMapper()
         );

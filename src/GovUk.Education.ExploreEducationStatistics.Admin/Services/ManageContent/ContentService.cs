@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Clients;
-using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -280,31 +279,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     };
                 })
                 .OnSuccessDo(block => _hubContext.Clients.Group(releaseId.ToString()).ContentBlockUpdated(block));
-        }
-
-        public async Task<Either<ActionResult, List<DataBlock>>> GetAvailableDataBlocks(Guid releaseId)
-        {
-            return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(async release =>
-                {
-                    var keyStatDataBlockIds = _context.KeyStatisticsDataBlock
-                        .Where(ks => ks.ReleaseId == release.Id)
-                        .Select(ks => ks.DataBlockId)
-                        .ToList();
-
-                    return await _context
-                        .ReleaseContentBlocks
-                        .Include(releaseContentBlock => releaseContentBlock.ContentBlock)
-                        .Where(releaseContentBlock => releaseContentBlock.ReleaseId == release.Id)
-                        .Select(releaseContentBlock => releaseContentBlock.ContentBlock)
-                        .OfType<DataBlock>()
-                        .Where(dataBlock =>
-                            dataBlock.ContentSectionId == null
-                            && !keyStatDataBlockIds.Contains(dataBlock.Id))
-                        .OrderBy(contentBlock => contentBlock.Name)
-                        .ToListAsync();
-                });
         }
 
         public Task<Either<ActionResult, IContentBlockViewModel>> AttachDataBlock(Guid releaseId, Guid contentSectionId,

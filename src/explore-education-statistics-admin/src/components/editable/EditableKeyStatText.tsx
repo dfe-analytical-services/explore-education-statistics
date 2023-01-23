@@ -20,9 +20,9 @@ export interface EditableKeyStatTextProps {
 }
 
 const EditableKeyStatText = ({
+  keyStat,
   isEditing = false,
   isReordering = false,
-  keyStat,
   testId = 'keyStat',
   onRemove,
   onSubmit,

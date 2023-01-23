@@ -147,10 +147,6 @@ const releaseContentService = {
     );
   },
 
-  getAvailableDataBlocks(releaseId: string): Promise<DataBlock[]> {
-    return client.get(`/release/${releaseId}/content/available-datablocks`);
-  },
-
   attachContentSectionBlock(
     releaseId: string,
     sectionId: string,

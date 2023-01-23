@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using ContentSectionId = System.Guid;
@@ -34,5 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, Unit>> RemoveChartFile(Guid releaseId, Guid id);
 
         Task InvalidateCachedDataBlocks(Guid releaseId);
+
+        Task<Either<ActionResult, List<DataBlock>>> GetAvailableDataBlocks(Guid releaseId);
     }
 }

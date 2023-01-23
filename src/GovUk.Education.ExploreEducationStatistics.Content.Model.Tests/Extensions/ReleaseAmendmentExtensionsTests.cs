@@ -516,7 +516,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         }
 
         [Fact]
-        public void CreateAmendment_RemovesKeyStatistics()
+        public void CreateAmendment_CopiesKeyStatistics()
         {
             var dataBlock = new DataBlock();
             var release = new Release
@@ -563,7 +563,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
 
             var amendmentKeyStatDataBlock = Assert.IsType<KeyStatisticDataBlock>(amendment.KeyStatistics[1]);
             Assert.NotEqual(release.KeyStatistics[1].Id, amendmentKeyStatDataBlock.Id);
-            var amendmentDataBlock = Assert.IsType<DataBlock>(amendment.ContentBlocks[0].ContentBlock);
+            Assert.IsType<DataBlock>(amendment.ContentBlocks[0].ContentBlock);
             Assert.NotEqual(
                 release.ContentBlocks[0].ContentBlockId,
                 amendment.ContentBlocks[0].ContentBlockId);

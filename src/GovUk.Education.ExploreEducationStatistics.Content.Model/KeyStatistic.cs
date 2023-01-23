@@ -26,14 +26,14 @@ public abstract class KeyStatistic : ICreatedUpdatedTimestamps<DateTime, DateTim
 
     public DateTime? Updated { get; set; }
 
-        public Guid ContentBlockIdTemp { get; set; }
+    public Guid ContentBlockIdTemp { get; set; } // TODO: Remove in EES-3988
 
-        public KeyStatistic Clone(Release newRelease)
-        {
-            var copy = MemberwiseClone() as KeyStatistic;
-            copy.Id = Guid.NewGuid();
-            copy.Release = newRelease;
-            copy.ReleaseId = newRelease.Id;
+    public KeyStatistic Clone(Release newRelease)
+    {
+        var copy = MemberwiseClone() as KeyStatistic;
+        copy.Id = Guid.NewGuid();
+        copy.Release = newRelease;
+        copy.ReleaseId = newRelease.Id;
 
         return copy;
     }

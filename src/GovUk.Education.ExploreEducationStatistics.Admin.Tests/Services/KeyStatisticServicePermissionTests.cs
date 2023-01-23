@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -90,13 +90,13 @@ public class KeyStatisticServicePermissionTests
     private KeyStatisticService SetupKeyStatisticService(
         ContentDbContext? contentDbContext = null,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
-        IContentService? contentService = null,
+        IDataBlockService? dataBlockService = null,
         IUserService? userService = null)
     {
         return new KeyStatisticService(
             contentDbContext ?? new Mock<ContentDbContext>().Object,
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-            contentService ?? Mock.Of<IContentService>(),
+            dataBlockService ?? Mock.Of<IDataBlockService>(),
             userService ?? Mock.Of<IUserService>(),
             AdminMapper()
         );

@@ -120,6 +120,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return persistenceHelper;
         }
 
+        [Fact]
+        public async Task GetAvailableDataBlocks()
+        {
+            await PolicyCheckBuilder<ContentSecurityPolicies>()
+                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = BuildDataBlockService(userService: userService.Object);
+                        return service.GetAvailableDataBlocks(_release.Id);
+                    }
+                );
+        }
+
         private DataBlockService BuildDataBlockService(
             ContentDbContext? contentDbContext = null,
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,

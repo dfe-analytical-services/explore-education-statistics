@@ -77,6 +77,10 @@ const dataBlockService = {
       {},
     );
   },
+
+  getAvailableDataBlocks(releaseId: string): Promise<DataBlock[]> {
+    return client.get(`/release/${releaseId}/data-blocks/available`);
+  },
 };
 
 export default dataBlockService;

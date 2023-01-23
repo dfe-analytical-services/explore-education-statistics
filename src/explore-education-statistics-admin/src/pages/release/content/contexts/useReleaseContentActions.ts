@@ -18,13 +18,14 @@ import keyStatisticService, {
   KeyStatisticDataBlockUpdateRequest,
 } from '@admin/services/keyStatisticService';
 import { KeyStatistic } from '@common/services/publicationService';
+import dataBlockService from '@admin/services/dataBlockService';
 
 export default function useReleaseContentActions() {
   const dispatch = useReleaseContentDispatch();
 
   const updateAvailableDataBlocks = useCallback(
     async ({ releaseId }: { releaseId: string }) => {
-      const availableDataBlocks = await releaseContentService.getAvailableDataBlocks(
+      const availableDataBlocks = await dataBlockService.getAvailableDataBlocks(
         releaseId,
       );
 
