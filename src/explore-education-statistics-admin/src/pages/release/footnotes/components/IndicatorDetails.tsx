@@ -32,7 +32,7 @@ const IndicatorDetails = ({
               `${valuePath}.indicatorGroups.${indicatorGroupId}.selected`,
             );
             const hideGrouping = indicatorGroup.label === 'Default';
-            const indicators =
+            const indicators: string[] =
               get(
                 form.values,
                 `${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`,

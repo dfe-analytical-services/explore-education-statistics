@@ -54,7 +54,7 @@ const FilterGroupDetails = ({
             `${groupPath}.filterGroups[${filterGroupId}].selected`,
           );
           const hideGrouping = filterGroup.label === 'Default';
-          const filterItems =
+          const filterItems: string[] =
             get(
               form.values,
               `${groupPath}.filterGroups[${filterGroupId}].filterItems`,

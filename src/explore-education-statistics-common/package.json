@@ -72,7 +72,7 @@
     "react-helmet": "^6.1.0",
     "react-highlight-words": "^0.16.0",
     "react-lazyload": "^3.0.0",
-    "react-leaflet": "^2.7.0",
+    "react-leaflet": "2.7.0",
     "react-markdown": "^4.3.1",
     "react-modal": "^3.12.1",
     "react-test-renderer": "16.13.1",
@@ -87,7 +87,7 @@
     "yup": "^0.29.3"
   },
   "scripts": {
-    "lint": "npm run lint:js && npm run lint:style",
+    "lint": "pnpm lint:js && pnpm lint:style",
     "lint:js": "eslint --ext .ts,.tsx,.js,.jsx .",
     "lint:style": "stylelint src/**/*.{scss,css}",
     "tsc": "tsc --noEmit",
@@ -125,7 +125,7 @@
     "testEnvironment": "jsdom",
     "testURL": "http://localhost",
     "transform": {
-      "^.+\\.(js|jsx|ts|tsx)$": "<rootDir>/node_modules/babel-jest",
+      "^.+\\.(js|jsx|ts|tsx)$": "babel-jest",
       "^.+\\.css$": "<rootDir>/test/cssTransform.js",
       "^(?!.*\\.(js|jsx|ts|tsx|css|json)$)": "<rootDir>/test/fileTransform.js"
     },
@@ -136,8 +136,7 @@
     "moduleNameMapper": {
       "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
       "^@common/(.*)$": "<rootDir>/src/$1",
-      "^@common-test/(.*)$": "<rootDir>/test/$1",
-      "\\.worker.js": "<rootDir>/__mocks__/mock.worker.ts"
+      "^@common-test/(.*)$": "<rootDir>/test/$1"
     },
     "moduleFileExtensions": [
       "web.js",

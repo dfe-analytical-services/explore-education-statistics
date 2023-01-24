@@ -68,7 +68,7 @@
     "case-sensitive-paths-webpack-plugin": "^2.4.0",
     "eslint": "^7.10.0",
     "eslint-webpack-plugin": "^3.0.1",
-    "explore-education-statistics-common": "0.1.0",
+    "explore-education-statistics-common": "workspace:*",
     "fork-ts-checker-webpack-plugin": "^6.3.3",
     "identity-obj-proxy": "3.0.0",
     "jest": "^26.5.2",
@@ -91,7 +91,7 @@
     "start": "cross-env NODE_ENV=production NEXT_CONFIG_MODE=server node server.js",
     "start:local": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 node server.js",
     "build": "next build ./src",
-    "lint": "npm run lint:js && npm run lint:style",
+    "lint": "pnpm lint:js && pnpm lint:style",
     "lint:js": "eslint src/**/*.{ts,tsx}",
     "lint:style": "stylelint src/**/*.{scss,css}",
     "test": "jest",
@@ -122,7 +122,7 @@
     "testEnvironment": "jsdom",
     "testURL": "http://localhost",
     "transform": {
-      "^.+\\.(js|jsx|ts|tsx)$": "<rootDir>/node_modules/babel-jest",
+      "^.+\\.(js|jsx|ts|tsx)$": "babel-jest",
       "^.+\\.css$": "<rootDir>/../explore-education-statistics-common/test/cssTransform.js",
       "^(?!.*\\.(js|jsx|ts|tsx|css|json)$)": "<rootDir>/../explore-education-statistics-common/test/fileTransform.js"
     },
@@ -135,11 +135,10 @@
       "^@frontend/(.*)$": "<rootDir>/src/$1",
       "^@common/(.*)$": "<rootDir>/../explore-education-statistics-common/src/$1",
       "^@common-test/(.*)$": "<rootDir>/../explore-education-statistics-common/test/$1",
-      "^react$": "<rootDir>/node_modules/react",
-      "^@tanstack/react-query$": "<rootDir>/node_modules/@tanstack/react-query",
-      "^react-dom$": "<rootDir>/node_modules/react-dom",
-      "^formik$": "<rootDir>/node_modules/formik",
-      "\\.worker.js":"<rootDir>/../explore-education-statistics-common/__mocks__/mock.worker.ts"
+      "^react$": "react",
+      "^@tanstack/react-query$": "@tanstack/react-query",
+      "^react-dom$": "react-dom",
+      "^formik$": "formik"
     },
     "moduleFileExtensions": [
       "web.js",
@@ -154,8 +153,8 @@
       "node"
     ],
     "watchPlugins": [
-      "<rootDir>/node_modules/jest-watch-typeahead/filename.js",
-      "<rootDir>/node_modules/jest-watch-typeahead/testname.js"
+      "jest-watch-typeahead/filename.js",
+      "jest-watch-typeahead/testname.js"
     ],
     "resetMocks": true,
     "snapshotSerializers": [

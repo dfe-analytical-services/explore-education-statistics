@@ -60,6 +60,7 @@ You will need the following groups of dependencies to run the project successful
 1. To run applications in this service you will require the following:
 
    - [NodeJS v16+](https://nodejs.org/)
+   - [corepack](https://github.com/nodejs/corepack)
    - [.NET Core v6.0](https://dotnet.microsoft.com/download/dotnet-core/6.0)
    - [Azure Functions Core Tools v4+](https://github.com/Azure/azure-functions-core-tools)
    
@@ -221,15 +222,14 @@ The [Keycloak Admin login](http://ees.local:5030/auth/admin/) is available with 
 1. To run the out-of-the-box Keycloak identity provider:
 
   ```bash
-  cd useful-scripts/
-  ./run.js idp
+  pnpm start idp 
   ```
    
 2. To then get Admin to use Keycloak, run:
 
   ```bash
-  cd useful-scripts/
-  ./run.js adminKeycloak # this sets the environment variable "IdpProviderConfiguration=Keycloak" for us
+  
+  pnpm start adminKeycloak # this sets the environment variable "IdpProviderConfiguration=Keycloak" for us
   ```
 
 The environment variable `IdpProviderConfiguration` lets Admin know to use 
@@ -287,7 +287,7 @@ If this is not available to you then you will need to use one, or a combination,
 
 #### Using `run` script
 
-The `run` script is a simple wrapper around the various CLI commands you need to run the applications. 
+The `run` script is a simple wrapper around the various CLI commands you need to run the applications. We've aliased the `run.js` script for convenience in the root package.json.
 You will need to ensure you have all the project dependencies as specified in [Requirements](#requirements).
 
 Examples:
@@ -295,31 +295,34 @@ Examples:
 - To run the public frontend services:
 
   ```bash
-  cd useful-scripts
-  ./run.js data content
+  pnpm start data content
   ```
 
 - To run the admin. Note you must set up the frontend first - see [Running the frontend](#running-the-frontend).
 
   ```bash
-  cd useful-scripts
-  ./run.js admin
+  pnpm start admin
   ```
 
 - To run other services:
   
   ```bash
-  cd useful-scripts
-  ./run.js publisher processor
+  pnpm start publisher processor
   ```
+
+- Run services with alias in root `package.json`
+  ```bash
+  pnpm start publisher processor
+  ```
+
 
 ### Running the frontend
 
-1. Run the following from the project root to install all project dependencies:
+1. Run the following from the project root to install all project dependencies and configure PNPM:
 
    ```bash
-   npm ci
-   npm run bootstrap
+   corepack enable
+   pnpm i
    ```
 
 2. Startup any required backend services (see [Running the backend](#running-the-backend))
@@ -329,30 +332,28 @@ Examples:
    - Running using the `run` script:
     
      ```bash
-     cd useful-scripts
-          
      # Admin frontend
-     ./run.js admin   # or ./run.js adminKeycloak if using the Keycloak IdP
+     pnpm start admin   # or pnpm start adminKeycloak if using the Keycloak IdP
      
      # Public frontend
-     ./run.js frontend
+     pnpm start frontend
      ```
 
    - Running from the project root:
 
      ```bash
      # Admin frontend
-     npm run start:admin
+     pnpm start:admin
     
      # Public frontend
-     npm run start:frontend
+     pnpm start:frontend
      ```
  
     - Going into each of the sub-project directories and starting it directly e.g.
     
      ```bash
      cd src/explore-education-statistics-frontend
-     npm start
+     pnpm start
      ```
 
 4. Access frontend applications at:
@@ -384,11 +385,11 @@ required variables and consequently needs to be in sync with any changes.
 
 No secrets/keys etc. should be added to these environment variables.
 
-### Dependency management with Lerna
+### Dependency management with PNPM
 
-The project currently uses [Lerna](https://github.com/lerna/lerna) to handle dependencies as we have
+The project currently uses [PNPM](https://pnpm.io/) to handle dependencies as we have
 adopted a monorepo project structure and have dependencies between sub-projects. These dependencies
-are established using symlinks that Lerna creates.
+are established using symlinks that PNPM creates.
 
 - `explore-education-statistics-admin`
   - Contains the admin frontend application.
@@ -422,17 +423,14 @@ When adding new NPM dependencies, be aware that we need to be careful about wher
   and simplicity. We need all dependencies to create the build, so it doesn't make sense to split 
   out separate `devDependencies`.
 
-**DO NOT** install (`npm install`) any dependencies directly into the sub-projects as this will
-most likely break the sub-project's `package-lock.json` and cause your installation to fail.
-
-Instead, you will need to use Lerna to do this, with the following steps:
+To install new dependencies, you will need to use PNPM to do this, with the following steps:
 
 1. Directly add dependencies to any required `package.json` file(s).
 
-2. Run the following from the project root:
+2. Run the following:
 
     ```bash
-    npm run bootstrap:install
+    pnpm i
     ```
 
 #### Cleaning dependencies
@@ -442,50 +440,41 @@ are broken for whatever reason. Consequently, it is advisable to clean down your
 `node_modules` by running the following from the project root.
 
 ```bash
-npm run clean
+pnpm clean
 ```
 
-### Common NPM scripts
+### Common PNPM scripts
 
 These scripts can generally be run from most `package.json` files across the project.
 
-- `npm test` - Run all tests.
+- `pnpm test` - Run all tests.
 
-- `npm run tsc` - Run Typescript compiler to check types are correct. Does not build anything.
+- `pnpm tsc` - Run Typescript compiler to check types are correct. Does not build anything.
 
-- `npm run lint` - Lint projects using Stylelint and ESLint.
-  - `npm run lint:js` - Run ESLint only.
-  - `npm run lint:style` - Run Stylelint only.
-- `npm run fix` - Fix any lint that can be automatically fixed by the linters.
+- `pnpm lint` - Lint projects using Stylelint and ESLint.
+  - `pnpm lint:js` - Run ESLint only.
+  - `pnpm lint:style` - Run Stylelint only.
+- `pnpm fix` - Fix any lint that can be automatically fixed by the linters.
 
-  - `npm run fix:js` - Fix only ESLint lints.
-  - `npm run fix:style` - Fix only Stylelint lints.
+  - `pnpm fix:js` - Fix only ESLint lints.
+  - `pnpm fix:style` - Fix only Stylelint lints.
 
-- `npm run format` - Format codebase using Prettier.
+- `pnpm format` - Format codebase using Prettier.
 
 #### Project root scripts
 
 These can only be run from the project root `package.json`.
 
-- `npm run bootstrap` - Install NPM dependencies to match `package-lock.json` files across entire 
-  project and symlink any dependent modules. This should be used when you want your dependencies to 
-  exactly match the project's requirements (e.g. in a fresh repo, or you changed to a different 
-  branch).
+- `pnpm clean` - Remove any `node_modules` directories across any sub-projects.
 
-- `npm run bootstrap:install` - Install NPM dependencies to match `package.json` files across entire
-  project and symlink any dependent modules. This should be used when you need to add new 
-  dependencies to the project.
-
-- `npm run clean` - Remove any `node_modules` directories across any sub-projects.
-
-- `npm run start:admin` - Run admin frontend dev server.
-- `npm run start:frontend` - Run public frontend dev server.
+- `pnpm start:admin` - Run admin frontend dev server.
+- `pnpm start:frontend` - Run public frontend dev server.
 
 #### Sub-project scripts
 
 These can only be run from a sub-project `package.json`.
 
-- `npm start` - Start a sub-project dev server.
+- `pnpm start` - Start a sub-project dev server.
 
 ### Code style
 
