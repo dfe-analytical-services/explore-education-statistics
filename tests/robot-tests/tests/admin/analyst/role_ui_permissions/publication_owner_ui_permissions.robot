@@ -77,3 +77,13 @@ Check cannot approve a draft release
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${DRAFT_RELEASE_TYPE}    ${THEME_NAME}    ${TOPIC_NAME}
     user cannot see the enabled approve release controls for release
+
+Check can see the editable "Update release access" section of the "Team access" page
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user clicks link    Team access
+    user waits until h3 is visible    Update release access
+    user waits until h3 is not visible    Release access
+    user waits until page contains link    Manage release contributors
+
+Check can see the "Invite publication contributors" functionality of the "Team access" page
+    user waits until page contains link    Invite publication contributors

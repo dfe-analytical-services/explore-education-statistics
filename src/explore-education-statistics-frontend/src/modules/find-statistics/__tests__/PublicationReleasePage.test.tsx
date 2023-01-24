@@ -337,7 +337,7 @@ describe('PublicationReleasePage', () => {
   test('renders "Last Updated" section correctly with updates in correct order', async () => {
     render(<PublicationReleasePage release={testRelease} />);
 
-    expect(screen.getByTestId('Last updated-value')).toHaveTextContent(
+    expect(screen.getByTestId('Last updated')).toHaveTextContent(
       '19 April 2018',
     );
 

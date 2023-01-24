@@ -42,6 +42,8 @@ public static class PermissionsUtils
             CanUpdateContact = await userService.CheckCanUpdateContact(publication).IsRight(),
             CanUpdateContributorReleaseRole =
                 await userService.CheckCanUpdateReleaseRole(publication, Contributor).IsRight(),
+            CanViewReleaseTeamAccess = 
+                await userService.CheckCanViewReleaseTeamAccess(publication).IsRight()
         };
     }
 

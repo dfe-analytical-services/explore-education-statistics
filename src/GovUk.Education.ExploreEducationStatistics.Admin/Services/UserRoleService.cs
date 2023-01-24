@@ -348,7 +348,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             Id = userPublicationRole.Id,
                             Publication = userPublicationRole.Publication.Title,
                             Role = userPublicationRole.Role,
-                            UserName = userPublicationRole.User.DisplayName
+                            UserName = userPublicationRole.User.DisplayName,
+                            Email = userPublicationRole.User.Email
                         })
                         .ToListAsync();
                 });
@@ -371,7 +372,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             Id = userPublicationRole.Id,
                             Publication = userPublicationRole.Publication.Title,
                             Role = userPublicationRole.Role,
-                            UserName = userPublicationRole.User.DisplayName
+                            UserName = userPublicationRole.User.DisplayName,
+                            Email = userPublicationRole.User.Email
                         })
                         .ToListAsync())
                         .OrderBy(userPublicationRole => userPublicationRole.UserName)

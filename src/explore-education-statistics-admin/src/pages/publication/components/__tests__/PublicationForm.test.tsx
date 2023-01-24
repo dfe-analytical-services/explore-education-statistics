@@ -462,6 +462,7 @@ describe('PublicationForm', () => {
         canManageLegacyReleases: true,
         canUpdateContact: true,
         canUpdateContributorReleaseRole: true,
+        canViewReleaseTeamAccess: true,
       },
     };
 

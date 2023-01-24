@@ -21,11 +21,11 @@ Validates publication approver publication page is correct
 
     user waits until page contains link    Releases
     user waits until page contains link    Methodologies
-    user waits until page contains link    Legacy releases
+    user waits until page contains link    Team access
+    user waits until page contains link    Legacy releases    # remove as part of EES-3794
 
     user checks page does not contain link    Details
     user checks page does not contain link    Contact
-    user checks page does not contain link    Team access
 
 Check cannot create a legacy release
     user clicks link    Legacy releases
@@ -44,3 +44,13 @@ Check cannot edit content for published release
 Check cannot create an amendment of a published release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
     user cannot see the create amendment controls for release    ${PUBLISHED_RELEASE_TYPE}
+
+Check can see the readonly "Release access" section of the "Team access" page
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user clicks link    Team access
+    user waits until h3 is visible    Release access
+    user waits until h3 is not visible    Update release access
+    user waits until page does not contain link    Manage release contributors
+
+Check cannot see the "Invite publication contributors" functionality of the "Team access" page
+    user waits until page does not contain link    Invite publication contributors

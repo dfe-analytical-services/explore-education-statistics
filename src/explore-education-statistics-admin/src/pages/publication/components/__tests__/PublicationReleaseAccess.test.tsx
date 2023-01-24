@@ -1,16 +1,12 @@
-import PublicationManageTeamAccess from '@admin/pages/publication/components/PublicationManageTeamAccess';
+import baseRender from '@common-test/render';
+import PublicationReleaseAccess from '@admin/pages/publication/components/PublicationReleaseAccess';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import _userService from '@admin/services/userService';
 import _releasePermissionService, {
-  ContributorInvite,
-  ContributorViewModel,
+  UserReleaseInvite,
+  UserReleaseRole,
 } from '@admin/services/releasePermissionService';
-import {
-  render as baseRender,
-  screen,
-  waitFor,
-  within,
-} from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import React, { ReactElement } from 'react';
@@ -23,7 +19,7 @@ const releasePermissionService = _releasePermissionService as jest.Mocked<
 jest.mock('@admin/services/userService');
 const userService = _userService as jest.Mocked<typeof _userService>;
 
-describe('PublicationManageTeamAccess', () => {
+describe('PublicationReleaseAccess', () => {
   const testPublicationId = 'publication-1';
 
   const testRelease: ReleaseSummary = {
@@ -43,66 +39,88 @@ describe('PublicationManageTeamAccess', () => {
     amendment: false,
   };
 
-  const testContributors: ContributorViewModel[] = [
+  const testContributors: UserReleaseRole[] = [
     {
       userId: 'user-1',
       userDisplayName: 'User 1',
       userEmail: 'user1@test.com',
+      role: 'Contributor',
     },
   ];
 
-  const testInvites: ContributorInvite[] = [{ email: 'user2@test.com' }];
+  const testInvites: UserReleaseInvite[] = [
+    {
+      email: 'user2@test.com',
+      role: 'Contributor',
+    },
+  ];
 
   test('renders the manage team access table correctly', async () => {
-    releasePermissionService.listReleaseContributors.mockResolvedValue(
-      testContributors,
-    );
-    releasePermissionService.listReleaseContributorInvites.mockResolvedValue(
-      testInvites,
-    );
+    releasePermissionService.listRoles.mockResolvedValue(testContributors);
+    releasePermissionService.listInvites.mockResolvedValue(testInvites);
     render(
-      <PublicationManageTeamAccess
+      <PublicationReleaseAccess
         publicationId={testPublicationId}
         release={testRelease}
+        hasReleaseTeamManagementPermission
       />,
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Academic Year 2000/01 (Not live)'),
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('Release')).toHaveTextContent(
+        'Academic Year 2000/01 (Not live)',
+      );
     });
 
-    expect(
-      screen.getByRole('heading', {
-        name: 'Academic Year 2000/01 (Not live) Draft',
-      }),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
+    });
 
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(3);
 
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+    expect(within(row1Cells[0]).getByText('User 1')).toBeInTheDocument();
     expect(
-      within(rows[1]).getByText('User 1 (user1@test.com)'),
+      within(row1Cells[1]).getByText('user1@test.com'),
     ).toBeInTheDocument();
-    expect(within(rows[2]).getByText('user2@test.com')).toBeInTheDocument();
+    expect(
+      within(row1Cells[2]).getByRole('button', { name: 'Remove User 1' }),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
-        name: 'Add or remove users',
+        name: 'Manage release contributors',
       }),
     ).toBeInTheDocument();
   });
 
-  test('renders a message if there are no contributors or invites', async () => {
-    releasePermissionService.listReleaseContributors.mockResolvedValue([]);
-    releasePermissionService.listReleaseContributorInvites.mockResolvedValue(
-      [],
-    );
+  test('omits the "Manage release contributors" button when requested', async () => {
+    releasePermissionService.listRoles.mockResolvedValue(testContributors);
+    releasePermissionService.listInvites.mockResolvedValue(testInvites);
     render(
-      <PublicationManageTeamAccess
+      <PublicationReleaseAccess
         publicationId={testPublicationId}
         release={testRelease}
+        hasReleaseTeamManagementPermission={false}
+      />,
+    );
+
+    expect(
+      screen.queryByRole('link', {
+        name: 'Manage release contributors',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders a message if there are no contributors or invites', async () => {
+    releasePermissionService.listRoles.mockResolvedValue([]);
+    releasePermissionService.listInvites.mockResolvedValue([]);
+    render(
+      <PublicationReleaseAccess
+        publicationId={testPublicationId}
+        release={testRelease}
+        hasReleaseTeamManagementPermission
       />,
     );
 
@@ -118,30 +136,25 @@ describe('PublicationManageTeamAccess', () => {
   });
 
   test('handles removing a user correctly', async () => {
-    releasePermissionService.listReleaseContributors.mockResolvedValue(
-      testContributors,
-    );
-    releasePermissionService.listReleaseContributorInvites.mockResolvedValue(
-      testInvites,
-    );
+    releasePermissionService.listRoles.mockResolvedValue(testContributors);
+    releasePermissionService.listInvites.mockResolvedValue(testInvites);
     render(
-      <PublicationManageTeamAccess
+      <PublicationReleaseAccess
         publicationId={testPublicationId}
         release={testRelease}
+        hasReleaseTeamManagementPermission
       />,
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Academic Year 2000/01 (Not live)'),
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('Release')).toHaveTextContent(
+        'Academic Year 2000/01 (Not live)',
+      );
     });
 
-    expect(
-      screen.getByRole('heading', {
-        name: 'Academic Year 2000/01 (Not live) Draft',
-      }),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
+    });
 
     userEvent.click(screen.getByRole('button', { name: 'Remove User 1' }));
 
@@ -159,30 +172,25 @@ describe('PublicationManageTeamAccess', () => {
   });
 
   test('handles cancelling an invite correctly', async () => {
-    releasePermissionService.listReleaseContributors.mockResolvedValue(
-      testContributors,
-    );
-    releasePermissionService.listReleaseContributorInvites.mockResolvedValue(
-      testInvites,
-    );
+    releasePermissionService.listRoles.mockResolvedValue(testContributors);
+    releasePermissionService.listInvites.mockResolvedValue(testInvites);
     render(
-      <PublicationManageTeamAccess
+      <PublicationReleaseAccess
         publicationId={testPublicationId}
         release={testRelease}
+        hasReleaseTeamManagementPermission
       />,
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Academic Year 2000/01 (Not live)'),
-      ).toBeInTheDocument();
+      expect(screen.getByTestId('Release')).toHaveTextContent(
+        'Academic Year 2000/01 (Not live)',
+      );
     });
 
-    expect(
-      screen.getByRole('heading', {
-        name: 'Academic Year 2000/01 (Not live) Draft',
-      }),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
+    });
 
     userEvent.click(
       screen.getByRole('button', { name: 'Cancel invite for user2@test.com' }),
@@ -204,5 +212,5 @@ describe('PublicationManageTeamAccess', () => {
 });
 
 function render(element: ReactElement) {
-  baseRender(<MemoryRouter>{element}</MemoryRouter>);
+  return baseRender(<MemoryRouter>{element}</MemoryRouter>);
 }
