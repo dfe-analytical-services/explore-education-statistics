@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -65,10 +66,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ObservationQueryContext queryContext,
             CancellationToken cancellationToken = default)
         {
-            var publicationId = await _subjectRepository.GetPublicationIdForSubject(queryContext.SubjectId);
-
-            return await _releaseRepository.GetLatestPublishedRelease(publicationId)
-                .OnSuccess(release => Query(release.Id, queryContext, cancellationToken));
+            return await FindLatestPublishedReleaseId(queryContext.SubjectId)
+                .OnSuccess(releaseId => Query(releaseId, queryContext, cancellationToken));
         }
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
@@ -141,6 +140,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 countOfTimePeriods: TimePeriodUtil.Range(queryContext.TimePeriod).Count,
                 countsOfFilterItemsByFilter: countsOfFilterItemsByFilter
             );
+        }
+
+        private async Task<Either<ActionResult, Guid>> FindLatestPublishedReleaseId(Guid subjectId)
+        {
+            return await _subjectRepository.FindPublicationIdForSubject(subjectId)
+                .OrNotFound()
+                .OnSuccess(publicationId => _releaseRepository.GetLatestPublishedRelease(publicationId))
+                .OnSuccess(release => release.Id);
         }
 
         private Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid subjectId, Guid releaseId)

@@ -294,6 +294,11 @@ describe('DataCataloguePage', () => {
 
     const testThemesSuperseded = produce(testThemes, draft => {
       draft[0].topics[0].publications[0].isSuperseded = true;
+      draft[0].topics[0].publications[0].supersededBy = {
+        id: 'test-publication-2',
+        title: 'Test publication 2',
+        slug: 'test-publication-2',
+      };
     });
     render(<DataCataloguePage themes={testThemesSuperseded} />);
 
@@ -320,6 +325,76 @@ describe('DataCataloguePage', () => {
     expect(
       screen.queryByText('This is the latest data'),
     ).not.toBeInTheDocument();
+  });
+
+  test('renders superseded warning text on step 1 if isSuperseded is true', async () => {
+    publicationService.listReleases.mockResolvedValue(testReleases);
+    tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
+
+    const testThemesSuperseded = produce(testThemes, draft => {
+      draft[0].topics[0].publications[0].isSuperseded = true;
+      draft[0].topics[0].publications[0].supersededBy = {
+        id: 'test-publication-2',
+        title: 'Test publication 2',
+        slug: 'test-publication-2',
+      };
+    });
+
+    render(<DataCataloguePage themes={testThemesSuperseded} />);
+
+    expect(screen.getByTestId('wizardStep-1')).toHaveAttribute(
+      'aria-current',
+      'step',
+    );
+
+    // Step 1
+
+    const step1 = within(screen.getByTestId('wizardStep-1'));
+
+    userEvent.click(step1.getByRole('radio', { name: 'Pupils and schools' }));
+    userEvent.click(step1.getByRole('radio', { name: 'Test publication' }));
+    userEvent.click(step1.getByRole('button', { name: 'Next step' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
+        'aria-current',
+        'step',
+      );
+      expect(screen.getByTestId('wizardStep-2')).toHaveAttribute(
+        'aria-current',
+        'step',
+      );
+    });
+
+    // Step 2
+
+    const supersededWarning = screen.getByTestId('superseded-warning');
+
+    expect(supersededWarning).toBeInTheDocument();
+
+    const supersededWarningLink = within(supersededWarning).getByRole('link', {
+      name: 'Test publication 2',
+    });
+
+    expect(supersededWarningLink).toHaveAttribute(
+      'href',
+      '/data-catalogue?publicationSlug=test-publication-2',
+    );
+  });
+
+  test('does not render superseded warning text on step 1 if isSuperseded is false', async () => {
+    publicationService.listReleases.mockResolvedValue(testReleases);
+    tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
+
+    render(<DataCataloguePage themes={testThemes} />);
+
+    expect(screen.getByTestId('wizardStep-1')).toHaveAttribute(
+      'aria-current',
+      'step',
+    );
+
+    // Step 1
+    expect(screen.queryByTestId('superseded-warning')).not.toBeInTheDocument();
   });
 
   test('direct link to step 2', async () => {

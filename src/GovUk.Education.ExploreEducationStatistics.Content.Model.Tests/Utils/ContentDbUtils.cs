@@ -1,5 +1,8 @@
+#nullable enable
 using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils
@@ -28,6 +31,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils
         public static ContentDbContext InMemoryContentDbContext(bool updateTimestamps = true)
         {
             return new ContentDbContext(InMemoryContentDbContextOptions(), updateTimestamps);
+        }
+
+        public static WebApplicationFactory<TEntrypoint> ResetContentDbContext<TEntrypoint>(
+            this WebApplicationFactory<TEntrypoint> app)
+            where TEntrypoint : class
+        {
+            return app.ResetDbContext<ContentDbContext, TEntrypoint>();
+        }
+
+        public static WebApplicationFactory<TEntrypoint> AddContentDbTestData<TEntrypoint>(
+            this WebApplicationFactory<TEntrypoint> app,
+            Action<ContentDbContext> testData
+        )
+            where TEntrypoint : class
+        {
+            return app.AddTestData(testData);
         }
     }
 }

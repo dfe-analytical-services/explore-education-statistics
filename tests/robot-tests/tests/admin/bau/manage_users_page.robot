@@ -61,10 +61,10 @@ Assert prerelease users are present in table
 
 Select a user to manage
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    user create test release via api    ${PUBLICATION_ID}    CY    2000
+    user creates test release via api    ${PUBLICATION_ID}    CY    2000
 
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_2_NAME}
-    user create test release via api    ${PUBLICATION_ID}    AY    2000
+    user creates test release via api    ${PUBLICATION_ID}    AY    2000
 
     user clicks link    Manage    ${PRE_RELEASE_ROW}
     user waits until page contains title    Manage user

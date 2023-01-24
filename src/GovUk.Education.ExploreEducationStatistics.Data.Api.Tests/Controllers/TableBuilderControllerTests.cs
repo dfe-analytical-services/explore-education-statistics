@@ -3,22 +3,23 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Moq;
 using Xunit;
@@ -29,7 +30,8 @@ using static Moq.MockBehavior;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
     [Collection(CacheServiceTests)]
-    public class TableBuilderControllerTests : CacheServiceTestFixture
+    public class TableBuilderControllerTests : CacheServiceTestFixture,
+        IClassFixture<TestApplicationFactory<TestStartup>>
     {
         private static readonly ObservationQueryContext ObservationQueryContext = new()
         {
@@ -97,38 +99,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             }
         };
 
+        private readonly WebApplicationFactory<TestStartup> _testApp;
+
+        public TableBuilderControllerTests(TestApplicationFactory<TestStartup> testApp)
+        {
+            _testApp = testApp;
+        }
+
         [Fact]
         public async Task Query()
         {
-            var cancellationToken = new CancellationToken();
+            var tableBuilderService = new Mock<ITableBuilderService>(Strict);
 
-            var (controller, mocks) = BuildControllerAndDependencies();
-
-            mocks.tableBuilderService
-                .Setup(s => s.Query(ObservationQueryContext, cancellationToken))
+            tableBuilderService
+                .Setup(
+                    s => s.Query(
+                        ItIs.DeepEqualTo(ObservationQueryContext),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(_tableBuilderResults);
 
-            var result = await controller.Query(ObservationQueryContext, cancellationToken);
-            VerifyAllMocks(mocks);
+            var client = SetupApp(tableBuilderService: tableBuilderService.Object).CreateClient();
 
-            result.AssertOkResult(_tableBuilderResults);
+            var response = await client
+                .PostAsync("/api/tablebuilder", new JsonNetContent(ObservationQueryContext));
+
+            VerifyAllMocks(tableBuilderService);
+
+            response.AssertOk(_tableBuilderResults);
         }
 
         [Fact]
         public async Task Query_ReleaseId()
         {
-            var cancellationToken = new CancellationToken();
+            var tableBuilderService = new Mock<ITableBuilderService>(Strict);
 
-            var (controller, mocks) = BuildControllerAndDependencies();
-
-            mocks.tableBuilderService
-                .Setup(s => s.Query(ReleaseId, ObservationQueryContext, cancellationToken))
+            tableBuilderService
+                .Setup(
+                    s => s.Query(
+                        ReleaseId,
+                        ItIs.DeepEqualTo(ObservationQueryContext),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(_tableBuilderResults);
 
-            var result = await controller.Query(ReleaseId, ObservationQueryContext, cancellationToken);
-            VerifyAllMocks(mocks);
+            var client = SetupApp(tableBuilderService: tableBuilderService.Object)
+                .AddContentDbTestData(context => context.Releases.Add(Release))
+                .CreateClient();
 
-            result.AssertOkResult(_tableBuilderResults);
+            var response = await client
+                .PostAsync($"/api/tablebuilder/release/{ReleaseId}", new JsonNetContent(ObservationQueryContext));
+
+            VerifyAllMocks(tableBuilderService);
+
+            response.AssertOk(_tableBuilderResults);
         }
 
         [Fact]
@@ -136,73 +162,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         {
             var cacheKey = new DataBlockTableResultCacheKey(Release.Publication.Slug, Release.Slug, DataBlockId);
 
-            var (controller, mocks) = BuildControllerAndDependencies();
-
-            SetupCall(mocks.persistenceHelper, ReleaseId, Release);
-
-            mocks.cacheService
+            BlobCacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(TableBuilderResultViewModel)))
                 .ReturnsAsync(null);
 
-            mocks.cacheService
+            BlobCacheService
                 .Setup(s => s.SetItem<object>(cacheKey, _tableBuilderResults))
                 .Returns(Task.CompletedTask);
 
-            mocks.dataBlockService
+            var dataBlockService = new Mock<IDataBlockService>();
+
+            dataBlockService
                 .Setup(s => s.GetDataBlockTableResult(ReleaseId, DataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
 
-            var result = await controller.QueryForDataBlock(ReleaseId, DataBlockId);
-            VerifyAllMocks(mocks);
+            var client = SetupApp(dataBlockService: dataBlockService.Object)
+                .AddContentDbTestData(context => context.Releases.Add(Release))
+                .CreateClient();
 
-            result.AssertOkResult(_tableBuilderResults);
+            var response = await client.GetAsync($"http://localhost/api/tablebuilder/release/{ReleaseId}/data-block/{DataBlockId}");
+
+            VerifyAllMocks(BlobCacheService, dataBlockService);
+
+            response.AssertOk(_tableBuilderResults);
         }
 
         [Fact]
         public async Task QueryForDataBlock_NotFound()
         {
-            var (controller, mocks) = BuildControllerAndDependencies();
+            var client = SetupApp().CreateClient();
 
-            SetupCall<ContentDbContext, Release>(mocks.persistenceHelper, ReleaseId, null);
+            var response = await client.GetAsync($"/api/tablebuilder/release/{ReleaseId}/data-block/{DataBlockId}");
 
-            var result = await controller.QueryForDataBlock(ReleaseId, DataBlockId);
-            VerifyAllMocks(mocks);
-
-            result.AssertNotFoundResult();
+            response.AssertNotFound();
         }
 
         [Fact]
         public async Task QueryForDataBlock_NotModified()
         {
-            var (controller, mocks) = BuildControllerAndDependencies();
+            var client = SetupApp()
+                .AddContentDbTestData(context => context.ReleaseContentBlocks.Add(ReleaseContentBlock))
+                .CreateClient();
 
-            SetupCall(mocks.persistenceHelper, ReleaseId, Release);
-
-            controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext
+            var response = await client.GetAsync(
+                $"/api/tablebuilder/release/{ReleaseId}/data-block/{DataBlockId}",
+                new Dictionary<string, string>
                 {
-                    Request =
                     {
-                        Headers =
-                        {
-                            {
-                                HeaderNames.IfModifiedSince,
-                                DateTime.Parse("2020-11-11T12:00:00Z").ToUniversalTime().ToString("R")
-                            },
-                            {
-                                HeaderNames.IfNoneMatch,
-                                $"W/\"{TableBuilderController.ApiVersion}\""
-                            }
-                        }
+                        HeaderNames.IfModifiedSince,
+                        DateTime.Parse("2020-11-11T12:00:00Z").ToUniversalTime().ToString("R")
+                    },
+                    {
+                        HeaderNames.IfNoneMatch,
+                        $"W/\"{TableBuilderController.ApiVersion}\""
                     }
                 }
-            };
+            );
 
-            var result = await controller.QueryForDataBlock(ReleaseId, DataBlockId);
-            VerifyAllMocks(mocks);
+            VerifyAllMocks(BlobCacheService);
 
-            result.AssertNotModified();
+            response.AssertNotModified();
         }
 
         [Fact]
@@ -210,47 +229,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         {
             var cacheKey = new DataBlockTableResultCacheKey(Release.Publication.Slug, Release.Slug, DataBlockId);
 
-            var (controller, mocks) = BuildControllerAndDependencies();
-
-            SetupCall(mocks.persistenceHelper, ReleaseId, Release);
-
-            mocks.cacheService
+            BlobCacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(TableBuilderResultViewModel)))
                 .ReturnsAsync(null);
 
-            mocks.cacheService
+            BlobCacheService
                 .Setup(s => s.SetItem<object>(cacheKey, _tableBuilderResults))
                 .Returns(Task.CompletedTask);
 
-            mocks.dataBlockService
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
+
+            dataBlockService
                 .Setup(s => s.GetDataBlockTableResult(ReleaseId, DataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
 
-            controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext
+            var client = SetupApp(dataBlockService: dataBlockService.Object)
+                .AddContentDbTestData(context => context.ReleaseContentBlocks.Add(ReleaseContentBlock))
+                .CreateClient();
+
+            var response = await client.GetAsync(
+                $"/api/tablebuilder/release/{ReleaseId}/data-block/{DataBlockId}",
+                new Dictionary<string, string>
                 {
-                    Request =
                     {
-                        Headers =
-                        {
-                            {
-                                HeaderNames.IfModifiedSince,
-                                DateTime.Parse("2019-11-11T12:00:00Z").ToUniversalTime().ToString("R")
-                            },
-                            {
-                                HeaderNames.IfNoneMatch,
-                                "\"not the same etag\""
-                            }
-                        }
+                        HeaderNames.IfModifiedSince,
+                        DateTime.Parse("2019-11-11T12:00:00Z").ToUniversalTime().ToString("R")
+                    },
+                    {
+                        HeaderNames.IfNoneMatch,
+                        "\"not the same etag\""
                     }
                 }
-            };
+            );
 
-            var result = await controller.QueryForDataBlock(ReleaseId, DataBlockId);
-            VerifyAllMocks(mocks);
+            VerifyAllMocks(BlobCacheService, dataBlockService);
 
-            result.AssertOkResult(_tableBuilderResults);
+            response.AssertOk(_tableBuilderResults);
         }
 
         [Fact]
@@ -258,47 +272,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         {
             var cacheKey = new DataBlockTableResultCacheKey(Release.Publication.Slug, Release.Slug, DataBlockId);
 
-            var (controller, mocks) = BuildControllerAndDependencies();
-
-            SetupCall(mocks.persistenceHelper, ReleaseId, Release);
-
-            mocks.cacheService
+            BlobCacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(TableBuilderResultViewModel)))
                 .ReturnsAsync(null);
 
-            mocks.cacheService
+            BlobCacheService
                 .Setup(s => s.SetItem<object>(cacheKey, _tableBuilderResults))
                 .Returns(Task.CompletedTask);
 
-            mocks.dataBlockService
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
+
+            dataBlockService
                 .Setup(s => s.GetDataBlockTableResult(ReleaseId, DataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
 
-            controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext
+            var client = SetupApp(dataBlockService: dataBlockService.Object)
+                .AddContentDbTestData(context => context.ReleaseContentBlocks.Add(ReleaseContentBlock))
+                .CreateClient();
+
+            var response = await client.GetAsync(
+                $"/api/tablebuilder/release/{ReleaseId}/data-block/{DataBlockId}",
+                new Dictionary<string, string>
                 {
-                    Request =
                     {
-                        Headers =
-                        {
-                            {
-                                HeaderNames.IfModifiedSince,
-                                DateTime.Parse("2019-11-11T12:00:00Z").ToUniversalTime().ToString("R")
-                            },
-                            {
-                                HeaderNames.IfNoneMatch,
-                                $"W/\"{TableBuilderController.ApiVersion}\""
-                            }
-                        }
+                        HeaderNames.IfModifiedSince,
+                        DateTime.Parse("2019-11-11T12:00:00Z").ToUniversalTime().ToString("R")
+                    },
+                    {
+                        HeaderNames.IfNoneMatch,
+                        $"W/\"{TableBuilderController.ApiVersion}\""
                     }
                 }
-            };
+            );
 
-            var result = await controller.QueryForDataBlock(ReleaseId, DataBlockId);
-            VerifyAllMocks(mocks);
+            VerifyAllMocks(BlobCacheService, dataBlockService);
 
-            result.AssertOkResult(_tableBuilderResults);
+            response.AssertOk(_tableBuilderResults);
         }
 
         [Fact]
@@ -313,40 +322,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var cacheKey = new DataBlockTableResultCacheKey(Release.Publication.Slug, Release.Slug, DataBlockId);
 
-            var (controller, mocks) = BuildControllerAndDependencies();
-
-            SetupCall(mocks.persistenceHelper, ReleaseContentBlock);
-
-            mocks.cacheService
+            BlobCacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(TableBuilderResultViewModel)))
                 .ReturnsAsync(null);
 
-            mocks.cacheService
+            BlobCacheService
                 .Setup(s => s.SetItem<object>(cacheKey, _tableBuilderResults))
                 .Returns(Task.CompletedTask);
 
-            mocks.dataBlockService
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
+
+            dataBlockService
                 .Setup(s => s.GetDataBlockTableResult(ReleaseId, DataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
 
-            mocks.releaseRepository
+            var releaseRepository = new Mock<IReleaseRepository>(Strict);
+
+            releaseRepository
                 .Setup(s => s.IsLatestPublishedVersionOfRelease(ReleaseId))
                 .ReturnsAsync(true);
 
-            mocks.releaseRepository
+            releaseRepository
                 .Setup(s => s.GetLatestPublishedRelease(PublicationId))
                 .ReturnsAsync(latestRelease);
 
-            var result = await controller.QueryForFastTrack(DataBlockId);
+            var client = SetupApp(
+                    dataBlockService: dataBlockService.Object,
+                    releaseRepository: releaseRepository.Object
+                )
+                .AddContentDbTestData(context => context.ReleaseContentBlocks.Add(ReleaseContentBlock))
+                .CreateClient();
 
-            VerifyAllMocks(mocks);
+            var response = await client.GetAsync($"/api/tablebuilder/fast-track/{DataBlockId}");
 
-            var viewModel = result.AssertOkResult();
+            VerifyAllMocks(BlobCacheService, dataBlockService, releaseRepository);
+
+            var viewModel = response.AssertOk<FastTrackViewModel>();
             Assert.Equal(DataBlockId, viewModel.Id);
             Assert.Equal(ReleaseId, viewModel.ReleaseId);
             Assert.Equal("2020-21", viewModel.ReleaseSlug);
-            Assert.Equal(TableConfiguration, viewModel.Configuration);
-            Assert.Equal(_tableBuilderResults, viewModel.FullTable);
+            viewModel.Configuration.AssertDeepEqualTo(TableConfiguration);
+            viewModel.FullTable.AssertDeepEqualTo(_tableBuilderResults);
             Assert.True(viewModel.LatestData);
             Assert.Equal("Academic Year 2020/21", viewModel.LatestReleaseTitle);
 
@@ -363,19 +379,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForFastTrack_NotForLatestPublishedVersionOfRelease()
         {
-            var (controller, mocks) = BuildControllerAndDependencies();
+            var releaseRepository = new Mock<IReleaseRepository>(Strict);
 
-            SetupCall(mocks.persistenceHelper, ReleaseContentBlock);
-
-            mocks.releaseRepository
+            releaseRepository
                 .Setup(s => s.IsLatestPublishedVersionOfRelease(ReleaseId))
                 .ReturnsAsync(false);
 
-            var result = await controller.QueryForFastTrack(DataBlockId);
+            var client = SetupApp(releaseRepository: releaseRepository.Object)
+                .AddContentDbTestData(context => context.ReleaseContentBlocks.Add(ReleaseContentBlock))
+                .CreateClient();
 
-            VerifyAllMocks(mocks);
+            var response = await client.GetAsync($"/api/tablebuilder/fast-track/{DataBlockId}");
 
-            result.AssertNotFoundResult();
+            VerifyAllMocks(BlobCacheService, releaseRepository);
+
+            response.AssertNotFound();;
         }
 
         [Fact]
@@ -390,35 +408,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var cacheKey = new DataBlockTableResultCacheKey(Release.Publication.Slug, Release.Slug, DataBlockId);
 
-            var (controller, mocks) = BuildControllerAndDependencies();
-
-            SetupCall(mocks.persistenceHelper, ReleaseContentBlock);
-
-            mocks.cacheService
+            BlobCacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(TableBuilderResultViewModel)))
                 .ReturnsAsync(null);
 
-            mocks.cacheService
+            BlobCacheService
                 .Setup(s => s.SetItem<object>(cacheKey, _tableBuilderResults))
                 .Returns(Task.CompletedTask);
 
-            mocks.dataBlockService
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
+
+            dataBlockService
                 .Setup(s => s.GetDataBlockTableResult(ReleaseId, DataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
 
-            mocks.releaseRepository
+            var releaseRepository = new Mock<IReleaseRepository>(Strict);
+
+            releaseRepository
                 .Setup(s => s.IsLatestPublishedVersionOfRelease(ReleaseId))
                 .ReturnsAsync(true);
 
-            mocks.releaseRepository
+            releaseRepository
                 .Setup(s => s.GetLatestPublishedRelease(PublicationId))
                 .ReturnsAsync(latestRelease);
 
-            var result = await controller.QueryForFastTrack(DataBlockId);
+            var client = SetupApp(
+                    dataBlockService: dataBlockService.Object,
+                    releaseRepository: releaseRepository.Object
+                )
+                .AddContentDbTestData(context => context.ReleaseContentBlocks.Add(ReleaseContentBlock))
+                .CreateClient();
 
-            VerifyAllMocks(mocks);
+            var response = await client.GetAsync($"/api/tablebuilder/fast-track/{DataBlockId}");
 
-            var viewModel = result.AssertOkResult();
+            VerifyAllMocks(BlobCacheService, dataBlockService, releaseRepository);
+
+            var viewModel = response.AssertOk<FastTrackViewModel>();
             Assert.Equal(DataBlockId, viewModel.Id);
             Assert.Equal(ReleaseId, viewModel.ReleaseId);
             Assert.Equal("2020-21", viewModel.ReleaseSlug);
@@ -426,34 +451,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             Assert.Equal("Academic Year 2021/22", viewModel.LatestReleaseTitle);
         }
 
-        private static (
-            TableBuilderController controller,
-            (Mock<IPersistenceHelper<ContentDbContext>> persistenceHelper,
-            Mock<IBlobCacheService> cacheService,
-            Mock<IDataBlockService> dataBlockService,
-            Mock<IReleaseRepository> releaseRepository,
-            Mock<ITableBuilderService> tableBuilderService) mocks) BuildControllerAndDependencies()
+        private WebApplicationFactory<TestStartup> SetupApp(
+            IDataBlockService? dataBlockService = null,
+            IReleaseRepository? releaseRepository = null,
+            ITableBuilderService? tableBuilderService = null)
         {
-            var persistenceHelper = MockPersistenceHelper<ContentDbContext>();
-            var dataBlockService = new Mock<IDataBlockService>(Strict);
-            var releaseRepository = new Mock<IReleaseRepository>(Strict);
-            var tableBuilderService = new Mock<ITableBuilderService>(Strict);
-
-            var controller = new TableBuilderController(
-                persistenceHelper.Object,
-                dataBlockService.Object,
-                releaseRepository.Object,
-                tableBuilderService.Object
-            )
-            {
-                ControllerContext = new ControllerContext
-                {
-                    HttpContext = new DefaultHttpContext()
-                }
-            };
-
-            return (controller,
-                (persistenceHelper, BlobCacheService, dataBlockService, releaseRepository, tableBuilderService));
+            return _testApp
+                .ResetDbContexts()
+                .ConfigureServices(
+                    services =>
+                    {
+                        services.AddTransient(_ => dataBlockService ?? Mock.Of<IDataBlockService>(Strict));
+                        services.AddTransient(_ => releaseRepository ?? Mock.Of<IReleaseRepository>(Strict));
+                        services.AddTransient(_ => tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict));
+                    }
+                );
         }
     }
 }

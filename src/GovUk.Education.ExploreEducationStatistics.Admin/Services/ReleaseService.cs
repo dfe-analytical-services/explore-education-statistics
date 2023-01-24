@@ -455,7 +455,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async file =>
                 {
                     var subject = file.SubjectId.HasValue
-                        ? await _subjectRepository.Get(file.SubjectId.Value)
+                        ? await _subjectRepository.Find(file.SubjectId.Value)
                         : null;
 
                     var footnotes = subject == null

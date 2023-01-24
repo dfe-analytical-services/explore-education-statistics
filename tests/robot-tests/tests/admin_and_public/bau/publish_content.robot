@@ -18,7 +18,7 @@ ${RELEASE_NAME}=        Calendar Year 2001
 *** Test Cases ***
 Create new publication and release via API
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    user create test release via api    ${PUBLICATION_ID}    CY    2001    AdHocStatistics
+    user creates test release via api    ${PUBLICATION_ID}    CY    2001    AdHocStatistics
 
 Navigate to release content
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}

@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             releaseDataFileRepository.Setup(s => s.GetBySubject(release.Id, subject.Id))
                 .ReturnsAsync(releaseFile);
 
-            subjectRepository.Setup(s => s.GetPublicationIdForSubject(subject.Id))
+            subjectRepository.Setup(s => s.FindPublicationIdForSubject(subject.Id))
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
@@ -326,7 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             releaseDataFileRepository.Setup(s => s.GetBySubject(release.Id, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
 
-            subjectRepository.Setup(s => s.GetPublicationIdForSubject(subject.Id))
+            subjectRepository.Setup(s => s.FindPublicationIdForSubject(subject.Id))
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
@@ -549,7 +549,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             releaseDataFileRepository.Setup(s => s.GetBySubject(release.Id, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
 
-            subjectRepository.Setup(s => s.GetPublicationIdForSubject(subject.Id))
+            subjectRepository.Setup(s => s.FindPublicationIdForSubject(subject.Id))
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
@@ -809,7 +809,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             releaseDataFileRepository.Setup(s => s.GetBySubject(release.Id, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
 
-            subjectRepository.Setup(s => s.GetPublicationIdForSubject(subject.Id))
+            subjectRepository.Setup(s => s.FindPublicationIdForSubject(subject.Id))
                 .ReturnsAsync(publication.Id);
 
             timePeriodService

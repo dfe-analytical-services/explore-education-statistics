@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
 {
-    public class TimePeriodQuery
+    public record TimePeriodQuery
     {
         public int StartYear { get; set; }
 
@@ -26,19 +26,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
             StartCode = startCode;
             EndYear = endYear;
             EndCode = endCode;
-        }
-
-        public TimePeriodQuery Clone()
-        {
-            return (TimePeriodQuery)MemberwiseClone();
-        }
-
-        public override string ToString()
-        {
-            return $"{nameof(StartYear)}: {StartYear}, " +
-                   $"{nameof(StartCode)}: {StartCode.GetEnumValue()}, " +
-                   $"{nameof(EndYear)}: {EndYear}, " +
-                   $"{nameof(EndCode)}: {EndCode.GetEnumValue()}";
         }
     }
 }

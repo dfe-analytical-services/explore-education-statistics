@@ -1,3 +1,4 @@
+import WarningMessage from '@common/components/WarningMessage';
 import PublicationForm, {
   PublicationFormSubmitHandler,
 } from '@common/modules/table-tool/components/PublicationForm';
@@ -15,6 +16,7 @@ import tableBuilderService, {
   Subject,
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
+import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import DownloadStep, {
   DownloadFormSubmitHandler,
@@ -24,7 +26,7 @@ import ReleaseStep from '@frontend/modules/data-catalogue/components/ReleaseStep
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useImmer } from 'use-immer';
 
 interface Props {
@@ -51,7 +53,7 @@ const DataCataloguePage: NextPage<Props> = ({
   selectedRelease,
   subjects = [],
   themes,
-}: Props) => {
+}) => {
   const router = useRouter();
 
   const initialState = useMemo<DataCatalogueState>(() => {
@@ -78,8 +80,18 @@ const DataCataloguePage: NextPage<Props> = ({
 
   const [state, updateState] = useImmer<DataCatalogueState>(initialState);
 
+  useEffect(() => {
+    updateState(() => initialState);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.query.publicationSlug, updateState]);
+
   const handlePublicationStepBack = () => {
-    router.push('/data-catalogue', undefined, { shallow: true });
+    router.push('/data-catalogue');
+    updateState(draft => {
+      // ensure no stale state is left in query
+      draft.query.release = undefined;
+      draft.query.publication = undefined;
+    });
   };
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
@@ -140,6 +152,20 @@ const DataCataloguePage: NextPage<Props> = ({
         }}
         onSubmit={handlePublicationFormSubmit}
         themes={themes}
+        renderSummaryAfter={
+          state.query.publication?.isSuperseded &&
+          state.query.publication.supersededBy ? (
+            <WarningMessage testId="superseded-warning">
+              This publication has been superseded by{' '}
+              <Link
+                testId="superseded-by-link"
+                to={`/data-catalogue?publicationSlug=${state.query.publication.supersededBy.slug}`}
+              >
+                {state.query.publication.supersededBy.title}
+              </Link>
+            </WarningMessage>
+          ) : null
+        }
       />
     );
   };

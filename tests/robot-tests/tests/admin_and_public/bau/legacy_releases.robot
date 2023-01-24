@@ -18,7 +18,7 @@ ${UPDATED_DESCRIPTION}=     updated legacy release description
 *** Test Cases ***
 Create new publication and release via api
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    user create test release via api    ${PUBLICATION_ID}    AY    2020
+    user creates test release via api    ${PUBLICATION_ID}    AY    2020
 
 Create legacy release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}

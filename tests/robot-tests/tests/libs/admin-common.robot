@@ -1,6 +1,7 @@
 *** Settings ***
 Resource    ./common.robot
 Library     admin-utilities.py
+Library     String
 
 
 *** Variables ***
@@ -496,7 +497,7 @@ user approves amended release for immediate publication
     user approves release for immediate publication    amendment
 
 user approves release for immediate publication
-    [Arguments]    ${release_type}=original
+    [Arguments]    ${release_type}=original    ${NEXT_RELEASE_MONTH}=01    ${NEXT_RELEASE_YEAR}=2200
     user clicks link    Sign off
     user waits until page does not contain loading spinner
     user waits until h2 is visible    Sign off
@@ -510,6 +511,8 @@ user approves release for immediate publication
     END
     user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    Approved by UI tests
     user clicks radio    Immediately
+    user enters text into element    id:releaseStatusForm-nextReleaseDate-month    ${NEXT_RELEASE_MONTH}
+    user enters text into element    id:releaseStatusForm-nextReleaseDate-year    ${NEXT_RELEASE_YEAR}
     user clicks button    Update status
     user waits until h2 is visible    Sign off    %{RELEASE_COMPLETE_WAIT}
     user checks summary list contains    Current status    Approved
@@ -576,17 +579,13 @@ user puts release into higher level review
     user clicks button    Update status
     user waits until element is visible    id:CurrentReleaseStatus-Awaiting higher review    %{WAIT_SMALL}
 
-user approves release for scheduled release
-    [Arguments]    ${DAYS_UNTIL_RELEASE}    ${NEXT_RELEASE_MONTH}=01    ${NEXT_RELEASE_YEAR}=2200
-    ${PUBLISH_DATE_DAY}=    get current datetime    %-d    ${DAYS_UNTIL_RELEASE}
-    ${PUBLISH_DATE_MONTH}=    get current datetime    %-m    ${DAYS_UNTIL_RELEASE}
-    ${PUBLISH_DATE_MONTH_WORD}=    get current datetime    %B    ${DAYS_UNTIL_RELEASE}
-    ${PUBLISH_DATE_YEAR}=    get current datetime    %Y    ${DAYS_UNTIL_RELEASE}
-    set suite variable    ${PUBLISH_DATE_DAY}
-    set suite variable    ${PUBLISH_DATE_MONTH}
-    set suite variable    ${PUBLISH_DATE_MONTH_WORD}
-    set suite variable    ${PUBLISH_DATE_YEAR}
-
+user approves release for scheduled publication
+    [Arguments]
+    ...    ${publish_date_day}
+    ...    ${publish_date_month}
+    ...    ${publish_date_year}
+    ...    ${next_release_month}=01
+    ...    ${next_release_year}=2200
     user clicks link    Sign off
     user waits until page does not contain loading spinner
     user waits until h2 is visible    Sign off    %{WAIT_SMALL}
@@ -599,15 +598,33 @@ user approves release for scheduled release
     user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    Approved by UI tests
     user clicks radio    On a specific date
     user waits until page contains    Publish date
-    user enters text into element    id:releaseStatusForm-publishScheduled-day    ${PUBLISH_DATE_DAY}
-    user enters text into element    id:releaseStatusForm-publishScheduled-month    ${PUBLISH_DATE_MONTH}
-    user enters text into element    id:releaseStatusForm-publishScheduled-year    ${PUBLISH_DATE_YEAR}
-    user enters text into element    id:releaseStatusForm-nextReleaseDate-month    ${NEXT_RELEASE_MONTH}
-    user enters text into element    id:releaseStatusForm-nextReleaseDate-year    ${NEXT_RELEASE_YEAR}
+    user enters text into element    id:releaseStatusForm-publishScheduled-day    ${publish_date_day}
+    user enters text into element    id:releaseStatusForm-publishScheduled-month    ${publish_date_month}
+    user enters text into element    id:releaseStatusForm-publishScheduled-year    ${publish_date_year}
+    user enters text into element    id:releaseStatusForm-nextReleaseDate-month    ${next_release_month}
+    user enters text into element    id:releaseStatusForm-nextReleaseDate-year    ${next_release_year}
 
     user clicks button    Update status
     user waits until h2 is visible    Confirm publish date    %{WAIT_SMALL}
     user clicks button    Confirm
+
+user waits for scheduled release to be published immediately
+    # It's possible that the actual scheduled "stage scheduled releases" function might pick up the staging of this
+    # scheduled Release before we get a chance to manually trigger the "stage scheduled releases immediately" function
+    # ourselves - hence we need to account for it going into "Started" state while it stages before we've manually
+    # triggered the function, as well as the standard "Scheduled" state that we would normally expect a scheduled
+    # Release to fall into.
+    ${release_id}=    get release id from url
+    user waits until page contains element
+    ...    xpath://*[@id='release-process-status-Scheduled' or @id='release-process-status-Started']    %{WAIT_SMALL}
+    trigger immediate staging of scheduled release    ${release_id}
+    user reloads page
+    user waits until page contains details dropdown    View stages    %{WAIT_SMALL}
+    user opens details dropdown    View stages
+    user waits until page contains    content - Scheduled    %{WAIT_MEDIUM}
+    user waits until page contains    files - Complete    %{WAIT_MEDIUM}
+    trigger immediate publishing of scheduled release    ${release_id}
+    user waits until page contains element    id:release-process-status-Complete    %{WAIT_MEDIUM}
 
 user verifies release summary
     [Arguments]    ${PUBLICATION_NAME}    ${PUBLICATION_SUMMARY}    ${TIME_PERIOD}    ${RELEASE_PERIOD}    ${LEAD_STATISTICIAN}    ${RELEASE_TYPE}
@@ -658,7 +675,7 @@ user gives analyst publication owner access
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user gives publication access to analyst    ${PUBLICATION_NAME}    Owner    ${ANALYST_EMAIL}
 
-user gives analyst publication release approver access
+user gives analyst publication approver access
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user gives publication access to analyst    ${PUBLICATION_NAME}    Approver    ${ANALYST_EMAIL}
 
@@ -773,3 +790,14 @@ user gets resolved comment
 user closes Set Page View box
     user clicks element    id:pageViewToggleButton
     user waits until element is not visible    id:editingMode    %{WAIT_SMALL}
+
+# This keyword will work for any URL containing the pattern release/<guid>, and will return the guid segment of the URL.
+# For example, in the URL https://localhost/publication/<publication id>/release/<release id>/status, this
+# keyword would return the <release id> segment of the URL.
+
+get release id from url
+    ${current_url}=    Get Location
+    @{release_id_match}=    Get Regexp Matches    ${current_url}
+    ...    release\/([0-9A-Fa-f]{8}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{12})    1
+    ${release_id}=    Get From List    ${release_id_match}    0
+    [Return]    ${release_id}
