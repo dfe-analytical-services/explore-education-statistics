@@ -256,6 +256,7 @@ Check data catalogue page contains archive and superseding publication subjects
     user checks page contains    This is not the latest data
 
     user clicks button    Change publication
+    user waits for page to finish loading
     user waits until page contains    Choose a publication
 
     user clicks radio    %{TEST_THEME_NAME}
@@ -419,6 +420,7 @@ Check data catalogue page is correct after archive-publication has been unarchiv
     user checks page does not contain    This is not the latest data
 
     user clicks button    Change publication
+    user waits for page to finish loading
     user waits until page contains    Choose a publication
 
     user clicks radio    %{TEST_THEME_NAME}

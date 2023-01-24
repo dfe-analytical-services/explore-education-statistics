@@ -43,7 +43,7 @@ const PublicationAccessForm = ({
       enableReinitialize
       onSubmit={onSubmit}
     >
-      {() => {
+      {form => {
         return (
           <Form id={`${user.id}-publicationRole`}>
             <FormFieldset
@@ -76,7 +76,11 @@ const PublicationAccessForm = ({
                 </div>
                 <div className="govuk-grid-column-one-quarter">
                   {user && (
-                    <Button type="submit" className="govuk-!-margin-top-6">
+                    <Button
+                      type="submit"
+                      disabled={form.isSubmitting}
+                      className="govuk-!-margin-top-6"
+                    >
                       Add publication access
                     </Button>
                   )}

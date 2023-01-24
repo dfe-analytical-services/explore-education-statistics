@@ -139,7 +139,10 @@ Check publication owner can add data guidance to ${SUBJECT_NAME} on new release
 Swap the publication owner role for release approver to test approving the methodology
     user changes to bau1
     user removes publication owner access from analyst    ${PUBLICATION_NAME}
-    user gives release access to analyst    ${RELEASE_NAME}    Approver
+    user gives release access to analyst
+    ...    ${PUBLICATION_NAME}
+    ...    ${RELEASE_TYPE}
+    ...    Approver
 
 Check release approver can approve methodology for publication
     user changes to analyst1
@@ -159,7 +162,10 @@ Check publication owner cannot remove approved methodology
 Swap the publication owner role for release approver to test unapproving the methodology
     user changes to bau1
     user removes publication owner access from analyst    ${PUBLICATION_NAME}
-    user gives release access to analyst    ${RELEASE_NAME}    Approver
+    user gives release access to analyst
+    ...    ${PUBLICATION_NAME}
+    ...    ${RELEASE_TYPE}
+    ...    Approver
 
 Check release approver can unapprove methodology
     user changes to analyst1
@@ -220,7 +226,10 @@ Check publication owner can create and cancel methodology amendments on a live p
 Swap the publication owner role for release approver to test approving methodology amendments
     user changes to bau1
     user removes publication owner access from analyst    ${PUBLICATION_NAME}
-    user gives release access to analyst    ${RELEASE_NAME}    Approver
+    user gives release access to analyst
+    ...    ${PUBLICATION_NAME}
+    ...    ${RELEASE_TYPE}
+    ...    Approver
 
 Check release approver can approve methodology amendments on a live publication
     user changes to analyst1
@@ -243,7 +252,10 @@ Create a new methodology amendment
 Swap the publication owner role for release approver to test approving the methodology amendment
     user changes to bau1
     user removes publication owner access from analyst    ${PUBLICATION_NAME}
-    user gives release access to analyst    ${RELEASE_NAME}    Approver
+    user gives release access to analyst
+    ...    ${PUBLICATION_NAME}
+    ...    ${RELEASE_TYPE}
+    ...    Approver
 
 Check release approver can approve the methodology amendment for publishing with the release amendment
     user changes to analyst1
