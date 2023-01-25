@@ -85,7 +85,7 @@ export interface UpdateReleaseRequest extends BaseReleaseRequest {
 
 export interface CreateReleaseStatusRequest {
   approvalStatus: ReleaseApprovalStatus;
-  latestInternalReleaseNote?: string;
+  internalReleaseNote?: string;
   publishMethod?: 'Scheduled' | 'Immediate';
   publishScheduled?: string;
   nextReleaseDate?: PartialDate;
@@ -179,7 +179,7 @@ export interface ReleaseStatus {
   approvalStatus: ReleaseApprovalStatus;
   notifySubscribers: boolean;
   created: string;
-  createdByEmail: string;
+  createdByEmail?: string;
   releaseVersion: number;
 }
 

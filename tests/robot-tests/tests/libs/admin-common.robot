@@ -510,7 +510,7 @@ user approves release for immediate publication
     IF    '${release_type}' == 'amendment'
         user waits until page contains    Notify subscribers by email
     END
-    user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    Approved by UI tests
+    user enters text into element    id:releaseStatusForm-internalReleaseNote    Approved by UI tests
     user clicks radio    Immediately
     user enters text into element    id:releaseStatusForm-nextReleaseDate-month    ${NEXT_RELEASE_MONTH}
     user enters text into element    id:releaseStatusForm-nextReleaseDate-year    ${NEXT_RELEASE_YEAR}
@@ -557,7 +557,7 @@ user puts release into draft
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
     user clicks radio    In draft
-    user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    ${release_note}
+    user enters text into element    id:releaseStatusForm-internalReleaseNote    ${release_note}
     IF    "${next_release_date_month}" != "${EMPTY}"
         user enters text into element    id:releaseStatusForm-nextReleaseDate-month    ${next_release_date_month}
     END
@@ -576,7 +576,7 @@ user puts release into higher level review
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
     user clicks radio    Ready for higher review (this will notify approvers)
-    user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    Ready for higher review
+    user enters text into element    id:releaseStatusForm-internalReleaseNote    Ready for higher review
     user clicks button    Update status
     user waits until element is visible    id:CurrentReleaseStatus-Awaiting higher review    %{WAIT_SMALL}
 
@@ -596,7 +596,7 @@ user approves release for scheduled publication
     user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
 
     user clicks radio    Approved for publication
-    user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    Approved by UI tests
+    user enters text into element    id:releaseStatusForm-internalReleaseNote    Approved by UI tests
     user clicks radio    On a specific date
     user waits until page contains    Publish date
     user enters text into element    id:releaseStatusForm-publishScheduled-day    ${publish_date_day}

@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             }
         }
 
-        public string LatestInternalReleaseNote
+        public string? LatestInternalReleaseNote
         {
             get
             {

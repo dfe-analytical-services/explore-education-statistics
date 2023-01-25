@@ -163,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishScheduled = "2051-06-30",
                             NextReleaseDate = nextReleaseDateEdited,
                             ApprovalStatus = ReleaseApprovalStatus.Draft,
-                            LatestInternalReleaseNote = "Test internal note"
+                            InternalReleaseNote = "Test internal note"
                         }
                     );
 
@@ -245,7 +245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
                             NextReleaseDate = new PartialDate {Month="12", Year="2000"}
@@ -291,7 +291,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = null,
                             NextReleaseDate = new PartialDate {Month="12", Year="2000"}
@@ -333,7 +333,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "",
                             NextReleaseDate = new PartialDate {Month="12", Year="2000"}
@@ -389,7 +389,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2022-12-31",
                             NextReleaseDate = new PartialDate {Month="12", Year="2000"}
@@ -450,7 +450,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2023-06-06",
                             NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
@@ -508,7 +508,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2023-01-01",
                             NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
@@ -569,7 +569,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2023-06-07",
                             NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
@@ -627,7 +627,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2023-01-08", // Sunday
                             NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
@@ -686,7 +686,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2023-01-01",
                             NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
@@ -804,7 +804,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
                             NextReleaseDate = new PartialDate {Month="12", Year="2000"}
@@ -879,7 +879,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             // No need to include NotifySubscribers - should default to true for original releases
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
@@ -1142,7 +1142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Draft,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note"
                         }
                     );
 
@@ -1238,7 +1238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishScheduled = "2051-06-30",
                             NextReleaseDate = nextReleaseDateEdited,
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
-                            LatestInternalReleaseNote = "Internal note"
+                            InternalReleaseNote = "Internal note"
                         }
                     );
 
@@ -1360,7 +1360,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishScheduled = "2051-06-30",
                             NextReleaseDate = nextReleaseDateEdited,
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
-                            LatestInternalReleaseNote = "Test internal note"
+                            InternalReleaseNote = "Test internal note"
                         }
                     );
 
@@ -1691,7 +1691,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
-                            LatestInternalReleaseNote = "Test internal note",
+                            InternalReleaseNote = "Test internal note",
                             NextReleaseDate = new PartialDate { Month = "12", Year = "2077" }
                         });
 
@@ -1768,7 +1768,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
-                            LatestInternalReleaseNote = "Test internal note",
+                            InternalReleaseNote = "Test internal note",
                             NextReleaseDate = new PartialDate { Month = "12", Year = "2077" },
                         });
 
@@ -1837,7 +1837,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
-                            LatestInternalReleaseNote = "Test internal note",
+                            InternalReleaseNote = "Test internal note",
                             NextReleaseDate = new PartialDate { Month = "12", Year = "2077" },
                         });
 

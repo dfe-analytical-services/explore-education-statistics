@@ -12,10 +12,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Release Release { get; set; } = null!;
 
-        public string InternalReleaseNote { get; set; } = null!;
+        public string? InternalReleaseNote { get; set; }
 
         public bool NotifySubscribers { get; set; }
-        
+
         public DateTime? NotifiedOn { get; set; }
 
         public ReleaseApprovalStatus ApprovalStatus { get; set; }

@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var releaseStatus = new ReleaseStatus
                     {
                         Release = release,
-                        InternalReleaseNote = request.LatestInternalReleaseNote,
+                        InternalReleaseNote = request.InternalReleaseNote,
                         NotifySubscribers = notifySubscribers,
                         ApprovalStatus = request.ApprovalStatus,
                         Created = _dateTimeProvider.UtcNow,

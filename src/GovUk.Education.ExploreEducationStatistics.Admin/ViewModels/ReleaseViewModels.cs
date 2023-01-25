@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public bool NotifySubscribers { get; set; }
 
-        public string LatestInternalReleaseNote { get; set; } = string.Empty;
+        public string? LatestInternalReleaseNote { get; set; }
 
         public bool Amendment { get; set; }
 

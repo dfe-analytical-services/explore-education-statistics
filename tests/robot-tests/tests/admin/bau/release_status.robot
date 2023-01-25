@@ -37,7 +37,7 @@ Go to release sign off page and verify initial release checklist
 
 Submit release for Higher Review
     user clicks radio    Ready for higher review (this will notify approvers)
-    user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    Submitted for Higher Review
+    user enters text into element    id:releaseStatusForm-internalReleaseNote    Submitted for Higher Review
     user enters text into element    id:releaseStatusForm-nextReleaseDate-month    12
     user enters text into element    id:releaseStatusForm-nextReleaseDate-year    3001
     user clicks button    Update status
@@ -76,7 +76,7 @@ Verify release checklist has been updated
 
 Approve release
     user clicks radio    Approved for publication
-    user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    Approved for release
+    user enters text into element    id:releaseStatusForm-internalReleaseNote    Approved for release
 
     user clicks radio    On a specific date
     user enters text into element    id:releaseStatusForm-publishScheduled-day    1

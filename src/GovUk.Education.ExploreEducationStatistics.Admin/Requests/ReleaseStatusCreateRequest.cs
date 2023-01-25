@@ -16,7 +16,7 @@ public record ReleaseStatusCreateRequest
     [JsonConverter(typeof(StringEnumConverter))]
     public ReleaseApprovalStatus ApprovalStatus { get; init; }
 
-    public string LatestInternalReleaseNote { get; init; } = string.Empty;
+    public string? InternalReleaseNote { get; init; }
 
     public bool? NotifySubscribers { get; init; }
 
