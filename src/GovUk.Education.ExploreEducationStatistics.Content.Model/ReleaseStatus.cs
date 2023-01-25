@@ -1,10 +1,11 @@
 #nullable enable
 
 using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
-    public class ReleaseStatus
+    public class ReleaseStatus : ICreatedTimestamp<DateTime?>
     {
         public Guid Id { get; set; }
 
@@ -14,8 +15,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string? InternalReleaseNote { get; set; }
 
+        // TODO EES-4058 Remove unused NotifySubscribers after EES-4056
         public bool NotifySubscribers { get; set; }
 
+        // TODO EES-4058 Remove unused NotifiedOn after EES-4056
         public DateTime? NotifiedOn { get; set; }
 
         public ReleaseApprovalStatus ApprovalStatus { get; set; }

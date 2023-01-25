@@ -65,19 +65,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<ReleaseStatus> ReleaseStatuses { get; set; } = new();
 
-        public bool NotifySubscribers
-        {
-            get
-            {
-                var status = ReleaseStatuses
-                           .OrderBy(rs => rs.Created)
-                           .LastOrDefault();
-                return status != null
-                       && status.NotifySubscribers
-                       && status.NotifiedOn == null;
-            }
-        }
-
         public string? LatestInternalReleaseNote
         {
             get
@@ -98,6 +85,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string PreReleaseAccessList { get; set; } = string.Empty;
 
         public string DataGuidance { get; set; } = string.Empty;
+
+        public bool NotifySubscribers { get; set; }
+
+        public DateTime? NotifiedOn { get; set; }
 
         public Release? PreviousVersion { get; set; }
 

@@ -129,23 +129,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     release.ApprovalStatus = request.ApprovalStatus;
                     release.NextReleaseDate = request.NextReleaseDate;
-                    release.PublishScheduled = request.PublishMethod == PublishMethod.Immediate &&
-                                               request.ApprovalStatus == ReleaseApprovalStatus.Approved
+                    release.NotifySubscribers = release.Version == 0 || request.NotifySubscribers == true;
+                    release.PublishScheduled = request.PublishMethod == PublishMethod.Immediate
                         ? _dateTimeProvider.UtcNow
                         : request.PublishScheduledDate;
-
-                    // NOTE: Subscribers should be notified if the release is approved and isn't amended,
-                    //       OR if the release is an amendment, is approved, and NotifySubscribers is true
-                    var notifySubscribers = request.ApprovalStatus == ReleaseApprovalStatus.Approved &&
-                        (!release.Amendment || request.NotifySubscribers.HasValue && request.NotifySubscribers.Value);
 
                     var releaseStatus = new ReleaseStatus
                     {
                         Release = release,
                         InternalReleaseNote = request.InternalReleaseNote,
-                        NotifySubscribers = notifySubscribers,
                         ApprovalStatus = request.ApprovalStatus,
-                        Created = _dateTimeProvider.UtcNow,
                         CreatedById = _userService.GetUserId()
                     };
 
@@ -167,9 +160,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     request.PublishMethod == PublishMethod.Immediate
                                 );
                             }
-
-                            _context.Update(release);
-                            await _context.SaveChangesAsync();
 
                             switch (request.ApprovalStatus)
                             {
