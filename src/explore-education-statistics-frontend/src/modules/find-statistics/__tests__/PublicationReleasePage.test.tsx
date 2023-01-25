@@ -6,22 +6,14 @@ import React from 'react';
 import { testPublication, testRelease } from './__data__/testReleaseData';
 
 describe('PublicationReleasePage', () => {
-  test('renders national statistics image', () => {
-    const { container } = render(
-      <PublicationReleasePage release={testRelease} />,
-    );
-
-    expect(
-      container.querySelector(
-        'img[alt="UK statistics authority quality mark"]',
-      ),
-    ).toBeDefined();
-  });
-
   test('renders latest data tag', () => {
     render(<PublicationReleasePage release={testRelease} />);
 
     expect(screen.queryByText('This is the latest data')).toBeInTheDocument();
+
+    expect(
+      screen.queryByText('This is not the latest data'),
+    ).not.toBeInTheDocument();
   });
 
   test('does not render latest data tag when publication is superseded', () => {
@@ -34,6 +26,25 @@ describe('PublicationReleasePage', () => {
     expect(
       screen.queryByText('This is the latest data'),
     ).not.toBeInTheDocument();
+  });
+
+  test('renders not latest data link and tag when publication is not the latest', () => {
+    const testReleaseNotLatest: Release = {
+      ...testRelease,
+      latestRelease: false,
+    };
+    render(<PublicationReleasePage release={testReleaseNotLatest} />);
+
+    expect(screen.getByText('This is not the latest data')).toBeInTheDocument();
+    expect(
+      screen.queryByText('This is the latest data'),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', {
+        name: 'View latest data: Academic Year 2018/19',
+      }),
+    ).toBeInTheDocument();
   });
 
   test('renders superseded warning text when publication is superseded', () => {
@@ -64,7 +75,7 @@ describe('PublicationReleasePage', () => {
     );
   });
 
-  test('does not render superseded warning text when publication is superseded', () => {
+  test('does not render superseded warning text when publication is not superseded', () => {
     const testReleaseSuperseded: Release = {
       ...testRelease,
       publication: {
@@ -224,6 +235,18 @@ describe('PublicationReleasePage', () => {
     );
   });
 
+  test('renders national statistics image', () => {
+    const { container } = render(
+      <PublicationReleasePage release={testRelease} />,
+    );
+
+    expect(
+      container.querySelector(
+        'img[alt="UK statistics authority quality mark"]',
+      ),
+    ).toBeInTheDocument();
+  });
+
   test('renders national statistics section', () => {
     render(<PublicationReleasePage release={testRelease} />);
 
@@ -235,7 +258,7 @@ describe('PublicationReleasePage', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders official statistics image', () => {
+  test('does not render image for official statistics', () => {
     const { container } = render(
       <PublicationReleasePage
         release={{
@@ -249,7 +272,7 @@ describe('PublicationReleasePage', () => {
       container.querySelector(
         'img[alt="UK statistics authority quality mark"]',
       ),
-    ).toBeNull();
+    ).not.toBeInTheDocument();
   });
 
   test('renders official statistics section', () => {
