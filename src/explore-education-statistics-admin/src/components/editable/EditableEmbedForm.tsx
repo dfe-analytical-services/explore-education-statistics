@@ -56,6 +56,7 @@ const EditableEmbedForm = ({
           <Form id={formId}>
             <FormFieldTextInput<EditableEmbedFormValues>
               name="title"
+              hint="This will show to users of assistive technology, it does not show on the release page"
               label="Title"
               onChange={event => {
                 setPreviewValues({

@@ -41,7 +41,7 @@ describe('EditableEmbedBlock', () => {
     );
 
     expect(
-      screen.getByRole('button', { name: 'Edit embed block' }),
+      screen.getByRole('button', { name: 'Edit embedded URL' }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Remove block' }),
@@ -59,7 +59,7 @@ describe('EditableEmbedBlock', () => {
     );
 
     expect(
-      screen.queryByRole('button', { name: 'Edit embed block' }),
+      screen.queryByRole('button', { name: 'Edit embedded URL' }),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Remove block' }),
@@ -76,11 +76,11 @@ describe('EditableEmbedBlock', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Edit embed block' }));
+    userEvent.click(screen.getByRole('button', { name: 'Edit embedded URL' }));
 
     const modal = within(screen.getByRole('dialog'));
     expect(
-      modal.getByRole('heading', { name: 'Edit embed block' }),
+      modal.getByRole('heading', { name: 'Edit embedded URL' }),
     ).toBeInTheDocument();
     expect(modal.getByLabelText('Title')).toBeInTheDocument();
     expect(modal.getByLabelText('URL')).toBeInTheDocument();
@@ -99,7 +99,7 @@ describe('EditableEmbedBlock', () => {
       />,
     );
 
-    userEvent.click(screen.getByRole('button', { name: 'Edit embed block' }));
+    userEvent.click(screen.getByRole('button', { name: 'Edit embedded URL' }));
 
     const modal = within(screen.getByRole('dialog'));
 
