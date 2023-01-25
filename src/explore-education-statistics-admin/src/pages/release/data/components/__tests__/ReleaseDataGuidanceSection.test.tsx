@@ -106,9 +106,11 @@ describe('ReleaseDataGuidanceSection', () => {
         'Main guidance content',
       ) as HTMLTextAreaElement;
 
-      expect(mainGuidanceContent).toHaveDisplayValue('<h3>Description</h3>');
-      expect(mainGuidanceContent).toHaveDisplayValue('<h3>Coverage</h3>');
-      expect(mainGuidanceContent).toHaveDisplayValue(
+      const mainGuidanceContentValue = mainGuidanceContent.value;
+
+      expect(mainGuidanceContentValue).toContain('<h3>Description</h3>');
+      expect(mainGuidanceContentValue).toContain('<h3>Coverage</h3>');
+      expect(mainGuidanceContentValue).toContain(
         '<h3>File formats and conventions</h3>',
       );
     });

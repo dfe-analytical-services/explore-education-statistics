@@ -40,6 +40,7 @@ import {
   YAxis,
   Symbols,
   SymbolsProps,
+  LabelProps,
 } from 'recharts';
 import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
 
@@ -188,7 +189,7 @@ const LineChartBlock = ({
               dot={getDot(config.symbol)}
               strokeWidth="2"
               strokeDasharray={lineStyles[config.lineStyle ?? 'solid']}
-              label={props => (
+              label={(props: LabelProps & { index: number }) => (
                 <LineChartLabel
                   colour={config.colour}
                   decimalPlaces={dataSet.indicator.decimalPlaces}
