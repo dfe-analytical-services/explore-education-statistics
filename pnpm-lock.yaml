@@ -603,6 +603,7 @@ importers:
       cross-env: ^7.0.2
       cross-fetch: ^3.0.6
       date-fns: ^2.16.1
+      diagnostic-channel: ^1.1.0
       eslint: ^7.10.0
       eslint-webpack-plugin: ^3.0.1
       explore-education-statistics-common: workspace:*
@@ -656,6 +657,7 @@ importers:
       cross-env: 7.0.3
       cross-fetch: 3.1.5
       date-fns: 2.29.3
+      diagnostic-channel: 1.1.0
       express: 4.18.2
       express-basic-auth: 1.2.1
       formik: 2.2.9_react@17.0.2
@@ -4320,7 +4322,7 @@ packages:
     dependencies:
       '@babel/core': 7.20.12
       postcss: 7.0.35
-      postcss-syntax: 0.36.2_postcss@8.4.21
+      postcss-syntax: 0.36.2_postcss@8.2.15
     transitivePeerDependencies:
       - supports-color
 
@@ -4332,7 +4334,7 @@ packages:
       postcss-syntax: '>=0.36.2'
     dependencies:
       postcss: 7.0.35
-      postcss-syntax: 0.36.2_postcss@8.4.21
+      postcss-syntax: 0.36.2_postcss@8.2.15
       remark: 13.0.0
       unist-util-find-all-after: 3.0.2
     transitivePeerDependencies:
@@ -7754,6 +7756,12 @@ packages:
 
   /diagnostic-channel/0.3.1:
     resolution: {integrity: sha512-6eb9YRrimz8oTr5+JDzGmSYnXy5V7YnK5y/hd8AUDK1MssHjQKm9LlD6NSrHx4vMDF3+e/spI2hmWTviElgWZA==}
+    dependencies:
+      semver: 5.7.1
+    dev: false
+
+  /diagnostic-channel/1.1.0:
+    resolution: {integrity: sha512-fwujyMe1gj6rk6dYi9hMZm0c8Mz8NDMVl2LB4iaYh3+LIAThZC8RKFGXWG0IML2OxAit/ZFRgZhMkhQ3d/bobQ==}
     dependencies:
       semver: 5.7.1
     dev: false
@@ -13086,7 +13094,7 @@ packages:
     dependencies:
       htmlparser2: 3.10.1
       postcss: 7.0.35
-      postcss-syntax: 0.36.2_postcss@8.4.21
+      postcss-syntax: 0.36.2_postcss@8.2.15
 
   /postcss-image-set-function/4.0.7_postcss@8.4.21:
     resolution: {integrity: sha512-9T2r9rsvYzm5ndsBE8WgtrMlIT7VbtTfE7b3BQnudUqnBcBo7L758oc+o+pdj/dUV0l5wjwSdjeOH2DZtfv8qw==}
@@ -13854,7 +13862,7 @@ packages:
       svgo: 2.8.0
     dev: false
 
-  /postcss-syntax/0.36.2_postcss@8.4.21:
+  /postcss-syntax/0.36.2_postcss@8.2.15:
     resolution: {integrity: sha512-nBRg/i7E3SOHWxF3PpF5WnJM/jQ1YpY9000OaVXlAQj6Zp/kIqJxEDWIZ67tAd7NLuk7zqN4yqe9nc0oNAOs1w==}
     peerDependencies:
       postcss: '>=5.0.0'
@@ -13875,7 +13883,7 @@ packages:
       postcss-scss:
         optional: true
     dependencies:
-      postcss: 8.4.21
+      postcss: 8.2.15
 
   /postcss-unique-selectors/4.0.1:
     resolution: {integrity: sha512-+JanVaryLo9QwZjKrmJgkI4Fn8SBgRO6WXQBJi7KiAVPlmxikB5Jzc4EvXMT2H0/m0RjrVVm9rGNhZddm/8Spg==}
@@ -16035,7 +16043,7 @@ packages:
       postcss-sass: 0.4.4
       postcss-scss: 2.1.1
       postcss-selector-parser: 6.0.6
-      postcss-syntax: 0.36.2_postcss@8.4.21
+      postcss-syntax: 0.36.2_postcss@8.2.15
       postcss-value-parser: 4.2.0
       resolve-from: 5.0.0
       slash: 3.0.0
