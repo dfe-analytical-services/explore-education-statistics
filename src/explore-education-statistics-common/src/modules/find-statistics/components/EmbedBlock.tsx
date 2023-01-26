@@ -20,7 +20,7 @@ const EmbedBlock = ({ title, url }: Props) => {
       {isLoading && <LoadingSpinner hideText text={`Loading ${title}`} />}
 
       <IframeResizer
-        heightCalculationMethod="lowestElement"
+        heightCalculationMethod="bodyScroll"
         src={url}
         style={{ border: 0, minWidth: '100%', width: '1px' }}
         title={title}
