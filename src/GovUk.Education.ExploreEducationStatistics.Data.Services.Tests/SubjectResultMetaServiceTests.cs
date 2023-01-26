@@ -28,7 +28,7 @@ using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
-    public class ResultSubjectMetaServiceTests
+    public class SubjectResultMetaServiceTests
     {
         private readonly Country _england = new("E92000001", "England");
         private readonly Region _northEast = new("E12000001", "North East");
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var contextId = Guid.NewGuid().ToString();
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
-            var service = BuildResultSubjectMetaService(statisticsDbContext);
+            var service = BuildService(statisticsDbContext);
 
             var result = await service.GetSubjectMeta(
                 releaseId: Guid.NewGuid(),
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = BuildResultSubjectMetaService(
+                var service = BuildService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     boundaryLevelRepository: boundaryLevelRepository.Object,
@@ -336,7 +336,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = BuildResultSubjectMetaService(
+                var service = BuildService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     boundaryLevelRepository: boundaryLevelRepository.Object,
@@ -559,7 +559,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = BuildResultSubjectMetaService(
+                var service = BuildService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     boundaryLevelRepository: boundaryLevelRepository.Object,
@@ -819,7 +819,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = BuildResultSubjectMetaService(
+                var service = BuildService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     boundaryLevelRepository: boundaryLevelRepository.Object,
@@ -905,7 +905,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             return Options.Create(new LocationsOptions());
         }
 
-        private static ResultSubjectMetaService BuildResultSubjectMetaService(
+        private static SubjectResultMetaService BuildService(
             StatisticsDbContext statisticsDbContext,
             ContentDbContext? contentDbContext = null,
             IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
@@ -933,7 +933,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
                 releaseDataFileRepository ?? Mock.Of<IReleaseDataFileRepository>(MockBehavior.Strict),
                 options ?? DefaultLocationOptions(),
-                Mock.Of<ILogger<ResultSubjectMetaService>>()
+                Mock.Of<ILogger<SubjectResultMetaService>>()
             );
         }
     }

@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
         {
             CreateMap<LegacyPermalink, LegacyPermalinkViewModel>();
             CreateMap<PermalinkTableBuilderResult, TableBuilderResultViewModel>();
-            CreateMap<PermalinkResultSubjectMeta, ResultSubjectMetaViewModel>()
+            CreateMap<PermalinkResultSubjectMeta, SubjectResultMetaViewModel>()
                 .ForMember(dest => dest.Locations,
                     m => m.MapFrom(source => source.LocationsHierarchical));
         }

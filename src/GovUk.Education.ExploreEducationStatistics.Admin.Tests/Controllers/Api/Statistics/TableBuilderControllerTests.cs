@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     TimePeriod = "2017/18"
                 }
             },
-            SubjectMeta = new ResultSubjectMetaViewModel
+            SubjectMeta = new SubjectResultMetaViewModel
             {
                 Filters = new Dictionary<string, FilterMetaViewModel>
                 {

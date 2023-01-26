@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var tableResult = new TableBuilderResultViewModel
             {
-                SubjectMeta = new ResultSubjectMetaViewModel
+                SubjectMeta = new SubjectResultMetaViewModel
                 {
                     SubjectName = "Test data set",
                     PublicationName = "Test publication"
@@ -213,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var tableResult = new TableBuilderResultViewModel
             {
-                SubjectMeta = new ResultSubjectMetaViewModel
+                SubjectMeta = new SubjectResultMetaViewModel
                 {
                     SubjectName = "Test data set",
                     PublicationName = "Test publication"

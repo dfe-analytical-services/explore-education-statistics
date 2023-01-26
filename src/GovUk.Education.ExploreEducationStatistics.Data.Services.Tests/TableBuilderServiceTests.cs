@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             };
 
-            var subjectMeta = new ResultSubjectMetaViewModel
+            var subjectMeta = new SubjectResultMetaViewModel
             {
                 Indicators = new List<IndicatorMetaViewModel>
                 {
@@ -180,9 +180,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .Setup(s => s.GetMatchedObservations(query, default))
                     .ReturnsAsync(statisticsDbContext.MatchedObservations);
 
-                var resultSubjectMetaService = new Mock<IResultSubjectMetaService>(Strict);
+                var subjectResultMetaService = new Mock<ISubjectResultMetaService>(Strict);
 
-                resultSubjectMetaService
+                subjectResultMetaService
                     .Setup(
                         s => s.GetSubjectMeta(
                             releaseId,
@@ -196,14 +196,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     statisticsDbContext: statisticsDbContext,
                     contentDbContext: contentDbContext,
                     observationService: observationService.Object,
-                    resultSubjectMetaService: resultSubjectMetaService.Object
+                    subjectResultMetaService: subjectResultMetaService.Object
                 );
 
                 var result = await service.Query(query);
 
                 VerifyAllMocks(
                     observationService,
-                    resultSubjectMetaService
+                    subjectResultMetaService
                 );
 
                 var observationResults = result.AssertRight().Results.ToList();
@@ -523,7 +523,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             };
 
-            var subjectMeta = new ResultSubjectMetaViewModel
+            var subjectMeta = new SubjectResultMetaViewModel
             {
                 Indicators = new List<IndicatorMetaViewModel>
                 {
@@ -569,9 +569,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .Setup(s => s.GetMatchedObservations(query, default))
                     .ReturnsAsync(statisticsDbContext.MatchedObservations);
 
-                var resultSubjectMetaService = new Mock<IResultSubjectMetaService>(Strict);
+                var subjectResultMetaService = new Mock<ISubjectResultMetaService>(Strict);
 
-                resultSubjectMetaService
+                subjectResultMetaService
                     .Setup(
                         s => s.GetSubjectMeta(
                             releaseSubject.ReleaseId,
@@ -584,12 +584,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var service = BuildTableBuilderService(
                     statisticsDbContext: statisticsDbContext,
                     observationService: observationService.Object,
-                    resultSubjectMetaService: resultSubjectMetaService.Object
+                    subjectResultMetaService: subjectResultMetaService.Object
                 );
 
                 var result = await service.Query(releaseSubject.ReleaseId, query);
 
-                VerifyAllMocks(observationService, resultSubjectMetaService);
+                VerifyAllMocks(observationService, subjectResultMetaService);
 
                 var observationResults = result.AssertRight().Results.ToList();
 
@@ -771,7 +771,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IFilterItemRepository? filterItemRepository = null,
             IObservationService? observationService = null,
             IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
-            IResultSubjectMetaService? resultSubjectMetaService = null,
+            ISubjectResultMetaService? subjectResultMetaService = null,
             ISubjectRepository? subjectRepository = null,
             IUserService? userService = null,
             IResultBuilder<Observation, ObservationViewModel>? resultBuilder = null,
@@ -783,7 +783,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 filterItemRepository ?? Mock.Of<IFilterItemRepository>(Strict),
                 observationService ?? Mock.Of<IObservationService>(Strict),
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
-                resultSubjectMetaService ?? Mock.Of<IResultSubjectMetaService>(Strict),
+                subjectResultMetaService ?? Mock.Of<ISubjectResultMetaService>(Strict),
                 subjectRepository ?? new SubjectRepository(statisticsDbContext),
                 userService ?? AlwaysTrueUserService().Object,
                 resultBuilder ?? new ResultBuilder(),

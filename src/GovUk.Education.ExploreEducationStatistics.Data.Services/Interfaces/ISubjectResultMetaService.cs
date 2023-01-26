@@ -8,12 +8,12 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+
+public interface ISubjectResultMetaService
 {
-    public interface IResultSubjectMetaService
-    {
-        Task<Either<ActionResult, ResultSubjectMetaViewModel>> GetSubjectMeta(Guid releaseId,
-            ObservationQueryContext query,
-            IList<Observation> observations);
-    }
+    Task<Either<ActionResult, SubjectResultMetaViewModel>> GetSubjectMeta(
+        Guid releaseId,
+        ObservationQueryContext query,
+        IList<Observation> observations);
 }

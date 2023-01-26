@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 {
     public class TableBuilderResultViewModel
     {
-        public ResultSubjectMetaViewModel SubjectMeta { get; set; }
+        public SubjectResultMetaViewModel SubjectMeta { get; set; }
 
         public IEnumerable<ObservationViewModel> Results { get; set; }
 

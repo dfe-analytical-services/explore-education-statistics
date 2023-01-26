@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IFilterItemRepository _filterItemRepository;
         private readonly IObservationService _observationService;
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
-        private readonly IResultSubjectMetaService _resultSubjectMetaService;
+        private readonly ISubjectResultMetaService _subjectResultMetaService;
         private readonly ISubjectRepository _subjectRepository;
         private readonly IUserService _userService;
         private readonly IResultBuilder<Observation, ObservationViewModel> _resultBuilder;
@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IFilterItemRepository filterItemRepository,
             IObservationService observationService,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
-            IResultSubjectMetaService resultSubjectMetaService,
+            ISubjectResultMetaService subjectResultMetaService,
             ISubjectRepository subjectRepository,
             IUserService userService,
             IResultBuilder<Observation, ObservationViewModel> resultBuilder,
@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _filterItemRepository = filterItemRepository;
             _observationService = observationService;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
-            _resultSubjectMetaService = resultSubjectMetaService;
+            _subjectResultMetaService = subjectResultMetaService;
             _subjectRepository = subjectRepository;
             _userService = userService;
             _resultBuilder = resultBuilder;
@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         return new TableBuilderResultViewModel();
                     }
 
-                    return await _resultSubjectMetaService
+                    return await _subjectResultMetaService
                         .GetSubjectMeta(
                             releaseId,
                             queryContext,
