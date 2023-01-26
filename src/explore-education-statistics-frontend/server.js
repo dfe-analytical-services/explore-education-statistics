@@ -1,20 +1,20 @@
 require('core-js/features/array/flat-map');
 require('core-js/features/array/flat');
 
-const appInsights = require('applicationinsights');
+// const appInsights = require('applicationinsights');
 
-if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
-  appInsights
-    .setup(process.env.APPINSIGHTS_INSTRUMENTATIONKEY)
-    .setAutoDependencyCorrelation(true)
-    .setAutoCollectRequests(true)
-    .setAutoCollectPerformance(true)
-    .setAutoCollectExceptions(true)
-    .setAutoCollectDependencies(true)
-    .setAutoCollectConsole(true)
-    .setUseDiskRetryCaching(true)
-    .start();
-}
+// if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
+//   appInsights
+//     .setup(process.env.APPINSIGHTS_INSTRUMENTATIONKEY)
+//     .setAutoDependencyCorrelation(true)
+//     .setAutoCollectRequests(true)
+//     .setAutoCollectPerformance(true)
+//     .setAutoCollectExceptions(true)
+//     .setAutoCollectDependencies(true)
+//     .setAutoCollectConsole(true)
+//     .setUseDiskRetryCaching(true)
+//     .start();
+// }
 
 const basicAuth = require('express-basic-auth');
 const express = require('express');
@@ -116,9 +116,9 @@ async function startServer(port = process.env.PORT || 3000) {
 }
 
 startServer().catch(err => {
-  if (appInsights.defaultClient) {
-    appInsights.defaultClient.trackException({ exception: err });
-  }
+  // if (appInsights.defaultClient) {
+  //   appInsights.defaultClient.trackException({ exception: err });
+  // }
 
   console.error(err);
   process.exit(1);
