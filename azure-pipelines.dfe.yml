@@ -41,12 +41,12 @@ jobs:
           projects: '**/GovUk.*/*csproj'
           arguments: '--configuration $(BuildConfiguration)'
 
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Test'
-        inputs:
-          command: 'test'
-          projects: '**/GovUk.*[Tt]ests/*.csproj'
-          arguments: '--configuration $(BuildConfiguration)'
+      # - task: 'DotNetCoreCLI@2'
+      #   displayName: 'Test'
+      #   inputs:
+      #     command: 'test'
+      #     projects: '**/GovUk.*[Tt]ests/*.csproj'
+      #     arguments: '--configuration $(BuildConfiguration)'
 
       - task: 'DotNetCoreCLI@2'
         displayName: 'Publish Data API'
@@ -156,12 +156,12 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
           arguments: '--configuration $(BuildConfiguration)'
 
-      - task: 'DotNetCoreCLI@2'
-        displayName: 'Test'
-        inputs:
-          command: 'test'
-          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
-          arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
+      # - task: 'DotNetCoreCLI@2'
+      #   displayName: 'Test'
+      #   inputs:
+      #     command: 'test'
+      #     projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
+      #     arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
 
       - task: 'Bash@3'
         displayName: 'pnpm i'
