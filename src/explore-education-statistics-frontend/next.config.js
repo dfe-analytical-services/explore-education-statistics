@@ -79,7 +79,7 @@ const nextConfig = {
         );
       }
     }
-    config.resolve.symlinks = false;
+
     config.resolve.alias = {
       ...config.resolve.alias,
       './dist/cpexcel.js': false,
@@ -104,11 +104,9 @@ module.exports = flowRight(
           'explore-education-statistics-common',
           // Need to add explicit dependencies as they may be un-transpiled
           // (ES6+) and cause IE11 to throw syntax errors.
+          'explore-education-statistics-common/node_modules/sanitize-html',
+          'explore-education-statistics-common/node_modules/nanoid',
         ]
       : [],
-    {
-      resolveSymlinks: true,
-      debug: true,
-    },
   ),
 )(nextConfig);
