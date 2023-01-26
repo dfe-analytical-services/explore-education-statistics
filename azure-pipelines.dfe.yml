@@ -41,12 +41,12 @@ jobs:
           projects: '**/GovUk.*/*csproj'
           arguments: '--configuration $(BuildConfiguration)'
 
-      # - task: 'DotNetCoreCLI@2'
-      #   displayName: 'Test'
-      #   inputs:
-      #     command: 'test'
-      #     projects: '**/GovUk.*[Tt]ests/*.csproj'
-      #     arguments: '--configuration $(BuildConfiguration)'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Test'
+        inputs:
+          command: 'test'
+          projects: '**/GovUk.*[Tt]ests/*.csproj'
+          arguments: '--configuration $(BuildConfiguration)'
 
       - task: 'DotNetCoreCLI@2'
         displayName: 'Publish Data API'
@@ -156,12 +156,12 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
           arguments: '--configuration $(BuildConfiguration)'
 
-      # - task: 'DotNetCoreCLI@2'
-      #   displayName: 'Test'
-      #   inputs:
-      #     command: 'test'
-      #     projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
-      #     arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Test'
+        inputs:
+          command: 'test'
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
+          arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
 
       - task: 'Bash@3'
         displayName: 'pnpm i'
@@ -169,11 +169,11 @@ jobs:
           targetType: 'inline'
           script: 'pnpm i'
 
-      # - task: 'Bash@3'
-      #   displayName: 'pnpm format'
-      #   inputs:
-      #     targetType: 'inline'
-      #     script: 'pnpm format'
+      - task: 'Bash@3'
+        displayName: 'pnpm format'
+        inputs:
+          targetType: 'inline'
+          script: 'pnpm format'
 
       - task: 'Bash@3'
         displayName: 'pnpm run build'
@@ -226,33 +226,33 @@ jobs:
           targetType: 'inline'
           script: 'pnpm i'
 
-      # - task: 'Bash@3'
-      #   displayName: 'pnpm tsc'
-      #   inputs:
-      #     workingDir: '.'
-      #     targetType: 'inline'
-      #     script: 'pnpm tsc'
+      - task: 'Bash@3'
+        displayName: 'pnpm tsc'
+        inputs:
+          workingDir: '.'
+          targetType: 'inline'
+          script: 'pnpm tsc'
 
-      # - task: 'Bash@3'
-      #   displayName: 'pnpm lint'
-      #   inputs:
-      #     workingDir: '.'
-      #     targetType: 'inline'
-      #     script: 'pnpm lint'
+      - task: 'Bash@3'
+        displayName: 'pnpm lint'
+        inputs:
+          workingDir: '.'
+          targetType: 'inline'
+          script: 'pnpm lint'
 
-      # - task: 'Bash@3'
-      #   displayName: 'pnpm format:check'
-      #   inputs:
-      #     workingDir: '.'
-      #     targetType: 'inline'
-      #     script: 'pnpm format:check'
+      - task: 'Bash@3'
+        displayName: 'pnpm format:check'
+        inputs:
+          workingDir: '.'
+          targetType: 'inline'
+          script: 'pnpm format:check'
 
-      # - task: 'Bash@3'
-      #   displayName: 'pnpm test:ci'
-      #   inputs:
-      #     workingDir: '.'
-      #     targetType: 'inline'
-      #     script: 'pnpm test:ci'
+      - task: 'Bash@3'
+        displayName: 'pnpm test:ci'
+        inputs:
+          workingDir: '.'
+          targetType: 'inline'
+          script: 'pnpm test:ci'
 
       - task: 'PublishTestResults@2'
         displayName: 'Publish frontend test results'
@@ -269,17 +269,17 @@ jobs:
           targetType: 'inline'
           script: 'pnpm --filter=explore-education-statistics-frontend run build'
 
-      # - task: 'Bash@3'
-      #   displayName: 'Remove dev dependencies'
-      #   inputs:
-      #     targetType: 'inline'
-      #     script: 'rm -rf ./src/**/node_modules'
+      - task: 'Bash@3'
+        displayName: 'Remove dev dependencies'
+        inputs:
+          targetType: 'inline'
+          script: 'rm -rf ./src/**/node_modules'
 
       - task: 'Bash@3'
         displayName: 'Install prod dependencies'
         inputs:
           targetType: 'inline'
-          script: 'pnpm i --prod -F ./src/explore-education-statistics-frontend --virtual-store-dir src/explore-education-statistics-frontend/node_modules/.pnpm'
+          script: 'pnpm i --filter=explore-education-statistics-frontend --prod'
 
       - task: 'ArchiveFiles@2'
         displayName: 'Archive frontend'
