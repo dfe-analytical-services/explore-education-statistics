@@ -100,13 +100,7 @@ module.exports = flowRight(
     // because we remove the target modules as part
     // of the build to reduce total artifact size.
     process.env.NEXT_CONFIG_MODE !== 'server'
-      ? [
-          'explore-education-statistics-common',
-          // Need to add explicit dependencies as they may be un-transpiled
-          // (ES6+) and cause IE11 to throw syntax errors.
-          'explore-education-statistics-common/node_modules/sanitize-html',
-          'explore-education-statistics-common/node_modules/nanoid',
-        ]
+      ? ['explore-education-statistics-common']
       : [],
   ),
 )(nextConfig);
