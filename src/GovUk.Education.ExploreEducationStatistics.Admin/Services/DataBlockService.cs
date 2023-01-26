@@ -127,11 +127,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         var dataBlocks = await _releaseContentBlockRepository.GetAll<DataBlock>(release.Id);
 
-                        return (await dataBlocks.SelectAsync(async block =>
+                        var dataBlockIdsAttachedToKeyStats = await _context.KeyStatisticsDataBlock
+                            .Where(ks => ks.ReleaseId == release.Id)
+                            .Select(ks => ks.DataBlockId)
+                            .ToListAsync();
+                        return dataBlocks.Select(block =>
                             {
                                 var inContent = block.ContentSectionId != null
-                                                || await _context.KeyStatisticsDataBlock.AnyAsync(
-                                                    ks => ks.DataBlockId == block.Id);
+                                                || dataBlockIdsAttachedToKeyStats.Contains(block.Id);
                                 return new DataBlockSummaryViewModel
                                 {
                                     Id = block.Id,
@@ -144,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     ChartsCount = block.Charts.Count,
                                     InContent = inContent,
                                 };
-                            }))
+                            })
                             .OrderBy(model => model.Name)
                             .ToList();
                     }
@@ -377,7 +380,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessVoid(_cacheService.DeleteItem);
         }
 
-        public async Task<Either<ActionResult, List<DataBlock>>> GetAvailableDataBlocks(Guid releaseId)
+        public async Task<Either<ActionResult, List<DataBlockViewModel>>> GetAvailableDataBlocks(Guid releaseId)
         {
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
@@ -398,6 +401,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             dataBlock.ContentSectionId == null
                             && !keyStatDataBlockIds.Contains(dataBlock.Id))
                         .OrderBy(contentBlock => contentBlock.Name)
+                        .Select(contentBlock => _mapper.Map<DataBlockViewModel>(contentBlock))
                         .ToListAsync();
                 });
         }
@@ -406,7 +410,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class DependentDataBlock
     {
         [JsonIgnore] public Guid Id { get; set; }
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
         public string? ContentSectionHeading { get; set; }
         public List<InfographicFileInfo> InfographicFilesInfo { get; set; } = new();
         public bool IsKeyStatistic { get; set; }
@@ -421,6 +425,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class DeleteDataBlockPlan
     {
         [JsonIgnore] public Guid ReleaseId { get; set; }
-        public List<DependentDataBlock> DependentDataBlocks { get; set; } = new List<DependentDataBlock>();
+        public List<DependentDataBlock> DependentDataBlocks { get; set; } = new ();
     }
 }

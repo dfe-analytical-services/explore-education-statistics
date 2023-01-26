@@ -110,6 +110,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         // Footnotes
         FootnotesDifferFromReleaseFootnotes,
 
+        // Key statistics
+        DataBlockShouldBeAvailable,
+        KeyStatsOrderCountShouldEqualReleaseKeyStatsCount,
+        KeyStatNotAttachedToRelease,
+
         // TODO EES-3755 Remove after Permalink snapshot migration work is complete
         NullMessageCountForPermalinksMigrationQueue,
         NonEmptyPermalinksMigrationQueue,

@@ -345,6 +345,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var keyStatistic = new KeyStatisticDataBlock
             {
+                Release = release,
                 DataBlock = dataBlock,
             };
 

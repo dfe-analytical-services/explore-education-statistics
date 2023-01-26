@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _dataBlockService = dataBlockService;
         }
 
-        [HttpPost("releases/{releaseId}/data-blocks")]
+        [HttpPost("releases/{releaseId:Guid}/data-blocks")]
         public async Task<ActionResult<DataBlockViewModel>> CreateDataBlock(
             Guid releaseId,
             DataBlockCreateViewModel dataBlock)
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("releases/{releaseId}/data-blocks/{id}")]
+        [HttpDelete("releases/{releaseId:Guid}/data-blocks/{id:Guid}")]
         public async Task<ActionResult> DeleteDataBlock(Guid releaseId, Guid id)
         {
             return await _dataBlockService
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrNoContent();
         }
 
-        [HttpGet("releases/{releaseId}/data-blocks/{id}/delete-plan")]
+        [HttpGet("releases/{releaseId:Guid}/data-blocks/{id:Guid}/delete-plan")]
         public async Task<ActionResult<DeleteDataBlockPlan>> GetDeletePlan(Guid releaseId, Guid id)
         {
             return await _dataBlockService
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("releases/{releaseId}/data-blocks")]
+        [HttpGet("releases/{releaseId:Guid}/data-blocks")]
         public async Task<ActionResult<List<DataBlockSummaryViewModel>>> List(Guid releaseId)
         {
             return await _dataBlockService
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("data-blocks/{id}")]
+        [HttpGet("data-blocks/{id:Guid}")]
         public async Task<ActionResult<DataBlockViewModel>> GetDataBlock(Guid id)
         {
             return await _dataBlockService
@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("data-blocks/{id}")]
+        [HttpPut("data-blocks/{id:Guid}")]
         public async Task<ActionResult<DataBlockViewModel>> UpdateDataBlock(Guid id,
             DataBlockUpdateViewModel dataBlock)
         {
@@ -74,8 +74,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId}/data-blocks/available")]
-        public async Task<ActionResult<List<DataBlock>>> GetAvailableDataBlocks(Guid releaseId)
+        [HttpGet("release/{releaseId:Guid}/data-blocks/available")]
+        public async Task<ActionResult<List<DataBlockViewModel>>> GetAvailableDataBlocks(Guid releaseId)
         {
             return await _dataBlockService
                 .GetAvailableDataBlocks(releaseId)

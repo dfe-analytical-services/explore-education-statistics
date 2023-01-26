@@ -13,7 +13,6 @@ import {
 import {
   ContentSection,
   KeyStatisticDataBlock,
-  KeyStatisticText,
 } from '@common/services/publicationService';
 import { DataBlock, Table } from '@common/services/types/blocks';
 import { produce } from 'immer';

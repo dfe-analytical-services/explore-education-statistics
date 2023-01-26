@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;

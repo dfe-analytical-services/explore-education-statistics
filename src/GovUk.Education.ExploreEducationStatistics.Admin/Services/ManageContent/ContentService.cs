@@ -245,7 +245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         // NOTE: Should never be necessary, as data blocks attached to key stats don't have ContentSectionId set
                         // and we are guaranteed the data block has a ContentSectionId set here
                         // Remove in EES-3988?
-                        await _keyStatisticService.DeleteAnyAssociatedWithDataBlock(releaseId, blockToRemove.Id);
+                        await _keyStatisticService.DeleteAssociatedKeyStatisticDataBlock(blockToRemove.Id);
                     }
 
                     _context.ContentSections.Update(section);

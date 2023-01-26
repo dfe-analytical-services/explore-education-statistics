@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -111,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Type = ReleaseType.OfficialStatistics,
             };
 
-            var availableDataBlocks = new List<DataBlock>
+            var availableDataBlocks = new List<Admin.ViewModels.DataBlockViewModel>
             {
                 new()
             };
@@ -400,7 +399,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Type = ReleaseType.OfficialStatistics,
             };
 
-            var availableDataBlocks = new List<DataBlock>
+            var availableDataBlocks = new List<Admin.ViewModels.DataBlockViewModel>
             {
                 new()
             };

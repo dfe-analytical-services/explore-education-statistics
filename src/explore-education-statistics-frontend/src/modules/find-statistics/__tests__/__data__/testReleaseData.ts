@@ -1,8 +1,4 @@
-import {
-  KeyStatisticText,
-  Publication,
-  Release,
-} from '@common/services/publicationService';
+import { Publication, Release } from '@common/services/publicationService';
 
 export const testPublication: Publication = {
   id: 'publication-1',

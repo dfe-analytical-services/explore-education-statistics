@@ -12,9 +12,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 {
     public class ManageContentPageViewModel
     {
-        public ReleaseViewModel Release { get; set; } = new ReleaseViewModel();
+        public ReleaseViewModel Release { get; set; } = new ();
 
-        public List<DataBlock> AvailableDataBlocks { get; set; } = new List<DataBlock>();
+        public List<DataBlockViewModel> AvailableDataBlocks { get; set; } = new ();
 
         public class ReleaseViewModel
         {

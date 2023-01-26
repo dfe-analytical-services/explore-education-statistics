@@ -2,7 +2,6 @@
 using System;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
@@ -12,7 +11,7 @@ public abstract class KeyStatistic : ICreatedUpdatedTimestamps<DateTime, DateTim
 
     public Guid ReleaseId { get; set; }
 
-    [JsonIgnore, IgnoreMap] public Release Release { get; set; } = null!;
+    [IgnoreMap] public Release Release { get; set; } = null!;
 
     public string? Trend { get; set; } = string.Empty;
 
@@ -43,7 +42,7 @@ public class KeyStatisticDataBlock : KeyStatistic
 {
     public Guid DataBlockId { get; set; }
 
-    [JsonIgnore, IgnoreMap] public DataBlock DataBlock { get; set; } = null!;
+    [IgnoreMap] public DataBlock DataBlock { get; set; } = null!;
 }
 
 public class KeyStatisticText : KeyStatistic

@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
                 return Content
                     .Select(join => join.ContentSection)
-                    .Where(cs => cs.Type != ContentSectionType.KeyStatistics)
+                    .Where(cs => cs.Type != ContentSectionType.KeyStatistics) // TODO: Remove as part of EES-3988
                     .ToList()
                     .FindAll(section => section.Type == ContentSectionType.Generic)
                     .ToImmutableList();

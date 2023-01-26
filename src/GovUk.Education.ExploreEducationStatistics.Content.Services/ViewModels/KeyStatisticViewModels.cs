@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 [JsonDiscriminator(Name = "Type")]
 [KnownType(typeof(KeyStatisticTextViewModel))]
 [KnownType(typeof(KeyStatisticDataBlockViewModel))]
-public abstract class KeyStatisticViewModel
+public abstract record KeyStatisticViewModel
 {
     public Guid Id { get; set; }
 
@@ -29,12 +29,12 @@ public abstract class KeyStatisticViewModel
     public DateTime? Updated { get; set; }
 }
 
-public class KeyStatisticDataBlockViewModel : KeyStatisticViewModel
+public record KeyStatisticDataBlockViewModel : KeyStatisticViewModel
 {
     public Guid DataBlockId { get; set; }
 }
 
-public class KeyStatisticTextViewModel : KeyStatisticViewModel
+public record KeyStatisticTextViewModel : KeyStatisticViewModel
 {
     public string Title { get; set; } = string.Empty;
 

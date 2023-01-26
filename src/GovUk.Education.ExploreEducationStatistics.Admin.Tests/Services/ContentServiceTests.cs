@@ -625,7 +625,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var keyStatisticService = new Mock<IKeyStatisticService>(MockBehavior.Strict);
                 keyStatisticService
                     .Setup(s =>
-                        s.DeleteAnyAssociatedWithDataBlock(release.Id, dataBlockId))
+                        s.DeleteAssociatedKeyStatisticDataBlock(dataBlockId))
                     .Returns(Task.CompletedTask);
 
                 var service = SetupContentService(

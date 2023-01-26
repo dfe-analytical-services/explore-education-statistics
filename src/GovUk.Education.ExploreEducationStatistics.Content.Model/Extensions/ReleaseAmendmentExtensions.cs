@@ -66,12 +66,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             {
                 var amendmentKeyStatistic = originalKeyStatistic.Clone(context.NewRelease);
 
-                if (amendmentKeyStatistic.GetType() == typeof(KeyStatisticDataBlock))
+                if (originalKeyStatistic is KeyStatisticDataBlock originalKeyStatDataBlock
+                    && amendmentKeyStatistic is KeyStatisticDataBlock amendmentKeyStatDataBlock)
                 {
-                    var originalDataBlock = ((KeyStatisticDataBlock)originalKeyStatistic).DataBlock;
+                    var originalDataBlock = originalKeyStatDataBlock.DataBlock;
                     var amendmentDataBlock = (DataBlock)context.OriginalToAmendmentContentBlockMap[originalDataBlock];
-                    ((KeyStatisticDataBlock)amendmentKeyStatistic).DataBlock = amendmentDataBlock;
-                    ((KeyStatisticDataBlock)amendmentKeyStatistic).DataBlockId = amendmentDataBlock.Id;
+                    amendmentKeyStatDataBlock.DataBlock = amendmentDataBlock;
+                    amendmentKeyStatDataBlock.DataBlockId = amendmentDataBlock.Id;
                 }
 
                 return amendmentKeyStatistic;

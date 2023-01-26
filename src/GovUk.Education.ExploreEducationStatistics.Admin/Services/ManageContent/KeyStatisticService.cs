@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -17,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 
@@ -50,22 +52,12 @@ public class KeyStatisticService : IKeyStatisticService
             .OnSuccess(_userService.CheckCanUpdateRelease)
             .OnSuccess(async _ =>
                 await _persistenceHelper.CheckEntityExists<DataBlock>(request.DataBlockId))
-            .OnSuccessVoid(async dataBlock =>
-            {
-                var either = await _dataBlockService.GetAvailableDataBlocks(releaseId);
-                if (either.IsLeft)
-                {
-                    throw new Exception("ContentService#GetAvailableDataBlocks error");
-                }
-
-                var availableDataBlocks = either.Right;
-                if (!availableDataBlocks
-                        .Select(available => available.Id)
-                        .Contains(dataBlock.Id))
-                {
-                    throw new ArgumentException("Data block should be available");
-                }
-            })
+            .OnSuccess(_ => _dataBlockService
+                .GetAvailableDataBlocks(releaseId))
+            .OnSuccess(availableDataBlocks =>
+                availableDataBlocks.Any(available => available.Id == request.DataBlockId)
+                    ? new Either<ActionResult, Unit>(Unit.Instance)
+                    : ValidationUtils.ValidationActionResult(DataBlockShouldBeAvailable))
             .OnSuccess(async _ =>
             {
                 var keyStatisticDataBlock = _mapper.Map<KeyStatisticDataBlock>(request);
@@ -96,7 +88,7 @@ public class KeyStatisticService : IKeyStatisticService
                     query.Where(keyStat => keyStat.ReleaseId == release.Id)))
             .OnSuccess(async keyStat =>
             {
-                _context.Update(keyStat);
+                _context.KeyStatisticsDataBlock.Update(keyStat);
 
                 keyStat.Trend = request.Trend;
                 keyStat.GuidanceTitle = request.GuidanceTitle;
@@ -124,9 +116,9 @@ public class KeyStatisticService : IKeyStatisticService
             // unset, that data block won't become available for selection again.
             .OnSuccess(async keyStat =>
             {
-                if (keyStat.GetType() == typeof(KeyStatisticDataBlock))
+                if (keyStat is KeyStatisticDataBlock keyStatDataBlock)
                 {
-                    var dataBlock = (keyStat as KeyStatisticDataBlock)!.DataBlock;
+                    var dataBlock = keyStatDataBlock.DataBlock;
                     dataBlock.ContentSection = null;
                     dataBlock.ContentSectionId = null;
                     _context.ContentBlocks.Update(dataBlock);
@@ -141,14 +133,17 @@ public class KeyStatisticService : IKeyStatisticService
             });
     }
 
-    public async Task DeleteAnyAssociatedWithDataBlock(Guid releaseId, Guid dataBlockId)
+    public async Task DeleteAssociatedKeyStatisticDataBlock(Guid dataBlockId)
     {
-        var keyStats = await _context
+        var keyStat = await _context
             .KeyStatisticsDataBlock
-            .Where(ks => ks.ReleaseId == releaseId && ks.DataBlockId == dataBlockId)
-            .ToListAsync();
-        _context.KeyStatisticsDataBlock.RemoveRange(keyStats);
-        await _context.SaveChangesAsync();
+            .SingleOrDefaultAsync(ks => ks.DataBlockId == dataBlockId);
+
+        if (keyStat != null)
+        {
+            _context.KeyStatisticsDataBlock.Remove(keyStat);
+            await _context.SaveChangesAsync();
+        }
     }
 
     public async Task<Either<ActionResult, List<KeyStatisticViewModel>>> Reorder(
@@ -157,7 +152,7 @@ public class KeyStatisticService : IKeyStatisticService
     {
         return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
             .OnSuccess(_userService.CheckCanUpdateRelease)
-            .OnSuccess(async release =>
+            .OnSuccess<ActionResult, Release, List<KeyStatisticViewModel>>(async release =>
             {
                 var keyStatistics = _context.KeyStatistics
                     .Where(ks => ks.ReleaseId == release.Id)
@@ -167,22 +162,23 @@ public class KeyStatisticService : IKeyStatisticService
 
                 if (keyStatistics.Count != idOrderPairList.Count)
                 {
-                    throw new ArgumentException("newKeyStatisticOrder.Count must equal release's key statistics count");
+                    return ValidationUtils.ValidationActionResult(
+                        KeyStatsOrderCountShouldEqualReleaseKeyStatsCount);
                 }
 
-                idOrderPairList.ForEach(idOrderPair =>
+                foreach (var idOrderPair in idOrderPairList)
                 {
                     var (keyStatisticId, newOrder) = idOrderPair;
                     var matchingKeyStat = keyStatistics.Find(ks => ks.Id == keyStatisticId);
                     if (matchingKeyStat == null)
                     {
-                        throw new ArgumentException(
-                            $"keyStatistic {keyStatisticId} not attached to release {releaseId}");
+                        return ValidationUtils.ValidationActionResult(
+                            KeyStatNotAttachedToRelease);
                     }
                     matchingKeyStat.Order = newOrder;
-                });
+                }
 
-                _context.UpdateRange(keyStatistics);
+                _context.KeyStatistics.UpdateRange(keyStatistics);
                 await _context.SaveChangesAsync();
 
                 return _mapper.Map<List<KeyStatisticViewModel>>(

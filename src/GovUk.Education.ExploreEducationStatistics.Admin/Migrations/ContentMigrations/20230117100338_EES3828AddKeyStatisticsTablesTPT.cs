@@ -1,5 +1,7 @@
 ﻿using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore.Migrations;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Migrations.MigrationConstants;
 
 #nullable disable
 
@@ -7,6 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 {
     public partial class EES3828AddKeyStatisticsTablesTPT : Migration
     {
+        private const string MigrationId = "20230117100338";
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -85,24 +89,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 table: "KeyStatisticsDataBlock",
                 column: "DataBlockId");
 
-            migrationBuilder.Sql("GRANT SELECT ON dbo.KeyStatistics TO [publisher];");
-            migrationBuilder.Sql("GRANT SELECT ON dbo.KeyStatisticsText TO [publisher];");
-            migrationBuilder.Sql("GRANT SELECT ON dbo.KeyStatisticsDataBlock TO [publisher];");
-            migrationBuilder.Sql("GRANT SELECT ON dbo.KeyStatistics TO [content];");
-            migrationBuilder.Sql("GRANT SELECT ON dbo.KeyStatisticsText TO [content];");
-            migrationBuilder.Sql("GRANT SELECT ON dbo.KeyStatisticsDataBlock TO [content];");
-
-            migrationBuilder.Sql("INSERT INTO KeyStatistics (Id, ReleaseId, Trend, GuidanceTitle, GuidanceText, [Order], Created, Updated, ContentBlockIdTemp) " +
-                                 "SELECT NEWID() AS Id, RCS.ReleaseId AS ReleaseId, JSON_VALUE(DataBlock_Summary, '$.DataSummary[0]') AS Trend, JSON_VALUE(DataBlock_Summary, '$.DataDefinitionTitle[0]') AS GuidanceTitle, JSON_VALUE(DataBlock_Summary, '$.DataDefinition[0]') AS GuidanceText, CB.[Order], GETDATE() AS Created, NULL AS Updated, CB.[Id] as ContentBlockIdTemp " +
-                                 "FROM ContentBlock CB " +
-                                 "JOIN ContentSections CS ON CS.Id = CB.ContentSectionId " +
-                                 "JOIN ReleaseContentSections RCS ON CS.Id = RCS.ContentSectionId " +
-                                 "WHERE CS.Type = 'KeyStatistics';");
-
-            // NOTE: use temporary KeyStatistics.ContentBlockId column to simplify and derisk this INSERT
-            migrationBuilder.Sql("INSERT INTO KeyStatisticsDataBlock (Id, DataBlockId) " +
-                                 "SELECT KS.Id AS Id, KS.ContentBlockIdTemp AS DataBlockId " +
-                                 "FROM KeyStatistics KS;");
+            migrationBuilder.SqlFromFile(ContentMigrationsPath, $"{MigrationId}_GrantPermissionsForKeyStatTables.sql");
+            migrationBuilder.SqlFromFile(ContentMigrationsPath, $"{MigrationId}_MigrateKeyStatDataBlockData.sql");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

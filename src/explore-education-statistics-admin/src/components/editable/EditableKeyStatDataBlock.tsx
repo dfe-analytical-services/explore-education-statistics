@@ -54,7 +54,7 @@ const EditableKeyStatDataBlock = ({
   const fetchedTitle = dataBlockValues?.title;
   const fetchedStatistic = dataBlockValues?.value;
 
-  if (error || fetchedTitle === undefined || fetchedStatistic === undefined) {
+  if (error || !fetchedTitle || !fetchedStatistic) {
     return (
       <>
         <WarningMessage>Could not load key statistic</WarningMessage>

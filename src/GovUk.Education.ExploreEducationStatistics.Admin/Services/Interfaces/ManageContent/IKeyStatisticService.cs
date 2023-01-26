@@ -21,7 +21,7 @@ public interface IKeyStatisticService
 
     Task<Either<ActionResult, Unit>> Delete(Guid releaseId, Guid keyStatisticId);
 
-    Task DeleteAnyAssociatedWithDataBlock(Guid releaseId, Guid dataBlockId);
+    Task DeleteAssociatedKeyStatisticDataBlock(Guid dataBlockId);
 
     Task<Either<ActionResult, List<KeyStatisticViewModel>>> Reorder(
         Guid releaseId,

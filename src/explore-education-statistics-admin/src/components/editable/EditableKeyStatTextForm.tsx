@@ -68,7 +68,7 @@ const EditableKeyStatTextForm = ({
             testId={testId}
             isReordering={isReordering}
           >
-            {/* TODO: EES-3919 Add inputs for title and statistic */}
+            {/* TODO: EES-2469 Inputs for title/statistic have just been added with no testing / consideration for styling / user experience etc. */}
             <FormFieldTextInput<KeyStatTextFormValues>
               name="title"
               label={<span className={styles.trendText}>Title</span>}
@@ -97,7 +97,7 @@ const EditableKeyStatTextForm = ({
 
           <ButtonGroup>
             <Button
-              disabled={!form.isValid}
+              disabled={form.isSubmitting || !form.isValid}
               type="submit"
               className="govuk-!-margin-right-2"
             >
