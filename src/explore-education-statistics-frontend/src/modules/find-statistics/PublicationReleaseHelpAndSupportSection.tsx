@@ -54,19 +54,23 @@ const PublicationReleaseHelpAndSupportSection = ({
             caption="Find out how and why we collect, process and publish these statistics"
             headingTag="h3"
           >
-            {methodologies.map(methodology => (
-              <p key={methodology.id} className="govuk-!-margin-bottom-9">
-                <Link to={`/methodology/${methodology.slug}`}>
-                  {methodology.title}
-                </Link>
-              </p>
-            ))}
-            {externalMethodology && (
-              <p className="govuk-!-margin-bottom-9">
-                <Link to={externalMethodology.url}>
-                  {externalMethodology.title}
-                </Link>
-              </p>
+            {(methodologies.length || externalMethodology) && (
+              <ul className="govuk-list govuk-list--spaced">
+                {methodologies.map(methodology => (
+                  <li key={methodology.id}>
+                    <Link to={`/methodology/${methodology.slug}`}>
+                      {methodology.title}
+                    </Link>
+                  </li>
+                ))}
+                {externalMethodology && (
+                  <li>
+                    <Link to={externalMethodology.url}>
+                      {externalMethodology.title}
+                    </Link>
+                  </li>
+                )}
+              </ul>
             )}
           </AccordionSection>
         )}
