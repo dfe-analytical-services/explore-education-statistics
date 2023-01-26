@@ -288,7 +288,7 @@ describe('FindStatisticsPage', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText('There are no matching results.'),
+      await screen.findByText('There are no matching results.'),
     ).toBeInTheDocument();
 
     expect(screen.queryByTestId('publicationsList')).not.toBeInTheDocument();
@@ -342,11 +342,9 @@ describe('FindStatisticsPage', () => {
 
     render(<FindStatisticsPage />);
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('There are no matching results.'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('There are no matching results.'),
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('heading', { name: '0 results' }),
@@ -415,11 +413,9 @@ describe('FindStatisticsPage', () => {
 
     render(<FindStatisticsPage />);
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('There are no matching results.'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('There are no matching results.'),
+    ).toBeInTheDocument();
 
     expect(screen.getByText('0 pages, filtered by:')).toBeInTheDocument();
 
