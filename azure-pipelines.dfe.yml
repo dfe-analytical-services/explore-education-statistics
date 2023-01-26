@@ -269,11 +269,11 @@ jobs:
           targetType: 'inline'
           script: 'pnpm --filter=explore-education-statistics-frontend run build'
 
-      - task: 'Bash@3'
-        displayName: 'Remove dev dependencies'
-        inputs:
-          targetType: 'inline'
-          script: 'rm -rf ./src/**/node_modules'
+      # - task: 'Bash@3'
+      #   displayName: 'Remove dev dependencies'
+      #   inputs:
+      #     targetType: 'inline'
+      #     script: 'rm -rf ./src/**/node_modules'
 
       - task: 'Bash@3'
         displayName: 'Install prod dependencies'

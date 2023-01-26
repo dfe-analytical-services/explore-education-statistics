@@ -1985,6 +1985,7 @@
         "PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
         "WEBSITE_NODE_DEFAULT_VERSION": "16.14.2",
         "WEBSITE_RUN_FROM_PACKAGE": "1"
+        
       }
     },
     {
