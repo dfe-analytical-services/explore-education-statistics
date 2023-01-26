@@ -279,7 +279,7 @@ jobs:
         displayName: 'Install prod dependencies'
         inputs:
           targetType: 'inline'
-          script: 'pnpm i --filter-prod=explore-education-statistics-frontend'
+          script: 'pnpm i --prod -F ./src/explore-education-statistics-frontend --virtual-store-dir src/explore-education-statistics-frontend/node_modules/.pnpm'
 
       - task: 'ArchiveFiles@2'
         displayName: 'Archive frontend'
