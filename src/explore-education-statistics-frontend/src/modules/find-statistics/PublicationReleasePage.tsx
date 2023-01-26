@@ -6,6 +6,7 @@ import RelatedAside from '@common/components/RelatedAside';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
+import TagGroup from '@common/components/TagGroup';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import ReleaseDataAccordion from '@common/modules/release/components/ReleaseDataAccordion';
 import publicationService, {
@@ -90,24 +91,30 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
         <div className="govuk-grid-column-two-thirds">
           <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between govuk-!-margin-bottom-3">
             <div>
-              {!release.publication.isSuperseded &&
-                (release.latestRelease ? (
-                  <Tag className="govuk-!-margin-right-3 govuk-!-margin-bottom-3">
-                    This is the latest data
-                  </Tag>
-                ) : (
-                  <Link
-                    className="dfe-print-hidden dfe-block govuk-!-margin-bottom-3"
-                    unvisited
-                    to={`/find-statistics/${release.publication.slug}`}
-                  >
-                    View latest data:{' '}
-                    <span className="govuk-!-font-weight-bold">
-                      {release.publication.releases[0].title}
-                    </span>
-                  </Link>
-                ))}
-              {release.type && <Tag>{releaseTypes[release.type]}</Tag>}
+              {!release.publication.isSuperseded && !release.latestRelease && (
+                <Link
+                  className="dfe-print-hidden dfe-block govuk-!-margin-bottom-3"
+                  unvisited
+                  to={`/find-statistics/${release.publication.slug}`}
+                >
+                  View latest data:{' '}
+                  <span className="govuk-!-font-weight-bold">
+                    {release.publication.releases[0].title}
+                  </span>
+                </Link>
+              )}
+              <TagGroup>
+                {!release.publication.isSuperseded && (
+                  <>
+                    {release.latestRelease ? (
+                      <Tag>This is the latest data</Tag>
+                    ) : (
+                      <Tag colour="orange">This is not the latest data</Tag>
+                    )}
+                  </>
+                )}
+                {release.type && <Tag>{releaseTypes[release.type]}</Tag>}
+              </TagGroup>
             </div>
             {release.type === 'NationalStatistics' && (
               <img
