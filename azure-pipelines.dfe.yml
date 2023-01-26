@@ -293,3 +293,20 @@ jobs:
         inputs:
           artifactName: 'public-frontend'
           targetPath: '$(Build.ArtifactStagingDirectory)'
+
+  - job: 'MiscellaneousArtifacts'
+    pool:
+      vmImage: 'ubuntu-20.04'
+    steps:
+      - task: CopyFiles@2
+        displayName: 'Copy Pipfiles to tests'
+        inputs:
+          Contents: |
+            Pipfile
+            Pipfile.lock
+          TargetFolder: 'tests'
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish test files'
+        inputs:
+          artifactName: 'tests'
+          targetPath: 'tests'
