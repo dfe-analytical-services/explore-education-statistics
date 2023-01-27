@@ -1,4 +1,5 @@
 *** Settings ***
+Library             DateTime
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
@@ -247,14 +248,17 @@ Verify release is scheduled
     user checks summary list contains    Scheduled release    ${EXPECTED_SCHEDULED_DATE}
     user checks summary list contains    Next release expected    December 3001
 
+Get public release link
+    user waits until page contains element    testid:public-release-url
+    ${PUBLIC_RELEASE_LINK}=    Get Value    xpath://*[@data-testid="public-release-url"]
+    check that variable is not empty    PUBLIC_RELEASE_LINK    ${PUBLIC_RELEASE_LINK}
+    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
+
 Publish the scheduled release
     user waits for scheduled release to be published immediately
 
-    ${publish_date_day}=    get current datetime    %-d
-    ${publish_date_month_word}=    get current datetime    %B
-    ${publish_date_year}=    get current datetime    %Y
+    ${EXPECTED_PUBLISHED_DATE}=    get current datetime    ${DATE_FORMAT_MEDIUM}
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
-    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
 
 Verify newly published release is on Find Statistics page
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
@@ -422,7 +426,7 @@ Verify embedded dashboard accordion section contains dashboard
     user waits until h1 is visible    Explore Education Statistics service    %{WAIT_SMALL}
     unselect frame
 
-Return to Admin and Create amendment
+Return to Admin and create first amendment
     user navigates to admin dashboard    Bau1
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
@@ -672,11 +676,11 @@ Update embedded dashboard title and url
 
     user closes accordion section    Test embedded dashboard section    id:releaseMainContent
 
-Add release note to amendment
+Add release note to first amendment
     user clicks button    Add note
     user enters text into element    id:createReleaseNoteForm-reason    Test release note one
     user clicks button    Save note
-    ${date}=    get current datetime    %-d %B %Y
+    ${date}=    get current datetime    ${DATE_FORMAT_MEDIUM}
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
 
@@ -700,12 +704,8 @@ Approve amendment for scheduled release
 
     user waits for scheduled release to be published immediately
 
-    ${publish_date_day}=    get current datetime    %-d
-    ${publish_date_month}=    get current datetime    %-m
-    ${publish_date_month_word}=    get current datetime    %B
-    ${publish_date_year}=    get current datetime    %Y
+    ${EXPECTED_PUBLISHED_DATE}=    get current datetime    ${DATE_FORMAT_MEDIUM}
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
-    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
 
 Verify amendment is on Find Statistics page again
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
@@ -874,23 +874,40 @@ Verify amendment embedded dashboard accordion section is correct
     ...    xpath:.//iframe[@title="Amended Test embedded dashboard title"]
     user closes accordion section    Test embedded dashboard section    id:content
 
-Check next release date can be updated
+Return to published release page in Admin
+    user navigates to admin dashboard    Bau1
+    user navigates to published release page from dashboard
+    ...    ${PUBLICATION_NAME}
+    ...    ${RELEASE_NAME}
+
+Override release published date to past date
+    ${release_id}=    get release id from url
+    ${published_override}=    Get Current Date    UTC    increment=-1000 days    result_format=datetime
+    user updates release published date via api    ${release_id}    ${published_override}
+    ${EXPECTED_PUBLISHED_DATE}=    format datetime    ${published_override}    ${DATE_FORMAT_MEDIUM}
+    set suite variable    ${EXPECTED_PUBLISHED_DATE}
+
+Verify published date on publication page is overriden with past date
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    ${row}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
+    user checks element contains    ${row}    ${EXPECTED_PUBLISHED_DATE}
+
+Verify public published date is overriden with past date
+    user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
+
+Return to Admin and create second amendment
     user navigates to admin dashboard    Bau1
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
-    user clicks link    Sign off
-    user clicks button    Edit release status
-    user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
-    user enters text into element    releaseStatusForm-nextReleaseDate-month    08
-    user enters text into element    id:releaseStatusForm-nextReleaseDate-year    4001
-    user clicks button    Update status
 
-Leave release note for amendment
+Add release note to second amendment
     user clicks link    Content
     user clicks button    Add note
-    user enters text into element    testid:comment-textarea    updated amendment
+    user enters text into element    id:createReleaseNoteForm-reason    Test release note two
     user clicks button    Save note
 
-Approve release amendment for scheduled publication
+Approve release amendment for scheduled publication and update published date
     ${days_until_release}=    set variable    2
     ${publish_date_day}=    get current datetime    %-d    ${days_until_release}
     ${publish_date_month}=    get current datetime    %-m    ${days_until_release}
@@ -899,18 +916,24 @@ Approve release amendment for scheduled publication
     ...    ${publish_date_day}
     ...    ${publish_date_month}
     ...    ${publish_date_year}
-    ...    8
-    ...    4001
+    ...    next_release_month=8
+    ...    next_release_year=4001
+    ...    update_amendment_published_date=${True}
     user waits for scheduled release to be published immediately
+    ${EXPECTED_PUBLISHED_DATE}=    get current datetime    ${DATE_FORMAT_MEDIUM}
+    set suite variable    ${EXPECTED_PUBLISHED_DATE}
 
-Save public release link for later use
-    user waits until page contains element    testid:public-release-url
-    ${PUBLIC_RELEASE_LINK}=    Get Value    xpath://*[@data-testid="public-release-url"]
-    check that variable is not empty    PUBLIC_RELEASE_LINK    ${PUBLIC_RELEASE_LINK}
-    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
+Verify published date on publication page has been updated
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    ${row}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
+    user checks element contains    ${row}    ${EXPECTED_PUBLISHED_DATE}
 
 Navigate to amended public release
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
 
-Validate Next update date
+Verify public published date has been updated
+    user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
+
+Validate next update date
     user checks summary list contains    Next update    August 4001

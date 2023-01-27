@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <param name="executionContext"></param>
         /// <param name="logger"></param>
         /// <returns></returns>
-        [FunctionName("PublishReleaseContent")]
+        [FunctionName("PublishImmediateReleaseContent")]
         // ReSharper disable once UnusedMember.Global
         public async Task PublishImmediateReleaseContent(
             [QueueTrigger(PublishReleaseContentQueue)]

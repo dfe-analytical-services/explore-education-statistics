@@ -19,6 +19,7 @@ ${timeout}=                             %{TIMEOUT}
 ${implicit_wait}=                       %{IMPLICIT_WAIT}
 ${prompt_to_continue_on_failure}=       0
 ${FAIL_TEST_SUITES_FAST}=               %{FAIL_TEST_SUITES_FAST}
+${DATE_FORMAT_MEDIUM}=                  %-d %B %Y
 
 
 *** Keywords ***

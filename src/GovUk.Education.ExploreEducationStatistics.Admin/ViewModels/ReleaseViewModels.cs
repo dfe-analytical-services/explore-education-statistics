@@ -64,6 +64,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public Guid? PreviousVersionId { get; set; }
 
         public ReleasePermissions? Permissions { get; set; }
+
+        public bool UpdatePublishedDate { get; set; }
     }
 
     public record ReleasePermissions

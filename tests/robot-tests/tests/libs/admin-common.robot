@@ -587,6 +587,7 @@ user approves release for scheduled publication
     ...    ${publish_date_year}
     ...    ${next_release_month}=01
     ...    ${next_release_year}=2200
+    ...    ${update_amendment_published_date}=${False}
     user clicks link    Sign off
     user waits until page does not contain loading spinner
     user waits until h2 is visible    Sign off    %{WAIT_SMALL}
@@ -597,6 +598,10 @@ user approves release for scheduled publication
 
     user clicks radio    Approved for publication
     user enters text into element    id:releaseStatusForm-internalReleaseNote    Approved by UI tests
+    IF    ${update_amendment_published_date}
+        user waits until page contains    Update published date
+        user clicks checkbox    Update published date
+    END
     user clicks radio    On a specific date
     user waits until page contains    Publish date
     user enters text into element    id:releaseStatusForm-publishScheduled-day    ${publish_date_day}

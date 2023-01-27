@@ -1,7 +1,7 @@
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import _releaseService, { Release } from '@admin/services/releaseService';
+import _releaseService from '@admin/services/releaseService';
 import _permissionService from '@admin/services/permissionService';
 import _preReleaseUserService from '@admin/services/preReleaseUserService';
 import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
@@ -21,40 +21,9 @@ const preReleaseUserService = _preReleaseUserService as jest.Mocked<
   typeof _preReleaseUserService
 >;
 
-const releaseData: Release = {
-  id: 'release-1',
-  slug: 'release-1-slug',
-  approvalStatus: 'Draft',
-  latestRelease: false,
-  live: false,
-  amendment: false,
-  year: 2021,
-  yearTitle: '2021/22',
-  publicationId: 'publication-1',
-  publicationTitle: 'Publication 1',
-  publicationSummary: 'Publication 1 summary',
-  publicationSlug: 'publication-1-slug',
-  timePeriodCoverage: { value: 'W51', label: 'Week 51' },
-  title: 'Release Title',
-  type: 'OfficialStatistics',
-  contact: {
-    teamName: 'Test name',
-    teamEmail: 'test@test.com',
-    contactName: 'Test contact name',
-    contactTelNo: '1111 1111 1111',
-  },
-  nextReleaseDate: {
-    day: 1,
-    month: 1,
-    year: 2020,
-  },
-  previousVersionId: '',
-  preReleaseAccessList: '',
-};
-
 describe('ReleasePreReleaseAccessPage', () => {
   test('renders the pre-release users tab', async () => {
-    releaseService.getRelease.mockResolvedValue(releaseData);
+    releaseService.getRelease.mockResolvedValue(testRelease);
     permissionService.canUpdateRelease.mockResolvedValue(true);
     preReleaseUserService.getUsers.mockResolvedValue([]);
 
@@ -82,7 +51,7 @@ describe('ReleasePreReleaseAccessPage', () => {
   });
 
   test('renders pre-release page link correctly', async () => {
-    releaseService.getRelease.mockResolvedValue(releaseData);
+    releaseService.getRelease.mockResolvedValue(testRelease);
     permissionService.canUpdateRelease.mockResolvedValue(true);
 
     renderPage();
@@ -97,7 +66,7 @@ describe('ReleasePreReleaseAccessPage', () => {
   });
 
   test('only renders the public access list for amendments', async () => {
-    const amendmentRelease = { ...releaseData, amendment: true };
+    const amendmentRelease = { ...testRelease, amendment: true };
     releaseService.getRelease.mockResolvedValue(amendmentRelease);
     permissionService.canUpdateRelease.mockResolvedValue(true);
 
@@ -115,7 +84,7 @@ describe('ReleasePreReleaseAccessPage', () => {
   });
 
   test('renders the public access list tab', async () => {
-    releaseService.getRelease.mockResolvedValue(releaseData);
+    releaseService.getRelease.mockResolvedValue(testRelease);
     permissionService.canUpdateRelease.mockResolvedValue(true);
     preReleaseUserService.getUsers.mockResolvedValue([]);
 

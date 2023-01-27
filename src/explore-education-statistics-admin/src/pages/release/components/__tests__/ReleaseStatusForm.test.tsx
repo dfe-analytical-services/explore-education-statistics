@@ -1,8 +1,6 @@
+import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import { ReleaseStatusPermissions } from '@admin/services/permissionService';
-import {
-  Release,
-  ReleaseChecklistErrorCode,
-} from '@admin/services/releaseService';
+import { ReleaseChecklistErrorCode } from '@admin/services/releaseService';
 import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { format } from 'date-fns';
@@ -14,32 +12,6 @@ import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
 
 describe('ReleaseStatusForm', () => {
-  const testRelease: Release = {
-    id: 'release-1',
-    slug: 'release-1-slug',
-    approvalStatus: 'Draft',
-    latestRelease: false,
-    live: false,
-    amendment: false,
-    year: 2021,
-    yearTitle: '2021/22',
-    publicationId: 'publication-1',
-    publicationTitle: 'Publication 1',
-    publicationSummary: 'Publication 1 summary',
-    publicationSlug: 'publication-1-slug',
-    timePeriodCoverage: { value: 'W51', label: 'Week 51' },
-    title: 'Release Title',
-    type: 'OfficialStatistics',
-    contact: {
-      teamName: 'Test name',
-      teamEmail: 'test@test.com',
-      contactName: 'Test contact name',
-      contactTelNo: '1111 1111 1111',
-    },
-    previousVersionId: '',
-    preReleaseAccessList: '',
-  };
-
   const testStatusPermissions: ReleaseStatusPermissions = {
     canMarkApproved: true,
     canMarkDraft: true,
@@ -694,7 +666,6 @@ describe('ReleaseStatusForm', () => {
           release={{
             ...testRelease,
             approvalStatus: 'Approved',
-            notifySubscribers: true,
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -785,7 +756,6 @@ describe('ReleaseStatusForm', () => {
           release={{
             ...testRelease,
             approvalStatus: 'Approved',
-            notifySubscribers: true,
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -849,7 +819,6 @@ describe('ReleaseStatusForm', () => {
           release={{
             ...testRelease,
             approvalStatus: 'Approved',
-            notifySubscribers: true,
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -891,7 +860,6 @@ describe('ReleaseStatusForm', () => {
       const expectedValues: ReleaseStatusFormValues = {
         internalReleaseNote: 'Test release note',
         approvalStatus: 'Approved',
-        notifySubscribers: true,
         publishScheduled: new Date(`${nextYear}-10-10`),
         publishMethod: 'Scheduled',
         nextReleaseDate: {
@@ -924,7 +892,6 @@ describe('ReleaseStatusForm', () => {
           release={{
             ...testRelease,
             approvalStatus: 'Approved',
-            notifySubscribers: true,
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -953,7 +920,6 @@ describe('ReleaseStatusForm', () => {
       const expectedValues: ReleaseStatusFormValues = {
         internalReleaseNote: 'Test release note',
         approvalStatus: 'Approved',
-        notifySubscribers: true,
         publishMethod: 'Immediate',
         nextReleaseDate: {
           month: 5,
@@ -966,53 +932,161 @@ describe('ReleaseStatusForm', () => {
       });
     });
 
-    test('amendment should have "Notify subscribers by email" checkbox', async () => {
-      const handleSubmit = jest.fn();
+    describe('amendments', () => {
+      test('renders with `notifySubscribers` and `updatePublishedDate` options', async () => {
+        const handleSubmit = jest.fn();
 
-      render(
-        <ReleaseStatusForm
-          release={{
-            ...testRelease,
-            approvalStatus: 'Approved',
-            amendment: true,
-            notifySubscribers: true,
-          }}
-          statusPermissions={testStatusPermissions}
-          onCancel={noop}
-          onSubmit={handleSubmit}
-        />,
-      );
+        render(
+          <ReleaseStatusForm
+            release={{
+              ...testRelease,
+              approvalStatus: 'Approved',
+              amendment: true,
+              notifySubscribers: true,
+              updatePublishedDate: true,
+            }}
+            statusPermissions={testStatusPermissions}
+            onCancel={noop}
+            onSubmit={handleSubmit}
+          />,
+        );
 
-      await userEvent.type(
-        screen.getByLabelText('Internal note'),
-        'Test release note',
-      );
+        await waitFor(() => {
+          expect(
+            screen.getByLabelText('Notify subscribers by email'),
+          ).toBeChecked();
+        });
 
-      expect(
-        screen.getByLabelText('Notify subscribers by email'),
-      ).toBeChecked();
+        expect(screen.getByLabelText('Update published date')).toBeChecked();
+      });
 
-      userEvent.click(screen.getByLabelText('Notify subscribers by email'));
+      test('renders default values for `notifySubscribers` and `updatePublishedDate` options when status is changed to Approved', async () => {
+        const handleSubmit = jest.fn();
 
-      expect(
-        screen.getByLabelText('Notify subscribers by email'),
-      ).not.toBeChecked();
+        render(
+          <ReleaseStatusForm
+            release={{
+              ...testRelease,
+              approvalStatus: 'Approved',
+              amendment: true,
+              notifySubscribers: false,
+              updatePublishedDate: true,
+            }}
+            statusPermissions={testStatusPermissions}
+            onCancel={noop}
+            onSubmit={handleSubmit}
+          />,
+        );
 
-      userEvent.click(screen.getByLabelText('Immediately'));
+        // Begin with checkboxes in opposite states to their default values
+        await waitFor(() => {
+          expect(
+            screen.getByLabelText('Notify subscribers by email'),
+          ).not.toBeChecked();
+        });
 
-      expect(handleSubmit).not.toHaveBeenCalled();
+        expect(screen.getByLabelText('Update published date')).toBeChecked();
 
-      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+        // Toggle to Draft status and expect the options to not be rendered
+        userEvent.click(screen.getByLabelText('In draft'));
 
-      const expectedValues: ReleaseStatusFormValues = {
-        internalReleaseNote: 'Test release note',
-        approvalStatus: 'Approved',
-        notifySubscribers: false,
-        publishMethod: 'Immediate',
-      };
+        expect(
+          screen.queryByLabelText('Notify subscribers by email'),
+        ).not.toBeInTheDocument();
 
-      await waitFor(() => {
-        expect(handleSubmit).toHaveBeenCalledWith(expectedValues);
+        expect(
+          screen.queryByLabelText('Update published date'),
+        ).not.toBeInTheDocument();
+
+        // Toggle back to Approved and expect the options have their default values
+        userEvent.click(screen.getByLabelText('Approved for publication'));
+
+        expect(
+          screen.getByLabelText('Notify subscribers by email'),
+        ).toBeChecked();
+
+        expect(
+          screen.getByLabelText('Update published date'),
+        ).not.toBeChecked();
+      });
+
+      test('shows warning message when `updatePublishedDate` is selected', async () => {
+        const handleSubmit = jest.fn();
+
+        render(
+          <ReleaseStatusForm
+            release={{
+              ...testRelease,
+              approvalStatus: 'Approved',
+              amendment: true,
+              notifySubscribers: false,
+              updatePublishedDate: false,
+            }}
+            statusPermissions={testStatusPermissions}
+            onCancel={noop}
+            onSubmit={handleSubmit}
+          />,
+        );
+
+        await waitFor(() => {
+          expect(
+            screen.getByLabelText('Update published date'),
+          ).not.toBeChecked();
+        });
+
+        userEvent.click(screen.getByLabelText('Update published date'));
+
+        expect(
+          screen.getByText(
+            "The release's published date in the public view will be updated once the publication is complete.",
+          ),
+        ).toBeInTheDocument();
+      });
+
+      test('submits successfully with updated values', async () => {
+        const handleSubmit = jest.fn();
+
+        render(
+          <ReleaseStatusForm
+            release={{
+              ...testRelease,
+              approvalStatus: 'Approved',
+              amendment: true,
+              notifySubscribers: true,
+              updatePublishedDate: false,
+            }}
+            statusPermissions={testStatusPermissions}
+            onCancel={noop}
+            onSubmit={handleSubmit}
+          />,
+        );
+
+        await userEvent.type(
+          screen.getByLabelText('Internal note'),
+          'Test release note',
+        );
+
+        userEvent.click(screen.getByLabelText('Notify subscribers by email'));
+
+        userEvent.click(screen.getByLabelText('Update published date'));
+
+        userEvent.click(screen.getByLabelText('Immediately'));
+
+        expect(handleSubmit).not.toHaveBeenCalled();
+
+        userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+
+        const expectedValues: ReleaseStatusFormValues = {
+          internalReleaseNote: 'Test release note',
+          approvalStatus: 'Approved',
+          publishMethod: 'Immediate',
+          notifySubscribers: false,
+          updatePublishedDate: true,
+        };
+
+        await waitFor(() => {
+          expect(handleSubmit).toHaveBeenCalledWith(expectedValues);
+        });
       });
     });
   });

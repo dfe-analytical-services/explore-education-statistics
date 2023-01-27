@@ -8,6 +8,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 
 public interface IReleaseRepository
 {
+    Task<DateTime> GetPublishedDate(Guid releaseId,
+        DateTime actualPublishedDate);
+
     Task<Either<ActionResult, Release>> GetLatestPublishedRelease(Guid publicationId);
 
     Task<bool> IsLatestPublishedVersionOfRelease(Guid releaseId);

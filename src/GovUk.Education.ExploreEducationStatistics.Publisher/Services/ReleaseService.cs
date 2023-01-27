@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Extensions.PublisherExtensions;
@@ -15,13 +16,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     public class ReleaseService : IReleaseService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly IMethodologyService _methodologyService;
+        private readonly IReleaseRepository _releaseRepository;
 
         public ReleaseService(ContentDbContext contentDbContext,
-            IMethodologyService methodologyService)
+            IReleaseRepository releaseRepository)
         {
             _contentDbContext = contentDbContext;
-            _methodologyService = methodologyService;
+            _releaseRepository = releaseRepository;
         }
 
         public async Task<Release> Get(Guid id)
@@ -63,36 +64,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Last();
         }
 
-        public async Task SetPublishedDates(Guid id, DateTime published)
+        public async Task SetPublishedDate(Guid releaseId, DateTime actualPublishedDate)
         {
             var release = await _contentDbContext.Releases
-                .SingleOrDefaultAsync(r => r.Id == id);
-
-            if (release == null)
-            {
-                throw new ArgumentException("Content Release does not exist", nameof(id));
-            }
-
-            if (release.Amendment)
-            {
-                var previousVersion = await _contentDbContext.Releases.AsNoTracking()
-                    .SingleOrDefaultAsync(r => r.Id == release.PreviousVersionId);
-
-                if (previousVersion?.Published == null)
-                {
-                    throw new ArgumentException("Previous version of release does not exist or is not live",
-                        nameof(release.PreviousVersionId));
-                }
-
-                published = previousVersion.Published.Value;
-            }
+                .SingleAsync(r => r.Id == releaseId);
 
             _contentDbContext.Releases.Update(release);
-            release.Published ??= published;
-
-            // Set the published date on any methodologies used by this publication that are now publicly accessible
-            // as a result of this release being published
-            await _methodologyService.SetPublishedDatesByPublication(release.PublicationId, published);
+            release.Published = await _releaseRepository.GetPublishedDate(release.Id, actualPublishedDate);
 
             await _contentDbContext.SaveChangesAsync();
         }

@@ -18,6 +18,7 @@ export interface Release {
   slug: string;
   approvalStatus: ReleaseApprovalStatus;
   notifySubscribers?: boolean;
+  updatePublishedDate: boolean;
   latestRelease: boolean;
   live: boolean;
   amendment: boolean;
@@ -90,6 +91,7 @@ export interface CreateReleaseStatusRequest {
   publishScheduled?: string;
   nextReleaseDate?: PartialDate;
   notifySubscribers?: boolean;
+  updatePublishedDate?: boolean;
 }
 
 type PublishingStage =
