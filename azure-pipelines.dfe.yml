@@ -279,7 +279,7 @@ jobs:
         displayName: 'Archive frontend'
         inputs:
           rootFolderOrFile: './src/explore-education-statistics-frontend'
-          includeRootFolder: true
+          includeRootFolder: false
           archiveFile: '$(Build.ArtifactStagingDirectory)/public-frontend.zip'
 
       - task: 'PublishPipelineArtifact@0'
