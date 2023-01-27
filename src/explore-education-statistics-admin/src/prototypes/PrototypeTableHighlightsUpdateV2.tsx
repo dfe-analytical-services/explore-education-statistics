@@ -49,28 +49,35 @@ const PrototypeTableHighlights = () => {
       className={classNames(
         styles.prototypePublicPage,
         styles.prototypeTableTool,
+        sourcePublication && styles.prototypeHideBreadcrumb,
       )}
     >
-      <PrototypePage wide>
+      <PrototypePage
+        wide
+        breadcrumbs={[
+          {
+            name: 'Explore our datasets',
+            link: '#',
+          },
+          { name: 'Further education', link: '#' },
+          { name: 'Apprenticeships and traineeships', link: '#' },
+          { name: datasetValue, link: '#' },
+        ]}
+      >
+        {sourcePublication && (
+          <div className={styles.prototypeBackLink}>
+            <Link to="./releaseData#exploreData" back>
+              Back to apprenticeships and traineeships, academic year 2021/22
+            </Link>
+          </div>
+        )}
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            <h1
-              className={classNames('govuk-heading-xl', [
-                (sourcePublication || sourceDataCat) &&
-                  'govuk-!-margin-bottom-0',
-              ])}
-            >
+            <h1 className={classNames('govuk-heading-xl')}>
               <span className="govuk-caption-xl">Table tool</span>
               Explore our datasets
             </h1>
-            {sourcePublication && (
-              <div className="govuk-!-margin-bottom-4">
-                <Link to="./releaseData#exploreData" back>
-                  Back to apprenticeships and traineeships, academic year
-                  2021/22
-                </Link>
-              </div>
-            )}
+
             {sourceDataCat && (
               <div className="govuk-!-margin-bottom-4">
                 <Link to="./data-selected" back>
@@ -116,7 +123,7 @@ const PrototypeTableHighlights = () => {
                           href="./releaseData"
                           className="govuk-!-margin-right-6"
                         >
-                          View publication
+                          View this release
                         </a>
 
                         <a

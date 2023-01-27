@@ -107,35 +107,36 @@ const PrototypeDataCatalogue = () => {
   }, [selectedReleaseType, selectedSortOrder, searchQuery, selectedTheme]);
 
   return (
-    <div className={styles.prototypePublicPage}>
+    <div
+      className={classNames(styles.prototypePublicPage, [
+        sourcePublication && styles.prototypeHideBreadcrumb,
+      ])}
+    >
       <PrototypePage
         wide={false}
         breadcrumbs={[
           {
             name: 'Data catalogue',
-            link: '/prototypes/data-catalog?theme=clear',
+            link: './data-catalog?theme=clear',
           },
-          { name: selectedTheme, link: '/prototypes/data-catalog?theme=fe' },
-          { name: selectedPublication, link: '/prototypes/data-catalog' },
+          { name: selectedTheme, link: `./data-catalog?theme=fe` },
+          {
+            name: selectedPublication,
+            link: './data-catalog?theme=fe&publication=traineeships',
+          },
+          { name: selectedRelease, link: './data-catalog' },
         ]}
       >
+        {sourcePublication && (
+          <div className={styles.prototypeBackLink}>
+            <Link to="./releaseData#exploreData" back>
+              Back to apprenticeships and traineeships, academic year 2021/22
+            </Link>
+          </div>
+        )}
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            <h1
-              className={classNames('govuk-heading-xl', [
-                sourcePublication && 'govuk-!-margin-bottom-0',
-              ])}
-            >
-              Data catalogue
-            </h1>
-            {sourcePublication && (
-              <div className="govuk-!-margin-bottom-4">
-                <Link to="./releaseData#exploreData" back>
-                  Back to apprenticeships and traineeships, academic year
-                  2021/22
-                </Link>
-              </div>
-            )}
+            <h1 className={classNames('govuk-heading-xl')}>Data catalogue</h1>
             <p className="govuk-body-l">
               View all of the open data available and choose files to download.
             </p>{' '}
@@ -154,21 +155,6 @@ const PrototypeDataCatalogue = () => {
                   </Link>
                 </li>
               </ul>
-
-              {selectedPublication === 'Apprenticeships and traineeships' && (
-                <>
-                  <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                    Publication
-                  </h3>
-                  <ul className="govuk-list">
-                    <li>
-                      <Link to="./releaseData#exploreData">
-                        Apprenticeships and traineeships
-                      </Link>
-                    </li>
-                  </ul>
-                </>
-              )}
             </RelatedInformation>
           </div>
         </div>
@@ -208,9 +194,12 @@ const PrototypeDataCatalogue = () => {
                 onBlur={e => {
                   params.delete('theme');
                   setSelectedTheme(e.target.value);
+                  setSelectedPublication('All publications');
                 }}
               >
-                <option value={selectedTheme}>{selectedTheme}</option>
+                <option value={selectedTheme} selected>
+                  {selectedTheme}
+                </option>
                 <option value="All themes">All themes</option>
                 <option value="Children's social care">
                   Children's social care
@@ -260,7 +249,7 @@ const PrototypeDataCatalogue = () => {
                   disabled: true,
                 })}
               >
-                <option value={selectedPublication}>
+                <option value={selectedPublication} selected>
                   {selectedPublication}
                 </option>
                 <option value="All publications">All publications</option>
@@ -399,33 +388,28 @@ const PrototypeDataCatalogue = () => {
           <div className="govuk-grid-column-two-thirds">
             {selectedPublication === 'All publications' && (
               <div role="region" aria-live="polite" aria-atomic="true">
+                {selectedPublication === 'All publications' &&
+                  selectedTheme === 'All themes' && (
+                    <>
+                      <h2 className="govuk-!-margin-bottom-0">All themes </h2>
+                      <h3 className="govuk-!-margin-bottom-0">XXXX datasets</h3>
+                    </>
+                  )}
+
+                {selectedPublication === 'All publications' &&
+                  selectedTheme === 'Further education' && (
+                    <>
+                      <h2 className="govuk-!-margin-bottom-0">
+                        {selectedTheme}
+                      </h2>
+                      <h3 className="govuk-!-margin-bottom-0">XX datasets</h3>
+                    </>
+                  )}
+
                 <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
-                  <h2 className="govuk-!-margin-bottom-2 govuk-heading-m">
-                    {selectedPublication === 'All publications' &&
-                      selectedTheme === 'All themes' && (
-                        <>
-                          <div className="govuk-caption-m">
-                            All themes and all publications{' '}
-                          </div>
-                          XXXX datasets
-                        </>
-                      )}
-                    {selectedPublication === 'All publications' &&
-                      selectedTheme === 'Further education' && (
-                        <>
-                          <div className="govuk-caption-m">
-                            {selectedTheme}{' '}
-                          </div>
-                          XX datasets
-                        </>
-                      )}
-                    {selectedPublication !== 'All publications' && (
-                      <>{totalResults !== 1 ? '32 datasets' : 'result'}</>
-                    )}
-                  </h2>
                   {selectedPublication === 'All publications' &&
                     selectedTheme === 'Further education' && (
-                      <div>
+                      <div className="govuk-!-margin-top-3">
                         <a
                           href="#"
                           onClick={e => {
@@ -434,7 +418,7 @@ const PrototypeDataCatalogue = () => {
                             e.preventDefault();
                           }}
                         >
-                          All themes
+                          Show all themes
                         </a>
                       </div>
                     )}
@@ -462,25 +446,27 @@ const PrototypeDataCatalogue = () => {
             </span>
             {selectedPublication !== 'All publications' && (
               <>
+                <h2 className="govuk-!-margin-bottom-0">
+                  {selectedPublication}
+                </h2>
                 <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
-                  <h2 className="govuk-heading-m">
-                    {' '}
-                    <div className="govuk-caption-m">{selectedPublication}</div>
+                  <h3 className="govuk-heading-m govuk-!-margin-bottom-3">
                     32 datasets{' '}
-                  </h2>
-                  <div>
-                    <a
-                      href="#"
-                      onClick={e => {
-                        setSelectedTheme('Further education');
-                        setSelectedPublication('All publications');
-                        e.preventDefault();
-                      }}
-                    >
-                      All publications
-                    </a>
-                  </div>
+                  </h3>
                 </div>
+                <div className="govuk-!-margin-top-3">
+                  <a
+                    href="#"
+                    onClick={e => {
+                      setSelectedTheme('Further education');
+                      setSelectedPublication('All publications');
+                      e.preventDefault();
+                    }}
+                  >
+                    Show all further education datasets
+                  </a>
+                </div>
+                <hr />
                 <SummaryList noBorder>
                   <SummaryListItem term="Type">
                     <span className="govuk-tag">National statistics</span>{' '}
@@ -488,10 +474,13 @@ const PrototypeDataCatalogue = () => {
                       <span className="govuk-tag">latest data</span>
                     )}
                     {selectedRelease !== latestRelease && (
-                      <span className="govuk-tag govuk-tag--red">
+                      <span className="govuk-tag govuk-tag--orange">
                         Not the latest data
                       </span>
                     )}
+                  </SummaryListItem>
+                  <SummaryListItem term="Release">
+                    {selectedRelease}
                     {selectedRelease !== latestRelease && (
                       <p className="govuk-!-margin-top-3">
                         <a
@@ -508,14 +497,22 @@ const PrototypeDataCatalogue = () => {
                   <SummaryListItem term="Theme">
                     Further education
                   </SummaryListItem>
-                  <SummaryListItem term="Publication">
-                    Apprenticeships and traineeships
-                  </SummaryListItem>
-                  <SummaryListItem term="Release">
-                    Academic year 2021/22
-                  </SummaryListItem>
                   <SummaryListItem term="Last updated">
                     21 December 2022
+                  </SummaryListItem>
+                  <SummaryListItem term="Options">
+                    <ul className="govuk-list">
+                      <li>
+                        <Button className="govuk-!-margin-bottom-3">
+                          Download all 32 datasets (.zip)
+                        </Button>
+                      </li>
+                      <li>
+                        <Link to="./releaseData#exploreData">
+                          View this release
+                        </Link>
+                      </li>
+                    </ul>
                   </SummaryListItem>
                 </SummaryList>
                 {/* <dl>
@@ -540,10 +537,9 @@ const PrototypeDataCatalogue = () => {
                   </div>
             </dl> */}{' '}
                 <hr />
-                <Button className="govuk-!-margin-bottom-0">
-                  Download all 32 datasets for this release (.zip)
-                </Button>
-                <hr />
+                <h2 className="govuk-!-heading-m govuk-heading-m">
+                  View and download individual datasets
+                </h2>
                 <div className="govuk-!-margin-top-0 dfe-flex dfe-justify-content--space-between dfe-align-items--center">
                   <div>
                     <PrototypeSortFilters
@@ -1583,308 +1579,314 @@ const PrototypeDataCatalogue = () => {
                 </>
               )}
             {selectedPublication === 'Apprenticeships and traineeships' && (
-              <ul className="govuk-list">
-                <li>
-                  <hr />
-                  <h3>
-                    <a href="#">Annual Headlines - detailed series</a>
-                  </h3>
-                  <p>Time series of headline apprenticeship figures</p>
-                  {!listCompact && (
-                    <SummaryList noBorder>
-                      <SummaryListItem term="Filetype and size">
-                        csv, 45Kb
-                      </SummaryListItem>
-                      <SummaryListItem term="Indicators">
-                        Starts, Achievements, Learner participation, Percentage
-                        Starts, Percentage Achievements, Percentage Learner
-                        participation
-                      </SummaryListItem>
-                      <SummaryListItem term="Filters">
-                        Apprenticeship level, Funding type, Age group
-                      </SummaryListItem>
-                      <SummaryListItem term="Geographic level">
-                        National
-                      </SummaryListItem>
-                      <SummaryListItem term="Time period">
-                        Academic years 2015/16 to 2021/22
-                      </SummaryListItem>
-                    </SummaryList>
-                  )}
-                </li>
-                <li>
-                  <hr />
-                  <h3>
-                    <a href="#">
-                      Apprenticeship Achievement Rates Demographics
-                    </a>
-                  </h3>
-                  <p>Apprenticeship national achievement rate tables</p>
-                  {!listCompact && (
-                    <SummaryList noBorder>
-                      <SummaryListItem term="Filetype and size">
-                        csv, 28 Kb
-                      </SummaryListItem>
-                      <SummaryListItem term="Indicators">
-                        Achievement rate, Achievers, Completers, Leavers, Pass
-                        rate, Retention rate
-                      </SummaryListItem>
-                      <SummaryListItem term="Filters">
-                        Age, Level, demographic - ethnicity, gender and lldd,
-                        Standard /Framework flag
-                      </SummaryListItem>
-                      <SummaryListItem term="Geographic level">
-                        National
-                      </SummaryListItem>
-                      <SummaryListItem term="Time period">
-                        Academic years 2018/19 to 2020/21
-                      </SummaryListItem>
-                    </SummaryList>
-                  )}
-                </li>
-                <li>
-                  <hr />
-                  <h3>
-                    <a href="./data-selected">
-                      Apprenticeship Achievement Rates Detailed Series
-                    </a>
-                  </h3>
-                  <p>Apprenticeship national achievement rate tables</p>
-                  {!listCompact && (
-                    <SummaryList noBorder>
-                      <SummaryListItem term="Filetype and size">
-                        csv, 2 Mb
-                      </SummaryListItem>
-                      <SummaryListItem term="Indicators">
-                        Achievement rate, Achievers, Completers, Leavers, Pass
-                        rate, Retention rate
-                      </SummaryListItem>
-                      <SummaryListItem term="Filters">
-                        Age, Level, demographic - ethnicity, gender and lldd,
-                        Standard /Framework flag
-                      </SummaryListItem>
-                      <SummaryListItem term="Geographic level">
-                        National
-                      </SummaryListItem>
-                      <SummaryListItem term="Time period">
-                        Academic years 2018/19 to 2020/21
-                      </SummaryListItem>
-                    </SummaryList>
-                  )}
-                </li>
-                <li>
-                  <hr />
-                  <h3>
-                    <a href="#">Apprenticeship Achievement Rates Headlines</a>
-                  </h3>
-                  <p>Apprenticeship national achievement rate tables</p>
-                  {!listCompact && (
-                    <SummaryList noBorder>
-                      <SummaryListItem term="Filetype and size">
-                        csv, 9 Kb
-                      </SummaryListItem>
-                      <SummaryListItem term="Indicators">
-                        Achievement rate, Leavers, Pass rate, Retention rate
-                      </SummaryListItem>
-                      <SummaryListItem term="Filters">
-                        Level, Detailed Level, Sector Subject Area, Standard
-                        /Framework flag
-                      </SummaryListItem>
-                      <SummaryListItem term="Geographic level">
-                        National
-                      </SummaryListItem>
-                      <SummaryListItem term="Time period">
-                        Academic years 2018/19 to 2020/21
-                      </SummaryListItem>
-                    </SummaryList>
-                  )}
-                </li>
-                <li>
-                  <hr />
-                  <h3>
-                    <a href="#">Apprenticeship Service - incentives</a>
-                  </h3>
-                  <p>
-                    Incentive claims recorded on the apprenticeship service as
-                    of June 2022
-                  </p>
-                  {!listCompact && (
-                    <SummaryList noBorder>
-                      <SummaryListItem term="Filetype and size">
-                        csv, 18 kb
-                      </SummaryListItem>
-                      <SummaryListItem term="Indicators">
-                        Incentive claims
-                      </SummaryListItem>
-                      <SummaryListItem term="Filters">
-                        Age group, Detailed apprenticeship level, Apprenticeship
-                        start month, Sector subject area Tier 1
-                      </SummaryListItem>
-                      <SummaryListItem term="Geographic level">
-                        National
-                      </SummaryListItem>
-                      <SummaryListItem term="Time period">
-                        August 2020 onwards
-                      </SummaryListItem>
-                    </SummaryList>
-                  )}
-                </li>
-                <li>
-                  <hr />
-                  <h3>
-                    <a href="#">Charts data</a>
-                  </h3>
-                  <p>
-                    Historical time series of headline adult (19+) further
-                    education and skills learner participation, containing
-                    breakdowns by provision type and in some cases level. Also
-                    includes all age apprenticeship participation figures.
-                  </p>
-                  {!listCompact && (
-                    <SummaryList noBorder>
-                      <SummaryListItem term="Filetype and size">
-                        csv, 2 kb
-                      </SummaryListItem>
-                      <SummaryListItem term="Indicators">
-                        Adult Apprenticeship, Adult Community learning, Adult
-                        Education & training, Adult FE & skills, Adult FE &
-                        skills - Level 4+, Adult FE & skills - Full Level 2,
-                        Adult FE & skills - Full Level3, Apprenticeships -
-                        Advanced, Apprenticeships - Higher, Apprenticeships -
-                        Intermediate, All age Apprenticeships
-                      </SummaryListItem>
-                      <SummaryListItem term="Filters">-</SummaryListItem>
-                      <SummaryListItem term="Geographic level">
-                        National
-                      </SummaryListItem>
-                      <SummaryListItem term="Time period">
-                        Academic years 2005/06 to 2021/22
-                      </SummaryListItem>
-                    </SummaryList>
-                  )}
-                </li>
-                <li>
-                  <hr />
-                  <h3>
-                    <a href="#">
-                      Duration, planned length of stay and length of employment
-                    </a>
-                  </h3>
-                  <p>
-                    Apprenticeship duration, apprenticeship planned length of
-                    stay and length of employment
-                  </p>
-                  {!listCompact && (
-                    <SummaryList noBorder>
-                      <SummaryListItem term="Filetype and size">
-                        csv, 28 kb
-                      </SummaryListItem>
-                      <SummaryListItem term="Indicators">
-                        Starts, Starts (used in duration calculations), Average
-                        expected duration
-                      </SummaryListItem>
-                      <SummaryListItem term="Filters">
-                        Age group, Detailed level, Length of employment, Planned
-                        length of stay
-                      </SummaryListItem>
-                      <SummaryListItem term="Geographic level">
-                        National
-                      </SummaryListItem>
-                      <SummaryListItem term="Time period">
-                        Academic years 2014/15 to 2021/22
-                      </SummaryListItem>
-                    </SummaryList>
-                  )}
-                </li>
-                <li>
-                  <hr />
-                  <h3>
-                    <a href="#">Find an apprenticeship adverts and vacancies</a>
-                  </h3>
-                  <p>
-                    Adverts and vacancies as reported on the Find an
-                    apprenticeship website
-                  </p>
-                  {!listCompact && (
-                    <SummaryList noBorder>
-                      <SummaryListItem term="Filetype and size">
-                        csv, 20 kb
-                      </SummaryListItem>
-                      <SummaryListItem term="Indicators">
-                        Adverts, Vacancies
-                      </SummaryListItem>
-                      <SummaryListItem term="Filters">
-                        Month, level
-                      </SummaryListItem>
-                      <SummaryListItem term="Geographic level">
-                        National
-                      </SummaryListItem>
-                      <SummaryListItem term="Time period">
-                        August 2018 to October 2022
-                      </SummaryListItem>
-                    </SummaryList>
-                  )}
-                </li>
-                <li>
-                  <hr />
-                  <h3>
-                    <a href="#">Geographical breakdowns - detailed</a>
-                  </h3>
-                  <p>
-                    Detailed geographical breakdowns (National, Regional, Local
-                    Authority District) of apprenticeship starts and
-                    achievements
-                  </p>
-                  {!listCompact && (
-                    <SummaryList noBorder>
-                      <SummaryListItem term="Filetype and size">
-                        csv, 62 Mb
-                      </SummaryListItem>
-                      <SummaryListItem term="Indicators">
-                        Starts, Achievements
-                      </SummaryListItem>
-                      <SummaryListItem term="Filters">
-                        Apprenticeship level, Ethnicity group, Sex, Sector
-                        subject area (tier 1), Region, Local Authority District
-                      </SummaryListItem>
-                      <SummaryListItem term="Geographic level">
-                        Local Authority District; National; Regional
-                      </SummaryListItem>
-                      <SummaryListItem term="Time period">
-                        Academic year 2021/22
-                      </SummaryListItem>
-                    </SummaryList>
-                  )}
-                </li>
-                <li>
-                  <hr />
-                  <h3>
-                    <a href="#">
-                      Geographical breakdowns - latest regional summary
-                    </a>
-                  </h3>
-                  <p>Headline regional breakdowns of apprenticeship starts</p>
-                  {!listCompact && (
-                    <SummaryList noBorder>
-                      <SummaryListItem term="Filetype and size">
-                        csv, 16 kb
-                      </SummaryListItem>
-                      <SummaryListItem term="Indicators">
-                        Starts
-                      </SummaryListItem>
-                      <SummaryListItem term="Filters">
-                        Region, Apprenticeship level
-                      </SummaryListItem>
-                      <SummaryListItem term="Geographic level">
-                        National, Regional
-                      </SummaryListItem>
-                      <SummaryListItem term="Time period">
-                        Academic years 2018/19 to 2021/22
-                      </SummaryListItem>
-                    </SummaryList>
-                  )}
-                </li>
-              </ul>
+              <>
+                <ul className="govuk-list">
+                  <li>
+                    <hr />
+                    <h3>
+                      <a href="#">Annual Headlines - detailed series</a>
+                    </h3>
+                    <p>Time series of headline apprenticeship figures</p>
+                    {!listCompact && (
+                      <SummaryList noBorder>
+                        <SummaryListItem term="Filetype and size">
+                          csv, 45Kb
+                        </SummaryListItem>
+                        <SummaryListItem term="Indicators">
+                          Starts, Achievements, Learner participation,
+                          Percentage Starts, Percentage Achievements, Percentage
+                          Learner participation
+                        </SummaryListItem>
+                        <SummaryListItem term="Filters">
+                          Apprenticeship level, Funding type, Age group
+                        </SummaryListItem>
+                        <SummaryListItem term="Geographic level">
+                          National
+                        </SummaryListItem>
+                        <SummaryListItem term="Time period">
+                          Academic years 2015/16 to 2021/22
+                        </SummaryListItem>
+                      </SummaryList>
+                    )}
+                  </li>
+                  <li>
+                    <hr />
+                    <h3>
+                      <a href="#">
+                        Apprenticeship Achievement Rates Demographics
+                      </a>
+                    </h3>
+                    <p>Apprenticeship national achievement rate tables</p>
+                    {!listCompact && (
+                      <SummaryList noBorder>
+                        <SummaryListItem term="Filetype and size">
+                          csv, 28 Kb
+                        </SummaryListItem>
+                        <SummaryListItem term="Indicators">
+                          Achievement rate, Achievers, Completers, Leavers, Pass
+                          rate, Retention rate
+                        </SummaryListItem>
+                        <SummaryListItem term="Filters">
+                          Age, Level, demographic - ethnicity, gender and lldd,
+                          Standard /Framework flag
+                        </SummaryListItem>
+                        <SummaryListItem term="Geographic level">
+                          National
+                        </SummaryListItem>
+                        <SummaryListItem term="Time period">
+                          Academic years 2018/19 to 2020/21
+                        </SummaryListItem>
+                      </SummaryList>
+                    )}
+                  </li>
+                  <li>
+                    <hr />
+                    <h3>
+                      <a href="./data-selected">
+                        Apprenticeship Achievement Rates Detailed Series
+                      </a>
+                    </h3>
+                    <p>Apprenticeship national achievement rate tables</p>
+                    {!listCompact && (
+                      <SummaryList noBorder>
+                        <SummaryListItem term="Filetype and size">
+                          csv, 2 Mb
+                        </SummaryListItem>
+                        <SummaryListItem term="Indicators">
+                          Achievement rate, Achievers, Completers, Leavers, Pass
+                          rate, Retention rate
+                        </SummaryListItem>
+                        <SummaryListItem term="Filters">
+                          Age, Level, demographic - ethnicity, gender and lldd,
+                          Standard /Framework flag
+                        </SummaryListItem>
+                        <SummaryListItem term="Geographic level">
+                          National
+                        </SummaryListItem>
+                        <SummaryListItem term="Time period">
+                          Academic years 2018/19 to 2020/21
+                        </SummaryListItem>
+                      </SummaryList>
+                    )}
+                  </li>
+                  <li>
+                    <hr />
+                    <h3>
+                      <a href="#">Apprenticeship Achievement Rates Headlines</a>
+                    </h3>
+                    <p>Apprenticeship national achievement rate tables</p>
+                    {!listCompact && (
+                      <SummaryList noBorder>
+                        <SummaryListItem term="Filetype and size">
+                          csv, 9 Kb
+                        </SummaryListItem>
+                        <SummaryListItem term="Indicators">
+                          Achievement rate, Leavers, Pass rate, Retention rate
+                        </SummaryListItem>
+                        <SummaryListItem term="Filters">
+                          Level, Detailed Level, Sector Subject Area, Standard
+                          /Framework flag
+                        </SummaryListItem>
+                        <SummaryListItem term="Geographic level">
+                          National
+                        </SummaryListItem>
+                        <SummaryListItem term="Time period">
+                          Academic years 2018/19 to 2020/21
+                        </SummaryListItem>
+                      </SummaryList>
+                    )}
+                  </li>
+                  <li>
+                    <hr />
+                    <h3>
+                      <a href="#">Apprenticeship Service - incentives</a>
+                    </h3>
+                    <p>
+                      Incentive claims recorded on the apprenticeship service as
+                      of June 2022
+                    </p>
+                    {!listCompact && (
+                      <SummaryList noBorder>
+                        <SummaryListItem term="Filetype and size">
+                          csv, 18 kb
+                        </SummaryListItem>
+                        <SummaryListItem term="Indicators">
+                          Incentive claims
+                        </SummaryListItem>
+                        <SummaryListItem term="Filters">
+                          Age group, Detailed apprenticeship level,
+                          Apprenticeship start month, Sector subject area Tier 1
+                        </SummaryListItem>
+                        <SummaryListItem term="Geographic level">
+                          National
+                        </SummaryListItem>
+                        <SummaryListItem term="Time period">
+                          August 2020 onwards
+                        </SummaryListItem>
+                      </SummaryList>
+                    )}
+                  </li>
+                  <li>
+                    <hr />
+                    <h3>
+                      <a href="#">Charts data</a>
+                    </h3>
+                    <p>
+                      Historical time series of headline adult (19+) further
+                      education and skills learner participation, containing
+                      breakdowns by provision type and in some cases level. Also
+                      includes all age apprenticeship participation figures.
+                    </p>
+                    {!listCompact && (
+                      <SummaryList noBorder>
+                        <SummaryListItem term="Filetype and size">
+                          csv, 2 kb
+                        </SummaryListItem>
+                        <SummaryListItem term="Indicators">
+                          Adult Apprenticeship, Adult Community learning, Adult
+                          Education & training, Adult FE & skills, Adult FE &
+                          skills - Level 4+, Adult FE & skills - Full Level 2,
+                          Adult FE & skills - Full Level3, Apprenticeships -
+                          Advanced, Apprenticeships - Higher, Apprenticeships -
+                          Intermediate, All age Apprenticeships
+                        </SummaryListItem>
+                        <SummaryListItem term="Filters">-</SummaryListItem>
+                        <SummaryListItem term="Geographic level">
+                          National
+                        </SummaryListItem>
+                        <SummaryListItem term="Time period">
+                          Academic years 2005/06 to 2021/22
+                        </SummaryListItem>
+                      </SummaryList>
+                    )}
+                  </li>
+                  <li>
+                    <hr />
+                    <h3>
+                      <a href="#">
+                        Duration, planned length of stay and length of
+                        employment
+                      </a>
+                    </h3>
+                    <p>
+                      Apprenticeship duration, apprenticeship planned length of
+                      stay and length of employment
+                    </p>
+                    {!listCompact && (
+                      <SummaryList noBorder>
+                        <SummaryListItem term="Filetype and size">
+                          csv, 28 kb
+                        </SummaryListItem>
+                        <SummaryListItem term="Indicators">
+                          Starts, Starts (used in duration calculations),
+                          Average expected duration
+                        </SummaryListItem>
+                        <SummaryListItem term="Filters">
+                          Age group, Detailed level, Length of employment,
+                          Planned length of stay
+                        </SummaryListItem>
+                        <SummaryListItem term="Geographic level">
+                          National
+                        </SummaryListItem>
+                        <SummaryListItem term="Time period">
+                          Academic years 2014/15 to 2021/22
+                        </SummaryListItem>
+                      </SummaryList>
+                    )}
+                  </li>
+                  <li>
+                    <hr />
+                    <h3>
+                      <a href="#">
+                        Find an apprenticeship adverts and vacancies
+                      </a>
+                    </h3>
+                    <p>
+                      Adverts and vacancies as reported on the Find an
+                      apprenticeship website
+                    </p>
+                    {!listCompact && (
+                      <SummaryList noBorder>
+                        <SummaryListItem term="Filetype and size">
+                          csv, 20 kb
+                        </SummaryListItem>
+                        <SummaryListItem term="Indicators">
+                          Adverts, Vacancies
+                        </SummaryListItem>
+                        <SummaryListItem term="Filters">
+                          Month, level
+                        </SummaryListItem>
+                        <SummaryListItem term="Geographic level">
+                          National
+                        </SummaryListItem>
+                        <SummaryListItem term="Time period">
+                          August 2018 to October 2022
+                        </SummaryListItem>
+                      </SummaryList>
+                    )}
+                  </li>
+                  <li>
+                    <hr />
+                    <h3>
+                      <a href="#">Geographical breakdowns - detailed</a>
+                    </h3>
+                    <p>
+                      Detailed geographical breakdowns (National, Regional,
+                      Local Authority District) of apprenticeship starts and
+                      achievements
+                    </p>
+                    {!listCompact && (
+                      <SummaryList noBorder>
+                        <SummaryListItem term="Filetype and size">
+                          csv, 62 Mb
+                        </SummaryListItem>
+                        <SummaryListItem term="Indicators">
+                          Starts, Achievements
+                        </SummaryListItem>
+                        <SummaryListItem term="Filters">
+                          Apprenticeship level, Ethnicity group, Sex, Sector
+                          subject area (tier 1), Region, Local Authority
+                          District
+                        </SummaryListItem>
+                        <SummaryListItem term="Geographic level">
+                          Local Authority District; National; Regional
+                        </SummaryListItem>
+                        <SummaryListItem term="Time period">
+                          Academic year 2021/22
+                        </SummaryListItem>
+                      </SummaryList>
+                    )}
+                  </li>
+                  <li>
+                    <hr />
+                    <h3>
+                      <a href="#">
+                        Geographical breakdowns - latest regional summary
+                      </a>
+                    </h3>
+                    <p>Headline regional breakdowns of apprenticeship starts</p>
+                    {!listCompact && (
+                      <SummaryList noBorder>
+                        <SummaryListItem term="Filetype and size">
+                          csv, 16 kb
+                        </SummaryListItem>
+                        <SummaryListItem term="Indicators">
+                          Starts
+                        </SummaryListItem>
+                        <SummaryListItem term="Filters">
+                          Region, Apprenticeship level
+                        </SummaryListItem>
+                        <SummaryListItem term="Geographic level">
+                          National, Regional
+                        </SummaryListItem>
+                        <SummaryListItem term="Time period">
+                          Academic years 2018/19 to 2021/22
+                        </SummaryListItem>
+                      </SummaryList>
+                    )}
+                  </li>
+                </ul>
+              </>
             )}
             {totalResults !== 0 && (
               <>
