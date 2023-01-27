@@ -264,22 +264,18 @@ jobs:
           mergeTestResults: true
 
       - task: 'Bash@3'
-        displayName: 'pnpm run build'
-        inputs:
-          targetType: 'inline'
-          script: 'pnpm --filter=explore-education-statistics-frontend run build'
-
-      - task: 'Bash@3'
-        displayName: 'Remove dev dependencies'
-        inputs:
-          targetType: 'inline'
-          script: 'rm -rf ./src/**/node_modules'
-
-      - task: 'Bash@3'
         displayName: 'Install prod dependencies'
         inputs:
           targetType: 'inline'
-          script: 'pnpm i --filter=explore-education-statistics-frontend --prod'
+          workingDirectory: 'src/explore-education-statistics-frontend'
+          # script: 'pnpm i --prod --filter explore-education-statistics-frontend'
+
+      - task: 'Bash@3'
+        displayName: 'pnpm build'
+        inputs:
+          targetType: 'inline'
+          workingDirectory: 'src/explore-education-statistics-frontend'
+          script: 'pnpm build'
 
       - task: 'ArchiveFiles@2'
         displayName: 'Archive frontend'
