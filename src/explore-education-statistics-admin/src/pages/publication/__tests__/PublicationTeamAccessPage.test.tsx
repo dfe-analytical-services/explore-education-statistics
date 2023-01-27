@@ -419,7 +419,7 @@ describe('PublicationTeamAccessPage', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'Invite publication contributors',
+        name: 'Invite new contributors',
       }),
     ).toBeInTheDocument();
   });
@@ -491,7 +491,7 @@ describe('PublicationTeamAccessPage', () => {
 
     expect(
       screen.queryByRole('link', {
-        name: 'Invite publication contributors',
+        name: 'Invite new contributors',
       }),
     ).not.toBeInTheDocument();
   });
@@ -529,7 +529,7 @@ describe('PublicationTeamAccessPage', () => {
 
     expect(
       screen.queryByRole('link', {
-        name: 'Invite publication contributors',
+        name: 'Invite new contributors',
       }),
     ).toBeInTheDocument();
   });
