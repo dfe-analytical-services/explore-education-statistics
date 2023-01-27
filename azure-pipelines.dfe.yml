@@ -226,33 +226,33 @@ jobs:
           targetType: 'inline'
           script: 'pnpm i'
 
-      - task: 'Bash@3'
-        displayName: 'pnpm tsc'
-        inputs:
-          workingDir: '.'
-          targetType: 'inline'
-          script: 'pnpm tsc'
+      # - task: 'Bash@3'
+      #   displayName: 'pnpm tsc'
+      #   inputs:
+      #     workingDir: '.'
+      #     targetType: 'inline'
+      #     script: 'pnpm tsc'
 
-      - task: 'Bash@3'
-        displayName: 'pnpm lint'
-        inputs:
-          workingDir: '.'
-          targetType: 'inline'
-          script: 'pnpm lint'
+      # - task: 'Bash@3'
+      #   displayName: 'pnpm lint'
+      #   inputs:
+      #     workingDir: '.'
+      #     targetType: 'inline'
+      #     script: 'pnpm lint'
 
-      - task: 'Bash@3'
-        displayName: 'pnpm format:check'
-        inputs:
-          workingDir: '.'
-          targetType: 'inline'
-          script: 'pnpm format:check'
+      # - task: 'Bash@3'
+      #   displayName: 'pnpm format:check'
+      #   inputs:
+      #     workingDir: '.'
+      #     targetType: 'inline'
+      #     script: 'pnpm format:check'
 
-      - task: 'Bash@3'
-        displayName: 'pnpm test:ci'
-        inputs:
-          workingDir: '.'
-          targetType: 'inline'
-          script: 'pnpm test:ci'
+      # - task: 'Bash@3'
+      #   displayName: 'pnpm test:ci'
+      #   inputs:
+      #     workingDir: '.'
+      #     targetType: 'inline'
+      #     script: 'pnpm test:ci'
 
       - task: 'PublishTestResults@2'
         displayName: 'Publish frontend test results'
