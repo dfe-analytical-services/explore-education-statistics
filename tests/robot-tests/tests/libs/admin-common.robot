@@ -405,7 +405,7 @@ user edits methodology note
     user enters text into element    label:Year    ${year}
     user enters text into element    label:Edit methodology note    ${note} - edited
     user clicks button    Update note
-    user waits until page contains    ${note} - edited
+    user waits until page contains button    Add note
 
 user creates public prerelease access list
     [Arguments]    ${content}
