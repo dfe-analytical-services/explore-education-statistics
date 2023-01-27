@@ -268,6 +268,11 @@ jobs:
       #   inputs:
       #     targetType: 'inline'
       #     script: 'pnpm --filter=explore-education-statistics-frontend install --prod'
+      - task: 'Bash@3'
+        displayName: 'pnpm build:prod'
+        inputs:
+          targetType: 'inline'
+          script: 'pnpm i -F ./src/explore-education-statistics-frontend --virtual-store-dir ./src/explore-education-statistics-frontend/node_modules/.pnpm'
 
       - task: 'Bash@3'
         displayName: 'pnpm build'
