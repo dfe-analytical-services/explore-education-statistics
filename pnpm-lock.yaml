@@ -603,7 +603,6 @@ importers:
       babel-core: 7.0.0-bridge.0
       babel-jest: ^26.5.2
       babel-plugin-named-asset-import: ^0.3.6
-      basic-auth: ^2.0.1
       case-sensitive-paths-webpack-plugin: ^2.4.0
       classnames: ^2.2.6
       core-js: ^3.6.5
@@ -657,7 +656,6 @@ importers:
       '@next/env': 11.1.4
       '@tanstack/react-query': 4.22.0_sfoxds7t5ydpegc3knd667wn6m
       axios: 0.24.0
-      basic-auth: 2.0.1
       classnames: 2.3.2
       core-js: 3.27.1
       cross-env: 7.0.3
@@ -4327,7 +4325,7 @@ packages:
     dependencies:
       '@babel/core': 7.20.12
       postcss: 7.0.35
-      postcss-syntax: 0.36.2_postcss@8.4.21
+      postcss-syntax: 0.36.2_postcss@7.0.35
     transitivePeerDependencies:
       - supports-color
 
@@ -4339,7 +4337,7 @@ packages:
       postcss-syntax: '>=0.36.2'
     dependencies:
       postcss: 7.0.35
-      postcss-syntax: 0.36.2_postcss@8.4.21
+      postcss-syntax: 0.36.2_postcss@7.0.35
       remark: 13.0.0
       unist-util-find-all-after: 3.0.2
     transitivePeerDependencies:
@@ -13039,7 +13037,7 @@ packages:
     dependencies:
       htmlparser2: 3.10.1
       postcss: 7.0.35
-      postcss-syntax: 0.36.2_postcss@8.4.21
+      postcss-syntax: 0.36.2_postcss@7.0.35
 
   /postcss-image-set-function/4.0.7_postcss@8.4.21:
     resolution: {integrity: sha512-9T2r9rsvYzm5ndsBE8WgtrMlIT7VbtTfE7b3BQnudUqnBcBo7L758oc+o+pdj/dUV0l5wjwSdjeOH2DZtfv8qw==}
@@ -13807,7 +13805,7 @@ packages:
       svgo: 2.8.0
     dev: false
 
-  /postcss-syntax/0.36.2_postcss@8.4.21:
+  /postcss-syntax/0.36.2_postcss@7.0.35:
     resolution: {integrity: sha512-nBRg/i7E3SOHWxF3PpF5WnJM/jQ1YpY9000OaVXlAQj6Zp/kIqJxEDWIZ67tAd7NLuk7zqN4yqe9nc0oNAOs1w==}
     peerDependencies:
       postcss: '>=5.0.0'
@@ -13828,7 +13826,7 @@ packages:
       postcss-scss:
         optional: true
     dependencies:
-      postcss: 8.4.21
+      postcss: 7.0.35
 
   /postcss-unique-selectors/4.0.1:
     resolution: {integrity: sha512-+JanVaryLo9QwZjKrmJgkI4Fn8SBgRO6WXQBJi7KiAVPlmxikB5Jzc4EvXMT2H0/m0RjrVVm9rGNhZddm/8Spg==}
@@ -15980,7 +15978,7 @@ packages:
       postcss-sass: 0.4.4
       postcss-scss: 2.1.1
       postcss-selector-parser: 6.0.6
-      postcss-syntax: 0.36.2_postcss@8.4.21
+      postcss-syntax: 0.36.2_postcss@7.0.35
       postcss-value-parser: 4.2.0
       resolve-from: 5.0.0
       slash: 3.0.0

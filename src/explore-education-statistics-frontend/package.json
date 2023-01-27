@@ -13,7 +13,6 @@
     "date-fns": "^2.16.1",
     "express": "^4.17.1",
     "express-basic-auth": "^1.2.0",
-    "basic-auth": "^2.0.1",
     "formik": "^2.1.7",
     "govuk-frontend": "^3.11.0",
     "helmet": "^4.1.1",
