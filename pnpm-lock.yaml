@@ -253,8 +253,8 @@ importers:
       eslint-plugin-jsx-a11y: 6.4.1_eslint@7.32.0
       eslint-plugin-react: 7.26.1_eslint@7.32.0
       eslint-webpack-plugin: 3.2.0_u2ubl3shblmc7225ne6wflnyua
-      explore-education-statistics-ckeditor: link:../explore-education-statistics-ckeditor
-      explore-education-statistics-common: link:../explore-education-statistics-common
+      explore-education-statistics-ckeditor: file:src/explore-education-statistics-ckeditor
+      explore-education-statistics-common: file:src/explore-education-statistics-common
       file-loader: 6.2.0_webpack@5.75.0
       formik: 2.2.9_react@17.0.2
       fs-extra: 9.1.0
@@ -320,6 +320,11 @@ importers:
       whatwg-fetch: 3.6.2
       workbox-webpack-plugin: 6.5.4_webpack@5.75.0
       yup: 0.29.3
+    dependenciesMeta:
+      explore-education-statistics-ckeditor:
+        injected: true
+      explore-education-statistics-common:
+        injected: true
 
   src/explore-education-statistics-ckeditor:
     specifiers:
@@ -17599,3 +17604,15 @@ packages:
 
   /zwitch/1.0.5:
     resolution: {integrity: sha512-V50KMwwzqJV0NpZIZFwfOD5/lyny3WlSzRiXgA0G7VUnRlqttta1L6UQIHzd6EuBY/cHGfwTIck7w1yH6Q5zUw==}
+
+  file:src/explore-education-statistics-ckeditor:
+    resolution: {directory: src/explore-education-statistics-ckeditor, type: directory}
+    name: explore-education-statistics-ckeditor
+    version: 0.1.0
+    dev: false
+
+  file:src/explore-education-statistics-common:
+    resolution: {directory: src/explore-education-statistics-common, type: directory}
+    name: explore-education-statistics-common
+    version: 0.1.0
+    dev: false

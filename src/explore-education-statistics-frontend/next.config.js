@@ -79,7 +79,6 @@ const nextConfig = {
         );
       }
     }
-    config.resolve.symlinks = false;
 
     config.resolve.alias = {
       ...config.resolve.alias,
@@ -109,8 +108,5 @@ module.exports = flowRight(
           'explore-education-statistics-common/node_modules/nanoid',
         ]
       : [],
-    {
-      resolveSymlinks: true,
-    },
   ),
 )(nextConfig);
