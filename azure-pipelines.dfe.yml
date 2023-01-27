@@ -264,22 +264,15 @@ jobs:
           mergeTestResults: true
 
       - task: 'Bash@3'
-        displayName: 'Install prod dependencies'
-        inputs:
-          targetType: 'inline'
-          script: 'pnpm i -F ./src/explore-education-statistics-frontend --virtual-store-dir src/explore-education-statistics-frontend/node_modules/.pnpm'
-
-      - task: 'Bash@3'
         displayName: 'pnpm build'
         inputs:
           targetType: 'inline'
-          workingDirectory: 'src/explore-education-statistics-frontend'
-          script: 'pnpm build'
+          script: 'pnpm --filter=explore-education-statistics-frontend run build && pnpm --filter=explore-education-statistics-frontend --no-dev deploy build'
 
       - task: 'ArchiveFiles@2'
         displayName: 'Archive frontend'
         inputs:
-          rootFolderOrFile: './src/explore-education-statistics-frontend'
+          rootFolderOrFile: './build'
           includeRootFolder: false
           archiveFile: '$(Build.ArtifactStagingDirectory)/public-frontend.zip'
 
