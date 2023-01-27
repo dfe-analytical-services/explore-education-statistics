@@ -38,7 +38,7 @@ const EditableEmbedBlock = ({
       </EditableBlockWrapper>
 
       <Modal
-        title="Edit embed block"
+        title="Edit embedded URL"
         open={showEmbedDashboardForm}
         onExit={toggleEmbedDashboardForm.off}
       >

@@ -99,11 +99,11 @@ describe('ReleaseContentAccordionSection', () => {
       screen.getByRole('button', { name: 'Add data block' }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Add embed block' }),
+      screen.queryByRole('button', { name: 'Embed a URL' }),
     ).not.toBeInTheDocument();
   });
 
-  test('renders the add embed block button for BAU users', () => {
+  test('renders the Embed a URL button for BAU users', () => {
     render(
       <AuthContextTestProvider
         user={{
@@ -161,7 +161,7 @@ describe('ReleaseContentAccordionSection', () => {
       screen.getByRole('button', { name: 'Add data block' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Add embed block' }),
+      screen.getByRole('button', { name: 'Embed a URL' }),
     ).toBeInTheDocument();
   });
 
@@ -211,7 +211,7 @@ describe('ReleaseContentAccordionSection', () => {
       screen.queryByRole('button', { name: 'Add data block' }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Add embed block' }),
+      screen.queryByRole('button', { name: 'Embed a URL' }),
     ).not.toBeInTheDocument();
   });
 
