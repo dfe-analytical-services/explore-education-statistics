@@ -16,6 +16,7 @@
     "formik": "^2.1.7",
     "govuk-frontend": "^3.11.0",
     "helmet": "^4.1.1",
+    "basic-auth": "^2.0.1",
     "immer": "^9.0.6",
     "leaflet": "^1.7.1",
     "lodash": "^4.17.21",
