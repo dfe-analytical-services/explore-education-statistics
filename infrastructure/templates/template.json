@@ -1247,7 +1247,7 @@
       ],
       "properties": {
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('dataAppInsights')), '2020-02-02').InstrumentationKey]",
-        "WEBSITE_NODE_DEFAULT_VERSION": "16.14.2",
+        "WEBSITE_NODE_DEFAULT_VERSION": "14.16.0",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
         "enableSwagger": "[parameters('enableSwagger')]",
@@ -1471,7 +1471,7 @@
       ],
       "properties": {
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('contentAppInsights')), '2020-02-02').InstrumentationKey]",
-        "WEBSITE_NODE_DEFAULT_VERSION": "16.14.2",
+        "WEBSITE_NODE_DEFAULT_VERSION": "14.16.0",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
         "enableSwagger": "[parameters('enableSwagger')]"
@@ -1695,7 +1695,7 @@
       "properties": {
         "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2020-02-02').InstrumentationKey]",
         "AppInsights__InstrumentationKey": "[reference(resourceId('microsoft.insights/components/', variables('adminAppInsights')), '2020-02-02').InstrumentationKey]",
-        "WEBSITE_NODE_DEFAULT_VERSION": "16.14.2",
+        "WEBSITE_NODE_DEFAULT_VERSION": "14.16.0",
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "WEBSITE_LOAD_CERTIFICATES": "*",
         "ASPNETCORE_DETAILEDERRORS": "[parameters('detailedErrors')]",
@@ -1948,7 +1948,6 @@
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
           "phpVersion": "off",
-          "linuxFxVersion": "DOTNETCORE|3.1",
           "netFrameworkVersion": "v6.0",
           "AlwaysOn": true,
           "webSocketsEnabled": false,
@@ -1984,7 +1983,7 @@
         "NEXT_CONFIG_MODE": "server",
         "NODE_ENV": "production",
         "PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
-        "WEBSITE_NODE_DEFAULT_VERSION": "16.14.2",
+        "WEBSITE_NODE_DEFAULT_VERSION": "14.16.0",
         "WEBSITE_RUN_FROM_PACKAGE": "1"
         
       }
