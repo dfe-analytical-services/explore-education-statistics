@@ -267,8 +267,7 @@ jobs:
         displayName: 'Install prod dependencies'
         inputs:
           targetType: 'inline'
-          workingDirectory: 'src/explore-education-statistics-frontend'
-          # script: 'pnpm i --prod --filter explore-education-statistics-frontend'
+          script: 'pnpm i -F ./src/explore-education-statistics-frontend --virtual-store-dir src/explore-education-statistics-frontend/node_modules/.pnpm'
 
       - task: 'Bash@3'
         displayName: 'pnpm build'
