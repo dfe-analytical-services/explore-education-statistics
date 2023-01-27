@@ -284,3 +284,120 @@
     max-width: 95vw;
   }
 }
+
+.prototypeHideBreadcrumb {
+  :global(.govuk-breadcrumbs) {
+    visibility: hidden;
+  }
+
+  .prototypeBackLink {
+    margin-top: -5.5rem;
+    position: absolute;
+  }
+}
+
+.prototypeHideBreadcrumb2 {
+  :global(.govuk-breadcrumbs) {
+    visibility: hidden;
+  }
+
+  :global(.govuk-back-link) {
+    margin-top: -2rem;
+    position: absolute;
+  }
+}
+
+.accordion {
+  :global(.govuk-accordion__controls) {
+    text-align: left;
+  }
+
+  :global(.govuk-accordion__open-all) {
+    margin-bottom: 0.4rem;
+    padding: 0.4rem 0;
+  }
+
+  :global(.govuk-accordion__open-all):hover {
+    background: govuk-colour('light-grey');
+  }
+}
+
+.accordionSection {
+  :global(.govuk-accordion__section-header) {
+    padding: 0;
+  }
+
+  :global(.govuk-accordion__section-button) {
+    display: block;
+    padding: 15px 0;
+    width: 100%;
+  }
+}
+
+.accordionShow {
+  font-size: 1.2rem;
+  font-weight: normal;
+  padding-top: 0.8rem;
+}
+
+.accordionChevron {
+  border: 0.0625rem solid;
+  border-radius: 50%;
+  box-sizing: border-box;
+  display: inline-block;
+  height: 1.25rem;
+  margin-right: 0.4rem;
+  position: relative;
+  vertical-align: middle;
+  width: 1.25rem;
+
+  &::after {
+    border-color: $govuk-link-colour;
+    border-right: 0.125rem solid;
+    border-top: 0.125rem solid;
+    bottom: 0.4125rem;
+    box-sizing: border-box;
+    content: '';
+    display: block;
+    height: 0.375rem;
+    left: 0.375rem;
+    position: absolute;
+    transform: rotate(135deg);
+    width: 0.375rem;
+  }
+}
+
+.accordionSection :global(.govuk-accordion__section-button):hover {
+  background: govuk-colour('light-grey');
+  color: $govuk-text-colour;
+  text-decoration: none !important;
+}
+
+.accordionSection
+  :global(.govuk-accordion__section-button):hover
+  .accordionChevron {
+  background: $govuk-text-colour;
+  color: $govuk-text-colour;
+
+  &::after {
+    border-color: govuk-colour('white');
+  }
+}
+
+.accordionChevronDown {
+  &::after {
+    bottom: 0.3125rem;
+    transform: rotate(-45deg);
+  }
+}
+
+.stickyLinksContainer {
+  float: right;
+  margin-right: -375px;
+  position: sticky;
+  top: 0;
+}
+
+.stickyLinks {
+  max-width: 300px;
+}

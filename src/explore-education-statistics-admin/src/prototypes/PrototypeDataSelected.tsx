@@ -16,6 +16,7 @@ const PrototypeHomepage = () => {
     <div
       className={classNames(
         styles.prototypePublicPage,
+        styles.prototypeHideBreadcrumb2,
         fullWidth
           ? styles.prototypeFullWidthOveride
           : styles.prototypeStandardWidth,
@@ -23,34 +24,15 @@ const PrototypeHomepage = () => {
     >
       <PrototypePage
         wide={fullWidth}
-        breadcrumbs={[
-          { name: 'Data catalogue', link: '/prototypes/data-catalog' },
-          {
-            name: 'Further education',
-            link: '/prototypes/data-catalog?theme=fe',
-          },
-          {
-            name: 'Apprenticeships and traineeships',
-            link: '/prototypes/data-catalog?theme=fe&publication=traineeships',
-          },
-          {
-            name: selectedRelease,
-            link: '/prototypes/data-catalog?theme=fe&publication=traineeships',
-          },
-        ]}
+        backLink="./data-catalog?theme=fe&publication=traineeships"
+        backLinkText=" Back to apprenticeships and traineeships data catalogue"
       >
         <>
-          <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">
+          <h1 className="govuk-heading-xl">
             <span className="govuk-caption-xl ">Data catalogue</span>{' '}
             Apprenticeship Achievement Rates Detailed Series
           </h1>
-          <Link
-            to="./data-catalog?theme=fe&publication=traineeships"
-            back
-            className="govuk-!-margin-bottom-6"
-          >
-            Back to apprenticeships and traineeships data catalogue
-          </Link>
+
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
               <span className="govuk-tag">National statistics</span>{' '}

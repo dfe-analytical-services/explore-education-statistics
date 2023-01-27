@@ -1,8 +1,6 @@
 import classNames from 'classnames';
 import Link from '@admin/components/Link';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
@@ -11,6 +9,8 @@ import TabsSection from '@common/components/TabsSection';
 import stylesKeyStat from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import stylesKeyStatTile from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
 import React from 'react';
+import Accordion from './components/PrototypeAccordion';
+import AccordionSection from './components/PrototypeAccordionSection';
 import PrototypeDownloadAncillary from './components/PrototypeDownloadAncillary';
 import PrototypeDownloadPopular from './components/PrototypeDownloadPopular';
 import PrototypeDownloadUnderlying from './components/PrototypeDownloadUnderlying';
@@ -144,7 +144,7 @@ const PrototypeReleaseData = () => {
           <div className="govuk-grid-column-one-third">
             <RelatedAside>
               <h2 className="govuk-heading-m">Quick links</h2>
-              <ul className="govuk-list govuk-list--spaced">
+              <ul className="govuk-list">
                 <li>
                   <a
                     href="#data-1"
@@ -159,6 +159,12 @@ const PrototypeReleaseData = () => {
                 <li>
                   <Link to="#exploreData">Explore data</Link>
                 </li>
+                <li>
+                  <Link to="#extra-information">Help and support</Link>
+                </li>
+              </ul>
+              <h3 className="govuk-heading-s">Related information</h3>
+              <ul className="govuk-list">
                 <li>
                   <Link to="./table-highlights-2?source=publicationPage">
                     View or create tables
@@ -198,6 +204,7 @@ const PrototypeReleaseData = () => {
             </RelatedAside>
           </div>
         </div>
+
         <h2 className="govuk-heading-l govuk-!-margin-top-6">
           Headlines and data downloads
         </h2>
@@ -490,76 +497,143 @@ const PrototypeReleaseData = () => {
             </ul>
           </AccordionSection>
         </Accordion>
-        <h2 className="govuk-heading-l" id="contents">
-          Release contents
-        </h2>
-        <Accordion id="content">
-          <AccordionSection heading="About these statistics" goToTop={false}>
-            This is a test
-          </AccordionSection>
-          <AccordionSection
-            heading="How to use this release and find data"
-            goToTop={false}
-          >
-            This is a test
-          </AccordionSection>
-          <AccordionSection
-            heading="Interactive data visualisation tool"
-            goToTop={false}
-          >
-            This is a test
-          </AccordionSection>
-          <AccordionSection
-            heading="Latest headline statistics"
-            goToTop={false}
-          >
-            This is a test
-          </AccordionSection>
-          <AccordionSection heading="Annual time series" goToTop={false}>
-            This is a test
-          </AccordionSection>
-          <AccordionSection heading="Learner characteristics" goToTop={false}>
-            This is a test
-          </AccordionSection>
-          <AccordionSection heading="Subjects and levels" goToTop={false}>
-            This is a test
-          </AccordionSection>
-          <AccordionSection heading="Geographical breakdowns" goToTop={false}>
-            This is a test
-          </AccordionSection>
-          <AccordionSection heading="Providers" goToTop={false}>
-            This is a test
-          </AccordionSection>
-          <AccordionSection
-            heading="Public sector apprenticeships"
-            goToTop={false}
-          >
-            This is a test
-          </AccordionSection>
-          <AccordionSection heading="Traineeships" goToTop={false}>
-            This is a test
-          </AccordionSection>
-          <AccordionSection
-            heading="National achievement rate tables"
-            goToTop={false}
-          >
-            This is a test
-          </AccordionSection>
-          <AccordionSection
-            heading="Apprenticeship Service and monthly transparency data"
-            goToTop={false}
-          >
-            This is a test
-          </AccordionSection>
-          <AccordionSection heading="Additional analysis" goToTop={false}>
-            This is a test
-          </AccordionSection>
-          <AccordionSection heading="Future changes" goToTop={false}>
-            This is a test
-          </AccordionSection>
-        </Accordion>
+        <div>
+          <div className={styles.stickyLinksContainer}>
+            <div className={classNames(styles.stickyLinks, 'govuk-inset-text')}>
+              <h3>Contents quick links</h3>
+              <ul className="govuk-list govuk-list--spaced">
+                <li>
+                  <a href="#about-these-statistics">About these statistics</a>
+                </li>
+                <li>
+                  <a href="#how-to-use-this-release-and-find-data">
+                    How to use this release and find datas
+                  </a>
+                </li>
+                <li>
+                  <a href="#interactive-data-visualisation-tool">
+                    Interactive data visualisation tool
+                  </a>
+                </li>
+                <li>
+                  <a href="#latest-headline-statistics">
+                    Latest headline statistics
+                  </a>
+                </li>
+                <li>
+                  <a href="#annual-time-series">Annual time series</a>
+                </li>
+                <li>
+                  <a href="#learner-characteristics">Learner characteristics</a>
+                </li>
+                <li>
+                  <a href="#subjects-and-levels">Subjects and levels</a>
+                </li>
+                <li>
+                  <a href="#geographical-breakdowns">Geographical breakdowns</a>
+                </li>
+                <li>
+                  <a href="#providers">Providers</a>
+                </li>
+                <li>
+                  <a href="#public-sector-apprenticeships">
+                    Public sector apprenticeships
+                  </a>
+                </li>
+                <li>
+                  <a href="#Traineeships">Traineeships</a>
+                </li>
+                <li>
+                  <a href="#national-achievement-rate-tables">
+                    National achievement rate tables
+                  </a>
+                </li>
+                <li>
+                  <a href="#apprenticeship-service-and-monthly-transparency-data">
+                    Apprenticeship Service and monthly transparency data
+                  </a>
+                </li>
+                <li>
+                  <a href="#additional-analysis">Additional analysis</a>
+                </li>
+                <li>
+                  <a href="#future-changes">Future changes</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <h2 className="govuk-heading-l" id="contents">
+            Release contents
+          </h2>
+          <Accordion id="content">
+            <AccordionSection heading="About these statistics" goToTop={false}>
+              This is a test
+            </AccordionSection>
+            <AccordionSection
+              heading="How to use this release and find data"
+              goToTop={false}
+            >
+              This is a test
+            </AccordionSection>
+            <AccordionSection
+              heading="Interactive data visualisation tool"
+              goToTop={false}
+            >
+              This is a test
+            </AccordionSection>
+            <AccordionSection
+              heading="Latest headline statistics"
+              goToTop={false}
+            >
+              This is a test
+            </AccordionSection>
+            <AccordionSection heading="Annual time series" goToTop={false}>
+              This is a test
+            </AccordionSection>
+            <AccordionSection heading="Learner characteristics" goToTop={false}>
+              This is a test
+            </AccordionSection>
+            <AccordionSection heading="Subjects and levels" goToTop={false}>
+              This is a test
+            </AccordionSection>
+            <AccordionSection heading="Geographical breakdowns" goToTop={false}>
+              This is a test
+            </AccordionSection>
+            <AccordionSection heading="Providers" goToTop={false}>
+              This is a test
+            </AccordionSection>
+            <AccordionSection
+              heading="Public sector apprenticeships"
+              goToTop={false}
+            >
+              This is a test
+            </AccordionSection>
+            <AccordionSection heading="Traineeships" goToTop={false}>
+              This is a test
+            </AccordionSection>
+            <AccordionSection
+              heading="National achievement rate tables"
+              goToTop={false}
+            >
+              This is a test
+            </AccordionSection>
+            <AccordionSection
+              heading="Apprenticeship Service and monthly transparency data"
+              goToTop={false}
+            >
+              This is a test
+            </AccordionSection>
+            <AccordionSection heading="Additional analysis" goToTop={false}>
+              This is a test
+            </AccordionSection>
+            <AccordionSection heading="Future changes" goToTop={false}>
+              This is a test
+            </AccordionSection>
+          </Accordion>
+        </div>
         <h2
-          className="govuk-heading-m govuk-!-margin-top-9"
+          className="govuk-heading-l govuk-!-margin-top-9"
+          id="extra-information"
           data-testid="extra-information"
         >
           Help and support
@@ -614,6 +688,7 @@ const PrototypeReleaseData = () => {
             Contact us
           </AccordionSection>
         </Accordion>
+        <div style={{ height: '1000px' }}>test</div>
       </PrototypePage>
     </div>
   );
