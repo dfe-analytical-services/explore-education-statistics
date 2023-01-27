@@ -108,15 +108,9 @@ class SnapshotService:
                 lambda driver: driver.find_element(By.XPATH, "//*[@data-testid='publicationsList']")
             )
 
-            publications_list = driver.find_element(By.XPATH, "//*[@data-testid='publicationsList']")
+            publications_list_items = driver.find_elements(By.XPATH, "//*[@data-testid='publicationsList']/li")
 
-            all_publications = publications_list.find_elements(By.CSS_SELECTOR, "li")
-
-            for publication in all_publications:
-                publication.click()
-
-                publication_details = publication.find_element(By.CSS_SELECTOR, "dl")
-
+            for publication in publications_list_items:
                 publication_title = publication.find_element(By.CSS_SELECTOR, "h3").text
 
                 try:
@@ -124,15 +118,11 @@ class SnapshotService:
                 except NoSuchElementException:
                     publication_summary = ""
 
-                release_type = publication_details.find_element(
-                    By.XPATH, "//*[dl]//div//dd[@data-testid='release-type']"
-                ).text
+                release_type = publication.find_element(By.XPATH, "./dl//dd[@data-testid='release-type']").text
 
-                theme = publication_details.find_element(By.XPATH, "//*[dl]//div//dd[@data-testid='theme']").text
+                theme = publication.find_element(By.XPATH, "./dl//dd[@data-testid='theme']").text
 
-                published = publication_details.find_element(
-                    By.XPATH, "//*[dl]//div//dd[@data-testid='published']"
-                ).text
+                published = publication.find_element(By.XPATH, "./dl//dd[@data-testid='published']").text
 
                 publications.append(
                     {
@@ -204,7 +194,7 @@ class SnapshotService:
         methodologies_accordion = parsed_html.find(id="themes")
 
         if methodologies_accordion is None:
-            return []
+            return "[]"
 
         theme_sections = methodologies_accordion.select('[data-testid="accordionSection"]') or []
 
