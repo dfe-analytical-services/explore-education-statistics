@@ -64,7 +64,7 @@ src/GovUk.Education.ExploreEducationStatistics.Data.Seed/Files/
 tags
 *.pyc
 *.tmp
-dist
+public-frontend
 lerna-debug.log
 
 admin-start.sh
