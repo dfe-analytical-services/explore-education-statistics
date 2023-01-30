@@ -88,11 +88,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .Include(r => r.Updates)
                 .Single(r => r.Id == releaseId);
 
-            // TODO EES-3650 Could this be !Live instead or use the scheduled published date?
-            if (!release.Published.HasValue && !expectedPublishDate.HasValue)
+            if (!release.Live && !expectedPublishDate.HasValue)
             {
-                throw new ArgumentException("Expected published date must be specified for a non-live release",
-                    nameof(expectedPublishDate));
+                expectedPublishDate = DateTime.UtcNow;
             }
 
             var releaseViewModel = _mapper.Map<ReleaseCacheViewModel>(release);

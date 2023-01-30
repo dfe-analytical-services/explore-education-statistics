@@ -542,7 +542,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetRelease_NotYetPublished()
+        public async Task GetRelease_NotPublished()
         {
             var release = new Release
             {
@@ -564,26 +564,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupReleaseService(contentDbContext: contentDbContext);
 
+                // Test scenario of the publisher getting an unpublished release to cache it in advance of publishing it
+                // on a scheduled date
                 var expectedPublishDate = DateTime.Today.Add(new TimeSpan(9, 30, 0));
                 var result = await service.GetRelease(release.Id, expectedPublishDate);
+
                 var viewModel = result.AssertRight();
 
-                Assert.Equal(release.Id, viewModel.Id);
-                Assert.Equal("Calendar Year 2022", viewModel.Title);
                 // Published date in the view model should match the expected publish date
                 Assert.Equal(expectedPublishDate, viewModel.Published);
-
-                Assert.Null(viewModel.KeyStatisticsSection);
-                Assert.Null(viewModel.SummarySection);
-                Assert.Null(viewModel.RelatedDashboardsSection);
-                Assert.Empty(viewModel.Content);
-                Assert.Empty(viewModel.DownloadFiles);
-                Assert.Empty(viewModel.RelatedInformation);
             }
         }
 
         [Fact]
-        public async Task GetRelease_NotYetPublished_ExpectedPublishDateIsNull()
+        public async Task GetRelease_NotPublished_ExpectedPublishDateIsNull()
         {
             var release = new Release
             {
@@ -605,14 +599,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupReleaseService(contentDbContext: contentDbContext);
 
-                DateTime? expectedPublishDate = null;
-                var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
-                    service.GetRelease(release.Id, expectedPublishDate));
+                // Test scenario of the publisher getting an unpublished release to cache it in advance of publishing it
+                // immediately.
+                var result = await service.GetRelease(release.Id,
+                    expectedPublishDate: null);
 
-                Assert.Equal(
-                    "Expected published date must be specified for a non-live release (Parameter 'expectedPublishDate')",
-                    exception.Message
-                );
+                var viewModel = result.AssertRight();
+
+                // Published date in the view model should match the date now
+                Assert.NotNull(viewModel.Published);
+                Assert.InRange(DateTime.UtcNow.Subtract(viewModel.Published!.Value).Milliseconds, 0, 1500);
             }
         }
 

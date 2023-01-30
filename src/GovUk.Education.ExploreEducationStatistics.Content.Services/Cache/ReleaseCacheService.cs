@@ -29,9 +29,17 @@ public class ReleaseCacheService : IReleaseCacheService
 
     [BlobCache(typeof(ReleaseCacheKey), forceUpdate: true, ServiceName = "public")]
     public Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateRelease(
-        bool staging,
-        DateTime expectedPublishDate,
         Guid releaseId,
+        string publicationSlug,
+        string? releaseSlug = null)
+    {
+        return _releaseService.GetRelease(releaseId);
+    }
+
+    [BlobCache(typeof(ReleaseStagedCacheKey), forceUpdate: true, ServiceName = "public")]
+    public Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateReleaseStaged(
+        Guid releaseId,
+        DateTime expectedPublishDate,
         string publicationSlug,
         string? releaseSlug = null)
     {
