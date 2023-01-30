@@ -267,7 +267,7 @@ jobs:
         displayName: 'pnpm deploy'
         inputs:
           targetType: 'inline'
-          script: 'pnpm --filter=explore-education-statistics-frontend --prod deploy dist'
+          script: 'pnpm --filter=explore-education-statistics-frontend --prod deploy dist --shamefully-hoist'
 
       - task: 'ArchiveFiles@2'
         displayName: 'Archive frontend'
