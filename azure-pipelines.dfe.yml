@@ -280,7 +280,7 @@ jobs:
         inputs:
           targetType: 'inline'
           script: |
-            zip -r -y ./dist/public-frontend public-frontend.zip 
+            zip -r -y ./dist/public-frontend . -i public-frontend.zip
 
       - task: Bash@3
         inputs:
