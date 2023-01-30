@@ -277,10 +277,16 @@ jobs:
           workingDirectory: 'src/explore-education-statistics-frontend'
           script: 'pnpm build'
 
+      - task: 'Bash@3'
+        displayName: 'pnpm deploy'
+        inputs:
+          targetType: 'inline'
+          script: 'pnpm --filter=explore-education-statistics-frontend --prod deploy dist'
+
       - task: 'ArchiveFiles@2'
         displayName: 'Archive frontend'
         inputs:
-          rootFolderOrFile: './src/explore-education-statistics-frontend'
+          rootFolderOrFile: './dist'
           includeRootFolder: false
           archiveFile: '$(Build.ArtifactStagingDirectory)/public-frontend.zip'
 
