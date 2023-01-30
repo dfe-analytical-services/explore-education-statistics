@@ -156,7 +156,7 @@ const PublicationTeamAccessPage = ({
               },
             )}
           >
-            Invite publication contributors
+            Invite new contributors
           </ButtonLink>
         )}
 

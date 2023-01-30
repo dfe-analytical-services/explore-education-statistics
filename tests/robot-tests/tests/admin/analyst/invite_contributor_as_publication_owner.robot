@@ -36,7 +36,7 @@ Validate "Manage release contributors" page
 Validate Invite new users page
     user clicks button    Go back
 
-    user clicks link    Invite publication contributors
+    user clicks link    Invite new contributors
 
     user waits until page contains element    id:email
     user checks checkbox is checked    Academic Year 2002/03
@@ -80,7 +80,7 @@ Validate Select release dropdown
     user checks select contains option    id:currentRelease    Academic Year 2000/01
 
 Invite existing user analyst2 to be a contributor for 2002/03 release
-    user clicks link    Invite publication contributors
+    user clicks link    Invite new contributors
     user waits until page contains    Invite a user to edit this publication
     user enters text into element    id:email    EES-test.ANALYST2@education.gov.uk
 
@@ -152,7 +152,7 @@ Validate contributors for 2000/01 release
     user checks page contains    There are no contributors or pending contributor invites for this release.
 
 Invite brand new user
-    user clicks link    Invite publication contributors
+    user clicks link    Invite new contributors
     user waits until page contains    Invite a user to edit this publication
     user enters text into element    id:email    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk
 
