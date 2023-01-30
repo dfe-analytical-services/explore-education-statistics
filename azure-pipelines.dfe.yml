@@ -269,7 +269,6 @@ jobs:
           targetType: 'inline'
           script: 'pnpm --filter=explore-education-statistics-frontend build'
 
-
       - task: 'Bash@3'
         displayName: 'pnpm deploy'
         inputs:
@@ -277,37 +276,17 @@ jobs:
           script: 'pnpm --filter=explore-education-statistics-frontend --prod deploy dist/public-frontend'
 
       - task: Bash@3
+        displayName: 'Archive public frontend'
         inputs:
           targetType: 'inline'
           script: |
-            zip -r -y ./dist/public-frontend . -i public-frontend.zip
-
-      - task: Bash@3
-        inputs:
-          targetType: 'inline'
-          script: |
-            echo "----------------------------------"
-            echo $(Build.ArtifactStagingDirectory)
-            echo "----------------------------------"
-            
-            echo "----------------------------------"
-
-            echo $(Build.BuildId)
-            echo "----------------------------------"
-
-            echo "----------------------------------"
-            ls -la $(Build.ArtifactStagingDirectory)
-            echo "----------------------------------"
-                    
-            echo "----------------------------------"     
-            ls -la $(Build.ArtifactStagingDirectory)/dist
-            echo "----------------------------------"
+          zip -r -y public-frontend.zip dist/public-frontend
 
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'
         inputs:
           artifactName: 'public-frontend'
-          targetPath: 'public-frontend.zip'
+          targetPath: ${Build.ArtifactStagingDirectory}/public-frontend.zip
 
   - job: 'MiscellaneousArtifacts'
     pool:
