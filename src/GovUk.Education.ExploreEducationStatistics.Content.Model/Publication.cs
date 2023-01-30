@@ -25,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<LegacyRelease> LegacyReleases { get; set; } = new();
 
+        // TODO EES-4058 Remove unused Published
         public DateTime? Published { get; set; }
 
         public Guid TopicId { get; set; }
@@ -41,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public DateTime? Updated { get; set; }
 
-        public bool Live => Published.HasValue && DateTime.Compare(DateTime.UtcNow, Published.Value) > 0;
+        public bool Live => LatestPublishedReleaseId.HasValue;
 
         public Guid? LatestPublishedReleaseId { get; set; }
 

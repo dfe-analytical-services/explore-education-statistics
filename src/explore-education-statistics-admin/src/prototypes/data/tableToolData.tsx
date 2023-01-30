@@ -654,7 +654,6 @@ export const summary: PublicationReleaseSummary = {
   },
   type: 'NationalStatistics',
   latestRelease: true,
-  dataLastPublished: '2021-10-28T08:30:03.5659378',
   publication: {
     id: '89869bba-0c00-40f7-b7d6-e28cb904ad37',
     title: 'Characteristics of children in need',

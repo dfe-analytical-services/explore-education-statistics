@@ -26,27 +26,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task NotifySubscribersIfApplicable(params Guid[] releaseIds)
         {
-            var releasesToNotify = _context.Releases
-                .Include(r => r.ReleaseStatuses)
-                .Where(r => releaseIds.Contains(r.Id))
-                .ToList()
-                .Where(r => r.NotifySubscribers)
-                .ToList();
+            var releasesToNotify = await _context.Releases
+                .Where(r => releaseIds.Contains(r.Id) && r.NotifySubscribers)
+                .ToListAsync();
+
             var messages = await releasesToNotify
                 .ToAsyncEnumerable()
                 .SelectAwait(async release => await BuildPublicationNotificationMessage(release))
                 .ToListAsync();
+
             if (messages.Count > 0)
             {
                 await _storageQueueService.AddMessages(ReleaseNotificationQueue, messages);
                 releasesToNotify
                     .ForEach(release =>
                     {
-                        var status = release.ReleaseStatuses
-                            .OrderBy(rs => rs.Created)
-                            .Last();
-                        _context.Update(status);
-                        status.NotifiedOn = DateTime.UtcNow;
+                        _context.Releases.Update(release);
+                        release.NotifiedOn = DateTime.UtcNow;
                     });
                 await _context.SaveChangesAsync();
             }

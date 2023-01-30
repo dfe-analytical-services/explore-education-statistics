@@ -249,7 +249,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.NotNull(contentRelease);
                 Assert.Equal(release.Id, contentRelease.Id);
                 Assert.Equal("Academic Year", contentRelease.CoverageTitle);
-                Assert.NotNull(contentRelease.DataLastPublished);
                 Assert.True(contentRelease.HasDataGuidance);
                 Assert.True(contentRelease.HasPreReleaseAccessList);
                 Assert.Equal(release.KeyStatisticsSection.Id, contentRelease.KeyStatisticsSection.Id);

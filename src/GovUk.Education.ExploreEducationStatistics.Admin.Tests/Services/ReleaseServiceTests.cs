@@ -712,11 +712,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     new()
                     {
-                       InternalReleaseNote = "Release note null Created date",
-                       Created = null
-                    },
-                    new()
-                    {
                        InternalReleaseNote = "Latest release note - 1 day ago",
                        Created = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1))
                     },

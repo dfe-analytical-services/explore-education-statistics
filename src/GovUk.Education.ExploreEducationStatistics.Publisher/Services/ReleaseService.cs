@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Extensions.PublisherExtensions;
@@ -16,15 +15,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     public class ReleaseService : IReleaseService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IMethodologyService _methodologyService;
 
         public ReleaseService(ContentDbContext contentDbContext,
-            StatisticsDbContext statisticsDbContext,
             IMethodologyService methodologyService)
         {
             _contentDbContext = contentDbContext;
-            _statisticsDbContext = statisticsDbContext;
             _methodologyService = methodologyService;
         }
 
@@ -69,39 +65,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task SetPublishedDates(Guid id, DateTime published)
         {
-            var contentRelease = await _contentDbContext.Releases
-                .Include(release => release.Publication)
+            var release = await _contentDbContext.Releases
                 .SingleOrDefaultAsync(r => r.Id == id);
 
-            if (contentRelease == null)
+            if (release == null)
             {
                 throw new ArgumentException("Content Release does not exist", nameof(id));
             }
 
-            if (contentRelease.Amendment)
+            if (release.Amendment)
             {
                 var previousVersion = await _contentDbContext.Releases.AsNoTracking()
-                    .SingleOrDefaultAsync(r => r.Id == contentRelease.PreviousVersionId);
+                    .SingleOrDefaultAsync(r => r.Id == release.PreviousVersionId);
 
                 if (previousVersion?.Published == null)
                 {
                     throw new ArgumentException("Previous version of release does not exist or is not live",
-                        nameof(contentRelease.PreviousVersionId));
+                        nameof(release.PreviousVersionId));
                 }
 
                 published = previousVersion.Published.Value;
             }
 
-            _contentDbContext.Releases.Update(contentRelease);
-            contentRelease.Published ??= published;
-            contentRelease.DataLastPublished = DateTime.UtcNow;
-
-            // Update the publication published date
-            contentRelease.Publication.Published = published;
+            _contentDbContext.Releases.Update(release);
+            release.Published ??= published;
 
             // Set the published date on any methodologies used by this publication that are now publicly accessible
             // as a result of this release being published
-            await _methodologyService.SetPublishedDatesByPublication(contentRelease.PublicationId, published);
+            await _methodologyService.SetPublishedDatesByPublication(release.PublicationId, published);
 
             await _contentDbContext.SaveChangesAsync();
         }

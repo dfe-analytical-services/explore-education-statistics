@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -54,8 +53,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public List<LinkViewModel> RelatedInformation { get; }
 
-        public DateTime? DataLastPublished { get; }
-
         public PublicationViewModel Publication { get; }
 
         public ReleaseViewModel(
@@ -81,7 +78,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             DownloadFiles = release.DownloadFiles;
             HasPreReleaseAccessList = !release.PreReleaseAccessList.IsNullOrEmpty();
             RelatedInformation = release.RelatedInformation;
-            DataLastPublished = release.DataLastPublished;
             Publication = publication;
         }
 

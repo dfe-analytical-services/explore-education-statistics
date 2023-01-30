@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
@@ -89,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         amendedRelease.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.Draft
@@ -104,7 +105,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var saved = await context.Releases
-                    .Include(r => r.ReleaseStatuses)
                     .FirstAsync(r => r.Id == amendedRelease.Id);
 
                 Assert.Equal("2030", saved.ReleaseName);
@@ -156,13 +156,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await releaseService
                     .CreateReleaseStatus(
                         releaseId,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
                             NextReleaseDate = nextReleaseDateEdited,
                             ApprovalStatus = ReleaseApprovalStatus.Draft,
-                            LatestInternalReleaseNote = "Test internal note"
+                            InternalReleaseNote = "Test internal note"
                         }
                     );
 
@@ -179,22 +179,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc),
                     saved.PublishScheduled);
                 Assert.Equal(nextReleaseDateEdited, saved.NextReleaseDate);
-                Assert.False(saved.NotifySubscribers);
+                // NotifySubscribers should default to true for original releases
+                Assert.True(saved.NotifySubscribers);
+                Assert.Null(saved.NotifiedOn);
                 Assert.Equal(ReleaseType.AdHocStatistics, saved.Type);
                 Assert.Equal("2030-march", saved.Slug);
                 Assert.Equal("2030", saved.ReleaseName);
                 Assert.Equal(TimeIdentifier.March, saved.TimePeriodCoverage);
                 Assert.Equal("Access list", saved.PreReleaseAccessList);
 
-                Assert.Single(saved.ReleaseStatuses);
-                var status = saved.ReleaseStatuses[0];
-                Assert.NotNull(status.Created);
-                Assert.InRange(DateTime.UtcNow
-                    .Subtract(status.Created!.Value).Milliseconds, 0, 1500);
-                Assert.Equal(release.Id, status.ReleaseId);
-                Assert.Equal(ReleaseApprovalStatus.Draft, status.ApprovalStatus);
-                Assert.Equal(_userId, status.CreatedById);
-                Assert.Equal("Test internal note", status.InternalReleaseNote);
+                var savedStatus = Assert.Single(saved.ReleaseStatuses);
+                Assert.Equal(release.Id, savedStatus.ReleaseId);
+                Assert.Equal(ReleaseApprovalStatus.Draft, savedStatus.ApprovalStatus);
+                Assert.Equal(_userId, savedStatus.CreatedById);
+                Assert.Equal("Test internal note", savedStatus.InternalReleaseNote);
             }
         }
 
@@ -241,10 +239,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
                             NextReleaseDate = new PartialDate {Month="12", Year="2000"}
@@ -287,10 +285,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = null,
                             NextReleaseDate = new PartialDate {Month="12", Year="2000"}
@@ -329,10 +327,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "",
                             NextReleaseDate = new PartialDate {Month="12", Year="2000"}
@@ -385,10 +383,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2022-12-31",
                             NextReleaseDate = new PartialDate {Month="12", Year="2000"}
@@ -446,10 +444,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2023-06-06",
                             NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
@@ -504,10 +502,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2023-01-01",
                             NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
@@ -565,10 +563,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2023-06-07",
                             NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
@@ -623,10 +621,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2023-01-08", // Sunday
                             NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
@@ -682,10 +680,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2023-01-01",
                             NextReleaseDate = new PartialDate { Month = "12", Year = "2000" }
@@ -731,7 +729,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Draft,
                         }
@@ -800,17 +798,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
                             NextReleaseDate = new PartialDate {Month="12", Year="2000"}
                         }
                     );
 
-                VerifyAllMocks(releaseChecklistService, contentService, preReleaseUserService);
+                VerifyAllMocks(contentService,
+                    preReleaseUserService,
+                    publishingService,
+                    releaseChecklistService);
 
                 result.AssertRight();
             }
@@ -875,10 +876,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note",
                             // No need to include NotifySubscribers - should default to true for original releases
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
@@ -894,7 +895,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var saved = await context.Releases
-                    .Include(r => r.ReleaseStatuses)
                     .FirstAsync(r => r.Id == release.Id);
 
                 Assert.True(saved.NotifySubscribers);
@@ -980,7 +980,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         amendedRelease.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -988,7 +988,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                VerifyAllMocks(contentService, releaseChecklistService);
+                VerifyAllMocks(contentService,
+                    preReleaseUserService,
+                    publishingService,
+                    releaseChecklistService);
 
                 result.AssertRight();
             }
@@ -996,7 +999,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var saved = await context.Releases
-                    .Include(r => r.ReleaseStatuses)
                     .FirstAsync(r => r.Id == amendedRelease.Id);
 
                 Assert.False(saved.NotifySubscribers);
@@ -1081,7 +1083,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         amendedRelease.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -1089,7 +1091,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     );
 
-                VerifyAllMocks(contentService, releaseChecklistService);
+                VerifyAllMocks(contentService,
+                    preReleaseUserService,
+                    publishingService,
+                    releaseChecklistService);
 
                 result.AssertRight();
             }
@@ -1097,7 +1102,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var saved = await context.Releases
-                    .Include(r => r.ReleaseStatuses)
                     .FirstAsync(r => r.Id == amendedRelease.Id);
 
                 Assert.True(saved.NotifySubscribers);
@@ -1138,10 +1142,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         release.Id,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Draft,
-                            LatestInternalReleaseNote = "Test note",
+                            InternalReleaseNote = "Test note"
                         }
                     );
 
@@ -1212,7 +1216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     mock.GetContentBlocks<HtmlBlock>(release.Id))
                 .ReturnsAsync(new List<HtmlBlock>
                 {
-                    new HtmlBlock
+                    new()
                     {
                         Body = $@"
     <img src=""/api/releases/{{releaseId}}/images/{imageFile1.File.Id}""/>
@@ -1232,44 +1236,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         releaseId,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             PublishScheduled = "2051-06-30",
                             NextReleaseDate = nextReleaseDateEdited,
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
-                            LatestInternalReleaseNote = "Internal note"
+                            InternalReleaseNote = "Internal note"
                         }
                     );
 
                 VerifyAllMocks(contentService, userReleaseRoleService);
 
                 result.AssertRight();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var saved = await context.Releases
-                    .Include(r => r.ReleaseStatuses)
-                    .FirstAsync(r => r.Id == releaseId);
-
-                Assert.Equal(release.Publication.Id, saved.PublicationId);
-                Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc), saved.PublishScheduled);
-                Assert.Equal(nextReleaseDateEdited, saved.NextReleaseDate);
-                Assert.False(saved.NotifySubscribers);
-                Assert.Equal(ReleaseType.AdHocStatistics, saved.Type);
-                Assert.Equal("2030-march", saved.Slug);
-                Assert.Equal("2030", saved.ReleaseName);
-                Assert.Equal(TimeIdentifier.March, saved.TimePeriodCoverage);
-                Assert.Equal("Access list", saved.PreReleaseAccessList);
-
-                Assert.Single(saved.ReleaseStatuses);
-                var savedStatus = saved.ReleaseStatuses[0];
-                Assert.Equal(ReleaseApprovalStatus.HigherLevelReview, savedStatus.ApprovalStatus);
-                Assert.Equal("Internal note", savedStatus.InternalReleaseNote);
-                Assert.NotNull(savedStatus.Created);
-                Assert.InRange(DateTime.UtcNow
-                    .Subtract(savedStatus.Created!.Value).Milliseconds, 0, 1500);
-                Assert.Equal(_userId, savedStatus.CreatedById);
             }
         }
 
@@ -1354,12 +1332,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await releaseService
                     .CreateReleaseStatus(
                         releaseId,
-                        new ReleaseStatusCreateViewModel
+                        new ReleaseStatusCreateRequest
                         {
                             PublishScheduled = "2051-06-30",
                             NextReleaseDate = nextReleaseDateEdited,
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
-                            LatestInternalReleaseNote = "Test internal note"
+                            InternalReleaseNote = "Test internal note"
                         }
                     );
 
@@ -1373,32 +1351,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(contentService, releaseFileService, userReleaseRoleService);
 
                 result.AssertRight();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var saved = await context.Releases
-                    .Include(r => r.ReleaseStatuses)
-                    .FirstAsync(r => r.Id == releaseId);
-
-                Assert.Equal(release.Publication.Id, saved.PublicationId);
-                Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc), saved.PublishScheduled);
-                Assert.Equal(nextReleaseDateEdited, saved.NextReleaseDate);
-                Assert.False(saved.NotifySubscribers);
-                Assert.Equal(ReleaseType.AdHocStatistics, saved.Type);
-                Assert.Equal("2030", saved.ReleaseName);
-                Assert.Equal(TimeIdentifier.March, saved.TimePeriodCoverage);
-                Assert.Equal("Access list", saved.PreReleaseAccessList);
-
-                Assert.Single(saved.ReleaseStatuses);
-                var savedStatus = saved.ReleaseStatuses[0];
-                Assert.Equal(ReleaseApprovalStatus.HigherLevelReview, savedStatus.ApprovalStatus);
-                Assert.Equal("Test internal note", savedStatus.InternalReleaseNote);
-                Assert.False(savedStatus.NotifySubscribers);
-                Assert.NotNull(savedStatus.Created);
-                Assert.InRange(DateTime.UtcNow
-                    .Subtract(savedStatus.Created ?? new DateTime()).Milliseconds, 0, 1500);
-                Assert.Equal(_userId, savedStatus.CreatedById);
             }
         }
 
@@ -1644,7 +1596,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task CreateReleaseStatus_HigherReview_DoesntSendEmailIfNoReleaseApprovers()
+        public async Task CreateReleaseStatus_HigherReview_DoesNotSendEmailIfNoReleaseApprovers()
         {
             var release = new Release
             {
@@ -1685,17 +1637,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id, new ReleaseStatusCreateViewModel
+                        release.Id, new ReleaseStatusCreateRequest
                         {
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
-                            LatestInternalReleaseNote = "Test internal note",
+                            InternalReleaseNote = "Test internal note",
                             NextReleaseDate = new PartialDate { Month = "12", Year = "2077" }
                         });
 
                 VerifyAllMocks(contentService,
+                    preReleaseUserService,
                     userReleaseRoleService);
+
                 result.AssertRight();
             }
         }
@@ -1762,12 +1716,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id, new ReleaseStatusCreateViewModel
+                        release.Id, new ReleaseStatusCreateRequest
                         {
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
-                            LatestInternalReleaseNote = "Test internal note",
+                            InternalReleaseNote = "Test internal note",
                             NextReleaseDate = new PartialDate { Month = "12", Year = "2077" },
                         });
 
@@ -1831,12 +1785,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .CreateReleaseStatus(
-                        release.Id, new ReleaseStatusCreateViewModel
+                        release.Id, new ReleaseStatusCreateRequest
                         {
                             PublishMethod = PublishMethod.Scheduled,
                             PublishScheduled = "2051-06-30",
                             ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview,
-                            LatestInternalReleaseNote = "Test internal note",
+                            InternalReleaseNote = "Test internal note",
                             NextReleaseDate = new PartialDate { Month = "12", Year = "2077" },
                         });
 

@@ -21,7 +21,6 @@ export const testEditableRelease: EditableRelease = {
   slug: '2020-21',
   publicationId: '8586c490-7027-4a8b-9df5-cf105c3e88ec',
   approvalStatus: 'Draft',
-  dataLastPublished: '',
   published: '',
   publication: {
     id: '8586c490-7027-4a8b-9df5-cf105c3e88ec',

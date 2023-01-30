@@ -143,7 +143,6 @@ export interface Release<
   updates: ReleaseNote[];
   content: ContentSection<ContentBlockType | DataBlockType | EmbedBlockType>[];
   downloadFiles: FileInfo[];
-  dataLastPublished: string;
   hasPreReleaseAccessList: boolean;
   hasDataGuidance: boolean;
 }
@@ -159,7 +158,6 @@ export interface ReleaseSummary {
   nextReleaseDate: PartialDate;
   type: ReleaseType;
   latestRelease: boolean;
-  dataLastPublished: string;
 }
 
 export interface PublicationReleaseSummary extends ReleaseSummary {

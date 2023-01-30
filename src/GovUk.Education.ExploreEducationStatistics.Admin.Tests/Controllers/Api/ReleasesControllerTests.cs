@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -299,14 +300,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task CreateReleaseStatus()
         {
-            var releaseStatusViewModel = new ReleaseStatusCreateViewModel();
+            var request = new ReleaseStatusCreateRequest();
             var returnedReleaseViewModel = new ReleaseViewModel();
             
             var mocks = Mocks();
 
             mocks
                 .ReleaseApprovalService
-                .Setup(s => s.CreateReleaseStatus(_releaseId, releaseStatusViewModel))
+                .Setup(s => s.CreateReleaseStatus(_releaseId, request))
                 .ReturnsAsync(Unit.Instance);
             
             mocks
@@ -317,7 +318,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
-            var result = await controller.CreateReleaseStatus(releaseStatusViewModel, _releaseId);
+            var result = await controller.CreateReleaseStatus(request, _releaseId);
             VerifyAllMocks(mocks);
             
             result.AssertOkResult(returnedReleaseViewModel);

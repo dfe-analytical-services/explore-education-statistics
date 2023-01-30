@@ -27,30 +27,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 ReleaseName = "2000",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
                 Slug = "2000-01",
+                NotifySubscribers = true,
                 Version = 0,
                 Publication = new Publication
                 {
                     Id = Guid.NewGuid(),
                     Title = "pub1 title",
                     Slug = "pub1-slug",
-                },
-                ReleaseStatuses = new List<ReleaseStatus>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        ApprovalStatus = ReleaseApprovalStatus.Approved,
-                        Created = DateTime.UtcNow,
-                        NotifySubscribers = true,
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        ApprovalStatus = ReleaseApprovalStatus.Draft,
-                        Created = DateTime.UtcNow.AddDays(-1),
-                        NotifySubscribers = false,
-                    },
-                },
+                }
             };
 
             var release2 = new Release
@@ -59,23 +43,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 ReleaseName = "2001",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
                 Slug = "2001-02",
+                NotifySubscribers = false,
                 Version = 0,
                 Publication = new Publication
                 {
                     Id = Guid.NewGuid(),
                     Title = "pub2 title",
                     Slug = "pub2-slug",
-                },
-                ReleaseStatuses = new List<ReleaseStatus>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        ApprovalStatus = ReleaseApprovalStatus.Approved,
-                        Created = DateTime.UtcNow,
-                        NotifySubscribers = false,
-                    },
-                },
+                }
             };
 
             var amendedRelease1 = new Release
@@ -84,22 +59,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 ReleaseName = "2002",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
                 Slug = "2002-03",
+                NotifySubscribers = true,
                 Version = 1,
                 Publication = new Publication
                 {
                     Id = Guid.NewGuid(),
                     Title = "pub3 title",
                     Slug = "pub3-slug",
-                },
-                ReleaseStatuses = new List<ReleaseStatus>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        ApprovalStatus = ReleaseApprovalStatus.Approved,
-                        Created = DateTime.UtcNow,
-                        NotifySubscribers = true,
-                    },
                 },
                 Updates = new List<Update>
                 {
@@ -125,8 +91,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var storageQueueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
             storageQueueService.Setup(mock => mock.AddMessages(
-                ReleaseNotificationQueue,
-                It.IsAny<List<ReleaseNotificationMessage>>()))
+                    ReleaseNotificationQueue,
+                    It.IsAny<List<ReleaseNotificationMessage>>()))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -138,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 storageQueueService.Verify(mock => mock.AddMessages(
                     ReleaseNotificationQueue,
-                new List<ReleaseNotificationMessage>
+                    new List<ReleaseNotificationMessage>
                     {
                         new()
                         {
@@ -164,48 +130,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
 
             MockUtils.VerifyAllMocks(storageQueueService);
-        }
-
-        [Fact]
-        public async Task NotifySubscribersIfApplicable_NotifyOnSet()
-        {
-            var release = new Release
-            {
-                Id = Guid.NewGuid(),
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid(),
-                    Title = "pub title",
-                    Slug = "pub-slug",
-                },
-                ReleaseStatuses = new List<ReleaseStatus>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        ApprovalStatus = ReleaseApprovalStatus.Approved,
-                        Created = DateTime.UtcNow,
-                        NotifySubscribers = true,
-                        NotifiedOn = DateTime.UtcNow,
-                    },
-                },
-            };
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddRangeAsync(release);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var notificationsService = BuildNotificationsService(contentDbContext);
-
-                await notificationsService.NotifySubscribersIfApplicable(release.Id);
-
-                // No interaction with storage queue service expected as NotifyOn is set
-                // in ReleaseStatus.
-            }
         }
 
         [Fact]

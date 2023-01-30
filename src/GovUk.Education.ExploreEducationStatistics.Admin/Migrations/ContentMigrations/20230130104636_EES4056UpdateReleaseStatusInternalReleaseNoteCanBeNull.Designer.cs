@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230130104636_EES4056UpdateReleaseStatusInternalReleaseNoteCanBeNull")]
+    partial class EES4056UpdateReleaseStatusInternalReleaseNoteCanBeNull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -669,12 +671,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<string>("NextReleaseDate")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("NotifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("NotifySubscribers")
-                        .HasColumnType("bit");
 
                     b.Property<string>("PreReleaseAccessList")
                         .HasColumnType("nvarchar(max)");

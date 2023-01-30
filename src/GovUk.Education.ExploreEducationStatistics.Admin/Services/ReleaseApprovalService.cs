@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Cronos;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -109,7 +110,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, Unit>> CreateReleaseStatus(
-            Guid releaseId, ReleaseStatusCreateViewModel request)
+            Guid releaseId,
+            ReleaseStatusCreateRequest request)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, ReleaseChecklistService.HydrateReleaseForChecklist)
@@ -127,23 +129,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     release.ApprovalStatus = request.ApprovalStatus;
                     release.NextReleaseDate = request.NextReleaseDate;
-                    release.PublishScheduled = request.PublishMethod == PublishMethod.Immediate &&
-                                               request.ApprovalStatus == ReleaseApprovalStatus.Approved
+                    release.NotifySubscribers = release.Version == 0 || request.NotifySubscribers == true;
+                    release.PublishScheduled = request.PublishMethod == PublishMethod.Immediate
                         ? _dateTimeProvider.UtcNow
                         : request.PublishScheduledDate;
-
-                    // NOTE: Subscribers should be notified if the release is approved and isn't amended,
-                    //       OR if the release is an amendment, is approved, and NotifySubscribers is true
-                    var notifySubscribers = request.ApprovalStatus == ReleaseApprovalStatus.Approved &&
-                        (!release.Amendment || request.NotifySubscribers.HasValue && request.NotifySubscribers.Value);
 
                     var releaseStatus = new ReleaseStatus
                     {
                         Release = release,
-                        InternalReleaseNote = request.LatestInternalReleaseNote,
-                        NotifySubscribers = notifySubscribers,
+                        InternalReleaseNote = request.InternalReleaseNote,
                         ApprovalStatus = request.ApprovalStatus,
-                        Created = _dateTimeProvider.UtcNow,
                         CreatedById = _userService.GetUserId()
                     };
 
@@ -165,9 +160,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     request.PublishMethod == PublishMethod.Immediate
                                 );
                             }
-
-                            _context.Update(release);
-                            await _context.SaveChangesAsync();
 
                             switch (request.ApprovalStatus)
                             {
@@ -229,7 +221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private Either<ActionResult, Unit> ValidatePublishDate(ReleaseStatusCreateViewModel request)
+        private Either<ActionResult, Unit> ValidatePublishDate(ReleaseStatusCreateRequest request)
         {
             if (request.ApprovalStatus == ReleaseApprovalStatus.Approved
                 && request.PublishMethod == PublishMethod.Scheduled)

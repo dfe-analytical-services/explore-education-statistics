@@ -66,7 +66,6 @@ export const testRelease: Release = {
   },
   published: '2018-04-25T09:30:00',
   slug: '2016-17',
-  dataLastPublished: '',
   hasDataGuidance: true,
   hasPreReleaseAccessList: true,
   type: 'NationalStatistics',
