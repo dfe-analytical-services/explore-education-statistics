@@ -216,7 +216,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var release = new Release
             {
                 PreviousVersionId = null,
-                Publication = new Publication(),
                 Version = 0
             };
 
@@ -250,23 +249,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 var actualRelease = await contentDbContext
                     .Releases
-                    .Include(r => r.Publication)
                     .SingleAsync(r => r.Id == release.Id);
 
                 Assert.Equal(published, actualRelease.Published);
-                Assert.Equal(published, actualRelease.Publication.Published);
             }
         }
 
         [Fact]
         public async Task SetPublishedDates_AmendedReleaseHasPublishedDateOfPreviousVersion()
         {
-            var publication = new Publication();
-
             var previousRelease = new Release
             {
                 Id = Guid.NewGuid(),
-                Publication = publication,
                 Published = DateTime.UtcNow.AddDays(-1),
                 PreviousVersionId = null,
                 Version = 0
@@ -275,7 +269,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var release = new Release
             {
                 PreviousVersionId = previousRelease.Id,
-                Publication = publication,
                 Version = 1
             };
 
@@ -283,7 +276,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Publications.AddAsync(publication);
                 await contentDbContext.Releases.AddRangeAsync(previousRelease, release);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -308,11 +300,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 var actualRelease = await contentDbContext
                     .Releases
-                    .Include(r => r.Publication)
                     .SingleAsync(r => r.Id == release.Id);
 
                 Assert.Equal(previousRelease.Published.Value, actualRelease.Published);
-                Assert.Equal(previousRelease.Published.Value, actualRelease.Publication.Published);
             }
         }
 

@@ -213,12 +213,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .ToTable("ExternalMethodology");
 
             modelBuilder.Entity<Publication>()
-                .Property(n => n.Published)
-                .HasConversion(
-                    v => v,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
-
-            modelBuilder.Entity<Publication>()
                 .Property(n => n.Updated)
                 .HasConversion(
                     v => v,

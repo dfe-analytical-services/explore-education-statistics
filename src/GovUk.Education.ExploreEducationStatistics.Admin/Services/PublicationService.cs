@@ -218,9 +218,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     if (publication.Live)
                     {
-                        publication.Published = DateTime.UtcNow;
-                        await _context.SaveChangesAsync();
-
                         await _methodologyCacheService.UpdateSummariesTree();
                         await _publicationCacheService.UpdatePublicationTree();
                         await _publicationCacheService.UpdatePublication(publication.Slug);

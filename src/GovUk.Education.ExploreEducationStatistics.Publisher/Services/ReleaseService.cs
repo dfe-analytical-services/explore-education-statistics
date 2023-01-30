@@ -66,7 +66,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task SetPublishedDates(Guid id, DateTime published)
         {
             var release = await _contentDbContext.Releases
-                .Include(release => release.Publication)
                 .SingleOrDefaultAsync(r => r.Id == id);
 
             if (release == null)
@@ -90,9 +89,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             _contentDbContext.Releases.Update(release);
             release.Published ??= published;
-
-            // Update the publication published date
-            release.Publication.Published = published;
 
             // Set the published date on any methodologies used by this publication that are now publicly accessible
             // as a result of this release being published

@@ -1046,7 +1046,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     TeamName = "Old team",
                     TeamEmail = "old.smith@test.com",
                 },
-                Published = new DateTime(2020, 8, 12),
+                LatestPublishedRelease = new Release(),
                 SupersededBy = supersedingPublicationToRemove,
             };
 
@@ -1229,7 +1229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Title = "Test topic",
                     Theme = new Theme(),
                 },
-                Published = DateTime.UtcNow,
+                LatestPublishedRelease = new Release()
             };
 
             var supersededPublication1 = new Publication

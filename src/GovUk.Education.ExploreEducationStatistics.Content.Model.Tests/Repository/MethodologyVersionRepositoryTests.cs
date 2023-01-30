@@ -356,7 +356,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     {
                         Publication = new Publication
                         {
-                            Published = DateTime.UtcNow
+                            LatestPublishedRelease = new Release()
                         },
                         Methodology = methodology
                     });
@@ -403,7 +403,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     {
                         Publication = new Publication
                         {
-                            Published = DateTime.UtcNow
+                            LatestPublishedRelease = new Release()
                         },
                         Methodology = methodology
                     });
@@ -443,7 +443,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     {
                         Publication = new Publication
                         {
-                            Published = DateTime.UtcNow
+                            LatestPublishedRelease = new Release()
                         },
                         Methodology = methodology
                     });
@@ -470,7 +470,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         {
             var nonLivePublication = new Publication
             {
-                Published = null
+                LatestPublishedRelease = null
             };
 
             var methodology = new Methodology
@@ -537,7 +537,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         {
             var publication = new Publication
             {
-                Published = DateTime.UtcNow
+                LatestPublishedRelease = new Release()
             };
 
             var methodology1 = new Methodology
@@ -650,7 +650,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         {
             var nonLivePublication = new Publication
             {
-                Published = null
+                LatestPublishedRelease = null
             };
 
             var methodology = new Methodology
@@ -704,7 +704,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         {
             var publication = new Publication
             {
-                Published = DateTime.UtcNow
+                LatestPublishedRelease = new Release()
             };
 
             var methodology1 = new Methodology
@@ -776,7 +776,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         {
             var publication = new Publication
             {
-                Published = DateTime.UtcNow
+                LatestPublishedRelease = new Release()
             };
 
             var methodology = new Methodology
@@ -843,7 +843,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         {
             var publication = new Publication
             {
-                Published = DateTime.UtcNow
+                LatestPublishedRelease = new Release()
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -885,7 +885,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Publication = new Publication
                 {
-                    Published = DateTime.UtcNow
+                    LatestPublishedRelease = new Release()
                 },
                 Methodology = new Methodology
                 {
@@ -929,7 +929,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Publication = new Publication
                 {
-                    Published = DateTime.UtcNow
+                    LatestPublishedRelease = new Release()
                 },
                 Methodology = new Methodology
                 {
@@ -967,7 +967,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Publication = new Publication
                 {
-                    Published = DateTime.UtcNow
+                    LatestPublishedRelease = new Release()
                 },
                 Methodology = new Methodology
                 {
@@ -1011,7 +1011,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Publication = new Publication
                 {
-                    Published = DateTime.UtcNow
+                    LatestPublishedRelease = new Release()
                 },
                 Methodology = new Methodology
                 {
@@ -1055,7 +1055,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Publication = new Publication
                 {
-                    Published = DateTime.UtcNow
+                    LatestPublishedRelease = new Release()
                 },
                 Methodology = new Methodology
                 {
@@ -1114,7 +1114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Publication = new Publication
                 {
-                    Published = DateTime.UtcNow
+                    LatestPublishedRelease = new Release()
                 },
                 Methodology = new Methodology
                 {
@@ -1181,7 +1181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Publication = new Publication
                 {
-                    Published = DateTime.UtcNow
+                    LatestPublishedRelease = new Release()
                 },
                 Methodology = new Methodology
                 {
@@ -1251,7 +1251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Publication = new Publication
                 {
-                    Published = DateTime.UtcNow
+                    LatestPublishedRelease = new Release()
                 },
                 Methodology = new Methodology
                 {
@@ -1326,7 +1326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Publication = new Publication
                 {
-                    Published = DateTime.UtcNow
+                    LatestPublishedRelease = new Release()
                 },
                 Methodology = new Methodology
                 {
@@ -1367,7 +1367,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Publication = new Publication
                 {
-                    Published = null
+                    LatestPublishedRelease = null
                 },
                 Methodology = new Methodology
                 {
@@ -1405,7 +1405,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 Publication = new Publication
                 {
-                    Published = null
+                    LatestPublishedRelease = new Release()
                 },
                 Methodology = new Methodology
                 {
@@ -1654,7 +1654,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     Publication = new Publication
                     {
                         Id = publicationId,
-                        Published = DateTime.UtcNow.AddDays(-1)
+                        LatestPublishedRelease = new Release()
                     },
                     Owner = true,
                     Methodology = new Methodology
