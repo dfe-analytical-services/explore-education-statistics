@@ -276,7 +276,7 @@ jobs:
           script: 'pnpm --filter=explore-education-statistics-frontend --prod deploy public-frontend'
 
       - task: Bash@3
-        displayName: 'Archive public frontend'
+        displayName: 'Zip public frontend'
         inputs:
           targetType: 'inline'
           script: 'zip -r -y public-frontend.zip public-frontend'
@@ -287,18 +287,24 @@ jobs:
       #     artifactName: 'public-frontend'
       #     targetPath: ${Build.ArtifactStagingDirectory}
 
-      - task: PublishPipelineArtifact@1
-        displayName: 'Publish public frontend'
+      - task: 'ArchiveFiles@2'
+        displayName: 'Archive frontend'
+        inputs:
+          rootFolderOrFile: './public-frontend.zip'
+          includeRootFolder: false
+          archiveFile: '$(Build.ArtifactStagingDirectory)/public-frontend.zip'
+
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Pipeline Artifact'
         inputs:
           artifactName: 'public-frontend'
-          path: 'public-frontend.zip'
-          parallel: true
+          targetPath: '$(Build.ArtifactStagingDirectory)'
 
-      - task: Bash@3
-        displayName: 'Copy public frontend to artifact staging directory'
-        inputs:
-          targetType: 'inline'
-          script: 'cp -r public-frontend.zip $(Build.ArtifactStagingDirectory)'
+      # - task: Bash@3
+      #   displayName: 'Copy public frontend to artifact staging directory'
+      #   inputs:
+      #     targetType: 'inline'
+      #     script: 'cp -r public-frontend.zip $(Build.ArtifactStagingDirectory)'
 
   - job: 'MiscellaneousArtifacts'
     pool:
