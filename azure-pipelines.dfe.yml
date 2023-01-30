@@ -276,12 +276,32 @@ jobs:
           targetType: 'inline'
           script: 'pnpm --filter=explore-education-statistics-frontend --prod deploy dist/public-frontend'
 
-      - task: 'ArchiveFiles@2'
-        displayName: 'Archive frontend'
+      - task: Bash@3
         inputs:
-          rootFolderOrFile: './dist/public-frontend'
-          includeRootFolder: false
-          archiveFile: '$(Build.ArtifactStagingDirectory)/public-frontend.zip'
+          targetType: 'inline'
+          script: |
+            zip -r -y $(Build.ArtifactStagingDirectory)/dist/public-frontend $(Build.BuildId).zip .
+
+      - task: Bash@3
+        inputs:
+          targetType: 'inline'
+          script: |
+            echo "----------------------------------"
+            echo $(Build.ArtifactStagingDirectory)
+            echo "----------------------------------"
+            
+            echo "----------------------------------"
+
+            echo $(Build.BuildId)
+            echo "----------------------------------"
+
+            echo "----------------------------------"
+            ls -la $(Build.ArtifactStagingDirectory)
+            echo "----------------------------------"
+                    
+            echo "----------------------------------"     
+            ls -la $(Build.ArtifactStagingDirectory)/dist
+            echo "----------------------------------"
 
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'

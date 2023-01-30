@@ -36,7 +36,7 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "clean": "pnpm -r --parallel exec rimraf node_modules && rimraf node_modules",
+    "install:clean": "pnpm i --force",
     "fix": "pnpm fix:js && pnpm fix:style",
     "fix:js": "eslint --fix --ext .ts,.tsx,.js,.jsx src",
     "fix:style": "stylelint --fix src/**/*.{scss,css}",
