@@ -281,18 +281,18 @@ jobs:
           targetType: 'inline'
           script: 'zip -r -y public-frontend.zip dist/public-frontend'
 
+      # - task: 'PublishPipelineArtifact@0'
+      #   displayName: 'Publish Pipeline Artifact'
+      #   inputs:
+      #     artifactName: 'public-frontend'
+      #     targetPath: ${Build.ArtifactStagingDirectory}
 
-      - task: Bash@3
-        displayName: 'Copy public frontend to staging directory'
-        inputs:
-          targetType: 'inline'
-          script: 'cp public-frontend.zip $(Build.ArtifactStagingDirectory)'
-
-      - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Pipeline Artifact'
+      - task: PublishPipelineArtifact@1
+        displayName: 'Publish public frontend'
         inputs:
           artifactName: 'public-frontend'
-          targetPath: ${Build.ArtifactStagingDirectory}
+          path: 'public-frontend.zip'
+          parallel: true
 
   - job: 'MiscellaneousArtifacts'
     pool:
