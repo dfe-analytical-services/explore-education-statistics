@@ -285,7 +285,7 @@ jobs:
         displayName: 'Publish frontend artifact'
         inputs:
           artifactName: 'public-frontend'
-          targetPath: '$(Build.ArtifactStagingDirectory)/public-frontend.zip'
+          targetPath: '$(Build.ArtifactStagingDirectory)'
 
   - job: 'MiscellaneousArtifacts'
     pool:
