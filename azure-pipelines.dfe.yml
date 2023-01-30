@@ -273,7 +273,7 @@ jobs:
         displayName: 'pnpm deploy'
         inputs:
           targetType: 'inline'
-          script: 'pnpm --filter=explore-education-statistics-frontend --prod deploy dist/public-frontend --shamefully-hoist'
+          script: 'pnpm --filter=explore-education-statistics-frontend --prod deploy dist/public-frontend'
 
       - task: Bash@3
         displayName: 'Zip public frontend'
