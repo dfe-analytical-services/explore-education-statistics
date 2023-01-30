@@ -281,29 +281,11 @@ jobs:
           targetType: 'inline'
           script: 'zip -r -y public-frontend.zip public-frontend'
 
-      - task: Bash@3
-        displayName: 'Move public frontend to artifact staging directory'
-        inputs:
-          targetType: 'inline'
-          script: 'mv public-frontend.zip $(Build.ArtifactStagingDirectory)'
-
-      # - task: 'PublishPipelineArtifact@0'
-      #   displayName: 'Publish Pipeline Artifact'
-      #   inputs:
-      #     artifactName: 'public-frontend'
-      #     targetPath: ${Build.ArtifactStagingDirectory}
-
-      - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Pipeline Artifact'
+      - task: PublishPipelineArtifact@0
+        displayName: 'Publish frontend artifact'
         inputs:
           artifactName: 'public-frontend'
-          targetPath: '$(Build.ArtifactStagingDirectory)'
-
-      # - task: Bash@3
-      #   displayName: 'Copy public frontend to artifact staging directory'
-      #   inputs:
-      #     targetType: 'inline'
-      #     script: 'cp -r public-frontend.zip $(Build.ArtifactStagingDirectory)'
+          targetPath: '$(Build.ArtifactStagingDirectory)/public-frontend.zip'
 
   - job: 'MiscellaneousArtifacts'
     pool:
