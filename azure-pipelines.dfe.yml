@@ -294,6 +294,12 @@ jobs:
           path: 'public-frontend.zip'
           parallel: true
 
+      - task: Bash@3
+        displayName: 'Copy public frontend to artifact staging directory'
+        inputs:
+          targetType: 'inline'
+          script: 'cp -r public-frontend.zip $(Build.ArtifactStagingDirectory)'
+
   - job: 'MiscellaneousArtifacts'
     pool:
       vmImage: 'ubuntu-20.04'
