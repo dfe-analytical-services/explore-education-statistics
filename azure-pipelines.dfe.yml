@@ -264,20 +264,6 @@ jobs:
           mergeTestResults: true
 
       - task: 'Bash@3'
-        displayName: 'Install prod dependencies'
-        inputs:
-          targetType: 'inline'
-          workingDirectory: 'src/explore-education-statistics-frontend'
-          script: 'pnpm i --prod --filter explore-education-statistics-frontend'
-
-      - task: 'Bash@3'
-        displayName: 'pnpm build'
-        inputs:
-          targetType: 'inline'
-          workingDirectory: 'src/explore-education-statistics-frontend'
-          script: 'pnpm build'
-
-      - task: 'Bash@3'
         displayName: 'pnpm deploy'
         inputs:
           targetType: 'inline'
