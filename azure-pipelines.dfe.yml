@@ -280,7 +280,7 @@ jobs:
         inputs:
           targetType: 'inline'
           script: |
-            zip -r -y $(Build.ArtifactStagingDirectory)/dist/public-frontend $(Build.BuildId).zip .
+            zip -r -y $(Build.ArtifactStagingDirectory)/dist/public-frontend public-frontend.zip .
 
       - task: Bash@3
         inputs:
