@@ -279,8 +279,7 @@ jobs:
         displayName: 'Archive public frontend'
         inputs:
           targetType: 'inline'
-          script: |
-          zip -r -y public-frontend.zip dist/public-frontend
+          script: 'zip -r -y public-frontend.zip dist/public-frontend'
 
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Pipeline Artifact'
