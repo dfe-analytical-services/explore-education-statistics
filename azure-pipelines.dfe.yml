@@ -307,7 +307,7 @@ jobs:
         displayName: 'Publish Pipeline Artifact'
         inputs:
           artifactName: 'public-frontend'
-          targetPath: '$(Build.ArtifactStagingDirectory)'
+          targetPath: 'public-frontend.zip'
 
   - job: 'MiscellaneousArtifacts'
     pool:
