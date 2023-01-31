@@ -1954,8 +1954,7 @@
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
-          "requestTracingEnabled": true,
-          "linuxFxVersion": "NODE|14-lts"
+          "requestTracingEnabled": true
         }
       },
       "dependsOn": [
@@ -2017,7 +2016,6 @@
         "name": "[variables('publicPlanName')]",
         "workerSizeId": "0",
         "numberOfWorkers": "1",
-        "kind": "linux",
         "hostingEnvironment": ""
       }
     },
