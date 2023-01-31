@@ -2016,6 +2016,7 @@
         "name": "[variables('publicPlanName')]",
         "workerSizeId": "0",
         "numberOfWorkers": "1",
+        "kind": "linux",
         "hostingEnvironment": ""
       }
     },
