@@ -160,14 +160,27 @@ Add test text to second accordion section
     ...    id:releaseMainContent
 
 Add embedded dashboard to third accordion section
-    user adds embedded dashboard to editable accordion section
+    ${modal}=    user adds embedded dashboard to editable accordion section
     ...    Test embedded dashboard section
     ...    Test embedded dashboard title
-    ...    https://department-for-education.shinyapps.io/dfe-shiny-template/
+    ...    https://google.com
     ...    id:releaseMainContent
 
+    user clicks button    Save    ${modal}
+    user waits until page contains    URL must be on a permitted domain
+
+    user updates embedded dashboard modal
+    ...    Test embedded dashboard title
+    ...    https://en.wikipedia.org/wiki/EES_Page
+
+    user waits until page does not contain    URL must be on a permitted domain
+    user clicks button    Save    ${modal}
+    user waits until modal is not visible    Embed a URL
+    user waits until all content blocks have been saved
+
+    user waits until page contains element    xpath://iframe[@title="Test embedded dashboard title"]
     select frame    xpath://iframe[@title="Test embedded dashboard title"]
-    user waits until h1 is visible    DfE Analytical Services R-Shiny data dashboard template (h1)    90
+    user waits until element is visible    xpath://h1[.='EES Page']    %{WAIT_SMALL}
     unselect frame
 
 User navigates to Data blocks page to edit block
@@ -405,7 +418,7 @@ Verify embedded dashboard accordion section contains dashboard
     user waits until parent contains element    ${section}    xpath:.//iframe[@title="Test embedded dashboard title"]
 
     select frame    xpath://iframe[@title="Test embedded dashboard title"]
-    user waits until h1 is visible    DfE Analytical Services R-Shiny data dashboard template (h1)    %{WAIT_SMALL}
+    user waits until element is visible    xpath://h1[.='EES Page']    %{WAIT_SMALL}
     unselect frame
 
 Return to Admin and Create amendment
@@ -629,12 +642,29 @@ Update second accordion section text for amendment
     user adds content to autosaving accordion section text block    Test text    1    Amended test text!
     ...    id:releaseMainContent
 
-Update embedded dashboard title
-    user updates embedded dashboard in editable accordion section
+Update embedded dashboard title and url
+    ${modal}=    user updates embedded dashboard in editable accordion section
     ...    Test embedded dashboard section
     ...    Amended Test embedded dashboard title
-    ...    https://department-for-education.shinyapps.io/dfe-shiny-template/
+    ...    https://google.com
     ...    id:releaseMainContent
+
+    user clicks button    Save    ${modal}
+    user waits until page contains    URL must be on a permitted domain
+
+    user updates embedded dashboard modal
+    ...    Amended Test embedded dashboard title
+    ...    https://en.wikipedia.org/wiki/Amended_EES_Page
+
+    user clicks button    Save    ${modal}
+    user waits until page does not contain    URL must be on a permitted domain
+    user waits until modal is not visible    Edit embedded URL
+    user waits until all content blocks have been saved
+
+    user waits until page contains element    xpath://iframe[@title="Test embedded dashboard title"]
+    select frame    xpath://iframe[@title="Amended Test embedded dashboard title"]
+    user waits until element is visible    xpath://h1[.='Amended EES Page']    %{WAIT_SMALL}
+    unselect frame
 
     user closes accordion section    Test embedded dashboard section    id:releaseMainContent
 

@@ -242,9 +242,11 @@ user adds embedded dashboard to editable accordion section
     ${section}=    user gets accordion section content element    ${section_name}    ${section_parent}
     user clicks button    Embed a URL    ${section}
 
-    user updates embedded dashboard modal
+    ${modal}=    user updates embedded dashboard modal
     ...    ${dashboard_title}
     ...    ${dashboard_url}
+
+    [Return]    ${modal}
 
 user updates embedded dashboard in editable accordion section
     [Arguments]
@@ -278,10 +280,7 @@ user updates embedded dashboard modal
 
     ${url_input}=    get child element    ${modal}    id:embedBlockForm-url
     user enters text into element    ${url_input}    ${url}
-
-    user clicks button    Save    ${modal}
-    user waits until modal is not visible    Embed a URL
-    user waits until page contains element    xpath://iframe[@title="${title}"]
+    [Return]    ${modal}
 
 user starts editing accordion section text block
     [Arguments]
@@ -404,6 +403,9 @@ user saves autosaving text block
     [Arguments]    ${parent}
     user clicks button    Save & close    ${parent}
     user waits until parent does not contain button    ${parent}    Save & close    %{WAIT_SMALL}
+
+user waits until all content blocks have been saved
+    user waits until page does not contain    Clicking away from this tab will result in the changes being lost
 
 user checks accordion section text block contains
     [Arguments]

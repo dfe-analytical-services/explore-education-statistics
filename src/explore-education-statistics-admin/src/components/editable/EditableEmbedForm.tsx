@@ -2,10 +2,14 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form, FormFieldTextInput } from '@common/components/form';
 import useFormSubmit from '@common/hooks/useFormSubmit';
-import { allowedEmbedDomains } from '@common/modules/find-statistics/components/EmbedBlock';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import React, { useState } from 'react';
+import { mapFieldErrors } from '@common/validation/serverValidations';
+import { PublicationDetailsFormValues } from '@admin/pages/publication/components/PublicationDetailsForm';
+
+export const permittedEmbedDomains =
+  process.env.REACT_APP_PERMITTED_EMBED_URL_DOMAINS?.split(',') ?? [];
 
 export interface EditableEmbedFormValues {
   title: string;
@@ -19,6 +23,15 @@ interface Props {
   onCancel: () => void;
   onSubmit: (values: EditableEmbedFormValues) => void;
 }
+
+const errorMappers = [
+  mapFieldErrors<EditableEmbedFormValues>({
+    target: 'url',
+    messages: {
+      EmbedBlockUrlNotPermitted: 'URL must be on a permitted domain',
+    },
+  }),
+];
 
 const EditableEmbedForm = ({
   initialValues = { title: '', url: '' },
@@ -44,13 +57,16 @@ const EditableEmbedForm = ({
               test: (value: string) =>
                 Boolean(
                   value &&
-                    allowedEmbedDomains.some(domain =>
+                    permittedEmbedDomains.some(domain =>
                       value.startsWith(domain),
                     ),
                 ),
             }),
         })}
-        onSubmit={useFormSubmit<EditableEmbedFormValues>(onSubmit)}
+        onSubmit={useFormSubmit<EditableEmbedFormValues>(
+          onSubmit,
+          errorMappers,
+        )}
       >
         {form => (
           <Form id={formId}>

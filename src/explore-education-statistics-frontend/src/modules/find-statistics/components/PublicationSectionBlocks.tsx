@@ -16,6 +16,9 @@ import {
 import React from 'react';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 
+export const permittedEmbedDomains =
+  process.env.PERMITTED_EMBED_URL_DOMAINS?.split(',') ?? [];
+
 export interface PublicationSectionBlocksProps {
   release: Release;
   blocks: Block[];
@@ -40,7 +43,11 @@ const PublicationSectionBlocks = ({
         if (block.type === 'EmbedBlockLink') {
           return (
             <Gate condition={!!visible} key={block.id}>
-              <EmbedBlock url={block.url} title={block.title} />
+              <EmbedBlock
+                url={block.url}
+                title={block.title}
+                permittedEmbedDomains={permittedEmbedDomains}
+              />
             </Gate>
           );
         }

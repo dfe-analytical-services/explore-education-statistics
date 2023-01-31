@@ -74,6 +74,7 @@ using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
 using Thinktecture;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Services.EmbedBlockService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using IContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IGlossaryService;
@@ -403,6 +404,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 Configuration.GetSection(ReleaseApprovalOptions.ReleaseApproval));
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+            services.Configure<ContentOptions>(Configuration.GetSection(ContentOptions.Content));
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
 

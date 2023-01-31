@@ -1,6 +1,7 @@
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableEmbedForm, {
   EditableEmbedFormValues,
+  permittedEmbedDomains,
 } from '@admin/components/editable/EditableEmbedForm';
 import Gate from '@common/components/Gate';
 import EmbedBlock from '@common/modules/find-statistics/components/EmbedBlock';
@@ -33,7 +34,11 @@ const EditableEmbedBlock = ({
         onDelete={editable ? onDelete : undefined}
       >
         <Gate condition={!!visible}>
-          <EmbedBlock title={block.title} url={block.url} />
+          <EmbedBlock
+            title={block.title}
+            url={block.url}
+            permittedEmbedDomains={permittedEmbedDomains}
+          />
         </Gate>
       </EditableBlockWrapper>
 
