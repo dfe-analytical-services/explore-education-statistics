@@ -1987,7 +1987,6 @@
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "WEBSITE_ZIP_PRESERVE_SYMLINKS": "true",
         "FRAMEWORK": "node"
-        
       }
     },
     {
@@ -2016,7 +2015,8 @@
         "name": "[variables('publicPlanName')]",
         "workerSizeId": "0",
         "numberOfWorkers": "1",
-        "hostingEnvironment": ""
+        "hostingEnvironment": "",
+        "linuxFxVersion": "NODE|14.16.0"
       }
     },
     {
