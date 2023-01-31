@@ -1954,7 +1954,8 @@
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
-          "requestTracingEnabled": true
+          "requestTracingEnabled": true,
+          "linuxFxVersion": "NODE|14-lts"
         }
       },
       "dependsOn": [
