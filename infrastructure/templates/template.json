@@ -1984,9 +1984,7 @@
         "NODE_ENV": "production",
         "PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
         "WEBSITE_NODE_DEFAULT_VERSION": "14.16.0",
-        "WEBSITE_RUN_FROM_PACKAGE": "1",
-        "WEBSITE_ZIP_PRESERVE_SYMLINKS": "true",
-        "FRAMEWORK": "node"
+        "WEBSITE_RUN_FROM_PACKAGE": "1"
       }
     },
     {

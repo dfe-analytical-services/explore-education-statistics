@@ -3,7 +3,6 @@ import {
   fireEvent,
   render as baseRender,
   screen,
-  waitFor,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React, { ReactElement } from 'react';
@@ -67,7 +66,7 @@ describe('Modal', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('when open,`onOpen` handler is called', async () => {
+  test('when open, `onOpen` handler is called', () => {
     const onOpen = jest.fn();
 
     const { rerender } = render(
@@ -84,9 +83,7 @@ describe('Modal', () => {
       </Modal>,
     );
 
-    await waitFor(() => {
-      expect(onOpen).toHaveBeenCalled();
-    });
+    expect(onOpen).toHaveBeenCalled();
   });
 
   test('pressing Esc key calls `onExit` handler', () => {

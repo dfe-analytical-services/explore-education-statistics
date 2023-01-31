@@ -49,12 +49,12 @@ const projects = {
   },
   frontend: {
     path: path.join(projectRoot, 'src/explore-education-statistics-frontend'),
-    command: 'pnpm start:local',
+    command: 'npm run start:local',
     colour: chalk.greenBright,
   },
   frontendProd: {
     path: path.join(projectRoot, 'src/explore-education-statistics-frontend'),
-    command: 'pnpm build && pnpm start',
+    command: 'npm run build && npm start',
     colour: chalk.greenBright,
   },
   content: {

@@ -99,22 +99,6 @@ You will need the following groups of dependencies to run the project successful
 
    See [bug raised with the library](https://github.com/hey-red/Mime/issues/36) for more info.
 
-### Install PNPM via corepack
-
-We use [PNPM](https://pnpm.io/) and [PNPM workspaces](https://pnpm.io/workspaces) to manage our dependencies. PNPM is a drop in replacement for [NPM](https://www.npmjs.com/) which has several advantages over it's predecessor. You can read more about the benefits of PNPM [here](https://pnpm.io/motivation). This is installed & managed via [corepack](https://github.com/nodejs/corepack).
-
-Corepack is a tool installed as part of your Node.js installation that allows you to install and manage multiple package manager versions in your environment based on per-project configuration (via the `packageManager` field in `package.json`). We use corepack to ensure that everyone is using the same version of PNPM to avoid any issues when people are using different versions of PNPM. In order to configure corepack to use PNPM, run the following command:
-
-```bash
-corepack enable
-```
-
-This will install the package manager version specified in the `package.json` file. You can check that this has been installed by running:
-
-```bash
-pnpm -v
-```
-
 ### Adding the local site domain to hosts file
 
 Add the following to your `hosts` file:
@@ -237,14 +221,15 @@ The [Keycloak Admin login](http://ees.local:5030/auth/admin/) is available with 
 1. To run the out-of-the-box Keycloak identity provider:
 
   ```bash
-  pnpm start idp 
+  cd useful-scripts/
+  ./run.js idp
   ```
    
 2. To then get Admin to use Keycloak, run:
 
   ```bash
-  
-  pnpm start adminKeycloak # this sets the environment variable "IdpProviderConfiguration=Keycloak" for us
+  cd useful-scripts/
+  ./run.js adminKeycloak # this sets the environment variable "IdpProviderConfiguration=Keycloak" for us
   ```
 
 The environment variable `IdpProviderConfiguration` lets Admin know to use 
@@ -302,7 +287,7 @@ If this is not available to you then you will need to use one, or a combination,
 
 #### Using `run` script
 
-The `run` script is a simple wrapper around the various CLI commands you need to run the applications. We've aliased the `run.js` script for convenience in the root package.json.
+The `run` script is a simple wrapper around the various CLI commands you need to run the applications. 
 You will need to ensure you have all the project dependencies as specified in [Requirements](#requirements).
 
 Examples:
@@ -310,27 +295,31 @@ Examples:
 - To run the public frontend services:
 
   ```bash
-  pnpm start data content
+  cd useful-scripts
+  ./run.js data content
   ```
 
 - To run the admin. Note you must set up the frontend first - see [Running the frontend](#running-the-frontend).
 
   ```bash
-  pnpm start admin
+  cd useful-scripts
+  ./run.js admin
   ```
 
 - To run other services:
   
   ```bash
-  pnpm start publisher processor
+  cd useful-scripts
+  ./run.js publisher processor
   ```
 
 ### Running the frontend
 
-1. Run the following to install all project dependencies:
+1. Run the following from the project root to install all project dependencies:
 
    ```bash
-   pnpm i
+   npm ci
+   npm run bootstrap
    ```
 
 2. Startup any required backend services (see [Running the backend](#running-the-backend))
@@ -340,28 +329,30 @@ Examples:
    - Running using the `run` script:
     
      ```bash
+     cd useful-scripts
+          
      # Admin frontend
-     pnpm start admin   # or pnpm start adminKeycloak if using the Keycloak IdP
+     ./run.js admin   # or ./run.js adminKeycloak if using the Keycloak IdP
      
      # Public frontend
-     pnpm start frontend
+     ./run.js frontend
      ```
 
    - Running from the project root:
 
      ```bash
      # Admin frontend
-     pnpm start:admin
+     npm run start:admin
     
      # Public frontend
-     pnpm start:frontend
+     npm run start:frontend
      ```
  
     - Going into each of the sub-project directories and starting it directly e.g.
     
      ```bash
      cd src/explore-education-statistics-frontend
-     pnpm start
+     npm start
      ```
 
 4. Access frontend applications at:
@@ -393,11 +384,11 @@ required variables and consequently needs to be in sync with any changes.
 
 No secrets/keys etc. should be added to these environment variables.
 
-### Dependency management with PNPM
+### Dependency management with Lerna
 
-The project currently uses [PNPM](https://pnpm.io) and [PNPM workspaces](https://pnpm.io/workspaces) to handle dependencies as we have
+The project currently uses [Lerna](https://github.com/lerna/lerna) to handle dependencies as we have
 adopted a monorepo project structure and have dependencies between sub-projects. These dependencies
-are established using symlinks that PNPM creates.
+are established using symlinks that Lerna creates.
 
 - `explore-education-statistics-admin`
   - Contains the admin frontend application.
@@ -431,14 +422,17 @@ When adding new NPM dependencies, be aware that we need to be careful about wher
   and simplicity. We need all dependencies to create the build, so it doesn't make sense to split 
   out separate `devDependencies`.
 
-To install new dependencies, you will need to use PNPM to do this, with the following steps:
+**DO NOT** install (`npm install`) any dependencies directly into the sub-projects as this will
+most likely break the sub-project's `package-lock.json` and cause your installation to fail.
+
+Instead, you will need to use Lerna to do this, with the following steps:
 
 1. Directly add dependencies to any required `package.json` file(s).
 
-2. Run the following:
+2. Run the following from the project root:
 
     ```bash
-    pnpm i
+    npm run bootstrap:install
     ```
 
 #### Cleaning dependencies
@@ -448,41 +442,50 @@ are broken for whatever reason. Consequently, it is advisable to clean down your
 `node_modules` by running the following from the project root.
 
 ```bash
-pnpm clean
+npm run clean
 ```
 
-### Common PNPM scripts
+### Common NPM scripts
 
 These scripts can generally be run from most `package.json` files across the project.
 
-- `pnpm test` - Run all tests.
+- `npm test` - Run all tests.
 
-- `pnpm tsc` - Run Typescript compiler to check types are correct. Does not build anything.
+- `npm run tsc` - Run Typescript compiler to check types are correct. Does not build anything.
 
-- `pnpm lint` - Lint projects using Stylelint and ESLint.
-  - `pnpm lint:js` - Run ESLint only.
-  - `pnpm lint:style` - Run Stylelint only.
-- `pnpm fix` - Fix any lint that can be automatically fixed by the linters.
+- `npm run lint` - Lint projects using Stylelint and ESLint.
+  - `npm run lint:js` - Run ESLint only.
+  - `npm run lint:style` - Run Stylelint only.
+- `npm run fix` - Fix any lint that can be automatically fixed by the linters.
 
-  - `pnpm fix:js` - Fix only ESLint lints.
-  - `pnpm fix:style` - Fix only Stylelint lints.
+  - `npm run fix:js` - Fix only ESLint lints.
+  - `npm run fix:style` - Fix only Stylelint lints.
 
-- `pnpm format` - Format codebase using Prettier.
+- `npm run format` - Format codebase using Prettier.
 
 #### Project root scripts
 
 These can only be run from the project root `package.json`.
 
-- `pnpm clean` - Remove any `node_modules` directories across any sub-projects.
+- `npm run bootstrap` - Install NPM dependencies to match `package-lock.json` files across entire 
+  project and symlink any dependent modules. This should be used when you want your dependencies to 
+  exactly match the project's requirements (e.g. in a fresh repo, or you changed to a different 
+  branch).
 
-- `pnpm start:admin` - Run admin frontend dev server.
-- `pnpm start:frontend` - Run public frontend dev server.
+- `npm run bootstrap:install` - Install NPM dependencies to match `package.json` files across entire
+  project and symlink any dependent modules. This should be used when you need to add new 
+  dependencies to the project.
+
+- `npm run clean` - Remove any `node_modules` directories across any sub-projects.
+
+- `npm run start:admin` - Run admin frontend dev server.
+- `npm run start:frontend` - Run public frontend dev server.
 
 #### Sub-project scripts
 
 These can only be run from a sub-project `package.json`.
 
-- `pnpm start` - Start a sub-project dev server.
+- `npm start` - Start a sub-project dev server.
 
 ### Code style
 

@@ -1,0 +1,14 @@
+{
+  "packages": [
+    "src/explore-education-statistics-admin",
+    "src/explore-education-statistics-ckeditor",
+    "src/explore-education-statistics-common",
+    "src/explore-education-statistics-frontend"
+  ],
+  "command": {
+    "bootstrap": {
+      "ignore": ["explore-education-statistics-ckeditor"]
+    }
+  },
+  "version": "0.0.0"
+}
