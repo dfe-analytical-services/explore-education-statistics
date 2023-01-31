@@ -40,6 +40,7 @@ jobs:
           command: 'test'
           projects: '**/GovUk.*[Tt]ests/*.csproj'
           arguments: '--configuration $(BuildConfiguration)'
+
       - task: 'DotNetCoreCLI@2'
         displayName: 'Publish Data API'
         inputs:
@@ -56,6 +57,13 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj'
           arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
           zipAfterPublish: True
+
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Public APIs Artifacts'
+        inputs:
+          artifactName: 'public-api'
+          targetPath: '$(Build.ArtifactStagingDirectory)/public-api'
+
       - task: 'DotNetCoreCLI@2'
         displayName: 'Publish Notifier Function'
         inputs:
@@ -69,6 +77,7 @@ jobs:
         inputs:
           artifactName: 'notifier'
           targetPath: '$(Build.ArtifactStagingDirectory)/notifier'
+
       - task: 'DotNetCoreCLI@2'
         displayName: 'Publish Publisher Function'
         inputs:
@@ -82,6 +91,7 @@ jobs:
         inputs:
           artifactName: 'publisher'
           targetPath: '$(Build.ArtifactStagingDirectory)/publisher'
+
       - task: 'DotNetCoreCLI@2'
         displayName: 'Publish Processor Function'
         inputs:
@@ -129,6 +139,7 @@ jobs:
           command: 'test'
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
           arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
+
       - task: Npm@1
         displayName: 'npm run ci'
         inputs:
@@ -154,6 +165,13 @@ jobs:
           workingDir: 'src/explore-education-statistics-admin'
           verbose: false
           customCommand: 'run build'
+
+      - task: CopyFiles@2
+        displayName: 'Copy files to wwwroot'
+        inputs:
+          SourceFolder: 'src/explore-education-statistics-admin/build'
+          TargetFolder: src/GovUk.Education.ExploreEducationStatistics.Admin/wwwroot
+
       - task: 'DotNetCoreCLI@2'
         displayName: 'Publish'
         inputs:
