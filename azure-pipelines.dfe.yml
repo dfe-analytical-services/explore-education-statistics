@@ -224,7 +224,7 @@ jobs:
         inputs:
           workingDir: '.'
           targetType: 'inline'
-          script: 'pnpm i'
+          script: 'pnpm i --virtual-store-dir ./src/explore-education-statistics-frontend/node_modules/.pnpm'
 
       # - task: 'Bash@3'
       #   displayName: 'pnpm tsc'
@@ -273,7 +273,7 @@ jobs:
         displayName: 'pnpm deploy'
         inputs:
           targetType: 'inline'
-          script: 'pnpm i -F ./src/explore-education-statistics-frontend --virtual-store-dir ./src/explore-education-statistics-frontend/node_modules/.pnpm'
+          script: 'pnpm --filter=explore-education-statistics-frontend --prod deploy public-frontend'
 
       - task: Bash@3
         displayName: 'Zip public frontend'
