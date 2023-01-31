@@ -273,13 +273,13 @@ jobs:
         displayName: 'pnpm deploy'
         inputs:
           targetType: 'inline'
-          script: 'pnpm --filter=explore-education-statistics-frontend --prod deploy dist/public-frontend'
+          script: 'pnpm i -F ./src/explore-education-statistics-frontend --virtual-store-dir ./src/explore-education-statistics-frontend/node_modules/.pnpm'
 
       - task: Bash@3
         displayName: 'Zip public frontend'
         inputs:
           targetType: 'inline'
-          script: 'cd dist/public-frontend && zip -r -y $(Build.ArtifactStagingDirectory)/public-frontend.zip *'
+          script: 'cd src/explore-education-statistics-frontend && zip -r -y $(Build.ArtifactStagingDirectory)/public-frontend.zip *'
 
       - task: PublishPipelineArtifact@0
         displayName: 'Publish frontend artifact'
