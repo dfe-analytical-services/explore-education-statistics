@@ -2016,6 +2016,7 @@
         "workerSizeId": "0",
         "numberOfWorkers": "1",
         "hostingEnvironment": "",
+        "kind": "linux",
         "linuxFxVersion": "NODE|14.16.0"
       }
     },
