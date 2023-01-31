@@ -1,9 +1,6 @@
 variables:
   BuildConfiguration: 'Release'
   CI: true
-  PNPM_VERSION: 7.26.0
-  NODE_VERSION: 16.14.2
-  DOTNET_VERSION: 6.0.x
 
 trigger:
   branches:
@@ -16,273 +13,258 @@ trigger:
 pr: [ 'master', 'dev' ]
 
 jobs:
-  # - job: 'Backend'
-  #   pool:
-  #     vmImage: 'windows-2022'
+  - job: 'Backend'
+    pool:
+      vmImage: 'windows-2022'
+    steps:
+      - task: UseDotNet@2
+        displayName: 'Install .NET Core SDK'
+        inputs:
+          version: 6.0.x
+          performMultiLevelLookup: true
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Restore'
+        inputs:
+          command: 'restore'
+          projects: '**/GovUk.*/*csproj'
+          feedsToUse: config
+          nugetConfigPath: src/nuget.config
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Build'
+        inputs:
+          projects: '**/GovUk.*/*csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Test'
+        inputs:
+          command: 'test'
+          projects: '**/GovUk.*[Tt]ests/*.csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish Data API'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Api.csproj'
+          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
+          zipAfterPublish: True
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish Content API'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj'
+          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
+          zipAfterPublish: True
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish Notifier Function'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Notifier.csproj'
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/notifier'
+          zipAfterPublish: True
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Notifier Artifacts'
+        inputs:
+          artifactName: 'notifier'
+          targetPath: '$(Build.ArtifactStagingDirectory)/notifier'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish Publisher Function'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Publisher.csproj'
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/publisher'
+          zipAfterPublish: True
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Publisher Artifacts'
+        inputs:
+          artifactName: 'publisher'
+          targetPath: '$(Build.ArtifactStagingDirectory)/publisher'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish Processor Function'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj'
+          arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/processor'
+          zipAfterPublish: True
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Processor Artifacts'
+        inputs:
+          artifactName: 'processor'
+          targetPath: '$(Build.ArtifactStagingDirectory)/processor'
 
-  #   steps:
-  #     - task: UseDotNet@2
-  #       displayName: 'Install .NET Core SDK'
-  #       inputs:
-  #         version: $(DOTNET_VERSION)
-  #         performMultiLevelLookup: true
-
-  #     - task: 'DotNetCoreCLI@2'
-  #       displayName: 'Restore'
-  #       inputs:
-  #         command: 'restore'
-  #         projects: '**/GovUk.*/*csproj'
-  #         feedsToUse: config
-  #         nugetConfigPath: src/nuget.config
-
-  #     - task: 'DotNetCoreCLI@2'
-  #       displayName: 'Build'
-  #       inputs:
-  #         projects: '**/GovUk.*/*csproj'
-  #         arguments: '--configuration $(BuildConfiguration)'
-
-  #     - task: 'DotNetCoreCLI@2'
-  #       displayName: 'Test'
-  #       inputs:
-  #         command: 'test'
-  #         projects: '**/GovUk.*[Tt]ests/*.csproj'
-  #         arguments: '--configuration $(BuildConfiguration)'
-
-  #     - task: 'DotNetCoreCLI@2'
-  #       displayName: 'Publish Data API'
-  #       inputs:
-  #         command: 'publish'
-  #         publishWebProjects: false
-  #         projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Api.csproj'
-  #         arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
-  #         zipAfterPublish: True
-
-  #     - task: 'DotNetCoreCLI@2'
-  #       displayName: 'Publish Content API'
-  #       inputs:
-  #         command: 'publish'
-  #         publishWebProjects: false
-  #         projects: '**/GovUk.Education.ExploreEducationStatistics.Content.Api.csproj'
-  #         arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
-  #         zipAfterPublish: True
-
-  #     - task: 'PublishPipelineArtifact@0'
-  #       displayName: 'Publish Public APIs Artifacts'
-  #       inputs:
-  #         artifactName: 'public-api'
-  #         targetPath: '$(Build.ArtifactStagingDirectory)/public-api'
-
-  #     - task: 'DotNetCoreCLI@2'
-  #       displayName: 'Publish Notifier Function'
-  #       inputs:
-  #         command: 'publish'
-  #         publishWebProjects: false
-  #         projects: '**/GovUk.Education.ExploreEducationStatistics.Notifier.csproj'
-  #         arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/notifier'
-  #         zipAfterPublish: True
-
-  #     - task: 'PublishPipelineArtifact@0'
-  #       displayName: 'Publish Notifier Artifacts'
-  #       inputs:
-  #         artifactName: 'notifier'
-  #         targetPath: '$(Build.ArtifactStagingDirectory)/notifier'
-
-  #     - task: 'DotNetCoreCLI@2'
-  #       displayName: 'Publish Publisher Function'
-  #       inputs:
-  #         command: 'publish'
-  #         publishWebProjects: false
-  #         projects: '**/GovUk.Education.ExploreEducationStatistics.Publisher.csproj'
-  #         arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/publisher'
-  #         zipAfterPublish: True
-
-  #     - task: 'PublishPipelineArtifact@0'
-  #       displayName: 'Publish Publisher Artifacts'
-  #       inputs:
-  #         artifactName: 'publisher'
-  #         targetPath: '$(Build.ArtifactStagingDirectory)/publisher'
-
-  #     - task: 'DotNetCoreCLI@2'
-  #       displayName: 'Publish Processor Function'
-  #       inputs:
-  #         command: 'publish'
-  #         publishWebProjects: false
-  #         projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj'
-  #         arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/processor'
-  #         zipAfterPublish: True
-
-  #     - task: 'PublishPipelineArtifact@0'
-  #       displayName: 'Publish Processor Artifacts'
-  #       inputs:
-  #         artifactName: 'processor'
-  #         targetPath: '$(Build.ArtifactStagingDirectory)/processor'
-
-  # - job: 'Admin'
-  #   pool:
-  #     vmImage: 'ubuntu-20.04'
-  #     demands:
-  #       - azureps
-
-  #   steps:
-  #     - task: NodeTool@0
-  #       displayName: 'Install Node.js $(NODE_VERSION)'
-  #       inputs:
-  #         versionSpec: $(NODE_VERSION)
-
-  #     - task: 'Bash@3'
-  #       displayName: 'Install PNPM'
-  #       inputs:
-  #         workingDir: '.'
-  #         targetType: 'inline'
-  #         script: 'npm i -g pnpm@$(PNPM_VERSION)'
-
-  #     - task: UseDotNet@2
-  #       displayName: 'Install .NET Core SDK'
-  #       inputs:
-  #         version: $(DOTNET_VERSION)
-  #         performMultiLevelLookup: true
-
-  #     - task: 'DotNetCoreCLI@2'
-  #       displayName: 'Restore'
-  #       inputs:
-  #         command: 'restore'
-  #         projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
-  #         feedsToUse: config
-  #         nugetConfigPath: src/nuget.config
-
-  #     - task: 'DotNetCoreCLI@2'
-  #       displayName: 'Build'
-  #       inputs:
-  #         projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
-  #         arguments: '--configuration $(BuildConfiguration)'
-
-  #     - task: 'DotNetCoreCLI@2'
-  #       displayName: 'Test'
-  #       inputs:
-  #         command: 'test'
-  #         projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
-  #         arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
-
-  #     - task: 'Bash@3'
-  #       displayName: 'pnpm i'
-  #       inputs:
-  #         targetType: 'inline'
-  #         script: 'pnpm i'
-
-  #     - task: 'Bash@3'
-  #       displayName: 'pnpm format'
-  #       inputs:
-  #         targetType: 'inline'
-  #         script: 'pnpm format'
-
-  #     - task: 'Bash@3'
-  #       displayName: 'pnpm run build'
-  #       inputs:
-  #         targetType: 'inline'
-  #         script: 'pnpm --filter=explore-education-statistics-admin run build'
-
-  #     - task: CopyFiles@2
-  #       displayName: 'Copy files to wwwroot'
-  #       inputs:
-  #         SourceFolder: 'src/explore-education-statistics-admin/build'
-  #         TargetFolder: src/GovUk.Education.ExploreEducationStatistics.Admin/wwwroot
-
-  #     - task: 'DotNetCoreCLI@2'
-  #       displayName: 'Publish'
-  #       inputs:
-  #         command: 'publish'
-  #         publishWebProjects: false
-  #         projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
-  #         arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
-
-  #     - task: 'PublishPipelineArtifact@0'
-  #       displayName: 'Publish Admin Artifact'
-  #       inputs:
-  #         artifactName: 'Admin'
-  #         targetPath: '$(Build.ArtifactStagingDirectory)'
+  - job: 'Admin'
+    pool:
+      vmImage: 'ubuntu-20.04'
+      demands:
+        - azureps
+    steps:
+      - task: NodeTool@0
+        displayName: 'Install Node.js 16.14.2'
+        inputs:
+          versionSpec: '16.14.2'
+      - task: UseDotNet@2
+        displayName: 'Install .NET Core SDK'
+        inputs:
+          version: 6.0.x
+          performMultiLevelLookup: true
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Restore'
+        inputs:
+          command: 'restore'
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
+          feedsToUse: config
+          nugetConfigPath: src/nuget.config
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Build'
+        inputs:
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
+          arguments: '--configuration $(BuildConfiguration)'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Test'
+        inputs:
+          command: 'test'
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
+          arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
+      - task: Npm@1
+        displayName: 'npm run ci'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: ci
+      - task: Npm@1
+        displayName: 'npm run bootstrap'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: 'run bootstrap'
+      - task: Npm@1
+        displayName: 'npm run format'
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: 'run format'
+      - task: Npm@1
+        displayName: 'npm run build'
+        inputs:
+          command: custom
+          workingDir: 'src/explore-education-statistics-admin'
+          verbose: false
+          customCommand: 'run build'
+      - task: 'DotNetCoreCLI@2'
+        displayName: 'Publish'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
+          arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Admin Artifact'
+        inputs:
+          artifactName: 'Admin'
+          targetPath: '$(Build.ArtifactStagingDirectory)'
 
   - job: 'Frontend'
     pool:
       vmImage: 'ubuntu-20.04'
       demands: azureps
-
     steps:
       - task: NodeTool@0
-        displayName: 'Install Node.js $(NODE_VERSION)'
+        displayName: 'Install Node.js 16.14.2'
         inputs:
-          versionSpec: $(NODE_VERSION)
-
-      - task: 'Bash@3'
-        displayName: 'Install PNPM'
+          versionSpec: '16.14.2'
+      - task: 'Npm@1'
+        displayName: 'npm run ci'
         inputs:
+          command: 'custom'
           workingDir: '.'
-          targetType: 'inline'
-          script: 'npm i -g pnpm@$(PNPM_VERSION)'
-
-      - task: 'Bash@3'
-        displayName: 'pnpm i'
+          verbose: false
+          customCommand: 'ci'
+      - task: 'Npm@1'
+        displayName: 'npm run bootstrap'
         inputs:
+          command: 'custom'
           workingDir: '.'
-          targetType: 'inline'
-          script: 'pnpm i --virtual-store-dir ./src/explore-education-statistics-frontend/node_modules/.pnpm'
-
-      # - task: 'Bash@3'
-      #   displayName: 'pnpm tsc'
-      #   inputs:
-      #     workingDir: '.'
-      #     targetType: 'inline'
-      #     script: 'pnpm tsc'
-
-      # - task: 'Bash@3'
-      #   displayName: 'pnpm lint'
-      #   inputs:
-      #     workingDir: '.'
-      #     targetType: 'inline'
-      #     script: 'pnpm lint'
-
-      # - task: 'Bash@3'
-      #   displayName: 'pnpm format:check'
-      #   inputs:
-      #     workingDir: '.'
-      #     targetType: 'inline'
-      #     script: 'pnpm format:check'
-
-      # - task: 'Bash@3'
-      #   displayName: 'pnpm test:ci'
-      #   inputs:
-      #     workingDir: '.'
-      #     targetType: 'inline'
-      #     script: 'pnpm test:ci'
-
-      # - task: 'PublishTestResults@2'
-      #   displayName: 'Publish frontend test results'
-      #   inputs:
-      #     testResultsFormat: 'JUnit'
-      #     testResultsFiles: 'explore-education-statistics-*/junit-*.xml'
-      #     searchFolder: './src'
-      #     testRunTitle: 'Release Jest tests'
-      #     mergeTestResults: true
-
-      - task: 'Bash@3'
-        displayName: 'pnpm build'
-        inputs:
-          targetType: 'inline'
-          script: 'pnpm --filter=explore-education-statistics-frontend build'
-
-      - task: 'Bash@3'
-        displayName: 'pnpm deploy'
-        inputs:
-          targetType: 'inline'
-          script: 'pnpm --filter=explore-education-statistics-frontend --prod deploy public-frontend'
-
-      - task: Bash@3
-        displayName: 'Zip public frontend'
-        inputs:
-          targetType: 'inline'
-          script: 'cd src/explore-education-statistics-frontend && zip -r -y $(Build.ArtifactStagingDirectory)/public-frontend.zip *'
-
+          verbose: false
+          customCommand: 'run bootstrap'
+      - script: 'npm audit --json >> audit.json'
+        workingDirectory: 'src/explore-education-statistics-frontend'
+        displayName: 'Run npm audit'
+        continueOnError: true
+        enabled: false
       - task: PublishPipelineArtifact@0
-        displayName: 'Publish frontend artifact'
+        displayName: 'Publish Pipeline Artifact audit_results'
+        inputs:
+          artifactName: 'audit_results'
+          targetPath: 'src/explore-education-statistics-frontend/audit.json'
+        continueOnError: true
+        enabled: false
+      - task: 'Npm@1'
+        displayName: 'npm run tsc'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run tsc'
+      - task: 'Npm@1'
+        displayName: 'npm run lint'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run lint'
+      - task: 'Npm@1'
+        displayName: 'npm run format:check'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run format:check'
+      - task: 'Npm@1'
+        displayName: 'npm run test:ci'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run test:ci'
+      - task: 'PublishTestResults@2'
+        displayName: 'Publish frontend test results'
+        inputs:
+          testResultsFormat: 'JUnit'
+          testResultsFiles: 'explore-education-statistics-*/junit-*.xml'
+          searchFolder: './src'
+          testRunTitle: 'Release Jest tests'
+          mergeTestResults: true
+      - task: 'Npm@1'
+        displayName: 'Build frontend'
+        inputs:
+          command: 'custom'
+          workingDir: './src/explore-education-statistics-frontend'
+          verbose: false
+          customCommand: 'run build'
+      - task: 'Bash@3'
+        displayName: 'Remove dev dependencies'
+        inputs:
+          targetType: 'inline'
+          script: 'rm -rf ./src/**/node_modules'
+      - task: 'Npm@1'
+        displayName: 'Install prod dependencies'
+        inputs:
+          command: 'custom'
+          workingDir: '.'
+          verbose: false
+          customCommand: 'run bootstrap:prod'
+      - task: 'ArchiveFiles@2'
+        displayName: 'Archive frontend'
+        inputs:
+          rootFolderOrFile: './src/explore-education-statistics-frontend'
+          includeRootFolder: false
+          archiveFile: '$(Build.ArtifactStagingDirectory)/public-frontend.zip'
+      - task: 'PublishPipelineArtifact@0'
+        displayName: 'Publish Pipeline Artifact'
         inputs:
           artifactName: 'public-frontend'
           targetPath: '$(Build.ArtifactStagingDirectory)'

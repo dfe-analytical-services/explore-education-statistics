@@ -32,7 +32,7 @@ const IndicatorDetails = ({
               `${valuePath}.indicatorGroups.${indicatorGroupId}.selected`,
             );
             const hideGrouping = indicatorGroup.label === 'Default';
-            const indicators: string[] =
+            const indicators =
               get(
                 form.values,
                 `${valuePath}.indicatorGroups.${indicatorGroupId}.indicators`,
@@ -64,7 +64,9 @@ const IndicatorDetails = ({
                 >
                   {indicatorGroup.options.map(indicatorItem => {
                     const checked =
-                      indicators.includes(indicatorItem.value) || false;
+                      (indicators &&
+                        indicators.includes(indicatorItem.value)) ||
+                      false;
                     return (
                       <FormCheckbox
                         {...indicatorItem}
