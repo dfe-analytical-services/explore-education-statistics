@@ -350,27 +350,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return targetStream;
         }
 
-        public async Task<Stream> StreamBlob(IBlobContainer containerName, string path, int? bufferSize = null)
+        public async Task<Stream> StreamBlob(
+            IBlobContainer containerName,
+            string path,
+            int? bufferSize = null,
+            CancellationToken cancellationToken = default)
         {
-            // Azure SDK v12 isn't compatible with how we want to use file
-            // streams i.e. they need to be seekable. This is particularly
-            // a problem for MIME type validation.
-            // See: https://github.com/Azure/azure-sdk-for-net/pull/15032
-            // TODO: Change to v12 implementation when possible
-            var blobContainer = await GetCloudBlobContainer(containerName);
-            var blob = blobContainer.GetBlockBlobReference(path);
+            var blob = await GetBlobClient(containerName, path);
 
-            if (!await blob.ExistsAsync())
+            try
             {
-                throw new FileNotFoundException($"Could not find file at {containerName}/{path}");
+                return await blob.OpenReadAsync(bufferSize: bufferSize, cancellationToken: cancellationToken);
             }
-
-            if (bufferSize != null)
+            catch (RequestFailedException exception)
             {
-                blob.StreamMinimumReadSizeInBytes = (int) bufferSize;
-            }
+                if (exception.Status == 404)
+                {
+                    throw new FileNotFoundException($"Could not find file at {containerName}/{path}");
+                }
 
-            return await blob.OpenReadAsync();
+                throw;
+            }
         }
 
         public async Task<string> DownloadBlobText(IBlobContainer containerName, string path)
