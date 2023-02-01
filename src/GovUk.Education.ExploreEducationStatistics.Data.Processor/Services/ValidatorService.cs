@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
@@ -103,8 +104,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     .OnSuccess(() => ValidateMetadataFile(import.MetaFile, metaFileStreamProvider, true))
                     .OnSuccess(async _ =>
                     {
-                        var dataFileColumnHeaders = await CsvUtil.GetCsvHeaders(dataFileStreamProvider);
-                        var dataFileTotalRows = await CsvUtil.GetTotalRows(dataFileStreamProvider);
+                        var dataFileColumnHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
+                        var dataFileTotalRows = await CsvUtils.GetTotalRows(dataFileStreamProvider);
 
                         return await 
                             ValidateObservationHeaders(dataFileColumnHeaders)
@@ -142,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             _logger.LogDebug("Determining if CSV file {FileName} is correct shape", file.Filename);
 
-            var columnHeaders = await CsvUtil.GetCsvHeaders(fileStreamProvider);
+            var columnHeaders = await CsvUtils.GetCsvHeaders(fileStreamProvider);
 
             var totalRows = 0;
             var errors = new List<DataImportError>();
@@ -161,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return errors;
             }
 
-            await CsvUtil.ForEachRow(fileStreamProvider, (cells, index) =>
+            await CsvUtils.ForEachRow(fileStreamProvider, (cells, index) =>
             {
                 totalRows++;
                 
@@ -228,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var rowCountByGeographicLevel = new Dictionary<GeographicLevel, int>();
             var errors = new List<DataImportError>();
 
-            await CsvUtil.ForEachRow(dataFileStreamProvider, async (cells, index) =>
+            await CsvUtils.ForEachRow(dataFileStreamProvider, async (cells, index) =>
             {
                 if (errors.Count == 100)
                 {
@@ -261,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     _importerService.GetTimeIdentifier(cells, columnHeaders);
                     _importerService.GetYear(cells, columnHeaders);
 
-                    var level = CsvUtil.GetGeographicLevel(cells, columnHeaders);
+                    var level = GeographicLevelCsvUtils.GetGeographicLevel(cells, columnHeaders);
                     if (rowCountByGeographicLevel.ContainsKey(level))
                     {
                         rowCountByGeographicLevel[level]++;
