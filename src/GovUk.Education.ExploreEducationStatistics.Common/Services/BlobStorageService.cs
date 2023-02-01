@@ -366,7 +366,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             {
                 if (exception.Status == 404)
                 {
-                    throw new FileNotFoundException($"Could not find file at {containerName}/{path}");
+                    ThrowFileNotFoundException(containerName, path);
                 }
 
                 throw;
@@ -377,16 +377,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             var blob = await GetBlobClient(containerName, path);
 
-            if (!await blob.ExistsAsync())
+            try
             {
-                throw new FileNotFoundException($"Could not find file at {containerName}/{path}");
+                var response = await blob.DownloadContentAsync();
+                return response.Value.Content.ToString();
             }
+            catch (RequestFailedException exception)
+            {
+                if (exception.Status == 404)
+                {
+                    ThrowFileNotFoundException(containerName, path);
+                }
 
-            await using var stream = await blob.OpenReadAsync();
-
-            var streamReader = new StreamReader(stream);
-
-            return await streamReader.ReadToEndAsync();
+                throw;
+            }
         }
 
         public async Task<object?> GetDeserializedJson(IBlobContainer containerName, string path, Type type)
@@ -617,6 +621,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         private static bool IsDevelopmentStorageAccount(CloudBlobClient client)
         {
             return client.Credentials.AccountName.ToLower() == "devstoreaccount1";
+        }
+
+        private static void ThrowFileNotFoundException(IBlobContainer containerName, string path)
+        {
+            throw new FileNotFoundException($"Could not find file at {containerName}/{path}");
         }
     }
 }
