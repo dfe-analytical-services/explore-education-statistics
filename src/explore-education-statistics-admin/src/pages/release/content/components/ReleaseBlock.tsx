@@ -7,7 +7,7 @@ import { Block } from '@common/services/types/blocks';
 import React from 'react';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import Gate from '@common/components/Gate';
-import { permittedEmbedDomains } from '@admin/components/editable/EditableEmbedForm';
+import { useConfig } from '@admin/contexts/ConfigContext';
 
 interface Props {
   block: Block;
@@ -22,13 +22,15 @@ const ReleaseBlock = ({ block, releaseId, visible }: Props) => {
     releaseId,
   });
 
+  const { PermittedEmbedUrlDomains } = useConfig();
+
   if (block.type === 'EmbedBlockLink') {
     return (
       <Gate condition={!!visible} key={block.id}>
         <EmbedBlock
           url={block.url}
           title={block.title}
-          permittedEmbedDomains={permittedEmbedDomains}
+          permittedEmbedDomains={PermittedEmbedUrlDomains}
         />
       </Gate>
     );

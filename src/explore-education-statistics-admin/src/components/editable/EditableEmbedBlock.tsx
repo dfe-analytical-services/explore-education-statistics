@@ -1,7 +1,6 @@
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableEmbedForm, {
   EditableEmbedFormValues,
-  permittedEmbedDomains,
 } from '@admin/components/editable/EditableEmbedForm';
 import Gate from '@common/components/Gate';
 import EmbedBlock from '@common/modules/find-statistics/components/EmbedBlock';
@@ -9,6 +8,7 @@ import React from 'react';
 import { EmbedBlock as EmbedBlockType } from '@common/services/types/blocks';
 import Modal from '@common/components/Modal';
 import useToggle from '@common/hooks/useToggle';
+import { useConfig } from '@admin/contexts/ConfigContext';
 
 interface Props {
   block: EmbedBlockType;
@@ -27,6 +27,8 @@ const EditableEmbedBlock = ({
 }: Props) => {
   const [showEmbedDashboardForm, toggleEmbedDashboardForm] = useToggle(false);
 
+  const { PermittedEmbedUrlDomains } = useConfig();
+
   return (
     <>
       <EditableBlockWrapper
@@ -37,7 +39,7 @@ const EditableEmbedBlock = ({
           <EmbedBlock
             title={block.title}
             url={block.url}
-            permittedEmbedDomains={permittedEmbedDomains}
+            permittedEmbedDomains={PermittedEmbedUrlDomains}
           />
         </Gate>
       </EditableBlockWrapper>

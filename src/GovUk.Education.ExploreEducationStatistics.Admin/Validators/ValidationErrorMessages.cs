@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         ContentBlockNotAttachedToThisContentSection,
         ContentSectionNotAttachedToRelease,
         ContentBlockNotAttachedToRelease,
-        EmbedBlockUrlNotPermitted,
+        EmbedBlockUrlDomainNotPermitted,
 
         // User Management
         UserAlreadyExists,

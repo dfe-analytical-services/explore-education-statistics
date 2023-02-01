@@ -160,27 +160,28 @@ Add test text to second accordion section
     ...    id:releaseMainContent
 
 Add embedded dashboard to third accordion section
-    ${modal}=    user adds embedded dashboard to editable accordion section
+    user chooses to embed a URL in editable accordion section
     ...    Test embedded dashboard section
+    ...    id:releaseMainContent
+
+    ${modal}=    user updates embedded URL details in modal
     ...    Test embedded dashboard title
     ...    https://google.com
-    ...    id:releaseMainContent
 
     user clicks button    Save    ${modal}
     user waits until page contains    URL must be on a permitted domain
 
-    user updates embedded dashboard modal
+    user updates embedded URL details in modal
     ...    Test embedded dashboard title
-    ...    https://en.wikipedia.org/wiki/EES_Page
+    ...    https://dfe-analytical-services.github.io/explore-education-statistics
 
     user waits until page does not contain    URL must be on a permitted domain
     user clicks button    Save    ${modal}
     user waits until modal is not visible    Embed a URL
-    user waits until all content blocks have been saved
 
     user waits until page contains element    xpath://iframe[@title="Test embedded dashboard title"]
     select frame    xpath://iframe[@title="Test embedded dashboard title"]
-    user waits until element is visible    xpath://h1[.='EES Page']    %{WAIT_SMALL}
+    user waits until h1 is visible    Explore Education Statistics service    %{WAIT_SMALL}
     unselect frame
 
 User navigates to Data blocks page to edit block
@@ -418,7 +419,7 @@ Verify embedded dashboard accordion section contains dashboard
     user waits until parent contains element    ${section}    xpath:.//iframe[@title="Test embedded dashboard title"]
 
     select frame    xpath://iframe[@title="Test embedded dashboard title"]
-    user waits until element is visible    xpath://h1[.='EES Page']    %{WAIT_SMALL}
+    user waits until h1 is visible    Explore Education Statistics service    %{WAIT_SMALL}
     unselect frame
 
 Return to Admin and Create amendment
@@ -643,27 +644,30 @@ Update second accordion section text for amendment
     ...    id:releaseMainContent
 
 Update embedded dashboard title and url
-    ${modal}=    user updates embedded dashboard in editable accordion section
+    user chooses to update an embedded URL in editable accordion section
     ...    Test embedded dashboard section
+    ...    id:releaseMainContent
+
+    ${modal}=    user updates embedded URL details in modal
     ...    Amended Test embedded dashboard title
     ...    https://google.com
-    ...    id:releaseMainContent
+    ...    Edit embedded URL
 
     user clicks button    Save    ${modal}
     user waits until page contains    URL must be on a permitted domain
 
-    user updates embedded dashboard modal
+    user updates embedded URL details in modal
     ...    Amended Test embedded dashboard title
-    ...    https://en.wikipedia.org/wiki/Amended_EES_Page
+    ...    https://dfe-analytical-services.github.io/explore-education-statistics/tests/robot-tests
+    ...    Edit embedded URL
 
     user clicks button    Save    ${modal}
     user waits until page does not contain    URL must be on a permitted domain
     user waits until modal is not visible    Edit embedded URL
-    user waits until all content blocks have been saved
 
-    user waits until page contains element    xpath://iframe[@title="Test embedded dashboard title"]
+    user waits until page contains element    xpath://iframe[@title="Amended Test embedded dashboard title"]
     select frame    xpath://iframe[@title="Amended Test embedded dashboard title"]
-    user waits until element is visible    xpath://h1[.='Amended EES Page']    %{WAIT_SMALL}
+    user waits until h1 is visible    Explore Education Statistics Robot Framework tests    %{WAIT_SMALL}
     unselect frame
 
     user closes accordion section    Test embedded dashboard section    id:releaseMainContent

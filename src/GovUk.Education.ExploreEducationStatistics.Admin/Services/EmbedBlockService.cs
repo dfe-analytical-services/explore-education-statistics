@@ -146,7 +146,7 @@ public class EmbedBlockService : IEmbedBlockService
     {
         return _options.PermittedEmbedUrlDomains.Split(',').Any(url.StartsWith) 
             ? Unit.Instance
-            : ValidationActionResult(EmbedBlockUrlNotPermitted);
+            : ValidationActionResult(EmbedBlockUrlDomainNotPermitted);
     }
 
     private Either<ActionResult, Unit> ValidateContentSectionAttachedToRelease(

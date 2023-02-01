@@ -1,8 +1,14 @@
 import EditableEmbedForm from '@admin/components/editable/EditableEmbedForm';
-import { render, screen, waitFor } from '@testing-library/react';
+import {
+  render as baseRender,
+  RenderResult,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React from 'react';
+import React, { ReactNode } from 'react';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 
 describe('EditableEmbedForm', () => {
   test('renders the form', () => {
@@ -118,4 +124,10 @@ describe('EditableEmbedForm', () => {
       );
     });
   });
+
+  function render(child: ReactNode): RenderResult {
+    return baseRender(
+      <TestConfigContextProvider>{child}</TestConfigContextProvider>,
+    );
+  }
 });

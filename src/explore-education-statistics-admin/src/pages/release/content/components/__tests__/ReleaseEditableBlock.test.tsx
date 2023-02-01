@@ -23,6 +23,7 @@ import {
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React, { ReactNode } from 'react';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 
 jest.mock('@admin/services/hubs/utils/createConnection');
 jest.mock('@admin/services/releaseContentService');
@@ -98,21 +99,23 @@ describe('ReleaseEditableBlock', () => {
       'https://test/some-image-url-300.jpg 300w';
 
     render(
-      <ReleaseEditableBlock
-        publicationId="publication-1"
-        releaseId="release-1"
-        sectionId="section-1"
-        sectionKey="content"
-        block={{
-          ...testHtmlBlock,
-          body: `
-          <h3>Test heading</h3>
-          <p>Some test content</p>
-          <img alt="Test image 1" src="/api/releases/{releaseId}/images/some-image-id" srcset="${image1SrcSet}" />
-          <img alt="Test image 2" src="https://test/some-image-url.jpg" srcset="${image2SrcSet}" />
-          `,
-        }}
-      />,
+      <TestConfigContextProvider>
+        <ReleaseEditableBlock
+          publicationId="publication-1"
+          releaseId="release-1"
+          sectionId="section-1"
+          sectionKey="content"
+          block={{
+            ...testHtmlBlock,
+            body: `
+            <h3>Test heading</h3>
+            <p>Some test content</p>
+            <img alt="Test image 1" src="/api/releases/{releaseId}/images/some-image-id" srcset="${image1SrcSet}" />
+            <img alt="Test image 2" src="https://test/some-image-url.jpg" srcset="${image2SrcSet}" />
+            `,
+          }}
+        />
+      </TestConfigContextProvider>,
     );
 
     expect(screen.getByRole('img', { name: 'Test image 1' })).toHaveAttribute(
@@ -860,26 +863,29 @@ describe('ReleaseEditableBlock', () => {
     release: EditableRelease = testEditableRelease,
   ): RenderResult {
     return baseRender(
-      <AuthContextTestProvider
-        user={{
-          id: testCurrentUser.id,
-          name: testCurrentUser.displayName,
-          validToken: true,
-          permissions: {} as GlobalPermissions,
-        }}
-      >
-        <ReleaseContentHubContextProvider releaseId={release.id}>
-          <ReleaseContentProvider
-            value={{
-              release,
-              canUpdateRelease: true,
-              availableDataBlocks: [],
-            }}
-          >
-            {child}
-          </ReleaseContentProvider>
-        </ReleaseContentHubContextProvider>
-      </AuthContextTestProvider>,
+      <TestConfigContextProvider>
+        <AuthContextTestProvider
+          user={{
+            id: testCurrentUser.id,
+            name: testCurrentUser.displayName,
+            validToken: true,
+            permissions: {} as GlobalPermissions,
+          }}
+        >
+          <ReleaseContentHubContextProvider releaseId={release.id}>
+            <ReleaseContentProvider
+              value={{
+                release,
+                canUpdateRelease: true,
+                availableDataBlocks: [],
+              }}
+            >
+              {child}
+            </ReleaseContentProvider>
+          </ReleaseContentHubContextProvider>
+        </AuthContextTestProvider>
+        ,
+      </TestConfigContextProvider>,
     );
   }
 });

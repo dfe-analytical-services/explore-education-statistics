@@ -6,10 +6,7 @@ import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import React, { useState } from 'react';
 import { mapFieldErrors } from '@common/validation/serverValidations';
-import { PublicationDetailsFormValues } from '@admin/pages/publication/components/PublicationDetailsForm';
-
-export const permittedEmbedDomains =
-  process.env.REACT_APP_PERMITTED_EMBED_URL_DOMAINS?.split(',') ?? [];
+import { useConfig } from '@admin/contexts/ConfigContext';
 
 export interface EditableEmbedFormValues {
   title: string;
@@ -42,6 +39,8 @@ const EditableEmbedForm = ({
     initialValues,
   );
 
+  const { PermittedEmbedUrlDomains } = useConfig();
+
   return (
     <>
       <Formik<EditableEmbedFormValues>
@@ -57,7 +56,7 @@ const EditableEmbedForm = ({
               test: (value: string) =>
                 Boolean(
                   value &&
-                    permittedEmbedDomains.some(domain =>
+                    PermittedEmbedUrlDomains.some(domain =>
                       value.startsWith(domain),
                     ),
                 ),
