@@ -98,8 +98,8 @@
     "dataFactoryConcurrency": {
       "value": 10
     },
-    "releaseStatusPollTimeMillis": {
-      "value": 500
+    "permittedEmbedUrlDomains": {
+      "value": "https://department-for-education.shinyapps.io,https://dfe-analytical-services.github.io"
     },
     "immediatePublicationOfScheduledReleasesEnabled": {
       "value": true

@@ -6,15 +6,16 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static Moq.MockBehavior;
@@ -54,7 +55,7 @@ public class EmbedBlockServiceTests
                 new EmbedBlockCreateRequest
                 {
                     Title = "Test title",
-                    Url = "http://www.test.com",
+                    Url = "http://www.test.com/test-page",
                     ContentSectionId = contentSectionId,
                 });
 
@@ -62,7 +63,7 @@ public class EmbedBlockServiceTests
 
             Assert.Equal(1, viewModel.Order);
             Assert.Equal("Test title", viewModel.Title);
-            Assert.Equal("http://www.test.com", viewModel.Url);
+            Assert.Equal("http://www.test.com/test-page", viewModel.Url);
             Assert.Empty(viewModel.Comments);
             Assert.Null(viewModel.Locked);
             Assert.Null(viewModel.LockedUntil);
@@ -80,7 +81,42 @@ public class EmbedBlockServiceTests
             var embedBlock = Assert.Single(embedBlocks);
             Assert.Equal(embedBlockLink.EmbedBlockId, embedBlock.Id);
             Assert.Equal("Test title", embedBlock.Title);
-            Assert.Equal("http://www.test.com", embedBlock.Url);
+            Assert.Equal("http://www.test.com/test-page", embedBlock.Url);
+        }
+    }
+
+    [Fact]
+    public async Task Create_InvalidDomain()
+    {
+        var contentSectionId = Guid.NewGuid();
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            await context.ReleaseContentSections.AddRangeAsync(new ReleaseContentSection
+            {
+                Release = _release,
+                ContentSection = new ContentSection
+                {
+                    Id = contentSectionId,
+                }
+            });
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var service = BuildEmbedBlockService(context);
+            var result = await service.Create(_release.Id,
+                new EmbedBlockCreateRequest
+                {
+                    Title = "Test title",
+                    Url = "http://www.invalid.com/test-page",
+                    ContentSectionId = contentSectionId,
+                });
+
+            result.AssertBadRequest(EmbedBlockUrlDomainNotPermitted);
+            Assert.Empty(context.EmbedBlockLinks);
         }
     }
 
@@ -116,7 +152,7 @@ public class EmbedBlockServiceTests
                 new EmbedBlockCreateRequest
                 {
                     Title = "Test title",
-                    Url = "http://www.test.com",
+                    Url = "http://www.test.com/test-page",
                     ContentSectionId = contentSectionId,
                 });
 
@@ -124,7 +160,7 @@ public class EmbedBlockServiceTests
 
             Assert.Equal(4, viewModel.Order);
             Assert.Equal("Test title", viewModel.Title);
-            Assert.Equal("http://www.test.com", viewModel.Url);
+            Assert.Equal("http://www.test.com/test-page", viewModel.Url);
             Assert.Empty(viewModel.Comments);
             Assert.Null(viewModel.Locked);
             Assert.Null(viewModel.LockedUntil);
@@ -145,7 +181,7 @@ public class EmbedBlockServiceTests
             var embedBlock = Assert.Single(embedBlocks);
             Assert.Equal(embedBlockLink.EmbedBlockId, embedBlock.Id);
             Assert.Equal("Test title", embedBlock.Title);
-            Assert.Equal("http://www.test.com", embedBlock.Url);
+            Assert.Equal("http://www.test.com/test-page", embedBlock.Url);
 
             Assert.Equal(embedBlock.Id, embedBlockLink.EmbedBlockId);
         }
@@ -177,7 +213,7 @@ public class EmbedBlockServiceTests
                 new EmbedBlockCreateRequest
                 {
                     Title = "Test title",
-                    Url = "http://www.test.com",
+                    Url = "http://www.test.com/test-page",
                     ContentSectionId = contentSectionId,
                 });
 
@@ -211,7 +247,7 @@ public class EmbedBlockServiceTests
                 new EmbedBlockCreateRequest
                 {
                     Title = "Test title",
-                    Url = "http://www.test.com",
+                    Url = "http://www.test.com/test-page",
                     ContentSectionId = Guid.NewGuid(),
                 });
 
@@ -251,11 +287,11 @@ public class EmbedBlockServiceTests
                 new EmbedBlockCreateRequest
                 {
                     Title = "Test title",
-                    Url = "http://www.test.com",
+                    Url = "http://www.test.com/test-page",
                     ContentSectionId = contentSectionId,
                 });
 
-            result.AssertBadRequest(ValidationErrorMessages.ContentSectionNotAttachedToRelease);
+            result.AssertBadRequest(ContentSectionNotAttachedToRelease);
         }
     }
 
@@ -290,7 +326,7 @@ public class EmbedBlockServiceTests
             {
                 Id = embedBlockId,
                 Title = "Test title",
-                Url = "http://www.test.com",
+                Url = "http://www.test.com/test-page",
             });
             await context.SaveChangesAsync();
         }
@@ -303,14 +339,14 @@ public class EmbedBlockServiceTests
                 new EmbedBlockUpdateRequest
                 {
                     Title = "Test title updated",
-                    Url = "http://www.test.com/update",
+                    Url = "http://www.test.com/updated-test-page",
                 });
 
             var viewModel = result.AssertRight();
 
             Assert.Equal(93, viewModel.Order);
             Assert.Equal("Test title updated", viewModel.Title);
-            Assert.Equal("http://www.test.com/update", viewModel.Url);
+            Assert.Equal("http://www.test.com/updated-test-page", viewModel.Url);
             Assert.Empty(viewModel.Comments);
             Assert.Null(viewModel.Locked);
             Assert.Null(viewModel.LockedUntil);
@@ -329,7 +365,74 @@ public class EmbedBlockServiceTests
             var embedBlock = Assert.Single(embedBlocks);
             Assert.Equal(embedBlockLink.EmbedBlockId, embedBlock.Id);
             Assert.Equal("Test title updated", embedBlock.Title);
-            Assert.Equal("http://www.test.com/update", embedBlock.Url);
+            Assert.Equal("http://www.test.com/updated-test-page", embedBlock.Url);
+        }
+    }
+    
+    [Fact]
+    public async Task Update_InvalidDomain()
+    {
+        var contentSectionId = Guid.NewGuid();
+        var contentBlockId = Guid.NewGuid();
+        var embedBlockId = Guid.NewGuid();
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            await context.ReleaseContentSections.AddRangeAsync(new ReleaseContentSection
+            {
+                Release = _release,
+                ContentSection = new ContentSection
+                {
+                    Id = contentSectionId,
+                    Content = new()
+                    {
+                        new EmbedBlockLink
+                        {
+                            Id = contentBlockId,
+                            Order = 93,
+                            EmbedBlockId = embedBlockId,
+                        },
+                    }
+                }
+            });
+            await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
+            {
+                Id = embedBlockId,
+                Title = "Test title",
+                Url = "http://www.test.com/test-page",
+            });
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var service = BuildEmbedBlockService(context);
+            var result = await service.Update(_release.Id,
+                contentBlockId,
+                new EmbedBlockUpdateRequest
+                {
+                    Title = "Test title updated",
+                    Url = "http://www.invalid.com/updated-test-page",
+                });
+
+            result.AssertBadRequest(EmbedBlockUrlDomainNotPermitted);
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            // Expect to not see any changes.
+            var embedBlockLinks = context.EmbedBlockLinks.ToList();
+            var embedBlockLink = Assert.Single(embedBlockLinks);
+            Assert.Equal(93, embedBlockLink.Order);
+            Assert.Equal(contentSectionId, embedBlockLink.ContentSectionId);
+            Assert.Equal(embedBlockId, embedBlockLink.EmbedBlockId);
+
+            var embedBlocks = context.EmbedBlocks.ToList();
+            var embedBlock = Assert.Single(embedBlocks);
+            Assert.Equal(embedBlockLink.EmbedBlockId, embedBlock.Id);
+            Assert.Equal("Test title", embedBlock.Title);
+            Assert.Equal("http://www.test.com/test-page", embedBlock.Url);
         }
     }
 
@@ -364,7 +467,7 @@ public class EmbedBlockServiceTests
             {
                 Id = embedBlockId,
                 Title = "Test title",
-                Url = "http://www.test.com",
+                Url = "http://www.test.com/test-page",
             });
             await context.SaveChangesAsync();
         }
@@ -377,7 +480,7 @@ public class EmbedBlockServiceTests
                 new EmbedBlockUpdateRequest
                 {
                     Title = "Test title update",
-                    Url = "http://www.test.com/update",
+                    Url = "http://www.test.com/updated-test-page",
                 });
 
             result.AssertNotFound();
@@ -415,7 +518,7 @@ public class EmbedBlockServiceTests
             {
                 Id = embedBlockId,
                 Title = "Test title",
-                Url = "http://www.test.com",
+                Url = "http://www.test.com/test-page",
             });
             await context.SaveChangesAsync();
         }
@@ -428,7 +531,7 @@ public class EmbedBlockServiceTests
                 new EmbedBlockUpdateRequest
                 {
                     Title = "Test title update",
-                    Url = "http://www.test.com/update",
+                    Url = "http://www.test.com/updated-test-page",
                 });
 
             result.AssertNotFound();
@@ -472,7 +575,7 @@ public class EmbedBlockServiceTests
             {
                 Id = embedBlockId,
                 Title = "Test title",
-                Url = "http://www.test.com",
+                Url = "http://www.test.com/test-page",
             });
             await context.SaveChangesAsync();
         }
@@ -485,10 +588,10 @@ public class EmbedBlockServiceTests
                 new EmbedBlockUpdateRequest
                 {
                     Title = "Test title update",
-                    Url = "http://www.test.com/update",
+                    Url = "http://www.test.com/updated-test-page",
                 });
 
-            result.AssertBadRequest(ValidationErrorMessages.ContentSectionNotAttachedToRelease);
+            result.AssertBadRequest(ContentSectionNotAttachedToRelease);
         }
     }
 
@@ -523,7 +626,7 @@ public class EmbedBlockServiceTests
             {
                 Id = embedBlockId,
                 Title = "Test title",
-                Url = "http://www.test.com",
+                Url = "http://www.test.com/test-page",
             });
             await context.SaveChangesAsync();
         }
@@ -577,7 +680,7 @@ public class EmbedBlockServiceTests
             {
                 Id = embedBlockId,
                 Title = "Test title",
-                Url = "http://www.test.com",
+                Url = "http://www.test.com/test-page",
             });
             await context.SaveChangesAsync();
         }
@@ -622,7 +725,7 @@ public class EmbedBlockServiceTests
             {
                 Id = embedBlockId,
                 Title = "Test title",
-                Url = "http://www.test.com",
+                Url = "http://www.test.com/test-page",
             });
             await context.SaveChangesAsync();
         }
@@ -673,7 +776,7 @@ public class EmbedBlockServiceTests
             {
                 Id = embedBlockId,
                 Title = "Test title",
-                Url = "http://www.test.com",
+                Url = "http://www.test.com/test-page",
             });
             await context.SaveChangesAsync();
         }
@@ -683,8 +786,16 @@ public class EmbedBlockServiceTests
             var service = BuildEmbedBlockService(context);
             var result = await service.Delete(_release.Id, contentBlockId);
 
-            result.AssertBadRequest(ValidationErrorMessages.ContentBlockNotAttachedToRelease);
+            result.AssertBadRequest(ContentBlockNotAttachedToRelease);
         }
+    }
+    
+    private static IOptions<EmbedBlockService.ContentOptions> DefaultOptions()
+    {
+        return Options.Create(new EmbedBlockService.ContentOptions
+        {
+            PermittedEmbedUrlDomains = "http://www.test.com"
+        });
     }
 
     private static EmbedBlockService BuildEmbedBlockService(
@@ -699,6 +810,7 @@ public class EmbedBlockServiceTests
             persistenceHelper ?? new PersistenceHelper<ContentDbContext>(context),
             contentBlockService ?? new ContentBlockService(context),
             userService ?? AlwaysTrueUserService().Object,
-            AdminMapper());
+            AdminMapper(),
+            DefaultOptions());
     }
 }

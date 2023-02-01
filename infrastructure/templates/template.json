@@ -688,11 +688,11 @@
       "type": "int",
       "defaultValue": 1
     },
-    "releaseStatusPollTimeMillis": {
-      "type": "int",
-      "defaultValue": 10000,
+    "permittedEmbedUrlDomains": {
+      "type": "string",
+      "defaultValue": "https://department-for-education.shinyapps.io",
       "metadata": {
-        "description": "Frequency with which the status of a Release undergoing publishing is polled on the Release Sign Off page"
+        "description": "A comma-separated list of valid domains from which URLs can be embedded in Release content"
       }
     }
   },
@@ -1732,7 +1732,7 @@
         "ReleaseApproval:PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
         "ReleaseApproval:PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
         "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]",
-        "RELEASE_STATUS_POLL_TIME_MILLIS": "[parameters('releaseStatusPollTimeMillis')]"
+        "Content:PermittedEmbedUrlDomains": "[parameters('permittedEmbedUrlDomains')]"
       }
     },
     {
