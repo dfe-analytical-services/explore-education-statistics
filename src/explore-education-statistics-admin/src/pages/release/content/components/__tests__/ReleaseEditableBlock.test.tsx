@@ -99,23 +99,21 @@ describe('ReleaseEditableBlock', () => {
       'https://test/some-image-url-300.jpg 300w';
 
     render(
-      <TestConfigContextProvider>
-        <ReleaseEditableBlock
-          publicationId="publication-1"
-          releaseId="release-1"
-          sectionId="section-1"
-          sectionKey="content"
-          block={{
-            ...testHtmlBlock,
-            body: `
-            <h3>Test heading</h3>
-            <p>Some test content</p>
-            <img alt="Test image 1" src="/api/releases/{releaseId}/images/some-image-id" srcset="${image1SrcSet}" />
-            <img alt="Test image 2" src="https://test/some-image-url.jpg" srcset="${image2SrcSet}" />
-            `,
-          }}
-        />
-      </TestConfigContextProvider>,
+      <ReleaseEditableBlock
+        publicationId="publication-1"
+        releaseId="release-1"
+        sectionId="section-1"
+        sectionKey="content"
+        block={{
+          ...testHtmlBlock,
+          body: `
+          <h3>Test heading</h3>
+          <p>Some test content</p>
+          <img alt="Test image 1" src="/api/releases/{releaseId}/images/some-image-id" srcset="${image1SrcSet}" />
+          <img alt="Test image 2" src="https://test/some-image-url.jpg" srcset="${image2SrcSet}" />
+          `,
+        }}
+      />,
     );
 
     expect(screen.getByRole('img', { name: 'Test image 1' })).toHaveAttribute(

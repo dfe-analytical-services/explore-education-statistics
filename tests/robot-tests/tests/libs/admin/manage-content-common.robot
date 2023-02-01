@@ -384,8 +384,12 @@ user removes image from accordion section text block
 user saves autosaving text block
     [Arguments]    ${parent}
     user checks element contains button    ${parent}    Save & close
+
+    # EES-3051 - moving focus out of the autosave textarea to give the onBlur() with the 100ms timeout in
+    # FormEditor.tsx a chance to process prior to processing the form submission when we click "Save & close".
     user presses keys    TAB
     sleep    0.2
+
     user clicks button    Save & close    ${parent}
     user waits until parent does not contain button    ${parent}    Save & close    %{WAIT_SMALL}
 
