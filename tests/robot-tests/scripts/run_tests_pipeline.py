@@ -26,12 +26,12 @@ def run_tests_pipeline():
     subprocess.check_call("python -m pip install --upgrade pip", shell=True)
     subprocess.check_call("pip install pipenv", shell=True)
     subprocess.check_call("pipenv install", shell=True)
-    
+
     run_tests_command = f"pipenv run python run_tests.py --admin-pass {args.admin_pass} --analyst-pass {args.analyst_pass} --expiredinvite-pass {args.expiredinvite_pass} --env {args.env} --file {args.file} --ci --processes {args.processes} --enable-slack-notifications"
-    
+
     if args.rerun_failed_suites is not None:
         run_tests_command += " --rerun-failed-suites"
-        
+
     subprocess.check_call(run_tests_command, shell=True)
 
 
@@ -57,7 +57,13 @@ if __name__ == "__main__":
 
     parser.add_argument("--processes", dest="processes", help="number of processes to run", required=True)
 
-    parser.add_argument("--rerun-failed-suites", dest="rerun_failed_suites", help="rerun any failed suites from a previous run", required=False)
+    parser.add_argument(
+        "--rerun-failed-suites",
+        dest="rerun_failed_suites",
+        help="rerun any failed suites from a previous run",
+        required=False,
+        action="store_true",
+    )
 
     args = parser.parse_args()
     run_tests_pipeline()
