@@ -17,6 +17,7 @@ import { ContentSection } from '@common/services/publicationService';
 import { render, screen } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 
 jest.mock('@admin/services/hubs/utils/createConnection');
 
@@ -167,31 +168,35 @@ describe('ReleaseContentAccordionSection', () => {
 
   test('renders correctly in preview mode', () => {
     render(
-      <EditingContextProvider editingMode="preview">
-        <ReleaseContentProvider
-          value={{
-            release: testEditableRelease,
-            canUpdateRelease: true,
-            availableDataBlocks: [],
-          }}
-        >
-          <ReleaseContentHubContextProvider releaseId={testEditableRelease.id}>
-            <EditableAccordion
-              onAddSection={noop}
-              id="test-accordion"
-              onReorder={noop}
+      <TestConfigContextProvider>
+        <EditingContextProvider editingMode="preview">
+          <ReleaseContentProvider
+            value={{
+              release: testEditableRelease,
+              canUpdateRelease: true,
+              availableDataBlocks: [],
+            }}
+          >
+            <ReleaseContentHubContextProvider
+              releaseId={testEditableRelease.id}
             >
-              <ReleaseContentAccordionSection
-                id="test-section-1"
-                section={{
-                  ...testSection,
-                  content: [testBlock],
-                }}
-              />
-            </EditableAccordion>
-          </ReleaseContentHubContextProvider>
-        </ReleaseContentProvider>
-      </EditingContextProvider>,
+              <EditableAccordion
+                onAddSection={noop}
+                id="test-accordion"
+                onReorder={noop}
+              >
+                <ReleaseContentAccordionSection
+                  id="test-section-1"
+                  section={{
+                    ...testSection,
+                    content: [testBlock],
+                  }}
+                />
+              </EditableAccordion>
+            </ReleaseContentHubContextProvider>
+          </ReleaseContentProvider>
+        </EditingContextProvider>
+      </TestConfigContextProvider>,
     );
 
     expect(

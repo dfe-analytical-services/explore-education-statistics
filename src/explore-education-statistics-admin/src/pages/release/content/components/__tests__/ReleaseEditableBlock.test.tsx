@@ -23,6 +23,7 @@ import {
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React, { ReactNode } from 'react';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 
 jest.mock('@admin/services/hubs/utils/createConnection');
 jest.mock('@admin/services/releaseContentService');
@@ -860,26 +861,29 @@ describe('ReleaseEditableBlock', () => {
     release: EditableRelease = testEditableRelease,
   ): RenderResult {
     return baseRender(
-      <AuthContextTestProvider
-        user={{
-          id: testCurrentUser.id,
-          name: testCurrentUser.displayName,
-          validToken: true,
-          permissions: {} as GlobalPermissions,
-        }}
-      >
-        <ReleaseContentHubContextProvider releaseId={release.id}>
-          <ReleaseContentProvider
-            value={{
-              release,
-              canUpdateRelease: true,
-              availableDataBlocks: [],
-            }}
-          >
-            {child}
-          </ReleaseContentProvider>
-        </ReleaseContentHubContextProvider>
-      </AuthContextTestProvider>,
+      <TestConfigContextProvider>
+        <AuthContextTestProvider
+          user={{
+            id: testCurrentUser.id,
+            name: testCurrentUser.displayName,
+            validToken: true,
+            permissions: {} as GlobalPermissions,
+          }}
+        >
+          <ReleaseContentHubContextProvider releaseId={release.id}>
+            <ReleaseContentProvider
+              value={{
+                release,
+                canUpdateRelease: true,
+                availableDataBlocks: [],
+              }}
+            >
+              {child}
+            </ReleaseContentProvider>
+          </ReleaseContentHubContextProvider>
+        </AuthContextTestProvider>
+        ,
+      </TestConfigContextProvider>,
     );
   }
 });

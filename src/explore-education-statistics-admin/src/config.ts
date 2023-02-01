@@ -4,6 +4,7 @@ import produce from 'immer';
 export interface Config {
   readonly AppInsightsKey: string;
   readonly PublicAppUrl: string;
+  readonly PermittedEmbedUrlDomains: string[];
 }
 
 let config: Config;
