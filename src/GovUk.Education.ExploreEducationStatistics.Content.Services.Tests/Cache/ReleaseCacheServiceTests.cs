@@ -77,7 +77,6 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
                 Id = Guid.NewGuid()
             }
         },
-        DataLastPublished = DateTime.UtcNow,
         Type = ReleaseType.NationalStatistics,
         RelatedInformation = new List<LinkViewModel>
         {
