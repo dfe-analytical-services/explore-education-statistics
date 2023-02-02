@@ -196,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task ClearPublicCachePublicationPaths_SingleValidPath()
+        public async Task ClearPublicCachePublicationJson()
         {
             var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
 
@@ -211,25 +211,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
-            var result = await controller.ClearPublicCachePublicationPaths(
-                new ClearPublicCachePublicationPathsViewModel
-                {
-                    Paths = SetOf("latest-release.json")
-                }
-            );
+            var result = await controller.ClearPublicCachePublicationJson();
 
             VerifyAllMocks(publicBlobStorageService);
 
             result.AssertNoContent();
 
             var regex = Assert.IsType<Regex>(options.IncludeRegex);
-            Assert.Matches(regex, "publications/publication-1/latest-release.json");
-            Assert.DoesNotMatch(regex, "publications/publication-1/latest-release.json.bak");
-            Assert.DoesNotMatch(regex, "something/publications/publication-1/latest-release.json");
-            Assert.DoesNotMatch(regex, "publications/publication-1/publication.json");
-            Assert.DoesNotMatch(regex, "publications/publication-1/releases/publications/latest-release.json");
-            Assert.DoesNotMatch(regex, "publications/publication-1/releases");
-            Assert.DoesNotMatch(regex, "publications/publication-1/releases/publications/releases");
+
+            Assert.Matches(regex, "publications/publication-1/publication.json");
+            Assert.DoesNotMatch(regex, "publications/publication-1/publication_json");
+            Assert.DoesNotMatch(regex, "something/publications/publication-1/publication.json");
+            Assert.DoesNotMatch(regex, "publications/publication-1/releases/publications/publication.json");
         }
 
         [Fact]
@@ -248,16 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
-            var result = await controller.ClearPublicCachePublicationPaths(
-                new ClearPublicCachePublicationPathsViewModel
-                {
-                    Paths = new HashSet<string>
-                    {
-                        "latest-release.json",
-                        "publication.json",
-                        "releases"
-                    }
-                });
+            var result = await controller.ClearPublicCacheReleaseJson();
 
             VerifyAllMocks(publicBlobStorageService);
 
@@ -265,15 +249,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var regex = Assert.IsType<Regex>(options.IncludeRegex);
             Assert.Matches(regex, "publications/publication-1/latest-release.json");
-            Assert.Matches(regex, "publications/publication-1/publication.json");
-            Assert.Matches(regex, "publications/publication-1/releases");
-            Assert.DoesNotMatch(regex, "releases");
-            Assert.DoesNotMatch(regex, "publications/publication-1/releases2");
-            Assert.DoesNotMatch(regex, "publications/releases");
-            Assert.DoesNotMatch(regex, "something/publications/publication-1/latest-release.json");
-            Assert.DoesNotMatch(regex, "something/publications/publication-1/publication.json");
-            Assert.DoesNotMatch(regex, "publications/publication-1/releases/publications/latest-release.json");
-            Assert.DoesNotMatch(regex, "publications/publication-1/releases/publications/publication.json");
+            Assert.Matches(regex, "publications/publication-1/releases/1234-56.json");
+            Assert.DoesNotMatch(regex, "publications/publication-1/latest-release_json");
+            Assert.DoesNotMatch(regex, "publications/publication-1/releases/1234-56_json");
+            Assert.DoesNotMatch(regex, "publications/latest-release.json");
+            Assert.DoesNotMatch(regex, "publications/publication-1/releases/latest-release.json");
+            Assert.DoesNotMatch(regex, "publications/publication-1/releases/12-56.json");
+            Assert.DoesNotMatch(regex, "publications/publication-1/releases/latest-release.json.bak");
+            Assert.DoesNotMatch(regex, "publications/publication-1/releases/1234-56.json.bak");
         }
 
         [Fact]

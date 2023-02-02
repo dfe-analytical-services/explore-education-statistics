@@ -147,22 +147,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             return NoContent();
         }
 
-        [HttpDelete("public-cache/publications/paths")]
-        public async Task<ActionResult> ClearPublicCachePublicationPaths(
-            ClearPublicCachePublicationPathsViewModel request)
+        /// <summary>
+        /// Clears all publication.json files
+        ///
+        /// Useful for when the PublicationCacheViewModel has been changed to invalidate all publication JSON files.
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete("public-cache/publications/publication-json")]
+        public async Task<ActionResult> ClearPublicCachePublicationJson()
         {
-            if (request.Paths.Any())
-            {
-                var pathString = request.Paths.JoinToString('|');
+            var publicationJsonFilenameRegex = FileStoragePathUtils.PublicationFileName.Replace(".", "\\.");
+            
+            await _publicBlobStorageService.DeleteBlobs(
+                BlobContainers.PublicContent,
+                options: new DeleteBlobsOptions
+                {
+                    IncludeRegex = new Regex($"^publications/[^/]*/{publicationJsonFilenameRegex}$")
+                });
 
-                await _publicBlobStorageService.DeleteBlobs(
-                    BlobContainers.PublicContent,
-                    options: new DeleteBlobsOptions
-                    {
-                        IncludeRegex = new Regex($"^publications/[^/]*/({pathString})$")
-                    }
-                );
-            }
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Clears all latest-release.json and releases/[yyyy-*].json.
+        ///
+        /// Useful for when the ReleaseCacheViewModel has been changed to invalidate all release JSON files, as this
+        /// will target both the latest-release.json and individual [release-year-and-time-identifier].json files in
+        /// the same call.
+        /// </summary>
+        [HttpDelete("public-cache/publications/release-json")]
+        public async Task<ActionResult> ClearPublicCacheReleaseJson()
+        {
+            var latestReleaseJsonFilenameRegex = FileStoragePathUtils.LatestReleaseFileName.Replace(".", "\\.");
+            
+            await _publicBlobStorageService.DeleteBlobs(
+                BlobContainers.PublicContent,
+                options: new DeleteBlobsOptions
+                {
+                    IncludeRegex = new Regex($"^publications/[^/]*/({latestReleaseJsonFilenameRegex}|releases/[0-9]{{4}}-.*\\.json)$")
+                });
 
             return NoContent();
         }
@@ -192,20 +215,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             {
                 FileStoragePathUtils.DataBlocksDirectory,
                 FileStoragePathUtils.SubjectMetaDirectory
-            };
-
-            [MinLength(1)]
-            [ContainsOnly(AllowedValuesProvider = nameof(AllowedPaths))]
-            public HashSet<string> Paths { get; set; } = new();
-        }
-
-        public class ClearPublicCachePublicationPathsViewModel
-        {
-            private static readonly HashSet<string> AllowedPaths = new()
-            {
-                FileStoragePathUtils.LatestReleaseFileName,
-                FileStoragePathUtils.PublicationFileName,
-                FileStoragePathUtils.ReleasesDirectory,
             };
 
             [MinLength(1)]
