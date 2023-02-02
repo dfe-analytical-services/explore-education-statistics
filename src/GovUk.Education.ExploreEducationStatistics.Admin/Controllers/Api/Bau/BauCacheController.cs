@@ -147,6 +147,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             return NoContent();
         }
 
+        [HttpDelete("public-cache/publications")]
+        public async Task<ActionResult> ClearPublicCachePublicationPaths(
+            ClearPublicCachePublicationPathsViewModel request)
+        {
+            if (request.Paths.Any())
+            {
+                var pathString = request.Paths.JoinToString('|');
+
+                await _publicBlobStorageService.DeleteBlobs(
+                    BlobContainers.PublicContent,
+                    options: new DeleteBlobsOptions
+                    {
+                        IncludeRegex = new Regex($"^publications/[^/]*/({pathString})")
+                    }
+                );
+            }
+
+            return NoContent();
+        }
+
         public class UpdatePublicCacheTreePathsViewModel
         {
             public enum CacheEntry
@@ -172,6 +192,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             {
                 FileStoragePathUtils.DataBlocksDirectory,
                 FileStoragePathUtils.SubjectMetaDirectory
+            };
+
+            [MinLength(1)]
+            [ContainsOnly(AllowedValuesProvider = nameof(AllowedPaths))]
+            public HashSet<string> Paths { get; set; } = new();
+        }
+
+        public class ClearPublicCachePublicationPathsViewModel
+        {
+            private static readonly HashSet<string> AllowedPaths = new()
+            {
+                FileStoragePathUtils.LatestReleaseFileName,
+                FileStoragePathUtils.PublicationFileName
             };
 
             [MinLength(1)]

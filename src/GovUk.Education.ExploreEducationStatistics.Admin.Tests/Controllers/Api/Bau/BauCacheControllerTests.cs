@@ -196,6 +196,79 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
+        public async Task ClearPublicCachePublicationPaths_SingleValidPath()
+        {
+            var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
+
+            DeleteBlobsOptions options = null!;
+            var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
+
+            publicBlobStorageService
+                .Setup(
+                    s =>
+                        s.DeleteBlobs(PublicContent, null, Capture.With(match)))
+                .Returns(Task.CompletedTask);
+
+            var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
+
+            var result = await controller.ClearPublicCachePublicationPaths(
+                new ClearPublicCachePublicationPathsViewModel
+                {
+                    Paths = SetOf("latest-release.json")
+                }
+            );
+
+            VerifyAllMocks(publicBlobStorageService);
+
+            result.AssertNoContent();
+
+            var regex = Assert.IsType<Regex>(options.IncludeRegex);
+            Assert.Matches(regex, "publications/publication-1/latest-release.json");
+            Assert.DoesNotMatch(regex, "something/publications/publication-1/latest-release.json");
+            Assert.DoesNotMatch(regex, "publications/publication-1/publication.json");
+            Assert.DoesNotMatch(regex, "publications/publication-1/releases/publications/latest-release.json");
+        }
+
+        [Fact]
+        public async Task ClearPublicCachePublicationPaths_AllValidPaths()
+        {
+            var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
+
+            DeleteBlobsOptions options = null!;
+            var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
+
+            publicBlobStorageService
+                .Setup(
+                    s =>
+                        s.DeleteBlobs(PublicContent, null, Capture.With(match)))
+                .Returns(Task.CompletedTask);
+
+            var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
+
+            var result = await controller.ClearPublicCachePublicationPaths(
+                new ClearPublicCachePublicationPathsViewModel
+                {
+                    Paths = new HashSet<string>
+                    {
+                        "latest-release.json",
+                        "publication.json"
+                    }
+                });
+
+            VerifyAllMocks(publicBlobStorageService);
+
+            result.AssertNoContent();
+
+            var regex = Assert.IsType<Regex>(options.IncludeRegex);
+            Assert.Matches(regex, "publications/publication-1/latest-release.json");
+            Assert.Matches(regex, "publications/publication-1/publication.json");
+            Assert.DoesNotMatch(regex, "something/publications/publication-1/latest-release.json");
+            Assert.DoesNotMatch(regex, "something/publications/publication-1/publication.json");
+            Assert.DoesNotMatch(regex, "publications/publication-1/releases/publications/latest-release.json");
+            Assert.DoesNotMatch(regex, "publications/publication-1/releases/publications/publication.json");
+        }
+
+        [Fact]
         public async Task ClearPublicCacheReleases_SingleValidPath()
         {
             var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
