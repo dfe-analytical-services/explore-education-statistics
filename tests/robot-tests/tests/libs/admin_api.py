@@ -78,13 +78,6 @@ def user_creates_topic_via_api(title: str, theme_id: str) -> str:
     return resp.json()["id"]
 
 
-def user_triggers_release_on_demand(release_id: str):
-    resp = admin_client.put(f"/api/bau/release/{release_id}/publish")
-    assert (
-        resp.status_code == 200
-    ), f"Release on demand request failed! Responded with {resp.status_code} and {resp.text}"
-
-
 def user_creates_test_publication_via_api(publication_name: str, topic_id: str = None):
     if topic_id is not None:
         chosen_topic_id = topic_id
@@ -191,7 +184,7 @@ def user_resets_user_roles_via_api_if_required(user_emails: list) -> None:
                 BuiltIn().log(f"User with email {user_email} does not exist in user list", "WARN")
 
 
-def user_create_test_release_via_api(
+def user_creates_test_release_via_api(
     publication_id: str, time_period: str, year: str, type: str = "NationalStatistics"
 ):
     response = admin_client.post(
@@ -209,6 +202,8 @@ def user_create_test_release_via_api(
     assert (
         response.status_code < 300
     ), f"Creating release API request failed with {response.status_code} and {response.text}"
+
+    return response.json()["id"]
 
 
 def _get_user_details_via_api(user_email: str):

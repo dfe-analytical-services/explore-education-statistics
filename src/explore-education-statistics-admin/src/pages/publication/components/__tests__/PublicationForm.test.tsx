@@ -459,8 +459,10 @@ describe('PublicationForm', () => {
         canUpdatePublicationSummary: true,
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
+        canManageLegacyReleases: true,
         canUpdateContact: true,
         canUpdateContributorReleaseRole: true,
+        canViewReleaseTeamAccess: true,
       },
     };
 

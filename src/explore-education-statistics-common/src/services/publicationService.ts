@@ -39,6 +39,7 @@ export interface Publication {
   externalMethodology?: ExternalMethodology;
   supersededById?: string;
   isSuperseded?: boolean;
+  supersededBy?: PublicationSupersededBy;
 }
 
 export interface PublicationSummary {
@@ -142,7 +143,6 @@ export interface Release<
   updates: ReleaseNote[];
   content: ContentSection<ContentBlockType | DataBlockType | EmbedBlockType>[];
   downloadFiles: FileInfo[];
-  dataLastPublished: string;
   hasPreReleaseAccessList: boolean;
   hasDataGuidance: boolean;
 }
@@ -158,7 +158,6 @@ export interface ReleaseSummary {
   nextReleaseDate: PartialDate;
   type: ReleaseType;
   latestRelease: boolean;
-  dataLastPublished: string;
 }
 
 export interface PublicationReleaseSummary extends ReleaseSummary {
@@ -176,8 +175,14 @@ export interface PublicationTreeSummary {
   slug: string;
   legacyPublicationUrl?: string;
   isSuperseded: boolean;
+  supersededBy?: PublicationSupersededBy;
 }
 
+export interface PublicationSupersededBy {
+  id: string;
+  title: string;
+  slug: string;
+}
 export interface Topic {
   id: string;
   title: string;

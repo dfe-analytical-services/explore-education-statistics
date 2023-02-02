@@ -20,7 +20,7 @@ ${RELEASE_NAME}=                        Academic Year 2021/22
 *** Test Cases ***
 Create a draft release via api
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    user create test release via api    ${PUBLICATION_ID}    AY    2021
+    user creates test release via api    ${PUBLICATION_ID}    AY    2021
 
 Create a methodology
     user creates methodology for publication    ${PUBLICATION_NAME}

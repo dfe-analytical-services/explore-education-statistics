@@ -670,6 +670,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("NextReleaseDate")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("NotifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("NotifySubscribers")
+                        .HasColumnType("bit");
+
                     b.Property<string>("PreReleaseAccessList")
                         .HasColumnType("nvarchar(max)");
 
@@ -801,7 +807,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("InternalReleaseNote")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("NotifiedOn")

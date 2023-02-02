@@ -11,7 +11,8 @@ using Microsoft.AspNetCore.Authorization;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
+    AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -30,6 +31,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             Id = Guid.NewGuid(),
             Methodologies = new List<PublicationMethodology>()
+        };
+
+        private static readonly Publication PublicationArchived = new()
+        {
+            Id = Guid.NewGuid(),
+            SupersededById = Guid.NewGuid()
         };
 
         private static readonly Publication PublicationWithOwnedMethodology = new()
@@ -65,6 +72,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 UserWithCorrectClaimCanCreateMethodologyForAnyPublication_AdoptedAnotherMethodologyButNotOwned()
             {
                 await AssertUserWithCorrectClaimCanCreateMethodology(PublicationWithAdoptedMethodology);
+            }
+
+            [Fact]
+            public async Task UserWithCorrectClaimCannotCreateMethodologyForArchivedPublication()
+            {
+                await AssertUserWithCorrectClaimCannotCreateMethodology(PublicationArchived);
             }
 
             [Fact]
@@ -141,6 +154,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
+            public async Task UserCannotCreateMethodologyForArchivedPublication()
+            {
+                await AssertPublicationOwnerCannotCreateMethodology(PublicationArchived);
+            }
+
+            [Fact]
             public async Task UserCannotCreateMethodologyForPublicationWithoutPublicationOwnerRole()
             {
                 await using var context = InMemoryApplicationDbContext();
@@ -204,10 +223,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var authContext = CreateAuthContext(user, publication);
 
                 await handler.HandleAsync(authContext);
+
+                // There should be no interactions to check the users' publication roles to determine
+                // whether or not they can create a methodology
                 VerifyAllMocks(userPublicationRoleRepository);
 
-                // Verify that the user can create a Methodology for this Publication by virtue of having a Publication
-                // Owner role on the Publication
+                // Verify that the user cannot create a methodology for this publication
                 Assert.False(authContext.HasSucceeded);
             }
         }

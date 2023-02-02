@@ -240,7 +240,7 @@ user adds embedded dashboard to editable accordion section
 
     user opens accordion section    ${section_name}    ${section_parent}
     ${section}=    user gets accordion section content element    ${section_name}    ${section_parent}
-    user clicks button    Add embed block    ${section}
+    user clicks button    Embed a URL    ${section}
 
     user updates embedded dashboard modal
     ...    ${dashboard_title}
@@ -255,21 +255,21 @@ user updates embedded dashboard in editable accordion section
 
     user opens accordion section    ${section_name}    ${section_parent}
     user waits until page does not contain loading spinner
-    user waits until page contains button    Edit embed block
+    user waits until page contains button    Edit embedded URL
 
     ${section}=    user gets accordion section content element    ${section_name}    ${section_parent}
-    user clicks button    Edit embed block    ${section}
+    user clicks button    Edit embedded URL    ${section}
 
     user updates embedded dashboard modal
     ...    ${dashboard_title}
     ...    ${dashboard_url}
-    ...    Edit embed block
+    ...    Edit embedded URL
 
 user updates embedded dashboard modal
     [Arguments]
     ...    ${title}
     ...    ${url}
-    ...    ${modal_heading}=Add embed block
+    ...    ${modal_heading}=Embed a URL
 
     ${modal}=    user waits until modal is visible    ${modal_heading}
 
@@ -280,7 +280,7 @@ user updates embedded dashboard modal
     user enters text into element    ${url_input}    ${url}
 
     user clicks button    Save    ${modal}
-    user waits until modal is not visible    Add embed block
+    user waits until modal is not visible    Embed a URL
     user waits until page contains element    xpath://iframe[@title="${title}"]
 
 user starts editing accordion section text block

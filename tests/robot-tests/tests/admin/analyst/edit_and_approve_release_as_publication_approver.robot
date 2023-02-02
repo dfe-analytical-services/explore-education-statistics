@@ -22,28 +22,33 @@ ${DATABLOCK_NAME}=      Dates data block name
 Create new publication and release for "UI tests topic" topic
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     Set suite variable    ${PUBLICATION_ID}
-    user create test release via api    ${PUBLICATION_ID}    FY    3000
+    user creates test release via api    ${PUBLICATION_ID}    FY    3000
 
 Check that no publication roles are listed yet on the Team access page
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user waits until page contains link    Team access
     user clicks link    Team access
-    user waits until page contains    There are no publication roles currently assigned.
+    user waits until page contains    There are no publication owners or approvers.
 
 Assign publication approver permissions to analyst1
     user adds publication role to user via api
     ...    EES-test.ANALYST1@education.gov.uk
     ...    ${PUBLICATION_ID}
     ...    Approver
-    user reloads page
-    user waits until page contains    To request changing the assigned publication roles
-    user checks table column heading contains    1    1    Name
-    user checks table column heading contains    1    2    Publication role
-    user checks table body has x rows    1
-    user checks table cell contains    1    1    Analyst1 User1
-    user checks table cell contains    1    2    Approver
 
-Sign in as analyst1 and navigate to the "Release summary" page for the new release
+Sign in as analyst1 and check that the Team access page now contains the Publication Approver details
+    user signs in as analyst1
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user clicks link    Team access
+    user waits until page contains    There are no publication owners.
+    user checks table column heading contains    1    1    Name    testid:publicationRoles
+    user checks table column heading contains    1    2    Email    testid:publicationRoles
+    user checks table column heading contains    1    3    Publication role    testid:publicationRoles
+    user checks table body has x rows    1    testid:publicationRoles
+    user checks table cell contains    1    1    Analyst1 User1    testid:publicationRoles
+    user checks table cell contains    1    2    ees-test.analyst1@education.gov.uk    testid:publicationRoles
+    user checks table cell contains    1    3    Approver    testid:publicationRoles
+
+Navigate to the "Release summary" page for the new release
     user signs in as analyst1
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
@@ -129,12 +134,25 @@ Put release back into draft
     user puts release into draft
 
 Approve release for scheduled release
-    user approves release for scheduled release    2    12    3001
+    ${days_until_release}=    set variable    2
+    ${publish_date_day}=    get current datetime    %-d    ${days_until_release}
+    ${publish_date_month}=    get current datetime    %-m    ${days_until_release}
+    ${publish_date_month_word}=    get current datetime    %B    ${days_until_release}
+    ${publish_date_year}=    get current datetime    %Y    ${days_until_release}
+
+    user approves release for scheduled publication
+    ...    ${publish_date_day}
+    ...    ${publish_date_month}
+    ...    ${publish_date_year}
+    ...    12
+    ...    3001
+
+    set suite variable    ${EXPECTED_SCHEDULED_DATE}
+    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
 
 Verify release is scheduled
     user checks summary list contains    Current status    Approved
-    user checks summary list contains    Scheduled release
-    ...    ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
+    user checks summary list contains    Scheduled release    ${EXPECTED_SCHEDULED_DATE}
     user checks summary list contains    Next release expected    December 3001
 
 Put release back into draft again

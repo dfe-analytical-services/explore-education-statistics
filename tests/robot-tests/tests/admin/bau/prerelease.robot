@@ -23,7 +23,7 @@ ${DATABLOCK_FEATURED_TABLE_DESCRIPTION}=    UI test featured table description
 *** Test Cases ***
 Create test publication and release via API
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    user create test release via api    ${PUBLICATION_ID}    CY    2000
+    user creates test release via api    ${PUBLICATION_ID}    CY    2000
 
 Upload subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
@@ -111,7 +111,7 @@ Approve release and wait for it to be Scheduled
 
     user clicks button    Edit release status
     user clicks radio    Approved for publication
-    user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    Approved by prerelease UI tests
+    user enters text into element    id:releaseStatusForm-internalReleaseNote    Approved by prerelease UI tests
     user waits until page contains element    xpath://label[text()="On a specific date"]/../input
     user clicks radio    On a specific date
     user waits until page contains    Publish date

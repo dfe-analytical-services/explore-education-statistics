@@ -63,11 +63,9 @@ describe('MethodologyStatusPage', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
-
-      expect(screen.getByTestId('Status-key')).toHaveTextContent('Status');
-      expect(screen.getByTestId('Status-value')).toHaveTextContent('In Draft');
     });
 
+    expect(screen.getByTestId('Status')).toHaveTextContent('In Draft');
     expect(screen.queryByTestId('Internal note-key')).not.toBeInTheDocument();
     expect(screen.queryByTestId('When to publish-key')).not.toBeInTheDocument();
     expect(
@@ -90,24 +88,23 @@ describe('MethodologyStatusPage', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
-
-      expect(screen.getByTestId('Status-key')).toHaveTextContent('Status');
-      expect(screen.getByTestId('Status-value')).toHaveTextContent('Approved');
-
-      expect(screen.getByTestId('Internal note-key')).toHaveTextContent(
-        'Internal note',
-      );
-      expect(screen.getByTestId('Internal note-value')).toHaveTextContent(
-        'Test internal release note',
-      );
-
-      expect(screen.getByTestId('When to publish-key')).toHaveTextContent(
-        'When to publish',
-      );
-      expect(screen.getByTestId('When to publish-value')).toHaveTextContent(
-        'Immediately',
-      );
     });
+
+    expect(screen.getByTestId('Status')).toHaveTextContent('Approved');
+
+    expect(screen.getByTestId('Internal note-key')).toHaveTextContent(
+      'Internal note',
+    );
+    expect(screen.getByTestId('Internal note-value')).toHaveTextContent(
+      'Test internal release note',
+    );
+
+    expect(screen.getByTestId('When to publish-key')).toHaveTextContent(
+      'When to publish',
+    );
+    expect(screen.getByTestId('When to publish-value')).toHaveTextContent(
+      'Immediately',
+    );
 
     expect(
       screen.queryByTestId('Publish with release-key'),
@@ -133,31 +130,30 @@ describe('MethodologyStatusPage', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
-
-      expect(screen.getByTestId('Status-key')).toHaveTextContent('Status');
-      expect(screen.getByTestId('Status-value')).toHaveTextContent('Approved');
-
-      expect(screen.getByTestId('Internal note-key')).toHaveTextContent(
-        'Internal note',
-      );
-      expect(screen.getByTestId('Internal note-value')).toHaveTextContent(
-        'Test internal release note',
-      );
-
-      expect(screen.getByTestId('When to publish-key')).toHaveTextContent(
-        'When to publish',
-      );
-      expect(screen.getByTestId('When to publish-value')).toHaveTextContent(
-        'With a specific release',
-      );
-
-      expect(screen.getByTestId('Publish with release-key')).toHaveTextContent(
-        'Publish with release',
-      );
-      expect(
-        screen.getByTestId('Publish with release-value'),
-      ).toHaveTextContent('Dependant Release');
     });
+
+    expect(screen.getByTestId('Status')).toHaveTextContent('Approved');
+
+    expect(screen.getByTestId('Internal note-key')).toHaveTextContent(
+      'Internal note',
+    );
+    expect(screen.getByTestId('Internal note-value')).toHaveTextContent(
+      'Test internal release note',
+    );
+
+    expect(screen.getByTestId('When to publish-key')).toHaveTextContent(
+      'When to publish',
+    );
+    expect(screen.getByTestId('When to publish-value')).toHaveTextContent(
+      'With a specific release',
+    );
+
+    expect(screen.getByTestId('Publish with release-key')).toHaveTextContent(
+      'Publish with release',
+    );
+    expect(screen.getByTestId('Publish with release-value')).toHaveTextContent(
+      'Dependant Release',
+    );
 
     expect(screen.queryByText('Edit status')).not.toBeInTheDocument();
   });

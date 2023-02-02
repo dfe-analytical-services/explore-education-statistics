@@ -65,7 +65,7 @@ describe('EditableBlockWrapper', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders the Edit embed block button when `onEmbedBlockEdit` is provided', () => {
+  test('renders the Edit embedded URL button when `onEmbedBlockEdit` is provided', () => {
     const handleEmbedBlockEdit = jest.fn();
     render(
       <EditableBlockWrapper onEmbedBlockEdit={handleEmbedBlockEdit}>
@@ -74,7 +74,7 @@ describe('EditableBlockWrapper', () => {
     );
 
     expect(
-      screen.getByRole('button', { name: 'Edit embed block' }),
+      screen.getByRole('button', { name: 'Edit embedded URL' }),
     ).toBeInTheDocument();
   });
 
@@ -88,12 +88,12 @@ describe('EditableBlockWrapper', () => {
 
     expect(handleEmbedBlockEdit).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Edit embed block' }));
+    userEvent.click(screen.getByRole('button', { name: 'Edit embedded URL' }));
 
     expect(handleEmbedBlockEdit).toHaveBeenCalled();
   });
 
-  test('does not render the Edit embed block button when `onEmbedBlockEdit` is not provided', () => {
+  test('does not render the Edit embedded URL button when `onEmbedBlockEdit` is not provided', () => {
     render(
       <EditableBlockWrapper>
         <div>Child block</div>
@@ -101,7 +101,7 @@ describe('EditableBlockWrapper', () => {
     );
 
     expect(
-      screen.queryByRole('button', { name: 'Edit embed block' }),
+      screen.queryByRole('button', { name: 'Edit embedded URL' }),
     ).not.toBeInTheDocument();
   });
 

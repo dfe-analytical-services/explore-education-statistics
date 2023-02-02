@@ -42,8 +42,10 @@ export interface PublicationPermissions {
   canAdoptMethodologies: boolean;
   canCreateMethodologies: boolean;
   canManageExternalMethodology: boolean;
+  canManageLegacyReleases: boolean;
   canUpdateContact: boolean;
   canUpdateContributorReleaseRole: boolean;
+  canViewReleaseTeamAccess: boolean;
 }
 
 export interface PublicationWithPermissions extends Publication {
@@ -215,7 +217,7 @@ const publicationService = {
     );
   },
 
-  getRoles(publicationId: string): Promise<UserPublicationRole[]> {
+  listRoles(publicationId: string): Promise<UserPublicationRole[]> {
     return client.get(`/publications/${publicationId}/roles`);
   },
 };

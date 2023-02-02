@@ -55,12 +55,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             return CheckPolicyAgainstEntity<Topic>(topicId, _userService.CheckCanCreatePublicationForTopic);
         }
 
-        [HttpGet("permissions/publication/{publicationId:guid}/release/create")]
-        public Task<ActionResult<bool>> CanCreateReleaseForPublication(Guid publicationId)
-        {
-            return CheckPolicyAgainstEntity<Publication>(publicationId, _userService.CheckCanCreateReleaseForPublication);
-        }
-
         [HttpGet("permissions/release/{releaseId:guid}/update")]
         public Task<ActionResult<bool>> CanUpdateRelease(Guid releaseId)
         {

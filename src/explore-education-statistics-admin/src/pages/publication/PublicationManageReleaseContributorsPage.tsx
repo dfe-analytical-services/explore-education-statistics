@@ -2,7 +2,7 @@ import PublicationReleaseContributorsForm from '@admin/pages/publication/compone
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
 import { PublicationManageTeamRouteParams } from '@admin/routes/publicationRoutes';
 import releasePermissionService, {
-  ContributorViewModel,
+  UserReleaseRole,
 } from '@admin/services/releasePermissionService';
 import releaseService, { Release } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -12,8 +12,8 @@ import { RouteComponentProps } from 'react-router';
 
 interface Model {
   release: Release;
-  publicationContributors: ContributorViewModel[];
-  releaseContributors: ContributorViewModel[];
+  publicationContributors: UserReleaseRole[];
+  releaseContributors: UserReleaseRole[];
 }
 
 const PublicationManageReleaseContributorsPage = ({
@@ -24,19 +24,17 @@ const PublicationManageReleaseContributorsPage = ({
   const { releaseId } = match.params;
 
   const { value, isLoading } = useAsyncHandledRetry<Model>(async () => {
-    const [
-      release,
-      publicationContributors,
-      releaseContributors,
-    ] = await Promise.all([
+    const [release, publicationContributors, releaseRoles] = await Promise.all([
       releaseService.getRelease(releaseId),
       releasePermissionService.listPublicationContributors(publicationId),
-      releasePermissionService.listReleaseContributors(releaseId),
+      releasePermissionService.listRoles(releaseId),
     ]);
     return {
       release,
       publicationContributors,
-      releaseContributors,
+      releaseContributors: releaseRoles.filter(
+        role => role.role === 'Contributor',
+      ),
     };
   }, [publicationId, releaseId]);
 

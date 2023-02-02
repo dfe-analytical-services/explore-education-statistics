@@ -51,7 +51,7 @@ Create new publications and published releases - for Publication Approver
     ...    ${TOPIC_ID}
     user creates releases in all states for publication    ${PUBLICATION_ID}
     ...    ${PUBLICATION_FOR_PUBLICATION_APPROVER}
-    user gives analyst publication release approver access    ${PUBLICATION_FOR_PUBLICATION_APPROVER}
+    user gives analyst publication approver access    ${PUBLICATION_FOR_PUBLICATION_APPROVER}
 
 Create new publications and published releases - for Release Viewer
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_FOR_RELEASE_VIEWER}    ${TOPIC_ID}
@@ -91,7 +91,7 @@ user gives release access to all releases of publication to analyst
     [Arguments]
     ...    ${PUBLICATION_NAME}
     ...    ${ROLE}
-    user gives release access to analyst    ${PUBLICATION_NAME} - ${DRAFT_RELEASE_TYPE}    ${ROLE}
-    user gives release access to analyst    ${PUBLICATION_NAME} - ${HIGHER_REVIEW_RELEASE_TYPE}    ${ROLE}
-    user gives release access to analyst    ${PUBLICATION_NAME} - ${APPROVED_RELEASE_TYPE}    ${ROLE}
-    user gives release access to analyst    ${PUBLICATION_NAME} - ${PUBLISHED_RELEASE_TYPE}    ${ROLE}
+    user gives release access to analyst    ${PUBLICATION_NAME}    ${DRAFT_RELEASE_TYPE}    ${ROLE}
+    user gives release access to analyst    ${PUBLICATION_NAME}    ${HIGHER_REVIEW_RELEASE_TYPE}    ${ROLE}
+    user gives release access to analyst    ${PUBLICATION_NAME}    ${APPROVED_RELEASE_TYPE}    ${ROLE}
+    user gives release access to analyst    ${PUBLICATION_NAME}    ${PUBLISHED_RELEASE_TYPE}    ${ROLE}

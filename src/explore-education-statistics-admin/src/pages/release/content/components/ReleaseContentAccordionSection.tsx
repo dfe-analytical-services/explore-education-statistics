@@ -242,7 +242,7 @@ const ReleaseContentAccordionSection = ({
                         variant="secondary"
                         onClick={toggleEmbedDashboardForm.on}
                       >
-                        Add embed block
+                        Embed a URL
                       </Button>
                     )}
                   </>
@@ -251,7 +251,7 @@ const ReleaseContentAccordionSection = ({
             </>
           )}
           <Modal
-            title="Add embed block"
+            title="Embed a URL"
             open={showEmbedDashboardForm}
             onExit={toggleEmbedDashboardForm.off}
           >

@@ -604,12 +604,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(false);
                 userService.Setup(s => s.MatchesPolicy(
                         It.Is<Publication>(p => p.Id == publication.Id),
+                        CanManageLegacyReleases))
+                    .ReturnsAsync(true);
+                userService.Setup(s => s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
                         CanUpdateContact))
                     .ReturnsAsync(true);
                 userService.Setup(s => s.MatchesPolicy(
                         It.Is<Tuple<Publication, ReleaseRole>>(tuple =>
                             tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor),
                         CanUpdateSpecificReleaseRole))
+                    .ReturnsAsync(false);
+                userService.Setup(s => s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        CanViewReleaseTeamAccess))
                     .ReturnsAsync(false);
 
                 var publicationService = BuildPublicationService(context,
@@ -626,6 +634,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(result.Permissions.CanAdoptMethodologies);
                 Assert.False(result.Permissions.CanCreateMethodologies);
                 Assert.False(result.Permissions.CanManageExternalMethodology);
+                Assert.True(result.Permissions.CanManageLegacyReleases);
                 Assert.True(result.Permissions.CanUpdateContact);
                 Assert.False(result.Permissions.CanUpdateContributorReleaseRole);
             }
@@ -1037,7 +1046,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     TeamName = "Old team",
                     TeamEmail = "old.smith@test.com",
                 },
-                Published = new DateTime(2020, 8, 12),
+                LatestPublishedRelease = new Release(),
                 SupersededBy = supersedingPublicationToRemove,
             };
 
@@ -1220,7 +1229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Title = "Test topic",
                     Theme = new Theme(),
                 },
-                Published = DateTime.UtcNow,
+                LatestPublishedRelease = new Release()
             };
 
             var supersededPublication1 = new Publication

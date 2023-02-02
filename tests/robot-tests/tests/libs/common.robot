@@ -2,7 +2,6 @@
 Library     SeleniumLibrary    timeout=%{TIMEOUT}    implicit_wait=%{IMPLICIT_WAIT}    run_on_failure=do this on failure
 Library     OperatingSystem
 Library     Collections
-#Library    XvfbRobot    # sudo apt install xvfb + pip install robotframework-xvfb
 Library     file_operations.py
 Library     utilities.py
 Library     fail_fast.py
@@ -449,6 +448,12 @@ user checks element has class
     ${classes}=    get element attribute    ${element}    class
     should contain    ${classes}    ${class}
 
+user checks element does not have class
+    [Arguments]    ${selector}    ${class}    ${parent}=css:body
+    ${element}=    lookup or return webelement    ${selector}    ${parent}
+    ${classes}=    get element attribute    ${element}    class
+    should not contain    ${classes}    ${class}
+
 user waits until element is enabled
     [Arguments]    ${element}    ${wait}=${timeout}
     wait until element is enabled    ${element}    ${wait}
@@ -723,12 +728,16 @@ user gets details content element
     [Return]    ${content}
 
 user waits until page contains details dropdown
-    [Arguments]    ${text}
-    user waits until page contains element    xpath:.//details/summary[contains(., "${text}")]
+    [Arguments]    ${text}    ${wait}=${timeout}
+    user waits until page contains element    xpath:.//details/summary[contains(., "${text}")]    ${wait}
 
 user checks page for details dropdown
     [Arguments]    ${text}
     user checks page contains element    xpath:.//details/summary[contains(., "${text}")]
+
+user scrolls to details dropdown
+    [Arguments]    ${text}    ${wait}=${timeout}
+    user scrolls to element    xpath:.//details/summary[contains(., "${text}")]
 
 user checks publication bullet contains link
     [Arguments]    ${publication}    ${link}

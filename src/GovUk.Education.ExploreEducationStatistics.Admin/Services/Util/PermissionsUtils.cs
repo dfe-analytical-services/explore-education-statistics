@@ -38,9 +38,12 @@ public static class PermissionsUtils
             CanCreateMethodologies = await userService.CheckCanCreateMethodologyForPublication(publication).IsRight(),
             CanManageExternalMethodology =
                 await userService.CheckCanManageExternalMethodologyForPublication(publication).IsRight(),
+            CanManageLegacyReleases = await userService.CheckCanManageLegacyReleases(publication).IsRight(),
             CanUpdateContact = await userService.CheckCanUpdateContact(publication).IsRight(),
             CanUpdateContributorReleaseRole =
                 await userService.CheckCanUpdateReleaseRole(publication, Contributor).IsRight(),
+            CanViewReleaseTeamAccess = 
+                await userService.CheckCanViewReleaseTeamAccess(publication).IsRight()
         };
     }
 

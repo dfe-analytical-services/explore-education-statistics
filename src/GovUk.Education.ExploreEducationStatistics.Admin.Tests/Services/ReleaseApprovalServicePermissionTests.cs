@@ -1,11 +1,11 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = BuildService(userService.Object);
                         return service.CreateReleaseStatus(
                             _release.Id,
-                            new ReleaseStatusCreateViewModel
+                            new ReleaseStatusCreateRequest
                             {
                                 ApprovalStatus = ReleaseApprovalStatus.Draft
                             }
@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = BuildService(userService.Object);
                         return service.CreateReleaseStatus(
                             _release.Id,
-                            new ReleaseStatusCreateViewModel
+                            new ReleaseStatusCreateRequest
                             {
                                 ApprovalStatus = ReleaseApprovalStatus.HigherLevelReview
                             }
@@ -106,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = BuildService(userService.Object);
                         return service.CreateReleaseStatus(
                             _release.Id,
-                            new ReleaseStatusCreateViewModel
+                            new ReleaseStatusCreateRequest
                             {
                                 ApprovalStatus = ReleaseApprovalStatus.Approved
                             }

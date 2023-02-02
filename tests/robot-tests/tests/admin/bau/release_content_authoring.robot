@@ -82,33 +82,22 @@ Switch to bau1 to add review comments for first text block
     user opens accordion section    ${SECTION_1_TITLE}    id:releaseMainContent
     ${block}=    user starts editing accordion section text block    First content section    1
     ...    id:releaseMainContent
-    ${editor}=    get editor    ${block}
-    ${toolbar}=    get editor toolbar    ${block}
-    ${comments}=    get comments sidebar    ${block}
 
     # ensure 'Set page view' box doesn't intercept button click
     user scrolls down    150
     user presses keys    CTRL+a
-    user clicks button    Add comment    ${toolbar}
-
-    user waits until parent contains element    ${comments}    testid:comment-textarea
-    ${textarea}=    get child element    ${comments}    testid:comment-textarea
-    user enters text into element    ${textarea}    Test comment 1
-    user clicks button    Add comment    ${comments}
+    user adds comment to selected text    ${block}    Test comment 1
 
     user checks list has x items    testid:unresolvedComments    1    ${block}
     user checks list item contains    testid:unresolvedComments    1    Test comment 1    ${block}
 
+    ${editor}=    get editor    ${block}
     user sets focus to element    ${editor}
 
     # Selects the rest of the line
-    user presses keys    END    ${\n}    Block 1 another sentence    SHIFT+ARROW_LEFT    SHIFT+HOME
-    user clicks button    Add comment    ${toolbar}
-
-    user waits until parent contains element    ${comments}    testid:comment-textarea
-    ${textarea}=    get child element    ${comments}    testid:comment-textarea
-    user enters text into element    ${textarea}    Test comment 2
-    user clicks button    Add comment    ${comments}
+    user presses keys    END    RETURN    Block 1 another sentence    SHIFT+HOME
+    sleep    0.1    # Prevent intermittent failure where toolbar button is disabled
+    user adds comment to selected text    ${block}    Test comment 2
 
     user checks list has x items    testid:unresolvedComments    2    ${block}
     user checks list item contains    testid:unresolvedComments    1    Test comment 1    ${block}
@@ -120,19 +109,11 @@ Add review comment for second text block as bau1
     user opens accordion section    ${SECTION_1_TITLE}    id:releaseMainContent
     ${block}=    user starts editing accordion section text block    First content section    2
     ...    id:releaseMainContent
-    ${editor}=    get editor    ${block}
-    ${toolbar}=    get editor toolbar    ${block}
-    ${comments}=    get comments sidebar    ${block}
 
     # ensure 'Set page view' box doesn't intercept button click
     user scrolls down    100
     user presses keys    CTRL+a
-    user clicks button    Add comment    ${toolbar}
-
-    user waits until parent contains element    ${comments}    testid:comment-textarea
-    ${textarea}=    get child element    ${comments}    testid:comment-textarea
-    user enters text into element    ${textarea}    Test comment 3
-    user clicks button    Add comment    ${comments}
+    user adds comment to selected text    ${block}    Test comment 3
 
     user checks list has x items    testid:unresolvedComments    1    ${block}
     user checks list item contains    testid:unresolvedComments    1    Test comment 3    ${block}
@@ -270,3 +251,18 @@ Delete unresolved comment as bau1
     user waits until parent does not contain element    ${block}    testid:unresolvedComments
 
     user saves autosaving text block    ${block}
+
+
+*** Keywords ***
+user adds comment to selected text
+    [Arguments]    ${block}    ${text}
+    ${toolbar}=    get editor toolbar    ${block}
+    ${button}=    user gets button element    Add comment    ${toolbar}
+    user checks element does not have class    ${button}    ck-disabled
+    user clicks element    ${button}
+
+    ${comments}=    get comments sidebar    ${block}
+    user waits until parent contains element    ${comments}    testid:comment-textarea
+    ${textarea}=    get child element    ${comments}    testid:comment-textarea
+    user enters text into element    ${textarea}    ${text}
+    user clicks button    Add comment    ${comments}

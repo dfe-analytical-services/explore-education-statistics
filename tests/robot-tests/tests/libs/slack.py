@@ -6,7 +6,6 @@ import requests
 from bs4 import BeautifulSoup
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
-from slack_sdk.webhook import WebhookClient
 from tests.libs.logger import get_logger
 
 logger = get_logger(__name__)
@@ -18,10 +17,9 @@ class SlackService:
     def __init__(self):
         self.slack_bot_token = os.getenv("SLACK_BOT_TOKEN")
         self.report_webhook_url = os.getenv("SLACK_TEST_REPORT_WEBHOOK_URL")
-        self.alert_webhook_url = os.getenv("SLACK_WEBHOOK_URL")
         self.client = WebClient(token=self.slack_bot_token)
 
-        for env_var in [self.slack_bot_token, self.report_webhook_url, self.alert_webhook_url]:
+        for env_var in [self.slack_bot_token, self.report_webhook_url]:
             if env_var is None:
                 raise AssertionError(f"{env_var} is not set")
 
@@ -93,9 +91,3 @@ class SlackService:
                 logger.error(f"Error uploading test report: {e}")
             os.remove("UI-test-report.zip")
             logger.info("Sent UI test report to #build")
-
-    def send_snapshot_alert(self, err_msg: str) -> None:
-        slack_webhook = WebhookClient(self.alert_webhook_url)
-        response = slack_webhook.send(text=err_msg)
-        assert response.status_code == 200 and response.body == "ok"
-        logger.info("Sent snapshot alert to #build")

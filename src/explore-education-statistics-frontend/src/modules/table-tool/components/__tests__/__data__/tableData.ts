@@ -303,7 +303,6 @@ export const testPublicationRelease: Release = {
   updates: [],
   content: [],
   downloadFiles: [],
-  dataLastPublished: '',
   hasPreReleaseAccessList: true,
   hasDataGuidance: true,
 };

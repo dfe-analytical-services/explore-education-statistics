@@ -31,8 +31,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public bool LatestRelease { get; }
 
-        public DateTime? DataLastPublished { get; }
-
         public PublicationSummaryViewModel? Publication { get; }
 
         public ReleaseSummaryViewModel(ReleaseCacheViewModel release, PublicationCacheViewModel publication)
@@ -47,7 +45,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             NextReleaseDate = release.NextReleaseDate;
             Type = release.Type;
             LatestRelease = Id == publication.LatestReleaseId;
-            DataLastPublished = release.DataLastPublished;
             Publication = new PublicationSummaryViewModel(publication);
         }
 
@@ -63,7 +60,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             NextReleaseDate = release.NextReleaseDate;
             Type = release.Type;
             LatestRelease = Id == release.Publication.LatestPublishedReleaseId;
-            DataLastPublished = release.DataLastPublished;
         }
     }
 }

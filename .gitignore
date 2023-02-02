@@ -24,11 +24,12 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+tsconfig.tsbuildinfo
 
 ## Tests
 
 junit.xml
-src/explore-education-statistics-admin/*.xml 
+src/explore-education-statistics-admin/*.xml
 src/explore-education-statistics-common/*.xml
 src/explore-education-statistics-frontend/*.xml
 **/test-results/
@@ -63,7 +64,6 @@ src/GovUk.Education.ExploreEducationStatistics.Data.Seed/Files/
 tags
 *.pyc
 *.tmp
-
 lerna-debug.log
 
 admin-start.sh

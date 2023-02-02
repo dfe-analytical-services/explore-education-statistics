@@ -1,4 +1,4 @@
-# Explore education statistics service
+# Explore Education Statistics service
 
 [![Build Status](https://dfe-gov-uk.visualstudio.com/s101-Explore-Education-Statistics/_apis/build/status/Explore%20Education%20Statistics?branchName=master)](https://dfe-gov-uk.visualstudio.com/s101-Explore-Education-Statistics/_build/latest?definitionId=200&branchName=master)
 
@@ -238,7 +238,7 @@ for its Open ID Connect configuration.
 
 Additional seed data users can be added to Keycloak by manually adding new entries to the "users" array in
 [keycloak-ees-realm.json](src/keycloak/keycloak-ees-realm.json), ensuring to supply unique GUIDs to the `user` and
-`credentials` ids. If copying and pasting from an existing user record in the array, the new user password will be
+`credentials` Ids. If copying and pasting from an existing user record in the array, the new user password will be
 "password" also.
 
 After this, existing Keycloak Docker containers will need to be rebuilt in order to pick up the new user list. To
@@ -589,11 +589,19 @@ docker exec -it ees-idp /opt/jboss/keycloak/bin/standalone.sh -Djboss.socket.bin
 Then simply copy the file from the `/tmp/new-ees-realm.json` file in the `ees-idp` container to `src/keycloak-ees-realm.json` in order for future restarts of the IdP to use this new 
 realm configuration.
 
+### Forcing immediate publishing of scheduled Releases in test environments
+
+During manual or automated testing, it is handy to have a way to schedule releases for publishing but to trigger that process to occur on demand, rather than having to wait for a lengthly
+period before the scheduled Publisher Functions run. For this, we provide 2 Functions that can be triggered by HTTP requests; one stages scheduled Releases, whilst the other completes the
+publishing process for any staged Releases and makes them live.
+
+See the [Publisher Functions README](src/GovUk.Education.ExploreEducationStatistics.Publisher/README.md) for more information.
+
+### Robot Tests
+
 Aside from unit tests for each project, we maintain suites of Robot Framework tests that can be found in `tests`.
 
-See the relevant README:
-
-- [Robot Framework tests](./tests/robot-tests/README.md)
+See the [Robot Framework tests README](tests/robot-tests/README.md) for more information.
 
 ## Contributing
 

@@ -44,7 +44,7 @@ export interface ReleaseStatusFormValues {
   nextReleaseDate?: PartialDate;
   approvalStatus: ReleaseApprovalStatus;
   notifySubscribers?: boolean;
-  latestInternalReleaseNote: string;
+  internalReleaseNote?: string;
 }
 
 export const formId = 'releaseStatusForm';
@@ -136,7 +136,7 @@ const ReleaseStatusForm = ({
       initialValues={{
         approvalStatus: release.approvalStatus,
         notifySubscribers: release.notifySubscribers,
-        latestInternalReleaseNote: release.latestInternalReleaseNote ?? '',
+        internalReleaseNote: release.latestInternalReleaseNote,
         publishMethod: release.publishScheduled ? 'Scheduled' : undefined,
         publishScheduled: release.publishScheduled
           ? parseISO(release.publishScheduled)
@@ -152,7 +152,7 @@ const ReleaseStatusForm = ({
           is: value => value === 'Approved',
           then: Yup.boolean().required(),
         }),
-        latestInternalReleaseNote: Yup.string().when('approvalStatus', {
+        internalReleaseNote: Yup.string().when('approvalStatus', {
           is: value => ['Approved', 'HigherLevelReview'].includes(value),
           then: Yup.string().required('Enter an internal note'),
         }),
@@ -230,7 +230,7 @@ const ReleaseStatusForm = ({
             />
 
             <FormFieldTextArea<ReleaseStatusFormValues>
-              name="latestInternalReleaseNote"
+              name="internalReleaseNote"
               className="govuk-!-width-one-half"
               label="Internal note"
               hint="Please include any relevant information"

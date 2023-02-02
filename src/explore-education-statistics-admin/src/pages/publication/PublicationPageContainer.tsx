@@ -73,8 +73,6 @@ const PublicationPageContainer = ({
           );
         case publicationContactRoute:
           return publication?.permissions?.canUpdateContact;
-        case publicationTeamAccessRoute:
-          return publication?.permissions?.canUpdateContributorReleaseRole;
         default:
           return true;
       }

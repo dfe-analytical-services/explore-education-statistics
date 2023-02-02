@@ -1,0 +1,583 @@
+[
+  {
+    "publication_summary": "Students sustaining an education, apprenticeship or employment destination after 16-18 study in England. Includes disadvantage, ethnicity and other breakdowns.",
+    "publication_title": "16-18 destination measures",
+    "published": "20 Oct 2022",
+    "release_type": "Official statistics",
+    "theme": "Destination of pupils and students"
+  },
+  {
+    "publication_summary": "Attainment and retention data for A level and other qualifications by age 16 to 18 in England. Includes region, institution type, characteristics, and subject.",
+    "publication_title": "A level and other 16 to 18 results",
+    "published": "10 Nov 2022",
+    "release_type": "National statistics",
+    "theme": "School and college outcomes and performance"
+  },
+  {
+    "publication_summary": "Annual release on academy transfers in England, including why academies transferred and any associated grant funding that was provided.",
+    "publication_title": "Academy transfers and funding",
+    "published": "21 Jul 2022",
+    "release_type": "Official statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Appeals submitted by parents against their child not getting an offer to a preferred primary or secondary school for the start of the academic year.",
+    "publication_title": "Admission appeals in England",
+    "published": "18 Aug 2022",
+    "release_type": "National statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Apprenticeship and traineeship starts, achievements and participation. Includes breakdowns by age, sex, ethnicity, subject, provider, geography etc.",
+    "publication_title": "Apprenticeships and traineeships",
+    "published": "26 Jan 2023",
+    "release_type": "National statistics",
+    "theme": "Further education"
+  },
+  {
+    "publication_summary": "Apprenticeship starts and achievements by employer sector and size. Experimental statistics including breakdowns by learner and apprenticeship characteristics.",
+    "publication_title": "Apprenticeships in England by industry characteristics",
+    "published": "28 Apr 2022",
+    "release_type": "Experimental statistics",
+    "theme": "Further education"
+  },
+  {
+    "publication_summary": "Attendance in education settings since Monday 23 March 2020 and early years settings since Thursday 16 April 2020.",
+    "publication_title": "Attendance in education and early years settings during the coronavirus (COVID-19) pandemic",
+    "published": "26 Jul 2022",
+    "release_type": "Official statistics",
+    "theme": "COVID-19"
+  },
+  {
+    "publication_summary": "Early-career employees by industry sector, education achievements and annualised earnings for FY2018-19.",
+    "publication_title": "Career pathways: post-16 qualifications held by employees",
+    "published": "25 May 2022",
+    "release_type": "Ad hoc statistics",
+    "theme": "Further education"
+  },
+  {
+    "publication_summary": "Statistics on children in need in England, including on child protection plans and referrals to and assessments completed by children\u2019s social care services.",
+    "publication_title": "Characteristics of children in need",
+    "published": "27 Oct 2022",
+    "release_type": "National statistics",
+    "theme": "Children's social care"
+  },
+  {
+    "publication_summary": "Statistics on the characteristics of early years providers in England.",
+    "publication_title": "Childcare and early years provider survey",
+    "published": "15 Dec 2022",
+    "release_type": "Official statistics",
+    "theme": "Early years"
+  },
+  {
+    "publication_summary": "",
+    "publication_title": "Childcare and early years survey of parents",
+    "published": "25 Aug 2022",
+    "release_type": "Official statistics",
+    "theme": "Early years"
+  },
+  {
+    "publication_summary": "Children accommodated in secure children's homes in England and Wales including approved places, availability, occupancy, gender, age, ethnicity, length of stay",
+    "publication_title": "Children accommodated in secure children's homes",
+    "published": "26 May 2022",
+    "release_type": "National statistics",
+    "theme": "Children's social care"
+  },
+  {
+    "publication_summary": "Children looked after, care leavers and children adopted in England. Annual statistics including characteristics, placement information and health outcomes.",
+    "publication_title": "Children looked after in England including adoptions",
+    "published": "17 Nov 2022",
+    "release_type": "National statistics",
+    "theme": "Children's social care"
+  },
+  {
+    "publication_summary": "Statistics on children\u2019s social workers, including agency workers, in England. Includes figures on caseload, vacancies, sickness absence, starters and leavers.",
+    "publication_title": "Children's social work workforce",
+    "published": "24 Feb 2022",
+    "release_type": "Official statistics",
+    "theme": "Children's social care"
+  },
+  {
+    "publication_summary": "Analysis on children's social workers covering those leaving local authority children's social care, agency social workers, and social worker caseload.",
+    "publication_title": "Children's social work workforce: attrition, caseload, and agency workforce",
+    "published": "23 May 2022",
+    "release_type": "Ad hoc statistics",
+    "theme": "Children's social care"
+  },
+  {
+    "publication_summary": "A summary of CO2 monitor delivery to state-funded education\u202fsettings in England.",
+    "publication_title": "CO2 monitors: cumulative delivery statistics",
+    "published": "16 Dec 2021",
+    "release_type": "Management information",
+    "theme": "COVID-19"
+  },
+  {
+    "publication_summary": "Statistics on known, confirmed cases of coronavirus (COVID-19) in higher education as reported by providers.",
+    "publication_title": "Coronavirus (COVID-19) Reporting in Higher Education Providers",
+    "published": "19 Feb 2021",
+    "release_type": "Ad hoc statistics",
+    "theme": "COVID-19"
+  },
+  {
+    "publication_summary": "Ad hoc publication demonstrating COVID testing in schools - Includes the proportion of schools participating and metrics to demonstrate the departmental support",
+    "publication_title": "COVID mass testing data in education",
+    "published": "12 Feb 2021",
+    "release_type": "Ad hoc statistics",
+    "theme": "COVID-19"
+  },
+  {
+    "publication_summary": "A summary of air cleaning unit delivery to schools in England.",
+    "publication_title": "Delivery of air cleaning units",
+    "published": "30 Jun 2022",
+    "release_type": "Management information",
+    "theme": "COVID-19"
+  },
+  {
+    "publication_summary": "Qualification level statistics on destinations of 16-18 year olds in Further Education, including industry sector of employment or subject area of learning.",
+    "publication_title": "Detailed destinations of 16 to 18 year olds in Further Education",
+    "published": "25 May 2022",
+    "release_type": "Ad hoc statistics",
+    "theme": "Further education"
+  },
+  {
+    "publication_summary": "Statistics on early years foundation stage profile assessments in England, including on the 7 areas of learning and the 17 early learning goals.",
+    "publication_title": "Early years foundation stage profile results",
+    "published": "24 Nov 2022",
+    "release_type": "National statistics",
+    "theme": "Early years"
+  },
+  {
+    "publication_summary": "Annual data release on schools, pupils, teachers, qualifications gained, education expenditure, further education and higher education in the UK.",
+    "publication_title": "Education and training statistics for the UK",
+    "published": "17 Nov 2022",
+    "release_type": "National statistics",
+    "theme": "UK education and training statistics"
+  },
+  {
+    "publication_summary": "Statistics on 2 to 4-year-olds registered for funded early education and childcare entitlements in England, including on staff and providers delivering them.",
+    "publication_title": "Education provision: children under 5 years of age",
+    "published": "30 Jun 2022",
+    "release_type": "National statistics",
+    "theme": "Early years"
+  },
+  {
+    "publication_summary": "Children and young people in England with an education, health and care plan (EHCP), including annual local authority activity on EHCP requests and assessment.",
+    "publication_title": "Education, health and care plans",
+    "published": "12 May 2022",
+    "release_type": "National statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "The number of further education learners going into employment and learning destinations by local authority district in the 2017/18 academic year.",
+    "publication_title": "FE learners going into employment and learning destinations by local authority district",
+    "published": "28 Jan 2021",
+    "release_type": "Ad hoc statistics",
+    "theme": "Further education"
+  },
+  {
+    "publication_summary": "Statistics on free school meals in schools in England as collected in the October 2020 school census.",
+    "publication_title": "Free school meals: Autumn term",
+    "published": "30 Mar 2021",
+    "release_type": "Ad hoc statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Apprenticeship and adult 19+ Further Education and skills learning, including community learning, education and training, and basic skills (English and maths).",
+    "publication_title": "Further education and skills",
+    "published": "26 Jan 2023",
+    "release_type": "National statistics",
+    "theme": "Further education"
+  },
+  {
+    "publication_summary": "Measures the total value-added of the Further Education system in England over time. Includes provision type breakdown and value-added per learner.",
+    "publication_title": "Further education skills index",
+    "published": "31 Mar 2022",
+    "release_type": "Official statistics",
+    "theme": "Further education"
+  },
+  {
+    "publication_summary": "Sustained employment and learning destinations, and earnings of further education learners in England. Annual statistics with demographic and other breakdowns.",
+    "publication_title": "Further education: outcome-based success measures",
+    "published": "24 Nov 2022",
+    "release_type": "Official statistics",
+    "theme": "Destination of pupils and students"
+  },
+  {
+    "publication_summary": "Official statistics on labour market outcomes such as salaries and employment rates, for graduates, non-graduates and postgraduates.",
+    "publication_title": "Graduate labour market statistics",
+    "published": "9 Jun 2022",
+    "release_type": "Official statistics",
+    "theme": "Higher education"
+  },
+  {
+    "publication_summary": "Participation in higher level learning at Further Education Providers (FEPs) and Higher Education Providers (HEPs) for English-domiciled learners in England.",
+    "publication_title": "Higher Level Learners in England",
+    "published": "23 Jun 2022",
+    "release_type": "Official statistics",
+    "theme": "Higher education"
+  },
+  {
+    "publication_summary": "Annual national and provider level statistics on new entrants to Initial Teacher Training (ITT) in England and their characteristics.",
+    "publication_title": "Initial Teacher Training Census",
+    "published": "1 Dec 2022",
+    "release_type": "Official statistics",
+    "theme": "Teachers and school workforce"
+  },
+  {
+    "publication_summary": "Annual national and provider level statistics on outcomes of final year teacher trainees in England (qualified teacher status rates and employment rates).",
+    "publication_title": "Initial teacher training performance profiles",
+    "published": "28 Jul 2022",
+    "release_type": "Official statistics",
+    "theme": "Teachers and school workforce"
+  },
+  {
+    "publication_summary": "",
+    "publication_title": "Key stage 1 and phonics screening check attainment",
+    "published": "6 Oct 2022",
+    "release_type": "National statistics",
+    "theme": "School and college outcomes and performance"
+  },
+  {
+    "publication_summary": "Key stage 2 attainment statistics by pupil characteristics, school characteristics, region and local authority.",
+    "publication_title": "Key stage 2 attainment",
+    "published": "6 Sep 2022",
+    "release_type": "National statistics",
+    "theme": "School and college outcomes and performance"
+  },
+  {
+    "publication_summary": "",
+    "publication_title": "Key stage 2 attainment: National headlines",
+    "published": "5 Jul 2022",
+    "release_type": "National statistics",
+    "theme": "School and college outcomes and performance"
+  },
+  {
+    "publication_summary": "Pupils sustaining an education, apprenticeship or employment destination after GCSEs in England. Includes disadvantage, ethnicity and other breakdowns.",
+    "publication_title": "Key stage 4 destination measures",
+    "published": "20 Oct 2022",
+    "release_type": "Official statistics",
+    "theme": "Destination of pupils and students"
+  },
+  {
+    "publication_summary": "GCSE results of pupils at the end of KS4 attending state-funded schools in England at national & LA level. This release includes pupil characteristic breakdowns",
+    "publication_title": "Key stage 4 performance",
+    "published": "20 Oct 2022",
+    "release_type": "National statistics",
+    "theme": "School and college outcomes and performance"
+  },
+  {
+    "publication_summary": "Local authority and school spending on education, children's services and social care across financial years. Also includes income of LA maintained schools.",
+    "publication_title": "LA and school expenditure",
+    "published": "8 Dec 2022",
+    "release_type": "Official statistics",
+    "theme": "Finance and funding"
+  },
+  {
+    "publication_summary": "Official data on the number of laptops and tablets dispatched to help providers during the COVID-19 pandemic. Breakdowns by local authority and academy trust.",
+    "publication_title": "Laptops and tablets data",
+    "published": "5 Apr 2022",
+    "release_type": "Official statistics",
+    "theme": "COVID-19"
+  },
+  {
+    "publication_summary": "Earnings and employment for higher education university graduates & postgraduates by subject studied and characteristics. Longitudinal Education Outcomes (LEO).",
+    "publication_title": "LEO Graduate and Postgraduate Outcomes",
+    "published": "24 Nov 2022",
+    "release_type": "Official statistics",
+    "theme": "Higher education"
+  },
+  {
+    "publication_summary": "Employment and earnings outcomes of graduates by each higher education provider by sex and current region/subject studied/prior attainment.",
+    "publication_title": "LEO Graduate outcomes provider level data",
+    "published": "24 Nov 2022",
+    "release_type": "Official statistics",
+    "theme": "Higher education"
+  },
+  {
+    "publication_summary": "Annual level 2 and 3 attainment figures age 16 to 25 in England. Includes qualification type, institution type, characteristics and geographical breakdowns.",
+    "publication_title": "Level 2 and 3 attainment age 16 to 25",
+    "published": "28 Apr 2022",
+    "release_type": "National statistics",
+    "theme": "School and college outcomes and performance"
+  },
+  {
+    "publication_summary": "School Places scorecard for local authorities in England. School places delivered, planned and needed, pupil forecasting accuracy, cost of school places.",
+    "publication_title": "Local authority school places scorecards",
+    "published": "30 Jun 2022",
+    "release_type": "Official statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Sustained education, apprenticeship or employment destinations 1, 3 and 5 years after GCSEs. Includes disadvantage and gender breakdowns.",
+    "publication_title": "Longer term destinations",
+    "published": "7 Jul 2022",
+    "release_type": "Official statistics",
+    "theme": "Destination of pupils and students"
+  },
+  {
+    "publication_summary": "",
+    "publication_title": "Looked after children aged 16 to 17 in independent or semi-independent placements",
+    "published": "14 Jul 2022",
+    "release_type": "Ad hoc statistics",
+    "theme": "Children's social care"
+  },
+  {
+    "publication_summary": "",
+    "publication_title": "Multi-academy trust performance measures at key stage 2",
+    "published": "8 Oct 2020",
+    "release_type": "Official statistics",
+    "theme": "School and college outcomes and performance"
+  },
+  {
+    "publication_summary": "",
+    "publication_title": "Multiplication tables check attainment",
+    "published": "24 Nov 2022",
+    "release_type": "Official statistics",
+    "theme": "School and college outcomes and performance"
+  },
+  {
+    "publication_summary": "Annual release providing national projections for the number of pupils in schools in England by type of school, age and whether full time or part time.",
+    "publication_title": "National pupil projections",
+    "published": "14 Jul 2022",
+    "release_type": "Official statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Experimental statistics for the National Tutoring Programme. England only.",
+    "publication_title": "National Tutoring Programme",
+    "published": "15 Dec 2022",
+    "release_type": "Experimental statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Annual estimates from the Labour Force Survey of young people aged 16 to 24 not in education, employment or training (NEET) in England.",
+    "publication_title": "NEET age 16 to 24",
+    "published": "3 Mar 2022",
+    "release_type": "National statistics",
+    "theme": "Destination of pupils and students"
+  },
+  {
+    "publication_summary": "Children in need, including children looked after by local authorities in England, national and local authority level outcomes including key stage 4 and absence",
+    "publication_title": "Outcomes for children in need, including children looked after by local authorities in England",
+    "published": "31 Mar 2022",
+    "release_type": "National statistics",
+    "theme": "Children's social care"
+  },
+  {
+    "publication_summary": "Children in need, including children looked after by local authorities in England, national level outcomes up to Key Stage 4, including absence and exclusion.",
+    "publication_title": "Outcomes of children in need, including looked after children",
+    "published": "24 Sep 2020",
+    "release_type": "Ad hoc statistics",
+    "theme": "Children's social care"
+  },
+  {
+    "publication_summary": "Local authority and national data on penalty notices, attendance case management, parenting orders and contracts, education supervision orders.",
+    "publication_title": "Parental responsibility measures",
+    "published": "15 Dec 2022",
+    "release_type": "Official statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Participation and not in education, employment or training (NEET) figures ages 16 to 18 in England. Includes institution type and qualification aim breakdowns.",
+    "publication_title": "Participation in education, training and employment age 16 to 18",
+    "published": "30 Jun 2022",
+    "release_type": "National statistics",
+    "theme": "Destination of pupils and students"
+  },
+  {
+    "publication_summary": "LA management information on participation and not in education or training (NEET) age 16 to 17. Includes ethnicity, SEND figures and comparative NEET scorecard",
+    "publication_title": "Participation in education, training and NEET age 16 to 17 by local authority",
+    "published": "1 Dec 2022",
+    "release_type": "Management information",
+    "theme": "Destination of pupils and students"
+  },
+  {
+    "publication_summary": "Higher Education initial entrants and estimated percentages of participation. Annual statistics that include student characteristics and provider type.",
+    "publication_title": "Participation measures in higher education",
+    "published": "26 Jan 2023",
+    "release_type": "Official statistics",
+    "theme": "Higher education"
+  },
+  {
+    "publication_summary": "Data on permanent exclusions and suspensions, including by reason for exclusion, duration, by pupil characteristics and data on independent review panels.",
+    "publication_title": "Permanent exclusions and suspensions in England",
+    "published": "24 Nov 2022",
+    "release_type": "National statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Local authority (LA) spending plans for education, children's services and social care.",
+    "publication_title": "Planned LA and school expenditure",
+    "published": "29 Sep 2022",
+    "release_type": "Official statistics",
+    "theme": "Finance and funding"
+  },
+  {
+    "publication_summary": "Annual target for the number of trainees to start postgraduate initial teacher training in the relevant academic year, in England, by subject.",
+    "publication_title": "Postgraduate initial teacher training targets",
+    "published": "21 Apr 2022",
+    "release_type": "Official statistics",
+    "theme": "Teachers and school workforce"
+  },
+  {
+    "publication_summary": "Rates and value-added scores of level 3 (e.g., A level) students that sustain a higher education or apprenticeship destination. Includes various breakdowns.",
+    "publication_title": "Progression to higher education or training",
+    "published": "20 Oct 2022",
+    "release_type": "Official statistics",
+    "theme": "Destination of pupils and students"
+  },
+  {
+    "publication_summary": "",
+    "publication_title": "Provisional T Level results",
+    "published": "18 Aug 2022",
+    "release_type": "Ad hoc statistics",
+    "theme": "School and college outcomes and performance"
+  },
+  {
+    "publication_summary": "Pupil absence, including overall, authorised and unauthorised absence and persistent absence by reason and pupil characteristics for the full academic year.",
+    "publication_title": "Pupil absence in schools in England",
+    "published": "24 Mar 2022",
+    "release_type": "National statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Pupil absence, including overall, authorised and unauthorised absence and persistent absence by reason and pupil characteristics for the autumn and spring terms",
+    "publication_title": "Pupil absence in schools in England: autumn and spring terms",
+    "published": "20 Oct 2022",
+    "release_type": "National statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Pupil absence, including overall, authorised and unauthorised absence and persistent absence by reason and pupil characteristics for the autumn term.",
+    "publication_title": "Pupil absence in schools in England: autumn term",
+    "published": "26 May 2022",
+    "release_type": "National statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly experimental statistics derived from DfE\u2019s regular attendance data",
+    "publication_title": "Pupil attendance in schools",
+    "published": "26 Jan 2023",
+    "release_type": "Experimental statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "School places in primary and secondary state-funded schools including sixth form. Local authorities\u2019 pupil forecasts and planned changes to school places.",
+    "publication_title": "School capacity",
+    "published": "24 Mar 2022",
+    "release_type": "Official statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "School funding data for England, including trends in funding over time since 2010-11 and funding allocations of individual primary and secondary schools.",
+    "publication_title": "School funding statistics",
+    "published": "26 Jan 2023",
+    "release_type": "Official statistics",
+    "theme": "Finance and funding"
+  },
+  {
+    "publication_summary": "Local authority reported school place applications and offers to children from outside of the UK from Afghanistan, Ukraine, and Hong Kong resettlement schemes.",
+    "publication_title": "School placements for children from outside of the UK",
+    "published": "13 Oct 2022",
+    "release_type": "Management information",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Significant changes to primary and secondary state-funded school places, collected in one-off voluntary survey of local authorities in 2020.",
+    "publication_title": "School places sufficiency survey",
+    "published": "25 Mar 2021",
+    "release_type": "Ad hoc statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Teachers and support staff in England statistics. Includes characteristics, pupil teacher ratios, teacher retention, pay and specialist teaching.",
+    "publication_title": "School workforce in England",
+    "published": "9 Jun 2022",
+    "release_type": "National statistics",
+    "theme": "Teachers and school workforce"
+  },
+  {
+    "publication_summary": "School and pupil statistics for England including age, gender, free school meals (FSM), ethnicity, English as additional language (EAL), class size.",
+    "publication_title": "Schools, pupils and their characteristics",
+    "published": "9 Jun 2022",
+    "release_type": "National statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Preference data including applications and offers made for secondary and primary school entry each September, and the proportion which received preferred offers",
+    "publication_title": "Secondary and primary school applications and offers",
+    "published": "23 Jun 2022",
+    "release_type": "Official statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Statistics for England on serious incidents that involve death or serious harm to a child due to abuse or neglect, and any death of a looked after child.",
+    "publication_title": "Serious incident notifications",
+    "published": "26 May 2022",
+    "release_type": "Experimental statistics",
+    "theme": "Children's social care"
+  },
+  {
+    "publication_summary": "Statistics on Skills Bootcamps participants in England. Data includes starts, completions and outcomes.",
+    "publication_title": "Skills Bootcamps outcomes",
+    "published": "9 Dec 2021",
+    "release_type": "Ad hoc statistics",
+    "theme": "Further education"
+  },
+  {
+    "publication_summary": "Provider-reported Skills Bootcamps starts between April 2021 and March 2022 (in FY 2021-22). National level estimates of the number of Skills Bootcamps starts.",
+    "publication_title": "Skills Bootcamps starts",
+    "published": "8 Dec 2022",
+    "release_type": "Ad hoc statistics",
+    "theme": "Further education"
+  },
+  {
+    "publication_summary": "Pupils in England with SEN support or an education, health and care plan (EHCP). Including type of need, age, gender, free school meals (FSM) and ethnicity.",
+    "publication_title": "Special educational needs in England",
+    "published": "16 Jun 2022",
+    "release_type": "National statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Student loan forecasts for English borrower entrants, outlay and repayments for FY2021-22, with average loan amounts, lifetime repayments and cost to government",
+    "publication_title": "Student loan forecasts for England",
+    "published": "14 Jul 2022",
+    "release_type": "Official statistics",
+    "theme": "Finance and funding"
+  },
+  {
+    "publication_summary": "",
+    "publication_title": "Teacher and Leader development: ECF and NPQs",
+    "published": "14 Jul 2022",
+    "release_type": "Experimental statistics",
+    "theme": "Teachers and school workforce"
+  },
+  {
+    "publication_summary": "A summary of the link between absence and attainment at key stage 2 and key stage 4.",
+    "publication_title": "The link between absence and attainment at KS2 and KS4",
+    "published": "6 May 2022",
+    "release_type": "Ad hoc statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Estimates of UK revenue from education-related exports and transnational education (TNE) activity.",
+    "publication_title": "UK revenue from education related exports and transnational education activity",
+    "published": "15 Dec 2022",
+    "release_type": "Experimental statistics",
+    "theme": "Higher education"
+  },
+  {
+    "publication_summary": "Summary of local authority survey in England to help understand the impact of the coronavirus (COVID-19) pandemic on children\u2019s social care.",
+    "publication_title": "Vulnerable children and young people survey",
+    "published": "15 Dec 2022",
+    "release_type": "Management information",
+    "theme": "COVID-19"
+  },
+  {
+    "publication_summary": "Annual statistics on young people's participation in higher education, including their background characteristics.",
+    "publication_title": "Widening participation in higher education",
+    "published": "28 Jul 2022",
+    "release_type": "Official statistics",
+    "theme": "Higher education"
+  }
+]

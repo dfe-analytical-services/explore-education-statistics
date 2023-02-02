@@ -40,6 +40,7 @@ describe('LegacyReleasesTable', () => {
   test('renders the legacy releases table correctly', () => {
     render(
       <LegacyReleasesTable
+        canManageLegacyReleases
         legacyReleases={testLegacyReleases}
         publicationId={testPublicationId}
       />,
@@ -112,6 +113,7 @@ describe('LegacyReleasesTable', () => {
   test('shows a message when there are no legacy releases', () => {
     render(
       <LegacyReleasesTable
+        canManageLegacyReleases
         legacyReleases={[]}
         publicationId={testPublicationId}
       />,
@@ -138,6 +140,7 @@ describe('LegacyReleasesTable', () => {
       render(
         <Router history={history}>
           <LegacyReleasesTable
+            canManageLegacyReleases
             legacyReleases={testLegacyReleases}
             publicationId={testPublicationId}
           />
@@ -165,6 +168,7 @@ describe('LegacyReleasesTable', () => {
       render(
         <Router history={history}>
           <LegacyReleasesTable
+            canManageLegacyReleases
             legacyReleases={testLegacyReleases}
             publicationId={testPublicationId}
           />
@@ -187,10 +191,50 @@ describe('LegacyReleasesTable', () => {
     });
   });
 
+  test('does not show edit and delete actions when user does not have permission to manage legacy releases', () => {
+    render(
+      <LegacyReleasesTable
+        canManageLegacyReleases={false}
+        legacyReleases={testLegacyReleases}
+        publicationId={testPublicationId}
+      />,
+    );
+
+    const table = screen.getByRole('table');
+    const rows = within(table).getAllByRole('row');
+
+    expect(rows).toHaveLength(4);
+
+    const row1Cells = within(rows[0]).getAllByRole('columnheader');
+    expect(row1Cells).toHaveLength(3);
+    expect(row1Cells[0]).toHaveTextContent('Order');
+    expect(row1Cells[1]).toHaveTextContent('Description');
+    expect(row1Cells[2]).toHaveTextContent('URL');
+
+    const row2Cells = within(rows[1]).getAllByRole('cell');
+    expect(row2Cells).toHaveLength(3);
+    expect(row2Cells[0]).toHaveTextContent('3');
+    expect(row2Cells[1]).toHaveTextContent('Legacy release 3');
+    expect(row2Cells[2]).toHaveTextContent('http://gov.uk/3');
+
+    const row3Cells = within(rows[2]).getAllByRole('cell');
+    expect(row3Cells).toHaveLength(3);
+    expect(row3Cells[0]).toHaveTextContent('2');
+    expect(row3Cells[1]).toHaveTextContent('Legacy release 2');
+    expect(row3Cells[2]).toHaveTextContent('http://gov.uk/2');
+
+    const row4Cells = within(rows[3]).getAllByRole('cell');
+    expect(row4Cells).toHaveLength(3);
+    expect(row4Cells[0]).toHaveTextContent('1');
+    expect(row4Cells[1]).toHaveTextContent('Legacy release 1');
+    expect(row4Cells[2]).toHaveTextContent('http://gov.uk/1');
+  });
+
   describe('deleting', () => {
     test('shows a warning modal when the delete release button is clicked', async () => {
       render(
         <LegacyReleasesTable
+          canManageLegacyReleases
           legacyReleases={testLegacyReleases}
           publicationId={testPublicationId}
         />,
@@ -219,6 +263,7 @@ describe('LegacyReleasesTable', () => {
     test('sends the delete request and updates the releases table when confirm is clicked', async () => {
       render(
         <LegacyReleasesTable
+          canManageLegacyReleases
           legacyReleases={testLegacyReleases}
           publicationId={testPublicationId}
         />,
@@ -251,6 +296,7 @@ describe('LegacyReleasesTable', () => {
       render(
         <Router history={history}>
           <LegacyReleasesTable
+            canManageLegacyReleases
             legacyReleases={testLegacyReleases}
             publicationId={testPublicationId}
           />
@@ -278,6 +324,7 @@ describe('LegacyReleasesTable', () => {
       render(
         <Router history={history}>
           <LegacyReleasesTable
+            canManageLegacyReleases
             legacyReleases={testLegacyReleases}
             publicationId={testPublicationId}
           />
@@ -297,12 +344,27 @@ describe('LegacyReleasesTable', () => {
         );
       });
     });
+
+    test('does not show button to create when user does not have permission to manage legacy releases', () => {
+      render(
+        <LegacyReleasesTable
+          canManageLegacyReleases={false}
+          legacyReleases={testLegacyReleases}
+          publicationId={testPublicationId}
+        />,
+      );
+
+      expect(
+        screen.queryByRole('button', { name: 'Create legacy release' }),
+      ).not.toBeInTheDocument();
+    });
   });
 
   describe('reordering', () => {
     test('shows a warning modal when the reorder legacy releases button is clicked', async () => {
       render(
         <LegacyReleasesTable
+          canManageLegacyReleases
           legacyReleases={testLegacyReleases}
           publicationId={testPublicationId}
         />,
@@ -327,6 +389,7 @@ describe('LegacyReleasesTable', () => {
     test('shows the reordering UI when OK is clicked', async () => {
       render(
         <LegacyReleasesTable
+          canManageLegacyReleases
           legacyReleases={testLegacyReleases}
           publicationId={testPublicationId}
         />,
@@ -359,6 +422,20 @@ describe('LegacyReleasesTable', () => {
       ).not.toBeInTheDocument();
       expect(
         screen.queryByRole('button', { name: 'Create legacy release' }),
+      ).not.toBeInTheDocument();
+    });
+
+    test('does not show button to reorder when user does not have permission to manage legacy releases', () => {
+      render(
+        <LegacyReleasesTable
+          canManageLegacyReleases={false}
+          legacyReleases={testLegacyReleases}
+          publicationId={testPublicationId}
+        />,
+      );
+
+      expect(
+        screen.queryByRole('button', { name: 'Reorder legacy releases' }),
       ).not.toBeInTheDocument();
     });
   });

@@ -18,36 +18,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleasePermissionServicePermissionTests
     {
-        [Fact]
-        public async Task ListReleaseContributors()
+        private static readonly Release Release = new()
         {
-            var release = new Release();
-            var publication = new Publication
+            Id = Guid.NewGuid()
+        };
+        
+        private static readonly Publication Publication = new()
+        {
+            Id = Guid.NewGuid(),
+            Releases = new List<Release>
             {
-                Id = Guid.NewGuid(),
-                Releases = new List<Release>
-                {
-                    release,
-                }
-            };
-
+                Release
+            }
+        };
+        
+        [Fact]
+        public async Task ListReleaseRoles()
+        {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
-                    tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == Contributor,
-                    CanUpdateSpecificReleaseRole)
+                .SetupResourceCheckToFailWithMatcher<Publication>(publication => 
+                    publication.Id == Publication.Id , CanViewReleaseTeamAccess)
                 .AssertForbidden(async userService =>
                 {
                     var contentDbContextId = Guid.NewGuid().ToString();
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
-                        await contentDbContext.AddRangeAsync(publication);
+                        await contentDbContext.AddRangeAsync(Publication);
                         await contentDbContext.SaveChangesAsync();
                     }
 
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
                         var service = SetupReleasePermissionService(contentDbContext, userService.Object);
-                        return await service.ListReleaseContributors(release.Id);
+                        return await service.ListReleaseRoles(Release.Id, new [] { Contributor });
+                    }
+                });
+        }
+        
+        [Fact]
+        public async Task ListReleaseInvites()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFailWithMatcher<Publication>(publication => 
+                    publication.Id == Publication.Id , CanViewReleaseTeamAccess)
+                .AssertForbidden(async userService =>
+                {
+                    var contentDbContextId = Guid.NewGuid().ToString();
+                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                    {
+                        await contentDbContext.AddRangeAsync(Publication);
+                        await contentDbContext.SaveChangesAsync();
+                    }
+
+                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                    {
+                        var service = SetupReleasePermissionService(contentDbContext, userService.Object);
+                        return await service.ListReleaseInvites(Release.Id);
                     }
                 });
         }
@@ -55,28 +81,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task ListPublicationContributors()
         {
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid(),
-            };
-
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
-                    tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == Contributor,
+                    tuple => tuple.Item1.Id == Publication.Id && tuple.Item2 == Contributor,
                     CanUpdateSpecificReleaseRole)
                 .AssertForbidden(async userService =>
                 {
                     var contentDbContextId = Guid.NewGuid().ToString();
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
-                        await contentDbContext.AddRangeAsync(publication);
+                        await contentDbContext.AddRangeAsync(Publication);
                         await contentDbContext.SaveChangesAsync();
                     }
 
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
                         var service = SetupReleasePermissionService(contentDbContext, userService.Object);
-                        return await service.ListPublicationContributors(publication.Id);
+                        return await service.ListPublicationContributors(Publication.Id);
                     }
                 });
         }
@@ -84,33 +105,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateReleaseContributors()
         {
-            var release = new Release();
-            var publication = new Publication
-            {
-                Id = Guid.NewGuid(),
-                Releases = new List<Release>
-                {
-                    release,
-                }
-            };
-
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
-                    tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == Contributor,
+                    tuple => tuple.Item1.Id == Publication.Id && tuple.Item2 == Contributor,
                     CanUpdateSpecificReleaseRole)
                 .AssertForbidden(async userService =>
                 {
                     var contentDbContextId = Guid.NewGuid().ToString();
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
-                        await contentDbContext.AddRangeAsync(publication);
+                        await contentDbContext.AddRangeAsync(Publication);
                         await contentDbContext.SaveChangesAsync();
                     }
 
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
                         var service = SetupReleasePermissionService(contentDbContext, userService.Object);
-                        return await service.UpdateReleaseContributors(release.Id, new List<Guid>());
+                        return await service.UpdateReleaseContributors(Release.Id, new List<Guid>());
                     }
                 });
         }

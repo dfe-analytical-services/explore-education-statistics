@@ -25,6 +25,11 @@ Navigate to Publication where analyst has Publication Owner role
     user waits until page contains link    Team access
     user waits until page contains link    Legacy releases
 
+Check can create a legacy release
+    user clicks link    Legacy releases
+    user waits until h2 is visible    Legacy releases
+    user checks page contains button    Create legacy release
+
 Check can create a Methodology for the owned Publication
     user clicks link    Methodologies
     user waits until h2 is visible    Manage methodologies
@@ -72,3 +77,13 @@ Check cannot approve a draft release
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${DRAFT_RELEASE_TYPE}    ${THEME_NAME}    ${TOPIC_NAME}
     user cannot see the enabled approve release controls for release
+
+Check can see the editable "Update release access" section of the "Team access" page
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    user clicks link    Team access
+    user waits until h3 is visible    Update release access
+    user waits until h3 is not visible    Release access
+    user waits until page contains link    Manage release contributors
+
+Check can see the "Invite new contributors" functionality of the "Team access" page
+    user waits until page contains link    Invite new contributors

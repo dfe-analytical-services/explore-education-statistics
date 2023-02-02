@@ -69,14 +69,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
             public PartialDate NextReleaseDate { get; set; }
 
             public List<Link> RelatedInformation { get; set; } = new List<Link>();
-
-            private DateTime? dataLastPublished;
-
-            public DateTime? DataLastPublished
-            {
-                get => dataLastPublished;
-                set => dataLastPublished = value ?? DateTime.UtcNow;
-            }
         }
 
         public class PublicationViewModel

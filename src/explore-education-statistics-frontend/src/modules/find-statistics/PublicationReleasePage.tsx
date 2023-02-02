@@ -6,6 +6,7 @@ import RelatedAside from '@common/components/RelatedAside';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
+import TagGroup from '@common/components/TagGroup';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import ReleaseDataAccordion from '@common/modules/release/components/ReleaseDataAccordion';
 import publicationService, {
@@ -35,6 +36,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import ScrollableContainer from '@common/components/ScrollableContainer';
+import WarningMessage from '@common/components/WarningMessage';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 
@@ -75,27 +77,44 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
       ]}
     >
       <div className={classNames('govuk-grid-row', styles.releaseIntro)}>
+        {release.publication?.isSuperseded ? (
+          <WarningMessage testId="superseded-warning">
+            This publication has been superseded by{' '}
+            <Link
+              testId="superseded-by-link"
+              to={`/find-statistics/${release.publication.supersededBy?.slug}`}
+            >
+              {release.publication.supersededBy?.title}
+            </Link>
+          </WarningMessage>
+        ) : null}
         <div className="govuk-grid-column-two-thirds">
           <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between govuk-!-margin-bottom-3">
             <div>
-              {!release.publication.isSuperseded &&
-                (release.latestRelease ? (
-                  <Tag className="govuk-!-margin-right-3 govuk-!-margin-bottom-3">
-                    This is the latest data
-                  </Tag>
-                ) : (
-                  <Link
-                    className="dfe-print-hidden dfe-block govuk-!-margin-bottom-3"
-                    unvisited
-                    to={`/find-statistics/${release.publication.slug}`}
-                  >
-                    View latest data:{' '}
-                    <span className="govuk-!-font-weight-bold">
-                      {release.publication.releases[0].title}
-                    </span>
-                  </Link>
-                ))}
-              {release.type && <Tag>{releaseTypes[release.type]}</Tag>}
+              {!release.publication.isSuperseded && !release.latestRelease && (
+                <Link
+                  className="dfe-print-hidden dfe-block govuk-!-margin-bottom-3"
+                  unvisited
+                  to={`/find-statistics/${release.publication.slug}`}
+                >
+                  View latest data:{' '}
+                  <span className="govuk-!-font-weight-bold">
+                    {release.publication.releases[0].title}
+                  </span>
+                </Link>
+              )}
+              <TagGroup>
+                {!release.publication.isSuperseded && (
+                  <>
+                    {release.latestRelease ? (
+                      <Tag>This is the latest data</Tag>
+                    ) : (
+                      <Tag colour="orange">This is not the latest data</Tag>
+                    )}
+                  </>
+                )}
+                {release.type && <Tag>{releaseTypes[release.type]}</Tag>}
+              </TagGroup>
             </div>
             {release.type === 'NationalStatistics' && (
               <img
@@ -106,7 +125,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               />
             )}
           </div>
-
           <SummaryList>
             <SummaryListItem term="Published">
               <FormattedDate>{release.published}</FormattedDate>
@@ -202,7 +220,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               }
             />
           ))}
-
           <PageSearchFormWithAnalytics
             inputLabel="Search in this release page."
             className="govuk-!-margin-top-3 govuk-!-margin-bottom-3"

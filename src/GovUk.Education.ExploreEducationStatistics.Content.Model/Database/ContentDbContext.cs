@@ -213,12 +213,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .ToTable("ExternalMethodology");
 
             modelBuilder.Entity<Publication>()
-                .Property(n => n.Published)
-                .HasConversion(
-                    v => v,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
-
-            modelBuilder.Entity<Publication>()
                 .Property(n => n.Updated)
                 .HasConversion(
                     v => v,
@@ -263,6 +257,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => JsonConvert.DeserializeObject<List<Link>>(v));
 
             modelBuilder.Entity<Release>()
+                .Property(r => r.NotifiedOn)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+
+            modelBuilder.Entity<Release>()
                 .HasIndex(r => new {r.PreviousVersionId, r.Version});
 
             modelBuilder.Entity<Release>()
@@ -292,14 +292,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(rs => rs.CreatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<ReleaseStatus>()
-                .Property(rs => rs.NotifiedOn)
-                .HasConversion(
-                    v => v,
-                    v => v.HasValue
-                        ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
-                        : null);
 
             modelBuilder.Entity<ReleaseStatus>()
                 .Property(rs => rs.ApprovalStatus)

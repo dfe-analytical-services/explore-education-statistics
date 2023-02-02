@@ -1477,7 +1477,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user = new User
             {
                 FirstName = "User",
-                LastName = "1"
+                LastName = "1",
+                Email = "user1@example.com"
             };
 
             var userPublicationRole1 = new UserPublicationRole
@@ -1538,11 +1539,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test Publication 1", userPublicationRoles[0].Publication);
                 Assert.Equal("User 1", userPublicationRoles[0].UserName);
                 Assert.Equal(Owner, userPublicationRoles[0].Role);
+                Assert.Equal("user1@example.com", userPublicationRoles[0].Email);
 
                 Assert.Equal(userPublicationRole2.Id, userPublicationRoles[1].Id);
                 Assert.Equal("Test Publication 2", userPublicationRoles[1].Publication);
                 Assert.Equal("User 1", userPublicationRoles[1].UserName);
                 Assert.Equal(Owner, userPublicationRoles[1].Role);
+                Assert.Equal("user1@example.com", userPublicationRoles[1].Email);
             }
         }
 
@@ -1563,13 +1566,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var user1 = new User
             {
                 FirstName = "User",
-                LastName = "1"
+                LastName = "1",
+                Email = "user1@example.com"
             };
             
             var user2 = new User
             {
                 FirstName = "User",
-                LastName = "2"
+                LastName = "2",
+                Email = "user2@example.com"
             };
             
             var publication = new Publication
@@ -1627,11 +1632,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test Publication 1", userPublicationRoles[0].Publication);
                 Assert.Equal("User 1", userPublicationRoles[0].UserName);
                 Assert.Equal(Owner, userPublicationRoles[0].Role);
+                Assert.Equal("user1@example.com", userPublicationRoles[0].Email);
 
                 Assert.Equal(userPublicationRole1.Id, userPublicationRoles[1].Id);
                 Assert.Equal("Test Publication 1", userPublicationRoles[1].Publication);
                 Assert.Equal("User 2", userPublicationRoles[1].UserName);
                 Assert.Equal(Owner, userPublicationRoles[1].Role);
+                Assert.Equal("user2@example.com", userPublicationRoles[1].Email);
             }
         }
 

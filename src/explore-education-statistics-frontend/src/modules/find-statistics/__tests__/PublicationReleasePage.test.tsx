@@ -1,3 +1,4 @@
+import { Release } from '@common/services/publicationService';
 import PublicationReleasePage from '@frontend/modules/find-statistics/PublicationReleasePage';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -5,26 +6,18 @@ import React from 'react';
 import { testPublication, testRelease } from './__data__/testReleaseData';
 
 describe('PublicationReleasePage', () => {
-  test('renders national statistics image', () => {
-    const { container } = render(
-      <PublicationReleasePage release={testRelease} />,
-    );
-
-    expect(
-      container.querySelector(
-        'img[alt="UK statistics authority quality mark"]',
-      ),
-    ).toBeDefined();
-  });
-
   test('renders latest data tag', () => {
     render(<PublicationReleasePage release={testRelease} />);
 
     expect(screen.queryByText('This is the latest data')).toBeInTheDocument();
+
+    expect(
+      screen.queryByText('This is not the latest data'),
+    ).not.toBeInTheDocument();
   });
 
   test('does not render latest data tag when publication is superseded', () => {
-    const testReleaseSuperseded = {
+    const testReleaseSuperseded: Release = {
       ...testRelease,
       publication: { ...testPublication, isSuperseded: true },
     };
@@ -33,6 +26,67 @@ describe('PublicationReleasePage', () => {
     expect(
       screen.queryByText('This is the latest data'),
     ).not.toBeInTheDocument();
+  });
+
+  test('renders not latest data link and tag when publication is not the latest', () => {
+    const testReleaseNotLatest: Release = {
+      ...testRelease,
+      latestRelease: false,
+    };
+    render(<PublicationReleasePage release={testReleaseNotLatest} />);
+
+    expect(screen.getByText('This is not the latest data')).toBeInTheDocument();
+    expect(
+      screen.queryByText('This is the latest data'),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', {
+        name: 'View latest data: Academic Year 2018/19',
+      }),
+    ).toBeInTheDocument();
+  });
+
+  test('renders superseded warning text when publication is superseded', () => {
+    const testReleaseSuperseded: Release = {
+      ...testRelease,
+      publication: {
+        ...testPublication,
+        isSuperseded: true,
+        supersededBy: {
+          id: 'publication-a',
+          title: 'publication A',
+          slug: 'publication-a',
+        },
+      },
+    };
+
+    render(<PublicationReleasePage release={testReleaseSuperseded} />);
+
+    const supersededWarningLink = within(
+      screen.getByTestId('superseded-warning'),
+    ).getByRole('link', {
+      name: 'publication A',
+    });
+
+    expect(supersededWarningLink).toHaveAttribute(
+      'href',
+      '/find-statistics/publication-a',
+    );
+  });
+
+  test('does not render superseded warning text when publication is not superseded', () => {
+    const testReleaseSuperseded: Release = {
+      ...testRelease,
+      publication: {
+        ...testPublication,
+        isSuperseded: false,
+      },
+    };
+
+    render(<PublicationReleasePage release={testReleaseSuperseded} />);
+
+    expect(screen.queryByTestId('superseded-warning')).not.toBeInTheDocument();
   });
 
   test('renders data downloads links', async () => {
@@ -181,6 +235,18 @@ describe('PublicationReleasePage', () => {
     );
   });
 
+  test('renders national statistics image', () => {
+    const { container } = render(
+      <PublicationReleasePage release={testRelease} />,
+    );
+
+    expect(
+      container.querySelector(
+        'img[alt="UK statistics authority quality mark"]',
+      ),
+    ).toBeInTheDocument();
+  });
+
   test('renders national statistics section', () => {
     render(<PublicationReleasePage release={testRelease} />);
 
@@ -192,7 +258,7 @@ describe('PublicationReleasePage', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders official statistics image', () => {
+  test('does not render image for official statistics', () => {
     const { container } = render(
       <PublicationReleasePage
         release={{
@@ -206,7 +272,7 @@ describe('PublicationReleasePage', () => {
       container.querySelector(
         'img[alt="UK statistics authority quality mark"]',
       ),
-    ).toBeNull();
+    ).not.toBeInTheDocument();
   });
 
   test('renders official statistics section', () => {
@@ -294,7 +360,7 @@ describe('PublicationReleasePage', () => {
   test('renders "Last Updated" section correctly with updates in correct order', async () => {
     render(<PublicationReleasePage release={testRelease} />);
 
-    expect(screen.getByTestId('Last updated-value')).toHaveTextContent(
+    expect(screen.getByTestId('Last updated')).toHaveTextContent(
       '19 April 2018',
     );
 
@@ -340,7 +406,7 @@ describe('PublicationReleasePage', () => {
   });
 
   test('renders link to an external methodology', () => {
-    const testReleaseWithExternalMethodology = {
+    const testReleaseWithExternalMethodology: Release = {
       ...testRelease,
       publication: {
         ...testRelease.publication,
@@ -368,7 +434,7 @@ describe('PublicationReleasePage', () => {
   });
 
   test('renders links to internal and external methodologies', () => {
-    const testReleaseWithInternalAndExternalMethodologies = {
+    const testReleaseWithInternalAndExternalMethodologies: Release = {
       ...testRelease,
       publication: {
         ...testRelease.publication,

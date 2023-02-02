@@ -2,7 +2,7 @@ import Page from '@admin/components/Page';
 import PublicationReleaseContributorsForm from '@admin/pages/publication/components/PublicationReleaseContributorsForm';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import releasePermissionService, {
-  ContributorViewModel,
+  UserReleaseRole,
 } from '@admin/services/releasePermissionService';
 import publicationService, {
   Publication,
@@ -16,8 +16,8 @@ import { RouteComponentProps } from 'react-router';
 interface Model {
   publication: Publication;
   release: Release;
-  publicationContributors: ContributorViewModel[];
-  releaseContributors: ContributorViewModel[];
+  publicationContributors: UserReleaseRole[];
+  releaseContributors: UserReleaseRole[];
 }
 
 const PublicationReleaseContributorsPage = ({
@@ -30,18 +30,20 @@ const PublicationReleaseContributorsPage = ({
       publication,
       release,
       publicationContributors,
-      releaseContributors,
+      releaseRoles,
     ] = await Promise.all([
       publicationService.getPublication(publicationId),
       releaseService.getRelease(releaseId),
       releasePermissionService.listPublicationContributors(publicationId),
-      releasePermissionService.listReleaseContributors(releaseId),
+      releasePermissionService.listRoles(releaseId),
     ]);
     return {
       publication,
       release,
       publicationContributors,
-      releaseContributors,
+      releaseContributors: releaseRoles.filter(
+        role => role.role === 'Contributor',
+      ),
     };
   }, [publicationId, releaseId]);
 

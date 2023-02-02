@@ -77,6 +77,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await ExecuteQueryAsync(query);
         }
 
+        public async Task<IEnumerable<ReleasePublishingStatus>> GetWherePublishingDueTodayOrInFutureWithStages(
+            ReleasePublishingStatusContentStage? content = null,
+            ReleasePublishingStatusFilesStage? files = null,
+            ReleasePublishingStatusPublishingStage? publishing = null,
+            ReleasePublishingStatusOverallStage? overall = null)
+        {
+            var query = QueryPublishTodayOrInFutureWithStages(content, files, publishing, overall);
+            return await ExecuteQueryAsync(query);
+        }
+
+
         public async Task<IEnumerable<ReleasePublishingStatus>> GetAllByOverallStage(Guid releaseId,
             params ReleasePublishingStatusOverallStage[] overallStages)
         {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -71,8 +72,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Create(PermalinkCreateViewModel request)
         {
-            var publicationId = await _subjectRepository.GetPublicationIdForSubject(request.Query.SubjectId);
-            return await _releaseRepository.GetLatestPublishedRelease(publicationId)
+            return await _subjectRepository.FindPublicationIdForSubject(request.Query.SubjectId)
+                .OrNotFound()
+                .OnSuccess(publicationId => _releaseRepository.GetLatestPublishedRelease(publicationId))
                 .OnSuccess(release => Create(release.Id, request));
         }
 

@@ -84,6 +84,7 @@
       {
         "methodologies": [
           "16-18 destination measures",
+          "Further education: outcome-based success measures",
           "Key stage 4 destination measures",
           "Longer term destinations",
           "Progression to higher education or training"
@@ -154,8 +155,7 @@
         "methodologies": [
           "Career pathways: post-16 qualifications held by employees",
           "Detailed destinations of 16 to 18 year olds in Further Education",
-          "Further education skills index",
-          "Further education: outcome-based success measures"
+          "Further education skills index"
         ],
         "topic_heading": "Further education outcomes"
       }
@@ -253,9 +253,9 @@
       },
       {
         "methodologies": [
-          " School places sufficiency survey",
           "Local authority school places scorecards",
-          "School capacity"
+          "School capacity",
+          "School places sufficiency survey"
         ],
         "topic_heading": "School capacity"
       },

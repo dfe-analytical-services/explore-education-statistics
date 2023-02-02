@@ -21,7 +21,7 @@ ${DATABLOCK_NAME}=      Dates data block name
 *** Test Cases ***
 Create new publication for "UI tests topic" topic
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    user create test release via api    ${PUBLICATION_ID}    FY    3000
+    user creates test release via api    ${PUBLICATION_ID}    FY    3000
 
 Go to "Release summary" page
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
@@ -170,21 +170,77 @@ Add embedded dashboard to third accordion section
     user waits until h1 is visible    DfE Analytical Services R-Shiny data dashboard template (h1)    90
     unselect frame
 
+User navigates to Data blocks page to edit block
+    [Documentation]    EES-3009
+    user clicks link    Data blocks
+    user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
+
+Edit data block
+    #just updating the table title and source
+    user waits until table is visible
+    user clicks link    Edit block    css:tbody > tr:first-child
+    user waits until h2 is visible    ${DATABLOCK_NAME}
+    user waits until h2 is visible    Data block details
+
+    user enters text into element    id:dataBlockDetailsForm-name    ${DATABLOCK_NAME}
+    user enters text into element    id:dataBlockDetailsForm-heading    Updated dates table title
+    user enters text into element    id:dataBlockDetailsForm-source    Updated dates source
+
+    user clicks button    Save data block
+    user waits until page contains button    Delete this data block
+
+Navigate to the 'Content' page
+    user clicks link    Content
+    user waits until h2 is visible    ${PUBLICATION_NAME}
+    user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
+
+Verify data block is updated correctly
+    #checking if data block cache has been invalidated by verifying the updates on the block
+    user scrolls to accordion section content    Dates data block    id:releaseMainContent
+    user opens accordion section    Dates data block    id:releaseMainContent
+    ${section}=    user gets accordion section content element    Dates data block    id:releaseMainContent
+
+    user checks chart title contains    ${section}    Updated dates table title
+    user clicks link by visible text    Table    ${section}
+    user waits until parent contains element    ${section}
+    ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Updated dates table title"]
+    user waits until parent contains element    ${section}    xpath:.//*[.="Source: Updated dates source"]
+    user closes accordion section    Dates data block    id:releaseMainContent
+
 Add public prerelease access list
     user clicks link    Pre-release access
     user creates public prerelease access list    Test public access list
 
-Approve release
-    user approves release for scheduled release    2    12    3001
+Approve release for scheduled publication
+    ${days_until_release}=    set variable    0
+    ${publish_date_day}=    get current datetime    %-d    ${days_until_release}
+    ${publish_date_month}=    get current datetime    %-m    ${days_until_release}
+    ${publish_date_month_word}=    get current datetime    %B    ${days_until_release}
+    ${publish_date_year}=    get current datetime    %Y    ${days_until_release}
+
+    user approves release for scheduled publication
+    ...    ${publish_date_day}
+    ...    ${publish_date_month}
+    ...    ${publish_date_year}
+    ...    12
+    ...    3001
+
+    set suite variable    ${EXPECTED_SCHEDULED_DATE}
+    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
 
 Verify release is scheduled
     user checks summary list contains    Current status    Approved
-    user checks summary list contains    Scheduled release
-    ...    ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
+    user checks summary list contains    Scheduled release    ${EXPECTED_SCHEDULED_DATE}
     user checks summary list contains    Next release expected    December 3001
 
-Approve release for immediate publication
-    user approves original release for immediate publication
+Publish the scheduled release
+    user waits for scheduled release to be published immediately
+
+    ${publish_date_day}=    get current datetime    %-d
+    ${publish_date_month_word}=    get current datetime    %B
+    ${publish_date_year}=    get current datetime    %Y
+    set suite variable    ${EXPECTED_PUBLISHED_DATE}
+    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
 
 Verify newly published release is on Find Statistics page
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
@@ -198,14 +254,7 @@ Verify release URL and page caption
     user waits until page contains title caption    ${RELEASE_NAME}
 
 Verify publish and update dates
-    ${PUBLISH_DATE_DAY}=    get current datetime    %-d
-    ${PUBLISH_DATE_MONTH_WORD}=    get current datetime    %B
-    ${PUBLISH_DATE_YEAR}=    get current datetime    %Y
-    set suite variable    ${PUBLISH_DATE_DAY}
-    set suite variable    ${PUBLISH_DATE_MONTH_WORD}
-    set suite variable    ${PUBLISH_DATE_YEAR}
-    user checks summary list contains    Published
-    ...    ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
+    user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
     user checks summary list contains    Next update    December 3001
 
 Verify release associated files
@@ -296,7 +345,7 @@ Verify public pre-release access list
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
     user waits until h2 is visible    Pre-release access list
-    user waits until page contains    Published ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
+    user waits until page contains    Published ${EXPECTED_PUBLISHED_DATE}
     user waits until page contains    Test public access list
 
 Verify accordions are correct
@@ -318,13 +367,13 @@ Verify Dates data block accordion section
     user scrolls to accordion section content    Dates data block    id:content
     ${section}=    user gets accordion section content element    Dates data block    id:content
 
-    user checks chart title contains    ${section}    Dates table title
+    user checks chart title contains    ${section}    Updated dates table title
     user checks infographic chart contains alt    ${section}    Sample alt text
 
     user clicks link by visible text    Table    ${section}
     user waits until parent contains element    ${section}
-    ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Dates table title"]
-    user waits until parent contains element    ${section}    xpath:.//*[.="Source: Dates source"]
+    ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Updated dates table title"]
+    user waits until parent contains element    ${section}    xpath:.//*[.="Source: Updated dates source"]
 
     user checks table column heading contains    1    1    2020 Week 13    ${section}
     user checks headed table body row cell contains    Number of open settings    1    22,900    ${section}
@@ -366,6 +415,7 @@ Return to Admin and Create amendment
 Change the Release type
     user waits until page contains link    Edit release summary
     user clicks link    Edit release summary
+    user waits until page does not contain loading spinner
     user waits until h2 is visible    Edit release summary
     user checks page contains radio    Experimental statistics
     user clicks radio    Experimental statistics
@@ -442,9 +492,9 @@ Verify existing data guidance for amendment
     user waits until element contains    ${editor}    Dates test subject test data guidance content
 
 Update existing data guidance for amendment
-    user enters text into element    id:dataGuidanceForm-content    Updated test data guidance content
+    user enters text into element    id:dataGuidanceForm-content    Amended test data guidance content
     user enters text into data guidance data file content editor    Dates test subject
-    ...    Updated Dates test subject test data guidance content
+    ...    Amended Dates test subject test data guidance content
 
     user clicks button    Save guidance
 
@@ -526,8 +576,8 @@ Edit data block for amendment
 
 Save data block for amendment
     user enters text into element    id:dataBlockDetailsForm-name    ${DATABLOCK_NAME}
-    user enters text into element    id:dataBlockDetailsForm-heading    Updated dates table title
-    user enters text into element    id:dataBlockDetailsForm-source    Updated dates source
+    user enters text into element    id:dataBlockDetailsForm-heading    Amended dates table title
+    user enters text into element    id:dataBlockDetailsForm-source    Amended dates source
 
     user clicks button    Save data block
     user waits until page contains button    Delete this data block
@@ -541,15 +591,15 @@ Update data block chart for amendment
 
     user checks radio is checked    Use table title
     user clicks radio    Set an alternative title
-    user enters text into element    id:chartConfigurationForm-title    Updated sample title
-    user checks input field contains    id:chartConfigurationForm-title    Updated sample title
-    user enters text into element    id:chartConfigurationForm-alt    Updated sample alt text
-    user checks textarea contains    id:chartConfigurationForm-alt    Updated sample alt text
+    user enters text into element    id:chartConfigurationForm-title    Amended sample title
+    user checks input field contains    id:chartConfigurationForm-title    Amended sample title
+    user enters text into element    id:chartConfigurationForm-alt    Amended sample alt text
+    user checks textarea contains    id:chartConfigurationForm-alt    Amended sample alt text
 
     user clicks button    Save chart options
     user waits until page does not contain loading spinner
     user waits until page contains element    id:chartBuilderPreview
-    user checks infographic chart contains alt    id:chartBuilderPreview    Updated sample alt text
+    user checks infographic chart contains alt    id:chartBuilderPreview    Amended sample alt text
 
 Navigate to 'Content' page for amendment
     user clicks link    Content
@@ -576,13 +626,13 @@ Verify amended Dates data block table has footnotes
 
 Update second accordion section text for amendment
     user opens accordion section    Test text    id:releaseMainContent
-    user adds content to autosaving accordion section text block    Test text    1    Updated test text!
+    user adds content to autosaving accordion section text block    Test text    1    Amended test text!
     ...    id:releaseMainContent
 
 Update embedded dashboard title
     user updates embedded dashboard in editable accordion section
     ...    Test embedded dashboard section
-    ...    Test embedded dashboard title updated
+    ...    Amended Test embedded dashboard title
     ...    https://department-for-education.shinyapps.io/dfe-shiny-template/
     ...    id:releaseMainContent
 
@@ -598,11 +648,30 @@ Add release note to amendment
 
 Update public prerelease access list for amendment
     user clicks link    Pre-release access
-    user updates public prerelease access list    Updated public access list
+    user updates public prerelease access list    Amended public access list
 
-Approve amendment for immediate release
-    user clicks link    Sign off
-    user approves amended release for immediate publication
+Approve amendment for scheduled release
+    ${days_until_release}=    set variable    1
+    ${publish_date_day}=    get current datetime    %-d    ${days_until_release}
+    ${publish_date_month}=    get current datetime    %-m    ${days_until_release}
+    ${publish_date_month_word}=    get current datetime    %B    ${days_until_release}
+    ${publish_date_year}=    get current datetime    %Y    ${days_until_release}
+
+    user approves release for scheduled publication
+    ...    ${publish_date_day}
+    ...    ${publish_date_month}
+    ...    ${publish_date_year}
+    ...    12
+    ...    3001
+
+    user waits for scheduled release to be published immediately
+
+    ${publish_date_day}=    get current datetime    %-d
+    ${publish_date_month}=    get current datetime    %-m
+    ${publish_date_month_word}=    get current datetime    %B
+    ${publish_date_year}=    get current datetime    %Y
+    set suite variable    ${EXPECTED_PUBLISHED_DATE}
+    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
 
 Verify amendment is on Find Statistics page again
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
@@ -624,8 +693,7 @@ Verify amendment is displayed as the latest release
     user checks page does not contain    See other releases (1)
 
 Verify amendment is published
-    user checks summary list contains    Published
-    ...    ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
+    user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
     user checks summary list contains    Next update    December 3001
 
 Verify amendment files
@@ -670,7 +738,7 @@ Verify amendment public metadata guidance document
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
     user waits until h2 is visible    Data guidance
-    user waits until page contains    Updated test data guidance content
+    user waits until page contains    Amended test data guidance content
 
     user waits until page contains accordion section    Dates test subject
     user checks there are x accordion sections    1
@@ -679,7 +747,7 @@ Verify amendment public metadata guidance document
     user checks summary list contains    Filename    dates-replacement.csv
     user checks summary list contains    Geographic levels    National
     user checks summary list contains    Time period    2020 Week 13 to 2021 Week 24
-    user checks summary list contains    Content    Updated Dates test subject test data guidance content
+    user checks summary list contains    Content    Amended Dates test subject test data guidance content
 
     user opens details dropdown    Variable names and descriptions
 
@@ -710,8 +778,8 @@ Verify amendment public pre-release access list
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
     user waits until h2 is visible    Pre-release access list
-    user waits until page contains    Published ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
-    user waits until page contains    Updated public access list
+    user waits until page contains    Published ${EXPECTED_PUBLISHED_DATE}
+    user waits until page contains    Amended public access list
 
 Verify amendment accordions are correct
     user goes to release page via breadcrumb    ${PUBLICATION_NAME}    ${RELEASE_NAME}
@@ -726,13 +794,13 @@ Verify amendment Dates data block accordion section
     user scrolls to accordion section content    Dates data block    id:content
     ${section}=    user gets accordion section content element    Dates data block    id:content
 
-    user checks chart title contains    ${section}    Updated sample title
-    user checks infographic chart contains alt    ${section}    Updated sample alt text
+    user checks chart title contains    ${section}    Amended sample title
+    user checks infographic chart contains alt    ${section}    Amended sample alt text
 
     user clicks link by visible text    Table    ${section}
     user waits until parent contains element    ${section}
-    ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Updated dates table title"]
-    user waits until parent contains element    ${section}    xpath:.//*[.="Source: Updated dates source"]
+    ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Amended dates table title"]
+    user waits until parent contains element    ${section}    xpath:.//*[.="Source: Amended dates source"]
 
     user checks table column heading contains    1    1    2020 Week 13    ${section}
     user checks headed table body row cell contains    Number of open settings    1    23,000    ${section}
@@ -762,14 +830,14 @@ Verify amendment Dates data block table has footnotes
 Verify amendment Test text accordion section contains correct text
     user opens accordion section    Test text    id:content
     ${section}=    user gets accordion section content element    Test text    id:content
-    user checks element contains    ${section}    Updated test text!
+    user checks element contains    ${section}    Amended test text!
     user closes accordion section    Test text    id:content
 
 Verify amendment embedded dashboard accordion section is correct
     user opens accordion section    Test embedded dashboard section    id:content
     ${section}=    user gets accordion section content element    Test embedded dashboard section    id:content
     user checks element contains child element    ${section}
-    ...    xpath:.//iframe[@title="Test embedded dashboard title updated"]
+    ...    xpath:.//iframe[@title="Amended Test embedded dashboard title"]
     user closes accordion section    Test embedded dashboard section    id:content
 
 Check next release date can be updated
@@ -788,8 +856,18 @@ Leave release note for amendment
     user enters text into element    testid:comment-textarea    updated amendment
     user clicks button    Save note
 
-Approve release amendment for immedate publication
-    user approves amended release for immediate publication
+Approve release amendment for scheduled publication
+    ${days_until_release}=    set variable    2
+    ${publish_date_day}=    get current datetime    %-d    ${days_until_release}
+    ${publish_date_month}=    get current datetime    %-m    ${days_until_release}
+    ${publish_date_year}=    get current datetime    %Y    ${days_until_release}
+    user approves release for scheduled publication
+    ...    ${publish_date_day}
+    ...    ${publish_date_month}
+    ...    ${publish_date_year}
+    ...    8
+    ...    4001
+    user waits for scheduled release to be published immediately
 
 Save public release link for later use
     user waits until page contains element    testid:public-release-url

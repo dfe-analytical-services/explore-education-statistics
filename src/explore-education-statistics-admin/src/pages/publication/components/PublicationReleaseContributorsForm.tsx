@@ -1,9 +1,9 @@
 import {
-  PublicationTeamRouteParams,
   publicationTeamAccessRoute,
+  PublicationTeamRouteParams,
 } from '@admin/routes/publicationRoutes';
 import releasePermissionService, {
-  ContributorViewModel,
+  UserReleaseRole,
 } from '@admin/services/releasePermissionService';
 import { Form, FormFieldCheckboxGroup } from '@common/components/form';
 import Button from '@common/components/Button';
@@ -20,9 +20,9 @@ interface AddExistingUsersFormValues {
 }
 
 interface Props {
-  publicationContributors: ContributorViewModel[];
+  publicationContributors: UserReleaseRole[];
   publicationId: string;
-  releaseContributors: ContributorViewModel[];
+  releaseContributors: UserReleaseRole[];
   releaseId: string;
 }
 

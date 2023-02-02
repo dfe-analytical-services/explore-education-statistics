@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -7,6 +8,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
     public static class EitherTaskExtensions
     {
+        public static async Task<Either<ActionResult, TRight>> OrNotFound<TRight>(this Task<TRight?> task)
+            where TRight : struct
+        {
+            var result = await task;
+
+            return result is not null ? result : new NotFoundResult();
+        }
+
+        public static async Task<Either<ActionResult, TRight>> OrNotFound<TRight>(this Task<TRight?> task)
+            where TRight : class?
+        {
+            var result = await task;
+
+            return result is not null ? result : new NotFoundResult();
+        }
+
         public static async Task<ActionResult> HandleFailures<TRight>(
             this Task<Either<ActionResult, TRight>> task) where TRight : ActionResult
         {

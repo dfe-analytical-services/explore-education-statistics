@@ -233,7 +233,6 @@ describe('ReleaseStatusForm', () => {
       userEvent.click(screen.getByRole('button', { name: 'Update status' }));
 
       const expectedValues: ReleaseStatusFormValues = {
-        latestInternalReleaseNote: '',
         approvalStatus: 'Draft',
       };
 
@@ -276,7 +275,7 @@ describe('ReleaseStatusForm', () => {
       userEvent.click(screen.getByRole('button', { name: 'Update status' }));
 
       const expectedValues: ReleaseStatusFormValues = {
-        latestInternalReleaseNote: 'Test release note',
+        internalReleaseNote: 'Test release note',
         approvalStatus: 'HigherLevelReview',
         nextReleaseDate: {
           month: 5,
@@ -313,7 +312,7 @@ describe('ReleaseStatusForm', () => {
 
       expect(
         screen.getByRole('link', { name: 'Enter an internal note' }),
-      ).toHaveAttribute('href', '#releaseStatusForm-latestInternalReleaseNote');
+      ).toHaveAttribute('href', '#releaseStatusForm-internalReleaseNote');
     });
 
     test('fails to submit with invalid values', async () => {
@@ -377,7 +376,7 @@ describe('ReleaseStatusForm', () => {
       userEvent.click(screen.getByRole('button', { name: 'Update status' }));
 
       const expectedValues: ReleaseStatusFormValues = {
-        latestInternalReleaseNote: 'Test release note',
+        internalReleaseNote: 'Test release note',
         approvalStatus: 'Draft',
         nextReleaseDate: {
           month: 5,
@@ -489,7 +488,7 @@ describe('ReleaseStatusForm', () => {
 
       expect(
         screen.getByRole('link', { name: 'Enter an internal note' }),
-      ).toHaveAttribute('href', '#releaseStatusForm-latestInternalReleaseNote');
+      ).toHaveAttribute('href', '#releaseStatusForm-internalReleaseNote');
     });
 
     test('shows error message when no publishing method selected', async () => {
@@ -676,7 +675,7 @@ describe('ReleaseStatusForm', () => {
       userEvent.click(screen.getByRole('button', { name: 'Update status' }));
 
       const expectedValues: ReleaseStatusFormValues = {
-        latestInternalReleaseNote: 'Test release note',
+        internalReleaseNote: 'Test release note',
         approvalStatus: 'Draft',
         nextReleaseDate: {
           month: 5,
@@ -890,7 +889,7 @@ describe('ReleaseStatusForm', () => {
       userEvent.click(screen.getByRole('button', { name: 'Update status' }));
 
       const expectedValues: ReleaseStatusFormValues = {
-        latestInternalReleaseNote: 'Test release note',
+        internalReleaseNote: 'Test release note',
         approvalStatus: 'Approved',
         notifySubscribers: true,
         publishScheduled: new Date(`${nextYear}-10-10`),
@@ -952,7 +951,7 @@ describe('ReleaseStatusForm', () => {
       userEvent.click(screen.getByRole('button', { name: 'Update status' }));
 
       const expectedValues: ReleaseStatusFormValues = {
-        latestInternalReleaseNote: 'Test release note',
+        internalReleaseNote: 'Test release note',
         approvalStatus: 'Approved',
         notifySubscribers: true,
         publishMethod: 'Immediate',
@@ -1006,7 +1005,7 @@ describe('ReleaseStatusForm', () => {
       userEvent.click(screen.getByRole('button', { name: 'Update status' }));
 
       const expectedValues: ReleaseStatusFormValues = {
-        latestInternalReleaseNote: 'Test release note',
+        internalReleaseNote: 'Test release note',
         approvalStatus: 'Approved',
         notifySubscribers: false,
         publishMethod: 'Immediate',

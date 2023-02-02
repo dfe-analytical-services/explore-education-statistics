@@ -68,7 +68,7 @@ const EditableBlockWrapper = ({
         )}
 
         {onEmbedBlockEdit && (
-          <Button onClick={onEmbedBlockEdit}>Edit embed block</Button>
+          <Button onClick={onEmbedBlockEdit}>Edit embedded URL</Button>
         )}
 
         {onDelete && (

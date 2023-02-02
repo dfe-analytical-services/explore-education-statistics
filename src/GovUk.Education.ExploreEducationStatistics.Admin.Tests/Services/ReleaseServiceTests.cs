@@ -290,7 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             footnoteRepository.Setup(service => service.GetFootnotes(release.Id, subject.Id))
                 .ReturnsAsync(new List<Footnote>());
 
-            subjectRepository.Setup(service => service.Get(subject.Id)).ReturnsAsync(subject);
+            subjectRepository.Setup(service => service.Find(subject.Id)).ReturnsAsync(subject);
 
             releaseDataFileService.Setup(service => service.Delete(release.Id, file.Id, false))
                 .ReturnsAsync(Unit.Instance);
@@ -448,8 +448,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     service.GetFootnotes(release.Id, It.IsIn(subject.Id, replacementSubject.Id)))
                 .ReturnsAsync(new List<Footnote>());
 
-            subjectRepository.Setup(service => service.Get(subject.Id)).ReturnsAsync(subject);
-            subjectRepository.Setup(service => service.Get(replacementSubject.Id)).ReturnsAsync(replacementSubject);
+            subjectRepository.Setup(service => service.Find(subject.Id)).ReturnsAsync(subject);
+            subjectRepository.Setup(service => service.Find(replacementSubject.Id)).ReturnsAsync(replacementSubject);
 
             releaseDataFileService
                 .Setup(service => service.Delete(release.Id, It.IsIn(file.Id, replacementFile.Id), false))
@@ -710,11 +710,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 PreReleaseAccessList = "Test access list",
                 ReleaseStatuses = new List<ReleaseStatus>
                 {
-                    new()
-                    {
-                       InternalReleaseNote = "Release note null Created date",
-                       Created = null
-                    },
                     new()
                     {
                        InternalReleaseNote = "Latest release note - 1 day ago",
