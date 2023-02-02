@@ -270,7 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPatch("releases/{releaseId:guid}")]
+        [HttpPatch("releases/{releaseId:guid}/published")]
         public async Task<ActionResult> UpdateReleasePublished(Guid releaseId,
             ReleasePublishedUpdateRequest request)
         {

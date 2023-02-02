@@ -1317,6 +1317,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 publication.Releases[0].Slug
             )).ReturnsAsync(new ReleaseCacheViewModel(releaseId));
 
+            // As the release is the latest for the publication the separate cache entry for the publication's latest
+            // release should also be updated
             releaseCacheService.Setup(s => s.UpdateRelease(releaseId,
                 publication.Slug,
                 null
@@ -1438,6 +1440,76 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 result.AssertBadRequest(ReleasePublishedCannotBeFutureDate);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateReleasePublished_ConvertsPublishedFromLocalToUniversalTimezone()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var publication = new Publication
+            {
+                LatestPublishedReleaseId = Guid.NewGuid(),
+                Releases = new List<Release>
+                {
+                    new()
+                    {
+                        Id = releaseId,
+                        Slug = "release-slug",
+                        Published = DateTime.UtcNow
+                    }
+                },
+                Slug = "publication-slug"
+            };
+
+            var request = new ReleasePublishedUpdateRequest
+            {
+                Published = DateTime.Parse("2022-08-08T09:30:00.0000000+01:00") // DateTimeKind: Local
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
+
+            releaseCacheService.Setup(s => s.UpdateRelease(releaseId,
+                publication.Slug,
+                publication.Releases[0].Slug
+            )).ReturnsAsync(new ReleaseCacheViewModel(releaseId));
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = BuildReleaseService(contentDbContext: context,
+                    releaseCacheService: releaseCacheService.Object);
+
+                var result = await service
+                    .UpdateReleasePublished(
+                        releaseId,
+                        request
+                    );
+
+                VerifyAllMocks(releaseCacheService);
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var saved = await context.Releases
+                    .SingleAsync(r => r.Id == releaseId);
+
+                // The published date retrieved from the database should always be represented in UTC
+                // because of the conversion setup in the database context config.
+                Assert.Equal(DateTimeKind.Utc, saved.Published!.Value.Kind);
+
+                // Make sure the request date was converted to UTC before it was updated on the release
+                Assert.Equal(DateTime.Parse("2022-08-08T08:30:00Z", styles: DateTimeStyles.AdjustToUniversal), saved.Published);
             }
         }
 

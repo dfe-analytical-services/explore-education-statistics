@@ -351,14 +351,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(ReleaseNotPublished);
                     }
 
+                    var newPublishedDate = request.Published?.ToUniversalTime() ?? DateTime.UtcNow;
+
                     // Prevent assigning a future date since it would have the effect of un-publishing the release
-                    if (request.Published > DateTime.UtcNow)
+                    if (newPublishedDate > DateTime.UtcNow)
                     {
                         return ValidationActionResult(ReleasePublishedCannotBeFutureDate);
                     }
 
                     _context.Releases.Update(release);
-                    release.Published = request.Published ?? DateTime.UtcNow;
+                    release.Published = newPublishedDate;
                     await _context.SaveChangesAsync();
 
                     // Update the cached release
