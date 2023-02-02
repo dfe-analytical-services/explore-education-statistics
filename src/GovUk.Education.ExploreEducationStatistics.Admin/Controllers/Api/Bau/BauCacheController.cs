@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                     BlobContainers.PrivateContent,
                     options: new DeleteBlobsOptions
                     {
-                        IncludeRegex = new Regex($"^releases/.*/({pathString})/")
+                        IncludeRegex = new Regex($"^releases/[^/]+/({pathString})/")
                     }
                 );
             }
@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                     BlobContainers.PublicContent,
                     options: new DeleteBlobsOptions
                     {
-                        IncludeRegex = new Regex($"^publications/.*/releases/.*/({pathString})/")
+                        IncludeRegex = new Regex($"^publications/[^/]+/releases/[^/]+/({pathString})/")
                     }
                 );
             }
@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                 BlobContainers.PublicContent,
                 options: new DeleteBlobsOptions
                 {
-                    IncludeRegex = new Regex($"^publications/[^/]*/{publicationJsonFilenameRegex}$")
+                    IncludeRegex = new Regex($"^publications/[^/]+/{publicationJsonFilenameRegex}$")
                 });
 
             return NoContent();
@@ -184,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                 BlobContainers.PublicContent,
                 options: new DeleteBlobsOptions
                 {
-                    IncludeRegex = new Regex($"^publications/[^/]*/({latestReleaseJsonFilenameRegex}|releases/[0-9]{{4}}-.*\\.json)$")
+                    IncludeRegex = new Regex($"^publications/[^/]+/({latestReleaseJsonFilenameRegex}|releases/[0-9]{{4}}-[^/]+\\.json)$")
                 });
 
             return NoContent();

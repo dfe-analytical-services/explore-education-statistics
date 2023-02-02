@@ -53,6 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var regex = Assert.IsType<Regex>(options.IncludeRegex);
             Assert.Matches(regex, "releases/release-1/subject-meta/something");
+            Assert.DoesNotMatch(regex, "releases/subject-meta/something");
+            Assert.DoesNotMatch(regex, "release-1/subject-meta/something");
             Assert.DoesNotMatch(regex, "something/releases/release-1/subject-meta/something");
             Assert.DoesNotMatch(regex, "releases/release-1/data-blocks/something");
             Assert.DoesNotMatch(regex, "releases/release-1/invalid/something");
@@ -156,6 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Assert.Matches(regex, "publications/publication-1/something");
             Assert.Matches(regex, "publications/publication-1/releases/something");
             Assert.Matches(regex, "publications/publication-1/releases/release-1/something");
+            Assert.DoesNotMatch(regex, "publication-1/something");
             Assert.DoesNotMatch(regex, "publications/publication-2/something");
             Assert.DoesNotMatch(regex, "publications/publication-2/releases/something");
             Assert.DoesNotMatch(regex, "publications/publication-2/releases/release-1/something");
@@ -226,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task ClearPublicCachePublicationPaths_AllValidPaths()
+        public async Task ClearPublicCacheReleaseJson()
         {
             var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
 
@@ -250,9 +253,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var regex = Assert.IsType<Regex>(options.IncludeRegex);
             Assert.Matches(regex, "publications/publication-1/latest-release.json");
             Assert.Matches(regex, "publications/publication-1/releases/1234-56.json");
+            Assert.Matches(regex, "publications/publication-1/releases/1234-56-fy.json");
             Assert.DoesNotMatch(regex, "publications/publication-1/latest-release_json");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/1234-56_json");
+            Assert.DoesNotMatch(regex, "publications/publication-1/releases/1234-56/data-block-id.json");
             Assert.DoesNotMatch(regex, "publications/latest-release.json");
+            Assert.DoesNotMatch(regex, "publications/publication-1/1234-56.json");
+            Assert.DoesNotMatch(regex, "publications/1234-56.json");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/latest-release.json");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/12-56.json");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/latest-release.json.bak");
@@ -288,6 +295,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var regex = Assert.IsType<Regex>(options.IncludeRegex);
             Assert.Matches(regex, "publications/publication-1/releases/release-1/subject-meta/something");
+            Assert.DoesNotMatch(regex, "publications/releases/release-1/subject-meta/something");
+            Assert.DoesNotMatch(regex, "publications/publication-1/releases/subject-meta/something");
             Assert.DoesNotMatch(regex,
                 "something/publications/publication-1/releases/release-1/subject-meta/something");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/release-1/data-blocks/something");
