@@ -236,9 +236,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<Link> RelatedInformation { get; set; } = new();
 
-        // TODO EES-4058 Remove unused DataLastPublished
-        public DateTime? DataLastPublished { get; set; }
-
         public Release Clone()
         {
             return MemberwiseClone() as Release;
