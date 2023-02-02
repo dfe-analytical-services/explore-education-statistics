@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
@@ -19,6 +18,7 @@ using Xunit;
 using static Azure.Storage.Blobs.Models.BlobsModelFactory;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.IBlobStorageService;
+using static Moq.MockBehavior;
 using Capture = Moq.Capture;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
@@ -100,8 +100,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var json = @"{ ""Value"": ""test-value"" }";
 
-            blobClient.Setup(s => s.OpenReadAsync(0, null, null, default))
-                .ReturnsAsync(json.ToStream());
+            var response = new Mock<Response<BlobDownloadResult>>(Strict);
+
+            response.SetupGet(r => r.Value)
+                .Returns(BlobDownloadResult(BinaryData.FromString(json)));
+
+            blobClient.Setup(s => s.DownloadContentAsync())
+                .ReturnsAsync(response.Object);
 
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
@@ -130,8 +135,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var json = @"{ ""Value"": ""test-value"" }";
 
-            blobClient.Setup(s => s.OpenReadAsync(0, null, null, default))
-                .ReturnsAsync(json.ToStream());
+            var response = new Mock<Response<BlobDownloadResult>>(Strict);
+
+            response.SetupGet(r => r.Value)
+                .Returns(BlobDownloadResult(BinaryData.FromString(json)));
+
+            blobClient.Setup(s => s.DownloadContentAsync())
+                .ReturnsAsync(response.Object);
 
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
@@ -161,8 +171,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var json = "null";
 
-            blobClient.Setup(s => s.OpenReadAsync(0, null, null, default))
-                .ReturnsAsync(json.ToStream());
+            var response = new Mock<Response<BlobDownloadResult>>(Strict);
+
+            response.SetupGet(r => r.Value)
+                .Returns(BlobDownloadResult(BinaryData.FromString(json)));
+
+            blobClient.Setup(s => s.DownloadContentAsync())
+                .ReturnsAsync(response.Object);
 
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
@@ -188,8 +203,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 metadata: new Dictionary<string, string>()
             );
 
-            blobClient.Setup(s => s.OpenReadAsync(0, null, null, default))
-                .ReturnsAsync(string.Empty.ToStream());
+
+            var response = new Mock<Response<BlobDownloadResult>>(Strict);
+
+            response.SetupGet(r => r.Value)
+                .Returns(BlobDownloadResult(BinaryData.FromString("")));
+
+            blobClient.Setup(s => s.DownloadContentAsync())
+                .ReturnsAsync(response.Object);
 
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
@@ -533,7 +554,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         private static Mock<BlobServiceClient> MockBlobServiceClient(
             params Mock<BlobContainerClient>[] blobContainerClients)
         {
-            var blobServiceClient = new Mock<BlobServiceClient>(MockBehavior.Strict);
+            var blobServiceClient = new Mock<BlobServiceClient>(Strict);
 
             blobServiceClient.Setup(s => s.Uri)
                 .Returns(new Uri("https://data-storage:10001/devstoreaccount1;"));
@@ -551,7 +572,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             string containerName,
             params Mock<BlobClient>[] blobClients)
         {
-            var blobContainerClient = new Mock<BlobContainerClient>(MockBehavior.Strict);
+            var blobContainerClient = new Mock<BlobContainerClient>(Strict);
 
             blobContainerClient
                 .SetupGet(client => client.Name)
@@ -574,7 +595,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             IDictionary<string, string>? metadata = null,
             bool exists = true)
         {
-            var blobClient = new Mock<BlobClient>(MockBehavior.Strict);
+            var blobClient = new Mock<BlobClient>(Strict);
 
             blobClient.SetupGet(client => client.Name)
                 .Returns(name);

@@ -79,11 +79,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         /// differences in how the outputted stream behaves that you may or may not want.
         /// </para>
         /// </remarks>
-        /// <param name="containerName">name of the blob container</param>
-        /// <param name="path">path to the blob within the container</param>
-        /// <param name="bufferSize">size of the stream buffer</param>
-        /// <returns>the chunked blob stream</returns>
-        public Task<Stream> StreamBlob(IBlobContainer containerName, string path, int? bufferSize = null);
+        /// <param name="containerName">Name of the blob container</param>
+        /// <param name="path">Path to the blob within the container</param>
+        /// <param name="bufferSize">Size of the stream buffer</param>
+        /// <param name="cancellationToken">Token to cancel the request</param>
+        /// <returns>The chunked blob stream</returns>
+        public Task<Stream> StreamBlob(
+            IBlobContainer containerName,
+            string path,
+            int? bufferSize = null,
+            CancellationToken cancellationToken = default);
 
         public Task<string> DownloadBlobText(IBlobContainer containerName, string path);
 

@@ -33,8 +33,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             string expectedBlobPath,
             string filePathToStream)
         {
-            return service.Setup(s => s.StreamBlob(container, expectedBlobPath, null))
-                .ReturnsAsync(() => System.IO.File.OpenRead(filePathToStream));
+            return service.Setup(s => s.StreamBlob(container, expectedBlobPath, null, default))
+                .ReturnsAsync(() => File.OpenRead(filePathToStream));
         }
         
         public static IReturnsResult<IBlobStorageService> SetupListBlobs(
