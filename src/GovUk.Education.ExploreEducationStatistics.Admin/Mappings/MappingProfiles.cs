@@ -100,8 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<KeyStatisticDataBlockCreateRequest, KeyStatisticDataBlock>();
             CreateMap<KeyStatisticTextCreateRequest, KeyStatisticText>();
 
-            CreateMap<Release, Data.Model.Release>()
-                .ForMember(dest => dest.TimeIdentifier, m => m.MapFrom(r => r.TimePeriodCoverage));
+            CreateMap<Release, Data.Model.Release>();
 
             CreateMap<Theme, ThemeViewModel>()
                 .ForMember(theme => theme.Topics, m => m.MapFrom(t => t.Topics.OrderBy(topic => topic.Title)));
