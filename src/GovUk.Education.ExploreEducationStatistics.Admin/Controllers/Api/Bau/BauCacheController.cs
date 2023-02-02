@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             return NoContent();
         }
 
-        [HttpDelete("public-cache/publications")]
+        [HttpDelete("public-cache/publications/paths")]
         public async Task<ActionResult> ClearPublicCachePublicationPaths(
             ClearPublicCachePublicationPathsViewModel request)
         {
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                     BlobContainers.PublicContent,
                     options: new DeleteBlobsOptions
                     {
-                        IncludeRegex = new Regex($"^publications/[^/]*/({pathString})")
+                        IncludeRegex = new Regex($"^publications/[^/]*/({pathString})$")
                     }
                 );
             }
@@ -204,7 +204,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             private static readonly HashSet<string> AllowedPaths = new()
             {
                 FileStoragePathUtils.LatestReleaseFileName,
-                FileStoragePathUtils.PublicationFileName
+                FileStoragePathUtils.PublicationFileName,
+                FileStoragePathUtils.ReleasesDirectory,
             };
 
             [MinLength(1)]
