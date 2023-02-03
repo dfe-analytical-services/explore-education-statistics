@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -51,15 +50,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 {
                     IncludingSeconds = CronExpressionHasSecondPrecision(publishStagedReleasesCronExpression)
                 }).GetNextOccurrence(DateTime.UtcNow);
-                var context = new PublishContext(nextScheduledPublishingTime, true);
-                await _contentService.UpdateContent(context, message.Releases.Select(tuple => tuple.ReleaseId).ToArray());
+                await _contentService.UpdateContentStaged(nextScheduledPublishingTime,
+                    message.Releases.Select(tuple => tuple.ReleaseId).ToArray());
                 await UpdateContentStage(message, Scheduled);
             }
             catch (Exception e)
             {
                 logger.LogError(e, "Exception occured while executing {FunctionName}",
                     executionContext.FunctionName);
-                
+
                 await UpdateContentStage(message, Failed,
                     new ReleasePublishingStatusLogMessage($"Exception in content stage: {e.Message}"));
             }
@@ -68,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         private async Task UpdateContentStage(
-            StageReleaseContentMessage message, 
+            StageReleaseContentMessage message,
             ReleasePublishingStatusContentStage stage,
             ReleasePublishingStatusLogMessage logMessage = null)
         {

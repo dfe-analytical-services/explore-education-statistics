@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
@@ -18,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -43,6 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IReleaseRepository _repository;
+        private readonly IReleaseCacheService _releaseCacheService;
         private readonly IReleaseFileRepository _releaseFileRepository;
         private readonly ISubjectRepository _subjectRepository;
         private readonly IReleaseDataFileService _releaseDataFileService;
@@ -63,6 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
             IReleaseRepository repository,
+            IReleaseCacheService releaseCacheService,
             IReleaseFileRepository releaseFileRepository,
             ISubjectRepository subjectRepository,
             IReleaseDataFileService releaseDataFileService,
@@ -81,6 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
             _userService = userService;
             _repository = repository;
+            _releaseCacheService = releaseCacheService;
             _releaseFileRepository = releaseFileRepository;
             _subjectRepository = subjectRepository;
             _releaseDataFileService = releaseDataFileService;
@@ -329,6 +334,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     _context.Releases.Update(release);
                     await _context.SaveChangesAsync();
                     return await GetRelease(releaseId);
+                });
+        }
+
+        public async Task<Either<ActionResult, Unit>> UpdateReleasePublished(Guid releaseId,
+            ReleasePublishedUpdateRequest request)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId,
+                    queryable => queryable.Include(r => r.Publication))
+                .OnSuccessDo(_userService.CheckIsBauUser)
+                .OnSuccess<ActionResult, Release, Unit>(async release =>
+                {
+                    if (release.Published == null)
+                    {
+                        return ValidationActionResult(ReleaseNotPublished);
+                    }
+
+                    var newPublishedDate = request.Published?.ToUniversalTime() ?? DateTime.UtcNow;
+
+                    // Prevent assigning a future date since it would have the effect of un-publishing the release
+                    if (newPublishedDate > DateTime.UtcNow)
+                    {
+                        return ValidationActionResult(ReleasePublishedCannotBeFutureDate);
+                    }
+
+                    _context.Releases.Update(release);
+                    release.Published = newPublishedDate;
+                    await _context.SaveChangesAsync();
+
+                    // Update the cached release
+                    await _releaseCacheService.UpdateRelease(
+                        releaseId,
+                        publicationSlug: release.Publication.Slug,
+                        releaseSlug: release.Slug);
+
+                    if (release.Publication.LatestPublishedReleaseId == releaseId)
+                    {
+                        // This is the latest published release so also update the latest cached release
+                        // for the publication which is a separate cache entry
+                        await _releaseCacheService.UpdateRelease(
+                            releaseId,
+                            publicationSlug: release.Publication.Slug);
+                    }
+
+                    return Unit.Instance;
                 });
         }
 

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -17,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Moq;
@@ -297,6 +299,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
         }
 
+        [Fact]
+        public async Task UpdateReleasePublished()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectCheckToFail(IsBauUser)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = BuildReleaseService(userService.Object);
+                        return service.UpdateReleasePublished(_release.Id,
+                            new ReleasePublishedUpdateRequest());
+                    }
+                );
+        }
+
         private ReleaseService BuildReleaseService(
             IUserService userService,
             ContentDbContext? context = null,
@@ -308,6 +325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 DefaultPersistenceHelperMock().Object,
                 userService,
                 releaseRepository ?? Mock.Of<IReleaseRepository>(),
+                Mock.Of<IReleaseCacheService>(),
                 Mock.Of<IReleaseFileRepository>(),
                 Mock.Of<ISubjectRepository>(),
                 Mock.Of<IReleaseDataFileService>(),

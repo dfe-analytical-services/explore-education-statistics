@@ -41,20 +41,18 @@ public class PublishingCompletionService : IPublishingCompletionService
     }
 
     public async Task CompletePublishingIfAllPriorStagesComplete(
-        IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releaseAndReleaseStatusIds, 
-        DateTime publishedDate)
+        IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releaseAndReleaseStatusIds)
     {
         var releaseStatuses = await releaseAndReleaseStatusIds
             .ToAsyncEnumerable()
             .SelectAwait(async status => await _releasePublishingStatusService.GetAsync(status.ReleaseId, status.ReleaseStatusId))
             .ToArrayAsync();
 
-        await CompletePublishingIfAllPriorStagesComplete(releaseStatuses, publishedDate);
+        await CompletePublishingIfAllPriorStagesComplete(releaseStatuses);
     }
 
     public async Task CompletePublishingIfAllPriorStagesComplete(
-        ReleasePublishingStatus[] releaseStatuses, 
-        DateTime publishedDate)
+        ReleasePublishingStatus[] releaseStatuses)
     {
         var prePublishingStagesComplete = releaseStatuses
             .Where(status => status.AllStagesPriorToPublishingComplete())
@@ -72,15 +70,15 @@ public class PublishingCompletionService : IPublishingCompletionService
                     status.ReleaseId, 
                     status.Id, 
                     ReleasePublishingStatusPublishingStage.Started));
-        
+
         var releaseIdsToUpdate = prePublishingStagesComplete
             .Select(status => status.ReleaseId)
             .ToArray();
 
         await releaseIdsToUpdate
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(releaseId => _releaseService.SetPublishedDates(releaseId, publishedDate));
-        
+            .ForEachAwaitAsync(releaseId => _releaseService.SetPublishedDates(releaseId, DateTime.UtcNow));
+
         var publicationSlugs = prePublishingStagesComplete
             .Select(status => status.PublicationSlug)
             .Distinct();
