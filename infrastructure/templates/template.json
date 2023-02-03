@@ -687,13 +687,6 @@
     "dataFactoryConcurrency": {
       "type": "int",
       "defaultValue": 1
-    },
-    "permittedEmbedUrlDomains": {
-      "type": "string",
-      "defaultValue": "https://department-for-education.shinyapps.io",
-      "metadata": {
-        "description": "A comma-separated list of valid domains from which URLs can be embedded in Release content"
-      }
     }
   },
   "variables": {
@@ -1731,8 +1724,7 @@
         "enableThemeDeletion": "[parameters('enableThemeDeletion')]",
         "ReleaseApproval:PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
         "ReleaseApproval:PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
-        "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]",
-        "Content:PermittedEmbedUrlDomains": "[parameters('permittedEmbedUrlDomains')]"
+        "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]"
       }
     },
     {
@@ -1982,7 +1974,6 @@
         "GA_TRACKING_ID": "[parameters('publicAppGATrackingId')]",
         "NEXT_CONFIG_MODE": "server",
         "NODE_ENV": "production",
-        "PERMITTED_EMBED_URL_DOMAINS": "[parameters('permittedEmbedUrlDomains')]",
         "PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
         "WEBSITE_NODE_DEFAULT_VERSION": "14.16.0",
         "WEBSITE_RUN_FROM_PACKAGE": "1"

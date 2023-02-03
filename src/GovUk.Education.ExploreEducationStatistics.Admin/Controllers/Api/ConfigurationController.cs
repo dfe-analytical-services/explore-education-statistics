@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -24,8 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         private Dictionary<string, object> BuildConfigurationValues()
         {
-            var permittedEmbedUrlDomainValue = GetValue(GetRootSection("Content"), "PermittedEmbedUrlDomains");
-            
             return new Dictionary<string, object>
             {
                 {
@@ -35,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                     ExposedKeys.PublicAppUrl.ToString(), GetRootValue("PublicAppUrl")
                 },
                 {
-                    ExposedKeys.PermittedEmbedUrlDomains.ToString(), permittedEmbedUrlDomainValue.Split(',')
+                    ExposedKeys.PermittedEmbedUrlDomains.ToString(), EmbedBlockService.PermittedDomains
                 }
             };
         }

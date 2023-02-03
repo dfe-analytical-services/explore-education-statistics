@@ -55,7 +55,7 @@ public class EmbedBlockServiceTests
                 new EmbedBlockCreateRequest
                 {
                     Title = "Test title",
-                    Url = "http://www.test.com/test-page",
+                    Url = "https://department-for-education.shinyapps.io/test-page",
                     ContentSectionId = contentSectionId,
                 });
 
@@ -63,7 +63,7 @@ public class EmbedBlockServiceTests
 
             Assert.Equal(1, viewModel.Order);
             Assert.Equal("Test title", viewModel.Title);
-            Assert.Equal("http://www.test.com/test-page", viewModel.Url);
+            Assert.Equal("https://department-for-education.shinyapps.io/test-page", viewModel.Url);
             Assert.Empty(viewModel.Comments);
             Assert.Null(viewModel.Locked);
             Assert.Null(viewModel.LockedUntil);
@@ -81,7 +81,7 @@ public class EmbedBlockServiceTests
             var embedBlock = Assert.Single(embedBlocks);
             Assert.Equal(embedBlockLink.EmbedBlockId, embedBlock.Id);
             Assert.Equal("Test title", embedBlock.Title);
-            Assert.Equal("http://www.test.com/test-page", embedBlock.Url);
+            Assert.Equal("https://department-for-education.shinyapps.io/test-page", embedBlock.Url);
         }
     }
 
@@ -152,7 +152,7 @@ public class EmbedBlockServiceTests
                 new EmbedBlockCreateRequest
                 {
                     Title = "Test title",
-                    Url = "http://www.test.com/test-page",
+                    Url = "https://department-for-education.shinyapps.io/test-page",
                     ContentSectionId = contentSectionId,
                 });
 
@@ -160,7 +160,7 @@ public class EmbedBlockServiceTests
 
             Assert.Equal(4, viewModel.Order);
             Assert.Equal("Test title", viewModel.Title);
-            Assert.Equal("http://www.test.com/test-page", viewModel.Url);
+            Assert.Equal("https://department-for-education.shinyapps.io/test-page", viewModel.Url);
             Assert.Empty(viewModel.Comments);
             Assert.Null(viewModel.Locked);
             Assert.Null(viewModel.LockedUntil);
@@ -181,7 +181,7 @@ public class EmbedBlockServiceTests
             var embedBlock = Assert.Single(embedBlocks);
             Assert.Equal(embedBlockLink.EmbedBlockId, embedBlock.Id);
             Assert.Equal("Test title", embedBlock.Title);
-            Assert.Equal("http://www.test.com/test-page", embedBlock.Url);
+            Assert.Equal("https://department-for-education.shinyapps.io/test-page", embedBlock.Url);
 
             Assert.Equal(embedBlock.Id, embedBlockLink.EmbedBlockId);
         }
@@ -213,7 +213,7 @@ public class EmbedBlockServiceTests
                 new EmbedBlockCreateRequest
                 {
                     Title = "Test title",
-                    Url = "http://www.test.com/test-page",
+                    Url = "https://department-for-education.shinyapps.io/test-page",
                     ContentSectionId = contentSectionId,
                 });
 
@@ -247,7 +247,7 @@ public class EmbedBlockServiceTests
                 new EmbedBlockCreateRequest
                 {
                     Title = "Test title",
-                    Url = "http://www.test.com/test-page",
+                    Url = "https://department-for-education.shinyapps.io/test-page",
                     ContentSectionId = Guid.NewGuid(),
                 });
 
@@ -287,7 +287,7 @@ public class EmbedBlockServiceTests
                 new EmbedBlockCreateRequest
                 {
                     Title = "Test title",
-                    Url = "http://www.test.com/test-page",
+                    Url = "https://department-for-education.shinyapps.io/test-page",
                     ContentSectionId = contentSectionId,
                 });
 
@@ -326,7 +326,7 @@ public class EmbedBlockServiceTests
             {
                 Id = embedBlockId,
                 Title = "Test title",
-                Url = "http://www.test.com/test-page",
+                Url = "https://department-for-education.shinyapps.io/test-page",
             });
             await context.SaveChangesAsync();
         }
@@ -339,14 +339,14 @@ public class EmbedBlockServiceTests
                 new EmbedBlockUpdateRequest
                 {
                     Title = "Test title updated",
-                    Url = "http://www.test.com/updated-test-page",
+                    Url = "https://department-for-education.shinyapps.io/updated-test-page",
                 });
 
             var viewModel = result.AssertRight();
 
             Assert.Equal(93, viewModel.Order);
             Assert.Equal("Test title updated", viewModel.Title);
-            Assert.Equal("http://www.test.com/updated-test-page", viewModel.Url);
+            Assert.Equal("https://department-for-education.shinyapps.io/updated-test-page", viewModel.Url);
             Assert.Empty(viewModel.Comments);
             Assert.Null(viewModel.Locked);
             Assert.Null(viewModel.LockedUntil);
@@ -365,7 +365,7 @@ public class EmbedBlockServiceTests
             var embedBlock = Assert.Single(embedBlocks);
             Assert.Equal(embedBlockLink.EmbedBlockId, embedBlock.Id);
             Assert.Equal("Test title updated", embedBlock.Title);
-            Assert.Equal("http://www.test.com/updated-test-page", embedBlock.Url);
+            Assert.Equal("https://department-for-education.shinyapps.io/updated-test-page", embedBlock.Url);
         }
     }
     
@@ -400,7 +400,7 @@ public class EmbedBlockServiceTests
             {
                 Id = embedBlockId,
                 Title = "Test title",
-                Url = "http://www.test.com/test-page",
+                Url = "https://department-for-education.shinyapps.io/test-page",
             });
             await context.SaveChangesAsync();
         }
@@ -432,7 +432,7 @@ public class EmbedBlockServiceTests
             var embedBlock = Assert.Single(embedBlocks);
             Assert.Equal(embedBlockLink.EmbedBlockId, embedBlock.Id);
             Assert.Equal("Test title", embedBlock.Title);
-            Assert.Equal("http://www.test.com/test-page", embedBlock.Url);
+            Assert.Equal("https://department-for-education.shinyapps.io/test-page", embedBlock.Url);
         }
     }
 
@@ -467,7 +467,7 @@ public class EmbedBlockServiceTests
             {
                 Id = embedBlockId,
                 Title = "Test title",
-                Url = "http://www.test.com/test-page",
+                Url = "https://department-for-education.shinyapps.io/test-page",
             });
             await context.SaveChangesAsync();
         }
@@ -480,7 +480,7 @@ public class EmbedBlockServiceTests
                 new EmbedBlockUpdateRequest
                 {
                     Title = "Test title update",
-                    Url = "http://www.test.com/updated-test-page",
+                    Url = "https://department-for-education.shinyapps.io/updated-test-page",
                 });
 
             result.AssertNotFound();
@@ -518,7 +518,7 @@ public class EmbedBlockServiceTests
             {
                 Id = embedBlockId,
                 Title = "Test title",
-                Url = "http://www.test.com/test-page",
+                Url = "https://department-for-education.shinyapps.io/test-page",
             });
             await context.SaveChangesAsync();
         }
@@ -531,7 +531,7 @@ public class EmbedBlockServiceTests
                 new EmbedBlockUpdateRequest
                 {
                     Title = "Test title update",
-                    Url = "http://www.test.com/updated-test-page",
+                    Url = "https://department-for-education.shinyapps.io/updated-test-page",
                 });
 
             result.AssertNotFound();
@@ -575,7 +575,7 @@ public class EmbedBlockServiceTests
             {
                 Id = embedBlockId,
                 Title = "Test title",
-                Url = "http://www.test.com/test-page",
+                Url = "https://department-for-education.shinyapps.io/test-page",
             });
             await context.SaveChangesAsync();
         }
@@ -588,7 +588,7 @@ public class EmbedBlockServiceTests
                 new EmbedBlockUpdateRequest
                 {
                     Title = "Test title update",
-                    Url = "http://www.test.com/updated-test-page",
+                    Url = "https://department-for-education.shinyapps.io/updated-test-page",
                 });
 
             result.AssertBadRequest(ContentSectionNotAttachedToRelease);
@@ -626,7 +626,7 @@ public class EmbedBlockServiceTests
             {
                 Id = embedBlockId,
                 Title = "Test title",
-                Url = "http://www.test.com/test-page",
+                Url = "https://department-for-education.shinyapps.io/test-page",
             });
             await context.SaveChangesAsync();
         }
@@ -680,7 +680,7 @@ public class EmbedBlockServiceTests
             {
                 Id = embedBlockId,
                 Title = "Test title",
-                Url = "http://www.test.com/test-page",
+                Url = "https://department-for-education.shinyapps.io/test-page",
             });
             await context.SaveChangesAsync();
         }
@@ -725,7 +725,7 @@ public class EmbedBlockServiceTests
             {
                 Id = embedBlockId,
                 Title = "Test title",
-                Url = "http://www.test.com/test-page",
+                Url = "https://department-for-education.shinyapps.io/test-page",
             });
             await context.SaveChangesAsync();
         }
@@ -776,7 +776,7 @@ public class EmbedBlockServiceTests
             {
                 Id = embedBlockId,
                 Title = "Test title",
-                Url = "http://www.test.com/test-page",
+                Url = "https://department-for-education.shinyapps.io/test-page",
             });
             await context.SaveChangesAsync();
         }
@@ -788,14 +788,6 @@ public class EmbedBlockServiceTests
 
             result.AssertBadRequest(ContentBlockNotAttachedToRelease);
         }
-    }
-    
-    private static IOptions<EmbedBlockService.ContentOptions> DefaultOptions()
-    {
-        return Options.Create(new EmbedBlockService.ContentOptions
-        {
-            PermittedEmbedUrlDomains = "http://www.test.com"
-        });
     }
 
     private static EmbedBlockService BuildEmbedBlockService(
@@ -810,7 +802,6 @@ public class EmbedBlockServiceTests
             persistenceHelper ?? new PersistenceHelper<ContentDbContext>(context),
             contentBlockService ?? new ContentBlockService(context),
             userService ?? AlwaysTrueUserService().Object,
-            AdminMapper(),
-            DefaultOptions());
+            AdminMapper());
     }
 }

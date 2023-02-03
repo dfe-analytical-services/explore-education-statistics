@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
@@ -90,9 +89,7 @@ public class EmbedBlockServicePermissionTests
             contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
             contentBlockService ?? Mock.Of<IContentBlockService>(),
             userService ?? Mock.Of<IUserService>(),
-            AdminMapper(),
-            Options.Create(new EmbedBlockService.ContentOptions())
-        );
+            AdminMapper());
     }
 
     private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()

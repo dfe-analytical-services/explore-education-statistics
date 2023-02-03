@@ -15,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
@@ -23,27 +22,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
 public class EmbedBlockService : IEmbedBlockService
 {
+    /// <summary>
+    /// Whitelist of permitted domains from which to embed URLs in Release content.
+    /// </summary>
+    /// <remarks>
+    /// Note that if amending this list, the corresponding changes must also be made to the public site's CSP
+    /// directive configuration in explore-education-statistics-frontend/server.js.
+    /// </remarks>
+    public static readonly string[] PermittedDomains =
+    {
+        "https://department-for-education.shinyapps.io", 
+        "https://dfe-analytical-services.github.io"
+    };
+    
     private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
     private readonly IContentBlockService _contentBlockService;
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
-    private readonly ContentOptions _options;
 
     public EmbedBlockService(
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
         IContentBlockService contentBlockService,
         IUserService userService,
-        IMapper mapper,
-        IOptions<ContentOptions> options)
+        IMapper mapper)
     {
         _contentDbContext = contentDbContext;
         _persistenceHelper = persistenceHelper;
         _contentBlockService = contentBlockService;
         _userService = userService;
         _mapper = mapper;
-        _options = options.Value;
     }
 
     public async Task<Either<ActionResult, EmbedBlockLinkViewModel>> Create(
@@ -144,7 +153,7 @@ public class EmbedBlockService : IEmbedBlockService
 
     private Either<ActionResult, Unit> ValidateEmbedUrl(string url)
     {
-        return _options.PermittedEmbedUrlDomains.Split(',').Any(url.StartsWith) 
+        return PermittedDomains.Any(url.StartsWith) 
             ? Unit.Instance
             : ValidationActionResult(EmbedBlockUrlDomainNotPermitted);
     }
@@ -158,12 +167,5 @@ public class EmbedBlockService : IEmbedBlockService
             .Any(rcs => rcs.ReleaseId == releaseId && rcs.ContentSectionId == contentSectionId)
             ? Unit.Instance
             : ValidationActionResult(ContentSectionNotAttachedToRelease);
-    }
-    
-    public class ContentOptions
-    {
-        public const string Content = "Content";
-
-        public string PermittedEmbedUrlDomains { get; set; } = null!;
     }
 }

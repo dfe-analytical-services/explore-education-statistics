@@ -79,9 +79,8 @@ async function startServer(port = process.env.PORT || 3000) {
             process.env.NODE_ENV !== 'production' ? ['*'] : cspConnectSrc,
           frameSrc: [
             "'self'",
-            ...process.env.PERMITTED_EMBED_URL_DOMAINS.split(',').map(
-              domain => `${domain}/`,
-            ),
+            'https://department-for-education.shinyapps.io/',
+            'https://dfe-analytical-services.github.io/',
           ],
           frameAncestors: ["'self'"],
           childSrc: ["'self'"],

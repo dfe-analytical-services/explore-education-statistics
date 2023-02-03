@@ -74,7 +74,6 @@ using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
 using Thinktecture;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Services.EmbedBlockService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using IContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IGlossaryService;
@@ -82,9 +81,9 @@ using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Conten
 using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
 using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
 using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
-using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
+using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using IDataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IDataGuidanceService;
 using IGlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IGlossaryService;
 using IMethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
@@ -97,6 +96,7 @@ using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Service
 using IThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IThemeService;
 using MethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyImageService;
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyService;
+using PublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationRepository;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
 using ReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseFileService;
 using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseRepository;
@@ -404,7 +404,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 Configuration.GetSection(ReleaseApprovalOptions.ReleaseApproval));
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
-            services.Configure<ContentOptions>(Configuration.GetSection(ContentOptions.Content));
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
 
@@ -477,7 +476,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()
                 )
             );
-            services.AddTransient<IPublicationRepository, Services.PublicationRepository>();
+            services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<ILegacyReleaseService, LegacyReleaseService>(provider =>
                 new LegacyReleaseService(

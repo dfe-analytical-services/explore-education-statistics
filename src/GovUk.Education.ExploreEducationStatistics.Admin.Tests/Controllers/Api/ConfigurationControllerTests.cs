@@ -27,14 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public void CheckPermittedEmbedUrlDomains()
-        {
-            var configuration = GetConfiguration();
-            var configValue = configuration.GetSection("Content").GetValue<string>("PermittedEmbedUrlDomains");
-            Assert.Equal("https://department-for-education.shinyapps.io,https://dfe-analytical-services.github.io", configValue);
-        }
-
-        [Fact]
         public void GetConfig()
         {
             var controller = new ConfigurationController(GetConfiguration());

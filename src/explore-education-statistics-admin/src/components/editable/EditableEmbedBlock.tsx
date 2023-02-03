@@ -8,7 +8,6 @@ import React from 'react';
 import { EmbedBlock as EmbedBlockType } from '@common/services/types/blocks';
 import Modal from '@common/components/Modal';
 import useToggle from '@common/hooks/useToggle';
-import { useConfig } from '@admin/contexts/ConfigContext';
 
 interface Props {
   block: EmbedBlockType;
@@ -27,8 +26,6 @@ const EditableEmbedBlock = ({
 }: Props) => {
   const [showEmbedDashboardForm, toggleEmbedDashboardForm] = useToggle(false);
 
-  const { PermittedEmbedUrlDomains } = useConfig();
-
   return (
     <>
       <EditableBlockWrapper
@@ -36,11 +33,7 @@ const EditableEmbedBlock = ({
         onDelete={editable ? onDelete : undefined}
       >
         <Gate condition={!!visible}>
-          <EmbedBlock
-            title={block.title}
-            url={block.url}
-            permittedEmbedDomains={PermittedEmbedUrlDomains}
-          />
+          <EmbedBlock title={block.title} url={block.url} />
         </Gate>
       </EditableBlockWrapper>
 

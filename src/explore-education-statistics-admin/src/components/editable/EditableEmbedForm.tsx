@@ -21,7 +21,7 @@ interface Props {
   onSubmit: (values: EditableEmbedFormValues) => void;
 }
 
-const errorMappers = [
+const errorMappings = [
   mapFieldErrors<EditableEmbedFormValues>({
     target: 'url',
     messages: {
@@ -64,7 +64,7 @@ const EditableEmbedForm = ({
         })}
         onSubmit={useFormSubmit<EditableEmbedFormValues>(
           onSubmit,
-          errorMappers,
+          errorMappings,
         )}
       >
         {form => (
