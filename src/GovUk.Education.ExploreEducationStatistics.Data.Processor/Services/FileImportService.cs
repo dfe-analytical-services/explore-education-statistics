@@ -2,12 +2,12 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
@@ -67,8 +67,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var datafileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, message.ObservationsFilePath);
             var metaFileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
 
-            var metaFileCsvHeaders = await CsvUtil.GetCsvHeaders(metaFileStreamProvider);
-            var metaFileCsvRows = await CsvUtil.GetCsvRows(metaFileStreamProvider);
+            var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
+            var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
 
             await _databaseHelper.DoInTransaction(
                 context,
@@ -101,8 +101,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var datafileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
             var metaFileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
 
-            var metaFileCsvHeaders = await CsvUtil.GetCsvHeaders(metaFileStreamProvider);
-            var metaFileCsvRows = await CsvUtil.GetCsvRows(metaFileStreamProvider);
+            var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
+            var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
 
             await _importerService.ImportFiltersAndLocations(
                 import,

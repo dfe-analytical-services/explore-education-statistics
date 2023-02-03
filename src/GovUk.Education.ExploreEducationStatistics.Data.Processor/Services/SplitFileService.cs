@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             DataImport dataImport,
             Func<Task<Stream>> dataFileStreamProvider)
         {
-            var csvHeaders = await CsvUtil.GetCsvHeaders(dataFileStreamProvider);
+            var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
 
             var existingBatchFiles = await _batchService.GetBatchFilesForDataFile(dataImport.File);
 
@@ -136,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await using var writeStream = new MemoryStream();
                 var writer = new StreamWriter(writeStream);
                 await writer.WriteLineAsync(csvHeaders.JoinToString(','));
-                
+
                 var currentRowNumberInBatch = 1;
 
                 while (!streamReader.EndOfStream && currentRowNumberInBatch <= dataImport.RowsPerBatch)
