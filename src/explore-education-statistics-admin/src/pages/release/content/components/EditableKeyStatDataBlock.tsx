@@ -1,79 +1,66 @@
-import EditableKeyStatDataBlockForm from '@admin/pages/release/content/components/EditableKeyStatDataBlockForm';
+import EditableKeyStatDataBlockForm, {
+  KeyStatDataBlockFormValues,
+} from '@admin/pages/release/content/components/EditableKeyStatDataBlockForm';
 import EditableKeyStatDisplay from '@admin/pages/release/content/components/EditableKeyStatDisplay';
 import Button from '@common/components/Button';
-import ButtonGroup from '@common/components/ButtonGroup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import useKeyStatQuery from '@common/modules/find-statistics/hooks/useKeyStatQuery';
 import { KeyStatisticDataBlock } from '@common/services/publicationService';
-import React from 'react';
-
-interface KeyStatsDataFormValues {
-  trend: string;
-  guidanceTitle: string;
-  guidanceText: string;
-}
+import React, { useCallback } from 'react';
 
 export interface EditableKeyStatDataBlockProps {
-  keyStat: KeyStatisticDataBlock;
   isEditing?: boolean;
   isReordering?: boolean;
+  keyStat: KeyStatisticDataBlock;
   releaseId: string;
   testId?: string;
   onRemove?: () => void;
-  onSubmit: (values: KeyStatsDataFormValues) => void;
+  onSubmit: (values: KeyStatDataBlockFormValues) => void;
 }
 
-const EditableKeyStatDataBlock = ({
+export default function EditableKeyStatDataBlock({
   isEditing = false,
   isReordering = false,
-  keyStat: {
-    id: keyStatId,
-    dataBlockId,
-    trend,
-    guidanceTitle = 'Help',
-    guidanceText,
-  },
+  keyStat,
   releaseId,
   testId = 'keyStat',
   onRemove,
   onSubmit,
-}: EditableKeyStatDataBlockProps) => {
+}: EditableKeyStatDataBlockProps) {
   const [showForm, toggleShowForm] = useToggle(false);
-  const [removing, toggleRemoving] = useToggle(false);
 
   const { value: dataBlockValues, isLoading, error } = useKeyStatQuery(
     releaseId,
-    dataBlockId,
+    keyStat.dataBlockId,
+  );
+
+  const handleSubmit = useCallback(
+    async (values: KeyStatDataBlockFormValues) => {
+      await onSubmit(values);
+      toggleShowForm.off();
+    },
+    [onSubmit, toggleShowForm],
   );
 
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  const fetchedTitle = dataBlockValues?.title;
-  const fetchedStatistic = dataBlockValues?.value;
+  const title = dataBlockValues?.title;
+  const statistic = dataBlockValues?.value;
 
-  if (error || !fetchedTitle || !fetchedStatistic) {
+  if (error || !title || !statistic) {
     return (
       <>
         <WarningMessage>Could not load key statistic</WarningMessage>
 
-        <ButtonGroup>
-          {onRemove && (
-            <Button
-              disabled={removing}
-              variant="secondary"
-              onClick={() => {
-                toggleRemoving.on();
-                onRemove();
-              }}
-            >
-              Remove
-            </Button>
-          )}
-        </ButtonGroup>
+        {onRemove && (
+          <Button variant="secondary" onClick={onRemove}>
+            Remove
+          </Button>
+        )}
       </>
     );
   }
@@ -81,34 +68,29 @@ const EditableKeyStatDataBlock = ({
   if (showForm) {
     return (
       <EditableKeyStatDataBlockForm
-        keyStatId={keyStatId}
-        title={fetchedTitle}
-        statistic={fetchedStatistic}
-        trend={trend}
-        guidanceTitle={guidanceTitle}
-        guidanceText={guidanceText}
+        keyStat={keyStat}
+        title={title}
+        statistic={statistic}
         isReordering={isReordering}
-        onSubmit={onSubmit}
-        toggleShowFormOff={toggleShowForm.off}
         testId={testId}
+        onSubmit={handleSubmit}
+        onCancel={toggleShowForm.off}
       />
     );
   }
 
   return (
     <EditableKeyStatDisplay
-      title={fetchedTitle}
-      statistic={fetchedStatistic}
-      trend={trend}
-      guidanceTitle={guidanceTitle}
-      guidanceText={guidanceText}
+      title={title}
+      statistic={statistic}
+      trend={keyStat.trend}
+      guidanceTitle={keyStat.guidanceTitle}
+      guidanceText={keyStat.guidanceText}
       testId={testId}
       isReordering={isReordering}
       isEditing={isEditing}
       onRemove={onRemove}
-      toggleShowForm={toggleShowForm}
+      onEdit={toggleShowForm.on}
     />
   );
-};
-
-export default EditableKeyStatDataBlock;
+}

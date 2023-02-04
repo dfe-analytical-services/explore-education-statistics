@@ -27,13 +27,11 @@ export const KeyStatColumn = ({ children, testId }: KeyStatColumnProps) => {
 
 export interface KeyStatProps {
   children?: ReactNode;
-
-  title?: string;
-  statistic?: string;
+  title: string;
+  statistic: string;
   trend?: string;
   guidanceTitle?: string;
   guidanceText?: string;
-
   testId?: string;
 }
 
@@ -48,30 +46,27 @@ const KeyStat = ({
 }: KeyStatProps) => {
   return (
     <KeyStatColumn testId={testId}>
-      {title && statistic && (
-        <>
-          <KeyStatTile title={title} value={statistic} testId={testId}>
-            {trend && (
-              <p className="govuk-body-s" data-testid={`${testId}-trend`}>
-                {trend}
-              </p>
-            )}
-          </KeyStatTile>
+      <KeyStatTile title={title} value={statistic} testId={testId}>
+        {trend && (
+          <p className="govuk-body-s" data-testid={`${testId}-trend`}>
+            {trend}
+          </p>
+        )}
+      </KeyStatTile>
 
-          {guidanceText && (
-            <Details
-              summary={guidanceTitle}
-              className={styles.guidanceTitle}
-              hiddenText={guidanceTitle === 'Help' ? `for ${title}` : undefined}
-            >
-              <div data-testid={`${testId}-guidanceText`}>
-                <ReactMarkdown key={guidanceText}>{guidanceText}</ReactMarkdown>
-              </div>
-            </Details>
-          )}
-          {children}
-        </>
+      {guidanceText && (
+        <Details
+          summary={guidanceTitle}
+          className={styles.guidanceTitle}
+          hiddenText={guidanceTitle === 'Help' ? `for ${title}` : undefined}
+        >
+          <div data-testid={`${testId}-guidanceText`}>
+            <ReactMarkdown key={guidanceText}>{guidanceText}</ReactMarkdown>
+          </div>
+        </Details>
       )}
+
+      {children}
     </KeyStatColumn>
   );
 };

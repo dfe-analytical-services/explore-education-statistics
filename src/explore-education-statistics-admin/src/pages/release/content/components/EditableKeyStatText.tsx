@@ -1,42 +1,46 @@
 import EditableKeyStatDisplay from '@admin/pages/release/content/components/EditableKeyStatDisplay';
-import EditableKeyStatTextForm from '@admin/pages/release/content/components/EditableKeyStatTextForm';
+import EditableKeyStatTextForm, {
+  KeyStatTextFormValues,
+} from '@admin/pages/release/content/components/EditableKeyStatTextForm';
 import useToggle from '@common/hooks/useToggle';
 import { KeyStatisticText } from '@common/services/publicationService';
-import React from 'react';
-
-interface KeyStatsFormValues {
-  trend: string;
-  guidanceTitle: string;
-  guidanceText: string;
-}
+import React, { useCallback } from 'react';
 
 export interface EditableKeyStatTextProps {
-  keyStat: KeyStatisticText;
   isEditing?: boolean;
   isReordering?: boolean;
-  onRemove?: () => void;
-  onSubmit: (values: KeyStatsFormValues) => void;
+  keyStat: KeyStatisticText;
   testId?: string;
+  onRemove?: () => void;
+  onSubmit: (values: KeyStatTextFormValues) => void;
 }
 
-const EditableKeyStatText = ({
-  keyStat,
+export default function EditableKeyStatText({
   isEditing = false,
   isReordering = false,
+  keyStat,
   testId = 'keyStat',
   onRemove,
   onSubmit,
-}: EditableKeyStatTextProps) => {
+}: EditableKeyStatTextProps) {
   const [showForm, toggleShowForm] = useToggle(false);
+
+  const handleSubmit = useCallback(
+    async (values: KeyStatTextFormValues) => {
+      await onSubmit(values);
+      toggleShowForm.off();
+    },
+    [onSubmit, toggleShowForm],
+  );
 
   if (showForm) {
     return (
       <EditableKeyStatTextForm
         keyStat={keyStat}
         isReordering={isReordering}
-        onSubmit={onSubmit}
-        toggleShowFormOff={toggleShowForm.off}
         testId={testId}
+        onSubmit={handleSubmit}
+        onCancel={toggleShowForm.off}
       />
     );
   }
@@ -46,15 +50,13 @@ const EditableKeyStatText = ({
       title={keyStat.title}
       statistic={keyStat.statistic}
       trend={keyStat.trend}
-      guidanceTitle={keyStat.guidanceTitle ?? 'Help'}
+      guidanceTitle={keyStat.guidanceTitle}
       guidanceText={keyStat.guidanceText}
       testId={testId}
       isReordering={isReordering}
       isEditing={isEditing}
       onRemove={onRemove}
-      toggleShowForm={toggleShowForm}
+      onEdit={toggleShowForm.on}
     />
   );
-};
-
-export default EditableKeyStatText;
+}

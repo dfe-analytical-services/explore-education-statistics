@@ -5,12 +5,6 @@ import { KeyStatisticDataBlockUpdateRequest } from '@admin/services/keyStatistic
 import { KeyStatistic } from '@common/services/publicationService';
 import React from 'react';
 
-export interface KeyStatsFormValues {
-  trend: string;
-  guidanceTitle: string;
-  guidanceText: string;
-}
-
 interface EditableKeyStatProps {
   isEditing?: boolean;
   isReordering?: boolean;
@@ -45,6 +39,7 @@ const EditableKeyStat = ({
             guidanceTitle: values.guidanceTitle,
             guidanceText: values.guidanceText,
           };
+
           await updateKeyStatisticDataBlock({
             releaseId,
             keyStatisticId: keyStat.id,
@@ -65,7 +60,7 @@ const EditableKeyStat = ({
         onRemove={onRemove}
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         onSubmit={async values => {
-          // EES-3913
+          // TODO: EES-3913
         }}
       />
     );

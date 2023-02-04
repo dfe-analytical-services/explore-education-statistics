@@ -5,13 +5,14 @@ import toMarkdown from '@admin/utils/markdown/toMarkdown';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form, FormFieldTextInput } from '@common/components/form';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import { KeyStatisticText } from '@common/services/publicationService';
 import { Formik } from 'formik';
 import React from 'react';
 
-interface KeyStatTextFormValues {
+export interface KeyStatTextFormValues {
   title: string;
   statistic: string;
   trend: string;
@@ -23,47 +24,41 @@ interface EditableKeyStatTextFormProps {
   keyStat: KeyStatisticText;
   isReordering?: boolean;
   onSubmit: (values: KeyStatTextFormValues) => void;
-  toggleShowFormOff: () => void;
+  onCancel: () => void;
   testId?: string;
 }
 
-const EditableKeyStatTextForm = ({
-  keyStat: {
-    id: keyStatId,
-    title,
-    statistic,
-    trend,
-    guidanceTitle = 'Help',
-    guidanceText,
-  },
+export default function EditableKeyStatTextForm({
+  keyStat,
   isReordering,
-  onSubmit,
-  toggleShowFormOff,
   testId = 'keyStat',
-}: EditableKeyStatTextFormProps) => {
+  onSubmit,
+  onCancel,
+}: EditableKeyStatTextFormProps) {
+  const handleSubmit = useFormSubmit<KeyStatTextFormValues>(async values => {
+    await onSubmit({
+      ...values,
+      guidanceTitle: values.guidanceTitle.trim(),
+      guidanceText: toMarkdown(values.guidanceText),
+    });
+  });
+
   return (
     <Formik<KeyStatTextFormValues>
       initialValues={{
-        title: title ?? '',
-        statistic: statistic ?? '',
-        trend: trend ?? '',
-        guidanceTitle: guidanceTitle ?? 'Help',
-        guidanceText: guidanceText ? toHtml(guidanceText) : '',
+        title: keyStat.title ?? '',
+        statistic: keyStat.statistic ?? '',
+        trend: keyStat.trend ?? '',
+        guidanceTitle: keyStat.guidanceTitle ?? 'Help',
+        guidanceText: keyStat.guidanceText ? toHtml(keyStat.guidanceText) : '',
       }}
-      onSubmit={values => {
-        onSubmit({
-          ...values,
-          guidanceTitle: values.guidanceTitle.trim(),
-          guidanceText: toMarkdown(values.guidanceText),
-        });
-        toggleShowFormOff();
-      }}
+      onSubmit={handleSubmit}
     >
       {form => (
-        <Form id={`editableKeyStatForm-${keyStatId}`}>
+        <Form id={`editableKeyStatForm-${keyStat.id}`}>
           <KeyStatTile
-            title={title}
-            value={statistic}
+            title={keyStat.title}
+            value={keyStat.statistic}
             titleTag="h4"
             testId={testId}
             isReordering={isReordering}
@@ -96,14 +91,10 @@ const EditableKeyStatTextForm = ({
           />
 
           <ButtonGroup>
-            <Button
-              disabled={form.isSubmitting || !form.isValid}
-              type="submit"
-              className="govuk-!-margin-right-2"
-            >
+            <Button disabled={form.isSubmitting} type="submit">
               Save
             </Button>
-            <Button variant="secondary" onClick={toggleShowFormOff}>
+            <Button variant="secondary" onClick={onCancel}>
               Cancel
             </Button>
           </ButtonGroup>
@@ -111,6 +102,4 @@ const EditableKeyStatTextForm = ({
       )}
     </Formik>
   );
-};
-
-export default EditableKeyStatTextForm;
+}

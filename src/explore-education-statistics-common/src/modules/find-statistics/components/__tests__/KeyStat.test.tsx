@@ -94,48 +94,4 @@ describe('KeyStat', () => {
       ).not.toBeInTheDocument();
     });
   });
-
-  test('does not render if no title provided', async () => {
-    render(
-      <KeyStat
-        title={undefined}
-        statistic="608180"
-        trend="Down from 620,330 in 2017"
-        guidanceTitle="What is the number of applications received?"
-        guidanceText="Total number of applications received for places at primary and secondary schools."
-      />,
-    );
-
-    await waitFor(() => {
-      expect(screen.queryByTestId('keyStat-title')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('keyStat-value')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
-      expect(
-        screen.queryByTestId('keyStat-guidanceText'),
-      ).not.toBeInTheDocument();
-    });
-  });
-
-  test('does not render if no statistic provided', async () => {
-    render(
-      <KeyStat
-        title="Number of applications received"
-        statistic={undefined}
-        trend="Down from 620,330 in 2017"
-        guidanceTitle="What is the number of applications received?"
-        guidanceText="Total number of applications received for places at primary and secondary schools."
-      />,
-    );
-
-    await waitFor(() => {
-      expect(screen.queryByTestId('keyStat-title')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('keyStat-value')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
-      expect(
-        screen.queryByTestId('keyStat-guidanceText'),
-      ).not.toBeInTheDocument();
-    });
-  });
 });

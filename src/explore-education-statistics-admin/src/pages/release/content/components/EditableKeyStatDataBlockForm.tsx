@@ -1,59 +1,63 @@
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import { toolbarConfigs } from '@admin/config/ckEditorConfig';
-import { KeyStatsFormValues } from '@admin/pages/release/content/components/EditableKeyStat';
 import toHtml from '@admin/utils/markdown/toHtml';
 import toMarkdown from '@admin/utils/markdown/toMarkdown';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form, FormFieldTextInput } from '@common/components/form';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
+import { KeyStatisticDataBlock } from '@common/services/publicationService';
 import { Formik } from 'formik';
 import React from 'react';
 
+export interface KeyStatDataBlockFormValues {
+  trend: string;
+  guidanceTitle: string;
+  guidanceText: string;
+}
+
 export interface EditableKeyStatDataBlockFormProps {
-  keyStatId: string;
+  keyStat: KeyStatisticDataBlock;
   title: string;
   statistic: string;
-  trend?: string;
-  guidanceTitle?: string;
-  guidanceText?: string;
   isReordering?: boolean;
-  onSubmit: (values: KeyStatsFormValues) => void;
-  toggleShowFormOff: () => void;
   testId?: string;
+  onSubmit: (values: KeyStatDataBlockFormValues) => void;
+  onCancel: () => void;
 }
 
 const EditableKeyStatDataBlockForm = ({
-  keyStatId,
+  keyStat,
   title,
   statistic,
-  trend,
-  guidanceTitle,
-  guidanceText,
   isReordering,
-  onSubmit,
-  toggleShowFormOff,
   testId = 'keyStat',
+  onSubmit,
+  onCancel,
 }: EditableKeyStatDataBlockFormProps) => {
+  const handleSubmit = useFormSubmit<KeyStatDataBlockFormValues>(
+    async values => {
+      await onSubmit({
+        ...values,
+        guidanceTitle: values.guidanceTitle.trim(),
+        guidanceText: toMarkdown(values.guidanceText),
+      });
+    },
+  );
+
   return (
-    <Formik<KeyStatsFormValues>
+    <Formik<KeyStatDataBlockFormValues>
       initialValues={{
-        trend: trend ?? '',
-        guidanceTitle: guidanceTitle ?? 'Help',
-        guidanceText: guidanceText ? toHtml(guidanceText) : '',
+        trend: keyStat.trend ?? '',
+        guidanceTitle: keyStat.guidanceTitle ?? 'Help',
+        guidanceText: keyStat.guidanceText ? toHtml(keyStat.guidanceText) : '',
       }}
-      onSubmit={values => {
-        onSubmit({
-          ...values,
-          guidanceTitle: values.guidanceTitle.trim(),
-          guidanceText: toMarkdown(values.guidanceText),
-        });
-        toggleShowFormOff();
-      }}
+      onSubmit={handleSubmit}
     >
       {form => (
-        <Form id={`editableKeyStatForm-${keyStatId}`}>
+        <Form id={`editableKeyStatForm-${keyStat.id}`}>
           <KeyStatTile
             title={title}
             titleTag="h4"
@@ -61,33 +65,29 @@ const EditableKeyStatDataBlockForm = ({
             value={statistic}
             isReordering={isReordering}
           >
-            <FormFieldTextInput<KeyStatsFormValues>
+            <FormFieldTextInput<KeyStatDataBlockFormValues>
               name="trend"
               label={<span className={styles.trendText}>Trend</span>}
             />
           </KeyStatTile>
 
-          <FormFieldTextInput<KeyStatsFormValues>
+          <FormFieldTextInput<KeyStatDataBlockFormValues>
             formGroupClass="govuk-!-margin-top-2"
             name="guidanceTitle"
             label="Guidance title"
           />
 
-          <FormFieldEditor<KeyStatsFormValues>
+          <FormFieldEditor<KeyStatDataBlockFormValues>
             name="guidanceText"
             toolbarConfig={toolbarConfigs.simple}
             label="Guidance text"
           />
 
           <ButtonGroup>
-            <Button
-              disabled={!form.isValid}
-              type="submit"
-              className="govuk-!-margin-right-2"
-            >
+            <Button disabled={form.isSubmitting} type="submit">
               Save
             </Button>
-            <Button variant="secondary" onClick={toggleShowFormOff}>
+            <Button variant="secondary" onClick={onCancel}>
               Cancel
             </Button>
           </ButtonGroup>

@@ -1,7 +1,6 @@
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Details from '@common/components/Details';
-import useToggle, { Toggle } from '@common/hooks/useToggle';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import React from 'react';
@@ -13,27 +12,25 @@ export interface EditableKeyStatDisplayProps {
   trend?: string;
   guidanceTitle?: string;
   guidanceText?: string;
-  testId: string;
+  testId?: string;
   isReordering: boolean;
   isEditing: boolean;
   onRemove?: () => void;
-  toggleShowForm: Toggle;
+  onEdit: () => void;
 }
 
-const EditableKeyStatDisplay = ({
+export default function EditableKeyStatDisplay({
   title,
   statistic,
   trend,
   guidanceTitle,
   guidanceText,
-  testId,
+  testId = 'keyStat',
   isReordering,
   isEditing,
   onRemove,
-  toggleShowForm,
-}: EditableKeyStatDisplayProps) => {
-  const [removing, toggleRemoving] = useToggle(false);
-
+  onEdit,
+}: EditableKeyStatDisplayProps) {
   return (
     <>
       <KeyStatTile
@@ -63,17 +60,10 @@ const EditableKeyStatDisplay = ({
 
       {isEditing && !isReordering && (
         <ButtonGroup className="govuk-!-margin-top-2">
-          <Button onClick={toggleShowForm.on}>Edit</Button>
+          <Button onClick={onEdit}>Edit</Button>
 
           {onRemove && (
-            <Button
-              disabled={removing}
-              variant="secondary"
-              onClick={() => {
-                toggleRemoving.on();
-                onRemove();
-              }}
-            >
+            <Button variant="secondary" onClick={onRemove}>
               Remove
             </Button>
           )}
@@ -81,6 +71,4 @@ const EditableKeyStatDisplay = ({
       )}
     </>
   );
-};
-
-export default EditableKeyStatDisplay;
+}

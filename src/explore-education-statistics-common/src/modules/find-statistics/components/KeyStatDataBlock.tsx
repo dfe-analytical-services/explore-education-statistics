@@ -13,7 +13,7 @@ export interface KeyStatDataBlockProps {
   testId?: string;
 }
 
-const KeyStatDataBlock = ({
+export default function KeyStatDataBlock({
   children,
   releaseId,
   dataBlockId,
@@ -21,18 +21,18 @@ const KeyStatDataBlock = ({
   guidanceTitle = 'Help',
   guidanceText,
   testId = 'keyStat',
-}: KeyStatDataBlockProps) => {
-  const { value: dataBlockResults, isLoading, error } = useKeyStatQuery(
+}: KeyStatDataBlockProps) {
+  const { value: dataBlock, isLoading, error } = useKeyStatQuery(
     releaseId,
     dataBlockId,
   );
 
-  if (error) {
+  const title = dataBlock?.title;
+  const statistic = dataBlock?.value;
+
+  if (error || !title || !statistic) {
     return null;
   }
-
-  const title = dataBlockResults?.title;
-  const statistic = dataBlockResults?.value;
 
   return (
     <LoadingSpinner loading={isLoading}>
@@ -48,6 +48,4 @@ const KeyStatDataBlock = ({
       </KeyStat>
     </LoadingSpinner>
   );
-};
-
-export default KeyStatDataBlock;
+}
