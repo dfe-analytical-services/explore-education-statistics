@@ -630,13 +630,18 @@ describe('ReleaseContentContext', () => {
 
   test('ADD_KEY_STATISTIC adds a key statistic to release.keyStatistics array', () => {
     expect(testEditableRelease.keyStatistics).toHaveLength(3);
-    const newKeyStat = {
+    const newKeyStat: KeyStatisticDataBlock = {
+      type: 'KeyStatisticDataBlock',
       id: 'keyStat-4',
+      releaseId: 'release-1',
       dataBlockId: 'dataBlock-0',
       trend: 'keyStat-4 trend',
       guidanceTitle: 'keyStat-4 guidanceTitle',
       guidanceText: 'keyStat-4 guidanceText',
-    } as KeyStatisticDataBlock;
+      order: 1,
+      created: '2022-02-01T12:00:00Z',
+    };
+
     const { release } = releaseReducer(
       {
         release: testEditableRelease,

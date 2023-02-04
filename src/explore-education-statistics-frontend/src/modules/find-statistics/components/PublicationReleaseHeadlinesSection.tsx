@@ -1,24 +1,20 @@
-import glossaryService from '@frontend/services/glossaryService';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import KeyStat, {
   KeyStatContainer,
 } from '@common/modules/find-statistics/components/KeyStat';
+import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStatDataBlock';
+import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
+import { Release } from '@common/services/publicationService';
+import glossaryService from '@frontend/services/glossaryService';
 import {
   logEvent,
   logOutboundLink,
 } from '@frontend/services/googleAnalyticsService';
-import {
-  KeyStatisticDataBlock,
-  KeyStatisticText,
-  Release,
-} from '@common/services/publicationService';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
-import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStatDataBlock';
 
 interface Props {
   release: Release;
@@ -39,12 +35,12 @@ const PublicationReleaseHeadlinesSection = ({
       <KeyStatContainer>
         {keyStatistics &&
           keyStatistics.map(keyStat => {
-            if ((keyStat as KeyStatisticDataBlock).dataBlockId) {
+            if (keyStat.type === 'KeyStatisticDataBlock') {
               return (
                 <KeyStatDataBlock
                   key={keyStat.id}
                   releaseId={releaseId}
-                  dataBlockId={(keyStat as KeyStatisticDataBlock).dataBlockId}
+                  dataBlockId={keyStat.dataBlockId}
                   trend={keyStat.trend}
                   guidanceTitle={keyStat.guidanceTitle}
                   guidanceText={keyStat.guidanceText}
@@ -52,9 +48,7 @@ const PublicationReleaseHeadlinesSection = ({
               );
             }
 
-            return (
-              <KeyStat key={keyStat.id} {...(keyStat as KeyStatisticText)} />
-            );
+            return <KeyStat {...keyStat} key={keyStat.id} />;
           })}
       </KeyStatContainer>
 

@@ -28,6 +28,7 @@ const keyStatisticService = _keyStatisticService as jest.Mocked<
 
 describe('EditableKeyStat', () => {
   const keyStatDataBlock: KeyStatisticDataBlock = {
+    type: 'KeyStatisticDataBlock',
     id: 'keyStatDataBlock-1',
     releaseId: 'release-1',
     trend: 'DataBlock trend',
@@ -39,6 +40,7 @@ describe('EditableKeyStat', () => {
   };
 
   const keyStatText: KeyStatisticText = {
+    type: 'KeyStatisticText',
     id: 'keyStatDataBlock-1',
     releaseId: 'release-1',
     trend: 'Text trend',
@@ -704,12 +706,14 @@ describe('EditableKeyStat', () => {
   test('Ambiguous KeyStatistic renders null', async () => {
     const { container } = renderEditableKeyStat(
       <EditableKeyStat
-        keyStat={{
-          id: 'KeyStat-1',
-          releaseId: 'release-1',
-          order: 0,
-          created: '2023-01-01',
-        }}
+        keyStat={
+          {
+            id: 'KeyStat-1',
+            releaseId: 'release-1',
+            order: 0,
+            created: '2023-01-01',
+          } as never
+        }
       />,
     );
 

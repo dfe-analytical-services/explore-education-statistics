@@ -2,11 +2,7 @@ import EditableKeyStatDataBlock from '@admin/pages/release/content/components/Ed
 import EditableKeyStatText from '@admin/pages/release/content/components/EditableKeyStatText';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { KeyStatisticDataBlockUpdateRequest } from '@admin/services/keyStatisticService';
-import {
-  KeyStatistic,
-  KeyStatisticDataBlock,
-  KeyStatisticText,
-} from '@common/services/publicationService';
+import { KeyStatistic } from '@common/services/publicationService';
 import React from 'react';
 
 export interface KeyStatsFormValues {
@@ -17,7 +13,6 @@ export interface KeyStatsFormValues {
 
 interface EditableKeyStatProps {
   keyStat: KeyStatistic;
-
   isEditing?: boolean;
   isReordering?: boolean;
   onRemove?: () => void;
@@ -32,10 +27,11 @@ const EditableKeyStat = ({
   onRemove,
 }: EditableKeyStatProps) => {
   const { updateKeyStatisticDataBlock } = useReleaseContentActions();
-  if ((keyStat as KeyStatisticDataBlock).dataBlockId) {
+
+  if (keyStat.type === 'KeyStatisticDataBlock') {
     return (
       <EditableKeyStatDataBlock
-        keyStat={keyStat as KeyStatisticDataBlock}
+        keyStat={keyStat}
         testId={testId}
         isEditing={isEditing}
         isReordering={isReordering}
@@ -56,13 +52,10 @@ const EditableKeyStat = ({
     );
   }
 
-  if (
-    (keyStat as KeyStatisticText).title &&
-    (keyStat as KeyStatisticText).statistic
-  ) {
+  if (keyStat.type === 'KeyStatisticText') {
     return (
       <EditableKeyStatText
-        keyStat={keyStat as KeyStatisticText}
+        keyStat={keyStat}
         testId={testId}
         isEditing={isEditing}
         isReordering={isReordering}

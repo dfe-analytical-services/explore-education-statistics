@@ -1,13 +1,14 @@
 #nullable enable
 using System;
 using System.Runtime.Serialization;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using JsonKnownTypes;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 
 [JsonConverter(typeof(JsonKnownTypesConverter<KeyStatisticViewModel>))]
-[JsonDiscriminator(Name = "Type")]
+[JsonDiscriminator(Name = "type")]
 [KnownType(typeof(KeyStatisticTextViewModel))]
 [KnownType(typeof(KeyStatisticDataBlockViewModel))]
 public abstract record KeyStatisticViewModel
@@ -29,11 +30,14 @@ public abstract record KeyStatisticViewModel
     public DateTime? Updated { get; set; }
 }
 
+[JsonKnownThisType(nameof(KeyStatisticDataBlock))]
+
 public record KeyStatisticDataBlockViewModel : KeyStatisticViewModel
 {
     public Guid DataBlockId { get; set; }
 }
 
+[JsonKnownThisType(nameof(KeyStatisticText))]
 public record KeyStatisticTextViewModel : KeyStatisticViewModel
 {
     public string Title { get; set; } = string.Empty;

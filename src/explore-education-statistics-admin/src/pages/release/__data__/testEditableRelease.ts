@@ -58,14 +58,16 @@ export const testEditableRelease: EditableRelease = {
   ],
   keyStatistics: [
     {
+      type: 'KeyStatisticDataBlock',
       id: 'keyStat-1',
       releaseId: '6a97c9b6-eaa2-4d22-7ba9-08d7bec1ba1a',
       dataBlockId: 'dataBlock-1',
       trend: 'keyStat-1 trend',
       order: 0,
       created: '2023-01-01',
-    } as KeyStatisticDataBlock,
+    },
     {
+      type: 'KeyStatisticText',
       id: 'keyStat-2',
       releaseId: '6a97c9b6-eaa2-4d22-7ba9-08d7bec1ba1a',
       title: 'KeyStat-2 title',
@@ -75,15 +77,16 @@ export const testEditableRelease: EditableRelease = {
       guidanceText: 'keyStat-2 guidanceText',
       order: 1,
       created: '2023-01-02',
-    } as KeyStatisticText,
+    },
     {
+      type: 'KeyStatisticDataBlock',
       id: 'keyStat-3',
       releaseId: '6a97c9b6-eaa2-4d22-7ba9-08d7bec1ba1a',
       dataBlockId: 'dataBlock-2',
       guidanceText: 'KeyStat-3 guidanceText',
       order: 2,
       created: '2023-01-03',
-    } as KeyStatisticDataBlock,
+    },
   ],
   content: [
     {

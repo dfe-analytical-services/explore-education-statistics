@@ -83,7 +83,7 @@ export interface ReleaseNote {
   reason: string;
 }
 
-export interface KeyStatistic {
+export interface KeyStatisticBase {
   id: string;
   releaseId: string;
   trend?: string;
@@ -94,14 +94,18 @@ export interface KeyStatistic {
   updated?: string;
 }
 
-export interface KeyStatisticDataBlock extends KeyStatistic {
+export interface KeyStatisticDataBlock extends KeyStatisticBase {
+  type: 'KeyStatisticDataBlock';
   dataBlockId: string;
 }
 
-export interface KeyStatisticText extends KeyStatistic {
+export interface KeyStatisticText extends KeyStatisticBase {
+  type: 'KeyStatisticText';
   title: string;
   statistic: string;
 }
+
+export type KeyStatistic = KeyStatisticDataBlock | KeyStatisticText;
 
 export interface ContentSection<BlockType> {
   id: string;
