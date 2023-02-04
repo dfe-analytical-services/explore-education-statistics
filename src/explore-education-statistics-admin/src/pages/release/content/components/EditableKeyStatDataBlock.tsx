@@ -19,22 +19,23 @@ export interface EditableKeyStatDataBlockProps {
   keyStat: KeyStatisticDataBlock;
   isEditing?: boolean;
   isReordering?: boolean;
+  releaseId: string;
+  testId?: string;
   onRemove?: () => void;
   onSubmit: (values: KeyStatsDataFormValues) => void;
-  testId?: string;
 }
 
 const EditableKeyStatDataBlock = ({
+  isEditing = false,
+  isReordering = false,
   keyStat: {
     id: keyStatId,
-    releaseId,
     dataBlockId,
     trend,
     guidanceTitle = 'Help',
     guidanceText,
   },
-  isEditing = false,
-  isReordering = false,
+  releaseId,
   testId = 'keyStat',
   onRemove,
   onSubmit,

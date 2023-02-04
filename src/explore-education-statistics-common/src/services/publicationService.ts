@@ -85,7 +85,6 @@ export interface ReleaseNote {
 
 export interface KeyStatisticBase {
   id: string;
-  releaseId: string;
   trend?: string;
   guidanceTitle?: string;
   guidanceText?: string;

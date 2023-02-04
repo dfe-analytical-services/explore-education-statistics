@@ -77,7 +77,6 @@ public class KeyStatisticServiceTests
 
             Assert.Equal(dataBlock.Id, viewModel.DataBlockId);
 
-            Assert.Equal(release.Id, viewModel.ReleaseId);
             Assert.Equal("trend", viewModel.Trend);
             Assert.Equal("guidanceTitle", viewModel.GuidanceTitle);
             Assert.Equal("guidanceText", viewModel.GuidanceText);
@@ -159,7 +158,6 @@ public class KeyStatisticServiceTests
 
             Assert.Equal(dataBlock.Id, viewModel.DataBlockId);
 
-            Assert.Equal(release.Id, viewModel.ReleaseId);
             Assert.Null(viewModel.Trend);
             Assert.Null(viewModel.GuidanceTitle);
             Assert.Null(viewModel.GuidanceText);
@@ -384,7 +382,6 @@ public class KeyStatisticServiceTests
 
             Assert.Equal(dataBlockId, viewModel.DataBlockId);
 
-            Assert.Equal(release.Id, viewModel.ReleaseId);
             Assert.Equal("new trend", viewModel.Trend);
             Assert.Equal("new guidanceTitle", viewModel.GuidanceTitle);
             Assert.Equal("new guidanceText", viewModel.GuidanceText);

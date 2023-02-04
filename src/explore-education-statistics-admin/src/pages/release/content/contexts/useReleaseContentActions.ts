@@ -484,7 +484,7 @@ export default function useReleaseContentActions() {
 
       dispatch({
         type: 'REMOVE_KEY_STATISTIC',
-        payload: { releaseId, keyStatisticId },
+        payload: { keyStatisticId },
       });
     },
     [dispatch],

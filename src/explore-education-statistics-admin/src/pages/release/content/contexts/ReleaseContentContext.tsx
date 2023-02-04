@@ -212,20 +212,24 @@ export const releaseReducer: Reducer<
     }
     case 'UPDATE_KEY_STATISTIC': {
       const { keyStatistic } = action.payload;
+
       const keyStatisticIndex = draft.release.keyStatistics.findIndex(
-        ks =>
-          ks.id === keyStatistic.id && ks.releaseId === keyStatistic.releaseId,
+        ks => ks.id === keyStatistic.id,
       );
+
       if (keyStatisticIndex !== -1) {
         draft.release.keyStatistics[keyStatisticIndex] = keyStatistic;
       }
+
       return draft;
     }
     case 'REMOVE_KEY_STATISTIC': {
-      const { releaseId, keyStatisticId } = action.payload;
+      const { keyStatisticId } = action.payload;
+
       draft.release.keyStatistics = draft.release.keyStatistics.filter(
-        ks => ks.id !== keyStatisticId || ks.releaseId !== releaseId,
+        ks => ks.id !== keyStatisticId,
       );
+
       return draft;
     }
     case 'SET_KEY_STATISTICS': {

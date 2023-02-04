@@ -15,8 +15,6 @@ public abstract record KeyStatisticViewModel
 {
     public Guid Id { get; set; }
 
-    public Guid ReleaseId { get; set; }
-
     public string? Trend { get; set; } = string.Empty;
 
     public string? GuidanceTitle { get; set; } = string.Empty;

@@ -121,7 +121,7 @@ export type UpdateKeyStatistic = {
 
 export type RemoveKeyStatistic = {
   type: 'REMOVE_KEY_STATISTIC';
-  payload: { releaseId: string; keyStatisticId: string };
+  payload: { keyStatisticId: string };
 };
 
 export type SetKeyStatistics = {

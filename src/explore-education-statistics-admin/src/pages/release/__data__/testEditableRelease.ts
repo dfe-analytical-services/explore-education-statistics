@@ -60,7 +60,6 @@ export const testEditableRelease: EditableRelease = {
     {
       type: 'KeyStatisticDataBlock',
       id: 'keyStat-1',
-      releaseId: '6a97c9b6-eaa2-4d22-7ba9-08d7bec1ba1a',
       dataBlockId: 'dataBlock-1',
       trend: 'keyStat-1 trend',
       order: 0,
@@ -69,7 +68,6 @@ export const testEditableRelease: EditableRelease = {
     {
       type: 'KeyStatisticText',
       id: 'keyStat-2',
-      releaseId: '6a97c9b6-eaa2-4d22-7ba9-08d7bec1ba1a',
       title: 'KeyStat-2 title',
       statistic: 'KeyStat-2 value',
       trend: 'KeyStat-2 trend',
@@ -81,7 +79,6 @@ export const testEditableRelease: EditableRelease = {
     {
       type: 'KeyStatisticDataBlock',
       id: 'keyStat-3',
-      releaseId: '6a97c9b6-eaa2-4d22-7ba9-08d7bec1ba1a',
       dataBlockId: 'dataBlock-2',
       guidanceText: 'KeyStat-3 guidanceText',
       order: 2,

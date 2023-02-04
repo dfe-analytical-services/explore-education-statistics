@@ -123,6 +123,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                         <EditableKeyStat
                           key={keyStat.id}
                           keyStat={keyStat}
+                          releaseId={release.id}
                           isEditing={isEditing}
                           isReordering={isReordering}
                           onRemove={async () => {

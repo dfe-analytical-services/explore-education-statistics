@@ -633,7 +633,6 @@ describe('ReleaseContentContext', () => {
     const newKeyStat: KeyStatisticDataBlock = {
       type: 'KeyStatisticDataBlock',
       id: 'keyStat-4',
-      releaseId: 'release-1',
       dataBlockId: 'dataBlock-0',
       trend: 'keyStat-4 trend',
       guidanceTitle: 'keyStat-4 guidanceTitle',
@@ -700,7 +699,6 @@ describe('ReleaseContentContext', () => {
       {
         type: 'REMOVE_KEY_STATISTIC',
         payload: {
-          releaseId: '6a97c9b6-eaa2-4d22-7ba9-08d7bec1ba1a',
           keyStatisticId: 'keyStat-2',
         },
       },

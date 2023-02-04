@@ -30,7 +30,6 @@ describe('EditableKeyStat', () => {
   const keyStatDataBlock: KeyStatisticDataBlock = {
     type: 'KeyStatisticDataBlock',
     id: 'keyStatDataBlock-1',
-    releaseId: 'release-1',
     trend: 'DataBlock trend',
     guidanceTitle: 'DataBlock guidance title',
     guidanceText: 'DataBlock guidance text',
@@ -42,7 +41,6 @@ describe('EditableKeyStat', () => {
   const keyStatText: KeyStatisticText = {
     type: 'KeyStatisticText',
     id: 'keyStatDataBlock-1',
-    releaseId: 'release-1',
     trend: 'Text trend',
     guidanceTitle: 'Text guidance title',
     guidanceText: 'Text guidance text',
@@ -118,7 +116,9 @@ describe('EditableKeyStat', () => {
   // Text onRemove
 
   test('KeyStatisticText renders correctly when read-only', async () => {
-    renderEditableKeyStat(<EditableKeyStat keyStat={keyStatText} />);
+    renderEditableKeyStat(
+      <EditableKeyStat releaseId="release-1" keyStat={keyStatText} />,
+    );
 
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).not.toHaveBeenCalled();
@@ -268,7 +268,9 @@ describe('EditableKeyStat', () => {
       testTableDataResponse,
     );
 
-    renderEditableKeyStat(<EditableKeyStat keyStat={keyStatDataBlock} />);
+    renderEditableKeyStat(
+      <EditableKeyStat releaseId="release-1" keyStat={keyStatDataBlock} />,
+    );
 
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(
@@ -308,6 +310,7 @@ describe('EditableKeyStat', () => {
 
     render(
       <EditableKeyStatDataBlock
+        releaseId="release-1"
         keyStat={{ ...keyStatDataBlock, trend: undefined }}
         onSubmit={noop}
       />,
@@ -349,6 +352,7 @@ describe('EditableKeyStat', () => {
 
     render(
       <EditableKeyStatDataBlock
+        releaseId="release-1"
         keyStat={{ ...keyStatDataBlock, guidanceTitle: undefined }}
         onSubmit={noop}
       />,
@@ -392,6 +396,7 @@ describe('EditableKeyStat', () => {
 
     render(
       <EditableKeyStatDataBlock
+        releaseId="release-1"
         keyStat={{ ...keyStatDataBlock, guidanceText: undefined }}
         onSubmit={noop}
       />,
@@ -434,7 +439,11 @@ describe('EditableKeyStat', () => {
     );
 
     renderEditableKeyStat(
-      <EditableKeyStat keyStat={keyStatDataBlock} isEditing />,
+      <EditableKeyStat
+        releaseId="release-1"
+        keyStat={keyStatDataBlock}
+        isEditing
+      />,
     );
 
     await waitFor(() => {
@@ -478,6 +487,7 @@ describe('EditableKeyStat', () => {
     const onRemove = jest.fn();
     renderEditableKeyStat(
       <EditableKeyStat
+        releaseId="release-1"
         keyStat={keyStatDataBlock}
         isEditing
         onRemove={onRemove}
@@ -527,7 +537,11 @@ describe('EditableKeyStat', () => {
     );
 
     renderEditableKeyStat(
-      <EditableKeyStat keyStat={keyStatDataBlock} isEditing />,
+      <EditableKeyStat
+        releaseId="release-1"
+        keyStat={keyStatDataBlock}
+        isEditing
+      />,
     );
 
     await waitFor(() => {
@@ -566,7 +580,11 @@ describe('EditableKeyStat', () => {
     );
 
     renderEditableKeyStat(
-      <EditableKeyStat keyStat={keyStatDataBlock} isEditing />,
+      <EditableKeyStat
+        releaseId="release-1"
+        keyStat={keyStatDataBlock}
+        isEditing
+      />,
     );
 
     await waitFor(() => {
@@ -618,7 +636,11 @@ describe('EditableKeyStat', () => {
     );
 
     renderEditableKeyStat(
-      <EditableKeyStat keyStat={keyStatDataBlock} isEditing />,
+      <EditableKeyStat
+        releaseId="release-1"
+        keyStat={keyStatDataBlock}
+        isEditing
+      />,
     );
 
     await waitFor(() => {
@@ -669,7 +691,11 @@ describe('EditableKeyStat', () => {
 
     const onRemove = jest.fn();
     renderEditableKeyStat(
-      <EditableKeyStat keyStat={keyStatDataBlock} onRemove={onRemove} />,
+      <EditableKeyStat
+        releaseId="release-1"
+        keyStat={keyStatDataBlock}
+        onRemove={onRemove}
+      />,
     );
 
     await waitFor(() => {
@@ -706,10 +732,10 @@ describe('EditableKeyStat', () => {
   test('Ambiguous KeyStatistic renders null', async () => {
     const { container } = renderEditableKeyStat(
       <EditableKeyStat
+        releaseId="release-1"
         keyStat={
           {
             id: 'KeyStat-1',
-            releaseId: 'release-1',
             order: 0,
             created: '2023-01-01',
           } as never

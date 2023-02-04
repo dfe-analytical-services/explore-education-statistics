@@ -12,17 +12,19 @@ export interface KeyStatsFormValues {
 }
 
 interface EditableKeyStatProps {
-  keyStat: KeyStatistic;
   isEditing?: boolean;
   isReordering?: boolean;
-  onRemove?: () => void;
+  keyStat: KeyStatistic;
+  releaseId: string;
   testId?: string;
+  onRemove?: () => void;
 }
 
 const EditableKeyStat = ({
   isEditing = false,
   isReordering = false,
   keyStat,
+  releaseId,
   testId = 'keyStat',
   onRemove,
 }: EditableKeyStatProps) => {
@@ -32,6 +34,7 @@ const EditableKeyStat = ({
     return (
       <EditableKeyStatDataBlock
         keyStat={keyStat}
+        releaseId={releaseId}
         testId={testId}
         isEditing={isEditing}
         isReordering={isReordering}
@@ -43,7 +46,7 @@ const EditableKeyStat = ({
             guidanceText: values.guidanceText,
           };
           await updateKeyStatisticDataBlock({
-            releaseId: keyStat.releaseId,
+            releaseId,
             keyStatisticId: keyStat.id,
             request,
           });
