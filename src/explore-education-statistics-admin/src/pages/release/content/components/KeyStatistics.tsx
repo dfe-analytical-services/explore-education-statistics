@@ -21,11 +21,7 @@ export interface KeyStatisticsProps {
 }
 
 const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
-  const {
-    updateAvailableDataBlocks,
-    deleteKeyStatistic,
-    reorderKeyStatistics,
-  } = useReleaseContentActions();
+  const { reorderKeyStatistics } = useReleaseContentActions();
   const [keyStatistics, setKeyStatistics] = useState(release.keyStatistics);
 
   useEffect(() => {
@@ -126,15 +122,6 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                           releaseId={release.id}
                           isEditing={isEditing}
                           isReordering={isReordering}
-                          onRemove={async () => {
-                            await deleteKeyStatistic({
-                              releaseId: release.id,
-                              keyStatisticId: keyStat.id,
-                            });
-                            await updateAvailableDataBlocks({
-                              releaseId: release.id,
-                            });
-                          }}
                         />
                       </div>
                     )}

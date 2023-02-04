@@ -11,7 +11,6 @@ interface EditableKeyStatProps {
   keyStat: KeyStatistic;
   releaseId: string;
   testId?: string;
-  onRemove?: () => void;
 }
 
 const EditableKeyStat = ({
@@ -20,9 +19,12 @@ const EditableKeyStat = ({
   keyStat,
   releaseId,
   testId = 'keyStat',
-  onRemove,
 }: EditableKeyStatProps) => {
-  const { updateKeyStatisticDataBlock } = useReleaseContentActions();
+  const {
+    deleteKeyStatistic,
+    updateAvailableDataBlocks,
+    updateKeyStatisticDataBlock,
+  } = useReleaseContentActions();
 
   if (keyStat.type === 'KeyStatisticDataBlock') {
     return (
@@ -32,7 +34,15 @@ const EditableKeyStat = ({
         testId={testId}
         isEditing={isEditing}
         isReordering={isReordering}
-        onRemove={onRemove}
+        onRemove={async () => {
+          await deleteKeyStatistic({
+            releaseId,
+            keyStatisticId: keyStat.id,
+          });
+          await updateAvailableDataBlocks({
+            releaseId,
+          });
+        }}
         onSubmit={async values => {
           const request: KeyStatisticDataBlockUpdateRequest = {
             trend: values.trend,
@@ -57,7 +67,12 @@ const EditableKeyStat = ({
         testId={testId}
         isEditing={isEditing}
         isReordering={isReordering}
-        onRemove={onRemove}
+        onRemove={async () => {
+          await deleteKeyStatistic({
+            releaseId,
+            keyStatisticId: keyStat.id,
+          });
+        }}
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         onSubmit={async values => {
           // TODO: EES-3913

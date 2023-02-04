@@ -1,6 +1,7 @@
 import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
 import EditableKeyStat from '@admin/pages/release/content/components/EditableKeyStat';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
+import _dataBlockService from '@admin/services/dataBlockService';
 import _keyStatisticService from '@admin/services/keyStatisticService';
 import {
   KeyStatisticDataBlock,
@@ -26,6 +27,11 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
 jest.mock('@admin/services/keyStatisticService');
 const keyStatisticService = _keyStatisticService as jest.Mocked<
   typeof _keyStatisticService
+>;
+
+jest.mock('@admin/services/dataBlockService');
+const dataBlockService = _dataBlockService as jest.Mocked<
+  typeof _dataBlockService
 >;
 
 describe('EditableKeyStat', () => {
@@ -232,37 +238,78 @@ describe('EditableKeyStat', () => {
         });
       });
     });
+
+    test('removing key stat calls correct services', async () => {
+      tableBuilderService.getDataBlockTableData.mockResolvedValue(
+        testTableDataResponse,
+      );
+
+      keyStatisticService.updateKeyStatisticDataBlock.mockResolvedValue(
+        keyStatDataBlock,
+      );
+
+      render(
+        <EditableKeyStat
+          releaseId="release-1"
+          keyStat={keyStatDataBlock}
+          isEditing
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText(/Remove/)).toBeInTheDocument();
+      });
+
+      expect(keyStatisticService.deleteKeyStatistic).not.toHaveBeenCalled();
+      expect(dataBlockService.getAvailableDataBlocks).not.toHaveBeenCalled();
+
+      userEvent.click(
+        screen.getByRole('button', {
+          name: 'Remove key statistic: Indicator',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(keyStatisticService.deleteKeyStatistic).toHaveBeenCalledWith<
+          Parameters<typeof keyStatisticService.deleteKeyStatistic>
+        >('release-1', 'keyStatDataBlock-1');
+
+        expect(dataBlockService.getAvailableDataBlocks).toHaveBeenCalledWith<
+          Parameters<typeof dataBlockService.getAvailableDataBlocks>
+        >('release-1');
+      });
+    });
+
+    test('invalid `keyStat` renders null', async () => {
+      const { container } = render(
+        <EditableKeyStat
+          releaseId="release-1"
+          keyStat={
+            {
+              id: 'KeyStat-1',
+              title: 'Key stat title',
+              order: 0,
+              created: '2023-01-01',
+            } as never
+          }
+        />,
+      );
+
+      expect(container).toBeEmptyDOMElement();
+    });
   });
-
-  test('invalid `keyStat` renders null', async () => {
-    const { container } = render(
-      <EditableKeyStat
-        releaseId="release-1"
-        keyStat={
-          {
-            id: 'KeyStat-1',
-            title: 'Key stat title',
-            order: 0,
-            created: '2023-01-01',
-          } as never
-        }
-      />,
-    );
-
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  function render(child: ReactNode): RenderResult {
-    return baseRender(
-      <ReleaseContentProvider
-        value={{
-          release: testEditableRelease,
-          canUpdateRelease: true,
-          availableDataBlocks: [],
-        }}
-      >
-        {child}
-      </ReleaseContentProvider>,
-    );
-  }
 });
+
+function render(child: ReactNode): RenderResult {
+  return baseRender(
+    <ReleaseContentProvider
+      value={{
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        availableDataBlocks: [],
+      }}
+    >
+      {child}
+    </ReleaseContentProvider>,
+  );
+}
