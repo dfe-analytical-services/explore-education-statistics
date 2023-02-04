@@ -1,6 +1,5 @@
-import React from 'react';
-import EditableKeyStatDataBlock from '@admin/components/editable/EditableKeyStatDataBlock';
-import EditableKeyStatText from '@admin/components/editable/EditableKeyStatText';
+import EditableKeyStatDataBlock from '@admin/pages/release/content/components/EditableKeyStatDataBlock';
+import EditableKeyStatText from '@admin/pages/release/content/components/EditableKeyStatText';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { KeyStatisticDataBlockUpdateRequest } from '@admin/services/keyStatisticService';
 import {
@@ -8,6 +7,7 @@ import {
   KeyStatisticDataBlock,
   KeyStatisticText,
 } from '@common/services/publicationService';
+import React from 'react';
 
 export interface KeyStatsFormValues {
   trend: string;

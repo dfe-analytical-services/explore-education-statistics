@@ -1,5 +1,6 @@
-import { toolbarConfigs } from '@admin/config/ckEditorConfig';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
+import { toolbarConfigs } from '@admin/config/ckEditorConfig';
+import { KeyStatsFormValues } from '@admin/pages/release/content/components/EditableKeyStat';
 import toHtml from '@admin/utils/markdown/toHtml';
 import toMarkdown from '@admin/utils/markdown/toMarkdown';
 import Button from '@common/components/Button';
@@ -9,43 +10,35 @@ import styles from '@common/modules/find-statistics/components/KeyStat.module.sc
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import { Formik } from 'formik';
 import React from 'react';
-import { KeyStatisticText } from '@common/services/publicationService';
 
-interface KeyStatTextFormValues {
+export interface EditableKeyStatDataBlockFormProps {
+  keyStatId: string;
   title: string;
   statistic: string;
-  trend: string;
-  guidanceTitle: string;
-  guidanceText: string;
-}
-
-interface EditableKeyStatTextFormProps {
-  keyStat: KeyStatisticText;
+  trend?: string;
+  guidanceTitle?: string;
+  guidanceText?: string;
   isReordering?: boolean;
-  onSubmit: (values: KeyStatTextFormValues) => void;
+  onSubmit: (values: KeyStatsFormValues) => void;
   toggleShowFormOff: () => void;
   testId?: string;
 }
 
-const EditableKeyStatTextForm = ({
-  keyStat: {
-    id: keyStatId,
-    title,
-    statistic,
-    trend,
-    guidanceTitle = 'Help',
-    guidanceText,
-  },
+const EditableKeyStatDataBlockForm = ({
+  keyStatId,
+  title,
+  statistic,
+  trend,
+  guidanceTitle,
+  guidanceText,
   isReordering,
   onSubmit,
   toggleShowFormOff,
   testId = 'keyStat',
-}: EditableKeyStatTextFormProps) => {
+}: EditableKeyStatDataBlockFormProps) => {
   return (
-    <Formik<KeyStatTextFormValues>
+    <Formik<KeyStatsFormValues>
       initialValues={{
-        title: title ?? '',
-        statistic: statistic ?? '',
         trend: trend ?? '',
         guidanceTitle: guidanceTitle ?? 'Help',
         guidanceText: guidanceText ? toHtml(guidanceText) : '',
@@ -63,33 +56,24 @@ const EditableKeyStatTextForm = ({
         <Form id={`editableKeyStatForm-${keyStatId}`}>
           <KeyStatTile
             title={title}
-            value={statistic}
             titleTag="h4"
             testId={testId}
+            value={statistic}
             isReordering={isReordering}
           >
-            {/* TODO: EES-2469 Inputs for title/statistic have just been added with no testing / consideration for styling / user experience etc. */}
-            <FormFieldTextInput<KeyStatTextFormValues>
-              name="title"
-              label={<span className={styles.trendText}>Title</span>}
-            />
-            <FormFieldTextInput<KeyStatTextFormValues>
-              name="statistic"
-              label={<span className={styles.trendText}>Statistic</span>}
-            />
-            <FormFieldTextInput<KeyStatTextFormValues>
+            <FormFieldTextInput<KeyStatsFormValues>
               name="trend"
               label={<span className={styles.trendText}>Trend</span>}
             />
           </KeyStatTile>
 
-          <FormFieldTextInput<KeyStatTextFormValues>
+          <FormFieldTextInput<KeyStatsFormValues>
             formGroupClass="govuk-!-margin-top-2"
             name="guidanceTitle"
             label="Guidance title"
           />
 
-          <FormFieldEditor<KeyStatTextFormValues>
+          <FormFieldEditor<KeyStatsFormValues>
             name="guidanceText"
             toolbarConfig={toolbarConfigs.simple}
             label="Guidance text"
@@ -97,7 +81,7 @@ const EditableKeyStatTextForm = ({
 
           <ButtonGroup>
             <Button
-              disabled={form.isSubmitting || !form.isValid}
+              disabled={!form.isValid}
               type="submit"
               className="govuk-!-margin-right-2"
             >
@@ -113,4 +97,4 @@ const EditableKeyStatTextForm = ({
   );
 };
 
-export default EditableKeyStatTextForm;
+export default EditableKeyStatDataBlockForm;

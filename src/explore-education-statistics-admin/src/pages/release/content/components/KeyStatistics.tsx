@@ -1,19 +1,19 @@
-import EditableKeyStat from '@admin/components/editable/EditableKeyStat';
-import KeyStatDataBlockSelectForm from '@admin/pages/release/content/components/KeyStatDataBlockSelectForm';
-import { EditableRelease } from '@admin/services/releaseContentService';
 import BlockDroppable from '@admin/components/editable/BlockDroppable';
+import EditableKeyStat from '@admin/pages/release/content/components/EditableKeyStat';
+import KeyStatDataBlockSelectForm from '@admin/pages/release/content/components/KeyStatDataBlockSelectForm';
+import styles from '@admin/pages/release/content/components/KeyStatistics.module.scss';
+import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
+import { EditableRelease } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import WarningMessage from '@common/components/WarningMessage';
-import { KeyStatContainer } from '@common/modules/find-statistics/components/KeyStat';
-import styles from '@admin/pages/release/content/components/KeyStatistics.module.scss';
-import keyStatStyles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import useToggle from '@common/hooks/useToggle';
-import React, { useCallback, useState, useEffect } from 'react';
-import { Draggable, DragDropContext, DropResult } from 'react-beautiful-dnd';
-import classNames from 'classnames';
+import { KeyStatContainer } from '@common/modules/find-statistics/components/KeyStat';
+import keyStatStyles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import reorder from '@common/utils/reorder';
-import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
+import classNames from 'classnames';
+import React, { useCallback, useEffect, useState } from 'react';
+import { DragDropContext, Draggable, DropResult } from 'react-beautiful-dnd';
 
 export interface KeyStatisticsProps {
   release: EditableRelease;

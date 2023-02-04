@@ -1,20 +1,20 @@
-import EditableKeyStat from '@admin/components/editable/EditableKeyStat';
-import EditableKeyStatDataBlock from '@admin/components/editable/EditableKeyStatDataBlock';
-import _tableBuilderService, {
-  TableDataResponse,
-} from '@common/services/tableBuilderService';
-import { render, RenderResult, screen, waitFor } from '@testing-library/react';
-import React, { ReactNode } from 'react';
+import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
+import EditableKeyStat from '@admin/pages/release/content/components/EditableKeyStat';
+import EditableKeyStatDataBlock from '@admin/pages/release/content/components/EditableKeyStatDataBlock';
+import EditableKeyStatText from '@admin/pages/release/content/components/EditableKeyStatText';
+import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
+import _keyStatisticService from '@admin/services/keyStatisticService';
 import {
   KeyStatisticDataBlock,
   KeyStatisticText,
 } from '@common/services/publicationService';
-import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
-import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
-import { noop } from 'lodash';
+import _tableBuilderService, {
+  TableDataResponse,
+} from '@common/services/tableBuilderService';
+import { render, RenderResult, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import _keyStatisticService from '@admin/services/keyStatisticService';
-import EditableKeyStatText from '@admin/components/editable/EditableKeyStatText';
+import { noop } from 'lodash';
+import React, { ReactNode } from 'react';
 
 jest.mock('@common/services/tableBuilderService');
 const tableBuilderService = _tableBuilderService as jest.Mocked<

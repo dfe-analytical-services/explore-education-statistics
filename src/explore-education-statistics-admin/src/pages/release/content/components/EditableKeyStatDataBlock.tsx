@@ -1,13 +1,13 @@
+import EditableKeyStatDataBlockForm from '@admin/pages/release/content/components/EditableKeyStatDataBlockForm';
+import EditableKeyStatDisplay from '@admin/pages/release/content/components/EditableKeyStatDisplay';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import useKeyStatQuery from '@common/modules/find-statistics/hooks/useKeyStatQuery';
-import React from 'react';
-import EditableKeyStatDataBlockForm from '@admin/components/editable/EditableKeyStatDataBlockForm';
 import { KeyStatisticDataBlock } from '@common/services/publicationService';
-import EditableKeyStatDisplay from '@admin/components/editable/EditableKeyStatDisplay';
+import React from 'react';
 
 interface KeyStatsDataFormValues {
   trend: string;

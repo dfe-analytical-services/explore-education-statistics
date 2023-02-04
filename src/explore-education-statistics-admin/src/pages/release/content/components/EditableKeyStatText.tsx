@@ -1,8 +1,8 @@
+import EditableKeyStatDisplay from '@admin/pages/release/content/components/EditableKeyStatDisplay';
+import EditableKeyStatTextForm from '@admin/pages/release/content/components/EditableKeyStatTextForm';
 import useToggle from '@common/hooks/useToggle';
-import React from 'react';
-import EditableKeyStatTextForm from '@admin/components/editable/EditableKeyStatTextForm';
 import { KeyStatisticText } from '@common/services/publicationService';
-import EditableKeyStatDisplay from '@admin/components/editable/EditableKeyStatDisplay';
+import React from 'react';
 
 interface KeyStatsFormValues {
   trend: string;

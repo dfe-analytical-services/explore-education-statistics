@@ -1,5 +1,5 @@
-import { toolbarConfigs } from '@admin/config/ckEditorConfig';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
+import { toolbarConfigs } from '@admin/config/ckEditorConfig';
 import toHtml from '@admin/utils/markdown/toHtml';
 import toMarkdown from '@admin/utils/markdown/toMarkdown';
 import Button from '@common/components/Button';
@@ -7,38 +7,45 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import { Form, FormFieldTextInput } from '@common/components/form';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
+import { KeyStatisticText } from '@common/services/publicationService';
 import { Formik } from 'formik';
 import React from 'react';
-import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStat';
 
-export interface EditableKeyStatDataBlockFormProps {
-  keyStatId: string;
+interface KeyStatTextFormValues {
   title: string;
   statistic: string;
-  trend?: string;
-  guidanceTitle?: string;
-  guidanceText?: string;
+  trend: string;
+  guidanceTitle: string;
+  guidanceText: string;
+}
+
+interface EditableKeyStatTextFormProps {
+  keyStat: KeyStatisticText;
   isReordering?: boolean;
-  onSubmit: (values: KeyStatsFormValues) => void;
+  onSubmit: (values: KeyStatTextFormValues) => void;
   toggleShowFormOff: () => void;
   testId?: string;
 }
 
-const EditableKeyStatDataBlockForm = ({
-  keyStatId,
-  title,
-  statistic,
-  trend,
-  guidanceTitle,
-  guidanceText,
+const EditableKeyStatTextForm = ({
+  keyStat: {
+    id: keyStatId,
+    title,
+    statistic,
+    trend,
+    guidanceTitle = 'Help',
+    guidanceText,
+  },
   isReordering,
   onSubmit,
   toggleShowFormOff,
   testId = 'keyStat',
-}: EditableKeyStatDataBlockFormProps) => {
+}: EditableKeyStatTextFormProps) => {
   return (
-    <Formik<KeyStatsFormValues>
+    <Formik<KeyStatTextFormValues>
       initialValues={{
+        title: title ?? '',
+        statistic: statistic ?? '',
         trend: trend ?? '',
         guidanceTitle: guidanceTitle ?? 'Help',
         guidanceText: guidanceText ? toHtml(guidanceText) : '',
@@ -56,24 +63,33 @@ const EditableKeyStatDataBlockForm = ({
         <Form id={`editableKeyStatForm-${keyStatId}`}>
           <KeyStatTile
             title={title}
+            value={statistic}
             titleTag="h4"
             testId={testId}
-            value={statistic}
             isReordering={isReordering}
           >
-            <FormFieldTextInput<KeyStatsFormValues>
+            {/* TODO: EES-2469 Inputs for title/statistic have just been added with no testing / consideration for styling / user experience etc. */}
+            <FormFieldTextInput<KeyStatTextFormValues>
+              name="title"
+              label={<span className={styles.trendText}>Title</span>}
+            />
+            <FormFieldTextInput<KeyStatTextFormValues>
+              name="statistic"
+              label={<span className={styles.trendText}>Statistic</span>}
+            />
+            <FormFieldTextInput<KeyStatTextFormValues>
               name="trend"
               label={<span className={styles.trendText}>Trend</span>}
             />
           </KeyStatTile>
 
-          <FormFieldTextInput<KeyStatsFormValues>
+          <FormFieldTextInput<KeyStatTextFormValues>
             formGroupClass="govuk-!-margin-top-2"
             name="guidanceTitle"
             label="Guidance title"
           />
 
-          <FormFieldEditor<KeyStatsFormValues>
+          <FormFieldEditor<KeyStatTextFormValues>
             name="guidanceText"
             toolbarConfig={toolbarConfigs.simple}
             label="Guidance text"
@@ -81,7 +97,7 @@ const EditableKeyStatDataBlockForm = ({
 
           <ButtonGroup>
             <Button
-              disabled={!form.isValid}
+              disabled={form.isSubmitting || !form.isValid}
               type="submit"
               className="govuk-!-margin-right-2"
             >
@@ -97,4 +113,4 @@ const EditableKeyStatDataBlockForm = ({
   );
 };
 
-export default EditableKeyStatDataBlockForm;
+export default EditableKeyStatTextForm;
