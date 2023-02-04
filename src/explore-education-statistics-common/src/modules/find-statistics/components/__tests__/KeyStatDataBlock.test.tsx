@@ -100,17 +100,17 @@ describe('KeyStatDataBlock', () => {
       expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
         'Down from 620,330 in 2017',
       );
-
-      expect(
-        screen.getByRole('button', {
-          name: 'What is the number of applications received?',
-        }),
-      ).toBeInTheDocument();
-
-      expect(screen.getByTestId('keyStat-guidanceText')).toHaveTextContent(
-        'Total number of applications received for places at primary and secondary schools.',
-      );
     });
+
+    expect(
+      screen.getByRole('button', {
+        name: 'What is the number of applications received?',
+      }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByTestId('keyStat-guidanceText')).toHaveTextContent(
+      'Total number of applications received for places at primary and secondary schools.',
+    );
   });
 
   test('renders correctly with a blank guidanceTitle', async () => {
@@ -142,17 +142,17 @@ describe('KeyStatDataBlock', () => {
       expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
         'Down from 620,330 in 2017',
       );
-
-      expect(
-        screen.getByRole('button', {
-          name: 'Help for Number of applications received',
-        }),
-      ).toBeInTheDocument();
-
-      expect(screen.getByTestId('keyStat-guidanceText')).toHaveTextContent(
-        'Total number of applications received for places at primary and secondary schools.',
-      );
     });
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Help for Number of applications received',
+      }),
+    ).toBeInTheDocument();
+
+    expect(screen.getByTestId('keyStat-guidanceText')).toHaveTextContent(
+      'Total number of applications received for places at primary and secondary schools.',
+    );
   });
 
   test('renders correctly without trend or guidance text', async () => {
@@ -180,14 +180,13 @@ describe('KeyStatDataBlock', () => {
       expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
 
       expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
-      expect(
-        screen.queryByTestId('keyStat-guidanceText'),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.queryByText("This shouldn't appear"),
-      ).not.toBeInTheDocument();
     });
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('keyStat-guidanceText'),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("This shouldn't appear")).not.toBeInTheDocument();
   });
 
   test('does not render if there was an error fetching the table data', async () => {
@@ -212,11 +211,12 @@ describe('KeyStatDataBlock', () => {
       expect(screen.queryByTestId('keyStat-title')).not.toBeInTheDocument();
       expect(screen.queryByTestId('keyStat-value')).not.toBeInTheDocument();
       expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
-      expect(
-        screen.queryByTestId('keyStat-guidanceText'),
-      ).not.toBeInTheDocument();
     });
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('keyStat-guidanceText'),
+    ).not.toBeInTheDocument();
   });
 
   test('does not render if there is no matching result in the response', async () => {
@@ -253,10 +253,11 @@ describe('KeyStatDataBlock', () => {
       expect(screen.queryByTestId('keyStat-title')).not.toBeInTheDocument();
       expect(screen.queryByTestId('keyStat-value')).not.toBeInTheDocument();
       expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
-      expect(
-        screen.queryByTestId('keyStat-guidanceText'),
-      ).not.toBeInTheDocument();
     });
+
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('keyStat-guidanceText'),
+    ).not.toBeInTheDocument();
   });
 });
