@@ -4,6 +4,7 @@ import EditableKeyStatDataBlockForm, {
 import EditableKeyStatPreview from '@admin/pages/release/content/components/EditableKeyStatPreview';
 import Button from '@common/components/Button';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import useKeyStatQuery from '@common/modules/find-statistics/hooks/useKeyStatQuery';
@@ -58,7 +59,7 @@ export default function EditableKeyStatDataBlock({
 
         {onRemove && (
           <Button variant="secondary" onClick={onRemove}>
-            Remove
+            Remove <VisuallyHidden> key statistic</VisuallyHidden>
           </Button>
         )}
       </>

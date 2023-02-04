@@ -84,10 +84,10 @@ describe('EditableKeyStat', () => {
       );
 
       expect(
-        screen.queryByRole('button', { name: 'Edit' }),
+        screen.queryByRole('button', { name: /Edit/ }),
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByRole('button', { name: 'Remove' }),
+        screen.queryByRole('button', { name: /Remove/ }),
       ).not.toBeInTheDocument();
     });
 
@@ -159,7 +159,7 @@ describe('EditableKeyStat', () => {
       );
 
       expect(
-        screen.queryByRole('button', { name: 'Remove' }),
+        screen.queryByRole('button', { name: /Remove/ }),
       ).not.toBeInTheDocument();
     });
 
@@ -196,7 +196,7 @@ describe('EditableKeyStat', () => {
       ).not.toBeInTheDocument();
 
       expect(
-        screen.queryByRole('button', { name: 'Remove' }),
+        screen.queryByRole('button', { name: /Remove/ }),
       ).not.toBeInTheDocument();
     });
   });
@@ -309,7 +309,7 @@ describe('EditableKeyStat', () => {
       );
 
       expect(
-        screen.queryByRole('button', { name: 'Remove' }),
+        screen.queryByRole('button', { name: /Remove/ }),
       ).not.toBeInTheDocument();
     });
 
@@ -353,7 +353,7 @@ describe('EditableKeyStat', () => {
       );
 
       expect(
-        screen.queryByRole('button', { name: 'Remove' }),
+        screen.queryByRole('button', { name: /Remove/ }),
       ).not.toBeInTheDocument();
     });
 
@@ -399,7 +399,7 @@ describe('EditableKeyStat', () => {
       );
 
       expect(
-        screen.queryByRole('button', { name: 'Remove' }),
+        screen.queryByRole('button', { name: /Remove/ }),
       ).not.toBeInTheDocument();
     });
 
@@ -445,7 +445,7 @@ describe('EditableKeyStat', () => {
       ).not.toBeInTheDocument();
 
       expect(
-        screen.queryByRole('button', { name: 'Remove' }),
+        screen.queryByRole('button', { name: /Remove/ }),
       ).not.toBeInTheDocument();
     });
 
@@ -490,10 +490,14 @@ describe('EditableKeyStat', () => {
         'DataBlock guidance text',
       );
 
-      expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', {
+          name: 'Edit key statistic: DataBlock indicator',
+        }),
+      ).toBeInTheDocument();
 
       expect(
-        screen.queryByRole('button', { name: 'Remove' }),
+        screen.queryByRole('button', { name: /Remove/ }),
       ).not.toBeInTheDocument();
     });
 
@@ -541,10 +545,16 @@ describe('EditableKeyStat', () => {
       );
 
       expect(
-        screen.getByRole('button', { name: 'Remove' }),
+        screen.getByRole('button', {
+          name: 'Remove key statistic: DataBlock indicator',
+        }),
       ).toBeInTheDocument();
 
-      userEvent.click(screen.getByRole('button', { name: 'Remove' }));
+      userEvent.click(
+        screen.getByRole('button', {
+          name: 'Remove key statistic: DataBlock indicator',
+        }),
+      );
 
       await waitFor(() => {
         expect(onRemove).toHaveBeenCalledTimes(1);
@@ -568,7 +578,11 @@ describe('EditableKeyStat', () => {
         expect(screen.getByText('Edit')).toBeInTheDocument();
       });
 
-      userEvent.click(screen.getByRole('button', { name: 'Edit' }));
+      userEvent.click(
+        screen.getByRole('button', {
+          name: 'Edit key statistic: DataBlock indicator',
+        }),
+      );
 
       await waitFor(() => {
         expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
@@ -614,7 +628,11 @@ describe('EditableKeyStat', () => {
         expect(screen.getByText('Edit')).toBeInTheDocument();
       });
 
-      userEvent.click(screen.getByRole('button', { name: 'Edit' }));
+      userEvent.click(
+        screen.getByRole('button', {
+          name: 'Edit key statistic: DataBlock indicator',
+        }),
+      );
 
       await waitFor(() => {
         expect(screen.getByText('Save')).toBeInTheDocument();
@@ -670,7 +688,11 @@ describe('EditableKeyStat', () => {
         expect(screen.getByText('Edit')).toBeInTheDocument();
       });
 
-      userEvent.click(screen.getByRole('button', { name: 'Edit' }));
+      userEvent.click(
+        screen.getByRole('button', {
+          name: 'Edit key statistic: DataBlock indicator',
+        }),
+      );
 
       await waitFor(() => {
         expect(screen.getByText('Cancel')).toBeInTheDocument();
@@ -700,10 +722,10 @@ describe('EditableKeyStat', () => {
       );
 
       expect(
-        screen.queryByRole('button', { name: 'Edit' }),
+        screen.queryByRole('button', { name: /Edit/ }),
       ).toBeInTheDocument();
       expect(
-        screen.queryByRole('button', { name: 'Remove' }),
+        screen.queryByRole('button', { name: /Remove/ }),
       ).not.toBeInTheDocument();
 
       expect(keyStatisticService.updateKeyStatisticDataBlock).not.toBeCalled();
@@ -743,7 +765,11 @@ describe('EditableKeyStat', () => {
         screen.queryByTestId('keyStat-guidanceText'),
       ).not.toBeInTheDocument();
 
-      userEvent.click(screen.getByRole('button', { name: 'Remove' }));
+      userEvent.click(
+        screen.getByRole('button', {
+          name: 'Remove key statistic',
+        }),
+      );
 
       await waitFor(() => {
         expect(onRemove).toBeCalledTimes(1);
