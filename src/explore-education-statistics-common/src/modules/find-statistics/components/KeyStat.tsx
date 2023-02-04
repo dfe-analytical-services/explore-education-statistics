@@ -32,6 +32,7 @@ export interface KeyStatProps {
   trend?: string;
   guidanceTitle?: string;
   guidanceText?: string;
+  hasColumn?: boolean;
   testId?: string;
 }
 
@@ -42,10 +43,11 @@ const KeyStat = ({
   trend,
   guidanceTitle = 'Help',
   guidanceText,
+  hasColumn = true,
   testId = 'keyStat',
 }: KeyStatProps) => {
-  return (
-    <KeyStatColumn testId={testId}>
+  const body = (
+    <>
       <KeyStatTile title={title} value={statistic} testId={testId}>
         {trend && (
           <p className="govuk-body-s" data-testid={`${testId}-trend`}>
@@ -67,7 +69,13 @@ const KeyStat = ({
       )}
 
       {children}
-    </KeyStatColumn>
+    </>
+  );
+
+  return hasColumn ? (
+    <KeyStatColumn testId={testId}>{body}</KeyStatColumn>
+  ) : (
+    body
   );
 };
 

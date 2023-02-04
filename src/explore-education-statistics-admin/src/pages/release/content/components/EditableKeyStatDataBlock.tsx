@@ -1,7 +1,7 @@
 import EditableKeyStatDataBlockForm, {
   KeyStatDataBlockFormValues,
 } from '@admin/pages/release/content/components/EditableKeyStatDataBlockForm';
-import EditableKeyStatDisplay from '@admin/pages/release/content/components/EditableKeyStatDisplay';
+import EditableKeyStatPreview from '@admin/pages/release/content/components/EditableKeyStatPreview';
 import Button from '@common/components/Button';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
@@ -80,7 +80,7 @@ export default function EditableKeyStatDataBlock({
   }
 
   return (
-    <EditableKeyStatDisplay
+    <EditableKeyStatPreview
       title={title}
       statistic={statistic}
       trend={keyStat.trend}

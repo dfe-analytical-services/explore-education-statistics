@@ -1,4 +1,4 @@
-import EditableKeyStatDisplay from '@admin/pages/release/content/components/EditableKeyStatDisplay';
+import EditableKeyStatPreview from '@admin/pages/release/content/components/EditableKeyStatPreview';
 import EditableKeyStatTextForm, {
   KeyStatTextFormValues,
 } from '@admin/pages/release/content/components/EditableKeyStatTextForm';
@@ -46,7 +46,7 @@ export default function EditableKeyStatText({
   }
 
   return (
-    <EditableKeyStatDisplay
+    <EditableKeyStatPreview
       title={keyStat.title}
       statistic={keyStat.statistic}
       trend={keyStat.trend}
