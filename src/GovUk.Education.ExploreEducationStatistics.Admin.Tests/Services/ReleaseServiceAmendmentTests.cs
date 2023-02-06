@@ -39,8 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var releaseId = Guid.NewGuid();
             var publicationId = Guid.NewGuid();
-            var publishedDate = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1));
-            var createdDate = DateTime.UtcNow.Subtract(TimeSpan.FromDays(2));
+            var publishedDate = DateTime.UtcNow.AddDays(-1);
+            var createdDate = DateTime.UtcNow.AddDays(-2);
             var previousVersionReleaseId = Guid.NewGuid();
             var version = 2;
             var createdById = Guid.NewGuid();
@@ -111,6 +111,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 PublicationId = publicationId,
                 Published = publishedDate,
                 ApprovalStatus = releaseApprovalStatus,
+                NotifiedOn = DateTime.UtcNow,
+                NotifySubscribers = true,
                 Version = version,
                 PreviousVersionId = previousVersionReleaseId,
                 Created = createdDate,
@@ -145,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        On = DateTime.UtcNow.Subtract(TimeSpan.FromDays(4)),
+                        On = DateTime.UtcNow.AddDays(-4),
                         Reason = "Reason 1",
                         ReleaseId = releaseId,
                         Created = createdDate.AddDays(1),
@@ -154,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        On = DateTime.UtcNow.Subtract(TimeSpan.FromDays(5)),
+                        On = DateTime.UtcNow.AddDays(-5),
                         Reason = "Reason 2",
                         ReleaseId = releaseId,
                         Created = createdDate.AddDays(2),
@@ -494,6 +496,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // check fields that should be set to new values for an amendment, rather than copied from its original
                 // Release
                 Assert.Equal(newReleaseId, amendment.Id);
+                Assert.Null(amendment.NotifiedOn);
+                Assert.False(amendment.NotifySubscribers);
                 Assert.Null(amendment.PublishScheduled);
                 Assert.Null(amendment.Published);
                 Assert.Equal(release.Version + 1, amendment.Version);
