@@ -27,7 +27,9 @@ public interface IReleaseFileBlobService
         int? bufferSize = null,
         CancellationToken cancellationToken = default);
 
-    Task<string> DownloadBlobText(ReleaseFile releaseFile);
+    Task<string> DownloadBlobText(
+        ReleaseFile releaseFile,
+        CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, Stream>> DownloadToStream(
         ReleaseFile releaseFile,

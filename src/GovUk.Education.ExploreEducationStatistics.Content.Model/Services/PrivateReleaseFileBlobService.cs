@@ -64,11 +64,14 @@ public class PrivateReleaseFileBlobService : IReleaseFileBlobService
         );
     }
 
-    public Task<string> DownloadBlobText(ReleaseFile releaseFile)
+    public Task<string> DownloadBlobText(
+        ReleaseFile releaseFile,
+        CancellationToken cancellationToken = default)
     {
         return _blobStorageService.DownloadBlobText(
             containerName: PrivateReleaseFiles,
-            path: releaseFile.Path()
+            path: releaseFile.Path(),
+            cancellationToken: cancellationToken
         );
     }
 

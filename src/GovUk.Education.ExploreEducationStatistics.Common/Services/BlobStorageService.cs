@@ -373,13 +373,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
         }
 
-        public async Task<string> DownloadBlobText(IBlobContainer containerName, string path)
+        public async Task<string> DownloadBlobText(
+            IBlobContainer containerName,
+            string path,
+            CancellationToken cancellationToken = default)
         {
             var blob = await GetBlobClient(containerName, path);
 
             try
             {
-                var response = await blob.DownloadContentAsync();
+                var response = await blob.DownloadContentAsync(cancellationToken);
                 return response.Value.Content.ToString();
             }
             catch (RequestFailedException exception)
@@ -393,9 +396,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
         }
 
-        public async Task<object?> GetDeserializedJson(IBlobContainer containerName, string path, Type type)
+        public async Task<object?> GetDeserializedJson(
+            IBlobContainer containerName,
+            string path,
+            Type type,
+            CancellationToken cancellationToken = default)
         {
-            var text = await DownloadBlobText(containerName, path);
+            var text = await DownloadBlobText(containerName, path, cancellationToken);
 
             if (string.IsNullOrWhiteSpace(text))
             {
@@ -409,10 +416,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             );
         }
 
-        public async Task<T?> GetDeserializedJson<T>(IBlobContainer containerName, string path)
+        public async Task<T?> GetDeserializedJson<T>(
+            IBlobContainer containerName,
+            string path,
+            CancellationToken cancellationToken = default)
             where T : class
         {
-            return (T?) await GetDeserializedJson(containerName, path, typeof(T));
+            return (T?) await GetDeserializedJson(containerName, path, typeof(T), cancellationToken);
         }
 
         public async Task<List<BlobInfo>> CopyDirectory(
