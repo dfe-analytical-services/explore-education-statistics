@@ -119,7 +119,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             string path,
             string blobText)
         {
-            return service.Setup(s => s.DownloadBlobText(container, path))
+            return service.Setup(s =>
+                    s.DownloadBlobText(container, path))
                 .ReturnsAsync(blobText);
         }
 
@@ -128,7 +129,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             IBlobContainer container,
             string path)
         {
-            return service.Setup(s => s.DownloadBlobText(container, path))
+            return service.Setup(s =>
+                    s.DownloadBlobText(container, path))
                 .ThrowsAsync(new StorageException(new RequestResult
                 {
                     HttpStatusCode = (int) HttpStatusCode.NotFound
