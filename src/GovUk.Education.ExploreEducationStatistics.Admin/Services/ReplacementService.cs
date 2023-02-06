@@ -178,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var locations = await _locationRepository.GetDistinctForSubject(subjectId);
 
-            var timePeriods = _timePeriodService.GetTimePeriods(subjectId);
+            var timePeriods = await _timePeriodService.GetTimePeriods(subjectId);
 
             return new ReplacementSubjectMeta
             {

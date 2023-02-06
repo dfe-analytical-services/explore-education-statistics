@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     releaseSubject.SubjectId);
 
             var geographicLevels = await GetGeographicLevels(subject.Id);
-            var timePeriods = _timePeriodService.GetTimePeriodLabels(subject.Id);
+            var timePeriods = await _timePeriodService.GetTimePeriodLabels(subject.Id);
             var variables = GetVariables(subject.Id);
             var footnotes = await GetFootnotes(releaseSubject.ReleaseId, subject.Id);
 
