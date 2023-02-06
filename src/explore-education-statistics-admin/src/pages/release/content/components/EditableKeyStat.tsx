@@ -22,7 +22,7 @@ const EditableKeyStat = ({
 }: EditableKeyStatProps) => {
   const {
     deleteKeyStatistic,
-    updateAvailableDataBlocks,
+    updateUnattachedDataBlocks,
     updateKeyStatisticDataBlock,
   } = useReleaseContentActions();
 
@@ -39,7 +39,7 @@ const EditableKeyStat = ({
             releaseId,
             keyStatisticId: keyStat.id,
           });
-          await updateAvailableDataBlocks({
+          await updateUnattachedDataBlocks({
             releaseId,
           });
         }}

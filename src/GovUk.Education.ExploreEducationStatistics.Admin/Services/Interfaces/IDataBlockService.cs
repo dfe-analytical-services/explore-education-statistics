@@ -36,6 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task InvalidateCachedDataBlocks(Guid releaseId);
 
-        Task<Either<ActionResult, List<DataBlockViewModel>>> GetAvailableDataBlocks(Guid releaseId);
+        Task<Either<ActionResult, List<DataBlockViewModel>>> GetUnattachedDataBlocks(Guid releaseId);
+
+        Task<bool> IsUnattachedDataBlock(Guid releaseId, DataBlock dataBlock);
     }
 }

@@ -139,7 +139,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
 const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const {
-    updateAvailableDataBlocks,
+    updateUnattachedDataBlocks,
     addKeyStatisticDataBlock,
   } = useReleaseContentActions();
 
@@ -148,10 +148,10 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
   const addKeyStatDataBlock = useCallback(
     async (dataBlockId: string) => {
       await addKeyStatisticDataBlock({ releaseId: release.id, dataBlockId });
-      await updateAvailableDataBlocks({ releaseId: release.id });
+      await updateUnattachedDataBlocks({ releaseId: release.id });
       setIsFormOpen(false);
     },
-    [release.id, addKeyStatisticDataBlock, updateAvailableDataBlocks],
+    [release.id, addKeyStatisticDataBlock, updateUnattachedDataBlocks],
   );
 
   return (

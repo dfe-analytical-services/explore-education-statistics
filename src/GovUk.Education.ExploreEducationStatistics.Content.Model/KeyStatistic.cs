@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -11,13 +10,13 @@ public abstract class KeyStatistic : ICreatedUpdatedTimestamps<DateTime, DateTim
 
     public Guid ReleaseId { get; set; }
 
-    [IgnoreMap] public Release Release { get; set; } = null!;
+    public Release Release { get; set; } = null!;
 
-    public string? Trend { get; set; } = string.Empty;
+    public string? Trend { get; set; }
 
-    public string? GuidanceTitle { get; set; } = string.Empty;
+    public string? GuidanceTitle { get; set; }
 
-    public string? GuidanceText { get; set; } = string.Empty;
+    public string? GuidanceText { get; set; }
 
     public int Order { get; set; }
 
@@ -42,7 +41,7 @@ public class KeyStatisticDataBlock : KeyStatistic
 {
     public Guid DataBlockId { get; set; }
 
-    [IgnoreMap] public DataBlock DataBlock { get; set; } = null!;
+    public DataBlock DataBlock { get; set; } = null!;
 }
 
 public class KeyStatisticText : KeyStatistic

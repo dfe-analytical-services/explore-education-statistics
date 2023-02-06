@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 {
                     var sections =
                         methodology.MethodologyContent.Annexes
-                        .Concat(methodology.MethodologyContent.Content);
+                            .Concat(methodology.MethodologyContent.Content);
 
                     return sections
                         .SelectMany(section => section.Content)
@@ -483,12 +483,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             FindContentListWithAllSectionIds(MethodologyVersionContent content,
                 List<Guid> contentSectionIds)
         {
-            if (content.Content.Select(section => section.Id).IsSameAsIgnoringOrder(contentSectionIds))
-            {
-                return TupleOf(content, content.Content);
-            }
+            if (ComparerUtils.SequencesAreEqualIgnoringOrder(
+                    content.Content.Select(section => section.Id),
+                    contentSectionIds))
+                {
+                    return TupleOf(content, content.Content);
+                }
 
-            if (content.Annexes.Select(section => section.Id).IsSameAsIgnoringOrder(contentSectionIds))
+            if (ComparerUtils.SequencesAreEqualIgnoringOrder(
+                content.Annexes.Select(section => section.Id),
+                contentSectionIds))
             {
                 return TupleOf(content, content.Annexes);
             }

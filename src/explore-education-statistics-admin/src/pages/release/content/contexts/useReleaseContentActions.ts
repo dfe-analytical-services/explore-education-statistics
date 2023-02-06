@@ -23,15 +23,15 @@ import dataBlockService from '@admin/services/dataBlockService';
 export default function useReleaseContentActions() {
   const dispatch = useReleaseContentDispatch();
 
-  const updateAvailableDataBlocks = useCallback(
+  const updateUnattachedDataBlocks = useCallback(
     async ({ releaseId }: { releaseId: string }) => {
-      const availableDataBlocks = await dataBlockService.getAvailableDataBlocks(
+      const unattachedDataBlocks = await dataBlockService.getUnattachedDataBlocks(
         releaseId,
       );
 
       dispatch({
-        type: 'SET_AVAILABLE_DATABLOCKS',
-        payload: availableDataBlocks,
+        type: 'SET_UNATTACHED_DATABLOCKS',
+        payload: unattachedDataBlocks,
       });
     },
     [dispatch],
@@ -59,9 +59,9 @@ export default function useReleaseContentActions() {
         payload: { meta: { sectionId, blockId, sectionKey } },
       });
 
-      await updateAvailableDataBlocks({ releaseId });
+      await updateUnattachedDataBlocks({ releaseId });
     },
-    [dispatch, updateAvailableDataBlocks],
+    [dispatch, updateUnattachedDataBlocks],
   );
 
   const updateContentSectionBlock = useCallback(
@@ -207,9 +207,9 @@ export default function useReleaseContentActions() {
         payload: { meta: { sectionId, sectionKey }, block: newBlock },
       });
 
-      await updateAvailableDataBlocks({ releaseId });
+      await updateUnattachedDataBlocks({ releaseId });
     },
-    [dispatch, updateAvailableDataBlocks],
+    [dispatch, updateUnattachedDataBlocks],
   );
 
   const addEmbedSectionBlock = useCallback(
@@ -312,9 +312,9 @@ export default function useReleaseContentActions() {
         payload: { meta: { sectionId, sectionKey }, block: newBlock },
       });
 
-      await updateAvailableDataBlocks({ releaseId });
+      await updateUnattachedDataBlocks({ releaseId });
     },
-    [dispatch, updateAvailableDataBlocks],
+    [dispatch, updateUnattachedDataBlocks],
   );
 
   const updateSectionBlockOrder = useCallback(
@@ -498,17 +498,9 @@ export default function useReleaseContentActions() {
       releaseId: string;
       keyStatistics: KeyStatistic[];
     }) => {
-      const order = keyStatistics.reduce<Dictionary<number>>(
-        (acc, keyStat, index) => {
-          acc[keyStat.id] = index;
-          return acc;
-        },
-        {},
-      );
-
       const reorderedKeyStatistics = await keyStatisticService.reorderKeyStatistics(
         releaseId,
-        order,
+        keyStatistics.map(ks => ks.id),
       );
 
       dispatch({
@@ -533,7 +525,7 @@ export default function useReleaseContentActions() {
       deleteKeyStatistic,
       removeContentSection,
       reorderKeyStatistics,
-      updateAvailableDataBlocks,
+      updateUnattachedDataBlocks,
       updateBlockComment,
       updateContentSectionBlock,
       updateContentSectionHeading,
@@ -555,7 +547,7 @@ export default function useReleaseContentActions() {
       deleteKeyStatistic,
       removeContentSection,
       reorderKeyStatistics,
-      updateAvailableDataBlocks,
+      updateUnattachedDataBlocks,
       updateBlockComment,
       updateContentSectionBlock,
       updateContentSectionHeading,

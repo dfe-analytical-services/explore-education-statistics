@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.ComparerUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -343,11 +344,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 footnote.Subjects = CreateSubjectLinks(footnote.Id, subjectIds);
             }
-        }
-
-        private static bool SequencesAreEqualIgnoringOrder(IEnumerable<Guid> left, IEnumerable<Guid> right)
-        {
-            return left.OrderBy(id => id).SequenceEqual(right.OrderBy(id => id));
         }
 
         private static IQueryable<Footnote> HydrateFootnote(IQueryable<Footnote> query)

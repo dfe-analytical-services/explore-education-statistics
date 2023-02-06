@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public ContentSectionViewModel HeadlinesSection { get; set; } = null!;
 
-        public List<KeyStatisticViewModel> KeyStatistics { get; set; } = null!;
+        public List<KeyStatisticViewModel> KeyStatistics { get; set; } = new();
 
         public ContentSectionViewModel KeyStatisticsSecondarySection { get; set; } = null!;
 

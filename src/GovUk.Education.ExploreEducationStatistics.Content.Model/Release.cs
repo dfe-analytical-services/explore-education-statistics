@@ -110,10 +110,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 }
 
                 return Content
-                    .Select(join => join.ContentSection)
-                    .Where(cs => cs.Type != ContentSectionType.KeyStatistics) // TODO: Remove as part of EES-3988
-                    .ToList()
-                    .FindAll(section => section.Type == ContentSectionType.Generic)
+                    .Where(rcs => rcs.ContentSection.Type == ContentSectionType.Generic)
+                    .Select(rcs => rcs.ContentSection)
                     .ToImmutableList();
             }
             set => ReplaceContentSectionsOfType(ContentSectionType.Generic, value);
@@ -198,8 +196,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             Content.RemoveAll(join => join.ContentSection.Type == type);
             Content.AddRange(replacementSections.Select(section => new ReleaseContentSection
             {
-               Release = this,
-               ContentSection = section,
+                Release = this,
+                ContentSection = section,
             }));
         }
 

@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetAvailableDataBlocks()
+        public async Task GetUnattachedDataBlocks()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
                 .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewSpecificRelease)
@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildDataBlockService(userService: userService.Object);
-                        return service.GetAvailableDataBlocks(_release.Id);
+                        return service.GetUnattachedDataBlocks(_release.Id);
                     }
                 );
         }

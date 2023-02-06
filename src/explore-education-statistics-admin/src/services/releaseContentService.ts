@@ -28,7 +28,7 @@ export interface EditableRelease
 
 export interface ReleaseContent {
   release: EditableRelease;
-  availableDataBlocks: DataBlock[];
+  unattachedDataBlocks: DataBlock[];
 }
 
 export interface ContentBlockAttachRequest {

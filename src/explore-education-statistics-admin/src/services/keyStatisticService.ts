@@ -48,7 +48,7 @@ const keyStatisticService = {
 
   reorderKeyStatistics(
     releaseId: string,
-    order: Dictionary<number>,
+    order: string[],
   ): Promise<KeyStatistic[]> {
     return client.put(`/release/${releaseId}/key-statistic/order`, order);
   },

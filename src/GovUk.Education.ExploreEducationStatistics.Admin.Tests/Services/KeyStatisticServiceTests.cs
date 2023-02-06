@@ -49,8 +49,8 @@ public class KeyStatisticServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var dataBlockService = new Mock<IDataBlockService>();
-            dataBlockService.Setup(s => s.GetAvailableDataBlocks(release.Id))
+            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
+            dataBlockService.Setup(s => s.GetUnattachedDataBlocks(release.Id))
                 .ReturnsAsync(new Either<ActionResult, List<DataBlockViewModel>>(
                     new List<DataBlockViewModel>
                     {
@@ -59,6 +59,12 @@ public class KeyStatisticServiceTests
                             Id = dataBlock.Id
                         },
                     }));
+
+            dataBlockService.Setup(s =>
+                    s.IsUnattachedDataBlock(
+                        release.Id,
+                        It.Is<DataBlock>(db => db.Id == dataBlock.Id)))
+                .ReturnsAsync(true);
 
             var keyStatisticService = SetupKeyStatisticService(context,
                 dataBlockService: dataBlockService.Object);
@@ -133,8 +139,8 @@ public class KeyStatisticServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var dataBlockService = new Mock<IDataBlockService>();
-            dataBlockService.Setup(s => s.GetAvailableDataBlocks(release.Id))
+            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
+            dataBlockService.Setup(s => s.GetUnattachedDataBlocks(release.Id))
                 .ReturnsAsync(new Either<ActionResult, List<DataBlockViewModel>>(
                     new List<DataBlockViewModel>
                     {
@@ -143,6 +149,12 @@ public class KeyStatisticServiceTests
                             Id = dataBlock.Id
                         },
                     }));
+            dataBlockService.Setup(s =>
+                    s.IsUnattachedDataBlock(
+                        release.Id,
+                        It.Is<DataBlock>(db => db.Id == dataBlock.Id)))
+                .ReturnsAsync(true);
+
 
             var keyStatisticService = SetupKeyStatisticService(context,
                 dataBlockService: dataBlockService.Object);
@@ -270,7 +282,7 @@ public class KeyStatisticServiceTests
     }
 
     [Fact]
-    public async Task CreateKeyStatisticDataBlock_DataBlockNotAvailable()
+    public async Task CreateKeyStatisticDataBlock_DataBlockAttachedToContent()
     {
         var dataBlock = new DataBlock();
         var release = new Release
@@ -300,8 +312,8 @@ public class KeyStatisticServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var dataBlockService = new Mock<IDataBlockService>();
-            dataBlockService.Setup(s => s.GetAvailableDataBlocks(release.Id))
+            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
+            dataBlockService.Setup(s => s.GetUnattachedDataBlocks(release.Id))
                 .ReturnsAsync(new Either<ActionResult, List<DataBlockViewModel>>(
                     new List<DataBlockViewModel>
                     {
@@ -309,16 +321,22 @@ public class KeyStatisticServiceTests
                         new (),
                     }));
 
+            dataBlockService.Setup(s =>
+                    s.IsUnattachedDataBlock(
+                        release.Id,
+                        It.Is<DataBlock>(db => db.Id == dataBlock.Id)))
+                .ReturnsAsync(false);
+
             var keyStatisticService = SetupKeyStatisticService(context,
                 dataBlockService: dataBlockService.Object);
 
-                var result = await keyStatisticService.CreateKeyStatisticDataBlock(
-                    release.Id,
-                    new KeyStatisticDataBlockCreateRequest
-                    {
-                        DataBlockId = dataBlock.Id,
-                    });
-                result.AssertBadRequest(DataBlockShouldBeAvailable);
+            var result = await keyStatisticService.CreateKeyStatisticDataBlock(
+                release.Id,
+                new KeyStatisticDataBlockCreateRequest
+                {
+                    DataBlockId = dataBlock.Id,
+                });
+            result.AssertBadRequest(DataBlockShouldBeUnattached);
         }
     }
 
@@ -915,12 +933,12 @@ public class KeyStatisticServiceTests
             var keyStatisticService = SetupKeyStatisticService(context);
             var result = await keyStatisticService.Reorder(
                 release.Id,
-                new Dictionary<Guid, int>
+                new List<Guid>
                 {
-                    { keyStat0.Id, 0 },
-                    { keyStat1.Id, 1 },
-                    { keyStat2.Id, 2 },
-                    { keyStat3.Id, 3 },
+                    keyStat0.Id,
+                    keyStat1.Id,
+                    keyStat2.Id,
+                    keyStat3.Id,
                 });
 
             var viewModelList = result.AssertRight();
@@ -996,15 +1014,15 @@ public class KeyStatisticServiceTests
             var invalidKeyStatId = Guid.NewGuid();
             var result = await keyStatisticService.Reorder(
                 release.Id,
-                new Dictionary<Guid, int>
+                new List<Guid>
                 {
-                    { keyStat0.Id, 0 },
-                    { keyStat1.Id, 1 },
-                    { invalidKeyStatId, 2 },
-                    { keyStat3.Id, 3 },
+                    keyStat0.Id,
+                    keyStat1.Id,
+                    invalidKeyStatId,
+                    keyStat3.Id,
                 });
 
-            result.AssertBadRequest(KeyStatNotAttachedToRelease);
+            result.AssertBadRequest(ProvidedKeyStatIdsDifferFromReleaseKeyStatIds);
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
@@ -1066,15 +1084,15 @@ public class KeyStatisticServiceTests
             var keyStatisticService = SetupKeyStatisticService(context);
             var result = await keyStatisticService.Reorder(
                 release.Id,
-                new Dictionary<Guid, int>
+                new List<Guid>
                 {
-                    { keyStat0.Id, 0 },
-                    { keyStat1.Id, 1 },
-                    { keyStat2.Id, 2 },
-                    { keyStat3.Id, 3 },
-                    { Guid.NewGuid(), 4 },
+                    keyStat0.Id,
+                    keyStat1.Id,
+                    keyStat2.Id,
+                    keyStat3.Id,
+                    Guid.NewGuid(),
                 });
-            result.AssertBadRequest(KeyStatsOrderCountShouldEqualReleaseKeyStatsCount);
+            result.AssertBadRequest(ProvidedKeyStatIdsDifferFromReleaseKeyStatIds);
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
@@ -1105,7 +1123,7 @@ public class KeyStatisticServiceTests
             var keyStatisticService = SetupKeyStatisticService(context);
             var result = await keyStatisticService.Reorder(
                 Guid.NewGuid(),
-                new Dictionary<Guid, int>());
+                new List<Guid>());
 
             result.AssertNotFound();
         }

@@ -246,8 +246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     _contentContext.Releases.Remove(contentRelease);
 
                     var keyStats = _contentContext.KeyStatistics
-                        .Where(ks => ks.ReleaseId == releaseId)
-                        .ToList();
+                        .Where(ks => ks.ReleaseId == releaseId);
                     _contentContext.KeyStatistics.RemoveRange(keyStats);
 
                     await _contentContext.SaveChangesAsync();

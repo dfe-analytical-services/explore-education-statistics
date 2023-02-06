@@ -208,4 +208,4 @@ user clicks the nth key stats tile button
     [Arguments]
     ...    ${tile_number}
     ...    ${button_text}
-    user clicks element    //*[@data-testid="keyStat"][${tile_number}]//button[.="${button_text}"]
+    user clicks element    //*[@data-testid="keyStat"][${tile_number}]//button[contains(., "${button_text}")]

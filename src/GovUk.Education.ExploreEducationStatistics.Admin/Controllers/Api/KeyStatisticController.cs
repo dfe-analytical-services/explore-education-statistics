@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,7 +24,7 @@ public class KeyStatisticController : ControllerBase
         _keyStatisticService = keyStatisticService;
     }
 
-    [HttpPost("release/{releaseId:Guid}/key-statistic-data-block")]
+    [HttpPost("release/{releaseId:guid}/key-statistic-data-block")]
     public async Task<ActionResult<KeyStatisticDataBlockViewModel>> CreateKeyStatisticDataBlock(
         Guid releaseId,
         KeyStatisticDataBlockCreateRequest request)
@@ -34,7 +34,7 @@ public class KeyStatisticController : ControllerBase
             .HandleFailuresOrOk();
     }
 
-    [HttpPut("release/{releaseId:Guid}/key-statistic-data-block/{keyStatisticId:Guid}")]
+    [HttpPut("release/{releaseId:guid}/key-statistic-data-block/{keyStatisticId:guid}")]
     public async Task<ActionResult<KeyStatisticDataBlockViewModel>> UpdateKeyStatisticDataBlock(
         Guid releaseId,
         Guid keyStatisticId,
@@ -45,7 +45,7 @@ public class KeyStatisticController : ControllerBase
             .HandleFailuresOrOk();
     }
 
-    [HttpDelete("release/{releaseId:Guid}/key-statistic/{keyStatisticId:Guid}")]
+    [HttpDelete("release/{releaseId:guid}/key-statistic/{keyStatisticId:guid}")]
     public async Task<ActionResult<Unit>> Delete(
         Guid releaseId,
         Guid keyStatisticId)
@@ -55,10 +55,10 @@ public class KeyStatisticController : ControllerBase
             .HandleFailuresOrNoContent();
     }
 
-    [HttpPut("release/{releaseId:Guid}/key-statistic/order")]
+    [HttpPut("release/{releaseId:guid}/key-statistic/order")]
     public async Task<ActionResult<List<KeyStatisticViewModel>>> ReorderKeyStatistics(
         Guid releaseId,
-        Dictionary<Guid, int> newOrder)
+        List<Guid> newOrder)
     {
         return await _keyStatisticService
             .Reorder(releaseId, newOrder)

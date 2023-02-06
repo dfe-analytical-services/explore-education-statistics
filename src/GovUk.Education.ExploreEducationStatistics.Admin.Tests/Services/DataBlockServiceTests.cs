@@ -1372,18 +1372,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetAvailableDataBlocks()
+        public async Task GetUnattachedDataBlocks()
         {
             var release = new Release();
 
-            var availableDataBlock1Id = Guid.NewGuid();
-            var availableDataBlock2Id = Guid.NewGuid();
+            var unattachedDataBlock1Id = Guid.NewGuid();
+            var unattachedDataBlock2Id = Guid.NewGuid();
 
-            var unavailableDataBlock1Id = Guid.NewGuid();
+            var attachedDataBlock1Id = Guid.NewGuid();
             var keyStat = new KeyStatisticDataBlock
             {
                 Release = release,
-                DataBlockId = unavailableDataBlock1Id,
+                DataBlockId = attachedDataBlock1Id,
             };
 
             var releaseContentBlocks = new List<ReleaseContentBlock>
@@ -1393,8 +1393,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Release = release,
                     ContentBlock = new DataBlock
                     {
-                        Id = unavailableDataBlock1Id, // unavailable because has key stat
-                        Name = "Unavailable 1",
+                        Id = attachedDataBlock1Id, // attached to key stat
+                        Name = "Attached 1",
                         ContentSectionId = null,
                     },
                 },
@@ -1403,8 +1403,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Release = release,
                     ContentBlock = new DataBlock
                     {
-                        Id = availableDataBlock1Id,
-                        Name = "Available 1",
+                        Id = unattachedDataBlock1Id,
+                        Name = "Unattached 1",
                         ContentSection = null,
                     },
                 },
@@ -1418,8 +1418,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Release = release,
                     ContentBlock = new DataBlock
                     {
-                        Id = availableDataBlock2Id,
-                        Name = "Available 2",
+                        Id = unattachedDataBlock2Id,
+                        Name = "Unattached 2",
                         ContentSection = null,
                     },
                 },
@@ -1428,7 +1428,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Release = release,
                     ContentBlock = new DataBlock
                     {
-                        Name = "Unavailable 2", // because has content section
+                        Name = "Attached 2", // because has content section
                         ContentSection = new ContentSection(),
                     },
                 },
@@ -1437,7 +1437,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Release = new Release(),
                     ContentBlock = new DataBlock
                     {
-                        Name = "Unavailable 3", // because different release
+                        Name = "Attached 3", // because different release
                         ContentSection = null,
                     }
                 },
@@ -1454,28 +1454,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = BuildDataBlockService(contentDbContext: contentDbContext);
-                var result = await service.GetAvailableDataBlocks(
+                var result = await service.GetUnattachedDataBlocks(
                     release.Id);
 
-                var availableDataBlocks = result.AssertRight();
+                var unattachedDataBlocks = result.AssertRight();
 
-                Assert.Equal(2, availableDataBlocks.Count);
+                Assert.Equal(2, unattachedDataBlocks.Count);
 
-                Assert.Equal(availableDataBlock1Id, availableDataBlocks[0].Id);
-                Assert.Equal("Available 1", availableDataBlocks[0].Name);
-                Assert.Equal(availableDataBlock2Id, availableDataBlocks[1].Id);
-                Assert.Equal("Available 2", availableDataBlocks[1].Name);
+                Assert.Equal(unattachedDataBlock1Id, unattachedDataBlocks[0].Id);
+                Assert.Equal("Unattached 1", unattachedDataBlocks[0].Name);
+                Assert.Equal(unattachedDataBlock2Id, unattachedDataBlocks[1].Id);
+                Assert.Equal("Unattached 2", unattachedDataBlocks[1].Name);
             }
         }
 
         [Fact]
-        public async Task GetAvailableDataBlocks_NoRelease()
+        public async Task GetUnattachedDataBlocks_NoRelease()
         {
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = BuildDataBlockService(contentDbContext: contentDbContext);
-                var result = await service.GetAvailableDataBlocks(
+                var result = await service.GetUnattachedDataBlocks(
                     Guid.NewGuid());
 
                 result.AssertNotFound();

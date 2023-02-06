@@ -261,7 +261,7 @@ describe('EditableKeyStat', () => {
       });
 
       expect(keyStatisticService.deleteKeyStatistic).not.toHaveBeenCalled();
-      expect(dataBlockService.getAvailableDataBlocks).not.toHaveBeenCalled();
+      expect(dataBlockService.getUnattachedDataBlocks).not.toHaveBeenCalled();
 
       userEvent.click(
         screen.getByRole('button', {
@@ -274,8 +274,8 @@ describe('EditableKeyStat', () => {
           Parameters<typeof keyStatisticService.deleteKeyStatistic>
         >('release-1', 'keyStatDataBlock-1');
 
-        expect(dataBlockService.getAvailableDataBlocks).toHaveBeenCalledWith<
-          Parameters<typeof dataBlockService.getAvailableDataBlocks>
+        expect(dataBlockService.getUnattachedDataBlocks).toHaveBeenCalledWith<
+          Parameters<typeof dataBlockService.getUnattachedDataBlocks>
         >('release-1');
       });
     });
@@ -306,7 +306,7 @@ function render(child: ReactNode): RenderResult {
       value={{
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [],
+        unattachedDataBlocks: [],
       }}
     >
       {child}

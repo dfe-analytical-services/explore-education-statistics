@@ -4,7 +4,6 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -14,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
     {
         public ReleaseViewModel Release { get; set; } = new ();
 
-        public List<DataBlockViewModel> AvailableDataBlocks { get; set; } = new ();
+        public List<DataBlockViewModel> UnattachedDataBlocks { get; set; } = new ();
 
         public class ReleaseViewModel
         {
@@ -111,13 +110,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
             public string Url { get; set; }
         }
-    }
-
-    public class KeyStatisticsViewModel
-    {
-        public List<DataBlock> KeyIndicators { get; set; }
-
-        public ContentSectionViewModel KeyStatisticsContent { get; set; }
     }
 
     public class ReleaseNoteViewModel

@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using JsonKnownTypes;
 using Newtonsoft.Json;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
 [JsonConverter(typeof(JsonKnownTypesConverter<KeyStatisticViewModel>))]
 [JsonDiscriminator(Name = "type")]

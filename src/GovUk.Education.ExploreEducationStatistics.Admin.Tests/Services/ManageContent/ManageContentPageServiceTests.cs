@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -14,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Type = ReleaseType.OfficialStatistics,
             };
 
-            var availableDataBlocks = new List<Admin.ViewModels.DataBlockViewModel>
+            var unattachedDataBlocks = new List<Admin.ViewModels.DataBlockViewModel>
             {
                 new()
             };
@@ -215,8 +215,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
             dataBlockService.Setup(mock =>
-                    mock.GetAvailableDataBlocks(release.Id))
-                .ReturnsAsync(availableDataBlocks);
+                    mock.GetUnattachedDataBlocks(release.Id))
+                .ReturnsAsync(unattachedDataBlocks);
 
             methodologyVersionRepository.Setup(mock =>
                     mock.GetLatestVersionByPublication(publication.Id))
@@ -238,12 +238,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.True(result.IsRight);
 
                 dataBlockService.Verify(mock =>
-                    mock.GetAvailableDataBlocks(release.Id), Times.Once);
+                    mock.GetUnattachedDataBlocks(release.Id), Times.Once);
 
                 releaseFileService.Verify(mock =>
                     mock.ListAll(release.Id, Ancillary, FileType.Data), Times.Once);
 
-                Assert.Equal(availableDataBlocks, result.Right.AvailableDataBlocks);
+                Assert.Equal(unattachedDataBlocks, result.Right.UnattachedDataBlocks);
 
                 var contentRelease = result.Right.Release;
 
@@ -399,7 +399,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Type = ReleaseType.OfficialStatistics,
             };
 
-            var availableDataBlocks = new List<Admin.ViewModels.DataBlockViewModel>
+            var unattachedDataBlocks = new List<Admin.ViewModels.DataBlockViewModel>
             {
                 new()
             };
@@ -472,8 +472,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
 
             dataBlockService.Setup(mock =>
-                    mock.GetAvailableDataBlocks(release.Id))
-                .ReturnsAsync(availableDataBlocks);
+                    mock.GetUnattachedDataBlocks(release.Id))
+                .ReturnsAsync(unattachedDataBlocks);
 
             methodologyVersionRepository.Setup(mock =>
                     mock.GetLatestVersionByPublication(publication.Id))
@@ -496,12 +496,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.True(result.IsRight);
 
                 dataBlockService.Verify(mock =>
-                    mock.GetAvailableDataBlocks(release.Id), Times.Once);
+                    mock.GetUnattachedDataBlocks(release.Id), Times.Once);
 
                 releaseFileService.Verify(mock =>
                     mock.ListAll(release.Id, Ancillary, FileType.Data), Times.Once);
 
-                Assert.Equal(availableDataBlocks, result.Right.AvailableDataBlocks);
+                Assert.Equal(unattachedDataBlocks, result.Right.UnattachedDataBlocks);
 
                 var contentRelease = result.Right.Release;
 

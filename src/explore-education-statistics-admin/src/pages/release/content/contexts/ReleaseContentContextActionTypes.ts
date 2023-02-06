@@ -27,8 +27,8 @@ export interface BlockMeta {
 
 type SectionMeta = Omit<BlockMeta, 'blockId'>;
 
-export type SetAvailableDataBlocks = {
-  type: 'SET_AVAILABLE_DATABLOCKS';
+export type SetUnattachedDataBlocks = {
+  type: 'SET_UNATTACHED_DATABLOCKS';
   payload: DataBlock[];
 };
 
@@ -134,7 +134,7 @@ export type ReleaseDispatchAction =
   | AddSectionBlock
   | AddContentSection
   | AddKeyStatistic
-  | SetAvailableDataBlocks
+  | SetUnattachedDataBlocks
   | SetReleaseContent
   | SetKeyStatistics
   | RemoveBlockComment

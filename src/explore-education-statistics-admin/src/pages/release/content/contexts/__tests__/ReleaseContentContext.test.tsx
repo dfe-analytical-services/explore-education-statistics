@@ -66,23 +66,23 @@ const releaseReducer = (
 ) => produce(initial, draft => originalReleaseReducer(draft, action));
 
 describe('ReleaseContentContext', () => {
-  test('SET_AVAILABLE_DATABLOCKS sets data blocks', () => {
+  test('SET_UNATTACHED_DATABLOCKS sets data blocks', () => {
     expect(
       releaseReducer(
         {
           release: testEditableRelease,
           canUpdateRelease: false,
-          availableDataBlocks: [],
+          unattachedDataBlocks: [],
         },
         {
-          type: 'SET_AVAILABLE_DATABLOCKS',
+          type: 'SET_UNATTACHED_DATABLOCKS',
           payload: [basicDataBlock],
         },
       ),
     ).toEqual({
       release: testEditableRelease,
       canUpdateRelease: false,
-      availableDataBlocks: [basicDataBlock],
+      unattachedDataBlocks: [basicDataBlock],
     });
   });
 
@@ -96,7 +96,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'REMOVE_SECTION_BLOCK',
@@ -123,7 +123,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'REMOVE_SECTION_BLOCK',
@@ -151,7 +151,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'UPDATE_SECTION_BLOCK',
@@ -183,7 +183,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'UPDATE_SECTION_BLOCK',
@@ -222,7 +222,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: false,
-        availableDataBlocks: [],
+        unattachedDataBlocks: [],
       },
       {
         type: 'ADD_SECTION_BLOCK',
@@ -256,7 +256,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'ADD_SECTION_BLOCK',
@@ -344,7 +344,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'UPDATE_SECTION_CONTENT',
@@ -376,7 +376,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'ADD_CONTENT_SECTION',
@@ -398,7 +398,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'SET_CONTENT',
@@ -429,7 +429,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'UPDATE_CONTENT_SECTION',
@@ -451,7 +451,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'ADD_BLOCK_COMMENT',
@@ -480,7 +480,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'ADD_BLOCK_COMMENT',
@@ -516,7 +516,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'UPDATE_BLOCK_COMMENT',
@@ -551,7 +551,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'UPDATE_BLOCK_COMMENT',
@@ -582,7 +582,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'REMOVE_BLOCK_COMMENT',
@@ -610,7 +610,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'REMOVE_BLOCK_COMMENT',
@@ -645,7 +645,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'ADD_KEY_STATISTIC',
@@ -673,7 +673,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'UPDATE_KEY_STATISTIC',
@@ -694,7 +694,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'REMOVE_KEY_STATISTIC',
@@ -716,7 +716,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'SET_KEY_STATISTICS',

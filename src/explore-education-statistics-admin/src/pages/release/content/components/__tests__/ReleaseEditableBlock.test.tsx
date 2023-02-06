@@ -873,7 +873,7 @@ describe('ReleaseEditableBlock', () => {
             value={{
               release,
               canUpdateRelease: true,
-              availableDataBlocks: [],
+              unattachedDataBlocks: [],
             }}
           >
             {child}

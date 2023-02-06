@@ -18,7 +18,7 @@ export type ReleaseContentContextDispatch = (
 export interface ReleaseContentContextState {
   release: EditableRelease;
   canUpdateRelease: boolean;
-  availableDataBlocks: DataBlock[];
+  unattachedDataBlocks: DataBlock[];
 }
 
 const ReleaseContentStateContext = createContext<
@@ -68,8 +68,8 @@ export const releaseReducer: Reducer<
   }
 
   switch (action.type) {
-    case 'SET_AVAILABLE_DATABLOCKS': {
-      draft.availableDataBlocks = action.payload;
+    case 'SET_UNATTACHED_DATABLOCKS': {
+      draft.unattachedDataBlocks = action.payload;
       return draft;
     }
     case 'REMOVE_SECTION_BLOCK': {

@@ -82,7 +82,7 @@ public class KeyStatisticServicePermissionTests
                     var service = SetupKeyStatisticService(userService: userService.Object);
                     return service.Reorder(
                         _release.Id,
-                        new Dictionary<Guid, int>());
+                        new List<Guid>());
                 }
             );
     }

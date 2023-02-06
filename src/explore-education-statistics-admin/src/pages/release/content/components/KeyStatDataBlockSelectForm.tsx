@@ -22,11 +22,11 @@ const KeyStatDataBlockSelectForm = ({
   hideCancel = false,
   label = 'Select a key statistic',
 }: Props) => {
-  const { availableDataBlocks } = useReleaseContentState();
+  const { unattachedDataBlocks } = useReleaseContentState();
   const [selectedDataBlockId, setSelectedDataBlockId] = useState('');
 
   const keyStatDataBlocks = useMemo(() => {
-    return availableDataBlocks.filter(dataBlock => {
+    return unattachedDataBlocks.filter(dataBlock => {
       const { indicators, locationIds, timePeriod } = dataBlock.query;
 
       return (
@@ -37,10 +37,10 @@ const KeyStatDataBlockSelectForm = ({
         // there is a single result
       );
     });
-  }, [availableDataBlocks]);
+  }, [unattachedDataBlocks]);
 
   function getKeyStatPreview() {
-    const selectedDataBlock = availableDataBlocks.find(
+    const selectedDataBlock = unattachedDataBlocks.find(
       dataBlock => dataBlock.id === selectedDataBlockId,
     );
     return selectedDataBlock ? (

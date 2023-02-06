@@ -96,13 +96,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var dataBlockIds = deletePlan.DependentDataBlocks
                         .Select(db => db.Id)
                         .ToList();
-                    var keyStats = await _context.KeyStatisticsDataBlock
-                        .Where(ks => dataBlockIds.Contains(ks.DataBlockId))
-                        .ToListAsync();
+                    var keyStats = _context.KeyStatisticsDataBlock
+                        .Where(ks => dataBlockIds.Contains(ks.DataBlockId));
                     _context.KeyStatisticsDataBlock.RemoveRange(keyStats);
                     await _context.SaveChangesAsync();
-                })
-                .OnSuccessVoid(() => RemoveChartFileReleaseLinks(deletePlan));
+
+                    await RemoveChartFileReleaseLinks(deletePlan);
+                });
         }
 
         public async Task<Either<ActionResult, Unit>> RemoveChartFile(Guid releaseId, Guid id)
@@ -380,30 +380,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessVoid(_cacheService.DeleteItem);
         }
 
-        public async Task<Either<ActionResult, List<DataBlockViewModel>>> GetAvailableDataBlocks(Guid releaseId)
+        public async Task<Either<ActionResult, List<DataBlockViewModel>>> GetUnattachedDataBlocks(Guid releaseId)
         {
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async release =>
                 {
-                    var keyStatDataBlockIds = _context.KeyStatisticsDataBlock
-                        .Where(ks => ks.ReleaseId == release.Id)
-                        .Select(ks => ks.DataBlockId)
-                        .ToList();
-
                     return await _context
                         .ReleaseContentBlocks
                         .Include(releaseContentBlock => releaseContentBlock.ContentBlock)
                         .Where(releaseContentBlock => releaseContentBlock.ReleaseId == release.Id)
                         .Select(releaseContentBlock => releaseContentBlock.ContentBlock)
                         .OfType<DataBlock>()
-                        .Where(dataBlock =>
-                            dataBlock.ContentSectionId == null
-                            && !keyStatDataBlockIds.Contains(dataBlock.Id))
+                        .ToAsyncEnumerable()
+                        .WhereAwait(async dataBlock =>
+                            await IsUnattachedDataBlock(releaseId, dataBlock))
                         .OrderBy(contentBlock => contentBlock.Name)
                         .Select(contentBlock => _mapper.Map<DataBlockViewModel>(contentBlock))
                         .ToListAsync();
                 });
+        }
+
+        public async Task<bool> IsUnattachedDataBlock(Guid releaseId, DataBlock dataBlock)
+        {
+                return dataBlock.ContentSectionId == null
+                       && await _context.KeyStatisticsDataBlock
+                           .Where(ks =>ks.ReleaseId == releaseId)
+                           .AllAsync(ks =>
+                               ks.DataBlockId != dataBlock.Id);
         }
     }
 
@@ -425,6 +429,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class DeleteDataBlockPlan
     {
         [JsonIgnore] public Guid ReleaseId { get; set; }
-        public List<DependentDataBlock> DependentDataBlocks { get; set; } = new ();
+        public List<DependentDataBlock> DependentDataBlocks { get; set; } = new();
     }
 }
