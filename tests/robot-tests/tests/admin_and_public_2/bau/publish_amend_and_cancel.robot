@@ -19,7 +19,7 @@ ${DATABLOCK_NAME}=      Dates data block name
 
 
 *** Test Cases ***
-Create new publication for "UI tests topic" topic
+Create new publication and release via API
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user creates test release via api    ${PUBLICATION_ID}    FY    3000
 
@@ -173,13 +173,13 @@ Verify newly published release is on Find Statistics page
 
 Navigate to newly published release page
     user clicks link    ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
 
 Verify release URL and page caption
     user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-%{RUN_IDENTIFIER}
     user waits until page contains title caption    ${RELEASE_NAME}
 
-Return to Admin and Create amendment
+Return to Admin and create amendment
     user navigates to admin dashboard    Bau1
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
@@ -248,7 +248,7 @@ Confirm amendment has footnotes
     user waits until page contains element    testid:Footnote - Applies to all data 2
     user waits until page contains element    testid:Footnote - Applies to all data 3
 
-User navigates to Data blocks page
+Navigate to Data blocks page
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
 
@@ -364,7 +364,7 @@ Verify that the footnotes are unchanged
     user waits until page contains element    testid:Footnote - Applies to all data 2
     user waits until page does not contain element    testid:Footnote - Applies to all data 3
 
-Verify that the Release content is unchanged
+Verify that release content is unchanged
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits for page to finish loading
@@ -392,7 +392,7 @@ Verify that the Dates data block accordion is unchanged
     user checks headed table body row cell contains    Proportion of settings open    1    1%    ${section}
     user closes accordion section    Dates data block    id:releaseMainContent
 
-Verify that the Dates data block table has footnotes are unchanged
+Verify that the Dates data block table footnotes are unchanged
     ${accordion}=    user opens accordion section    Dates data block    id:releaseMainContent
     ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
 
@@ -410,7 +410,7 @@ Verify that the Test text accordion is unchanged
     user waits until parent contains element    ${section}    xpath:.//p[text()="Some test text !"]
     user closes accordion section    Test text    id:releaseMainContent
 
-Verify that the Embedded URL accordian section is unchanged
+Verify that the Embedded URL accordion section is unchanged
     user opens accordion section    Test embedded dashboard section    id:releaseMainContent
     ${section}=    user gets accordion section content element    Test embedded dashboard section
     ...    id:releaseMainContent
