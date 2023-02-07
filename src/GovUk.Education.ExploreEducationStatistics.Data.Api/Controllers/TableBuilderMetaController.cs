@@ -1,9 +1,7 @@
 #nullable enable
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -11,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
@@ -23,18 +22,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     [ApiController]
     public class TableBuilderMetaController : ControllerBase
     {
+        private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly IReleaseSubjectService _releaseSubjectService;
         private readonly ISubjectMetaService _subjectMetaService;
 
         public TableBuilderMetaController(
+            StatisticsDbContext statisticsDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             IReleaseSubjectService releaseSubjectService,
             ISubjectMetaService subjectMetaService)
         {
+            _statisticsDbContext = statisticsDbContext;
             _contentPersistenceHelper = contentPersistenceHelper;
             _releaseSubjectService = releaseSubjectService;
             _subjectMetaService = subjectMetaService;
+        }
+
+        [HttpDelete("buffer-cache")]
+        public async Task<ActionResult> DeleteBufferCache()
+        {
+            await _statisticsDbContext.Database.ExecuteSqlRawAsync("CHECKPOINT");
+            await _statisticsDbContext.Database.ExecuteSqlRawAsync("DBCC DROPCLEANBUFFERS");
+            return NoContent();
         }
 
         [HttpGet("meta/subject/{subjectId:guid}")]
@@ -66,7 +76,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 .OnSuccess(release => new CacheableReleaseSubject(releaseSubject, release));
         }
 
-        [BlobCache(typeof(SubjectMetaCacheKey))]
+        // TODO EES-4029 Revert this
+        //[BlobCache(typeof(SubjectMetaCacheKey))]
         private Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(CacheableReleaseSubject cacheable)
         {
             return _subjectMetaService.GetSubjectMeta(cacheable.ReleaseSubject);

@@ -48,7 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanViewRelease)
+                // TODO EES-4029 Revert this
+                //.OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async _ =>
                 {
                     var subjectsToInclude = GetPublishedSubjectIds(releaseId);

@@ -16,7 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
@@ -87,8 +86,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public async Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(ReleaseSubject releaseSubject)
         {
-            return await _userService.CheckCanViewSubjectData(releaseSubject)
-                .OnSuccess(GetSubjectMetaViewModel);
+            // TODO EES-4029 Revert this
+            return await GetSubjectMetaViewModel(releaseSubject);
+            // return await _userService.CheckCanViewSubjectData(releaseSubject)
+            //     .OnSuccess(GetSubjectMetaViewModel);
         }
 
         public async Task<Either<ActionResult, SubjectMetaViewModel>> FilterSubjectMeta(Guid? releaseId,
@@ -96,7 +97,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             CancellationToken cancellationToken)
         {
             return await _releaseSubjectService.Find(subjectId: query.SubjectId, releaseId: releaseId)
-                .OnSuccess(_userService.CheckCanViewSubjectData)
+                // TODO EES-4029 Revert this
+                //.OnSuccess(_userService.CheckCanViewSubjectData)
                 .OnSuccess(releaseSubject =>
                     GetSubjectMetaViewModelFromQuery(query, releaseSubject, cancellationToken));
         }

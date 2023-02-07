@@ -45,7 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 .HandleFailuresOrOk();
         }
 
-        [BlobCache(typeof(ReleaseSubjectsCacheKey))]
+        // TODO EES-4029 Revert this
+        //[BlobCache(typeof(ReleaseSubjectsCacheKey))]
         private Task<Either<ActionResult, List<SubjectViewModel>>> ListSubjects(ReleaseSubjectsCacheKey cacheKey)
         {
             return _releaseService.ListSubjects(cacheKey.ReleaseId);

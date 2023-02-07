@@ -28,14 +28,19 @@ public class ReleaseSubjectService : IReleaseSubjectService
 
     public async Task<Either<ActionResult, ReleaseSubject>> Find(Guid subjectId, Guid? releaseId = null)
     {
-        return await (
-                releaseId.HasValue
-                    ? _statisticsDbContext.ReleaseSubject.FirstOrDefaultAsync(
-                        rs => rs.ReleaseId == releaseId && rs.SubjectId == subjectId
-                    )
-                    : FindForLatestPublishedVersion(subjectId)
-            )
-            .OrNotFound();
+        // TODO EES-4029 Remove this
+        return await _statisticsDbContext.ReleaseSubject.FirstOrDefaultAsync(
+                    rs => rs.ReleaseId == releaseId && rs.SubjectId == subjectId
+                ).OrNotFound();
+
+        // return await (
+        //         releaseId.HasValue
+        //             ? _statisticsDbContext.ReleaseSubject.FirstOrDefaultAsync(
+        //                 rs => rs.ReleaseId == releaseId && rs.SubjectId == subjectId
+        //             )
+        //             : FindForLatestPublishedVersion(subjectId)
+        //     )
+        //     .OrNotFound();
     }
 
     public async Task<ReleaseSubject?> FindForLatestPublishedVersion(Guid subjectId)

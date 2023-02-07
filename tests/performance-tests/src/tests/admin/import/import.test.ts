@@ -21,18 +21,18 @@ const uploadFileStrategy = utils.getDataFileUploadStrategy({
 
 export const options: Options = {
   stages: [
+    // {
+    //   duration: '1s',
+    //   target: 10,
+    // },
     {
-      duration: '1s',
+      duration: '60m',
       target: 10,
     },
-    {
-      duration: '119m',
-      target: 10,
-    },
-    {
-      duration: '30s',
-      target: 10,
-    },
+    // {
+    //   duration: '30s',
+    //   target: 10,
+    // },
   ],
   noConnectionReuse: true,
   insecureSkipTLSVerify: true,
