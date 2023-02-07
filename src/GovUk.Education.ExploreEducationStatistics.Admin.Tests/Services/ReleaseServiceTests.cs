@@ -70,21 +70,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         PublicationId = publication.Id,
                         Year = 2018,
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        PublishScheduled = "2050-06-30",
                         Type = ReleaseType.OfficialStatistics
                     }
                 )).AssertRight();
 
-                var publishScheduled = new DateTime(2050, 6, 30, 0, 0, 0, DateTimeKind.Unspecified);
-
                 Assert.Equal("Academic Year 2018/19", result.Title);
                 Assert.Equal(2018, result.Year);
                 Assert.Equal("2018/19", result.YearTitle);
-                Assert.Null(result.Published);
-                Assert.Equal(publishScheduled, result.PublishScheduled);
-                Assert.False(result.LatestRelease); // Most recent - but not published yet.
                 Assert.Equal(TimeIdentifier.AcademicYear, result.TimePeriodCoverage);
                 Assert.Equal(ReleaseType.OfficialStatistics, result.Type);
+                Assert.Equal(ReleaseApprovalStatus.Draft, result.ApprovalStatus);
+
+                Assert.False(result.Amendment);
+                Assert.False(result.LatestRelease); // Most recent - but not published yet.
+                Assert.False(result.Live);
+                Assert.Null(result.NextReleaseDate);
+                Assert.Null(result.PublishScheduled);
+                Assert.Null(result.Published);
+                Assert.False(result.NotifySubscribers);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var actual = await context.Releases
+                    .SingleAsync(r => r.PublicationId == publication.Id);
+
+                Assert.Equal(2018, actual.Year);
+                Assert.Equal(TimeIdentifier.AcademicYear, actual.TimePeriodCoverage);
+                Assert.Equal(ReleaseType.OfficialStatistics, actual.Type);
+                Assert.Equal(ReleaseApprovalStatus.Draft, actual.ApprovalStatus);
+                Assert.Equal(0, actual.Version);
+
+                Assert.Null(actual.PreviousVersionId);
+                Assert.Null(actual.PublishScheduled);
+                Assert.Null(actual.Published);
+                Assert.Null(actual.NextReleaseDate);
+                Assert.Null(actual.NotifiedOn);
+                Assert.False(actual.NotifySubscribers);
             }
         }
 
