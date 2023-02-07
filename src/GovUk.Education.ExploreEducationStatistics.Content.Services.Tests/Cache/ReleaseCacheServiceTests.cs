@@ -77,7 +77,6 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
                 Id = Guid.NewGuid()
             }
         },
-        DataLastPublished = DateTime.UtcNow,
         Type = ReleaseType.NationalStatistics,
         RelatedInformation = new List<LinkViewModel>
         {
@@ -227,14 +226,12 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task UpdateRelease()
     {
-        const bool staging = false;
-        var published = DateTime.UtcNow;
-        var cacheKey = new ReleaseCacheKey(staging, PublicationSlug, ReleaseSlug);
+        var cacheKey = new ReleaseCacheKey(PublicationSlug, ReleaseSlug);
 
         var releaseService = new Mock<IReleaseService>(Strict);
 
         releaseService
-            .Setup(s => s.GetRelease(ReleaseId, published))
+            .Setup(s => s.GetRelease(ReleaseId, null))
             .ReturnsAsync(_releaseViewModel);
 
         PublicBlobCacheService
@@ -243,11 +240,10 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         var service = BuildService(releaseService: releaseService.Object);
 
-        var result = await service.UpdateRelease(staging,
-            published,
+        var result = await service.UpdateRelease(
             ReleaseId,
-            PublicationSlug,
-            ReleaseSlug);
+            publicationSlug: PublicationSlug,
+            releaseSlug: ReleaseSlug);
 
         // There should be no attempt on the cache service to get the cached resource
 
@@ -259,14 +255,12 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public async Task UpdateRelease_LatestRelease()
     {
-        const bool staging = false;
-        var published = DateTime.UtcNow;
-        var cacheKey = new ReleaseCacheKey(staging, PublicationSlug);
+        var cacheKey = new ReleaseCacheKey(PublicationSlug);
 
         var releaseService = new Mock<IReleaseService>(Strict);
 
         releaseService
-            .Setup(s => s.GetRelease(ReleaseId, published))
+            .Setup(s => s.GetRelease(ReleaseId, null))
             .ReturnsAsync(_releaseViewModel);
 
         PublicBlobCacheService
@@ -275,10 +269,70 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
 
         var service = BuildService(releaseService: releaseService.Object);
 
-        var result = await service.UpdateRelease(staging,
-            published,
+        var result = await service.UpdateRelease(
             ReleaseId,
-            PublicationSlug);
+            publicationSlug: PublicationSlug);
+
+        // There should be no attempt on the cache service to get the cached resource
+
+        VerifyAllMocks(releaseService, PublicBlobCacheService);
+
+        result.AssertRight(_releaseViewModel);
+    }
+
+    [Fact]
+    public async Task UpdateReleaseStaged()
+    {
+        var expectedPublishDate = DateTime.UtcNow;
+        var cacheKey = new ReleaseStagedCacheKey(PublicationSlug, ReleaseSlug);
+
+        var releaseService = new Mock<IReleaseService>(Strict);
+
+        releaseService
+            .Setup(s => s.GetRelease(ReleaseId, expectedPublishDate))
+            .ReturnsAsync(_releaseViewModel);
+
+        PublicBlobCacheService
+            .Setup(s => s.SetItem<object>(cacheKey, _releaseViewModel))
+            .Returns(Task.CompletedTask);
+
+        var service = BuildService(releaseService: releaseService.Object);
+
+        var result = await service.UpdateReleaseStaged(
+            ReleaseId,
+            expectedPublishDate,
+            publicationSlug: PublicationSlug,
+            releaseSlug: ReleaseSlug);
+
+        // There should be no attempt on the cache service to get the cached resource
+
+        VerifyAllMocks(releaseService, PublicBlobCacheService);
+
+        result.AssertRight(_releaseViewModel);
+    }
+
+    [Fact]
+    public async Task UpdateReleaseStaged_LatestRelease()
+    {
+        var expectedPublishDate = DateTime.UtcNow;
+        var cacheKey = new ReleaseStagedCacheKey(PublicationSlug);
+
+        var releaseService = new Mock<IReleaseService>(Strict);
+
+        releaseService
+            .Setup(s => s.GetRelease(ReleaseId, expectedPublishDate))
+            .ReturnsAsync(_releaseViewModel);
+
+        PublicBlobCacheService
+            .Setup(s => s.SetItem<object>(cacheKey, _releaseViewModel))
+            .Returns(Task.CompletedTask);
+
+        var service = BuildService(releaseService: releaseService.Object);
+
+        var result = await service.UpdateReleaseStaged(
+            ReleaseId,
+            expectedPublishDate,
+            publicationSlug: PublicationSlug);
 
         // There should be no attempt on the cache service to get the cached resource
 

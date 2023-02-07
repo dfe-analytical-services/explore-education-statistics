@@ -80,7 +80,10 @@ using IContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Conte
 using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Content.Services.GlossaryService;
 using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
 using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
+using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
+using IContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
+using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
 using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
@@ -422,9 +425,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContentGlossaryService, ContentGlossaryService>();
             services.AddTransient<IContentMethodologyService, ContentMethodologyService>();
             services.AddTransient<IContentPublicationService, ContentPublicationService>();
+            services.AddTransient<IContentReleaseService, ContentReleaseService>();
             services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
             services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
             services.AddTransient<IPublicationCacheService, PublicationCacheService>();
+            services.AddTransient<IPublicationCacheService, PublicationCacheService>();
+            services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
 
             services.AddTransient<IFileRepository, FileRepository>();
             services.AddTransient<IDataImportRepository, DataImportRepository>();

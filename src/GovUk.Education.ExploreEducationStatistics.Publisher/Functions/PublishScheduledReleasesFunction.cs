@@ -100,10 +100,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             var publishedReleaseIds = await PublishScheduledReleases(scheduled.ToArray());
 
-            logger.LogInformation("{FunctionName} completed. Published Releases [{ReleaseIds}]", 
+            logger.LogInformation("{FunctionName} completed. Published Releases [{ReleaseIds}]",
                 executionContext.FunctionName,
                 publishedReleaseIds.JoinToString(','));
-            
+
             return new ManualTriggerResponse(publishedReleaseIds);
         }
 
@@ -113,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 return Array.Empty<Guid>();
             }
-            
+
             await _publishingService.PublishStagedReleaseContent();
 
             await scheduled
@@ -123,8 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             // Finalise publishing of these releases
             await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
-                scheduled.Select(status => (status.ReleaseId, status.Id)),
-                DateTime.UtcNow);
+                scheduled.Select(status => (status.ReleaseId, status.Id)));
 
             return scheduled
                 .Select(releaseStatus => releaseStatus.ReleaseId)
@@ -138,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 files: ReleasePublishingStatusFilesStage.Complete,
                 publishing: ReleasePublishingStatusPublishingStage.Scheduled);
         }
-        
+
         private async Task<IEnumerable<ReleasePublishingStatus>> QueryScheduledReleasesForTodayOrFuture()
         {
             return await _releasePublishingStatusService.GetWherePublishingDueTodayOrInFutureWithStages(
@@ -148,20 +147,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         private async Task UpdateContentStage(
-            ReleasePublishingStatus status, 
+            ReleasePublishingStatus status,
             ReleasePublishingStatusContentStage stage,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {
             await _releasePublishingStatusService.UpdateContentStageAsync(
-                status.ReleaseId, 
-                status.Id, 
-                stage, 
+                status.ReleaseId,
+                status.Id,
+                stage,
                 logMessage);
         }
-        
+
         // ReSharper disable once ClassNeverInstantiated.Local
         private record ManualTriggerRequest(Guid[] ReleaseIds);
-        
+
         public record ManualTriggerResponse(Guid[] ReleaseIds);
     }
 }

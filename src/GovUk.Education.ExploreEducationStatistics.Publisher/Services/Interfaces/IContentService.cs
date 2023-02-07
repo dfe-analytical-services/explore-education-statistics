@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces
 {
@@ -11,7 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task DeletePreviousVersionsContent(params Guid[] releaseIds);
 
-        Task UpdateContent(PublishContext context, params Guid[] releaseIds);
+        Task UpdateContent(params Guid[] releaseIds);
+
+        Task UpdateContentStaged(DateTime expectedPublishDate, params Guid[] releaseIds);
 
         Task UpdateCachedTaxonomyBlobs();
     }

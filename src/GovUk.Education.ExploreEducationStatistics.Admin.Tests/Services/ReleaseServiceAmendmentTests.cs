@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -712,6 +713,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             IUserService? userService = null,
             IReleaseRepository? repository = null,
+            IReleaseCacheService? releaseCacheService = null,
             IReleaseFileRepository? releaseFileRepository = null,
             ISubjectRepository? subjectRepository = null,
             IReleaseDataFileService? releaseDataFileService = null,
@@ -729,6 +731,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 userService ?? UserServiceMock().Object,
                 repository ?? Mock.Of<IReleaseRepository>(Strict),
+                releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
                 releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict),
                 subjectRepository ?? Mock.Of<ISubjectRepository>(Strict),
                 releaseDataFileService ?? Mock.Of<IReleaseDataFileService>(Strict),

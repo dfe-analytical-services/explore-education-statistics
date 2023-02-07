@@ -5,13 +5,13 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStor
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 
-public record ReleaseCacheKey : IBlobCacheKey
+public record ReleaseStagedCacheKey : IBlobCacheKey
 {
     private string PublicationSlug { get; }
 
     private string? ReleaseSlug { get; }
 
-    public ReleaseCacheKey(string publicationSlug, string? releaseSlug = null)
+    public ReleaseStagedCacheKey(string publicationSlug, string? releaseSlug = null)
     {
         PublicationSlug = publicationSlug;
         ReleaseSlug = releaseSlug;
@@ -20,6 +20,6 @@ public record ReleaseCacheKey : IBlobCacheKey
     public IBlobContainer Container => BlobContainers.PublicContent;
 
     public string Key => ReleaseSlug == null
-        ? PublicContentLatestReleasePath(PublicationSlug)
-        : PublicContentReleasePath(PublicationSlug, ReleaseSlug);
+        ? PublicContentLatestReleasePath(PublicationSlug, staging: true)
+        : PublicContentReleasePath(PublicationSlug, ReleaseSlug, staging: true);
 }

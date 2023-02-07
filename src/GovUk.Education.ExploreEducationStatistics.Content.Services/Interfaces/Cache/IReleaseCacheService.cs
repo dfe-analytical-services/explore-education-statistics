@@ -12,9 +12,14 @@ public interface IReleaseCacheService
     Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(string publicationSlug,
         string? releaseSlug = null);
 
-    Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateRelease(bool staging,
-        DateTime expectedPublishDate,
+    Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateRelease(
         Guid releaseId,
+        string publicationSlug,
+        string? releaseSlug = null);
+
+    Task<Either<ActionResult, ReleaseCacheViewModel>> UpdateReleaseStaged(
+        Guid releaseId,
+        DateTime expectedPublishDate,
         string publicationSlug,
         string? releaseSlug = null);
 }

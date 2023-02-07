@@ -79,9 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             try
             {
-                await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
-                    successfulReleases,
-                    DateTime.UtcNow);
+                await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(successfulReleases);
             }
             catch (Exception e)
             {

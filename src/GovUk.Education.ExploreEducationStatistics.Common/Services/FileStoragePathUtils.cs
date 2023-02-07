@@ -11,6 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public const string DataBlocksDirectory = "data-blocks";
         public const string ReleasesDirectory = "releases";
         public const string SubjectMetaDirectory = "subject-meta";
+        public const string LatestReleaseFileName = "latest-release.json";
+        public const string PublicationFileName = "publication.json";
 
         public static string PublicContentStagingPath() => "staging";
 
@@ -26,12 +28,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public static string PublicContentPublicationPath(string slug)
         {
-            return $"{PublicContentPublicationParentPath(slug)}/publication.json";
+            return $"{PublicContentPublicationParentPath(slug)}/{PublicationFileName}";
         }
 
         public static string PublicContentLatestReleasePath(string publicationSlug, bool staging = false)
         {
-            return $"{PublicContentPublicationParentPath(publicationSlug, staging)}/latest-release.json";
+            return $"{PublicContentPublicationParentPath(publicationSlug, staging)}/{LatestReleaseFileName}";
         }
 
         public static string PublicContentReleasePath(string publicationSlug, string releaseSlug, bool staging = false)

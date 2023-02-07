@@ -7,9 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
@@ -95,11 +93,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        public async Task UpdateContent(PublishContext context, params Guid[] releaseIds)
+        public async Task UpdateContent(params Guid[] releaseIds)
         {
             var releases = (await _releaseService
-                .List(releaseIds))
+                    .List(releaseIds))
                 .ToList();
+
+            foreach (var release in releases)
+            {
+                await _releaseCacheService.UpdateRelease(
+                    release.Id,
+                    publicationSlug: release.Publication.Slug,
+                    releaseSlug: release.Slug);
+            }
 
             var publications = releases
                 .Select(release => release.Publication)
@@ -108,11 +114,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var publication in publications)
             {
-                await CacheLatestRelease(publication, context, releaseIds);
-                foreach (var release in releases)
-                {
-                    await CacheRelease(release, context);
-                }
+                // Cache the latest release for the publication as a separate cache entry
+                var latestRelease = await _releaseService.GetLatestRelease(publication.Id, releaseIds);
+                await _releaseCacheService.UpdateRelease(
+                    latestRelease.Id,
+                    publicationSlug: publication.Slug);
+            }
+        }
+
+        public async Task UpdateContentStaged(DateTime expectedPublishDate, params Guid[] releaseIds)
+        {
+            var releases = (await _releaseService
+                    .List(releaseIds))
+                .ToList();
+
+            foreach (var release in releases)
+            {
+                await _releaseCacheService.UpdateReleaseStaged(
+                    release.Id,
+                    expectedPublishDate,
+                    publicationSlug: release.Publication.Slug,
+                    releaseSlug: release.Slug);
+            }
+
+            var publications = releases
+                .Select(release => release.Publication)
+                .DistinctByProperty(publication => publication.Id)
+                .ToList();
+
+            foreach (var publication in publications)
+            {
+                // Cache the latest release for the publication as a separate cache entry
+                var latestRelease = await _releaseService.GetLatestRelease(publication.Id, releaseIds);
+                await _releaseCacheService.UpdateReleaseStaged(
+                    latestRelease.Id,
+                    expectedPublishDate,
+                    publicationSlug: publication.Slug);
             }
         }
 
@@ -120,24 +157,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             await _methodologyCacheService.UpdateSummariesTree();
             await _publicationCacheService.UpdatePublicationTree();
-        }
-
-        private async Task CacheLatestRelease(Publication publication, PublishContext context, params Guid[] includedReleaseIds)
-        {
-            var latestRelease = await _releaseService.GetLatestRelease(publication.Id, includedReleaseIds);
-            await _releaseCacheService.UpdateRelease(context.Staging,
-                context.Published,
-                latestRelease.Id,
-                publication.Slug);
-        }
-
-        private async Task CacheRelease(Release release, PublishContext context)
-        {
-            await _releaseCacheService.UpdateRelease(context.Staging,
-                context.Published,
-                release.Id,
-                release.Publication.Slug,
-                release.Slug);
         }
 
         private record ReleaseDataBlockResultsFolderCacheKey : IBlobCacheKey

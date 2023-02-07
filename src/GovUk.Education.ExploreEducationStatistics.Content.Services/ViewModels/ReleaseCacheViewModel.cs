@@ -55,13 +55,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
         public string PreReleaseAccessList { get; set; } = string.Empty;
 
         public List<LinkViewModel> RelatedInformation { get; set; } = new();
-
-        private DateTime? _dataLastPublished;
-
-        public DateTime? DataLastPublished
-        {
-            get => _dataLastPublished;
-            set => _dataLastPublished = value ?? DateTime.UtcNow;
-        }
     }
 }
