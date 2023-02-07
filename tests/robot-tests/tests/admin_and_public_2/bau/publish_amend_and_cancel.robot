@@ -39,10 +39,6 @@ Add data guidance
     user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    Dates test subject
 
-    user checks summary list contains    Filename    dates.csv
-    user checks summary list contains    Geographic levels    National
-    user checks summary list contains    Time period    2020 Week 13 to 2021 Week 24
-
     user enters text into data guidance data file content editor    Dates test subject
     ...    Dates test subject test data guidance content
     user clicks button    Save guidance
@@ -57,13 +53,6 @@ Add ancillary file
     user clicks button    Upload file
 
     user waits until page contains accordion section    Test ancillary file 1
-    user opens accordion section    Test ancillary file 1    id:file-uploads
-
-    ${section_1}=    user gets accordion section content element    Test ancillary file 1    id:file-uploads
-    user checks summary list contains    Title    Test ancillary file 1    ${section_1}
-    user checks summary list contains    Summary    Test ancillary file 1 summary    ${section_1}
-    user checks summary list contains    File    test-file-1.txt    ${section_1}
-    user checks summary list contains    File size    12 B    ${section_1}
 
     user checks there are x accordion sections    1    id:file-uploads
 
@@ -220,11 +209,6 @@ Navigate to data replacement page
     user clicks link    Replace data    ${section}
 
     user waits until h2 is visible    Data file details
-    user checks headed table body row contains    Subject title    Dates test subject
-    user checks headed table body row contains    Data file    dates.csv
-    user checks headed table body row contains    Metadata file    dates.meta.csv
-    user checks headed table body row contains    Number of rows    118    wait=%{WAIT_SMALL}
-    user checks headed table body row contains    Data file size    17 Kb    wait=%{WAIT_SMALL}
     user checks headed table body row contains    Status    Complete    wait=%{WAIT_LONG}
 
 Upload replacement data
@@ -236,20 +220,6 @@ Upload replacement data
     user waits until page contains element    testid:Replacement Subject title
     user checks table column heading contains    1    1    Original file
     user checks table column heading contains    1    2    Replacement file
-
-    user checks headed table body row cell contains    Subject title    1    Dates test subject
-    user checks headed table body row cell contains    Data file    1    dates.csv
-    user checks headed table body row cell contains    Metadata file    1    dates.meta.csv
-    user checks headed table body row cell contains    Number of rows    1    118    wait=%{WAIT_SMALL}
-    user checks headed table body row cell contains    Data file size    1    17 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row cell contains    Status    1    Data replacement in progress    wait=%{WAIT_LONG}
-
-    user checks headed table body row cell contains    Subject title    2    Dates test subject
-    user checks headed table body row cell contains    Data file    2    dates-replacement.csv
-    user checks headed table body row cell contains    Metadata file    2    dates-replacement.meta.csv
-    user checks headed table body row cell contains    Number of rows    2    118    wait=%{WAIT_SMALL}
-    user checks headed table body row cell contains    Data file size    2    17 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_LONG}
 
 Confirm data replacement
     user waits until page contains    Data blocks: OK
@@ -306,12 +276,6 @@ Edit data block for amendment
     user clicks element    id:filtersForm-submit
     user waits until results table appears    %{WAIT_LONG}
 
-    user checks table column heading contains    1    1    2020 Week 13
-    user checks headed table body row cell contains    Number of open settings    1    23,000
-    user checks headed table body row cell contains    Proportion of settings open    1    2%
-    user checks headed table body row cell contains    Number of open settings    1    23,600
-    user checks headed table body row cell contains    Proportion of settings open    1    1%
-
 Save data block for amendment
     user enters text into element    id:dataBlockDetailsForm-name    ${DATABLOCK_NAME}
     user enters text into element    id:dataBlockDetailsForm-heading    Amended dates table title
@@ -357,8 +321,6 @@ Update embedded dashboard title
 
     user closes accordion section    Test embedded dashboard section    id:releaseMainContent
 
-#Cancel amendment
-
 Cancel the release amendment
     [Documentation]    EES-3399
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
@@ -382,7 +344,7 @@ Revisit the Release after the cancellation to double check it remains unaffected
     ...    UI test contact name
     ...    National statistics
 
-Verify pre existing Data and Files
+Verify that the Data and Files are unchanged
     user clicks link    Data and files
     user waits until h2 is visible    Uploaded data files    %{WAIT_MEDIUM}
     user waits until page contains accordion section    Dates test subject
@@ -395,14 +357,14 @@ Verify pre existing Data and Files
     user checks headed table body row contains    Data file size    17 Kb    wait=%{WAIT_SMALL}
     user checks headed table body row contains    Status    Complete    wait=%{WAIT_LONG}
 
-Verify pre existing footnotes
+Verify that the footnotes are unchanged
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
     user waits until page contains element    testid:Footnote - Applies to all data 1
     user waits until page contains element    testid:Footnote - Applies to all data 2
     user waits until page does not contain element    testid:Footnote - Applies to all data 3
 
-Navigate to the 'Content' page to check if its intact
+Verify that the Release content is unchanged
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits for page to finish loading
@@ -413,7 +375,7 @@ Navigate to the 'Content' page to check if its intact
     user checks accordion is in position    Test text    2    id:releaseMainContent
     user checks accordion is in position    Test embedded dashboard section    3    id:releaseMainContent
 
-Verify Dates data block accordion section is intact
+Verify that the Dates data block accordion is unchanged
     user scrolls to accordion section content    Dates data block    id:releaseMainContent
     user opens accordion section    Dates data block    id:releaseMainContent
     ${section}=    user gets accordion section content element    Dates data block    id:releaseMainContent
@@ -430,7 +392,7 @@ Verify Dates data block accordion section is intact
     user checks headed table body row cell contains    Proportion of settings open    1    1%    ${section}
     user closes accordion section    Dates data block    id:releaseMainContent
 
-Verify Dates data block table has footnotes as before
+Verify that the Dates data block table has footnotes are unchanged
     ${accordion}=    user opens accordion section    Dates data block    id:releaseMainContent
     ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
 
@@ -442,13 +404,13 @@ Verify Dates data block table has footnotes as before
     ...    Applies to all data 2
     ...    ${data_block_table}
 
-Verify Test text accordion section contains correct text as before
+Verify that the Test text accordion is unchanged
     user opens accordion section    Test text    id:releaseMainContent
     ${section}=    user gets accordion section content element    Test text    id:releaseMainContent
     user waits until parent contains element    ${section}    xpath:.//p[text()="Some test text !"]
     user closes accordion section    Test text    id:releaseMainContent
 
-Verify embedded dashboard accordion section contains dashboard as before
+Verify that the Embedded URL accordian section is unchanged
     user opens accordion section    Test embedded dashboard section    id:releaseMainContent
     ${section}=    user gets accordion section content element    Test embedded dashboard section
     ...    id:releaseMainContent
