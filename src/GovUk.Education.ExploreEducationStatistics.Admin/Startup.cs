@@ -86,6 +86,7 @@ using IContentReleaseService = GovUk.Education.ExploreEducationStatistics.Conten
 using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
+using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using IDataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IDataGuidanceService;
 using IGlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IGlossaryService;
 using IMethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
@@ -98,6 +99,7 @@ using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Service
 using IThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IThemeService;
 using MethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyImageService;
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyService;
+using PublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationRepository;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
 using ReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseFileService;
 using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseRepository;
@@ -480,7 +482,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()
                 )
             );
-            services.AddTransient<IPublicationRepository, Services.PublicationRepository>();
+            services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<ILegacyReleaseService, LegacyReleaseService>(provider =>
                 new LegacyReleaseService(

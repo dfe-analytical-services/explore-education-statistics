@@ -32,8 +32,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = new ConfigurationController(GetConfiguration());
             var result = controller.GetConfig();
             var unboxed = result.AssertOkResult();
+
             Assert.Equal(string.Empty, unboxed["AppInsightsKey"]);
             Assert.Equal("http://localhost:3000", unboxed["PublicAppUrl"]);
+
+            var permittedEmbedUrlDomains = unboxed["PermittedEmbedUrlDomains"];
+            var expectedDomains = new []{ "https://department-for-education.shinyapps.io", "https://dfe-analytical-services.github.io" };
+            Assert.IsType<string[]>(permittedEmbedUrlDomains);
+            Assert.Equal(expectedDomains, permittedEmbedUrlDomains);
         }
 
         private static IConfiguration GetConfiguration()
