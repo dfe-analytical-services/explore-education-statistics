@@ -128,14 +128,20 @@ Add test text to second accordion section
     ...    id:releaseMainContent
 
 Add embedded dashboard to third accordion section
-    user adds embedded dashboard to editable accordion section
+    user chooses to embed a URL in editable accordion section
     ...    Test embedded dashboard section
-    ...    Test embedded dashboard title
-    ...    https://department-for-education.shinyapps.io/dfe-shiny-template/
     ...    id:releaseMainContent
 
+    ${modal}=    user updates embedded URL details in modal
+    ...    Test embedded dashboard title
+    ...    https://dfe-analytical-services.github.io/explore-education-statistics
+
+    user clicks button    Save    ${modal}
+    user waits until modal is not visible    Embed a URL
+
+    user waits until page contains element    xpath://iframe[@title="Test embedded dashboard title"]
     select frame    xpath://iframe[@title="Test embedded dashboard title"]
-    user waits until h1 is visible    DfE Analytical Services R-Shiny data dashboard template (h1)    90
+    user waits until h1 is visible    Explore Education Statistics service    %{WAIT_SMALL}
     unselect frame
 
 Add public prerelease access list
@@ -313,13 +319,22 @@ Update second accordion section text for amendment
     ...    id:releaseMainContent
 
 Update embedded dashboard title
-    user updates embedded dashboard in editable accordion section
+    user chooses to update an embedded URL in editable accordion section
     ...    Test embedded dashboard section
-    ...    Amended Test embedded dashboard title
-    ...    https://department-for-education.shinyapps.io/dfe-shiny-template/
     ...    id:releaseMainContent
 
-    user closes accordion section    Test embedded dashboard section    id:releaseMainContent
+    ${modal}=    user updates embedded URL details in modal
+    ...    Amended Test embedded dashboard title
+    ...    https://dfe-analytical-services.github.io/explore-education-statistics/tests/robot-tests
+    ...    Edit embedded URL
+
+    user clicks button    Save    ${modal}
+    user waits until modal is not visible    Edit embedded URL
+
+    user waits until page contains element    xpath://iframe[@title="Amended Test embedded dashboard title"]
+    select frame    xpath://iframe[@title="Amended Test embedded dashboard title"]
+    user waits until h1 is visible    Explore Education Statistics Robot Framework tests    %{WAIT_SMALL}
+    unselect frame
 
 Cancel the release amendment
     [Documentation]    EES-3399
@@ -417,5 +432,5 @@ Verify that the Embedded URL accordion section is unchanged
     user waits until parent contains element    ${section}    xpath:.//iframe[@title="Test embedded dashboard title"]
 
     select frame    xpath://iframe[@title="Test embedded dashboard title"]
-    user waits until h1 is visible    DfE Analytical Services R-Shiny data dashboard template (h1)    %{WAIT_SMALL}
+    user waits until h1 is visible    Explore Education Statistics service    %{WAIT_SMALL}
     unselect frame
