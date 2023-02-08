@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     stopwatch.Restart();
 
                     var filterItems =
-                        _filterItemRepository.GetFilterItemsFromObservationList(observations);
+                        await _filterItemRepository.GetFilterItemsFromObservations(observations);
                     var filterViewModels = FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(filterItems,
                         releaseSubject.FilterSequence);
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);

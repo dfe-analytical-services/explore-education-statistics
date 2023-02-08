@@ -413,7 +413,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             };
         }
 
-        private ICollection<ObservationFilterItem> GetFilterItems(
+        private List<ObservationFilterItem> GetFilterItems(
             StatisticsDbContext context,
             IReadOnlyList<string> rowValues,
             List<string> colValues,

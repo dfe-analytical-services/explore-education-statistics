@@ -133,8 +133,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(new List<GeographicLevel>()))
                 .Returns(Enumerable.Empty<BoundaryLevel>());
 
-            filterItemRepository.Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(new List<FilterItem>());
+            filterItemRepository.Setup(s => s.GetFilterItemsFromObservations(observations))
+                .ReturnsAsync(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     release.Id,
@@ -310,8 +310,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     _regionsBoundaryLevel
                 });
 
-            filterItemRepository.Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(new List<FilterItem>());
+            filterItemRepository.Setup(s => s.GetFilterItemsFromObservations(observations))
+                .ReturnsAsync(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     release.Id,
@@ -533,8 +533,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(new List<BoundaryLevel>());
 
             filterItemRepository
-                .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(new List<FilterItem>());
+                .Setup(s => s.GetFilterItemsFromObservations(observations))
+                .ReturnsAsync(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     release.Id,
@@ -771,8 +771,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(ListOf(_regionsBoundaryLevel));
 
             filterItemRepository
-                .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(new List<FilterItem>());
+                .Setup(s => s.GetFilterItemsFromObservations(observations))
+                .ReturnsAsync(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     release.Id,
