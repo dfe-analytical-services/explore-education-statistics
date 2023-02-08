@@ -37,6 +37,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -591,6 +593,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUserInviteRepository, UserInviteRepository>();
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
+            services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
             services.AddTransient(provider => GetBlobStorageService(provider, "CoreStorage"));
             services.AddTransient<ITableStorageService, TableStorageService>(_ =>
                 new TableStorageService(

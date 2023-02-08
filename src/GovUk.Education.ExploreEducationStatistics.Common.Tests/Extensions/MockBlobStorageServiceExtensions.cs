@@ -117,18 +117,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             this Mock<IBlobStorageService> service,
             IBlobContainer container,
             string path,
-            string blobText)
+            string blobText,
+            CancellationToken cancellationToken = default)
         {
-            return service.Setup(s => s.DownloadBlobText(container, path))
+            return service.Setup(s =>
+                    s.DownloadBlobText(container, path, cancellationToken))
                 .ReturnsAsync(blobText);
         }
 
         public static IReturnsResult<IBlobStorageService> SetupDownloadBlobTextNotFound(
             this Mock<IBlobStorageService> service,
             IBlobContainer container,
-            string path)
+            string path,
+            CancellationToken cancellationToken = default)
         {
-            return service.Setup(s => s.DownloadBlobText(container, path))
+            return service.Setup(s =>
+                    s.DownloadBlobText(container, path, cancellationToken))
                 .ThrowsAsync(new StorageException(new RequestResult
                 {
                     HttpStatusCode = (int) HttpStatusCode.NotFound

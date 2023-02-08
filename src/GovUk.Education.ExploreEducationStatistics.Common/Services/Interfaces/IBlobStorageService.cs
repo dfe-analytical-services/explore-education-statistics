@@ -90,11 +90,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
             int? bufferSize = null,
             CancellationToken cancellationToken = default);
 
-        public Task<string> DownloadBlobText(IBlobContainer containerName, string path);
+        public Task<string> DownloadBlobText(
+            IBlobContainer containerName,
+            string path,
+            CancellationToken cancellationToken = default);
 
-        Task<object?> GetDeserializedJson(IBlobContainer containerName, string path, Type target);
+        Task<object?> GetDeserializedJson(
+            IBlobContainer containerName,
+            string path,
+            Type target,
+            CancellationToken cancellationToken = default);
 
-        Task<T?> GetDeserializedJson<T>(IBlobContainer containerName, string path)
+        Task<T?> GetDeserializedJson<T>(
+            IBlobContainer containerName,
+            string path,
+            CancellationToken cancellationToken = default)
             where T : class;
 
         public class CopyDirectoryOptions

@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             response.SetupGet(r => r.Value)
                 .Returns(BlobDownloadResult(BinaryData.FromString(json)));
 
-            blobClient.Setup(s => s.DownloadContentAsync())
+            blobClient.Setup(s => s.DownloadContentAsync(default))
                 .ReturnsAsync(response.Object);
 
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
@@ -140,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             response.SetupGet(r => r.Value)
                 .Returns(BlobDownloadResult(BinaryData.FromString(json)));
 
-            blobClient.Setup(s => s.DownloadContentAsync())
+            blobClient.Setup(s => s.DownloadContentAsync(default))
                 .ReturnsAsync(response.Object);
 
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
@@ -176,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             response.SetupGet(r => r.Value)
                 .Returns(BlobDownloadResult(BinaryData.FromString(json)));
 
-            blobClient.Setup(s => s.DownloadContentAsync())
+            blobClient.Setup(s => s.DownloadContentAsync(default))
                 .ReturnsAsync(response.Object);
 
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
@@ -209,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             response.SetupGet(r => r.Value)
                 .Returns(BlobDownloadResult(BinaryData.FromString("")));
 
-            blobClient.Setup(s => s.DownloadContentAsync())
+            blobClient.Setup(s => s.DownloadContentAsync(default))
                 .ReturnsAsync(response.Object);
 
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
