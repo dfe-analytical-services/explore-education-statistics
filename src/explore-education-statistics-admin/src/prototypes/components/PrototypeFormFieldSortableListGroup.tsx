@@ -136,7 +136,7 @@ function FormFieldSortableListGroup<FormValues>({
                       </>
                     }
                     legendSize="s"
-                    name={`${name}[${index}]`}
+                    name={`${name as string}[${index}]`}
                     readOnly={activeList !== index}
                   />
                 </div>
@@ -190,7 +190,10 @@ function FormFieldSortableListGroup<FormValues>({
                 const key = `group-${index}`;
                 return (
                   <div className={styles.groupContainer} key={key}>
-                    <Draggable draggableId={`${name}-${index}`} index={index}>
+                    <Draggable
+                      draggableId={`${name as string}-${index}`}
+                      index={index}
+                    >
                       {(draggableProvided, draggableSnapshot) => (
                         <div
                           // eslint-disable-next-line react/jsx-props-no-spreading
@@ -220,7 +223,7 @@ function FormFieldSortableListGroup<FormValues>({
                               </>
                             }
                             legendSize="s"
-                            name={`${name}[${index}]`}
+                            name={`${name as string}[${index}]`}
                             readOnly
                           />
                         </div>
