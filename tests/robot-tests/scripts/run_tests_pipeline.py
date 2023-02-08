@@ -29,7 +29,7 @@ def run_tests_pipeline():
 
     run_tests_command = f"pipenv run python run_tests.py --admin-pass {args.admin_pass} --analyst-pass {args.analyst_pass} --expiredinvite-pass {args.expiredinvite_pass} --env {args.env} --file {args.file} --ci --processes {args.processes} --enable-slack-notifications"
 
-    if args.rerun_failed_suites is not None:
+    if args.rerun_failed_suites:
         run_tests_command += " --rerun-failed-suites"
 
     subprocess.check_call(run_tests_command, shell=True)
