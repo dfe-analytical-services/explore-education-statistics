@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -16,6 +17,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
         private readonly LocalAuthority _nottingham = new("E06000018", "", "Nottingham");
 
         private readonly List<string> _countryRegionLaHierarchy = ListOf("Country", "Region");
+
+        [Fact]
+        public void GetAttributes()
+        {
+            var location = new Location
+            {
+                Id = Guid.NewGuid(),
+                Country = _england,
+                Region = _northWest,
+                LocalAuthority = _nottingham,
+                GeographicLevel = GeographicLevel.LocalAuthority
+            };
+
+            Assert.Equal(3, location.GetAttributes().Count());
+
+            var attributes = location.GetAttributes().ToHashSet();
+            Assert.Contains(_england, attributes);
+            Assert.Contains(_northWest, attributes);
+            Assert.Contains(_nottingham, attributes);
+        }
 
         [Fact]
         public void GetLocationAttributesHierarchical_NoLocations()
@@ -61,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
         public void GetLocationAttributesHierarchical_GeographicLevelsHaveNoRelevantHierarchy()
         {
             // Test a scenario where hierarchies are defined but none are relevant to the Subject data
-            var locations = ListOf(new Location 
+            var locations = ListOf(new Location
                 {
                     Id = Guid.NewGuid(),
                     Country = _england,
@@ -189,7 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             /*
              * Test a scenario where all Observations have Locations that don't have attributes present in the hierarchy.
              * E.g a Country-Region-LA hierarchy is defined for the LA level but no Locations have Country or Region:
-             * 
+             *
              * geographic_level    country_code    country_name    region_code    region_name    la_code    la_name
              * ====================================================================================================
              * Local authority                                                                   E06000015  Derby
@@ -225,7 +246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             var localAuthorities = result[GeographicLevel.LocalAuthority];
             Assert.Single(localAuthorities);
 
-            // Country attribute at depth 1 is empty as not defined for any of the LA data 
+            // Country attribute at depth 1 is empty as not defined for any of the LA data
             Assert.Equal(new Country(null, null), localAuthorities[0].Attribute);
             Assert.Null(localAuthorities[0].LocationId);
             Assert.Single(localAuthorities[0].Children);
@@ -250,7 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             /*
              * Test a scenario where *some* Observations have Locations that don't have attributes present in the hierarchy.
              * E.g a Country-Region-LA hierarchy is defined for the LA level but Derby appears with and without a Region.
-             * 
+             *
              * geographic_level    country_code    country_name    region_code    region_name    la_code    la_name
              * ====================================================================================================
              * Local authority     E92000001       England         E12000004      East Midlands  E06000015  Derby
@@ -321,7 +342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
             Assert.Equal(new Region(null, null), localAuthorities[0].Children[1].Attribute);
             Assert.Null(localAuthorities[0].Children[1].LocationId);
             Assert.Single(localAuthorities[0].Children[1].Children);
-            
+
             Assert.Equal(_derby, localAuthorities[0].Children[1].Children[0].Attribute);
             Assert.Equal(locations[1].Id, localAuthorities[0].Children[1].Children[0].LocationId);
             Assert.Empty(localAuthorities[0].Children[1].Children[0].Children);
