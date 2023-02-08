@@ -13,11 +13,11 @@ public static class FilterGeneratorExtensions
 
     public static Generator<Filter> DefaultFilter(
         this DataFixture fixture,
-        int filterGroupCount, int filterItemCount)
+        int filterGroupCount,
+        int filterItemCount)
         => fixture
             .DefaultFilter()
-                .WithFilterGroups(_ => fixture.DefaultFilterGroup()
-                    .WithFilterItems(_ => fixture.DefaultFilterItem().Generate(filterItemCount))
+            .WithFilterGroups(_ => fixture.DefaultFilterGroup(filterItemCount: filterItemCount)
                 .Generate(filterGroupCount));
 
     public static Generator<Filter> WithDefaults(this Generator<Filter> generator)
