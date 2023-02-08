@@ -1,6 +1,6 @@
 import Button from '@common/components/Button';
 import { FormFieldset } from '@common/components/form';
-import { useFormContext } from '@common/components/form/contexts/FormContext';
+import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import DragIcon from '@admin/prototypes/components/PrototypeDragIcon';
 import FormFieldSortableList from '@admin/prototypes/components/PrototypeFormFieldSortableList';
 import styles from '@admin/prototypes/components/PrototypeFormFieldSortableListGroup.module.scss';
@@ -112,8 +112,8 @@ function FormFieldSortableListGroup<FormValues>({
   onMoveGroupToOtherAxis,
   onReorderingList,
 }: Props<FormValues>) {
-  const { prefixFormId, fieldId } = useFormContext();
-  const id = customId ? prefixFormId(customId) : fieldId(name as string);
+  const { fieldId } = useFormIdContext();
+  const id = fieldId(name as string, customId);
   const [field, meta] = useField(name as string);
   const [activeList, setActiveList] = useState<number | undefined>(undefined);
 

@@ -1,16 +1,14 @@
-import { FormFieldTextInput } from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
 import Yup from '@common/validation/yup';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Field, Formik } from 'formik';
-import noop from 'lodash/noop';
 import React from 'react';
-import Form from '../Form';
 
 describe('Form', () => {
   test('renders error summary from form errors when form is submitted', async () => {
     const { container } = render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: '',
           lastName: '',
@@ -19,13 +17,12 @@ describe('Form', () => {
           firstName: Yup.string().required('First name is required'),
           lastName: Yup.string().required('Last name is required'),
         })}
-        onSubmit={() => {}}
       >
-        <Form id="test-form">
+        <RHFForm id="test-form" onSubmit={Promise.resolve}>
           The form
           <button type="submit">Submit</button>
-        </Form>
-      </Formik>,
+        </RHFForm>
+      </FormProvider>,
     );
 
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -46,7 +43,7 @@ describe('Form', () => {
 
   test('does not render errors for fields that do not have errors', async () => {
     const { container } = render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: '',
           lastName: 'Lastname',
@@ -55,13 +52,12 @@ describe('Form', () => {
           firstName: Yup.string().required('First name is required'),
           lastName: Yup.string().required('Last name is required'),
         })}
-        onSubmit={() => {}}
       >
-        <Form id="test-form">
+        <RHFForm id="test-form" onSubmit={Promise.resolve}>
           The form
           <button type="submit">Submit</button>
-        </Form>
-      </Formik>,
+        </RHFForm>
+      </FormProvider>,
     );
 
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -78,7 +74,7 @@ describe('Form', () => {
 
   test('renders nested error messages', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           address: {
             line1: '',
@@ -89,13 +85,12 @@ describe('Form', () => {
             line1: Yup.string().required('Line 1 of address is required'),
           }),
         })}
-        onSubmit={() => {}}
       >
-        <Form id="test-form">
+        <RHFForm id="test-form" onSubmit={Promise.resolve}>
           The form
           <button type="submit">Submit</button>
-        </Form>
-      </Formik>,
+        </RHFForm>
+      </FormProvider>,
     );
 
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -110,7 +105,7 @@ describe('Form', () => {
 
   test('does not render nested error messages for fields that do not have errors', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           address: {
             line1: 'Line 1',
@@ -123,13 +118,12 @@ describe('Form', () => {
             line2: Yup.string().required('Line 2 of address is required'),
           }),
         })}
-        onSubmit={() => {}}
       >
-        <Form id="test-form">
+        <RHFForm id="test-form" onSubmit={Promise.resolve}>
           The form
           <button type="submit">Submit</button>
-        </Form>
-      </Formik>,
+        </RHFForm>
+      </FormProvider>,
     );
 
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -145,50 +139,52 @@ describe('Form', () => {
   });
 
   test('calls `onSubmit` handler when form is submitted successfully', async () => {
-    const handleSubmit = jest.fn();
+    const handleSubmitForm = jest.fn();
 
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
           firstName: Yup.string().required(),
         })}
-        onSubmit={handleSubmit}
       >
-        <Form id="test-form">
+        <RHFForm id="test-form" onSubmit={handleSubmitForm}>
           The form
           <button type="submit">Submit</button>
-        </Form>
-      </Formik>,
+        </RHFForm>
+      </FormProvider>,
     );
 
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledTimes(1);
+      expect(handleSubmitForm).toHaveBeenCalledTimes(1);
     });
   });
 
   test('renders submit error', async () => {
     const { container } = render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
           firstName: Yup.string().required(),
         })}
-        onSubmit={() => {
-          throw new Error('Something went wrong');
-        }}
       >
-        <Form id="test-form" showSubmitError>
+        <RHFForm
+          id="test-form"
+          showSubmitError
+          onSubmit={() => {
+            throw new Error('Something went wrong');
+          }}
+        >
           The form
           <button type="submit">Submit</button>
-        </Form>
-      </Formik>,
+        </RHFForm>
+      </FormProvider>,
     );
 
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -209,26 +205,25 @@ describe('Form', () => {
     });
 
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
           firstName: Yup.string().required(),
         })}
-        onSubmit={onSubmit}
       >
-        <Form id="test-form" showSubmitError>
+        <RHFForm id="test-form" showSubmitError onSubmit={onSubmit}>
           The form
           <button type="submit">Submit</button>
-        </Form>
-      </Formik>,
+        </RHFForm>
+      </FormProvider>,
     );
 
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.queryByText('Something went wrong')).toBeInTheDocument();
+      expect(screen.getByText('Something went wrong')).toBeInTheDocument();
     });
 
     // Stop the onSubmit from throwing error
@@ -245,36 +240,44 @@ describe('Form', () => {
 
   test('removes submit error when form is reset', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
           firstName: Yup.string().required(),
         })}
-        onSubmit={() => {
-          throw new Error('Something went wrong');
-        }}
       >
-        {formik => (
-          <Form id="test-form" showSubmitError>
+        {({ reset }) => (
+          <RHFForm
+            id="test-form"
+            showSubmitError
+            onSubmit={() => {
+              throw new Error('Something went wrong');
+            }}
+          >
             The form
             <button type="submit">Submit</button>
-            <button type="button" onClick={formik.handleReset}>
+            <button
+              type="button"
+              onClick={() => {
+                reset();
+              }}
+            >
               Reset form
             </button>
-          </Form>
+          </RHFForm>
         )}
-      </Formik>,
+      </FormProvider>,
     );
 
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.queryByText('Something went wrong')).toBeInTheDocument();
+      expect(screen.getByText('Something went wrong')).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByText('Reset form'));
+    userEvent.click(screen.getByText('Reset form'));
 
     await waitFor(() => {
       expect(
@@ -285,99 +288,113 @@ describe('Form', () => {
 
   test('removes submit error when form values are changed', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
           firstName: Yup.string().required(),
         })}
-        onSubmit={() => {
-          throw new Error('Something went wrong');
-        }}
       >
-        <Form id="test-form" showSubmitError>
-          <label htmlFor="firstName">Firstname</label>
-          <Field name="firstName" type="text" id="firstName" />
-
-          <button type="submit">Submit</button>
-        </Form>
-      </Formik>,
+        {({ register }) => (
+          <RHFForm
+            id="test-form"
+            showSubmitError
+            onSubmit={() => {
+              throw new Error('Something went wrong');
+            }}
+          >
+            <label htmlFor="firstName">Firstname</label>
+            <input
+              type="text"
+              id="firstName"
+              // eslint-disable-next-line react/jsx-props-no-spreading
+              {...register('firstName')}
+            />
+            <button type="submit">Submit</button>
+          </RHFForm>
+        )}
+      </FormProvider>,
     );
 
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.queryByText('Something went wrong')).toBeInTheDocument();
+      expect(screen.getByText('Something went wrong')).toBeInTheDocument();
     });
 
-    fireEvent.change(screen.getByLabelText('Firstname'), {
-      target: {
-        value: 'Another firstname',
-      },
-    });
+    userEvent.type(screen.getByLabelText('Firstname'), 'Another firstname');
 
-    expect(screen.queryByText('Something went wrong')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.queryByText('Something went wrong'),
+      ).not.toBeInTheDocument();
+    });
   });
 
   test('focuses error summary on submit', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: '',
         }}
         validationSchema={Yup.object({
           firstName: Yup.string().required(),
         })}
-        onSubmit={noop}
       >
-        <Form id="test-form" showSubmitError>
-          <FormFieldTextInput
-            id="test-form-firstName"
-            label="First name"
-            name="firstName"
-          />
-
-          <button type="submit">Submit</button>
-        </Form>
-      </Formik>,
+        {({ register }) => (
+          <RHFForm id="test-form" showSubmitError onSubmit={Promise.resolve}>
+            <input
+              id="test-form-firstName"
+              // eslint-disable-next-line react/jsx-props-no-spreading
+              {...register('firstName')}
+            />
+            <button type="submit">Submit</button>
+          </RHFForm>
+        )}
+      </FormProvider>,
     );
 
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveFocus();
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
+
+    expect(screen.getByRole('alert')).toHaveFocus();
   });
 
   test('does not re-focus error summary when changing input', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: '',
         }}
         validationSchema={Yup.object({
           firstName: Yup.string().required(),
         })}
-        onSubmit={noop}
       >
-        <Form id="test-form" showSubmitError>
-          <FormFieldTextInput
-            id="test-form-firstName"
-            label="First name"
-            name="firstName"
-          />
-
-          <button type="submit">Submit</button>
-        </Form>
-      </Formik>,
+        {({ register }) => (
+          <RHFForm id="test-form" showSubmitError onSubmit={Promise.resolve}>
+            <label htmlFor="firstName">First name</label>
+            <input
+              id="firstName"
+              // eslint-disable-next-line react/jsx-props-no-spreading
+              {...register('firstName')}
+            />
+            <button type="submit">Submit</button>
+          </RHFForm>
+        )}
+      </FormProvider>,
     );
 
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveFocus();
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
+
+    expect(screen.getByRole('alert')).toHaveFocus();
 
     const input = screen.getByLabelText('First name');
 
@@ -398,34 +415,35 @@ describe('Form', () => {
 
   test('re-focuses error summary on re-submit', async () => {
     render(
-      <Formik
+      <FormProvider
         initialValues={{
           firstName: '',
         }}
         validationSchema={Yup.object({
           firstName: Yup.string().required(),
         })}
-        onSubmit={noop}
       >
-        {() => (
-          <Form id="test-form" showSubmitError>
-            <FormFieldTextInput
-              id="test-form-firstName"
-              label="First name"
-              name="firstName"
+        {({ register }) => (
+          <RHFForm id="test-form" showSubmitError onSubmit={Promise.resolve}>
+            <label htmlFor="firstName">First name</label>
+            <input
+              id="firstName"
+              // eslint-disable-next-line react/jsx-props-no-spreading
+              {...register('firstName')}
             />
-
             <button type="submit">Submit</button>
-          </Form>
+          </RHFForm>
         )}
-      </Formik>,
+      </FormProvider>,
     );
 
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveFocus();
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
+
+    expect(screen.getByRole('alert')).toHaveFocus();
 
     screen.getByLabelText('First name').focus();
     expect(screen.getByRole('alert')).not.toHaveFocus();
@@ -433,7 +451,9 @@ describe('Form', () => {
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveFocus();
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
+
+    expect(screen.getByRole('alert')).toHaveFocus();
   });
 });
