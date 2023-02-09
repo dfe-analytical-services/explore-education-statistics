@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
@@ -46,7 +47,8 @@ public static class FilterGeneratorExtensions
             .SetDefault(f => f.Id)
             .SetDefault(f => f.Label)
             .SetDefault(f => f.Hint)
-            .SetDefault(f => f.Name);
+            .SetDefault(f => f.Name)
+            .Set(f => f.Name, (_, f) => f.Name.SnakeCase());
 
     public static InstanceSetters<Filter> SetSubject(
         this InstanceSetters<Filter> setters,

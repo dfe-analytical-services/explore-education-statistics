@@ -786,11 +786,11 @@ public class SubjectCsvMetaServiceTests
                 "old_la_code",
                 "region_name",
                 "region_code",
-                @$"""{filters[1].Name}""",
-                @$"""{filters[0].Name}""",
-                @$"""{indicators[2].Name}""",
-                @$"""{indicators[0].Name}""",
-                @$"""{indicators[1].Name}"""
+                filters[1].Name,
+                filters[0].Name,
+                indicators[2].Name,
+                indicators[0].Name,
+                indicators[1].Name
             );
 
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
@@ -918,11 +918,11 @@ public class SubjectCsvMetaServiceTests
                 "geographic_level",
                 "country_code",
                 "country_name",
-                @$"""{filters[0].Name}""",
-                @$"""{indicators[0].Name}""",
-                @$"""{indicators[1].Name}""",
-                @$"""{indicators[2].Name}""",
-                @$"""{indicators[3].Name}"""
+                filters[0].Name,
+                indicators[0].Name,
+                indicators[1].Name,
+                indicators[2].Name,
+                indicators[3].Name
             );
 
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
@@ -1043,9 +1043,9 @@ public class SubjectCsvMetaServiceTests
                 "geographic_level",
                 "country_code",
                 "country_name",
-                @$"""{filters[0].Name}""",
-                @$"""{indicators[0].Name}""",
-                @$"""{indicators[1].Name}"""
+                filters[0].Name,
+                indicators[0].Name,
+                indicators[1].Name
             );
 
             var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
@@ -1165,10 +1165,10 @@ public class SubjectCsvMetaServiceTests
                 "geographic_level",
                 "country_code",
                 "country_name",
-                @$"""{filters[0].Name}""",
+                filters[0].Name,
                 "another_header",
-                @$"""{indicators[0].Name}""",
-                @$"""{indicators[1].Name}""",
+                indicators[0].Name,
+                indicators[1].Name,
                 "last_header"
             );
 
