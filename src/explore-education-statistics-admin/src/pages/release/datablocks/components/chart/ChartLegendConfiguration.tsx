@@ -39,7 +39,7 @@ import Yup from '@common/validation/yup';
 import { Formik, FormikTouched } from 'formik';
 import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
-
+import omit from 'lodash/omit';
 import toPath from 'lodash/toPath';
 import upperFirst from 'lodash/upperFirst';
 import React, { ReactNode, useCallback, useMemo, useRef } from 'react';
@@ -167,8 +167,8 @@ const ChartLegendConfiguration = ({
     return {
       position: true,
       items: initialValues.items.map(item =>
-        mapValues(item, () => true),
-      ) as FormikTouched<LegendItem>[],
+        mapValues(omit(item, 'dataSet'), () => true),
+      ),
     };
   }, [hasSubmitted, initialValues.items]);
 
