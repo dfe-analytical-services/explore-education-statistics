@@ -13,7 +13,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - publish release %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    UI tests - publish release and amend %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Financial Year 3000-01
 ${DATABLOCK_NAME}=      Dates data block name
 
