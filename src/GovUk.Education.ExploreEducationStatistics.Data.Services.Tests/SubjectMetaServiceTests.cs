@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             timePeriodService
                 .Setup(s => s.GetTimePeriods(releaseSubject.SubjectId))
-                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             locationRepository
                 .Setup(s => s.GetDistinctForSubject(releaseSubject.SubjectId))
@@ -218,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             timePeriodService
                 .Setup(s => s.GetTimePeriods(releaseSubject.SubjectId))
-                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             locationRepository
                 .Setup(s => s.GetDistinctForSubject(releaseSubject.SubjectId))
@@ -356,7 +356,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             timePeriodService
                 .Setup(s => s.GetTimePeriods(It.IsAny<IQueryable<Observation>>()))
-                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
@@ -423,7 +423,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             timePeriodService
                 .Setup(s => s.GetTimePeriods(It.IsAny<IQueryable<Observation>>()))
-                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -575,7 +575,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                             .ToList()
                             .Select(o => o.Id)
                             .SequenceEqual(observationsWihMatchingLocations.Select(m => m.Id)))))
-                    .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
+                    .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>
                     {
                         (2012, TimeIdentifier.April),
                         (2012, TimeIdentifier.May),

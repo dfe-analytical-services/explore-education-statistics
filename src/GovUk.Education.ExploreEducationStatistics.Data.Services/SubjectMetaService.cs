@@ -153,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     await InvalidateCachedReleaseSubjectMetadata(releaseId, subjectId);
                 });
         }
-        
+
         public async Task<ReleaseSubject?> GetReleaseSubjectForLatestPublishedVersion(Guid subjectId)
         {
             // Find all versions of a Release that this Subject is linked to.
@@ -183,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             {
                 return null;
             }
-            
+
             // Finally, now that we have identified the latest Release version linked to this Subject, return the
             // appropriate ReleaseSubject record.
             return releaseSubjects
@@ -197,7 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 Filters = await GetFilters(releaseSubject),
                 Indicators = await GetIndicators(releaseSubject),
                 Locations = await GetLocations(releaseSubject.SubjectId),
-                TimePeriod = GetTimePeriods(releaseSubject.SubjectId)
+                TimePeriod = await GetTimePeriods(releaseSubject.SubjectId)
             };
         }
 
@@ -229,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         .AsNoTracking()
                         .Where(o => o.SubjectId == query.SubjectId && query.LocationIds.Contains(o.LocationId));
 
-                    var timePeriods = GetTimePeriods(observations);
+                    var timePeriods = await GetTimePeriods(observations);
 
                     _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
 
@@ -277,15 +277,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return FiltersMetaViewModelBuilder.BuildFilters(filters, releaseSubject.FilterSequence);
         }
 
-        private TimePeriodsMetaViewModel GetTimePeriods(Guid subjectId)
+        private async Task<TimePeriodsMetaViewModel> GetTimePeriods(Guid subjectId)
         {
-            var timePeriods = _timePeriodService.GetTimePeriods(subjectId);
+            var timePeriods = await _timePeriodService.GetTimePeriods(subjectId);
             return BuildTimePeriodsViewModels(timePeriods);
         }
 
-        private TimePeriodsMetaViewModel GetTimePeriods(IQueryable<Observation> observations)
+        private async Task<TimePeriodsMetaViewModel> GetTimePeriods(IQueryable<Observation> observations)
         {
-            var timePeriods = _timePeriodService.GetTimePeriods(observations);
+            var timePeriods = await _timePeriodService.GetTimePeriods(observations);
             return BuildTimePeriodsViewModels(timePeriods);
         }
 
