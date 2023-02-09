@@ -22,6 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             amendment.ApprovalStatus = ReleaseApprovalStatus.Draft;
             amendment.NotifiedOn = null;
             amendment.NotifySubscribers = false;
+            amendment.UpdatePublishedDate = false;
             amendment.Created = createdDate;
             amendment.CreatedById = createdByUserId;
             amendment.Version = release.Version + 1;

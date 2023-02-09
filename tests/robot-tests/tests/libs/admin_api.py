@@ -107,7 +107,6 @@ def user_creates_test_publication_via_api(publication_name: str, topic_id: str =
 
 
 def user_adds_user_invite_via_api(user_email: str, role_name: str, created_date: str = None):
-
     response = admin_client.post(
         f"/api/user-management/invites",
         {
@@ -122,7 +121,6 @@ def user_adds_user_invite_via_api(user_email: str, role_name: str, created_date:
 
 
 def user_adds_release_role_to_user_via_api(user_email: str, release_id: str, role_name: str = None):
-
     user_id = _get_user_details_via_api(user_email)["id"]
 
     response = admin_client.post(
@@ -138,7 +136,6 @@ def user_adds_release_role_to_user_via_api(user_email: str, release_id: str, rol
 
 
 def user_adds_publication_role_to_user_via_api(user_email: str, publication_id: str, role_name: str = None):
-
     user_id = _get_user_details_via_api(user_email)["id"]
 
     response = admin_client.post(
@@ -206,8 +203,14 @@ def user_creates_test_release_via_api(
     return response.json()["id"]
 
 
-def _get_user_details_via_api(user_email: str):
+def user_updates_release_published_date_via_api(release_id: str, published: datetime) -> None:
+    response = admin_client.patch(f"/api/releases/{release_id}/published", {"published": published.isoformat()})
+    assert (
+        response.status_code < 300
+    ), f"Updating release published date failed with {response.status_code} and {response.text}"
 
+
+def _get_user_details_via_api(user_email: str):
     users = admin_client.get("/api/user-management/users").json()
 
     matching_users = list(filter(lambda user: user["email"] == user_email, users))
@@ -218,7 +221,6 @@ def _get_user_details_via_api(user_email: str):
 
 
 def _get_prerelease_user_details_via_api(user_email: str):
-
     users = admin_client.get("/api/user-management/pre-release").json()
 
     matching_users = list(filter(lambda user: user["email"] == user_email, users))
@@ -229,7 +231,6 @@ def _get_prerelease_user_details_via_api(user_email: str):
 
 
 def _get_global_role_id(role_name: str):
-
     response = admin_client.get("/api/user-management/roles")
     assert (
         response.status_code < 300
@@ -244,7 +245,6 @@ def _get_global_role_id(role_name: str):
 
 
 def _get_user_invite(user_email: str):
-
     response = admin_client.get("/api/user-management/invites")
     assert response.status_code < 300, f"Getting list of invites failed with {response.status_code} and {response.text}"
 

@@ -15,6 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task<List<File>> GetFiles(Guid methodologyVersionId, params FileType[] types);
 
-        Task SetPublishedDatesByPublication(Guid publicationId, DateTime published);
+        Task SetPublishedDatesIfApplicable(Guid publicationId);
     }
 }

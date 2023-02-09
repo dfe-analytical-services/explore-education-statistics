@@ -90,6 +90,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public DateTime? NotifiedOn { get; set; }
 
+        public bool UpdatePublishedDate { get; set; }
+
         public Release? PreviousVersion { get; set; }
 
         public bool SoftDeleted { get; set; }

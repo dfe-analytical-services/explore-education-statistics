@@ -556,7 +556,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(release);
+                await contentDbContext.Releases.AddAsync(release);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -591,7 +591,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(release);
+                await contentDbContext.Releases.AddAsync(release);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -613,13 +613,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetRelease_AmendedReleaseNotYetPublishedHasPublishedDateOfPreviousVersion()
+        public async Task GetRelease_AmendedReleaseAndUpdatePublishedDateIsFalse()
         {
+            var previousRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2023",
+                TimePeriodCoverage = AcademicYear,
+                Published = DateTime.UtcNow.AddDays(-1),
+                PreviousVersionId = null,
+                Version = 0
+            };
+
+            var release = new Release
+            {
+                ReleaseName = "2023",
+                TimePeriodCoverage = AcademicYear,
+                Published = null,
+                PreviousVersionId = previousRelease.Id,
+                Version = 1,
+                UpdatePublishedDate = false
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(Releases);
+                await contentDbContext.Releases.AddRangeAsync(previousRelease, release);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -627,26 +647,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupReleaseService(contentDbContext: contentDbContext);
 
-                // The expected publish date for this release should be ignored
+                // Test scenario of the publisher getting an unpublished amended release to cache it in advance of
+                // publishing it.
+                // An update to the published date *has not* been requested.
                 var expectedPublishDate = DateTime.Today.Add(new TimeSpan(9, 30, 0));
+                var result = await service.GetRelease(release.Id, expectedPublishDate);
 
-                var result = await service.GetRelease(Release1V3NotPublished.Id, expectedPublishDate);
                 var viewModel = result.AssertRight();
 
-                Assert.Equal(Release1V3NotPublished.Id, viewModel.Id);
-                Assert.Equal("Academic Year Q1 2018/19", viewModel.Title);
+                Assert.Equal(release.Id, viewModel.Id);
                 // Published date in the view model should match the published date of the previous version
-                Assert.Equal(Release1V1.Published, viewModel.Published);
-                Assert.Null(viewModel.KeyStatisticsSection);
-                Assert.Null(viewModel.SummarySection);
-                Assert.Null(viewModel.RelatedDashboardsSection);
-                Assert.Empty(viewModel.Content);
+                Assert.Equal(previousRelease.Published, viewModel.Published);
+            }
+        }
 
-                Assert.Empty(viewModel.DownloadFiles);
+        [Fact]
+        public async Task GetRelease_AmendedReleaseAndUpdatePublishedDateIsTrue()
+        {
+            var previousRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2023",
+                TimePeriodCoverage = AcademicYear,
+                Published = DateTime.UtcNow.AddDays(-1),
+                PreviousVersionId = null,
+                Version = 0
+            };
 
-                Assert.Equal("Release 1 v3 Guidance", viewModel.DataGuidance);
+            var release = new Release
+            {
+                ReleaseName = "2023",
+                TimePeriodCoverage = AcademicYear,
+                Published = null,
+                PreviousVersionId = previousRelease.Id,
+                Version = 1,
+                UpdatePublishedDate = true
+            };
 
-                Assert.Empty(viewModel.RelatedInformation);
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddRangeAsync(previousRelease, release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseService(contentDbContext: contentDbContext);
+
+                // Test scenario of the publisher getting an unpublished amended release to cache it in advance of
+                // publishing it.
+                // An update to the published date *has* been requested.
+                var expectedPublishDate = DateTime.Today.Add(new TimeSpan(9, 30, 0));
+                var result = await service.GetRelease(release.Id, expectedPublishDate);
+
+                var viewModel = result.AssertRight();
+
+                Assert.Equal(release.Id, viewModel.Id);
+                // Published date in the view model should match the expected publish date
+                Assert.Equal(expectedPublishDate, viewModel.Published);
             }
         }
 

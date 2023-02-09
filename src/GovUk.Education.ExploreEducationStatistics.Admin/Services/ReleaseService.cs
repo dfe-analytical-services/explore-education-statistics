@@ -116,9 +116,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _ => await ValidateReleaseSlugUniqueToPublication(releaseCreate.Slug, releaseCreate.PublicationId))
                 .OnSuccess(async () =>
                 {
-                    var release = _mapper.Map<Release>(releaseCreate);
-
-                    release.Id = _guidGenerator.NewGuid();
+                    var release = new Release
+                    {
+                        Id = _guidGenerator.NewGuid(),
+                        PublicationId =  releaseCreate.PublicationId,
+                        Slug = releaseCreate.Slug,
+                        TimePeriodCoverage = releaseCreate.TimePeriodCoverage,
+                        ReleaseName = releaseCreate.Year.ToString(),
+                        Type = releaseCreate.Type,
+                        ApprovalStatus = ReleaseApprovalStatus.Draft
+                    };
 
                     if (releaseCreate.TemplateReleaseId.HasValue)
                     {

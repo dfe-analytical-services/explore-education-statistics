@@ -229,12 +229,14 @@ def format_uk_to_local_datetime(uk_local_datetime: str, strf: str) -> str:
 
 
 def get_current_datetime(strf: str, offset_days: int = 0) -> str:
-    now = datetime.datetime.now() + datetime.timedelta(days=offset_days)
+    return format_datetime(datetime.datetime.now() + datetime.timedelta(days=offset_days), strf)
 
+
+def format_datetime(datetime: datetime, strf: str) -> str:
     if os.name == "nt":
         strf = strf.replace("%-", "%#")
 
-    return now.strftime(strf)
+    return datetime.strftime(strf)
 
 
 def user_should_be_at_top_of_page():

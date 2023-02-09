@@ -88,11 +88,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .Include(r => r.Updates)
                 .Single(r => r.Id == releaseId);
 
-            if (!release.Live && !expectedPublishDate.HasValue)
-            {
-                expectedPublishDate = DateTime.UtcNow;
-            }
-
             var releaseViewModel = _mapper.Map<ReleaseCacheViewModel>(release);
 
             // Filter content blocks to remove any non-public or unnecessary information
@@ -105,29 +100,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
             releaseViewModel.DownloadFiles = await GetDownloadFiles(release);
 
-            // If the release has no published date yet because it's not live, set the published date in the view model.
-            // This is based on what we expect it to eventually be set as in the database when publishing completes
-            if (!releaseViewModel.Published.HasValue)
-            {
-                if (release.Amendment)
-                {
-                    // For amendments this will be the published date of the previous release
-                    var previousVersion = await _contentDbContext.Releases
-                        .FindAsync(release.PreviousVersionId);
-
-                    if (!previousVersion.Published.HasValue)
-                    {
-                        throw new ArgumentException(
-                            $"Expected Release {previousVersion.Id} to have a Published date as the previous version of Release {release.Id}");
-                    }
-
-                    releaseViewModel.Published = previousVersion.Published;
-                }
-                else
-                {
-                    releaseViewModel.Published = expectedPublishDate;
-                }
-            }
+            // If the view model has no mapped published date because it's not published, set a date
+            // based on what we expect it to be when publishing completes
+            releaseViewModel.Published ??= await _releaseRepository.GetPublishedDate(release.Id,
+                expectedPublishDate ?? DateTime.UtcNow);
 
             return releaseViewModel;
         }

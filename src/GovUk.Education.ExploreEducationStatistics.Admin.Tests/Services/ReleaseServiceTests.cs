@@ -75,7 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 )).AssertRight();
 
                 Assert.Equal("Academic Year 2018/19", result.Title);
-                Assert.Equal(2018, result.Year);
                 Assert.Equal("2018/19", result.YearTitle);
                 Assert.Equal(TimeIdentifier.AcademicYear, result.TimePeriodCoverage);
                 Assert.Equal(ReleaseType.OfficialStatistics, result.Type);
@@ -88,6 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(result.PublishScheduled);
                 Assert.Null(result.Published);
                 Assert.False(result.NotifySubscribers);
+                Assert.False(result.UpdatePublishedDate);
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -107,6 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(actual.NextReleaseDate);
                 Assert.Null(actual.NotifiedOn);
                 Assert.False(actual.NotifySubscribers);
+                Assert.False(actual.UpdatePublishedDate);
             }
         }
 
@@ -230,7 +231,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TemplateReleaseId = templateReleaseId,
                         Year = 2018,
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        PublishScheduled = "2050-01-01",
                         Type = ReleaseType.OfficialStatistics
                     }
                 );
@@ -746,7 +746,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         InternalReleaseNote = "Release note 2 days ago",
                         Created = DateTime.UtcNow.Subtract(TimeSpan.FromDays(2))
                     }
-                }
+                },
+                NotifySubscribers = true,
+                UpdatePublishedDate = true
             };
 
             var publication = new Publication
@@ -800,6 +802,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(viewModel.LatestRelease);
                 Assert.True(viewModel.Live);
                 Assert.False(viewModel.Amendment);
+                Assert.True(viewModel.NotifySubscribers);
+                Assert.True(viewModel.UpdatePublishedDate);
             }
         }
 

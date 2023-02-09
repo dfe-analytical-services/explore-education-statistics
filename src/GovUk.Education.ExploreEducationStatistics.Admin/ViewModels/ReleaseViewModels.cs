@@ -1,15 +1,11 @@
 #nullable enable
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using static System.Globalization.CultureInfo;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.TimePeriodLabelFormatter;
 
@@ -68,6 +64,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public Guid? PreviousVersionId { get; set; }
 
         public ReleasePermissions? Permissions { get; set; }
+
+        public bool UpdatePublishedDate { get; set; }
     }
 
     public record ReleasePermissions
@@ -92,31 +90,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [Required]
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public TimeIdentifier TimePeriodCoverage { get; init; }
-
-        [DateTimeFormatValidator("yyyy-MM-dd")]
-        public string PublishScheduled { get; init; } = string.Empty;
-
-        public DateTime? PublishScheduledDate
-        {
-            get
-            {
-                if (PublishScheduled.IsNullOrEmpty())
-                {
-                    return null;
-                }
-
-                DateTime.TryParseExact(
-                    PublishScheduled,
-                    "yyyy-MM-dd",
-                    InvariantCulture,
-                    DateTimeStyles.None,
-                    out var dateTime
-                );
-                return dateTime.AsStartOfDayUtcForTimeZone();
-            }
-        }
-
-        [PartialDateValidator] public PartialDate? NextReleaseDate { get; set; } = null!;
 
         public string Slug => SlugFromTitle(Title);
 

@@ -113,6 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ApprovalStatus = releaseApprovalStatus,
                 NotifiedOn = DateTime.UtcNow,
                 NotifySubscribers = true,
+                UpdatePublishedDate = true,
                 Version = version,
                 PreviousVersionId = previousVersionReleaseId,
                 Created = createdDate,
@@ -498,6 +499,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(newReleaseId, amendment.Id);
                 Assert.Null(amendment.NotifiedOn);
                 Assert.False(amendment.NotifySubscribers);
+                Assert.False(amendment.UpdatePublishedDate);
                 Assert.Null(amendment.PublishScheduled);
                 Assert.Null(amendment.Published);
                 Assert.Equal(release.Version + 1, amendment.Version);

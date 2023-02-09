@@ -50,6 +50,7 @@ const testRelease: Release = {
   type: 'AdHocStatistics',
   year: 2000,
   yearTitle: '2000/01',
+  updatePublishedDate: false,
 };
 
 const testPublicationContributors: UserReleaseRole[] = [

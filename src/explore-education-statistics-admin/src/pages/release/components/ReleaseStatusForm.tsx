@@ -35,7 +35,7 @@ import Yup from '@common/validation/yup';
 import { endOfDay, format, isValid, parseISO } from 'date-fns';
 import { Formik } from 'formik';
 import { keyBy, mapValues } from 'lodash';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StringSchema } from 'yup';
 
 export interface ReleaseStatusFormValues {
@@ -45,6 +45,7 @@ export interface ReleaseStatusFormValues {
   approvalStatus: ReleaseApprovalStatus;
   notifySubscribers?: boolean;
   internalReleaseNote?: string;
+  updatePublishedDate?: boolean;
 }
 
 export const formId = 'releaseStatusForm';
@@ -87,7 +88,7 @@ interface Props {
   release: Release;
   statusPermissions: ReleaseStatusPermissions;
   onCancel: () => void;
-  onSubmit: (values: ReleaseStatusFormValues) => void;
+  onSubmit: (values: ReleaseStatusFormValues) => Promise<void> | void;
 }
 
 const ReleaseStatusForm = ({
@@ -102,7 +103,14 @@ const ReleaseStatusForm = ({
   const [showScheduleErrorModal, toggleScheduleErrorModal] = useToggle(false);
 
   const handleSubmit = useFormSubmit<ReleaseStatusFormValues>(
-    async ({ approvalStatus, publishMethod, publishScheduled, ...values }) => {
+    async ({
+      approvalStatus,
+      publishMethod,
+      publishScheduled,
+      notifySubscribers,
+      updatePublishedDate,
+      ...values
+    }) => {
       const isApproved = approvalStatus === 'Approved';
 
       try {
@@ -114,6 +122,10 @@ const ReleaseStatusForm = ({
             isApproved && publishScheduled && publishMethod === 'Scheduled'
               ? publishScheduled
               : undefined,
+          notifySubscribers:
+            isApproved && release.amendment ? notifySubscribers : undefined,
+          updatePublishedDate:
+            isApproved && release.amendment ? updatePublishedDate : undefined,
         });
       } catch (err) {
         if (
@@ -130,12 +142,84 @@ const ReleaseStatusForm = ({
     fallbackErrorMapping,
   );
 
+  const validationSchema = useMemo(() => {
+    const schema = Yup.object<ReleaseStatusFormValues>({
+      approvalStatus: Yup.string().required('Choose a status') as StringSchema<
+        ReleaseStatusFormValues['approvalStatus']
+      >,
+      internalReleaseNote: Yup.string().when('approvalStatus', {
+        is: value => ['Approved', 'HigherLevelReview'].includes(value),
+        then: Yup.string().required('Enter an internal note'),
+      }),
+      publishMethod: Yup.string().when('approvalStatus', {
+        is: 'Approved',
+        then: Yup.string().required('Choose when to publish'),
+      }) as StringSchema<ReleaseStatusFormValues['publishMethod']>,
+      publishScheduled: Yup.date().when('publishMethod', {
+        is: 'Scheduled',
+        then: Yup.date()
+          .required('Enter a valid publish date')
+          .test({
+            name: 'validDateIfAfterToday',
+            message: `Publish date cannot be before ${format(
+              new Date(),
+              'do MMMM yyyy',
+            )}`,
+            test(value) {
+              return endOfDay(value) >= endOfDay(new Date());
+            },
+          }),
+      }),
+      nextReleaseDate: Yup.object<PartialDate>({
+        day: Yup.number().notRequired(),
+        month: Yup.number(),
+        year: Yup.number(),
+      })
+        .notRequired()
+        .test({
+          name: 'validDate',
+          message: 'Enter a valid next release date',
+          test(value: PartialDate) {
+            if (isPartialDateEmpty(value)) {
+              return true;
+            }
+
+            if (!isValidPartialDate(value)) {
+              return false;
+            }
+
+            return isValid(parsePartialDateToLocalDate(value));
+          },
+        }),
+    });
+
+    if (release.amendment) {
+      return schema.shape({
+        notifySubscribers: Yup.boolean().when('approvalStatus', {
+          is: value => value === 'Approved',
+          then: Yup.boolean().required(),
+        }),
+        updatePublishedDate: Yup.boolean().when('approvalStatus', {
+          is: value => value === 'Approved',
+          then: Yup.boolean().required(),
+        }),
+      });
+    }
+
+    return schema;
+  }, [release.amendment]);
+
   return (
     <Formik<ReleaseStatusFormValues>
       enableReinitialize
       initialValues={{
         approvalStatus: release.approvalStatus,
-        notifySubscribers: release.notifySubscribers,
+        notifySubscribers: release.amendment
+          ? release.notifySubscribers
+          : undefined,
+        updatePublishedDate: release.amendment
+          ? release.updatePublishedDate
+          : undefined,
         internalReleaseNote: release.latestInternalReleaseNote,
         publishMethod: release.publishScheduled ? 'Scheduled' : undefined,
         publishScheduled: release.publishScheduled
@@ -144,59 +228,7 @@ const ReleaseStatusForm = ({
         nextReleaseDate: release.nextReleaseDate,
       }}
       onSubmit={handleSubmit}
-      validationSchema={Yup.object<ReleaseStatusFormValues>({
-        approvalStatus: Yup.string().required(
-          'Choose a status',
-        ) as StringSchema<ReleaseStatusFormValues['approvalStatus']>,
-        notifySubscribers: Yup.boolean().when('approvalStatus', {
-          is: value => value === 'Approved',
-          then: Yup.boolean().required(),
-        }),
-        internalReleaseNote: Yup.string().when('approvalStatus', {
-          is: value => ['Approved', 'HigherLevelReview'].includes(value),
-          then: Yup.string().required('Enter an internal note'),
-        }),
-        publishMethod: Yup.string().when('approvalStatus', {
-          is: 'Approved',
-          then: Yup.string().required('Choose when to publish'),
-        }) as StringSchema<ReleaseStatusFormValues['publishMethod']>,
-        publishScheduled: Yup.date().when('publishMethod', {
-          is: 'Scheduled',
-          then: Yup.date()
-            .required('Enter a valid publish date')
-            .test({
-              name: 'validDateIfAfterToday',
-              message: `Publish date cannot be before ${format(
-                new Date(),
-                'do MMMM yyyy',
-              )}`,
-              test(value) {
-                return endOfDay(value) >= endOfDay(new Date());
-              },
-            }),
-        }),
-        nextReleaseDate: Yup.object<PartialDate>({
-          day: Yup.number().notRequired(),
-          month: Yup.number(),
-          year: Yup.number(),
-        })
-          .notRequired()
-          .test({
-            name: 'validDate',
-            message: 'Enter a valid next release date',
-            test(value: PartialDate) {
-              if (isPartialDateEmpty(value)) {
-                return true;
-              }
-
-              if (!isValidPartialDate(value)) {
-                return false;
-              }
-
-              return isValid(parsePartialDateToLocalDate(value));
-            },
-          }),
-      })}
+      validationSchema={validationSchema}
     >
       {form => (
         <>
@@ -223,8 +255,9 @@ const ReleaseStatusForm = ({
                 },
               ]}
               onChange={element => {
-                if (element.target.value === 'Approved') {
+                if (release.amendment && element.target.value === 'Approved') {
                   form.setFieldValue('notifySubscribers', true);
+                  form.setFieldValue('updatePublishedDate', false);
                 }
               }}
             />
@@ -238,10 +271,23 @@ const ReleaseStatusForm = ({
             />
 
             {form.values.approvalStatus === 'Approved' && release.amendment && (
-              <FormFieldCheckbox
-                name="notifySubscribers"
-                label="Notify subscribers by email"
-              />
+              <>
+                <FormFieldCheckbox
+                  name="notifySubscribers"
+                  label="Notify subscribers by email"
+                />
+
+                <FormFieldCheckbox<ReleaseStatusFormValues>
+                  name="updatePublishedDate"
+                  label="Update published date"
+                  conditional={
+                    <WarningMessage className="govuk-!-width-two-thirds">
+                      The release's published date in the public view will be
+                      updated once the publication is complete.
+                    </WarningMessage>
+                  }
+                />
+              </>
             )}
 
             {form.values.approvalStatus === 'Approved' && (
@@ -292,10 +338,6 @@ const ReleaseStatusForm = ({
                 disabled={form.isSubmitting}
                 onClick={async e => {
                   e.preventDefault();
-
-                  if (form.values.approvalStatus !== 'Approved') {
-                    form.setFieldValue('notifySubscribers', undefined);
-                  }
 
                   if (
                     form.values.approvalStatus === 'Approved' &&

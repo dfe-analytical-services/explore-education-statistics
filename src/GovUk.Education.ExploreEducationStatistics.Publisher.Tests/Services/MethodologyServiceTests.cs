@@ -1,10 +1,12 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -133,10 +135,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public async Task SetPublishedDatesByPublication_PublishedMethodologyHasPublishedDateSet()
+        public async Task SetPublishedDatesIfApplicable()
         {
             var publicationId = Guid.NewGuid();
-            var published = DateTime.UtcNow;
 
             var methodologyVersion = new MethodologyVersion
             {
@@ -164,21 +165,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository.Object);
 
-                await service.SetPublishedDatesByPublication(publicationId, published);
+                await service.SetPublishedDatesIfApplicable(publicationId);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var actual = await contentDbContext.MethodologyVersions.FindAsync(methodologyVersion.Id);
-                Assert.NotNull(actual);
-                Assert.Equal(published, actual.Published);
+                var actual = await contentDbContext.MethodologyVersions
+                    .SingleAsync(mv => mv.Id == methodologyVersion.Id);
+
+                // Published date should match the date now
+                Assert.InRange(DateTime.UtcNow.Subtract(actual.Published!.Value).Milliseconds, 0, 1500);
             }
 
             MockUtils.VerifyAllMocks(methodologyVersionRepository);
         }
 
         [Fact]
-        public async Task SetPublishedDatesByPublication_MethodologyWithAPublishedDateRemainsUntouched()
+        public async Task SetPublishedDatesIfApplicable_MethodologyVersionWithAPublishedDateRemainsUntouched()
         {
             var publicationId = Guid.NewGuid();
 
@@ -208,13 +211,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository.Object);
 
-                await service.SetPublishedDatesByPublication(publicationId, DateTime.UtcNow);
+                await service.SetPublishedDatesIfApplicable(publicationId);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var actual = await contentDbContext.MethodologyVersions.FindAsync(methodologyVersion.Id);
-                Assert.NotNull(actual);
+                var actual = await contentDbContext.MethodologyVersions
+                    .SingleAsync(mv => mv.Id == methodologyVersion.Id);
+
+                // Published date should remain untouched because the methodology version was already published
                 Assert.Equal(methodologyVersion.Published, actual.Published);
             }
 
@@ -222,11 +227,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         private static MethodologyService SetupMethodologyService(ContentDbContext contentDbContext,
-            IMethodologyVersionRepository methodologyVersionRepository = null)
+            IMethodologyVersionRepository? methodologyVersionRepository = null)
         {
             return new(
                 contentDbContext,
-                methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object);
+                methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(MockBehavior.Strict));
         }
     }
 }

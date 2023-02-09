@@ -56,12 +56,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                             ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
                             : (DateTime?)null));
 
-            CreateMap<ReleaseCreateRequest, Release>()
-                .ForMember(dest => dest.PublishScheduled,
-                    m => m.MapFrom(model => model.PublishScheduledDate))
-                .ForMember(dest => dest.ReleaseName,
-                    m => m.MapFrom(r => r.Year.ToString()));
-
             CreateMap<Release, ReleaseSummaryViewModel>()
                 .ForMember(model => model.PublishScheduled,
                     m => m.MapFrom(model =>
