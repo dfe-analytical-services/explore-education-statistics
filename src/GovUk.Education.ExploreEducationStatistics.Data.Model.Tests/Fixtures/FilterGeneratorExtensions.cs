@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -20,6 +21,13 @@ public static class FilterGeneratorExtensions
         this Generator<Filter> generator,
         IEnumerable<FilterGroup> filterGroups)
         => generator.ForInstance(s => s.SetFilterGroups(filterGroups));
+
+    // TODO this needs to apply to backwards-linking that s.SetFilterGroups(filterGroups) does
+    public static Generator<Filter> WithFilterGroups(
+        this Generator<Filter> generator,
+        Func<SetterContext, IEnumerable<FilterGroup>> filterGroups)
+        => generator.ForInstance(s => s
+            .Set(f => f.FilterGroups, (_, _, context) => filterGroups.Invoke(context)));
 
     public static Generator<Filter> WithFootnotes(
         this Generator<Filter> generator,

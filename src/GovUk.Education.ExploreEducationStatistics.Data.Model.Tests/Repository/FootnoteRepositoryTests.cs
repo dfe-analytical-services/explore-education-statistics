@@ -3,8 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
@@ -13,247 +15,105 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 {
     public class FootnoteRepositoryTests
     {
+        private readonly DataFixture _fixture = new();
+        private readonly Generator<Release> _releaseGenerator;
+        private readonly Generator<Footnote> _footnoteGenerator;
+        private readonly Generator<ReleaseFootnote> _releaseFootnoteGenerator;
+        private readonly Generator<ReleaseSubject> _releaseSubjectGenerator;
+        private readonly Generator<Subject> _subjectsGenerator;
+        private readonly Generator<Filter> _filterGenerator;
+        private readonly Generator<FilterGroup> _filterGroupGenerator;
+        private readonly Generator<FilterItem> _filterItemGenerator;
+        private readonly Generator<IndicatorGroup> _indicatorGroupGenerator;
+        private readonly Generator<Indicator> _indicatorGenerator;
+
+        public FootnoteRepositoryTests()
+        {
+            _releaseGenerator = _fixture.Generator<Release>();
+            _footnoteGenerator = _fixture.DefaultFootnote();
+            _releaseFootnoteGenerator = _fixture.Generator<ReleaseFootnote>();
+            _releaseSubjectGenerator = _fixture.Generator<ReleaseSubject>();
+            _subjectsGenerator = _fixture.DefaultSubject();
+            _filterGenerator = _fixture.DefaultFilter();
+            _filterGroupGenerator = _fixture.DefaultFilterGroup();
+            _filterItemGenerator = _fixture.DefaultFilterItem();
+            _indicatorGroupGenerator = _fixture.DefaultIndicatorGroup();
+            _indicatorGenerator = _fixture.DefaultIndicator();
+        }
+
         [Fact]
         public async Task GetFilteredFootnotes()
         {
-            var subject1 = new Subject();
-            var subject2 = new Subject();
+            var release = _releaseGenerator.Generate();
+            
+            var subject1Filters = _filterGenerator
+                .WithFilterGroups(_ => _filterGroupGenerator
+                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+                    .GenerateList(1))
+                .GenerateList(3);
+            
+            var (subject1, subject2) = _subjectsGenerator
+                .ForIndex(0, s => s.SetFilters(subject1Filters))
+                .GenerateTuple2();
 
-            var subject1Filter1 = new Filter
-            {
-                Label = "Subject 1 filter 1",
-                Subject = subject1,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 1 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 1 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
+            var subject1IndicatorGroup1 = _indicatorGroupGenerator
+                .WithIndicators(_indicatorGenerator.GenerateList(1))
+                .WithSubject(subject1)
+                .Generate();
 
-            var subject1Filter2 = new Filter
-            {
-                Label = "Subject 1 filter 2",
-                Subject = subject1,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 2 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 2 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
+            var footnotes = _footnoteGenerator
+                .ForIndex(0, s => s
+                    .Set(f => f.Content, "Applies to subject 1")
+                    .SetSubjects(_ => ListOf(subject1)))
+                .ForIndex(1, s => s
+                    .Set(f => f.Content, "Applies to subject 1 filter 1")
+                    .SetFilters(_ => ListOf(subject1Filters[0])))
+                .ForIndex(2, s => s
+                    .Set(f => f.Content, "Applies to subject 1 filter 2 group 1")
+                    .SetFilterGroups(_ => ListOf(subject1Filters[1].FilterGroups[0])))
+                .ForIndex(3, s => s
+                    .Set(f => f.Content, "Applies to subject 1 filter 3 group 1 item 1")
+                    .SetFilterItems(_ => ListOf(subject1Filters[2].FilterGroups[0].FilterItems[0])))
+                .ForIndex(4, s => s
+                    .Set(f => f.Content, "Applies to subject 1 indicator 1")
+                    .SetIndicators(_ => ListOf(subject1IndicatorGroup1.Indicators[0])))
+                
+                // Footnote applies to subject 1 filter 1
+                // and subject 1 filter 2 group 1
+                // and subject 1 filter 3 group 1 item 1
+                // and subject 1 indicator 1
+                .ForIndex(5, s => s
+                    .Set(f => f.Content, "Applies to multiple attributes of subject 1")
+                    .SetFilters(_ => ListOf(subject1Filters[0]))
+                    .SetFilterGroups(_ => ListOf(subject1Filters[1].FilterGroups[0]))
+                    .SetFilterItems(_ => ListOf(subject1Filters[2].FilterGroups[0].FilterItems[0]))
+                    .SetIndicators(_ => ListOf(subject1IndicatorGroup1.Indicators[0])))
+                .ForIndex(6, s => s
+                    .Set(f => f.Content, "Applies to subject 2")
+                    .SetSubjects(_ => ListOf(subject2)))
+                .GenerateList();
+            
+            var releaseFootnotes = _releaseFootnoteGenerator
+                .ForInstance(s => s.Set(rf => rf.Release, release))
+                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
+                .GenerateList(footnotes.Count);
 
-            var subject1Filter3 = new Filter
-            {
-                Label = "Subject 1 filter 3",
-                Subject = subject1,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 3 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 3 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
-
-            var subject1IndicatorGroup1 = new IndicatorGroup
-            {
-                Label = "Subject 1 indicator group 1",
-                Subject = subject1,
-                Indicators = new List<Indicator>
-                {
-                    new()
-                    {
-                        Label = "Indicator 1"
-                    }
-                }
-            };
-
-            var release = new Release
-            {
-                Footnotes = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1",
-                            Order = 0,
-                            Subjects = new List<SubjectFootnote>
-                            {
-                                new()
-                                {
-                                    Subject = subject1
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 filter 1",
-                            Order = 1,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = subject1Filter1
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 filter 2 group 1",
-                            Order = 2,
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = subject1Filter2.FilterGroups[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 filter 3 group 1 item 1",
-                            Order = 3,
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = subject1Filter3.FilterGroups[0].FilterItems[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 indicator 1",
-                            Order = 4,
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = subject1IndicatorGroup1.Indicators[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        // Footnote applies to subject 1 filter 1
-                        // and subject 1 filter 2 group 1
-                        // and subject 1 filter 3 group 1 item 1
-                        // and subject 1 indicator 1
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to multiple attributes of subject 1",
-                            Order = 5,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = subject1Filter1
-                                }
-                            },
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = subject1Filter2.FilterGroups[0]
-                                }
-                            },
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = subject1Filter3.FilterGroups[0].FilterItems[0]
-                                }
-                            },
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = subject1IndicatorGroup1.Indicators[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 2",
-                            Order = 6,
-                            Subjects = new List<SubjectFootnote>
-                            {
-                                new()
-                                {
-                                    Subject = subject2
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-
-            var releaseFootnotes = release.Footnotes.ToList();
-
-            var releaseSubjects = new List<ReleaseSubject>
-            {
-                new()
-                {
-                    Release = release,
-                    Subject = subject1
-                },
-                new()
-                {
-                    Release = release,
-                    Subject = subject2
-                }
-            };
+            var releaseSubjects = _releaseSubjectGenerator
+                .ForInstance(s => s.Set(rs => rs.Release, release))
+                .ForIndex(0, s => s.Set(rs => rs.Subject, subject1))
+                .ForIndex(1, s => s.Set(rs => rs.Subject, subject2))
+                .GenerateList();
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 await context.Subject.AddRangeAsync(subject1, subject2);
-                await context.Filter.AddRangeAsync(subject1Filter1, subject1Filter2, subject1Filter3);
+                await context.Filter.AddRangeAsync(subject1Filters);
                 await context.IndicatorGroup.AddAsync(subject1IndicatorGroup1);
                 await context.Release.AddAsync(release);
                 await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
+                await context.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
                 await context.SaveChangesAsync();
             }
 
@@ -262,9 +122,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 var repository = BuildFootnoteRepository(context);
 
                 //  Get the footnotes applying to subject 1 or any of its filter items or indicators
-                var filter1Group1Item1Id = subject1Filter1.FilterGroups[0].FilterItems[0].Id;
-                var filter2Group1Item1Id = subject1Filter2.FilterGroups[0].FilterItems[0].Id;
-                var filter3Group1Item1Id = subject1Filter3.FilterGroups[0].FilterItems[0].Id;
+                var filter1Group1Item1Id = subject1Filters[0].FilterGroups[0].FilterItems[0].Id;
+                var filter2Group1Item1Id = subject1Filters[1].FilterGroups[0].FilterItems[0].Id;
+                var filter3Group1Item1Id = subject1Filters[2].FilterGroups[0].FilterItems[0].Id;
                 var indicatorGroup1Item1Id = subject1IndicatorGroup1.Indicators[0].Id;
 
                 var results = await repository.GetFilteredFootnotes(
@@ -305,1562 +165,579 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task GetFilteredFootnotes_FilterBySubject()
         {
-            var subject1 = new Subject();
-            var subject2 = new Subject();
+            var release = _releaseGenerator.Generate();
+            
+            // todo a default one with new filtergroups and all?
+            var subject1Filter = _filterGenerator
+                .WithFilterGroups(_ => _filterGroupGenerator
+                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+                    .GenerateList(1))
+                .Generate();
+            
+            var subject2Filter = _filterGenerator
+                .WithFilterGroups(_ => _filterGroupGenerator
+                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+                    .GenerateList(1))
+                .Generate();
+            
+            var (subject1, subject2) = _subjectsGenerator
+                .ForIndex(0, s => s.SetFilters(ListOf(subject1Filter)))
+                .ForIndex(1, s => s.SetFilters(ListOf(subject2Filter)))
+                .GenerateTuple2();
 
-            var subject1Filter1 = new Filter
-            {
-                Label = "Subject 1 filter 1",
-                Subject = subject1,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 1 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 1 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
+            var subject1IndicatorGroup = _indicatorGroupGenerator
+                .WithIndicators(_indicatorGenerator.GenerateList(1))
+                .WithSubject(subject1)
+                .Generate();
 
-            var subject2Filter1 = new Filter
-            {
-                Label = "Subject 2 filter 1",
-                Subject = subject2,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 1 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 1 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
-
-            var subject1IndicatorGroup1 = new IndicatorGroup
-            {
-                Label = "Subject 1 indicator group 1",
-                Subject = subject1,
-                Indicators = new List<Indicator>
-                {
-                    new()
-                    {
-                        Label = "Indicator 1"
-                    }
-                }
-            };
-
-            var subject2IndicatorGroup1 = new IndicatorGroup
-            {
-                Label = "Subject 2 indicator group 1",
-                Subject = subject2,
-                Indicators = new List<Indicator>
-                {
-                    new()
-                    {
-                        Label = "Indicator 1"
-                    }
-                }
-            };
-
+            var subject2IndicatorGroup = _indicatorGroupGenerator
+                .WithIndicators(_indicatorGenerator.GenerateList(1))
+                .WithSubject(subject2)
+                .Generate();
+            
             // Set up a release with footnotes that apply to either subject 1 or subject 2 but not both
-            var release = new Release
-            {
-                Footnotes = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1",
-                            Order = 0,
-                            Subjects = new List<SubjectFootnote>
-                            {
-                                new()
-                                {
-                                    Subject = subject1
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 2",
-                            Order = 1,
-                            Subjects = new List<SubjectFootnote>
-                            {
-                                new()
-                                {
-                                    Subject = subject2
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 filter 1",
-                            Order = 2,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = subject1Filter1
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 2 filter 1",
-                            Order = 3,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = subject2Filter1
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 filter 1 group 1",
-                            Order = 4,
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = subject1Filter1.FilterGroups[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 2 filter 1 group 1",
-                            Order = 5,
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = subject2Filter1.FilterGroups[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 filter 1 group 1 item 1",
-                            Order = 6,
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = subject1Filter1.FilterGroups[0].FilterItems[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 2 filter 1 group 1 item 1",
-                            Order = 7,
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = subject2Filter1.FilterGroups[0].FilterItems[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 indicator 1",
-                            Order = 8,
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = subject1IndicatorGroup1.Indicators[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 2 indicator 1",
-                            Order = 9,
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = subject2IndicatorGroup1.Indicators[0]
-                                }
-                            }
-                        }
-                    }
-                }
-            };
+            var footnotes = _footnoteGenerator
+                .ForIndex(0, s => s
+                    .Set(f => f.Content, "Applies to subject 1")
+                    .SetSubjects(_ => ListOf(subject1)))
+                .ForIndex(1, s => s
+                    .Set(f => f.Content, "Applies to subject 2")
+                    .SetSubjects(_ => ListOf(subject2)))
+                .ForIndex(2, s => s
+                    .Set(f => f.Content, "Applies to subject 1 filter 1")
+                    .SetFilters(_ => ListOf(subject1Filter)))
+                .ForIndex(3, s => s
+                    .Set(f => f.Content, "Applies to subject 2 filter 1")
+                    .SetFilters(_ => ListOf(subject2Filter)))
+                .ForIndex(4, s => s
+                    .Set(f => f.Content, "Applies to subject 1 filter 1 group 1")
+                    .SetFilterGroups(_ => ListOf(subject1Filter.FilterGroups[0])))
+                .ForIndex(5, s => s
+                    .Set(f => f.Content, "Applies to subject 2 filter 1 group 1")
+                    .SetFilterGroups(_ => ListOf(subject2Filter.FilterGroups[0])))
+                .ForIndex(6, s => s
+                    .Set(f => f.Content, "Applies to subject 1 filter 1 group 1 item 1")
+                    .SetFilterItems(_ => ListOf(subject1Filter.FilterGroups[0].FilterItems[0])))
+                .ForIndex(7, s => s
+                    .Set(f => f.Content, "Applies to subject 2 filter 1 group 1 item 1")
+                    .SetFilterItems(_ => ListOf(subject2Filter.FilterGroups[0].FilterItems[0])))
+                .ForIndex(8, s => s
+                    .Set(f => f.Content, "Applies to subject 1 indicator 1")
+                    .SetIndicators(_ => ListOf(subject1IndicatorGroup.Indicators[0])))
+                .ForIndex(9, s => s
+                    .Set(f => f.Content, "Applies to subject 2 indicator 1")
+                    .SetIndicators(_ => ListOf(subject2IndicatorGroup.Indicators[0])))
+                .GenerateList();
+            
+            var releaseFootnotes = _releaseFootnoteGenerator
+                .ForInstance(s => s.Set(rf => rf.Release, release))
+                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
+                .GenerateList(footnotes.Count);
 
-            var releaseFootnotes = release.Footnotes.ToList();
-
-            var releaseSubjects = new List<ReleaseSubject>
-            {
-                new()
-                {
-                    Release = release,
-                    Subject = subject1
-                },
-                new()
-                {
-                    Release = release,
-                    Subject = subject2
-                }
-            };
-
+            var releaseSubjects = _releaseSubjectGenerator
+                .ForInstance(s => s.Set(rs => rs.Release, release))
+                .ForIndex(0, s => s.Set(rs => rs.Subject, subject1))
+                .ForIndex(1, s => s.Set(rs => rs.Subject, subject2))
+                .GenerateList();
+            
             var contextId = Guid.NewGuid().ToString();
-
+        
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 await context.Subject.AddRangeAsync(subject1, subject2);
-                await context.Filter.AddRangeAsync(subject1Filter1, subject2Filter1);
-                await context.IndicatorGroup.AddRangeAsync(subject1IndicatorGroup1, subject2IndicatorGroup1);
+                await context.Filter.AddRangeAsync(subject1Filter, subject2Filter);
+                await context.IndicatorGroup.AddRangeAsync(subject1IndicatorGroup, subject2IndicatorGroup);
                 await context.Release.AddAsync(release);
+                await context.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
                 await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
                 await context.SaveChangesAsync();
             }
-
+        
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
-
+        
                 // This test makes sure that all footnotes which apply exclusively to subjects other than the one
                 // requested are excluded
-
+        
                 //  Get the footnotes applying to subject 1 or any of its filter items or indicators
                 var results = await repository.GetFilteredFootnotes(
                     releaseId: release.Id,
                     subjectId: subject1.Id,
-                    filterItemIds: ListOf(subject1Filter1.FilterGroups[0].FilterItems[0].Id),
-                    indicatorIds: ListOf(subject1IndicatorGroup1.Indicators[0].Id));
-
+                    filterItemIds: ListOf(subject1Filter.FilterGroups[0].FilterItems[0].Id),
+                    indicatorIds: ListOf(subject1IndicatorGroup.Indicators[0].Id));
+        
                 // Check that only footnotes applying to subject 1 or any of its filter items or indicators are returned
                 // and that all footnotes applying to subject 2 are excluded
                 Assert.Equal(5, results.Count);
-
+        
                 Assert.Equal(releaseFootnotes[0].FootnoteId, results[0].Id);
                 Assert.Equal("Applies to subject 1", results[0].Content);
-
+        
                 Assert.Equal(releaseFootnotes[2].FootnoteId, results[1].Id);
                 Assert.Equal("Applies to subject 1 filter 1", results[1].Content);
-
+        
                 // Footnote applies to a requested filter item via its filter group
                 Assert.Equal(releaseFootnotes[4].FootnoteId, results[2].Id);
                 Assert.Equal("Applies to subject 1 filter 1 group 1", results[2].Content);
-
+        
                 // Footnote applies to a requested filter item via its filter group
                 Assert.Equal(releaseFootnotes[6].FootnoteId, results[3].Id);
                 Assert.Equal("Applies to subject 1 filter 1 group 1 item 1", results[3].Content);
-
+        
                 Assert.Equal(releaseFootnotes[8].FootnoteId, results[4].Id);
                 Assert.Equal("Applies to subject 1 indicator 1", results[4].Content);
             }
         }
-
+        
         [Fact]
         public async Task GetFilteredFootnotes_FilterByFiltersAndIndicators()
         {
-            var subject1 = new Subject();
+            var release = _releaseGenerator.Generate();
+            
+            // todo a default one with new filtergroups and all?
+            var filter = _filterGenerator
+                .WithFilterGroups(_ => _filterGroupGenerator
+                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(2))
+                    .GenerateList(1))
+                .Generate();
+            
+            var subject = _subjectsGenerator
+                .WithFilters(ListOf(filter))
+                .Generate();
 
-            var filter1 = new Filter
-            {
-                Label = "Filter 1",
-                Subject = subject1,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 1 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 1 group 1 item 1"
-                            },
-                            new()
-                            {
-                                Label = "Filter 1 group 1 item 2"
-                            }
-                        }
-                    }
-                }
-            };
+            var indicatorGroup = _indicatorGroupGenerator
+                .WithIndicators(_indicatorGenerator.GenerateList(2))
+                .WithSubject(subject)
+                .Generate();
+            
+            var footnotes = _footnoteGenerator
+                .ForIndex(0, s => s
+                    .Set(f => f.Content, "Applies to filter 1")
+                    .SetFilters(_ => ListOf(filter)))
+                .ForIndex(1, s => s
+                    .Set(f => f.Content, "Applies to filter 1 group 1")
+                    .SetFilterGroups(_ => ListOf(filter.FilterGroups[0])))
+                .ForIndex(2, s => s
+                    .Set(f => f.Content, "Applies to filter item 1")
+                    .SetFilterItems(_ => ListOf(filter.FilterGroups[0].FilterItems[0])))
+                .ForIndex(3, s => s
+                    .Set(f => f.Content, "Applies to filter item 2")
+                    .SetFilterItems(_ => ListOf(filter.FilterGroups[0].FilterItems[1])))
+                .ForIndex(4, s => s
+                    .Set(f => f.Content, "Applies to indicator 1")
+                    .SetIndicators(_ => ListOf(indicatorGroup.Indicators[0])))
+                .ForIndex(5, s => s
+                    .Set(f => f.Content, "Applies to indicator 2")
+                    .SetIndicators(_ => ListOf(indicatorGroup.Indicators[1])))
+                .ForIndex(6, s => s
+                    .Set(f => f.Content, "Applies to filter 1 and indicator 1")
+                    .SetFilters(_ => ListOf(filter))
+                    .SetIndicators(_ => ListOf(indicatorGroup.Indicators[0])))
+                .ForIndex(7, s => s
+                    .Set(f => f.Content, "Applies to filter 1 and indicator 2")
+                    .SetFilters(_ => ListOf(filter))
+                    .SetIndicators(_ => ListOf(indicatorGroup.Indicators[1])))
+                .ForIndex(8, s => s
+                    .Set(f => f.Content, "Applies to filter 1 group 1 and indicator 1")
+                    .SetFilterGroups(_ => ListOf(filter.FilterGroups[0]))
+                    .SetIndicators(_ => ListOf(indicatorGroup.Indicators[0])))
+                .ForIndex(9, s => s
+                    .Set(f => f.Content, "Applies to filter 1 group 1 and indicator 2")
+                    .SetFilterGroups(_ => ListOf(filter.FilterGroups[0]))
+                    .SetIndicators(_ => ListOf(indicatorGroup.Indicators[1])))
+                .ForIndex(10, s => s
+                    .Set(f => f.Content, "Applies to filter item 1 and indicator 1")
+                    .SetFilterItems(_ => ListOf(filter.FilterGroups[0].FilterItems[0]))
+                    .SetIndicators(_ => ListOf(indicatorGroup.Indicators[0])))
+                .ForIndex(11, s => s
+                    .Set(f => f.Content, "Applies to filter item 1 and indicator 2")
+                    .SetFilterItems(_ => ListOf(filter.FilterGroups[0].FilterItems[0]))
+                    .SetIndicators(_ => ListOf(indicatorGroup.Indicators[1])))
+                .GenerateList();
+                
+            var releaseFootnotes = _releaseFootnoteGenerator
+                .ForInstance(s => s.Set(rf => rf.Release, release))
+                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
+                .GenerateList(footnotes.Count);
 
-            var indicatorGroup1 = new IndicatorGroup
-            {
-                Label = "Indicator group 1",
-                Subject = subject1,
-                Indicators = new List<Indicator>
-                {
-                    new()
-                    {
-                        Label = "Indicator 1"
-                    },
-                    new()
-                    {
-                        Label = "Indicator 2"
-                    }
-                }
-            };
-
-            var release = new Release
-            {
-                Footnotes = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 1",
-                            Order = 0,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = filter1
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 1 group 1",
-                            Order = 1,
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = filter1.FilterGroups[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter item 1",
-                            Order = 2,
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = filter1.FilterGroups[0].FilterItems[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter item 2",
-                            Order = 3,
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = filter1.FilterGroups[0].FilterItems[1]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to indicator 1",
-                            Order = 4,
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = indicatorGroup1.Indicators[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to indicator 2",
-                            Order = 5,
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = indicatorGroup1.Indicators[1]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 1 and indicator 1",
-                            Order = 6,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = filter1
-                                }
-                            },
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = indicatorGroup1.Indicators[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 1 and indicator 2",
-                            Order = 7,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = filter1
-                                }
-                            },
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = indicatorGroup1.Indicators[1]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 1 group 1 and indicator 1",
-                            Order = 8,
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = filter1.FilterGroups[0]
-                                }
-                            },
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = indicatorGroup1.Indicators[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 1 group 1 and indicator 2",
-                            Order = 9,
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = filter1.FilterGroups[0]
-                                }
-                            },
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = indicatorGroup1.Indicators[1]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter item 1 and indicator 1",
-                            Order = 10,
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = filter1.FilterGroups[0].FilterItems[0]
-                                }
-                            },
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = indicatorGroup1.Indicators[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter item 1 and indicator 2",
-                            Order = 11,
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = filter1.FilterGroups[0].FilterItems[0]
-                                }
-                            },
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = indicatorGroup1.Indicators[1]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter item 2 and indicator 1",
-                            Order = 12,
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = filter1.FilterGroups[0].FilterItems[1]
-                                }
-                            },
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = indicatorGroup1.Indicators[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter item 2 and indicator 2",
-                            Order = 13,
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = filter1.FilterGroups[0].FilterItems[1]
-                                }
-                            },
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = indicatorGroup1.Indicators[1]
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-
-            var releaseFootnotes = release.Footnotes.ToList();
-
-            var releaseSubjects = new List<ReleaseSubject>
-            {
-                new()
-                {
-                    Release = release,
-                    Subject = subject1
-                }
-            };
-
+            var releaseSubject = _releaseSubjectGenerator
+                .ForInstance(s => s.Set(rs => rs.Release, release))
+                .ForInstance(s => s.Set(rs => rs.Subject, subject))
+                .Generate();
+        
             var contextId = Guid.NewGuid().ToString();
-
+        
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
-                await context.Subject.AddAsync(subject1);
-                await context.Filter.AddAsync(filter1);
-                await context.IndicatorGroup.AddAsync(indicatorGroup1);
+                await context.Subject.AddAsync(subject);
+                await context.Filter.AddAsync(filter);
+                await context.IndicatorGroup.AddAsync(indicatorGroup);
                 await context.Release.AddAsync(release);
-                await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
+                await context.ReleaseSubject.AddRangeAsync(releaseSubject);
+                await context.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
                 await context.SaveChangesAsync();
             }
-
+        
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
-
+        
                 //  Get the footnotes applying to filter item 1 and indicator 1
                 var results = await repository.GetFilteredFootnotes(
                     releaseId: release.Id,
-                    subjectId: subject1.Id,
-                    filterItemIds: ListOf(filter1.FilterGroups[0].FilterItems[0].Id),
-                    indicatorIds: ListOf(indicatorGroup1.Indicators[0].Id));
-
+                    subjectId: subject.Id,
+                    filterItemIds: ListOf(filter.FilterGroups[0].FilterItems[0].Id),
+                    indicatorIds: ListOf(indicatorGroup.Indicators[0].Id));
+        
                 // Check that only footnotes applying to filter item 1, or indicator 1
                 // are returned.
-
+        
                 // Any footnotes applying to filter item 2 or only to indicator 2 should be excluded
                 Assert.Equal(7, results.Count);
-
+        
                 Assert.Equal(releaseFootnotes[0].FootnoteId, results[0].Id);
                 Assert.Equal("Applies to filter 1", results[0].Content);
-
+        
                 Assert.Equal(releaseFootnotes[1].FootnoteId, results[1].Id);
                 Assert.Equal("Applies to filter 1 group 1", results[1].Content);
-
+        
                 Assert.Equal(releaseFootnotes[2].FootnoteId, results[2].Id);
                 Assert.Equal("Applies to filter item 1", results[2].Content);
-
+        
                 Assert.Equal(releaseFootnotes[4].FootnoteId, results[3].Id);
                 Assert.Equal("Applies to indicator 1", results[3].Content);
-
+        
                 Assert.Equal(releaseFootnotes[6].FootnoteId, results[4].Id);
                 Assert.Equal("Applies to filter 1 and indicator 1", results[4].Content);
-
+        
                 Assert.Equal(releaseFootnotes[8].FootnoteId, results[5].Id);
                 Assert.Equal("Applies to filter 1 group 1 and indicator 1", results[5].Content);
-
+        
                 Assert.Equal(releaseFootnotes[10].FootnoteId, results[6].Id);
                 Assert.Equal("Applies to filter item 1 and indicator 1", results[6].Content);
             }
         }
-
+        
         [Fact]
         public async Task GetFilteredFootnotes_FilterByFilterItems()
         {
-            var subject1 = new Subject();
+            var release = _releaseGenerator.Generate();
+            
+            var (filter1, filter2, filter3) = _filterGenerator
+                .WithFilterGroups(_ => _filterGroupGenerator
+                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(3))
+                    .GenerateList(1))
+                .GenerateTuple3();
+            
+            var subject = _subjectsGenerator
+                .WithFilters(ListOf(filter1, filter2, filter3))
+                .Generate();
+            
+            var footnotes = _footnoteGenerator
+                .ForIndex(0, s => s
+                    .Set(f => f.Content, "Applies to filter 1")
+                    .SetFilters(_ => ListOf(filter1)))
+                .ForIndex(1, s => s
+                    .Set(f => f.Content, "Applies to filter 3")
+                    .SetFilters(_ => ListOf(filter3)))
+                .ForIndex(2, s => s
+                    .Set(f => f.Content, "Applies to filter 1 and filter 3")
+                    .SetFilters(_ => ListOf(filter1, filter3)))
+                .ForIndex(3, s => s
+                    .Set(f => f.Content, "Applies to filter 1 and filter 3 group 1")
+                    .SetFilters(_ => ListOf(filter1))
+                    .SetFilterGroups(_ => ListOf(filter3.FilterGroups[0])))
+                .ForIndex(4, s => s
+                    .Set(f => f.Content, "Applies to filter 3 and filter 1 group 1")
+                    .SetFilters(_ => ListOf(filter3))
+                    .SetFilterGroups(_ => ListOf(filter1.FilterGroups[0])))
+                .ForIndex(5, s => s
+                    .Set(f => f.Content, "Applies to filter 1 and filter 3 group item 1")
+                    .SetFilters(_ => ListOf(filter1))
+                    .SetFilterItems(_ => ListOf(filter3.FilterGroups[0].FilterItems[0])))
+                .ForIndex(6, s => s
+                    .Set(f => f.Content, "Applies to filter 3 and filter 1 group item 1")
+                    .SetFilters(_ => ListOf(filter3))
+                    .SetFilterItems(_ => ListOf(filter1.FilterGroups[0].FilterItems[0])))
+                .ForIndex(7, s => s
+                    .Set(f => f.Content, "Applies to filter 1 group 1")
+                    .SetFilterGroups(_ => ListOf(filter1.FilterGroups[0])))
+                .ForIndex(8, s => s
+                    .Set(f => f.Content, "Applies to filter 3 group 1")
+                    .SetFilterGroups(_ => ListOf(filter3.FilterGroups[0])))
+                .ForIndex(9, s => s
+                    .Set(f => f.Content, "Applies to filter 1 group 1 and filter 1 group 1 item 1")
+                    .SetFilterGroups(_ => ListOf(filter1.FilterGroups[0]))
+                    .SetFilterItems(_ => ListOf(filter1.FilterGroups[0].FilterItems[0])))
+                .ForIndex(10, s => s
+                    .Set(f => f.Content, "Applies to filter 1 group 1 and filter 3 group 1 item 1")
+                    .SetFilterGroups(_ => ListOf(filter1.FilterGroups[0]))
+                    .SetFilterItems(_ => ListOf(filter3.FilterGroups[0].FilterItems[0])))
+                .ForIndex(11, s => s
+                    .Set(f => f.Content, "Applies to filter 3 group 1 and filter 1 group 1 item 1")
+                    .SetFilterGroups(_ => ListOf(filter3.FilterGroups[0]))
+                    .SetFilterItems(_ => ListOf(filter1.FilterGroups[0].FilterItems[0])))
+                .ForIndex(12, s => s
+                    .Set(f => f.Content, "Applies to filter 3 group 1 and filter 3 group 1 item 1")
+                    .SetFilterGroups(_ => ListOf(filter3.FilterGroups[0]))
+                    .SetFilterItems(_ => ListOf(filter3.FilterGroups[0].FilterItems[0])))
+                .ForIndex(13, s => s
+                    .Set(f => f.Content, "Applies to filter 1 group 1 item 1")
+                    .SetFilterItems(_ => ListOf(filter1.FilterGroups[0].FilterItems[0])))
+                .ForIndex(14, s => s
+                    .Set(f => f.Content, "Applies to filter 1 group 1 item 3")
+                    .SetFilterItems(_ => ListOf(filter1.FilterGroups[0].FilterItems[2])))
+                .ForIndex(15, s => s
+                    .Set(f => f.Content, "Applies to filter 3 group 1 item 1")
+                    .SetFilterItems(_ => ListOf(filter3.FilterGroups[0].FilterItems[0])))
+                .ForIndex(16, s => s
+                    .Set(f => f.Content, "Applies to filter 1 group 1 item 1 and filter 1 group 1 item 3")
+                    .SetFilterItems(_ => ListOf(filter1.FilterGroups[0].FilterItems[0], filter1.FilterGroups[0].FilterItems[2])))
+                .GenerateList();
+                
+            var releaseFootnotes = _releaseFootnoteGenerator
+                .ForInstance(s => s.Set(rf => rf.Release, release))
+                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
+                .GenerateList(footnotes.Count);
 
-            var filter1 = new Filter
-            {
-                Label = "Filter 1",
-                Subject = subject1,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 1 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 1 group 1 item 1"
-                            },
-                            new()
-                            {
-                                Label = "Filter 1 group 1 item 2"
-                            },
-                            new()
-                            {
-                                Label = "Filter 1 group 1 item 3"
-                            }
-                        }
-                    }
-                }
-            };
-
-            var filter2 = new Filter
-            {
-                Label = "Filter 2",
-                Subject = subject1,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 2 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 2 group 1 item 1"
-                            },
-                            new()
-                            {
-                                Label = "Filter 2 group 1 item 2"
-                            }
-                        }
-                    }
-                }
-            };
-
-            var filter3 = new Filter
-            {
-                Label = "Filter 3",
-                Subject = subject1,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 3 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 3 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
-
-            var release = new Release
-            {
-                Footnotes = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 1",
-                            Order = 0,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = filter1
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 3",
-                            Order = 1,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = filter3
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 1 and filter 3",
-                            Order = 2,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = filter1
-                                },
-                                new()
-                                {
-                                    Filter = filter3
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 1 and filter 3 group 1",
-                            Order = 3,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = filter1
-                                }
-                            },
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = filter3.FilterGroups[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 3 and filter 1 group 1",
-                            Order = 4,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = filter3
-                                }
-                            },
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = filter1.FilterGroups[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 1 and filter 3 group item 1",
-                            Order = 5,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = filter1
-                                }
-                            },
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = filter3.FilterGroups[0].FilterItems[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 3 and filter 1 group item 1",
-                            Order = 6,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = filter3
-                                }
-                            },
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = filter1.FilterGroups[0].FilterItems[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 1 group 1",
-                            Order = 7,
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = filter1.FilterGroups[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 3 group 1",
-                            Order = 8,
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = filter3.FilterGroups[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 1 group 1 and filter 1 group 1 item 1",
-                            Order = 9,
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = filter1.FilterGroups[0]
-                                }
-                            },
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = filter1.FilterGroups[0].FilterItems[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 1 group 1 and filter 3 group 1 item 1",
-                            Order = 10,
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = filter1.FilterGroups[0]
-                                }
-                            },
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = filter3.FilterGroups[0].FilterItems[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 3 group 1 and filter 1 group 1 item 1",
-                            Order = 11,
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = filter3.FilterGroups[0]
-                                }
-                            },
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = filter1.FilterGroups[0].FilterItems[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 3 group 1 and filter 3 group 1 item 1",
-                            Order = 12,
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = filter3.FilterGroups[0]
-                                }
-                            },
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = filter3.FilterGroups[0].FilterItems[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 1 group 1 item 1",
-                            Order = 13,
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = filter1.FilterGroups[0].FilterItems[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 1 group 1 item 3",
-                            Order = 14,
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = filter1.FilterGroups[0].FilterItems[2]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 3 group 1 item 1",
-                            Order = 15,
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = filter3.FilterGroups[0].FilterItems[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to filter 1 group 1 item 1 and filter 1 group 1 item 3",
-                            Order = 16,
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = filter1.FilterGroups[0].FilterItems[0]
-                                },
-                                new()
-                                {
-                                    FilterItem = filter1.FilterGroups[0].FilterItems[2]
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-
-            var releaseFootnotes = release.Footnotes.ToList();
-
-            var releaseSubjects = new List<ReleaseSubject>
-            {
-                new()
-                {
-                    Release = release,
-                    Subject = subject1
-                }
-            };
-
+            var releaseSubject = _releaseSubjectGenerator
+                .ForInstance(s => s.Set(rs => rs.Release, release))
+                .ForInstance(s => s.Set(rs => rs.Subject, subject))
+                .Generate();
+        
             var contextId = Guid.NewGuid().ToString();
-
+        
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
-                await context.Subject.AddAsync(subject1);
+                await context.Subject.AddAsync(subject);
                 await context.Filter.AddRangeAsync(filter1, filter2, filter3);
                 await context.Release.AddAsync(release);
-                await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
+                await context.ReleaseSubject.AddRangeAsync(releaseSubject);
+                await context.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
                 await context.SaveChangesAsync();
             }
-
+        
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
-
+        
                 // Get the footnotes applying to filter 1 group 1 item 1 or filter 1 group 1 item 2
                 // or the filter item id's of filter 2
                 var results = await repository.GetFilteredFootnotes(
                     releaseId: release.Id,
-                    subjectId: subject1.Id,
+                    subjectId: subject.Id,
                     filterItemIds: ListOf(filter1.FilterGroups[0].FilterItems[0].Id,
                         filter1.FilterGroups[0].FilterItems[1].Id,
                         filter2.FilterGroups[0].FilterItems[0].Id,
                         filter2.FilterGroups[0].FilterItems[1].Id),
                     indicatorIds: ListOf<Guid>()
                 );
-
+        
                 // Check that only footnotes applying to filter 1 group 1 item 1 are returned.
-
+        
                 // No footnotes apply to filter 1 group 1 item 2 or to the filter items of filter 2 but
                 // including their additional id's in the parameter shouldn't alter the result.
-
+        
                 // The footnotes which apply only to filter 3, filter 3 group 1 item 1, or filter 3 group 1 item 1
                 // should be excluded.
                 Assert.Equal(12, results.Count);
-
+        
                 Assert.Equal(releaseFootnotes[0].FootnoteId, results[0].Id);
                 Assert.Equal("Applies to filter 1", results[0].Content);
-
+        
                 Assert.Equal(releaseFootnotes[2].FootnoteId, results[1].Id);
                 Assert.Equal("Applies to filter 1 and filter 3", results[1].Content);
-
+        
                 Assert.Equal(releaseFootnotes[3].FootnoteId, results[2].Id);
                 Assert.Equal("Applies to filter 1 and filter 3 group 1", results[2].Content);
-
+        
                 Assert.Equal(releaseFootnotes[4].FootnoteId, results[3].Id);
                 Assert.Equal("Applies to filter 3 and filter 1 group 1", results[3].Content);
-
+        
                 Assert.Equal(releaseFootnotes[5].FootnoteId, results[4].Id);
                 Assert.Equal("Applies to filter 1 and filter 3 group item 1", results[4].Content);
-
+        
                 Assert.Equal(releaseFootnotes[6].FootnoteId, results[5].Id);
                 Assert.Equal("Applies to filter 3 and filter 1 group item 1", results[5].Content);
-
+        
                 Assert.Equal(releaseFootnotes[7].FootnoteId, results[6].Id);
                 Assert.Equal("Applies to filter 1 group 1", results[6].Content);
-
+        
                 Assert.Equal(releaseFootnotes[9].FootnoteId, results[7].Id);
                 Assert.Equal("Applies to filter 1 group 1 and filter 1 group 1 item 1", results[7].Content);
-
+        
                 Assert.Equal(releaseFootnotes[10].FootnoteId, results[8].Id);
                 Assert.Equal("Applies to filter 1 group 1 and filter 3 group 1 item 1", results[8].Content);
-
+        
                 Assert.Equal(releaseFootnotes[11].FootnoteId, results[9].Id);
                 Assert.Equal("Applies to filter 3 group 1 and filter 1 group 1 item 1", results[9].Content);
-
+        
                 Assert.Equal(releaseFootnotes[13].FootnoteId, results[10].Id);
                 Assert.Equal("Applies to filter 1 group 1 item 1", results[10].Content);
-
+        
                 Assert.Equal(releaseFootnotes[16].FootnoteId, results[11].Id);
                 Assert.Equal("Applies to filter 1 group 1 item 1 and filter 1 group 1 item 3", results[11].Content);
             }
         }
-
+        
         [Fact]
         public async Task GetFilteredFootnotes_FilterByIndicators()
         {
-            var subject1 = new Subject();
+            var release = _releaseGenerator.Generate();
+            
+            var indicatorGroup = _indicatorGroupGenerator
+                .WithIndicators(_indicatorGenerator.GenerateList(3))
+                .Generate();
+            
+            var subject = _subjectsGenerator
+                .WithIndicatorGroups(ListOf(indicatorGroup))
+                .Generate();
+            
+            var footnotes = _footnoteGenerator
+                .ForIndex(0, s => s
+                    .Set(f => f.Content, "Applies to indicator 1")
+                    .SetIndicators(_ => ListOf(indicatorGroup.Indicators[0])))
+                .ForIndex(1, s => s
+                    .Set(f => f.Content, "Applies to indicator 3")
+                    .SetIndicators(_ => ListOf(indicatorGroup.Indicators[2])))
+                .ForIndex(2, s => s
+                    .Set(f => f.Content, "Applies to indicator 1 and indicator 3")
+                    .SetIndicators(_ => ListOf(indicatorGroup.Indicators[0], indicatorGroup.Indicators[2])))
+                .GenerateList();
+                
+            var releaseFootnotes = _releaseFootnoteGenerator
+                .ForInstance(s => s.Set(rf => rf.Release, release))
+                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
+                .GenerateList(footnotes.Count);
 
-            var indicatorGroup1 = new IndicatorGroup
-            {
-                Label = "Indicator group 1",
-                Subject = subject1,
-                Indicators = new List<Indicator>
-                {
-                    new()
-                    {
-                        Label = "Indicator 1"
-                    },
-                    new()
-                    {
-                        Label = "Indicator 2"
-                    },
-                    new()
-                    {
-                        Label = "Indicator 3"
-                    }
-                }
-            };
-
-            var release = new Release
-            {
-                Footnotes = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to indicator 1",
-                            Order = 0,
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = indicatorGroup1.Indicators[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to indicator 3",
-                            Order = 1,
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = indicatorGroup1.Indicators[2]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to indicator 1 and indicator 3",
-                            Order = 2,
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = indicatorGroup1.Indicators[0]
-                                },
-                                new()
-                                {
-                                    Indicator = indicatorGroup1.Indicators[2]
-                                }
-                            }
-                        }
-                    },
-                }
-            };
-
-            var releaseFootnotes = release.Footnotes.ToList();
-
-            var releaseSubjects = new List<ReleaseSubject>
-            {
-                new()
-                {
-                    Release = release,
-                    Subject = subject1
-                }
-            };
-
+            var releaseSubject = _releaseSubjectGenerator
+                .ForInstance(s => s.Set(rs => rs.Release, release))
+                .ForInstance(s => s.Set(rs => rs.Subject, subject))
+                .Generate();
+        
             var contextId = Guid.NewGuid().ToString();
-
+        
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
-                await context.Subject.AddAsync(subject1);
-                await context.IndicatorGroup.AddAsync(indicatorGroup1);
+                await context.Subject.AddAsync(subject);
+                await context.IndicatorGroup.AddAsync(indicatorGroup);
                 await context.Release.AddAsync(release);
-                await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
+                await context.ReleaseSubject.AddRangeAsync(releaseSubject);
+                await context.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
                 await context.SaveChangesAsync();
             }
-
+        
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
-
+        
                 //  Get the footnotes applying to indicator 1 or indicator 2
                 var results = await repository.GetFilteredFootnotes(
                     releaseId: release.Id,
-                    subjectId: subject1.Id,
+                    subjectId: subject.Id,
                     filterItemIds: ListOf<Guid>(),
-                    indicatorIds: ListOf(indicatorGroup1.Indicators[0].Id,
-                        indicatorGroup1.Indicators[1].Id)
+                    indicatorIds: ListOf(indicatorGroup.Indicators[0].Id,
+                        indicatorGroup.Indicators[1].Id)
                 );
-
+        
                 // Check that only footnotes applying to indicator 1 are returned.
                 // No footnotes apply to indicator 2 but including its id in the parameter shouldn't alter the result.
                 // The footnote which applies only to indicator 3 should be excluded.
                 Assert.Equal(2, results.Count);
-
+        
                 Assert.Equal(releaseFootnotes[0].FootnoteId, results[0].Id);
                 Assert.Equal("Applies to indicator 1", results[0].Content);
-
+        
                 Assert.Equal(releaseFootnotes[2].FootnoteId, results[1].Id);
                 Assert.Equal("Applies to indicator 1 and indicator 3", results[1].Content);
             }
         }
-
+        
         [Fact]
         public async Task GetFilteredFootnotes_FootnotesApplyToMultipleSubjects()
         {
-            var subject1 = new Subject();
-            var subject2 = new Subject();
+            var release = _releaseGenerator.Generate();
+            
+            // todo a default one with new filtergroups and all?
+            var filters = _filterGenerator
+                .WithFilterGroups(_ => _filterGroupGenerator
+                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+                    .GenerateList(1))
+                .GenerateList(4);
+            
+            var (subject1, subject2) = _subjectsGenerator
+                .ForIndex(0, s => s.SetFilters(filters.GetRange(0, 1)))
+                .ForIndex(1, s => s.SetFilters(filters.GetRange(1, 3)))
+                .GenerateTuple2();
 
-            var subject1Filter1 = new Filter
-            {
-                Label = "Subject 1 filter 1",
-                Subject = subject1,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 1 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 1 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
+            var indicatorGroup = _indicatorGroupGenerator
+                .WithIndicators(_indicatorGenerator.GenerateList(2))
+                .WithSubject(subject1)
+                .Generate();
 
-            var subject2Filter1 = new Filter
-            {
-                Label = "Subject 2 filter 1",
-                Subject = subject2,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 1 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 1 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
-
-            var subject2Filter2 = new Filter
-            {
-                Label = "Subject 2 filter 2",
-                Subject = subject2,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 2 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 2 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
-
-            var subject2Filter3 = new Filter
-            {
-                Label = "Subject 2 filter 3",
-                Subject = subject2,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 3 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 3 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
-
-            var subject1IndicatorGroup1 = new IndicatorGroup
-            {
-                Label = "Indicator group 1",
-                Subject = subject1,
-                Indicators = new List<Indicator>
-                {
-                    new()
-                    {
-                        Label = "Indicator 1"
-                    }
-                }
-            };
-
-            var subject2IndicatorGroup1 = new IndicatorGroup
-            {
-                Label = "Subject 2 indicator group 1",
-                Subject = subject2,
-                Indicators = new List<Indicator>
-                {
-                    new()
-                    {
-                        Label = "Indicator 1"
-                    }
-                }
-            };
-
+            
             // Set up a release with footnotes that apply to both subject 1 and subject 2
-            var release = new Release
-            {
-                Footnotes = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        // Footnote applies to subject 1 and subject 2
-                        Footnote = new Footnote
-                        {
-                            Content = "Footnote 1",
-                            Order = 0,
-                            Subjects = new List<SubjectFootnote>
-                            {
-                                new()
-                                {
-                                    Subject = subject1
-                                },
-                                new()
-                                {
-                                    Subject = subject2
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        // Footnote applies to subject 1 filter 1
-                        // and subject 2 filter 1
-                        // and subject 2 filter 2 group 1
-                        // and subject 2 filter 3 group 1 item 1
-                        Footnote = new Footnote
-                        {
-                            Content = "Footnote 2",
-                            Order = 1,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = subject1Filter1
-                                },
-                                new()
-                                {
-                                    Filter = subject2Filter1
-                                }
-                            },
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = subject2Filter2.FilterGroups[0]
-                                }
-                            },
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = subject2Filter3.FilterGroups[0].FilterItems[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        // Footnote applies to subject 1 indicator 1
-                        // and subject 2 filter 1
-                        Footnote = new Footnote
-                        {
-                            Content = "Footnote 3",
-                            Order = 2,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = subject2Filter1
-                                }
-                            },
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = subject1IndicatorGroup1.Indicators[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        // Footnote applies to subject 1 filter  1
-                        // and subject 2 indicator 1
-                        Footnote = new Footnote
-                        {
-                            Content = "Footnote 4",
-                            Order = 3,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = subject1Filter1
-                                }
-                            },
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = subject2IndicatorGroup1.Indicators[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        // Footnote applies to subject 1 indicator  1
-                        // and subject 2 indicator 1
-                        Footnote = new Footnote
-                        {
-                            Content = "Footnote 5",
-                            Order = 4,
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = subject1IndicatorGroup1.Indicators[0]
-                                },
-                                new()
-                                {
-                                    Indicator = subject2IndicatorGroup1.Indicators[0]
-                                }
-                            }
-                        }
-                    }
-                }
-            };
+            
+            
+            // Footnote applies to subject 1 and subject 2
 
-            var releaseFootnotes = release.Footnotes.ToList();
+                        
+                        
+            // Footnote applies to subject 1 filter 1
+            // and subject 2 filter 1
+            // and subject 2 filter 2 group 1
+            // and subject 2 filter 3 group 1 item 1
 
-            var releaseSubjects = new List<ReleaseSubject>
-            {
-                new()
-                {
-                    Release = release,
-                    Subject = subject1
-                },
-                new()
-                {
-                    Release = release,
-                    Subject = subject2
-                }
-            };
+                        
+                        
+                        
+            // Footnote applies to subject 1 indicator 1
+            // and subject 2 filter 1
 
+                        
+                        
+                        
+            // Footnote applies to subject 1 filter  1
+            // and subject 2 indicator 1
+
+                        
+                        
+                        
+            // Footnote applies to subject 1 indicator  1
+            // and subject 2 indicator 1
+
+
+            var footnotes = _footnoteGenerator
+                .ForIndex(0, s => s
+                    .Set(f => f.Content, "Applies to subject 1 and subject 2")
+                    .SetSubjects(_ => ListOf(subject1, subject2)))
+                .ForIndex(1, s => s
+                    .Set(f => f.Content, "Applies to s1f1 s2f1 s2f2g1 s2f3g1i1")
+                    .SetFilters(_ => ListOf(filter.FilterGroups[0])))
+                .ForIndex(2, s => s
+                    .Set(f => f.Content, "Applies to subject 1 indicator 1 and subject 2 filter 1")
+                    .SetFilterItems(_ => ListOf(filter.FilterGroups[0].FilterItems[0])))
+                .ForIndex(3, s => s
+                    .Set(f => f.Content, "Footnote applies to subject 1 filter 1 and subject 2 indicator 1")
+                    .SetFilterItems(_ => ListOf(filter.FilterGroups[0].FilterItems[1])))
+                .ForIndex(4, s => s
+                    .Set(f => f.Content, "Footnote applies to subject 1 indicator 1 and subject 2 indicator 1")
+                    .SetIndicators(_ => ListOf(indicatorGroup.Indicators[0])))
+                .GenerateList();
+                
+            var releaseFootnotes = _releaseFootnoteGenerator
+                .ForInstance(s => s.Set(rf => rf.Release, release))
+                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
+                .GenerateList(footnotes.Count);
+
+            var releaseSubject = _releaseSubjectGenerator
+                .ForInstance(s => s.Set(rs => rs.Release, release))
+                .ForInstance(s => s.Set(rs => rs.Subject, subject1))
+                .Generate();
+        
             var contextId = Guid.NewGuid().ToString();
-
+        
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 await context.Subject.AddRangeAsync(subject1, subject2);
@@ -1870,11 +747,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
                 await context.SaveChangesAsync();
             }
-
+        
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
-
+        
                 // This test makes sure that applying footnotes to more than one subject doesn't exclude them from the
                 // result.
                 
@@ -1884,733 +761,733 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     subjectId: subject1.Id,
                     filterItemIds: ListOf(subject1Filter1.FilterGroups[0].FilterItems[0].Id),
                     indicatorIds: ListOf(subject1IndicatorGroup1.Indicators[0].Id));
-
+        
                 // Check that all of the footnotes are returned even though they have also been applied to subject 2
                 Assert.Equal(5, results.Count);
-
+        
                 // Footnote applies to the requested subject as well as another subject
                 Assert.Equal(releaseFootnotes[0].FootnoteId, results[0].Id);
                 Assert.Equal("Footnote 1", results[0].Content);
-
+        
                 // Footnote applies to a requested filter item via its filter as well as another subject's filter,
                 // filter group, and filter item
                 Assert.Equal(releaseFootnotes[1].FootnoteId, results[1].Id);
                 Assert.Equal("Footnote 2", results[1].Content);
-
+        
                 // Footnote applies to a requested indicator as well as another subject's filter
                 Assert.Equal(releaseFootnotes[2].FootnoteId, results[2].Id);
                 Assert.Equal("Footnote 3", results[2].Content);
-
+        
                 // Footnote applies to a requested filter via its filter item as well as another subject's indicator
                 Assert.Equal(releaseFootnotes[3].FootnoteId, results[3].Id);
                 Assert.Equal("Footnote 4", results[3].Content);
-
+        
                 // Footnote applies to a requested indicator as well as another subject's indicator
                 Assert.Equal(releaseFootnotes[4].FootnoteId, results[4].Id);
                 Assert.Equal("Footnote 5", results[4].Content);
             }
         }
-
-        [Fact]
-        public async Task GetFilteredFootnotes_FilterByEmptyListOfFiltersAndIndicators()
-        {
-            var subject1 = new Subject();
-            var subject2 = new Subject();
-
-            var subject1Filter1 = new Filter
-            {
-                Label = "Subject 1 filter 1",
-                Subject = subject1,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 1 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 1 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
-
-            var subject1Filter2 = new Filter
-            {
-                Label = "Subject 1 filter 2",
-                Subject = subject1,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 2 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 2 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
-
-            var subject1Filter3 = new Filter
-            {
-                Label = "Subject 1 filter 3",
-                Subject = subject1,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 3 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 3 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
-
-            var subject1IndicatorGroup1 = new IndicatorGroup
-            {
-                Label = "Subject 1 indicator group 1",
-                Subject = subject1,
-                Indicators = new List<Indicator>
-                {
-                    new()
-                    {
-                        Label = "Indicator 1"
-                    }
-                }
-            };
-
-            var release = new Release
-            {
-                Footnotes = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1",
-                            Order = 0,
-                            Subjects = new List<SubjectFootnote>
-                            {
-                                new()
-                                {
-                                    Subject = subject1
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 filter 1",
-                            Order = 1,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = subject1Filter1
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 filter 2 group 1",
-                            Order = 2,
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = subject1Filter2.FilterGroups[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 filter 3 group 1 item 1",
-                            Order = 3,
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = subject1Filter3.FilterGroups[0].FilterItems[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 indicator 1",
-                            Order = 4,
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = subject1IndicatorGroup1.Indicators[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 2",
-                            Order = 5,
-                            Subjects = new List<SubjectFootnote>
-                            {
-                                new()
-                                {
-                                    Subject = subject2
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-
-            var releaseFootnotes = release.Footnotes.ToList();
-
-            var releaseSubjects = new List<ReleaseSubject>
-            {
-                new()
-                {
-                    Release = release,
-                    Subject = subject1
-                },
-                new()
-                {
-                    Release = release,
-                    Subject = subject2
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryStatisticsDbContext(contextId))
-            {
-                await context.Subject.AddRangeAsync(subject1, subject2);
-                await context.Filter.AddRangeAsync(subject1Filter1, subject1Filter2, subject1Filter3);
-                await context.IndicatorGroup.AddAsync(subject1IndicatorGroup1);
-                await context.Release.AddAsync(release);
-                await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryStatisticsDbContext(contextId))
-            {
-                var repository = BuildFootnoteRepository(context);
-
-                //  Get footnotes applying directly to subject 1 using empty lists of filter item and indicator id's
-                var results = await repository.GetFilteredFootnotes(
-                    releaseId: release.Id,
-                    subjectId: subject1.Id,
-                    filterItemIds: ListOf<Guid>(),
-                    indicatorIds: ListOf<Guid>());
-
-                // Check that only the footnotes which apply directly to subject 1 are returned
-                // Other footnotes related to subject 1 should be ignored as no filter items or indicators were requested
-                Assert.Single(results);
-
-                Assert.Equal(releaseFootnotes[0].FootnoteId, results[0].Id);
-                Assert.Equal("Applies to subject 1", results[0].Content);
-            }
-        }
-
-        [Fact]
-        public async Task GetFilteredFootnotes_IgnoresFootnotesUnrelatedToRelease()
-        {
-            var subject1 = new Subject();
-
-            var filter1 = new Filter
-            {
-                Label = "Filter 1",
-                Subject = subject1,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 1 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 1 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
-
-            var filter2 = new Filter
-            {
-                Label = "Filter 2",
-                Subject = subject1,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 2 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 2 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
-
-            var filter3 = new Filter
-            {
-                Label = "Filter 3",
-                Subject = subject1,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 3 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 3 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
-
-            var indicatorGroup1 = new IndicatorGroup
-            {
-                Label = "Indicator group 1",
-                Subject = subject1,
-                Indicators = new List<Indicator>
-                {
-                    new()
-                    {
-                        Label = "Indicator 1"
-                    }
-                }
-            };
-
-            var release1 = new Release
-            {
-                Footnotes = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1",
-                            Order = 0,
-                            Subjects = new List<SubjectFootnote>
-                            {
-                                new()
-                                {
-                                    Subject = subject1
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 filter 1",
-                            Order = 1,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = filter1
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 filter 2 group 1",
-                            Order = 2,
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = filter2.FilterGroups[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 filter 3 group 1 item 1",
-                            Order = 3,
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = filter3.FilterGroups[0].FilterItems[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 indicator 1",
-                            Order = 4,
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = indicatorGroup1.Indicators[0]
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-
-            // Create another release which has no footnotes
-            var release2 = new Release();
-
-            var releaseSubjects = new List<ReleaseSubject>
-            {
-                new()
-                {
-                    Release = release1,
-                    Subject = subject1
-                },
-                new()
-                {
-                    Release = release2,
-                    Subject = subject1
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryStatisticsDbContext(contextId))
-            {
-                await context.Subject.AddAsync(subject1);
-                await context.Filter.AddRangeAsync(filter1, filter2, filter3);
-                await context.IndicatorGroup.AddAsync(indicatorGroup1);
-                await context.Release.AddRangeAsync(release1, release2);
-                await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryStatisticsDbContext(contextId))
-            {
-                var repository = BuildFootnoteRepository(context);
-
-                // This test covers a case where a subject is shared by multiple releases. It makes sure that when other
-                // releases have footnotes for the subject, that there's no way of retrieving those footnotes that
-                // belong to other releases by specifying the subject id and filter item and indicator id's of the subject.
-
-                var filter1Group1Item1Id = filter1.FilterGroups[0].FilterItems[0].Id;
-                var filter2Group1Item1Id = filter2.FilterGroups[0].FilterItems[0].Id;
-                var filter3Group1Item1Id = filter3.FilterGroups[0].FilterItems[0].Id;
-                var indicatorGroup1Item1Id = indicatorGroup1.Indicators[0].Id;
-
-                var results = await repository.GetFilteredFootnotes(
-                    releaseId: release2.Id, // release 2 has no footnotes
-                    subjectId: subject1.Id,
-                    filterItemIds: ListOf(filter1Group1Item1Id, filter2Group1Item1Id, filter3Group1Item1Id),
-                    indicatorIds: ListOf(indicatorGroup1Item1Id));
-
-                // Check that no footnotes are returned even though subject 1 has footnotes for a different release
-                Assert.Empty(results);
-            }
-        }
-
-        [Fact]
-        public async Task GetFilteredFootnotes_IgnoresRequestedFilterItemsAndIndicatorsUnrelatedToSubject()
-        {
-            var subject1 = new Subject();
-            var subject2 = new Subject();
-
-            var subject1Filter1 = new Filter
-            {
-                Label = "Subject 1 filter 1",
-                Subject = subject1,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 1 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 1 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
-
-            var subject1Filter2 = new Filter
-            {
-                Label = "Subject 1 filter 2",
-                Subject = subject1,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 2 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 2 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
-
-            var subject1Filter3 = new Filter
-            {
-                Label = "Subject 1 filter 3",
-                Subject = subject1,
-                FilterGroups = new List<FilterGroup>
-                {
-                    new()
-                    {
-                        Label = "Filter 3 group 1",
-                        FilterItems = new List<FilterItem>
-                        {
-                            new()
-                            {
-                                Label = "Filter 3 group 1 item 1"
-                            }
-                        }
-                    }
-                }
-            };
-
-            var subject1IndicatorGroup1 = new IndicatorGroup
-            {
-                Label = "Subject 1 indicator group 1",
-                Subject = subject1,
-                Indicators = new List<Indicator>
-                {
-                    new()
-                    {
-                        Label = "Indicator 1"
-                    }
-                }
-            };
-
-            var subject2IndicatorGroup1 = new IndicatorGroup
-            {
-                Label = "Subject 2 indicator group 1",
-                Subject = subject2,
-                Indicators = new List<Indicator>
-                {
-                    new()
-                    {
-                        Label = "Indicator 1"
-                    }
-                }
-            };
-
-            var release = new Release
-            {
-                Footnotes = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1",
-                            Order = 0,
-                            Subjects = new List<SubjectFootnote>
-                            {
-                                new()
-                                {
-                                    Subject = subject1
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 filter 1",
-                            Order = 1,
-                            Filters = new List<FilterFootnote>
-                            {
-                                new()
-                                {
-                                    Filter = subject1Filter1
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 filter 2 group 1",
-                            Order = 2,
-                            FilterGroups = new List<FilterGroupFootnote>
-                            {
-                                new()
-                                {
-                                    FilterGroup = subject1Filter2.FilterGroups[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 filter 3 group 1 item 1",
-                            Order = 3,
-                            FilterItems = new List<FilterItemFootnote>
-                            {
-                                new()
-                                {
-                                    FilterItem = subject1Filter3.FilterGroups[0].FilterItems[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 1 indicator 1",
-                            Order = 4,
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = subject1IndicatorGroup1.Indicators[0]
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 2",
-                            Order = 5,
-                            Subjects = new List<SubjectFootnote>
-                            {
-                                new()
-                                {
-                                    Subject = subject2
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Footnote = new Footnote
-                        {
-                            Content = "Applies to subject 2 indicator 1",
-                            Order = 6,
-                            Indicators = new List<IndicatorFootnote>
-                            {
-                                new()
-                                {
-                                    Indicator = subject2IndicatorGroup1.Indicators[0]
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-
-            var releaseFootnotes = release.Footnotes.ToList();
-
-            var releaseSubjects = new List<ReleaseSubject>
-            {
-                new()
-                {
-                    Release = release,
-                    Subject = subject1
-                },
-                new()
-                {
-                    Release = release,
-                    Subject = subject2
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryStatisticsDbContext(contextId))
-            {
-                await context.Subject.AddRangeAsync(subject1, subject2);
-                await context.Filter.AddRangeAsync(subject1Filter1, subject1Filter2, subject1Filter3);
-                await context.IndicatorGroup.AddRangeAsync(subject1IndicatorGroup1, subject2IndicatorGroup1);
-                await context.Release.AddAsync(release);
-                await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryStatisticsDbContext(contextId))
-            {
-                var repository = BuildFootnoteRepository(context);
-
-                // Get footnotes applying to subject 2
-                // but also include filter item and indicator id's from subject 1
-                var results = await repository.GetFilteredFootnotes(
-                    releaseId: release.Id,
-                    subjectId: subject2.Id,
-                    filterItemIds: ListOf(
-                        subject1Filter1.FilterGroups[0].FilterItems[0].Id, // subject 1
-                        subject1Filter2.FilterGroups[0].FilterItems[0].Id, // subject 1
-                        subject1Filter3.FilterGroups[0].FilterItems[0].Id // subject 1
-                    ),
-                    indicatorIds: ListOf(
-                        subject1IndicatorGroup1.Indicators[0].Id, // subject 1
-                        subject2IndicatorGroup1.Indicators[0].Id // subject 2
-                    ));
-
-                // Check that only the footnotes which apply to subject 2 are returned
-                // The filter item and indicator id's related to subject 1 should have been ignored
-                // Footnotes applying to subject 1 should be excluded
-                Assert.Equal(2, results.Count);
-
-                Assert.Equal(releaseFootnotes[5].FootnoteId, results[0].Id);
-                Assert.Equal("Applies to subject 2", results[0].Content);
-
-                Assert.Equal(releaseFootnotes[6].FootnoteId, results[1].Id);
-                Assert.Equal("Applies to subject 2 indicator 1", results[1].Content);
-            }
-        }
+        //
+        // [Fact]
+        // public async Task GetFilteredFootnotes_FilterByEmptyListOfFiltersAndIndicators()
+        // {
+        //     var subject1 = new Subject();
+        //     var subject2 = new Subject();
+        //
+        //     var subject1Filter1 = new Filter
+        //     {
+        //         Label = "Subject 1 filter 1",
+        //         Subject = subject1,
+        //         FilterGroups = new List<FilterGroup>
+        //         {
+        //             new()
+        //             {
+        //                 Label = "Filter 1 group 1",
+        //                 FilterItems = new List<FilterItem>
+        //                 {
+        //                     new()
+        //                     {
+        //                         Label = "Filter 1 group 1 item 1"
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     };
+        //
+        //     var subject1Filter2 = new Filter
+        //     {
+        //         Label = "Subject 1 filter 2",
+        //         Subject = subject1,
+        //         FilterGroups = new List<FilterGroup>
+        //         {
+        //             new()
+        //             {
+        //                 Label = "Filter 2 group 1",
+        //                 FilterItems = new List<FilterItem>
+        //                 {
+        //                     new()
+        //                     {
+        //                         Label = "Filter 2 group 1 item 1"
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     };
+        //
+        //     var subject1Filter3 = new Filter
+        //     {
+        //         Label = "Subject 1 filter 3",
+        //         Subject = subject1,
+        //         FilterGroups = new List<FilterGroup>
+        //         {
+        //             new()
+        //             {
+        //                 Label = "Filter 3 group 1",
+        //                 FilterItems = new List<FilterItem>
+        //                 {
+        //                     new()
+        //                     {
+        //                         Label = "Filter 3 group 1 item 1"
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     };
+        //
+        //     var subject1IndicatorGroup1 = new IndicatorGroup
+        //     {
+        //         Label = "Subject 1 indicator group 1",
+        //         Subject = subject1,
+        //         Indicators = new List<Indicator>
+        //         {
+        //             new()
+        //             {
+        //                 Label = "Indicator 1"
+        //             }
+        //         }
+        //     };
+        //
+        //     var release = new Release
+        //     {
+        //         Footnotes = new List<ReleaseFootnote>
+        //         {
+        //             new()
+        //             {
+        //                 Footnote = new Footnote
+        //                 {
+        //                     Content = "Applies to subject 1",
+        //                     Order = 0,
+        //                     Subjects = new List<SubjectFootnote>
+        //                     {
+        //                         new()
+        //                         {
+        //                             Subject = subject1
+        //                         }
+        //                     }
+        //                 }
+        //             },
+        //             new()
+        //             {
+        //                 Footnote = new Footnote
+        //                 {
+        //                     Content = "Applies to subject 1 filter 1",
+        //                     Order = 1,
+        //                     Filters = new List<FilterFootnote>
+        //                     {
+        //                         new()
+        //                         {
+        //                             Filter = subject1Filter1
+        //                         }
+        //                     }
+        //                 }
+        //             },
+        //             new()
+        //             {
+        //                 Footnote = new Footnote
+        //                 {
+        //                     Content = "Applies to subject 1 filter 2 group 1",
+        //                     Order = 2,
+        //                     FilterGroups = new List<FilterGroupFootnote>
+        //                     {
+        //                         new()
+        //                         {
+        //                             FilterGroup = subject1Filter2.FilterGroups[0]
+        //                         }
+        //                     }
+        //                 }
+        //             },
+        //             new()
+        //             {
+        //                 Footnote = new Footnote
+        //                 {
+        //                     Content = "Applies to subject 1 filter 3 group 1 item 1",
+        //                     Order = 3,
+        //                     FilterItems = new List<FilterItemFootnote>
+        //                     {
+        //                         new()
+        //                         {
+        //                             FilterItem = subject1Filter3.FilterGroups[0].FilterItems[0]
+        //                         }
+        //                     }
+        //                 }
+        //             },
+        //             new()
+        //             {
+        //                 Footnote = new Footnote
+        //                 {
+        //                     Content = "Applies to subject 1 indicator 1",
+        //                     Order = 4,
+        //                     Indicators = new List<IndicatorFootnote>
+        //                     {
+        //                         new()
+        //                         {
+        //                             Indicator = subject1IndicatorGroup1.Indicators[0]
+        //                         }
+        //                     }
+        //                 }
+        //             },
+        //             new()
+        //             {
+        //                 Footnote = new Footnote
+        //                 {
+        //                     Content = "Applies to subject 2",
+        //                     Order = 5,
+        //                     Subjects = new List<SubjectFootnote>
+        //                     {
+        //                         new()
+        //                         {
+        //                             Subject = subject2
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     };
+        //
+        //     var releaseFootnotes = release.Footnotes.ToList();
+        //
+        //     var releaseSubjects = new List<ReleaseSubject>
+        //     {
+        //         new()
+        //         {
+        //             Release = release,
+        //             Subject = subject1
+        //         },
+        //         new()
+        //         {
+        //             Release = release,
+        //             Subject = subject2
+        //         }
+        //     };
+        //
+        //     var contextId = Guid.NewGuid().ToString();
+        //
+        //     await using (var context = InMemoryStatisticsDbContext(contextId))
+        //     {
+        //         await context.Subject.AddRangeAsync(subject1, subject2);
+        //         await context.Filter.AddRangeAsync(subject1Filter1, subject1Filter2, subject1Filter3);
+        //         await context.IndicatorGroup.AddAsync(subject1IndicatorGroup1);
+        //         await context.Release.AddAsync(release);
+        //         await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
+        //         await context.SaveChangesAsync();
+        //     }
+        //
+        //     await using (var context = InMemoryStatisticsDbContext(contextId))
+        //     {
+        //         var repository = BuildFootnoteRepository(context);
+        //
+        //         //  Get footnotes applying directly to subject 1 using empty lists of filter item and indicator id's
+        //         var results = await repository.GetFilteredFootnotes(
+        //             releaseId: release.Id,
+        //             subjectId: subject1.Id,
+        //             filterItemIds: ListOf<Guid>(),
+        //             indicatorIds: ListOf<Guid>());
+        //
+        //         // Check that only the footnotes which apply directly to subject 1 are returned
+        //         // Other footnotes related to subject 1 should be ignored as no filter items or indicators were requested
+        //         Assert.Single(results);
+        //
+        //         Assert.Equal(releaseFootnotes[0].FootnoteId, results[0].Id);
+        //         Assert.Equal("Applies to subject 1", results[0].Content);
+        //     }
+        // }
+        //
+        // [Fact]
+        // public async Task GetFilteredFootnotes_IgnoresFootnotesUnrelatedToRelease()
+        // {
+        //     var subject1 = new Subject();
+        //
+        //     var filter1 = new Filter
+        //     {
+        //         Label = "Filter 1",
+        //         Subject = subject1,
+        //         FilterGroups = new List<FilterGroup>
+        //         {
+        //             new()
+        //             {
+        //                 Label = "Filter 1 group 1",
+        //                 FilterItems = new List<FilterItem>
+        //                 {
+        //                     new()
+        //                     {
+        //                         Label = "Filter 1 group 1 item 1"
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     };
+        //
+        //     var filter2 = new Filter
+        //     {
+        //         Label = "Filter 2",
+        //         Subject = subject1,
+        //         FilterGroups = new List<FilterGroup>
+        //         {
+        //             new()
+        //             {
+        //                 Label = "Filter 2 group 1",
+        //                 FilterItems = new List<FilterItem>
+        //                 {
+        //                     new()
+        //                     {
+        //                         Label = "Filter 2 group 1 item 1"
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     };
+        //
+        //     var filter3 = new Filter
+        //     {
+        //         Label = "Filter 3",
+        //         Subject = subject1,
+        //         FilterGroups = new List<FilterGroup>
+        //         {
+        //             new()
+        //             {
+        //                 Label = "Filter 3 group 1",
+        //                 FilterItems = new List<FilterItem>
+        //                 {
+        //                     new()
+        //                     {
+        //                         Label = "Filter 3 group 1 item 1"
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     };
+        //
+        //     var indicatorGroup1 = new IndicatorGroup
+        //     {
+        //         Label = "Indicator group 1",
+        //         Subject = subject1,
+        //         Indicators = new List<Indicator>
+        //         {
+        //             new()
+        //             {
+        //                 Label = "Indicator 1"
+        //             }
+        //         }
+        //     };
+        //
+        //     var release1 = new Release
+        //     {
+        //         Footnotes = new List<ReleaseFootnote>
+        //         {
+        //             new()
+        //             {
+        //                 Footnote = new Footnote
+        //                 {
+        //                     Content = "Applies to subject 1",
+        //                     Order = 0,
+        //                     Subjects = new List<SubjectFootnote>
+        //                     {
+        //                         new()
+        //                         {
+        //                             Subject = subject1
+        //                         }
+        //                     }
+        //                 }
+        //             },
+        //             new()
+        //             {
+        //                 Footnote = new Footnote
+        //                 {
+        //                     Content = "Applies to subject 1 filter 1",
+        //                     Order = 1,
+        //                     Filters = new List<FilterFootnote>
+        //                     {
+        //                         new()
+        //                         {
+        //                             Filter = filter1
+        //                         }
+        //                     }
+        //                 }
+        //             },
+        //             new()
+        //             {
+        //                 Footnote = new Footnote
+        //                 {
+        //                     Content = "Applies to subject 1 filter 2 group 1",
+        //                     Order = 2,
+        //                     FilterGroups = new List<FilterGroupFootnote>
+        //                     {
+        //                         new()
+        //                         {
+        //                             FilterGroup = filter2.FilterGroups[0]
+        //                         }
+        //                     }
+        //                 }
+        //             },
+        //             new()
+        //             {
+        //                 Footnote = new Footnote
+        //                 {
+        //                     Content = "Applies to subject 1 filter 3 group 1 item 1",
+        //                     Order = 3,
+        //                     FilterItems = new List<FilterItemFootnote>
+        //                     {
+        //                         new()
+        //                         {
+        //                             FilterItem = filter3.FilterGroups[0].FilterItems[0]
+        //                         }
+        //                     }
+        //                 }
+        //             },
+        //             new()
+        //             {
+        //                 Footnote = new Footnote
+        //                 {
+        //                     Content = "Applies to subject 1 indicator 1",
+        //                     Order = 4,
+        //                     Indicators = new List<IndicatorFootnote>
+        //                     {
+        //                         new()
+        //                         {
+        //                             Indicator = indicatorGroup1.Indicators[0]
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     };
+        //
+        //     // Create another release which has no footnotes
+        //     var release2 = new Release();
+        //
+        //     var releaseSubjects = new List<ReleaseSubject>
+        //     {
+        //         new()
+        //         {
+        //             Release = release1,
+        //             Subject = subject1
+        //         },
+        //         new()
+        //         {
+        //             Release = release2,
+        //             Subject = subject1
+        //         }
+        //     };
+        //
+        //     var contextId = Guid.NewGuid().ToString();
+        //
+        //     await using (var context = InMemoryStatisticsDbContext(contextId))
+        //     {
+        //         await context.Subject.AddAsync(subject1);
+        //         await context.Filter.AddRangeAsync(filter1, filter2, filter3);
+        //         await context.IndicatorGroup.AddAsync(indicatorGroup1);
+        //         await context.Release.AddRangeAsync(release1, release2);
+        //         await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
+        //         await context.SaveChangesAsync();
+        //     }
+        //
+        //     await using (var context = InMemoryStatisticsDbContext(contextId))
+        //     {
+        //         var repository = BuildFootnoteRepository(context);
+        //
+        //         // This test covers a case where a subject is shared by multiple releases. It makes sure that when other
+        //         // releases have footnotes for the subject, that there's no way of retrieving those footnotes that
+        //         // belong to other releases by specifying the subject id and filter item and indicator id's of the subject.
+        //
+        //         var filter1Group1Item1Id = filter1.FilterGroups[0].FilterItems[0].Id;
+        //         var filter2Group1Item1Id = filter2.FilterGroups[0].FilterItems[0].Id;
+        //         var filter3Group1Item1Id = filter3.FilterGroups[0].FilterItems[0].Id;
+        //         var indicatorGroup1Item1Id = indicatorGroup1.Indicators[0].Id;
+        //
+        //         var results = await repository.GetFilteredFootnotes(
+        //             releaseId: release2.Id, // release 2 has no footnotes
+        //             subjectId: subject1.Id,
+        //             filterItemIds: ListOf(filter1Group1Item1Id, filter2Group1Item1Id, filter3Group1Item1Id),
+        //             indicatorIds: ListOf(indicatorGroup1Item1Id));
+        //
+        //         // Check that no footnotes are returned even though subject 1 has footnotes for a different release
+        //         Assert.Empty(results);
+        //     }
+        // }
+        //
+        // [Fact]
+        // public async Task GetFilteredFootnotes_IgnoresRequestedFilterItemsAndIndicatorsUnrelatedToSubject()
+        // {
+        //     var subject1 = new Subject();
+        //     var subject2 = new Subject();
+        //
+        //     var subject1Filter1 = new Filter
+        //     {
+        //         Label = "Subject 1 filter 1",
+        //         Subject = subject1,
+        //         FilterGroups = new List<FilterGroup>
+        //         {
+        //             new()
+        //             {
+        //                 Label = "Filter 1 group 1",
+        //                 FilterItems = new List<FilterItem>
+        //                 {
+        //                     new()
+        //                     {
+        //                         Label = "Filter 1 group 1 item 1"
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     };
+        //
+        //     var subject1Filter2 = new Filter
+        //     {
+        //         Label = "Subject 1 filter 2",
+        //         Subject = subject1,
+        //         FilterGroups = new List<FilterGroup>
+        //         {
+        //             new()
+        //             {
+        //                 Label = "Filter 2 group 1",
+        //                 FilterItems = new List<FilterItem>
+        //                 {
+        //                     new()
+        //                     {
+        //                         Label = "Filter 2 group 1 item 1"
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     };
+        //
+        //     var subject1Filter3 = new Filter
+        //     {
+        //         Label = "Subject 1 filter 3",
+        //         Subject = subject1,
+        //         FilterGroups = new List<FilterGroup>
+        //         {
+        //             new()
+        //             {
+        //                 Label = "Filter 3 group 1",
+        //                 FilterItems = new List<FilterItem>
+        //                 {
+        //                     new()
+        //                     {
+        //                         Label = "Filter 3 group 1 item 1"
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     };
+        //
+        //     var subject1IndicatorGroup1 = new IndicatorGroup
+        //     {
+        //         Label = "Subject 1 indicator group 1",
+        //         Subject = subject1,
+        //         Indicators = new List<Indicator>
+        //         {
+        //             new()
+        //             {
+        //                 Label = "Indicator 1"
+        //             }
+        //         }
+        //     };
+        //
+        //     var subject2IndicatorGroup1 = new IndicatorGroup
+        //     {
+        //         Label = "Subject 2 indicator group 1",
+        //         Subject = subject2,
+        //         Indicators = new List<Indicator>
+        //         {
+        //             new()
+        //             {
+        //                 Label = "Indicator 1"
+        //             }
+        //         }
+        //     };
+        //
+        //     var release = new Release
+        //     {
+        //         Footnotes = new List<ReleaseFootnote>
+        //         {
+        //             new()
+        //             {
+        //                 Footnote = new Footnote
+        //                 {
+        //                     Content = "Applies to subject 1",
+        //                     Order = 0,
+        //                     Subjects = new List<SubjectFootnote>
+        //                     {
+        //                         new()
+        //                         {
+        //                             Subject = subject1
+        //                         }
+        //                     }
+        //                 }
+        //             },
+        //             new()
+        //             {
+        //                 Footnote = new Footnote
+        //                 {
+        //                     Content = "Applies to subject 1 filter 1",
+        //                     Order = 1,
+        //                     Filters = new List<FilterFootnote>
+        //                     {
+        //                         new()
+        //                         {
+        //                             Filter = subject1Filter1
+        //                         }
+        //                     }
+        //                 }
+        //             },
+        //             new()
+        //             {
+        //                 Footnote = new Footnote
+        //                 {
+        //                     Content = "Applies to subject 1 filter 2 group 1",
+        //                     Order = 2,
+        //                     FilterGroups = new List<FilterGroupFootnote>
+        //                     {
+        //                         new()
+        //                         {
+        //                             FilterGroup = subject1Filter2.FilterGroups[0]
+        //                         }
+        //                     }
+        //                 }
+        //             },
+        //             new()
+        //             {
+        //                 Footnote = new Footnote
+        //                 {
+        //                     Content = "Applies to subject 1 filter 3 group 1 item 1",
+        //                     Order = 3,
+        //                     FilterItems = new List<FilterItemFootnote>
+        //                     {
+        //                         new()
+        //                         {
+        //                             FilterItem = subject1Filter3.FilterGroups[0].FilterItems[0]
+        //                         }
+        //                     }
+        //                 }
+        //             },
+        //             new()
+        //             {
+        //                 Footnote = new Footnote
+        //                 {
+        //                     Content = "Applies to subject 1 indicator 1",
+        //                     Order = 4,
+        //                     Indicators = new List<IndicatorFootnote>
+        //                     {
+        //                         new()
+        //                         {
+        //                             Indicator = subject1IndicatorGroup1.Indicators[0]
+        //                         }
+        //                     }
+        //                 }
+        //             },
+        //             new()
+        //             {
+        //                 Footnote = new Footnote
+        //                 {
+        //                     Content = "Applies to subject 2",
+        //                     Order = 5,
+        //                     Subjects = new List<SubjectFootnote>
+        //                     {
+        //                         new()
+        //                         {
+        //                             Subject = subject2
+        //                         }
+        //                     }
+        //                 }
+        //             },
+        //             new()
+        //             {
+        //                 Footnote = new Footnote
+        //                 {
+        //                     Content = "Applies to subject 2 indicator 1",
+        //                     Order = 6,
+        //                     Indicators = new List<IndicatorFootnote>
+        //                     {
+        //                         new()
+        //                         {
+        //                             Indicator = subject2IndicatorGroup1.Indicators[0]
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     };
+        //
+        //     var releaseFootnotes = release.Footnotes.ToList();
+        //
+        //     var releaseSubjects = new List<ReleaseSubject>
+        //     {
+        //         new()
+        //         {
+        //             Release = release,
+        //             Subject = subject1
+        //         },
+        //         new()
+        //         {
+        //             Release = release,
+        //             Subject = subject2
+        //         }
+        //     };
+        //
+        //     var contextId = Guid.NewGuid().ToString();
+        //
+        //     await using (var context = InMemoryStatisticsDbContext(contextId))
+        //     {
+        //         await context.Subject.AddRangeAsync(subject1, subject2);
+        //         await context.Filter.AddRangeAsync(subject1Filter1, subject1Filter2, subject1Filter3);
+        //         await context.IndicatorGroup.AddRangeAsync(subject1IndicatorGroup1, subject2IndicatorGroup1);
+        //         await context.Release.AddAsync(release);
+        //         await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
+        //         await context.SaveChangesAsync();
+        //     }
+        //
+        //     await using (var context = InMemoryStatisticsDbContext(contextId))
+        //     {
+        //         var repository = BuildFootnoteRepository(context);
+        //
+        //         // Get footnotes applying to subject 2
+        //         // but also include filter item and indicator id's from subject 1
+        //         var results = await repository.GetFilteredFootnotes(
+        //             releaseId: release.Id,
+        //             subjectId: subject2.Id,
+        //             filterItemIds: ListOf(
+        //                 subject1Filter1.FilterGroups[0].FilterItems[0].Id, // subject 1
+        //                 subject1Filter2.FilterGroups[0].FilterItems[0].Id, // subject 1
+        //                 subject1Filter3.FilterGroups[0].FilterItems[0].Id // subject 1
+        //             ),
+        //             indicatorIds: ListOf(
+        //                 subject1IndicatorGroup1.Indicators[0].Id, // subject 1
+        //                 subject2IndicatorGroup1.Indicators[0].Id // subject 2
+        //             ));
+        //
+        //         // Check that only the footnotes which apply to subject 2 are returned
+        //         // The filter item and indicator id's related to subject 1 should have been ignored
+        //         // Footnotes applying to subject 1 should be excluded
+        //         Assert.Equal(2, results.Count);
+        //
+        //         Assert.Equal(releaseFootnotes[5].FootnoteId, results[0].Id);
+        //         Assert.Equal("Applies to subject 2", results[0].Content);
+        //
+        //         Assert.Equal(releaseFootnotes[6].FootnoteId, results[1].Id);
+        //         Assert.Equal("Applies to subject 2 indicator 1", results[1].Content);
+        //     }
+        // }
 
         [Fact]
         public async Task GetFootnotes_MapsAllCriteria()

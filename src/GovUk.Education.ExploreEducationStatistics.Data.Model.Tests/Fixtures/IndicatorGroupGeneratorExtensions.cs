@@ -34,6 +34,7 @@ public static class IndicatorGroupGeneratorExtensions
                 ig => ig.Subject,
                 (_, indicatorGroup) =>
                 {
+                    subject.IndicatorGroups ??= new List<IndicatorGroup>();
                     subject.IndicatorGroups.Add(indicatorGroup);
                     return subject;
                 }
