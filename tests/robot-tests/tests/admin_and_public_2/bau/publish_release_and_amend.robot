@@ -715,7 +715,7 @@ Navigate to amendment release page
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
     user waits until page contains title caption    ${RELEASE_NAME}
 
-    user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-%{RUN_IDENTIFIER}
+    user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-and-amend-%{RUN_IDENTIFIER}
 
     user checks breadcrumb count should be    3
     user checks nth breadcrumb contains    1    Home
