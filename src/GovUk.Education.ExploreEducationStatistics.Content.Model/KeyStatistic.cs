@@ -24,6 +24,14 @@ public abstract class KeyStatistic : ICreatedUpdatedTimestamps<DateTime, DateTim
 
     public DateTime? Updated { get; set; }
 
+    public Guid? CreatedById { get; set; }
+
+    public User? CreatedBy { get; set; }
+
+    public Guid? UpdatedById { get; set; }
+
+    public User? UpdatedBy { get; set; }
+
     public Guid ContentBlockIdTemp { get; set; } // TODO: Remove in EES-3988
 
     public KeyStatistic Clone(Release newRelease)

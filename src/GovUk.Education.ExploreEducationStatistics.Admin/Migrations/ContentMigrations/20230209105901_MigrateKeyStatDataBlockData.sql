@@ -1,11 +1,14 @@
-﻿INSERT INTO [dbo].[KeyStatistics] (Id, ReleaseId, Trend, GuidanceTitle, GuidanceText, [Order], Created, Updated, ContentBlockIdTemp)
+﻿INSERT INTO [dbo].[KeyStatistics] (Id, ReleaseId, Trend, GuidanceTitle, GuidanceText, [Order], Created, Updated, CreatedById, UpdatedById, ContentBlockIdTemp)
 SELECT NEWID() AS Id,
        RCS.ReleaseId AS ReleaseId,
        JSON_VALUE(DataBlock_Summary, '$.DataSummary[0]') AS Trend,
        JSON_VALUE(DataBlock_Summary, '$.DataDefinitionTitle[0]') AS GuidanceTitle,
        JSON_VALUE(DataBlock_Summary, '$.DataDefinition[0]') AS GuidanceText,
-       CB.[Order], GETDATE() AS Created,
+       CB.[Order],
+       GETDATE() AS Created,
        NULL AS Updated,
+       NULL AS CreatedById,
+       NULL AS UpdatedById,
        CB.[Id] as ContentBlockIdTemp
 FROM [dbo].[ContentBlock] CB
 JOIN [dbo].[ContentSections] CS ON CS.Id = CB.ContentSectionId

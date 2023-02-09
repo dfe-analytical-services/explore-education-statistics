@@ -67,6 +67,7 @@ public class KeyStatisticService : IKeyStatisticService
             {
                 var keyStatisticDataBlock = _mapper.Map<KeyStatisticDataBlock>(request);
                 keyStatisticDataBlock.ReleaseId = releaseId;
+                keyStatisticDataBlock.CreatedById = _userService.GetUserId();
 
                 var order = await _context.KeyStatistics
                     .Where(ks => ks.ReleaseId == releaseId)
@@ -95,6 +96,7 @@ public class KeyStatisticService : IKeyStatisticService
             {
                 _context.KeyStatisticsDataBlock.Update(keyStat);
 
+                keyStat.UpdatedById = _userService.GetUserId();
                 keyStat.Trend = request.Trend;
                 keyStat.GuidanceTitle = request.GuidanceTitle;
                 keyStat.GuidanceText = request.GuidanceText;
@@ -171,10 +173,13 @@ public class KeyStatisticService : IKeyStatisticService
                         ProvidedKeyStatIdsDifferFromReleaseKeyStatIds);
                 }
 
+                var updatingUserId = _userService.GetUserId();
+
                 newOrder.ForEach((keyStatisticId, order) =>
                 {
                     var matchingKeyStat = keyStatistics.Single(ks => ks.Id == keyStatisticId);
                     matchingKeyStat.Order = order;
+                    matchingKeyStat.UpdatedById = updatingUserId;
                 });
 
                 _context.KeyStatistics.UpdateRange(keyStatistics);

@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 {
     public partial class EES3828AddKeyStatisticsTablesTPT : Migration
     {
-        private const string MigrationId = "20230117100338";
+        private const string MigrationId = "20230209105901";
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -25,6 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     Order = table.Column<int>(type: "int", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Updated = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ContentBlockIdTemp = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -36,6 +38,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         principalTable: "Releases",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_KeyStatistics_Users_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_KeyStatistics_Users_UpdatedById",
+                        column: x => x.UpdatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -80,9 +92,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_KeyStatistics_CreatedById",
+                table: "KeyStatistics",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_KeyStatistics_ReleaseId",
                 table: "KeyStatistics",
                 column: "ReleaseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_KeyStatistics_UpdatedById",
+                table: "KeyStatistics",
+                column: "UpdatedById");
 
             migrationBuilder.CreateIndex(
                 name: "IX_KeyStatisticsDataBlock_DataBlockId",

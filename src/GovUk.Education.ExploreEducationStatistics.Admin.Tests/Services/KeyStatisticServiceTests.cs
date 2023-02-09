@@ -25,6 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
 public class KeyStatisticServiceTests
 {
+    private readonly Guid _userId = Guid.NewGuid();
+
     [Fact]
     public async Task CreateKeyStatisticDataBlock()
     {
@@ -104,6 +106,8 @@ public class KeyStatisticServiceTests
             Assert.Equal("guidanceTitle", keyStatDataBlock.GuidanceTitle);
             Assert.Equal("guidanceText", keyStatDataBlock.GuidanceText);
             Assert.Equal(0, keyStatDataBlock.Order);
+            Assert.Equal(_userId, keyStatDataBlock.CreatedById);
+            Assert.Null(keyStatDataBlock.UpdatedById);
             Assert.InRange(DateTime.UtcNow.Subtract(keyStatDataBlock.Created).Milliseconds, 0, 1500);
             Assert.Null(keyStatDataBlock.Updated);
         }
@@ -198,6 +202,8 @@ public class KeyStatisticServiceTests
             Assert.Null(keyStatDataBlock.GuidanceTitle);
             Assert.Null(keyStatDataBlock.GuidanceText);
             Assert.Equal(3, keyStatDataBlock.Order);
+            Assert.Equal(_userId, keyStatDataBlock.CreatedById);
+            Assert.Null(keyStatDataBlock.UpdatedById);
             Assert.InRange(DateTime.UtcNow.Subtract(keyStatDataBlock.Created).Milliseconds, 0, 1500);
             Assert.Null(keyStatDataBlock.Updated);
         }
@@ -355,6 +361,8 @@ public class KeyStatisticServiceTests
             GuidanceText = "guidanceText",
             Created = new DateTime(2000, 1, 1),
             Updated = null,
+            CreatedById = Guid.NewGuid(),
+            UpdatedById = Guid.NewGuid(),
         };
 
         var release = new Release
@@ -424,6 +432,8 @@ public class KeyStatisticServiceTests
             Assert.Equal(0, keyStatDataBlock.Order);
             Assert.Equal(new DateTime(2000, 1, 1), keyStatDataBlock.Created);
             Assert.NotNull(keyStatDataBlock.Updated);
+            Assert.Equal(keyStatisticDataBlock.CreatedById, keyStatDataBlock.CreatedById);
+            Assert.Equal(_userId, keyStatDataBlock.UpdatedById);
             Assert.InRange(DateTime.UtcNow.Subtract(keyStatDataBlock.Updated!.Value).Milliseconds, 0, 1500);
         }
     }
@@ -898,10 +908,30 @@ public class KeyStatisticServiceTests
     {
         var dataBlockId = Guid.NewGuid();
 
-        var keyStat0 = new KeyStatisticText { Order = 1 }; // will be reordered to match variable name
-        var keyStat1 = new KeyStatisticDataBlock { Order = 3 };
-        var keyStat2 = new KeyStatisticText { Order = 2 };
-        var keyStat3 = new KeyStatisticDataBlock { Order = 0 };
+        var keyStat0 = new KeyStatisticText // keyStats will be reordered to match variable name
+        {
+            Order = 1,
+            CreatedById = Guid.NewGuid(),
+            UpdatedById = null,
+        };
+        var keyStat1 = new KeyStatisticDataBlock
+        {
+            Order = 3,
+            CreatedById = Guid.NewGuid(),
+            UpdatedById = Guid.NewGuid(),
+        };
+        var keyStat2 = new KeyStatisticText
+        {
+            Order = 2,
+            CreatedById = Guid.NewGuid(),
+            UpdatedById = Guid.NewGuid(),
+        };
+        var keyStat3 = new KeyStatisticDataBlock
+        {
+            Order = 0,
+            CreatedById = Guid.NewGuid(),
+            UpdatedById = Guid.NewGuid(),
+        };
 
         var release = new Release
         {
@@ -964,12 +994,23 @@ public class KeyStatisticServiceTests
 
             Assert.Equal(keyStat0.Id, keyStatistics[0].Id);
             Assert.Equal(0, keyStatistics[0].Order);
+            Assert.Equal(keyStat0.CreatedById, keyStatistics[0].CreatedById);
+            Assert.Equal(_userId, keyStatistics[0].UpdatedById);
+
             Assert.Equal(keyStat1.Id, keyStatistics[1].Id);
             Assert.Equal(1, keyStatistics[1].Order);
+            Assert.Equal(keyStat1.CreatedById, keyStatistics[1].CreatedById);
+            Assert.Equal(_userId, keyStatistics[1].UpdatedById);
+
             Assert.Equal(keyStat2.Id, keyStatistics[2].Id);
             Assert.Equal(2, keyStatistics[2].Order);
+            Assert.Equal(keyStat2.CreatedById, keyStatistics[2].CreatedById);
+            Assert.Equal(_userId, keyStatistics[2].UpdatedById);
+
             Assert.Equal(keyStat3.Id, keyStatistics[3].Id);
             Assert.Equal(3, keyStatistics[3].Order);
+            Assert.Equal(keyStat3.CreatedById, keyStatistics[3].CreatedById);
+            Assert.Equal(_userId, keyStatistics[3].UpdatedById);
         }
     }
 
@@ -1129,7 +1170,7 @@ public class KeyStatisticServiceTests
         }
     }
 
-    private static KeyStatisticService SetupKeyStatisticService(
+    private KeyStatisticService SetupKeyStatisticService(
         ContentDbContext contentDbContext,
         IDataBlockService? dataBlockService = null,
         IUserService? userService = null)
@@ -1138,7 +1179,7 @@ public class KeyStatisticServiceTests
             contentDbContext,
             new PersistenceHelper<ContentDbContext>(contentDbContext),
             dataBlockService ?? Mock.Of<IDataBlockService>(MockBehavior.Strict),
-            userService ?? MockUtils.AlwaysTrueUserService().Object,
+            userService ?? MockUtils.AlwaysTrueUserService(_userId).Object,
             AdminMapper()
         );
     }
