@@ -264,7 +264,7 @@ Navigate to newly published release page
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
 
 Verify release URL and page caption
-    user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-%{RUN_IDENTIFIER}
+    user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-and-amend-%{RUN_IDENTIFIER}
     user waits until page contains title caption    ${RELEASE_NAME}
 
 Verify publish and update dates
