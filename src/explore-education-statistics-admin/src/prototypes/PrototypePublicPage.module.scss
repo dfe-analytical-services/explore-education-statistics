@@ -8,7 +8,7 @@
 
 .prototypePublicPage :global(#data) {
   margin-bottom: 60px;
-  margin-top: -30px;
+  //margin-top: -30px;
 
   :global(.govuk-accordion__controls) {
     display: none;
@@ -29,7 +29,7 @@
 .prototypeCardContainer {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 3rem;
+  margin-bottom: 0;
   //padding: 1rem;
 }
 .prototypeCard {
@@ -392,12 +392,15 @@
 }
 
 .stickyLinksContainer {
-  float: right;
-  margin-right: -375px;
+  //float: right;
+  //margin-right: -375px;
   position: sticky;
   top: 0;
 }
 
 .stickyLinks {
-  max-width: 300px;
+  border-right: 2px solid $govuk-link-colour;
+  margin-right: 1rem;
+  max-width: 250px;
+  padding-right: 1rem;
 }

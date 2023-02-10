@@ -150,7 +150,7 @@ const PrototypeReleaseData = () => {
                     href="#data-1"
                     className="govuk-button govuk-!-margin-bottom-3"
                   >
-                    Download all data (zip)
+                    Download all data (ZIP)
                   </a>
                 </li>
                 <li>
@@ -292,20 +292,21 @@ const PrototypeReleaseData = () => {
               )}
             >
               <a
-                href="#"
+                href="./table-highlights-2?source=publicationPage"
                 className={classNames(
                   styles.prototypeCardChevronLink,
                   'govuk-link--no-visited-state',
                 )}
               >
-                Download all data (.zip)
+                View or create your own tables
               </a>
             </h2>
             <p className="govuk-body govuk-!-margin-bottom-0">
-              All data used in this release is available as open data for
-              download
+              View featured tables that we have built for you, or create your
+              own tables from open data using our table tool
             </p>
           </div>
+
           <div className={classNames(styles.prototypeCardChevron)}>
             <h2
               className={classNames(
@@ -343,18 +344,18 @@ const PrototypeReleaseData = () => {
               )}
             >
               <a
-                href="./table-highlights-2?source=publicationPage"
+                href="#"
                 className={classNames(
                   styles.prototypeCardChevronLink,
                   'govuk-link--no-visited-state',
                 )}
               >
-                View or create your own tables
+                Download all data (ZIP)
               </a>
             </h2>
             <p className="govuk-body govuk-!-margin-bottom-0">
-              You can view featured tables that we have built for you, or create
-              your own tables from the open data using our table tool
+              Download all data available in this release as a compressed ZIP
+              file
             </p>
           </div>
           <div className={classNames(styles.prototypeCardChevron)}>
@@ -381,7 +382,7 @@ const PrototypeReleaseData = () => {
           </div>
         </div>
         <Accordion id="data">
-          <AccordionSection heading="All supporting files" goToTop={false}>
+          <AccordionSection heading="Other supporting files" goToTop={false}>
             <p>
               All supporting files from this release are listed for individual
               download below:
@@ -497,139 +498,371 @@ const PrototypeReleaseData = () => {
             </ul>
           </AccordionSection>
         </Accordion>
-        <div>
-          <div className={styles.stickyLinksContainer}>
-            <div className={classNames(styles.stickyLinks, 'govuk-inset-text')}>
-              <h3>Contents quick links</h3>
-              <ul className="govuk-list govuk-list--spaced">
-                <li>
-                  <a href="#about-these-statistics">About these statistics</a>
-                </li>
-                <li>
-                  <a href="#how-to-use-this-release-and-find-data">
-                    How to use this release and find datas
-                  </a>
-                </li>
-                <li>
-                  <a href="#interactive-data-visualisation-tool">
-                    Interactive data visualisation tool
-                  </a>
-                </li>
-                <li>
-                  <a href="#latest-headline-statistics">
-                    Latest headline statistics
-                  </a>
-                </li>
-                <li>
-                  <a href="#annual-time-series">Annual time series</a>
-                </li>
-                <li>
-                  <a href="#learner-characteristics">Learner characteristics</a>
-                </li>
-                <li>
-                  <a href="#subjects-and-levels">Subjects and levels</a>
-                </li>
-                <li>
-                  <a href="#geographical-breakdowns">Geographical breakdowns</a>
-                </li>
-                <li>
-                  <a href="#providers">Providers</a>
-                </li>
-                <li>
-                  <a href="#public-sector-apprenticeships">
-                    Public sector apprenticeships
-                  </a>
-                </li>
-                <li>
-                  <a href="#Traineeships">Traineeships</a>
-                </li>
-                <li>
-                  <a href="#national-achievement-rate-tables">
-                    National achievement rate tables
-                  </a>
-                </li>
-                <li>
-                  <a href="#apprenticeship-service-and-monthly-transparency-data">
-                    Apprenticeship Service and monthly transparency data
-                  </a>
-                </li>
-                <li>
-                  <a href="#additional-analysis">Additional analysis</a>
-                </li>
-                <li>
-                  <a href="#future-changes">Future changes</a>
-                </li>
-              </ul>
+        <div style={{ display: 'flex' }}>
+          <div>
+            <div className={styles.stickyLinksContainer}>
+              <div className={classNames(styles.stickyLinks)}>
+                <h3>Release contents</h3>
+                <ul className="govuk-list govuk-list--spaced">
+                  <li>
+                    <a href="#about-these-statistics">About these statistics</a>
+                  </li>
+                  <li>
+                    <a href="#how-to-use-this-release-and-find-data">
+                      How to use this release and find datas
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#interactive-data-visualisation-tool">
+                      Interactive data visualisation tool
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#latest-headline-statistics">
+                      Latest headline statistics
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#annual-time-series">Annual time series</a>
+                  </li>
+                  <li>
+                    <a href="#learner-characteristics">
+                      Learner characteristics
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#subjects-and-levels">Subjects and levels</a>
+                  </li>
+                  <li>
+                    <a href="#geographical-breakdowns">
+                      Geographical breakdowns
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#providers">Providers</a>
+                  </li>
+                  <li>
+                    <a href="#public-sector-apprenticeships">
+                      Public sector apprenticeships
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#Traineeships">Traineeships</a>
+                  </li>
+                  <li>
+                    <a href="#national-achievement-rate-tables">
+                      National achievement rate tables
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#apprenticeship-service-and-monthly-transparency-data">
+                      Apprenticeship Service and monthly transparency data
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#additional-analysis">Additional analysis</a>
+                  </li>
+                  <li>
+                    <a href="#future-changes">Future changes</a>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
-          <h2 className="govuk-heading-l" id="contents">
-            Release contents
-          </h2>
-          <Accordion id="content">
-            <AccordionSection heading="About these statistics" goToTop={false}>
-              This is a test
-            </AccordionSection>
-            <AccordionSection
-              heading="How to use this release and find data"
-              goToTop={false}
-            >
-              This is a test
-            </AccordionSection>
-            <AccordionSection
-              heading="Interactive data visualisation tool"
-              goToTop={false}
-            >
-              This is a test
-            </AccordionSection>
-            <AccordionSection
-              heading="Latest headline statistics"
-              goToTop={false}
-            >
-              This is a test
-            </AccordionSection>
-            <AccordionSection heading="Annual time series" goToTop={false}>
-              This is a test
-            </AccordionSection>
-            <AccordionSection heading="Learner characteristics" goToTop={false}>
-              This is a test
-            </AccordionSection>
-            <AccordionSection heading="Subjects and levels" goToTop={false}>
-              This is a test
-            </AccordionSection>
-            <AccordionSection heading="Geographical breakdowns" goToTop={false}>
-              This is a test
-            </AccordionSection>
-            <AccordionSection heading="Providers" goToTop={false}>
-              This is a test
-            </AccordionSection>
-            <AccordionSection
-              heading="Public sector apprenticeships"
-              goToTop={false}
-            >
-              This is a test
-            </AccordionSection>
-            <AccordionSection heading="Traineeships" goToTop={false}>
-              This is a test
-            </AccordionSection>
-            <AccordionSection
-              heading="National achievement rate tables"
-              goToTop={false}
-            >
-              This is a test
-            </AccordionSection>
-            <AccordionSection
-              heading="Apprenticeship Service and monthly transparency data"
-              goToTop={false}
-            >
-              This is a test
-            </AccordionSection>
-            <AccordionSection heading="Additional analysis" goToTop={false}>
-              This is a test
-            </AccordionSection>
-            <AccordionSection heading="Future changes" goToTop={false}>
-              This is a test
-            </AccordionSection>
-          </Accordion>
+          <div style={{ width: '70%' }}>
+            <Accordion id="content">
+              <AccordionSection
+                heading="About these statistics"
+                goToTop={false}
+              >
+                <div className="dfe-content">
+                  <p>
+                    This statistical release presents provisional information on
+                    all age (16+) apprenticeships starts, achievements and
+                    participation in England for the first quarter of the
+                    2022/23 academic year.
+                  </p>
+                  <p>Also published are official statistics covering:</p>
+                  <ul>
+                    <li>
+                      Apprenticeship service commitments, registrations, and
+                      reservations
+                    </li>
+                    <li>
+                      Employers reporting the withdrawal of apprentices due to
+                      redundancy
+                    </li>
+                    <li>
+                      Adverts and vacancies as reported on the Find an
+                      apprenticeship website
+                    </li>
+                  </ul>
+                  <p>
+                    A separate release covers overall further education and
+                    skills data, please see ‘
+                    <a href="https://explore-education-statistics.service.gov.uk/find-statistics/further-education-and-skills">
+                      Further education and skills
+                    </a>
+                    ’. Please note that the FE and skills release includes the
+                    adult apprenticeships and traineeships published here in its
+                    headline figures.
+                  </p>
+                  <h4>
+                    <strong>
+                      Individualised Learner Record (ILR) administrative data
+                    </strong>
+                  </h4>
+                  <p>
+                    The apprenticeship data in this release are based on the
+                    fourth ILR data return from FE and apprenticeship providers
+                    for the 2022/23 academic year, which was taken in December
+                    2022. The ILR is an administrative data collection system
+                    designed primarily for operational use in order to fund
+                    training providers for learners in FE and on apprenticeship
+                    programmes.
+                  </p>
+                  <h4>
+                    <strong>National achievement rate tables data</strong>
+                  </h4>
+                  <p>
+                    Figures in the ‘national achievement rate tables’ section
+                    are as published in March 2022.&nbsp;These official
+                    statistics cover achievement rates for apprenticeships in
+                    the 2020/21 academic year and would have been previously
+                    released as part of the standalone National achievement rate
+                    tables publication. As confirmed in our&nbsp;
+                    <a href="https://www.gov.uk/government/publications/coronavirus-covid-19-school-and-college-performance-measures">
+                      guidance
+                    </a>
+                    , due to Coronavirus (COVID-19), we have not published
+                    institution-level qualification achievement rates (QARs) in
+                    the national achievement rate tables for 2019/20 or 2020/21
+                    academic years. We have published high level summaries of
+                    QARs for statistical purposes.&nbsp;
+                  </p>
+                  <p>
+                    Achievement rates covering the 2021/22 academic year are
+                    planned to be published as part of our March 2023 statistics
+                    update.
+                  </p>
+                  <h4>
+                    <strong>
+                      Provider reporting during the COVID-19 pandemic
+                    </strong>
+                  </h4>
+                  <p>
+                    Historic data in this publication covers periods affected by
+                    varying COVID-19 restrictions,&nbsp;which will have impacted
+                    on apprenticeship and traineeship learning.&nbsp;Therefore,
+                    extra care should be taken in comparing and interpreting
+                    data presented in this release.
+                  </p>
+                  <p>
+                    The furlough scheme may also have impacted on how aspects of
+                    ILR data were recorded, such as how the ‘learning status’ of
+                    a learner was captured, e.g. whether a learner was recorded
+                    as a continuing learner or whether they were recorded as
+                    being on a break in learning while still being with an
+                    employer.
+                  </p>
+                </div>
+              </AccordionSection>
+              <AccordionSection
+                heading="How to use this release and find data"
+                goToTop={false}
+              >
+                <div className="dfe-content">
+                  <p>
+                    The Apprenticeships and traineeships publication still
+                    provides the same range of data it always did, but has
+                    undergone some structural changes since the previous
+                    publication in order to improve user’s experience.&nbsp;
+                  </p>
+                  <p>
+                    We have also adopted a new naming convention for files to
+                    help users find their data of interest. We have not changed
+                    the content of these files except in a few cases where we
+                    have merged some smaller files. You can find a look-up of
+                    the old and new file names in the file called
+                    <strong> “New Release Layout - Names Lookup” </strong>that
+                    can be found by clicking '
+                    <a href="https://explore-education-statistics.service.gov.uk/find-statistics/apprenticeships-and-traineeships#explore-data-and-files">
+                      Explore data and files
+                    </a>
+                    ' and opening the ‘all supporting files’ section.
+                  </p>
+                  <p>
+                    <strong>
+                      This section serves to signpost users to the data most
+                      relevant to their uses by detailing the routes through
+                      which it can be accessed.&nbsp;
+                    </strong>
+                  </p>
+                  <p>
+                    <strong>
+                      The content of the publication below contains charts and
+                      tables which highlight key figures
+                    </strong>{' '}
+                    and trends that give an overview of the national picture of
+                    the apprenticeship and traineeship landscape.
+                  </p>
+                  <p>
+                    <strong>
+                      'Featured tables' provide further detail with figures
+                      broken down by common areas of interest.{' '}
+                    </strong>
+                    These can be found by expanding the '
+                    <a href="https://explore-education-statistics.service.gov.uk/find-statistics/apprenticeships-and-traineeships#explore-data-and-files">
+                      Explore data and files
+                    </a>
+                    ' accordion and clicking '
+                    <a href="https://explore-education-statistics.service.gov.uk/data-tables/apprenticeships-and-traineeships">
+                      Create tables
+                    </a>
+                    '. These tables are created to provide the next level of
+                    detail one might wish to find below the level of detail
+                    provided by tables embedded within the release.&nbsp; They
+                    also provide the user the opportunity to then amend content,
+                    reorder and take away to meet their needs.&nbsp; Within the
+                    release we list out the most relevant featured tables at the
+                    end of each commentary section.
+                  </p>
+                  <p>
+                    <strong>
+                      In addition to featured tables you can also access
+                      underlying data files&nbsp;
+                    </strong>
+                    and build your own tables using the table builder tool. For
+                    example, the featured table showing enrolments by provider
+                    is produced from an underlying data file which also contains
+                    detail on the level of an aim, and it's sector subject area.
+                  </p>
+                  <p>
+                    The list of files available can be accessed by expanding the
+                    '
+                    <a href="https://explore-education-statistics.service.gov.uk/find-statistics/apprenticeships-and-traineeships#explore-data-and-files">
+                      Explore data and files
+                    </a>
+                    ' accordion and clicking either ‘browse data files’ or '
+                    <a href="https://explore-education-statistics.service.gov.uk/data-tables/apprenticeships-and-traineeships">
+                      Create tables
+                    </a>
+                    ', then switching to the&nbsp;'Create your own table' tab
+                    and selecting your file of interest.
+                  </p>
+                  <p>
+                    Alternatively you can modify and existing featured table by
+                    selecting it and then depending on the breakdowns available,
+                    edit the location, time periods, indicators and/or filters
+                    (Steps 3, 4 and 5).
+                  </p>
+                  <p>
+                    <strong>There is a dashboard&nbsp;</strong>that provides
+                    interactive presentation of our published data, with a
+                    number of different views on to data and ‘drilldown’
+                    capability to allow users to investigate different types of
+                    FE provision.&nbsp; It is particularly helpful in viewing
+                    data across different geographical areas and providers.
+                  </p>
+                  <p>
+                    <strong>
+                      This release also provides ‘all supporting files’&nbsp;
+                    </strong>
+                    which can be found at the end of the '
+                    <a href="https://explore-education-statistics.service.gov.uk/find-statistics/apprenticeships-and-traineeships#explore-data-and-files">
+                      Explore data and files
+                    </a>
+                    ' accordion.<strong> </strong>These are mainly csv files
+                    which can be downloaded, and provide some additional
+                    breakdowns including unrounded data.&nbsp; They are provided
+                    for transparency to enable analysts to re-use the data in
+                    this release. A metadata document is available in the same
+                    location which explains the content of these supporting
+                    files.
+                  </p>
+                  <p>
+                    All of the data available in this release can be downloaded
+                    using the 'Download all data (zip)' button at the top right
+                    of this page.
+                  </p>
+                  <p>
+                    <strong>Feedback</strong>
+                  </p>
+                  <p>
+                    This release is a structural change to how we publish our
+                    data and statistics, which we continually look to improve.
+                    As a result, your feedback is important to help us further
+                    improve and develop. To provide feedback on this release,
+                    please email&nbsp;us at&nbsp;
+                    <a href="mailto:FE.OFFICIALSTATISTICS@education.gov.uk">
+                      FE.OFFICIALSTATISTICS@education.gov.uk
+                    </a>
+                    .&nbsp;
+                  </p>
+                </div>
+              </AccordionSection>
+              <AccordionSection
+                heading="Interactive data visualisation tool"
+                goToTop={false}
+              >
+                This is a test
+              </AccordionSection>
+              <AccordionSection
+                heading="Latest headline statistics"
+                goToTop={false}
+              >
+                This is a test
+              </AccordionSection>
+              <AccordionSection heading="Annual time series" goToTop={false}>
+                This is a test
+              </AccordionSection>
+              <AccordionSection
+                heading="Learner characteristics"
+                goToTop={false}
+              >
+                This is a test
+              </AccordionSection>
+              <AccordionSection heading="Subjects and levels" goToTop={false}>
+                This is a test
+              </AccordionSection>
+              <AccordionSection
+                heading="Geographical breakdowns"
+                goToTop={false}
+              >
+                This is a test
+              </AccordionSection>
+              <AccordionSection heading="Providers" goToTop={false}>
+                This is a test
+              </AccordionSection>
+              <AccordionSection
+                heading="Public sector apprenticeships"
+                goToTop={false}
+              >
+                This is a test
+              </AccordionSection>
+              <AccordionSection heading="Traineeships" goToTop={false}>
+                This is a test
+              </AccordionSection>
+              <AccordionSection
+                heading="National achievement rate tables"
+                goToTop={false}
+              >
+                This is a test
+              </AccordionSection>
+              <AccordionSection
+                heading="Apprenticeship Service and monthly transparency data"
+                goToTop={false}
+              >
+                This is a test
+              </AccordionSection>
+              <AccordionSection heading="Additional analysis" goToTop={false}>
+                This is a test
+              </AccordionSection>
+              <AccordionSection heading="Future changes" goToTop={false}>
+                This is a test
+              </AccordionSection>
+            </Accordion>
+          </div>
         </div>
         <h2
           className="govuk-heading-l govuk-!-margin-top-9"
@@ -688,7 +921,6 @@ const PrototypeReleaseData = () => {
             Contact us
           </AccordionSection>
         </Accordion>
-        <div style={{ height: '1000px' }}>test</div>
       </PrototypePage>
     </div>
   );
