@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -665,65 +664,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
                     .GenerateList(1))
                 .GenerateList(4);
+
+            var subject1Filters = ListOf(filters[0]);
+            var subject2Filters = filters.GetRange(1, 3);
             
             var (subject1, subject2) = _subjectsGenerator
-                .ForIndex(0, s => s.SetFilters(filters.GetRange(0, 1)))
-                .ForIndex(1, s => s.SetFilters(filters.GetRange(1, 3)))
+                .ForIndex(0, s => s.SetFilters(subject1Filters))
+                .ForIndex(1, s => s.SetFilters(subject2Filters))
                 .GenerateTuple2();
 
-            var indicatorGroup = _indicatorGroupGenerator
-                .WithIndicators(_indicatorGenerator.GenerateList(2))
+            var subject1IndicatorGroup = _indicatorGroupGenerator
+                .WithIndicators(_indicatorGenerator.GenerateList(1))
                 .WithSubject(subject1)
                 .Generate();
-
+            
+            var subject2IndicatorGroup = _indicatorGroupGenerator
+                .WithIndicators(_indicatorGenerator.GenerateList(1))
+                .WithSubject(subject2)
+                .Generate();
             
             // Set up a release with footnotes that apply to both subject 1 and subject 2
-            
-            
-            // Footnote applies to subject 1 and subject 2
-
-                        
-                        
-            // Footnote applies to subject 1 filter 1
-            // and subject 2 filter 1
-            // and subject 2 filter 2 group 1
-            // and subject 2 filter 3 group 1 item 1
-
-                        
-                        
-                        
-            // Footnote applies to subject 1 indicator 1
-            // and subject 2 filter 1
-
-                        
-                        
-                        
-            // Footnote applies to subject 1 filter  1
-            // and subject 2 indicator 1
-
-                        
-                        
-                        
-            // Footnote applies to subject 1 indicator  1
-            // and subject 2 indicator 1
-
-
             var footnotes = _footnoteGenerator
                 .ForIndex(0, s => s
                     .Set(f => f.Content, "Applies to subject 1 and subject 2")
                     .SetSubjects(_ => ListOf(subject1, subject2)))
+                
+                // Footnote applies to subject 1 filter 1
+                // and subject 2 filter 1
+                // and subject 2 filter 2 group 1
+                // and subject 2 filter 3 group 1 item 1
                 .ForIndex(1, s => s
                     .Set(f => f.Content, "Applies to s1f1 s2f1 s2f2g1 s2f3g1i1")
-                    .SetFilters(_ => ListOf(filter.FilterGroups[0])))
+                    .SetFilters(_ => ListOf(subject1Filters[0], subject2Filters[0]))
+                    .SetFilterGroups(_ => ListOf(subject2Filters[1].FilterGroups[0]))
+                    .SetFilterItems(_ => ListOf(subject2Filters[2].FilterGroups[0].FilterItems[0])))
                 .ForIndex(2, s => s
                     .Set(f => f.Content, "Applies to subject 1 indicator 1 and subject 2 filter 1")
-                    .SetFilterItems(_ => ListOf(filter.FilterGroups[0].FilterItems[0])))
+                    .SetFilters(_ => ListOf(subject2Filters[0]))
+                    .SetIndicators(_ => ListOf(subject1IndicatorGroup.Indicators[0])))
                 .ForIndex(3, s => s
-                    .Set(f => f.Content, "Footnote applies to subject 1 filter 1 and subject 2 indicator 1")
-                    .SetFilterItems(_ => ListOf(filter.FilterGroups[0].FilterItems[1])))
+                    .Set(f => f.Content, "Applies to subject 1 filter 1 and subject 2 indicator 1")
+                    .SetFilters(_ => ListOf(subject1Filters[0]))
+                    .SetIndicators(_ => ListOf(subject2IndicatorGroup.Indicators[0])))
                 .ForIndex(4, s => s
-                    .Set(f => f.Content, "Footnote applies to subject 1 indicator 1 and subject 2 indicator 1")
-                    .SetIndicators(_ => ListOf(indicatorGroup.Indicators[0])))
+                    .Set(f => f.Content, "Applies to subject 1 indicator 1 and subject 2 indicator 1")
+                    .SetIndicators(_ => ListOf(subject1IndicatorGroup.Indicators[0], subject2IndicatorGroup.Indicators[0])))
                 .GenerateList();
                 
             var releaseFootnotes = _releaseFootnoteGenerator
@@ -731,20 +716,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
                 .GenerateList(footnotes.Count);
 
-            var releaseSubject = _releaseSubjectGenerator
+            var releaseSubjects = _releaseSubjectGenerator
                 .ForInstance(s => s.Set(rs => rs.Release, release))
-                .ForInstance(s => s.Set(rs => rs.Subject, subject1))
-                .Generate();
+                .ForIndex(0, s => s.Set(rs => rs.Subject, subject1))
+                .ForIndex(1, s => s.Set(rs => rs.Subject, subject2))
+                .GenerateList();
         
             var contextId = Guid.NewGuid().ToString();
         
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 await context.Subject.AddRangeAsync(subject1, subject2);
-                await context.Filter.AddRangeAsync(subject1Filter1, subject2Filter1, subject2Filter2, subject2Filter3);
-                await context.IndicatorGroup.AddRangeAsync(subject1IndicatorGroup1, subject2IndicatorGroup1);
+                await context.Filter.AddRangeAsync(filters);
+                await context.IndicatorGroup.AddRangeAsync(subject1IndicatorGroup, subject2IndicatorGroup);
                 await context.Release.AddAsync(release);
                 await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
+                await context.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
                 await context.SaveChangesAsync();
             }
         
@@ -759,1395 +746,735 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 var results = await repository.GetFilteredFootnotes(
                     releaseId: release.Id,
                     subjectId: subject1.Id,
-                    filterItemIds: ListOf(subject1Filter1.FilterGroups[0].FilterItems[0].Id),
-                    indicatorIds: ListOf(subject1IndicatorGroup1.Indicators[0].Id));
+                    filterItemIds: ListOf(subject1Filters[0].FilterGroups[0].FilterItems[0].Id),
+                    indicatorIds: ListOf(subject1IndicatorGroup.Indicators[0].Id));
         
                 // Check that all of the footnotes are returned even though they have also been applied to subject 2
                 Assert.Equal(5, results.Count);
         
                 // Footnote applies to the requested subject as well as another subject
                 Assert.Equal(releaseFootnotes[0].FootnoteId, results[0].Id);
-                Assert.Equal("Footnote 1", results[0].Content);
+                Assert.Equal("Applies to subject 1 and subject 2", results[0].Content);
         
                 // Footnote applies to a requested filter item via its filter as well as another subject's filter,
                 // filter group, and filter item
                 Assert.Equal(releaseFootnotes[1].FootnoteId, results[1].Id);
-                Assert.Equal("Footnote 2", results[1].Content);
+                Assert.Equal("Applies to s1f1 s2f1 s2f2g1 s2f3g1i1", results[1].Content);
         
                 // Footnote applies to a requested indicator as well as another subject's filter
                 Assert.Equal(releaseFootnotes[2].FootnoteId, results[2].Id);
-                Assert.Equal("Footnote 3", results[2].Content);
+                Assert.Equal("Applies to subject 1 indicator 1 and subject 2 filter 1", results[2].Content);
         
                 // Footnote applies to a requested filter via its filter item as well as another subject's indicator
                 Assert.Equal(releaseFootnotes[3].FootnoteId, results[3].Id);
-                Assert.Equal("Footnote 4", results[3].Content);
+                Assert.Equal("Applies to subject 1 filter 1 and subject 2 indicator 1", results[3].Content);
         
                 // Footnote applies to a requested indicator as well as another subject's indicator
                 Assert.Equal(releaseFootnotes[4].FootnoteId, results[4].Id);
-                Assert.Equal("Footnote 5", results[4].Content);
+                Assert.Equal("Applies to subject 1 indicator 1 and subject 2 indicator 1", results[4].Content);
             }
         }
-        //
-        // [Fact]
-        // public async Task GetFilteredFootnotes_FilterByEmptyListOfFiltersAndIndicators()
-        // {
-        //     var subject1 = new Subject();
-        //     var subject2 = new Subject();
-        //
-        //     var subject1Filter1 = new Filter
-        //     {
-        //         Label = "Subject 1 filter 1",
-        //         Subject = subject1,
-        //         FilterGroups = new List<FilterGroup>
-        //         {
-        //             new()
-        //             {
-        //                 Label = "Filter 1 group 1",
-        //                 FilterItems = new List<FilterItem>
-        //                 {
-        //                     new()
-        //                     {
-        //                         Label = "Filter 1 group 1 item 1"
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     };
-        //
-        //     var subject1Filter2 = new Filter
-        //     {
-        //         Label = "Subject 1 filter 2",
-        //         Subject = subject1,
-        //         FilterGroups = new List<FilterGroup>
-        //         {
-        //             new()
-        //             {
-        //                 Label = "Filter 2 group 1",
-        //                 FilterItems = new List<FilterItem>
-        //                 {
-        //                     new()
-        //                     {
-        //                         Label = "Filter 2 group 1 item 1"
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     };
-        //
-        //     var subject1Filter3 = new Filter
-        //     {
-        //         Label = "Subject 1 filter 3",
-        //         Subject = subject1,
-        //         FilterGroups = new List<FilterGroup>
-        //         {
-        //             new()
-        //             {
-        //                 Label = "Filter 3 group 1",
-        //                 FilterItems = new List<FilterItem>
-        //                 {
-        //                     new()
-        //                     {
-        //                         Label = "Filter 3 group 1 item 1"
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     };
-        //
-        //     var subject1IndicatorGroup1 = new IndicatorGroup
-        //     {
-        //         Label = "Subject 1 indicator group 1",
-        //         Subject = subject1,
-        //         Indicators = new List<Indicator>
-        //         {
-        //             new()
-        //             {
-        //                 Label = "Indicator 1"
-        //             }
-        //         }
-        //     };
-        //
-        //     var release = new Release
-        //     {
-        //         Footnotes = new List<ReleaseFootnote>
-        //         {
-        //             new()
-        //             {
-        //                 Footnote = new Footnote
-        //                 {
-        //                     Content = "Applies to subject 1",
-        //                     Order = 0,
-        //                     Subjects = new List<SubjectFootnote>
-        //                     {
-        //                         new()
-        //                         {
-        //                             Subject = subject1
-        //                         }
-        //                     }
-        //                 }
-        //             },
-        //             new()
-        //             {
-        //                 Footnote = new Footnote
-        //                 {
-        //                     Content = "Applies to subject 1 filter 1",
-        //                     Order = 1,
-        //                     Filters = new List<FilterFootnote>
-        //                     {
-        //                         new()
-        //                         {
-        //                             Filter = subject1Filter1
-        //                         }
-        //                     }
-        //                 }
-        //             },
-        //             new()
-        //             {
-        //                 Footnote = new Footnote
-        //                 {
-        //                     Content = "Applies to subject 1 filter 2 group 1",
-        //                     Order = 2,
-        //                     FilterGroups = new List<FilterGroupFootnote>
-        //                     {
-        //                         new()
-        //                         {
-        //                             FilterGroup = subject1Filter2.FilterGroups[0]
-        //                         }
-        //                     }
-        //                 }
-        //             },
-        //             new()
-        //             {
-        //                 Footnote = new Footnote
-        //                 {
-        //                     Content = "Applies to subject 1 filter 3 group 1 item 1",
-        //                     Order = 3,
-        //                     FilterItems = new List<FilterItemFootnote>
-        //                     {
-        //                         new()
-        //                         {
-        //                             FilterItem = subject1Filter3.FilterGroups[0].FilterItems[0]
-        //                         }
-        //                     }
-        //                 }
-        //             },
-        //             new()
-        //             {
-        //                 Footnote = new Footnote
-        //                 {
-        //                     Content = "Applies to subject 1 indicator 1",
-        //                     Order = 4,
-        //                     Indicators = new List<IndicatorFootnote>
-        //                     {
-        //                         new()
-        //                         {
-        //                             Indicator = subject1IndicatorGroup1.Indicators[0]
-        //                         }
-        //                     }
-        //                 }
-        //             },
-        //             new()
-        //             {
-        //                 Footnote = new Footnote
-        //                 {
-        //                     Content = "Applies to subject 2",
-        //                     Order = 5,
-        //                     Subjects = new List<SubjectFootnote>
-        //                     {
-        //                         new()
-        //                         {
-        //                             Subject = subject2
-        //                         }
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     };
-        //
-        //     var releaseFootnotes = release.Footnotes.ToList();
-        //
-        //     var releaseSubjects = new List<ReleaseSubject>
-        //     {
-        //         new()
-        //         {
-        //             Release = release,
-        //             Subject = subject1
-        //         },
-        //         new()
-        //         {
-        //             Release = release,
-        //             Subject = subject2
-        //         }
-        //     };
-        //
-        //     var contextId = Guid.NewGuid().ToString();
-        //
-        //     await using (var context = InMemoryStatisticsDbContext(contextId))
-        //     {
-        //         await context.Subject.AddRangeAsync(subject1, subject2);
-        //         await context.Filter.AddRangeAsync(subject1Filter1, subject1Filter2, subject1Filter3);
-        //         await context.IndicatorGroup.AddAsync(subject1IndicatorGroup1);
-        //         await context.Release.AddAsync(release);
-        //         await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
-        //         await context.SaveChangesAsync();
-        //     }
-        //
-        //     await using (var context = InMemoryStatisticsDbContext(contextId))
-        //     {
-        //         var repository = BuildFootnoteRepository(context);
-        //
-        //         //  Get footnotes applying directly to subject 1 using empty lists of filter item and indicator id's
-        //         var results = await repository.GetFilteredFootnotes(
-        //             releaseId: release.Id,
-        //             subjectId: subject1.Id,
-        //             filterItemIds: ListOf<Guid>(),
-        //             indicatorIds: ListOf<Guid>());
-        //
-        //         // Check that only the footnotes which apply directly to subject 1 are returned
-        //         // Other footnotes related to subject 1 should be ignored as no filter items or indicators were requested
-        //         Assert.Single(results);
-        //
-        //         Assert.Equal(releaseFootnotes[0].FootnoteId, results[0].Id);
-        //         Assert.Equal("Applies to subject 1", results[0].Content);
-        //     }
-        // }
-        //
-        // [Fact]
-        // public async Task GetFilteredFootnotes_IgnoresFootnotesUnrelatedToRelease()
-        // {
-        //     var subject1 = new Subject();
-        //
-        //     var filter1 = new Filter
-        //     {
-        //         Label = "Filter 1",
-        //         Subject = subject1,
-        //         FilterGroups = new List<FilterGroup>
-        //         {
-        //             new()
-        //             {
-        //                 Label = "Filter 1 group 1",
-        //                 FilterItems = new List<FilterItem>
-        //                 {
-        //                     new()
-        //                     {
-        //                         Label = "Filter 1 group 1 item 1"
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     };
-        //
-        //     var filter2 = new Filter
-        //     {
-        //         Label = "Filter 2",
-        //         Subject = subject1,
-        //         FilterGroups = new List<FilterGroup>
-        //         {
-        //             new()
-        //             {
-        //                 Label = "Filter 2 group 1",
-        //                 FilterItems = new List<FilterItem>
-        //                 {
-        //                     new()
-        //                     {
-        //                         Label = "Filter 2 group 1 item 1"
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     };
-        //
-        //     var filter3 = new Filter
-        //     {
-        //         Label = "Filter 3",
-        //         Subject = subject1,
-        //         FilterGroups = new List<FilterGroup>
-        //         {
-        //             new()
-        //             {
-        //                 Label = "Filter 3 group 1",
-        //                 FilterItems = new List<FilterItem>
-        //                 {
-        //                     new()
-        //                     {
-        //                         Label = "Filter 3 group 1 item 1"
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     };
-        //
-        //     var indicatorGroup1 = new IndicatorGroup
-        //     {
-        //         Label = "Indicator group 1",
-        //         Subject = subject1,
-        //         Indicators = new List<Indicator>
-        //         {
-        //             new()
-        //             {
-        //                 Label = "Indicator 1"
-        //             }
-        //         }
-        //     };
-        //
-        //     var release1 = new Release
-        //     {
-        //         Footnotes = new List<ReleaseFootnote>
-        //         {
-        //             new()
-        //             {
-        //                 Footnote = new Footnote
-        //                 {
-        //                     Content = "Applies to subject 1",
-        //                     Order = 0,
-        //                     Subjects = new List<SubjectFootnote>
-        //                     {
-        //                         new()
-        //                         {
-        //                             Subject = subject1
-        //                         }
-        //                     }
-        //                 }
-        //             },
-        //             new()
-        //             {
-        //                 Footnote = new Footnote
-        //                 {
-        //                     Content = "Applies to subject 1 filter 1",
-        //                     Order = 1,
-        //                     Filters = new List<FilterFootnote>
-        //                     {
-        //                         new()
-        //                         {
-        //                             Filter = filter1
-        //                         }
-        //                     }
-        //                 }
-        //             },
-        //             new()
-        //             {
-        //                 Footnote = new Footnote
-        //                 {
-        //                     Content = "Applies to subject 1 filter 2 group 1",
-        //                     Order = 2,
-        //                     FilterGroups = new List<FilterGroupFootnote>
-        //                     {
-        //                         new()
-        //                         {
-        //                             FilterGroup = filter2.FilterGroups[0]
-        //                         }
-        //                     }
-        //                 }
-        //             },
-        //             new()
-        //             {
-        //                 Footnote = new Footnote
-        //                 {
-        //                     Content = "Applies to subject 1 filter 3 group 1 item 1",
-        //                     Order = 3,
-        //                     FilterItems = new List<FilterItemFootnote>
-        //                     {
-        //                         new()
-        //                         {
-        //                             FilterItem = filter3.FilterGroups[0].FilterItems[0]
-        //                         }
-        //                     }
-        //                 }
-        //             },
-        //             new()
-        //             {
-        //                 Footnote = new Footnote
-        //                 {
-        //                     Content = "Applies to subject 1 indicator 1",
-        //                     Order = 4,
-        //                     Indicators = new List<IndicatorFootnote>
-        //                     {
-        //                         new()
-        //                         {
-        //                             Indicator = indicatorGroup1.Indicators[0]
-        //                         }
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     };
-        //
-        //     // Create another release which has no footnotes
-        //     var release2 = new Release();
-        //
-        //     var releaseSubjects = new List<ReleaseSubject>
-        //     {
-        //         new()
-        //         {
-        //             Release = release1,
-        //             Subject = subject1
-        //         },
-        //         new()
-        //         {
-        //             Release = release2,
-        //             Subject = subject1
-        //         }
-        //     };
-        //
-        //     var contextId = Guid.NewGuid().ToString();
-        //
-        //     await using (var context = InMemoryStatisticsDbContext(contextId))
-        //     {
-        //         await context.Subject.AddAsync(subject1);
-        //         await context.Filter.AddRangeAsync(filter1, filter2, filter3);
-        //         await context.IndicatorGroup.AddAsync(indicatorGroup1);
-        //         await context.Release.AddRangeAsync(release1, release2);
-        //         await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
-        //         await context.SaveChangesAsync();
-        //     }
-        //
-        //     await using (var context = InMemoryStatisticsDbContext(contextId))
-        //     {
-        //         var repository = BuildFootnoteRepository(context);
-        //
-        //         // This test covers a case where a subject is shared by multiple releases. It makes sure that when other
-        //         // releases have footnotes for the subject, that there's no way of retrieving those footnotes that
-        //         // belong to other releases by specifying the subject id and filter item and indicator id's of the subject.
-        //
-        //         var filter1Group1Item1Id = filter1.FilterGroups[0].FilterItems[0].Id;
-        //         var filter2Group1Item1Id = filter2.FilterGroups[0].FilterItems[0].Id;
-        //         var filter3Group1Item1Id = filter3.FilterGroups[0].FilterItems[0].Id;
-        //         var indicatorGroup1Item1Id = indicatorGroup1.Indicators[0].Id;
-        //
-        //         var results = await repository.GetFilteredFootnotes(
-        //             releaseId: release2.Id, // release 2 has no footnotes
-        //             subjectId: subject1.Id,
-        //             filterItemIds: ListOf(filter1Group1Item1Id, filter2Group1Item1Id, filter3Group1Item1Id),
-        //             indicatorIds: ListOf(indicatorGroup1Item1Id));
-        //
-        //         // Check that no footnotes are returned even though subject 1 has footnotes for a different release
-        //         Assert.Empty(results);
-        //     }
-        // }
-        //
-        // [Fact]
-        // public async Task GetFilteredFootnotes_IgnoresRequestedFilterItemsAndIndicatorsUnrelatedToSubject()
-        // {
-        //     var subject1 = new Subject();
-        //     var subject2 = new Subject();
-        //
-        //     var subject1Filter1 = new Filter
-        //     {
-        //         Label = "Subject 1 filter 1",
-        //         Subject = subject1,
-        //         FilterGroups = new List<FilterGroup>
-        //         {
-        //             new()
-        //             {
-        //                 Label = "Filter 1 group 1",
-        //                 FilterItems = new List<FilterItem>
-        //                 {
-        //                     new()
-        //                     {
-        //                         Label = "Filter 1 group 1 item 1"
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     };
-        //
-        //     var subject1Filter2 = new Filter
-        //     {
-        //         Label = "Subject 1 filter 2",
-        //         Subject = subject1,
-        //         FilterGroups = new List<FilterGroup>
-        //         {
-        //             new()
-        //             {
-        //                 Label = "Filter 2 group 1",
-        //                 FilterItems = new List<FilterItem>
-        //                 {
-        //                     new()
-        //                     {
-        //                         Label = "Filter 2 group 1 item 1"
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     };
-        //
-        //     var subject1Filter3 = new Filter
-        //     {
-        //         Label = "Subject 1 filter 3",
-        //         Subject = subject1,
-        //         FilterGroups = new List<FilterGroup>
-        //         {
-        //             new()
-        //             {
-        //                 Label = "Filter 3 group 1",
-        //                 FilterItems = new List<FilterItem>
-        //                 {
-        //                     new()
-        //                     {
-        //                         Label = "Filter 3 group 1 item 1"
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     };
-        //
-        //     var subject1IndicatorGroup1 = new IndicatorGroup
-        //     {
-        //         Label = "Subject 1 indicator group 1",
-        //         Subject = subject1,
-        //         Indicators = new List<Indicator>
-        //         {
-        //             new()
-        //             {
-        //                 Label = "Indicator 1"
-        //             }
-        //         }
-        //     };
-        //
-        //     var subject2IndicatorGroup1 = new IndicatorGroup
-        //     {
-        //         Label = "Subject 2 indicator group 1",
-        //         Subject = subject2,
-        //         Indicators = new List<Indicator>
-        //         {
-        //             new()
-        //             {
-        //                 Label = "Indicator 1"
-        //             }
-        //         }
-        //     };
-        //
-        //     var release = new Release
-        //     {
-        //         Footnotes = new List<ReleaseFootnote>
-        //         {
-        //             new()
-        //             {
-        //                 Footnote = new Footnote
-        //                 {
-        //                     Content = "Applies to subject 1",
-        //                     Order = 0,
-        //                     Subjects = new List<SubjectFootnote>
-        //                     {
-        //                         new()
-        //                         {
-        //                             Subject = subject1
-        //                         }
-        //                     }
-        //                 }
-        //             },
-        //             new()
-        //             {
-        //                 Footnote = new Footnote
-        //                 {
-        //                     Content = "Applies to subject 1 filter 1",
-        //                     Order = 1,
-        //                     Filters = new List<FilterFootnote>
-        //                     {
-        //                         new()
-        //                         {
-        //                             Filter = subject1Filter1
-        //                         }
-        //                     }
-        //                 }
-        //             },
-        //             new()
-        //             {
-        //                 Footnote = new Footnote
-        //                 {
-        //                     Content = "Applies to subject 1 filter 2 group 1",
-        //                     Order = 2,
-        //                     FilterGroups = new List<FilterGroupFootnote>
-        //                     {
-        //                         new()
-        //                         {
-        //                             FilterGroup = subject1Filter2.FilterGroups[0]
-        //                         }
-        //                     }
-        //                 }
-        //             },
-        //             new()
-        //             {
-        //                 Footnote = new Footnote
-        //                 {
-        //                     Content = "Applies to subject 1 filter 3 group 1 item 1",
-        //                     Order = 3,
-        //                     FilterItems = new List<FilterItemFootnote>
-        //                     {
-        //                         new()
-        //                         {
-        //                             FilterItem = subject1Filter3.FilterGroups[0].FilterItems[0]
-        //                         }
-        //                     }
-        //                 }
-        //             },
-        //             new()
-        //             {
-        //                 Footnote = new Footnote
-        //                 {
-        //                     Content = "Applies to subject 1 indicator 1",
-        //                     Order = 4,
-        //                     Indicators = new List<IndicatorFootnote>
-        //                     {
-        //                         new()
-        //                         {
-        //                             Indicator = subject1IndicatorGroup1.Indicators[0]
-        //                         }
-        //                     }
-        //                 }
-        //             },
-        //             new()
-        //             {
-        //                 Footnote = new Footnote
-        //                 {
-        //                     Content = "Applies to subject 2",
-        //                     Order = 5,
-        //                     Subjects = new List<SubjectFootnote>
-        //                     {
-        //                         new()
-        //                         {
-        //                             Subject = subject2
-        //                         }
-        //                     }
-        //                 }
-        //             },
-        //             new()
-        //             {
-        //                 Footnote = new Footnote
-        //                 {
-        //                     Content = "Applies to subject 2 indicator 1",
-        //                     Order = 6,
-        //                     Indicators = new List<IndicatorFootnote>
-        //                     {
-        //                         new()
-        //                         {
-        //                             Indicator = subject2IndicatorGroup1.Indicators[0]
-        //                         }
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     };
-        //
-        //     var releaseFootnotes = release.Footnotes.ToList();
-        //
-        //     var releaseSubjects = new List<ReleaseSubject>
-        //     {
-        //         new()
-        //         {
-        //             Release = release,
-        //             Subject = subject1
-        //         },
-        //         new()
-        //         {
-        //             Release = release,
-        //             Subject = subject2
-        //         }
-        //     };
-        //
-        //     var contextId = Guid.NewGuid().ToString();
-        //
-        //     await using (var context = InMemoryStatisticsDbContext(contextId))
-        //     {
-        //         await context.Subject.AddRangeAsync(subject1, subject2);
-        //         await context.Filter.AddRangeAsync(subject1Filter1, subject1Filter2, subject1Filter3);
-        //         await context.IndicatorGroup.AddRangeAsync(subject1IndicatorGroup1, subject2IndicatorGroup1);
-        //         await context.Release.AddAsync(release);
-        //         await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
-        //         await context.SaveChangesAsync();
-        //     }
-        //
-        //     await using (var context = InMemoryStatisticsDbContext(contextId))
-        //     {
-        //         var repository = BuildFootnoteRepository(context);
-        //
-        //         // Get footnotes applying to subject 2
-        //         // but also include filter item and indicator id's from subject 1
-        //         var results = await repository.GetFilteredFootnotes(
-        //             releaseId: release.Id,
-        //             subjectId: subject2.Id,
-        //             filterItemIds: ListOf(
-        //                 subject1Filter1.FilterGroups[0].FilterItems[0].Id, // subject 1
-        //                 subject1Filter2.FilterGroups[0].FilterItems[0].Id, // subject 1
-        //                 subject1Filter3.FilterGroups[0].FilterItems[0].Id // subject 1
-        //             ),
-        //             indicatorIds: ListOf(
-        //                 subject1IndicatorGroup1.Indicators[0].Id, // subject 1
-        //                 subject2IndicatorGroup1.Indicators[0].Id // subject 2
-        //             ));
-        //
-        //         // Check that only the footnotes which apply to subject 2 are returned
-        //         // The filter item and indicator id's related to subject 1 should have been ignored
-        //         // Footnotes applying to subject 1 should be excluded
-        //         Assert.Equal(2, results.Count);
-        //
-        //         Assert.Equal(releaseFootnotes[5].FootnoteId, results[0].Id);
-        //         Assert.Equal("Applies to subject 2", results[0].Content);
-        //
-        //         Assert.Equal(releaseFootnotes[6].FootnoteId, results[1].Id);
-        //         Assert.Equal("Applies to subject 2 indicator 1", results[1].Content);
-        //     }
-        // }
+        
+        [Fact]
+        public async Task GetFilteredFootnotes_FilterByEmptyListOfFiltersAndIndicators()
+        {
+            var release = _releaseGenerator.Generate();
+            
+            // todo a default one with new filtergroups and all?
+            var subject1Filters = _filterGenerator
+                .WithFilterGroups(_ => _filterGroupGenerator
+                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+                    .GenerateList(1))
+                .GenerateList(3);
+            
+            var (subject1, subject2) = _subjectsGenerator
+                .ForIndex(0, s => s.SetFilters(subject1Filters))
+                .GenerateTuple2();
+
+            var subject1IndicatorGroup = _indicatorGroupGenerator
+                .WithIndicators(_indicatorGenerator.GenerateList(1))
+                .WithSubject(subject1)
+                .Generate();
+            
+            var footnotes = _footnoteGenerator
+                .ForIndex(0, s => s
+                    .Set(f => f.Content, "Applies to subject 1")
+                    .SetSubjects(_ => ListOf(subject1)))
+                .ForIndex(1, s => s
+                    .Set(f => f.Content, "Applies to subject 1 filter 1")
+                    .SetFilters(_ => ListOf(subject1Filters[0])))
+                .ForIndex(2, s => s
+                    .Set(f => f.Content, "Applies to subject 1 filter 2 group 1")
+                    .SetFilterGroups(_ => ListOf(subject1Filters[1].FilterGroups[0])))
+                .ForIndex(3, s => s
+                    .Set(f => f.Content, "Applies to subject 1 filter 3 group 1 item 1")
+                    .SetFilterItems(_ => ListOf(subject1Filters[2].FilterGroups[0].FilterItems[0])))
+                .ForIndex(4, s => s
+                    .Set(f => f.Content, "Applies to subject 1 indicator 1")
+                    .SetIndicators(_ => ListOf(subject1IndicatorGroup.Indicators[0])))
+                .ForIndex(5, s => s
+                    .Set(f => f.Content, "Applies to subject 2")
+                    .SetSubjects(_ => ListOf(subject2)))
+                .GenerateList();
+                
+            var releaseFootnotes = _releaseFootnoteGenerator
+                .ForInstance(s => s.Set(rf => rf.Release, release))
+                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
+                .GenerateList(footnotes.Count);
+
+            var releaseSubjects = _releaseSubjectGenerator
+                .ForInstance(s => s.Set(rs => rs.Release, release))
+                .ForIndex(0, s => s.Set(rs => rs.Subject, subject1))
+                .ForIndex(1, s => s.Set(rs => rs.Subject, subject2))
+                .GenerateList();
+        
+            var contextId = Guid.NewGuid().ToString();
+        
+            await using (var context = InMemoryStatisticsDbContext(contextId))
+            {
+                await context.Subject.AddRangeAsync(subject1, subject2);
+                await context.Filter.AddRangeAsync(subject1Filters);
+                await context.IndicatorGroup.AddAsync(subject1IndicatorGroup);
+                await context.Release.AddAsync(release);
+                await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
+                await context.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
+                await context.SaveChangesAsync();
+            }
+        
+            await using (var context = InMemoryStatisticsDbContext(contextId))
+            {
+                var repository = BuildFootnoteRepository(context);
+        
+                //  Get footnotes applying directly to subject 1 using empty lists of filter item and indicator id's
+                var results = await repository.GetFilteredFootnotes(
+                    releaseId: release.Id,
+                    subjectId: subject1.Id,
+                    filterItemIds: ListOf<Guid>(),
+                    indicatorIds: ListOf<Guid>());
+        
+                // Check that only the footnotes which apply directly to subject 1 are returned
+                // Other footnotes related to subject 1 should be ignored as no filter items or indicators were requested
+                Assert.Single(results);
+        
+                Assert.Equal(releaseFootnotes[0].FootnoteId, results[0].Id);
+                Assert.Equal("Applies to subject 1", results[0].Content);
+            }
+        }
+        
+        [Fact]
+        public async Task GetFilteredFootnotes_IgnoresFootnotesUnrelatedToRelease()
+        {
+            // Create one release with footnotes and another without
+            var (release1, release2) = _releaseGenerator.GenerateTuple2();
+            
+            // todo a default one with new filtergroups and all?
+            var filters = _filterGenerator
+                .WithFilterGroups(_ => _filterGroupGenerator
+                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+                    .GenerateList(1))
+                .GenerateList(3);
+            
+            var subject = _subjectsGenerator
+                .WithFilters(filters)
+                .Generate();
+
+            var indicatorGroup = _indicatorGroupGenerator
+                .WithIndicators(_indicatorGenerator.GenerateList(1))
+                .WithSubject(subject)
+                .Generate();
+            
+            var footnotes = _footnoteGenerator
+                .ForIndex(0, s => s
+                    .Set(f => f.Content, "Applies to subject 1")
+                    .SetSubjects(_ => ListOf(subject)))
+                .ForIndex(1, s => s
+                    .Set(f => f.Content, "Applies to subject 1 filter 1")
+                    .SetFilters(_ => ListOf(filters[0])))
+                .ForIndex(2, s => s
+                    .Set(f => f.Content, "Applies to subject 1 filter 2 group 1")
+                    .SetFilterGroups(_ => ListOf(filters[1].FilterGroups[0])))
+                .ForIndex(3, s => s
+                    .Set(f => f.Content, "Applies to subject 1 filter 3 group 1 item 1")
+                    .SetFilterItems(_ => ListOf(filters[2].FilterGroups[0].FilterItems[0])))
+                .ForIndex(4, s => s
+                    .Set(f => f.Content, "Applies to subject 1 indicator 1")
+                    .SetIndicators(_ => ListOf(indicatorGroup.Indicators[0])))
+                .GenerateList();
+                
+            var releaseFootnotes = _releaseFootnoteGenerator
+                .ForInstance(s => s.Set(rf => rf.Release, release1))
+                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
+                .GenerateList(footnotes.Count);
+            
+            var releaseSubjects = _releaseSubjectGenerator
+                .ForIndex(0, s => s.Set(rs => rs.Release, release1))
+                .ForIndex(0, s => s.Set(rs => rs.Subject, subject))
+                .ForIndex(1, s => s.Set(rs => rs.Release, release2))
+                .ForIndex(1, s => s.Set(rs => rs.Subject, subject))
+                .GenerateList();
+        
+            var contextId = Guid.NewGuid().ToString();
+        
+            await using (var context = InMemoryStatisticsDbContext(contextId))
+            {
+                await context.Subject.AddAsync(subject);
+                await context.Filter.AddRangeAsync(filters);
+                await context.IndicatorGroup.AddAsync(indicatorGroup);
+                await context.Release.AddRangeAsync(release1, release2);
+                await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
+                await context.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
+                await context.SaveChangesAsync();
+            }
+        
+            await using (var context = InMemoryStatisticsDbContext(contextId))
+            {
+                var repository = BuildFootnoteRepository(context);
+        
+                // This test covers a case where a subject is shared by multiple releases. It makes sure that when other
+                // releases have footnotes for the subject, that there's no way of retrieving those footnotes that
+                // belong to other releases by specifying the subject id and filter item and indicator id's of the subject.
+        
+                var filter1Group1Item1Id = filters[0].FilterGroups[0].FilterItems[0].Id;
+                var filter2Group1Item1Id = filters[1].FilterGroups[0].FilterItems[0].Id;
+                var filter3Group1Item1Id = filters[2].FilterGroups[0].FilterItems[0].Id;
+                var indicatorGroup1Item1Id = indicatorGroup.Indicators[0].Id;
+        
+                var results = await repository.GetFilteredFootnotes(
+                    releaseId: release2.Id, // release 2 has no footnotes
+                    subjectId: subject.Id,
+                    filterItemIds: ListOf(filter1Group1Item1Id, filter2Group1Item1Id, filter3Group1Item1Id),
+                    indicatorIds: ListOf(indicatorGroup1Item1Id));
+        
+                // Check that no footnotes are returned even though subject 1 has footnotes for a different release
+                Assert.Empty(results);
+            }
+        }
+        
+        [Fact]
+        public async Task GetFilteredFootnotes_IgnoresRequestedFilterItemsAndIndicatorsUnrelatedToSubject()
+        {
+            var release = _releaseGenerator.Generate();
+            
+            // todo a default one with new filtergroups and all?
+            var subject1Filters = _filterGenerator
+                .WithFilterGroups(_ => _filterGroupGenerator
+                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+                    .GenerateList(1))
+                .GenerateList(3);
+            
+            var (subject1, subject2) = _subjectsGenerator
+                .ForIndex(0, s => s.SetFilters(subject1Filters))
+                .GenerateTuple2();
+
+            var subject1IndicatorGroup = _indicatorGroupGenerator
+                .WithIndicators(_indicatorGenerator.GenerateList(1))
+                .WithSubject(subject1)
+                .Generate();
+
+            var subject2IndicatorGroup = _indicatorGroupGenerator
+                .WithIndicators(_indicatorGenerator.GenerateList(1))
+                .WithSubject(subject2)
+                .Generate();
+            
+            var footnotes = _footnoteGenerator
+                .ForIndex(0, s => s
+                    .Set(f => f.Content, "Applies to subject 1")
+                    .SetSubjects(_ => ListOf(subject1)))
+                .ForIndex(1, s => s
+                    .Set(f => f.Content, "Applies to subject 1 filter 1")
+                    .SetFilters(_ => ListOf(subject1Filters[0])))
+                .ForIndex(2, s => s
+                    .Set(f => f.Content, "Applies to subject 1 filter 2 group 1")
+                    .SetFilterGroups(_ => ListOf(subject1Filters[1].FilterGroups[0])))
+                .ForIndex(3, s => s
+                    .Set(f => f.Content, "Applies to subject 1 filter 3 group 1 item 1")
+                    .SetFilterItems(_ => ListOf(subject1Filters[2].FilterGroups[0].FilterItems[0])))
+                .ForIndex(4, s => s
+                    .Set(f => f.Content, "Applies to subject 1 indicator 1")
+                    .SetIndicators(_ => ListOf(subject1IndicatorGroup.Indicators[0])))
+                .ForIndex(5, s => s
+                    .Set(f => f.Content, "Applies to subject 2")
+                    .SetSubjects(_ => ListOf(subject2)))
+                .ForIndex(6, s => s
+                    .Set(f => f.Content, "Applies to subject 2 indicator 1")
+                    .SetIndicators(_ => ListOf(subject2IndicatorGroup.Indicators[0])))
+                .GenerateList();
+                
+            var releaseFootnotes = _releaseFootnoteGenerator
+                .ForInstance(s => s.Set(rf => rf.Release, release))
+                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
+                .GenerateList(footnotes.Count);
+
+            var releaseSubjects = _releaseSubjectGenerator
+                .ForInstance(s => s.Set(rs => rs.Release, release))
+                .ForIndex(0, s => s.Set(rs => rs.Subject, subject1))
+                .ForIndex(1, s => s.Set(rs => rs.Subject, subject2))
+                .GenerateList();
+        
+            var contextId = Guid.NewGuid().ToString();
+        
+            await using (var context = InMemoryStatisticsDbContext(contextId))
+            {
+                await context.Subject.AddRangeAsync(subject1, subject2);
+                await context.Filter.AddRangeAsync(subject1Filters);
+                await context.IndicatorGroup.AddRangeAsync(subject1IndicatorGroup, subject2IndicatorGroup);
+                await context.Release.AddAsync(release);
+                await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
+                await context.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
+                await context.SaveChangesAsync();
+            }
+        
+            await using (var context = InMemoryStatisticsDbContext(contextId))
+            {
+                var repository = BuildFootnoteRepository(context);
+        
+                // Get footnotes applying to subject 2
+                // but also include filter item and indicator id's from subject 1
+                var results = await repository.GetFilteredFootnotes(
+                    releaseId: release.Id,
+                    subjectId: subject2.Id,
+                    filterItemIds: ListOf(
+                        subject1Filters[0].FilterGroups[0].FilterItems[0].Id, // subject 1
+                        subject1Filters[1].FilterGroups[0].FilterItems[0].Id, // subject 1
+                        subject1Filters[2].FilterGroups[0].FilterItems[0].Id // subject 1
+                    ),
+                    indicatorIds: ListOf(
+                        subject1IndicatorGroup.Indicators[0].Id, // subject 1
+                        subject2IndicatorGroup.Indicators[0].Id // subject 2
+                    ));
+        
+                // Check that only the footnotes which apply to subject 2 are returned
+                // The filter item and indicator id's related to subject 1 should have been ignored
+                // Footnotes applying to subject 1 should be excluded
+                Assert.Equal(2, results.Count);
+        
+                Assert.Equal(releaseFootnotes[5].FootnoteId, results[0].Id);
+                Assert.Equal("Applies to subject 2", results[0].Content);
+        
+                Assert.Equal(releaseFootnotes[6].FootnoteId, results[1].Id);
+                Assert.Equal("Applies to subject 2 indicator 1", results[1].Content);
+            }
+        }
 
         [Fact]
         public async Task GetFootnotes_MapsAllCriteria()
         {
-            var release = new Release();
+            var (release1, release2) = _releaseGenerator.GenerateTuple2();
 
-            var releaseSubject1 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
+            // todo a default one with new filtergroups and all?
+            var subject1Filters = _filterGenerator
+                .WithFilterGroups(_ => _filterGroupGenerator
+                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+                    .GenerateList(1))
+                .GenerateList(3);
+            
+            var subject2Filters = _filterGenerator
+                .WithFilterGroups(_ => _filterGroupGenerator
+                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+                    .GenerateList(1))
+                .GenerateList(3);
+            
+            var (subject1, subject2) = _subjectsGenerator
+                .ForIndex(0, s => s.SetFilters(subject1Filters))
+                .ForIndex(1, s => s.SetFilters(subject2Filters))
+                .GenerateTuple2();
 
-            var releaseSubject2 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
+            var subject1IndicatorGroup = _indicatorGroupGenerator
+                .WithIndicators(_indicatorGenerator.GenerateList(1))
+                .WithSubject(subject1)
+                .Generate();
 
-            var footnote = new Footnote
-            {
-                Content = "Test footnote",
-                Order = 0,
-                Releases = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Release = release
-                    },
-                },
-                Subjects = new List<SubjectFootnote>
-                {
-                    new()
-                    {
-                        Subject = releaseSubject1.Subject
-                    },
-                    new()
-                    {
-                        Subject = releaseSubject2.Subject
-                    },
-                },
-                Filters = new List<FilterFootnote>
-                {
-                    new()
-                    {
-                        Filter = new Filter
-                        {
-                            Subject = releaseSubject1.Subject
-                        }
-                    },
-                    new()
-                    {
-                        Filter = new Filter
-                        {
-                            Subject = releaseSubject2.Subject
-                        }
-                    }
-                },
-                FilterGroups = new List<FilterGroupFootnote>
-                {
-                    new()
-                    {
-                        FilterGroup = new FilterGroup
-                        {
-                            Filter = new Filter
-                            {
-                                Subject = releaseSubject1.Subject
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        FilterGroup = new FilterGroup
-                        {
-                            Filter = new Filter
-                            {
-                                Subject = releaseSubject2.Subject
-                            }
-                        }
-                    }
-                },
-                FilterItems = new List<FilterItemFootnote>
-                {
-                    new()
-                    {
-                        FilterItem = new FilterItem
-                        {
-                            FilterGroup = new FilterGroup
-                            {
-                                Filter = new Filter
-                                {
-                                    Subject = releaseSubject1.Subject,
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        FilterItem = new FilterItem
-                        {
-                            FilterGroup = new FilterGroup
-                            {
-                                Filter = new Filter
-                                {
-                                    Subject = releaseSubject2.Subject,
-                                }
-                            }
-                        }
-                    }
-                },
-                Indicators = new List<IndicatorFootnote>
-                {
-                    new()
-                    {
-                        Indicator = new Indicator
-                        {
-                            IndicatorGroup = new IndicatorGroup
-                            {
-                                Subject = releaseSubject1.Subject
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Indicator = new Indicator
-                        {
-                            IndicatorGroup = new IndicatorGroup
-                            {
-                                Subject = releaseSubject2.Subject
-                            }
-                        }
-                    }
-                }
-            };
+            var subject2IndicatorGroup = _indicatorGroupGenerator
+                .WithIndicators(_indicatorGenerator.GenerateList(1))
+                .WithSubject(subject2)
+                .Generate();
+            
+            var footnotes = _footnoteGenerator
+                .ForIndex(0, s => s
+                    .Set(f => f.Content, "Applies to all criteria")
+                    .SetSubjects(_ => ListOf(subject1, subject2))
+                    .SetFilters(_ => ListOf(subject1Filters[0], subject2Filters[0]))
+                    .SetFilterGroups(_ => ListOf(subject1Filters[1].FilterGroups[0], subject2Filters[1].FilterGroups[0]))
+                    .SetFilterItems(_ => ListOf(subject1Filters[2].FilterGroups[0].FilterItems[0], subject2Filters[2].FilterGroups[0].FilterItems[0]))
+                    .SetIndicators(_ => ListOf(subject1IndicatorGroup.Indicators[0], subject2IndicatorGroup.Indicators[0])))
+                .GenerateList();
+                
+            var releaseFootnotes = _releaseFootnoteGenerator
+                .ForInstance(s => s.Set(rf => rf.Release, release1))
+                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
+                .GenerateList(footnotes.Count);
 
+            var releaseSubjects = _releaseSubjectGenerator
+                .ForInstance(s => s.Set(rs => rs.Release, release1))
+                .ForIndex(0, s => s.Set(rs => rs.Subject, subject1))
+                .ForIndex(1, s => s.Set(rs => rs.Subject, subject2))
+                .GenerateList();
+            
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
-                await context.AddAsync(release);
-                await context.AddRangeAsync(releaseSubject1, releaseSubject2);
-                await context.AddAsync(footnote);
+                await context.Subject.AddRangeAsync(subject1, subject2);
+                await context.Filter.AddRangeAsync(subject1Filters.Concat(subject2Filters));
+                await context.IndicatorGroup.AddRangeAsync(subject1IndicatorGroup, subject2IndicatorGroup);
+                await context.Release.AddRangeAsync(release1, release2);
+                await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
+                await context.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
                 await context.SaveChangesAsync();
             }
 
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
-                var results = await repository.GetFootnotes(release.Id);
+                var results = await repository.GetFootnotes(release1.Id);
 
                 Assert.Single(results);
 
-                Assert.Equal("Test footnote", results[0].Content);
+                Assert.Equal("Applies to all criteria", results[0].Content);
 
                 var footnoteReleases = results[0].Releases.ToList();
 
                 Assert.Single(footnoteReleases);
-                Assert.Equal(release.Id, footnoteReleases[0].ReleaseId);
+                Assert.Equal(release1.Id, footnoteReleases[0].ReleaseId);
 
                 var footnoteSubjects = results[0].Subjects.ToList();
 
                 Assert.Equal(2, footnoteSubjects.Count);
-                Assert.Equal(releaseSubject1.SubjectId, footnoteSubjects[0].SubjectId);
-                Assert.Equal(releaseSubject2.SubjectId, footnoteSubjects[1].SubjectId);
+                Assert.Equal(subject1.Id, footnoteSubjects[0].SubjectId);
+                Assert.Equal(subject2.Id, footnoteSubjects[1].SubjectId);
 
                 var footnoteFilters = results[0].Filters.ToList();
 
                 Assert.Equal(2, footnoteSubjects.Count);
-                Assert.Equal(releaseSubject1.SubjectId, footnoteFilters[0].Filter.SubjectId);
-                Assert.Equal(releaseSubject2.SubjectId, footnoteFilters[1].Filter.SubjectId);
+                Assert.Equal(subject1.Id, footnoteFilters[0].Filter.SubjectId);
+                Assert.Equal(subject2.Id, footnoteFilters[1].Filter.SubjectId);
 
                 var footnoteFilterGroups = results[0].FilterGroups.ToList();
 
                 Assert.Equal(2, footnoteFilterGroups.Count);
-                Assert.Equal(releaseSubject1.SubjectId, footnoteFilterGroups[0].FilterGroup.Filter.SubjectId);
-                Assert.Equal(releaseSubject2.SubjectId, footnoteFilterGroups[1].FilterGroup.Filter.SubjectId);
+                Assert.Equal(subject1.Id, footnoteFilterGroups[0].FilterGroup.Filter.SubjectId);
+                Assert.Equal(subject2.Id, footnoteFilterGroups[1].FilterGroup.Filter.SubjectId);
 
                 var footnoteFilterItems = results[0].FilterItems.ToList();
 
                 Assert.Equal(2, footnoteFilterItems.Count);
-                Assert.Equal(releaseSubject1.SubjectId, footnoteFilterItems[0].FilterItem.FilterGroup.Filter.SubjectId);
-                Assert.Equal(releaseSubject2.SubjectId, footnoteFilterItems[1].FilterItem.FilterGroup.Filter.SubjectId);
+                Assert.Equal(subject1.Id, footnoteFilterItems[0].FilterItem.FilterGroup.Filter.SubjectId);
+                Assert.Equal(subject2.Id, footnoteFilterItems[1].FilterItem.FilterGroup.Filter.SubjectId);
 
                 var footnoteIndicators = results[0].Indicators.ToList();
 
                 Assert.Equal(2, footnoteIndicators.Count);
-                Assert.Equal(releaseSubject1.SubjectId, footnoteIndicators[0].Indicator.IndicatorGroup.SubjectId);
-                Assert.Equal(releaseSubject2.SubjectId, footnoteIndicators[1].Indicator.IndicatorGroup.SubjectId);
+                Assert.Equal(subject1.Id, footnoteIndicators[0].Indicator.IndicatorGroup.SubjectId);
+                Assert.Equal(subject2.Id, footnoteIndicators[1].Indicator.IndicatorGroup.SubjectId);
             }
         }
 
         [Fact]
         public async Task GetFootnotes_FiltersByRelease()
         {
-            var release = new Release();
-            var otherRelease = new Release();
+            var (release1, release2) = _releaseGenerator.GenerateTuple2();
 
-            var releaseSubject1 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
+            // todo a default one with new filtergroups and all?
+            var subject1Filters = _filterGenerator
+                .WithFilterGroups(_ => _filterGroupGenerator
+                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+                    .GenerateList(1))
+                .GenerateList(3);
+            
+            var subject2Filters = _filterGenerator
+                .WithFilterGroups(_ => _filterGroupGenerator
+                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+                    .GenerateList(1))
+                .GenerateList(3);
+            
+            var (release1Subject1, release1Subject2, release2Subject) = _subjectsGenerator
+                .ForIndex(0, s => s.SetFilters(subject1Filters))
+                .ForIndex(1, s => s.SetFilters(subject2Filters))
+                .GenerateTuple3();
 
-            var releaseSubject2 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
+            var subject1IndicatorGroup = _indicatorGroupGenerator
+                .WithIndicators(_indicatorGenerator.GenerateList(1))
+                .WithSubject(release1Subject1)
+                .Generate();
 
-            var footnote1 = new Footnote
-            {
-                Content = "Test footnote 1",
-                Order = 0,
-                Releases = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Release = release
-                    },
-                    // Check that footnote is still fetched
-                    // even if it also linked to another release
-                    new()
-                    {
-                        Release = otherRelease
-                    }
-                },
-                Subjects = new List<SubjectFootnote>
-                {
-                    new()
-                    {
-                        Subject = releaseSubject1.Subject
-                    }
-                },
-            };
+            var subject2IndicatorGroup = _indicatorGroupGenerator
+                .WithIndicators(_indicatorGenerator.GenerateList(1))
+                .WithSubject(release1Subject2)
+                .Generate();
+            
+            var release1Footnotes = _footnoteGenerator
+                .ForIndex(0, s => s
+                    .Set(f => f.Content, "Applied to release 1 subject 1")
+                    .SetSubjects(_ => ListOf(release1Subject1)))
+                .ForIndex(1, s => s
+                    .Set(f => f.Content, "Applied to release 1 subject 2")
+                    .SetSubjects(_ => ListOf(release1Subject2)))
+                .GenerateList();
+            
+            var release2Footnotes = _footnoteGenerator
+                .ForIndex(0, s => s
+                    .Set(f => f.Content, "Applied to release 2 subject")
+                    .SetSubjects(_ => ListOf(release2Subject)))
+                .GenerateList();
+                
+            var releaseFootnotes = _releaseFootnoteGenerator
+                .ForIndex(0, s => s
+                    .Set(rf => rf.Release, release1)
+                    .Set(rf => rf.Footnote, release1Footnotes[0]))
+                .ForIndex(1, s => s
+                    .Set(rf => rf.Release, release1)
+                    .Set(rf => rf.Footnote, release1Footnotes[1]))
+                .ForIndex(2, s => s
+                    .Set(rf => rf.Release, release2)
+                    .Set(rf => rf.Footnote, release2Footnotes[0]))
+                .GenerateList();
 
-            var footnote2 = new Footnote
-            {
-                Content = "Test footnote 2",
-                Order = 1,
-                Releases = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Release = release
-                    },
-                },
-                Subjects = new List<SubjectFootnote>
-                {
-                    new()
-                    {
-                        Subject = releaseSubject2.Subject
-                    }
-                },
-            };
-
-            var footnoteForOtherRelease = new Footnote
-            {
-                Content = "Test footnote for other release",
-                Order = 0,
-                Releases = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Release = new Release()
-                    },
-                },
-                Subjects = new List<SubjectFootnote>
-                {
-                    new()
-                    {
-                        Subject = new Subject()
-                    }
-                },
-            };
+            var releaseSubjects = _releaseSubjectGenerator
+                .ForInstance(s => s.Set(rs => rs.Release, release1))
+                .ForIndex(0, s => s.Set(rs => rs.Subject, release1Subject1))
+                .ForIndex(1, s => s.Set(rs => rs.Subject, release1Subject2))
+                .ForIndex(2, s => s.Set(rs => rs.Subject, release2Subject))
+                .GenerateList();
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
-                await context.AddAsync(release);
-                await context.AddRangeAsync(releaseSubject1, releaseSubject2);
-                await context.AddRangeAsync(footnote1, footnote2, footnoteForOtherRelease);
+                await context.Subject.AddRangeAsync(release1Subject1, release1Subject2);
+                await context.Filter.AddRangeAsync(subject1Filters.Concat(subject2Filters));
+                await context.IndicatorGroup.AddRangeAsync(subject1IndicatorGroup, subject2IndicatorGroup);
+                await context.Release.AddRangeAsync(release1, release2);
+                await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
+                await context.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
                 await context.SaveChangesAsync();
             }
 
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
-                var results = await repository.GetFootnotes(release.Id);
+                var results = await repository.GetFootnotes(release1.Id);
 
                 Assert.Equal(2, results.Count);
 
-                Assert.Equal("Test footnote 1", results[0].Content);
+                Assert.Equal("Applied to release 1 subject 1", results[0].Content);
 
                 var footnote1Releases = results[0].Releases.ToList();
 
                 Assert.Single(footnote1Releases);
-                Assert.Equal(release.Id, footnote1Releases[0].ReleaseId);
+                Assert.Equal(release1.Id, footnote1Releases[0].ReleaseId);
 
                 var footnote1Subjects = results[0].Subjects.ToList();
 
                 Assert.Single(footnote1Subjects);
-                Assert.Equal(releaseSubject1.SubjectId, footnote1Subjects[0].SubjectId);
+                Assert.Equal(release1Subject1.Id, footnote1Subjects[0].SubjectId);
 
-                Assert.Equal("Test footnote 2", results[1].Content);
+                Assert.Equal("Applied to release 1 subject 2", results[1].Content);
 
                 var footnote2Releases = results[1].Releases.ToList();
 
                 Assert.Single(footnote2Releases);
-                Assert.Equal(release.Id, footnote2Releases[0].ReleaseId);
+                Assert.Equal(release1.Id, footnote2Releases[0].ReleaseId);
 
                 var footnote2Subjects = results[1].Subjects.ToList();
                 Assert.Single(footnote2Subjects);
-                Assert.Equal(releaseSubject2.SubjectId, footnote2Subjects[0].SubjectId);
+                Assert.Equal(release1Subject2.Id, footnote2Subjects[0].SubjectId);
             }
         }
 
         [Fact]
         public async Task GetFootnotes_FiltersBySubjectId()
         {
-            var release = new Release();
+            var release = _releaseGenerator.Generate();
+            
+            var (subject1, subject2) = _subjectsGenerator
+                .GenerateTuple2();
 
-            var releaseSubject1 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
+            var footnotes = _footnoteGenerator
+                .ForIndex(0, s => s
+                    .Set(f => f.Content, "Applied to subject 1")
+                    .SetSubjects(_ => ListOf(subject1)))
+                .ForIndex(1, s => s
+                    .Set(f => f.Content, "Applied to subject 2")
+                    .SetSubjects(_ => ListOf(subject2)))
+                .GenerateList();
+            
+            var releaseFootnotes = _releaseFootnoteGenerator
+                .ForInstance(s => s.Set(rf => rf.Release, release))
+                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
+                .GenerateList(footnotes.Count);
 
-            var releaseSubject2 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
-
-            var footnote1 = new Footnote
-            {
-                Content = "Test footnote 1",
-                Order = 0,
-                Releases = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Release = release
-                    },
-                },
-                Subjects = new List<SubjectFootnote>
-                {
-                    new()
-                    {
-                        Subject = releaseSubject1.Subject
-                    }
-                },
-            };
-
-            var footnote2 = new Footnote
-            {
-                Content = "Test footnote 2",
-                Order = 1,
-                Releases = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Release = release
-                    },
-                },
-                Subjects = new List<SubjectFootnote>
-                {
-                    new()
-                    {
-                        Subject = releaseSubject2.Subject
-                    }
-                },
-            };
-
+            var releaseSubjects = _releaseSubjectGenerator
+                .ForInstance(s => s.Set(rs => rs.Release, release))
+                .ForIndex(0, s => s.Set(rs => rs.Subject, subject1))
+                .ForIndex(1, s => s.Set(rs => rs.Subject, subject2))
+                .GenerateList();
+            
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
-                await context.AddAsync(release);
-                await context.AddRangeAsync(releaseSubject1, releaseSubject2);
-                await context.AddRangeAsync(footnote1, footnote2);
+                await context.Subject.AddRangeAsync(subject1, subject2);
+                await context.Release.AddRangeAsync(release);
+                await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
+                await context.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
                 await context.SaveChangesAsync();
             }
 
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
-                var results = await repository.GetFootnotes(release.Id, releaseSubject2.SubjectId);
+                var results = await repository.GetFootnotes(release.Id, subject2.Id);
 
                 Assert.Single(results);
-                Assert.Equal("Test footnote 2", results[0].Content);
+                Assert.Equal("Applied to subject 2", results[0].Content);
             }
         }
 
         [Fact]
         public async Task GetFootnotes_FiltersCriteriaBySubjectId()
         {
-            var release = new Release();
-            var otherRelease = new Release();
+            var (release1, release2) = _releaseGenerator.GenerateTuple2();
 
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
+            // todo a default one with new filtergroups and all?
+            var subject1Filters = _filterGenerator
+                .WithFilterGroups(_ => _filterGroupGenerator
+                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+                    .GenerateList(1))
+                .GenerateList(3);
+            
+            var subject2Filters = _filterGenerator
+                .WithFilterGroups(_ => _filterGroupGenerator
+                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+                    .GenerateList(1))
+                .GenerateList(3);
+            
+            var (subject1, subject2) = _subjectsGenerator
+                .ForIndex(0, s => s.SetFilters(subject1Filters))
+                .ForIndex(1, s => s.SetFilters(subject2Filters))
+                .GenerateTuple2();
 
-            var otherReleaseSubject = new ReleaseSubject
-            {
-                Release = otherRelease,
-                Subject = new Subject()
-            };
+            var subject1IndicatorGroup = _indicatorGroupGenerator
+                .WithIndicators(_indicatorGenerator.GenerateList(1))
+                .WithSubject(subject1)
+                .Generate();
 
-            var footnote = new Footnote
-            {
-                Content = "Test footnote",
-                Order = 0,
-                Releases = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Release = release
-                    },
-                    new()
-                    {
-                        Release = otherRelease
-                    }
-                },
-                Subjects = new List<SubjectFootnote>
-                {
-                    new()
-                    {
-                        Subject = releaseSubject.Subject
-                    },
-                    new()
-                    {
-                        Subject = otherReleaseSubject.Subject
-                    },
-                },
-                Filters = new List<FilterFootnote>
-                {
-                    new()
-                    {
-                        Filter = new Filter
-                        {
-                            Subject = releaseSubject.Subject
-                        }
-                    },
-                    new()
-                    {
-                        Filter = new Filter
-                        {
-                            Subject = otherReleaseSubject.Subject
-                        }
-                    }
-                },
-                FilterGroups = new List<FilterGroupFootnote>
-                {
-                    new()
-                    {
-                        FilterGroup = new FilterGroup
-                        {
-                            Filter = new Filter
-                            {
-                                Subject = releaseSubject.Subject
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        FilterGroup = new FilterGroup
-                        {
-                            Filter = new Filter
-                            {
-                                Subject = otherReleaseSubject.Subject
-                            }
-                        }
-                    }
-                },
-                FilterItems = new List<FilterItemFootnote>
-                {
-                    new()
-                    {
-                        FilterItem = new FilterItem
-                        {
-                            FilterGroup = new FilterGroup
-                            {
-                                Filter = new Filter
-                                {
-                                    Subject = releaseSubject.Subject
-                                }
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        FilterItem = new FilterItem
-                        {
-                            FilterGroup = new FilterGroup
-                            {
-                                Filter = new Filter
-                                {
-                                    Subject = otherReleaseSubject.Subject,
-                                }
-                            }
-                        }
-                    }
-                },
-                Indicators = new List<IndicatorFootnote>
-                {
-                    new()
-                    {
-                        Indicator = new Indicator
-                        {
-                            IndicatorGroup = new IndicatorGroup
-                            {
-                                Subject = releaseSubject.Subject
-                            }
-                        }
-                    },
-                    new()
-                    {
-                        Indicator = new Indicator
-                        {
-                            IndicatorGroup = new IndicatorGroup
-                            {
-                                Subject = otherReleaseSubject.Subject
-                            }
-                        }
-                    }
-                }
-            };
+            var subject2IndicatorGroup = _indicatorGroupGenerator
+                .WithIndicators(_indicatorGenerator.GenerateList(1))
+                .WithSubject(subject2)
+                .Generate();
+            
+            var footnotes = _footnoteGenerator
+                .ForIndex(0, s => s
+                    .Set(f => f.Content, "Applies to all types of element")
+                    .SetSubjects(_ => ListOf(subject1, subject2))
+                    .SetFilters(_ => ListOf(subject1Filters[0], subject2Filters[0]))
+                    .SetFilterGroups(_ => ListOf(subject1Filters[1].FilterGroups[0], subject2Filters[1].FilterGroups[0]))
+                    .SetFilterItems(_ => ListOf(subject1Filters[2].FilterGroups[0].FilterItems[0], subject2Filters[2].FilterGroups[0].FilterItems[0]))
+                    .SetIndicators(_ => ListOf(subject1IndicatorGroup.Indicators[0], subject2IndicatorGroup.Indicators[0])))
+                .GenerateList();
+                
+            var releaseFootnotes = _releaseFootnoteGenerator
+                .ForInstance(s => s.Set(rf => rf.Release, release1))
+                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
+                .GenerateList(footnotes.Count);
 
+            var releaseSubjects = _releaseSubjectGenerator
+                .ForInstance(s => s.Set(rs => rs.Release, release1))
+                .ForIndex(0, s => s.Set(rs => rs.Subject, subject1))
+                .ForIndex(1, s => s.Set(rs => rs.Subject, subject2))
+                .GenerateList();
+            
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
-                await context.AddRangeAsync(release, otherRelease);
-                await context.AddRangeAsync(releaseSubject, otherReleaseSubject);
-                await context.AddAsync(footnote);
+                await context.Subject.AddRangeAsync(subject1, subject2);
+                await context.Filter.AddRangeAsync(subject1Filters.Concat(subject2Filters));
+                await context.IndicatorGroup.AddRangeAsync(subject1IndicatorGroup, subject2IndicatorGroup);
+                await context.Release.AddRangeAsync(release1, release2);
+                await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
+                await context.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
                 await context.SaveChangesAsync();
             }
 
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
-                var results = await repository.GetFootnotes(release.Id, releaseSubject.SubjectId);
+                var results = await repository.GetFootnotes(release1.Id, subject1.Id);
 
                 Assert.Single(results);
-                Assert.Equal("Test footnote", results[0].Content);
+                Assert.Equal("Applies to all types of element", results[0].Content);
 
                 var footnoteReleases = results[0].Releases.ToList();
 
                 Assert.Single(footnoteReleases);
-                Assert.Equal(releaseSubject.ReleaseId, footnoteReleases[0].ReleaseId);
+                Assert.Equal(release1.Id, footnoteReleases[0].ReleaseId);
 
                 var footnoteSubjects = results[0].Subjects.ToList();
 
                 Assert.Single(footnoteSubjects);
-                Assert.Equal(releaseSubject.SubjectId, footnoteSubjects[0].SubjectId);
+                Assert.Equal(subject1.Id, footnoteSubjects[0].SubjectId);
 
                 var footnoteFilters = results[0].Filters.ToList();
 
-                Assert.Single(footnoteSubjects);
-                Assert.Equal(releaseSubject.SubjectId, footnoteFilters[0].Filter.SubjectId);
+                Assert.Single(footnoteFilters);
+                Assert.Equal(subject1.Id, footnoteFilters[0].Filter.SubjectId);
 
                 var footnoteFilterGroups = results[0].FilterGroups.ToList();
 
                 Assert.Single(footnoteFilterGroups);
-                Assert.Equal(releaseSubject.SubjectId, footnoteFilterGroups[0].FilterGroup.Filter.SubjectId);
+                Assert.Equal(subject1.Id, footnoteFilterGroups[0].FilterGroup.Filter.SubjectId);
 
                 var footnoteFilterItems = results[0].FilterItems.ToList();
 
                 Assert.Single(footnoteFilterItems);
-                Assert.Equal(releaseSubject.SubjectId, footnoteFilterItems[0].FilterItem.FilterGroup.Filter.SubjectId);
+                Assert.Equal(subject1.Id, footnoteFilterItems[0].FilterItem.FilterGroup.Filter.SubjectId);
 
                 var footnoteIndicators = results[0].Indicators.ToList();
 
                 Assert.Single(footnoteIndicators);
-                Assert.Equal(releaseSubject.SubjectId, footnoteIndicators[0].Indicator.IndicatorGroup.SubjectId);
+                Assert.Equal(subject1.Id, footnoteIndicators[0].Indicator.IndicatorGroup.SubjectId);
             }
         }
 
         [Fact]
         public async Task GetFootnotes_OrdersFootnotes()
         {
-            var release = new Release();
+            var release = _releaseGenerator.Generate();
+            var subject = _subjectsGenerator.Generate();
 
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
+            var footnotes = _footnoteGenerator
+                .ForIndex(0, s => s
+                    .Set(f => f.Content, "Footnote 3")
+                    .Set(f => f.Order, 2)
+                    .SetSubjects(_ => ListOf(subject)))
+                .ForIndex(1, s => s
+                    .Set(f => f.Content, "Footnote 1")
+                    .Set(f => f.Order, 0)
+                    .SetSubjects(_ => ListOf(subject)))
+                .ForIndex(2, s => s
+                    .Set(f => f.Content, "Footnote 2")
+                    .Set(f => f.Order, 1)
+                    .SetSubjects(_ => ListOf(subject)))
+                .GenerateList();
+                
+            var releaseFootnotes = _releaseFootnoteGenerator
+                .ForInstance(s => s.Set(rf => rf.Release, release))
+                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
+                .GenerateList(footnotes.Count);
 
-            var footnotes = new List<Footnote>
-            {
-                new()
-                {
-                    Content = "Footnote 3",
-                    Releases = new List<ReleaseFootnote>
-                    {
-                        new()
-                        {
-                            Release = release
-                        }
-                    },
-                    Subjects = new List<SubjectFootnote>
-                    {
-                        new()
-                        {
-                            Subject = releaseSubject.Subject
-                        }
-                    },
-                    Order = 2
-                },
-                new()
-                {
-                    Content = "Footnote 1",
-                    Releases = new List<ReleaseFootnote>
-                    {
-                        new()
-                        {
-                            Release = release
-                        }
-                    },
-                    Subjects = new List<SubjectFootnote>
-                    {
-                        new()
-                        {
-                            Subject = releaseSubject.Subject
-                        }
-                    },
-                    Order = 0
-                },
-                new()
-                {
-                    Content = "Footnote 2",
-                    Releases = new List<ReleaseFootnote>
-                    {
-                        new()
-                        {
-                            Release = release
-                        }
-                    },
-                    Subjects = new List<SubjectFootnote>
-                    {
-                        new()
-                        {
-                            Subject = releaseSubject.Subject
-                        }
-                    },
-                    Order = 1
-                }
-            };
+            var releaseSubjects = _releaseSubjectGenerator
+                .ForInstance(s => s.Set(rs => rs.Release, release))
+                .ForInstance(s => s.Set(rs => rs.Subject, subject))
+                .GenerateList(1);
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
-                await context.AddRangeAsync(release);
-                await context.AddRangeAsync(releaseSubject);
-                await context.AddRangeAsync(footnotes);
+                await context.Release.AddRangeAsync(release);
+                await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
+                await context.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
                 await context.SaveChangesAsync();
             }
 
@@ -2172,168 +1499,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task GetSubjectsWithNoFootnotes_FootnotePerSubject()
         {
-            var release = new Release();
+            var release = _releaseGenerator.Generate();
+            
+            var subjects = _subjectsGenerator
+                .WithFilters(_ => _filterGenerator
+                    .WithFilterGroups(_ => _filterGroupGenerator
+                        .WithFilterItems(_ => _filterItemGenerator
+                            .GenerateList(1))
+                        .GenerateList(1))
+                    .GenerateList(3))
+                .GenerateList(6);
+            
+            var subjectWithNoFootnotes = subjects[5];
 
-            var releaseSubject1 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
-            var releaseSubject2 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
-            var releaseSubject3 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
-            var releaseSubject4 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
-            var releaseSubject5 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
-            var releaseSubjectWithNoFootnotes = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
+            var subject5IndicatorGroup = _indicatorGroupGenerator
+                .WithSubject(subjects[4])
+                .WithIndicators(_indicatorGenerator.GenerateList(1))
+                .Generate();
 
-            var footnote1 = new Footnote
-            {
-                Content = "Test footnote 1",
-                Releases = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Release = release
-                    },
-                },
-                Subjects = new List<SubjectFootnote>
-                {
-                    new()
-                    {
-                        Subject = releaseSubject1.Subject,
-                    }
-                }
-            };
-            var footnote2 = new Footnote
-            {
-                Content = "Test footnote 2",
-                Releases = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Release = release
-                    },
-                },
-                Filters = new List<FilterFootnote>
-                {
-                    new()
-                    {
-                        Filter = new Filter
-                        {
-                            Subject = releaseSubject2.Subject
-                        }
-                    }
-                }
-            };
-            var footnote3 = new Footnote
-            {
-                Content = "Test footnote 3",
-                Releases = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Release = release
-                    },
-                },
-                FilterGroups = new List<FilterGroupFootnote>
-                {
-                    new()
-                    {
-                        FilterGroup = new FilterGroup
-                        {
-                            Filter = new Filter
-                            {
-                                Subject = releaseSubject3.Subject
-                            }
-                        }
-                    }
-                }
-            };
-            var footnote4 = new Footnote
-            {
-                Content = "Test footnote 4",
-                Releases = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Release = release
-                    },
-                },
-                FilterItems = new List<FilterItemFootnote>
-                {
-                    new()
-                    {
-                        FilterItem = new FilterItem
-                        {
-                            FilterGroup = new FilterGroup
-                            {
-                                Filter = new Filter
-                                {
-                                    Subject = releaseSubject4.Subject
-                                }
-                            }
-                        }
-                    },
-                }
-            };
-            var footnote5 = new Footnote
-            {
-                Content = "Test footnote 5",
-                Releases = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Release = release
-                    },
-                },
-                Indicators = new List<IndicatorFootnote>
-                {
-                    new()
-                    {
-                        Indicator = new Indicator
-                        {
-                            IndicatorGroup = new IndicatorGroup
-                            {
-                                Subject = releaseSubject5.Subject
-                            }
-                        }
-                    }
-                }
-            };
+            var footnotes = _footnoteGenerator
+                .ForIndex(0, s => s
+                    .SetSubjects(_ => ListOf(subjects[0])))
+                .ForIndex(1, s => s
+                    .SetFilters(_ => ListOf(subjects[1].Filters[0])))
+                .ForIndex(2, s => s
+                    .SetFilterGroups(_ => ListOf(subjects[2].Filters[1].FilterGroups[0])))
+                .ForIndex(3, s => s
+                    .SetFilterItems(_ => ListOf(subjects[3].Filters[2].FilterGroups[0].FilterItems[0])))
+                .ForIndex(4, s => s
+                    .SetIndicators(_ => ListOf(subject5IndicatorGroup.Indicators[0])))
+                .GenerateList();
+                
+            var releaseFootnotes = _releaseFootnoteGenerator
+                .ForInstance(s => s.Set(rf => rf.Release, release))
+                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
+                .GenerateList(footnotes.Count);
 
+            var releaseSubjects = _releaseSubjectGenerator
+                .ForInstance(s => s.Set(rs => rs.Release, release))
+                .ForInstance(s => s.Set(rs => rs.Subject, (_, _, context) => subjects[context.Index]))
+                .GenerateList(subjects.Count);
+            
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
-                await context.AddRangeAsync(release);
-                await context.AddRangeAsync(
-                    releaseSubject1,
-                    releaseSubject2,
-                    releaseSubject3,
-                    releaseSubject4,
-                    releaseSubject5,
-                    releaseSubjectWithNoFootnotes
-                );
-                await context.AddRangeAsync(footnote1, footnote2, footnote3, footnote4, footnote5);
+                await context.Subject.AddRangeAsync(subjects);
+                await context.IndicatorGroup.AddRangeAsync(subject5IndicatorGroup);
+                await context.Release.AddRangeAsync(release);
+                await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
+                await context.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
                 await context.SaveChangesAsync();
             }
 
@@ -2343,132 +1558,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 var results = await repository.GetSubjectsWithNoFootnotes(release.Id);
 
                 Assert.Single(results);
-
-                Assert.Equal(releaseSubjectWithNoFootnotes.Subject.Id, results[0].Id);
+                Assert.Equal(subjectWithNoFootnotes.Id, results[0].Id);
             }
         }
 
         [Fact]
         public async Task GetSubjectsWithNoFootnotes_FootnoteForMultipleSubjects()
         {
-            var release = new Release();
+            var release = _releaseGenerator.Generate();
+            
+            var subjects = _subjectsGenerator
+                .WithFilters(_ => _filterGenerator
+                    .WithFilterGroups(_ => _filterGroupGenerator
+                        .WithFilterItems(_ => _filterItemGenerator
+                            .GenerateList(1))
+                        .GenerateList(1))
+                    .GenerateList(3))
+                .GenerateList(2);
+            
+            var subjectWithFootnotes = subjects[0];
+            var subjectWithNoFootnotes = subjects[1];
+            
+            var subjectWithFootnotesIndicatorGroup = _indicatorGroupGenerator
+                .WithSubject(subjectWithFootnotes)
+                .WithIndicators(_indicatorGenerator.GenerateList(1))
+                .Generate();
 
-            var releaseSubject1 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
-            var releaseSubject2 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
-            var releaseSubject3 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
-            var releaseSubject4 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
-            var releaseSubject5 = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
-            var releaseSubjectWithNoFootnotes = new ReleaseSubject
-            {
-                Release = release,
-                Subject = new Subject()
-            };
+            var footnotes = _footnoteGenerator
+                .ForIndex(0, s => s
+                    .SetSubjects(_ => ListOf(subjectWithFootnotes))
+                    .SetFilters(_ => ListOf(subjectWithFootnotes.Filters[0]))
+                    .SetFilterGroups(_ => ListOf(subjectWithFootnotes.Filters[1].FilterGroups[0]))
+                    .SetFilterItems(_ => ListOf(subjectWithFootnotes.Filters[2].FilterGroups[0].FilterItems[0]))
+                    .SetIndicators(_ => ListOf(subjectWithFootnotesIndicatorGroup.Indicators[0])))
+                .GenerateList(1);
+                
+            var releaseFootnotes = _releaseFootnoteGenerator
+                .ForInstance(s => s.Set(rf => rf.Release, release))
+                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
+                .GenerateList(footnotes.Count);
 
-            var footnote = new Footnote
-            {
-                Content = "Test footnote 1",
-                Releases = new List<ReleaseFootnote>
-                {
-                    new()
-                    {
-                        Release = release
-                    },
-                },
-                Subjects = new List<SubjectFootnote>
-                {
-                    new()
-                    {
-                        Subject = releaseSubject1.Subject,
-                    }
-                },
-                Filters = new List<FilterFootnote>
-                {
-                    new()
-                    {
-                        Filter = new Filter
-                        {
-                            Subject = releaseSubject2.Subject
-                        },
-                    }
-                },
-                FilterGroups = new List<FilterGroupFootnote>
-                {
-                    new()
-                    {
-                        FilterGroup = new FilterGroup
-                        {
-                            Filter = new Filter
-                            {
-                                Subject = releaseSubject3.Subject
-                            },
-                        }
-                    }
-                },
-                FilterItems = new List<FilterItemFootnote>
-                {
-                    new()
-                    {
-                        FilterItem = new FilterItem
-                        {
-                            FilterGroup = new FilterGroup
-                            {
-                                Filter = new Filter
-                                {
-                                    Subject = releaseSubject4.Subject
-                                },
-                            }
-                        }
-                    }
-                },
-                Indicators = new List<IndicatorFootnote>
-                {
-                    new()
-                    {
-                        Indicator = new Indicator
-                        {
-                            IndicatorGroup = new IndicatorGroup
-                            {
-                                Subject = releaseSubject5.Subject
-                            }
-                        }
-                    }
-                }
-            };
-
+            var releaseSubjects = _releaseSubjectGenerator
+                .ForInstance(s => s.Set(rs => rs.Release, release))
+                .ForInstance(s => s.Set(rs => rs.Subject, (_, _, context) => subjects[context.Index]))
+                .GenerateList(subjects.Count);
+            
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryStatisticsDbContext(contextId))
             {
-                await context.AddRangeAsync(release);
-                await context.AddRangeAsync(
-                    releaseSubject1,
-                    releaseSubject2,
-                    releaseSubject3,
-                    releaseSubject4,
-                    releaseSubject5,
-                    releaseSubjectWithNoFootnotes
-                );
-                await context.AddRangeAsync(footnote);
+                await context.Subject.AddRangeAsync(subjects);
+                await context.IndicatorGroup.AddRangeAsync(subjectWithFootnotesIndicatorGroup);
+                await context.Release.AddRangeAsync(release);
+                await context.ReleaseSubject.AddRangeAsync(releaseSubjects);
+                await context.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
                 await context.SaveChangesAsync();
             }
 
@@ -2479,7 +1622,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
                 Assert.Single(results);
 
-                Assert.Equal(releaseSubjectWithNoFootnotes.Subject.Id, results[0].Id);
+                Assert.Equal(subjectWithNoFootnotes.Id, results[0].Id);
             }
         }
 

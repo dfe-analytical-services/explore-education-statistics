@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -14,6 +15,9 @@ public static class SubjectGeneratorExtensions
         => generator.ForInstance(s => s.SetDefaults());
 
     public static Generator<Subject> WithFilters(this Generator<Subject> generator, IEnumerable<Filter> filters)
+        => generator.ForInstance(s => s.SetFilters(filters));
+    
+    public static Generator<Subject> WithFilters(this Generator<Subject> generator, Func<SetterContext, IEnumerable<Filter>> filters)
         => generator.ForInstance(s => s.SetFilters(filters));
 
     public static Generator<Subject> WithIndicatorGroups(
@@ -42,6 +46,22 @@ public static class SubjectGeneratorExtensions
             (_, subject) =>
             {
                 var list = filters.ToList();
+
+                list.ForEach(filter => filter.Subject = subject);
+
+                return list;
+            }
+        );
+
+    // TODO merge with above method
+    public static InstanceSetters<Subject> SetFilters(
+        this InstanceSetters<Subject> setters,
+        Func<SetterContext, IEnumerable<Filter>> filters)
+        => setters.Set(
+            s => s.Filters,
+            (_, subject, context) =>
+            {
+                var list = filters.Invoke(context).ToList();
 
                 list.ForEach(filter => filter.Subject = subject);
 

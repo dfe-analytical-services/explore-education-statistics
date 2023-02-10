@@ -14,6 +14,21 @@ public static class FootnoteGeneratorExtensions
     public static Generator<Footnote> WithDefaults(this Generator<Footnote> generator)
         => generator.ForInstance(s => s.SetDefaults());
 
+    public static Generator<Footnote> WithSubjects(this Generator<Footnote> generator, IEnumerable<Subject> subjects)
+        => generator.ForInstance(s => s.SetSubjects(subjects));
+
+    public static Generator<Footnote> WithFilters(this Generator<Footnote> generator, IEnumerable<Filter> filters)
+        => generator.ForInstance(s => s.SetFilters(filters));
+
+    public static Generator<Footnote> WithFilterGroups(this Generator<Footnote> generator, IEnumerable<FilterGroup> filterGroups)
+        => generator.ForInstance(s => s.SetFilterGroups(filterGroups));
+
+    public static Generator<Footnote> WithFilterItems(this Generator<Footnote> generator, IEnumerable<FilterItem> filterItems)
+        => generator.ForInstance(s => s.SetFilterItems(filterItems));
+
+    public static Generator<Footnote> WithIndicators(this Generator<Footnote> generator, IEnumerable<Indicator> indicators)
+        => generator.ForInstance(s => s.SetIndicators(indicators));
+
     public static InstanceSetters<Footnote> SetDefaults(this InstanceSetters<Footnote> setters)
         => setters
             .SetDefault(f => f.Id)
@@ -25,6 +40,23 @@ public static class FootnoteGeneratorExtensions
                 (f, footnote) => f.Date.Soon(14, footnote.Created)
             );
     
+    public static InstanceSetters<Footnote> SetSubjects(this InstanceSetters<Footnote> instanceSetter, IEnumerable<Subject> subjects)
+    {
+        instanceSetter.Set(footnote => footnote.Subjects, (_, footnote, context) =>
+        {
+            return subjects
+                .Select(subject => new SubjectFootnote
+                {
+                    Footnote = footnote,
+                    Subject = subject
+                })
+                .ToList();
+        });
+    
+        return instanceSetter;
+    }
+    
+    // TODO combine with above
     public static InstanceSetters<Footnote> SetSubjects(this InstanceSetters<Footnote> instanceSetter, Func<SetterContext, IEnumerable<Subject>> subjects)
     {
         instanceSetter.Set(footnote => footnote.Subjects, (_, footnote, context) =>
@@ -35,6 +67,23 @@ public static class FootnoteGeneratorExtensions
                 {
                     Footnote = footnote,
                     Subject = subject
+                })
+                .ToList();
+        });
+    
+        return instanceSetter;
+    }
+    
+    // TODO
+    public static InstanceSetters<Footnote> SetFilters(this InstanceSetters<Footnote> instanceSetter, IEnumerable<Filter> filters)
+    {
+        instanceSetter.Set(footnote => footnote.Filters, (_, footnote, context) =>
+        {
+            return filters
+                .Select(filter => new FilterFootnote
+                {
+                    Footnote = footnote,
+                    Filter = filter
                 })
                 .ToList();
         });
@@ -59,6 +108,23 @@ public static class FootnoteGeneratorExtensions
         return instanceSetter;
     }
     
+    public static InstanceSetters<Footnote> SetFilterGroups(this InstanceSetters<Footnote> instanceSetter, IEnumerable<FilterGroup> filterGroups)
+    {
+        instanceSetter.Set(footnote => footnote.FilterGroups, (_, footnote, context) =>
+        {
+            return filterGroups
+                .Select(filterGroup => new FilterGroupFootnote
+                {
+                    Footnote = footnote,
+                    FilterGroup = filterGroup
+                })
+                .ToList();
+        });
+    
+        return instanceSetter;
+    }
+    
+    // TODO
     public static InstanceSetters<Footnote> SetFilterGroups(this InstanceSetters<Footnote> instanceSetter, Func<SetterContext, IEnumerable<FilterGroup>> filterGroups)
     {
         instanceSetter.Set(footnote => footnote.FilterGroups, (_, footnote, context) =>
@@ -76,6 +142,23 @@ public static class FootnoteGeneratorExtensions
         return instanceSetter;
     }
     
+    public static InstanceSetters<Footnote> SetFilterItems(this InstanceSetters<Footnote> instanceSetter, IEnumerable<FilterItem> filterItems)
+    {
+        instanceSetter.Set(footnote => footnote.FilterItems, (_, footnote, context) =>
+        {
+            return filterItems
+                .Select(filterItem => new FilterItemFootnote
+                {
+                    Footnote = footnote,
+                    FilterItem = filterItem
+                })
+                .ToList();
+        });
+    
+        return instanceSetter;
+    }
+    
+    // TODO
     public static InstanceSetters<Footnote> SetFilterItems(this InstanceSetters<Footnote> instanceSetter, Func<SetterContext, IEnumerable<FilterItem>> filterItems)
     {
         instanceSetter.Set(footnote => footnote.FilterItems, (_, footnote, context) =>
@@ -93,6 +176,23 @@ public static class FootnoteGeneratorExtensions
         return instanceSetter;
     }
     
+    public static InstanceSetters<Footnote> SetIndicators(this InstanceSetters<Footnote> instanceSetter, IEnumerable<Indicator> indicators)
+    {
+        instanceSetter.Set(footnote => footnote.Indicators, (_, footnote, context) =>
+        {
+            return indicators
+                .Select(indicator => new IndicatorFootnote
+                {
+                    Footnote = footnote,
+                    Indicator = indicator
+                })
+                .ToList();
+        });
+    
+        return instanceSetter;
+    }
+    
+    // TODO
     public static InstanceSetters<Footnote> SetIndicators(this InstanceSetters<Footnote> instanceSetter, Func<SetterContext, IEnumerable<Indicator>> indicators)
     {
         instanceSetter.Set(footnote => footnote.Indicators, (_, footnote, context) =>
