@@ -41,19 +41,8 @@ public static class SubjectGeneratorExtensions
     public static InstanceSetters<Subject> SetFilters(
         this InstanceSetters<Subject> setters,
         IEnumerable<Filter> filters)
-        => setters.Set(
-            s => s.Filters,
-            (_, subject) =>
-            {
-                var list = filters.ToList();
+        => setters.SetFilters(_ => filters);
 
-                list.ForEach(filter => filter.Subject = subject);
-
-                return list;
-            }
-        );
-
-    // TODO merge with above method
     public static InstanceSetters<Subject> SetFilters(
         this InstanceSetters<Subject> setters,
         Func<SetterContext, IEnumerable<Filter>> filters)

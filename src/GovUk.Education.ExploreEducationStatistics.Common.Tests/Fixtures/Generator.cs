@@ -20,7 +20,6 @@ public class Generator<T> where T : class
 
     // Setters
     private readonly List<ISetter> _setters = new();
-    private readonly List<IndexSetter> _indexSetters = new();
     private readonly List<RangeSetter> _rangeSetters = new();
 
     private readonly List<Action<T, Faker>> _finalizers = new();
@@ -92,18 +91,19 @@ public class Generator<T> where T : class
     }
 
     /// <summary>
-    /// Set properties on the instance of <see cref="T"/> over a range of values
-    /// e.g. the first 2, last 2, etc.
+    /// Set properties on the instance of <see cref="T"/> at a particular index in
+    /// the generated list.
     /// </summary>
     /// <remarks>
-    /// Range setters will take precedence over <see cref="ForInstance"/> setters.
-    /// If a range applies, it will override any previous instance setters.
+    /// Index setters will take precedence over <see cref="ForInstance"/> setters.
+    /// If an index applies, it will override any previous instance setters. Index
+    /// setters have the same level of precedence as Range setters. 
     /// </remarks>
-    /// <param name="index">The range of indices that the setters apply.</param>
-    /// <param name="builder">A builder for registering setters for the range.</param>
+    /// <param name="index">The index to which the setters apply.</param>
+    /// <param name="builder">A builder for registering setters for the index.</param>
     public Generator<T> ForIndex(Index index, Action<InstanceSetters<T>> builder)
     {
-        _indexSetters.Add(new IndexSetter(index, builder));
+        _rangeSetters.Add(new RangeSetter(index.Value..index.Value, builder));
         return this;
     }
 
@@ -148,41 +148,55 @@ public class Generator<T> where T : class
     /// Generate multiple instances of <see cref="T"/>.
     /// </summary>
     /// <param name="count">The number of instances.</param>
-    public IEnumerable<T> Generate(int count) =>
-        Enumerable.Range(1, count)
+    public IEnumerable<T> Generate(int count) {
+
+        if (_rangeSetters.Count > 0 && count < GetMaximumIndex() - 1)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(count),
+                count,
+                $"Expected a count of at least {GetMaximumIndex() - 1} " +
+                $"based on the Range and Index setters provided, but received {count}");
+        }
+        
+        return Enumerable.Range(1, count)
             .Select(i => GenerateWithRange(index: i - 1, length: count));
+    }
 
     public List<T> GenerateList(int count) => Generate(count).ToList();
 
     public T[] GenerateArray(int count) => Generate(count).ToArray();
 
+    /// <summary>
+    /// Identical to <see cref="GenerateList(int)"/> but uses a count derived from
+    /// the maximum index of any Range and Index setters used rather than a manually
+    /// provided count.
+    /// </summary>
     public List<T> GenerateList() => Generate(GetMaximumIndex() + 1).ToList();
 
+    /// <summary>
+    /// Identical to <see cref="GenerateArray(int)"/> but uses a count derived from
+    /// the maximum index of any Range and Index setters used rather than a manually
+    /// provided count.
+    /// </summary>
     public T[] GenerateArray() => Generate(GetMaximumIndex() + 1).ToArray();
 
+    /// <summary>
+    /// Get the maximum index specified by any use of <see cref="ForRange"/> or
+    /// <see cref="ForIndex"/>. If no ranges or indices have been specified, throw
+    /// an ArgumentException.
+    /// </summary>
     private int GetMaximumIndex()
     {
-        var maxRangeIndex = _rangeSetters.Count > 0 
+        if (_rangeSetters.Count == 0)
+        {
+            throw new ArgumentException("At least one Range setter must be " +
+                                        "used in order to calculate the maximum index " +
+                                        "that setters apply to");
+        }
+        return _rangeSetters.Count > 0 
             ? _rangeSetters.Select(rangeSetter => rangeSetter.Range.End.Value).Max() 
             : 0;
-        
-        var maxIndex = _indexSetters.Count > 0 
-            ? _indexSetters.Select(indexSetter => indexSetter.Index.Value).Max()
-            : 0;
-        
-        return Math.Max(maxRangeIndex, maxIndex);
-    }
-
-    public Tuple<T, T> GenerateTuple2()
-    {
-        var generated = GenerateArray(2);
-        return new Tuple<T, T>(generated[0], generated[1]);
-    }
-
-    public Tuple<T, T, T> GenerateTuple3()
-    {
-        var generated = GenerateArray(3);
-        return new Tuple<T, T, T>(generated[0], generated[1], generated[2]);
     }
 
     private T GenerateSingle(int index, int? fixtureTypeIndex, int? fixtureIndex)
@@ -265,33 +279,6 @@ public class Generator<T> where T : class
             }
         }
 
-        var indexSetters = new List<ISetter>();
-
-        foreach (var indexSetter in _indexSetters
-                     .Where(setter => setter.Index.Value == index))
-        {
-            indexSetter.Builder(
-            new InstanceSetters<T>(
-                onAction: setter =>
-                    indexSetters.Add(new ActionSetter(setter)),
-                onProperty: (property, setter) =>
-                    indexSetters.Add(new PropertySetter(property, setter))
-            ));    
-        }
-        
-        foreach (var setter in indexSetters)
-        {
-            setter.Invoke(
-                _faker,
-                instance,
-                new SetterContext(
-                    index: index,
-                    fixtureTypeIndex: fixtureTypeIndex,
-                    fixtureIndex: fixtureIndex
-                )
-            );
-        }
-
         InvokeFinalizers(instance);
 
         return instance;
@@ -350,8 +337,6 @@ public class Generator<T> where T : class
             setter(instance, value);
         }
     }
-
-    private record IndexSetter(Index Index, Action<InstanceSetters<T>> Builder);
 
     private record RangeSetter(Range Range, Action<InstanceSetters<T>> Builder);
 }

@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -426,7 +427,7 @@ public class GeneratorTests
     [Fact]
     public void Generate_ForRange_RangeOutOfBoundsThrows()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(
             () => new Generator<Test>()
                 .ForRange(..2, s => s
                     .Set(t => t.FirstName, "John")
@@ -436,6 +437,47 @@ public class GeneratorTests
                     .Set(t => t.LastName, "Loe"))
                 .GenerateArray(2)
         );
+        Assert.Equal(2, ex.ActualValue);
+    }
+
+    [Fact]
+    public void Generate_Multiple_GenerateList_NoArg()
+    {
+       var items = new Generator<Test>()
+            .ForRange(..2, s => s
+                .Set(t => t.FirstName, "John"))
+            .ForRange(2..4, s => s
+                .Set(t => t.FirstName, "Jane"))
+            .GenerateList();
+       
+        Assert.Equal(5, items.Count);
+    }
+
+    [Fact]
+    public void Generate_Multiple_GenerateArray_NoArg()
+    {
+        var items = new Generator<Test>()
+            .ForRange(..2, s => s
+                .Set(t => t.FirstName, "John"))
+            .ForRange(2..4, s => s
+                .Set(t => t.FirstName, "Jane"))
+            .GenerateArray();
+       
+        Assert.Equal(5, items.Length);
+    }
+    
+    [Fact]
+    public void Generate_Multiple_GenerateList_NoArg_NoRangesProvided()
+    {
+        Assert.Throws<ArgumentException>(() => 
+            new Generator<Test>().GenerateList());
+    }
+    
+    [Fact]
+    public void Generate_Multiple_GenerateArray_NoArg_NoRangesProvided()
+    {
+        Assert.Throws<ArgumentException>(() => 
+            new Generator<Test>().GenerateArray());
     }
 
     [Fact]
@@ -493,6 +535,60 @@ public class GeneratorTests
         Assert.All(items[2..4], item => Assert.Equal("Roe", item.LastName));
         Assert.All(items[4..], item => Assert.Equal("Jill", item.FirstName));
         Assert.All(items[4..], item => Assert.Equal("Roe", item.LastName));
+    }
+
+    [Fact]
+    public void Generate_ForIndex()
+    {
+        var items = new Generator<Test>()
+            .ForInstance(s => s.Set(t => t.FirstName, "Test"))
+            .ForInstance(s => s.Set(t => t.LastName, "User"))
+            .ForIndex(1, s => s
+                .Set(t => t.FirstName, "John")
+                .Set(t => t.LastName, "Doe"))
+            .GenerateArray(3);
+
+        Assert.Equal(3, items.Length);
+        
+        Assert.Equal("Test", items[0].FirstName);
+        Assert.Equal("User", items[0].LastName);
+        
+        Assert.Equal("John", items[1].FirstName);
+        Assert.Equal("Doe", items[1].LastName);
+        
+        Assert.Equal("Test", items[2].FirstName);
+        Assert.Equal("User", items[2].LastName);
+    }
+
+    [Fact]
+    public void Generate_Tuple2()
+    {
+        var (item1, item2) = new Generator<Test>()
+            .ForIndex(0, s => s
+                .Set(t => t.FirstName, "Test"))
+            .ForIndex(1, s => s
+                .Set(t => t.FirstName, "John"))
+            .GenerateTuple2();
+
+        Assert.Equal("Test", item1.FirstName);
+        Assert.Equal("John", item2.FirstName);
+    }
+
+    [Fact]
+    public void Generate_Tuple3()
+    {
+        var (item1, item2, item3) = new Generator<Test>()
+            .ForIndex(0, s => s
+                .Set(t => t.FirstName, "Test"))
+            .ForIndex(1, s => s
+                .Set(t => t.FirstName, "John"))
+            .ForIndex(2, s => s
+                .Set(t => t.FirstName, "Jane"))
+            .GenerateTuple3();
+
+        Assert.Equal("Test", item1.FirstName);
+        Assert.Equal("John", item2.FirstName);
+        Assert.Equal("Jane", item3.FirstName);
     }
 
     [Fact]

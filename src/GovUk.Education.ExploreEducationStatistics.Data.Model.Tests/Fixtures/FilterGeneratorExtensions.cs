@@ -22,12 +22,10 @@ public static class FilterGeneratorExtensions
         IEnumerable<FilterGroup> filterGroups)
         => generator.ForInstance(s => s.SetFilterGroups(filterGroups));
 
-    // TODO this needs to apply to backwards-linking that s.SetFilterGroups(filterGroups) does
     public static Generator<Filter> WithFilterGroups(
         this Generator<Filter> generator,
         Func<SetterContext, IEnumerable<FilterGroup>> filterGroups)
-        => generator.ForInstance(s => s
-            .Set(f => f.FilterGroups, (_, _, context) => filterGroups.Invoke(context)));
+        => generator.ForInstance(s => s.SetFilterGroups(filterGroups.Invoke));
 
     public static Generator<Filter> WithFootnotes(
         this Generator<Filter> generator,
@@ -57,12 +55,17 @@ public static class FilterGeneratorExtensions
 
     public static InstanceSetters<Filter> SetFilterGroups(
         this InstanceSetters<Filter> setters,
-        IEnumerable<FilterGroup> filterGroups)
+        IEnumerable<FilterGroup> filterGroups) 
+        => setters.SetFilterGroups(_ => filterGroups);
+    
+    private static InstanceSetters<Filter> SetFilterGroups(
+        this InstanceSetters<Filter> setters,
+        Func<SetterContext, IEnumerable<FilterGroup>> filterGroups)
         => setters.Set(
             f => f.FilterGroups,
-            (_, filter) =>
+            (_, filter, context) =>
             {
-                var list = filterGroups.ToList();
+                var list = filterGroups.Invoke(context).ToList();
 
                 list.ForEach(filterGroup => filterGroup.Filter = filter);
 

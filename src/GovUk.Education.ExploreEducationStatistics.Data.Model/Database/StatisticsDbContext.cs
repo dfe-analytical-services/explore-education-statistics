@@ -323,12 +323,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             modelBuilder.Entity<ReleaseFootnote>()
                 .HasKey(item => new { item.ReleaseId, item.FootnoteId });
-            
+
             modelBuilder.Entity<ReleaseFootnote>()
                 .HasOne(rf => rf.Release)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Cascade);
-            
+
             modelBuilder.Entity<ReleaseFootnote>()
                 .HasOne(rf => rf.Footnote)
                 .WithMany(footnote => footnote.Releases)
