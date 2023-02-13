@@ -11,7 +11,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.TimePeri
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class ReleaseViewModel
+    public record ReleaseViewModel
     {
         public Guid Id { get; set; }
 
@@ -44,6 +44,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public TimeIdentifier TimePeriodCoverage { get; set; }
 
         public string PreReleaseAccessList { get; set; } = string.Empty;
+
+        public bool PreReleaseUsersAdded { get; set; }
 
         public bool LatestRelease { get; set; }
 
