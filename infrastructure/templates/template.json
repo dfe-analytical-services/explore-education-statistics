@@ -1285,6 +1285,7 @@
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
+              "https://ees-pnpm-linux-container.azurewebsites.net/",
               "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
               "https://localhost:3000",
               "http://localhost:3000",
@@ -1427,6 +1428,7 @@
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
+              "https://ees-pnpm-linux-container.azurewebsites.net/",
               "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
               "https://localhost:3000",
               "http://localhost:3000",
@@ -1507,6 +1509,7 @@
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
+              "https://ees-pnpm-linux-container.azurewebsites.net/",
               "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
               "https://localhost:3000",
               "http://localhost:3000",
@@ -2777,6 +2780,7 @@
           "allowedOrigins": [
             "[concat('https://', parameters('domain'))]",
             "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
+            "https://ees-pnpm-linux-container.azurewebsites.net/",
             "https://localhost:3000",
             "http://localhost:3000",
             "http://127.0.0.1"
