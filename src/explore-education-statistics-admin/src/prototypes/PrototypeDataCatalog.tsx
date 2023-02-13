@@ -2,14 +2,8 @@ import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import RelatedInformation from '@common/components/RelatedInformation';
 import classNames from 'classnames';
 import Link from '@admin/components/Link';
-import ButtonText from '@common/components/ButtonText';
-import styles2 from '@common/components/PageSearchForm.module.scss';
 import { releaseTypes } from '@common/services/types/releaseType';
-import PrototypeSearchResult from '@admin/prototypes/components/PrototypeSearchResult';
-import PrototypeSortFilters, {
-  PrototypeMobileSortFilters,
-} from '@admin/prototypes/components/PrototypeSortFilters';
-import PrototypeFilters from '@admin/prototypes/components/PrototypeFilters3';
+import PrototypeSortFilters from '@admin/prototypes/components/PrototypeSortFilters';
 import styles from '@admin/prototypes/PrototypePublicPage.module.scss';
 import { publications, themes } from '@admin/prototypes/data/newThemesData';
 import orderBy from 'lodash/orderBy';
@@ -26,7 +20,6 @@ const PrototypeDataCatalogue = () => {
 
   const [fullList, setFullList] = useState(true);
   const [listCompact, setListCompact] = useState(false);
-  const [searchInput, setSearchInput] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTheme, setSelectedTheme] = useState(
     urlTheme === 'fe' ? 'Further education' : 'All themes',
@@ -42,17 +35,11 @@ const PrototypeDataCatalogue = () => {
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalResults, setTotalResults] = useState<number>();
   const [selectedSortOrder, setSelectedSortOrder] = useState('newest');
-  const [showFilters, setShowFilters] = useState(false);
   const [sourcePublication, setSourcePublication] = useState(
     urlSource === 'publicationPage',
   );
   const latestRelease = 'Academic year 2021/22';
   const [selectedRelease, setSelectedRelease] = useState(latestRelease);
-
-  const generateSlug = (title: string) => {
-    const slug = title.toLowerCase();
-    return slug.split(' ').join('-');
-  };
 
   const getSelectedTheme = (themeId: string) => {
     return themes.find(theme => theme.id === themeId);

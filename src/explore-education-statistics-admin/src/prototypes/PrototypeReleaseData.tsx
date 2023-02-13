@@ -8,7 +8,7 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import stylesKeyStat from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import stylesKeyStatTile from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
-import React from 'react';
+import React, { useState } from 'react';
 import Accordion from './components/PrototypeAccordion';
 import AccordionSection from './components/PrototypeAccordionSection';
 import PrototypeDownloadAncillary from './components/PrototypeDownloadAncillary';
@@ -18,6 +18,8 @@ import PrototypeTableBuilder from './components/PrototypeTableBuilder';
 import styles from './PrototypePublicPage.module.scss';
 
 const PrototypeReleaseData = () => {
+  const [showContents, setShowContents] = useState(true);
+
   return (
     <div className={styles.prototypePublicPage}>
       <PrototypePage
@@ -154,7 +156,7 @@ const PrototypeReleaseData = () => {
                   </a>
                 </li>
                 <li>
-                  <Link to="#contents">Release contents</Link>
+                  <Link to="#content">Release contents</Link>
                 </li>
                 <li>
                   <Link to="#exploreData">Explore data</Link>
@@ -280,7 +282,7 @@ const PrototypeReleaseData = () => {
         </h2>
         <div
           className={classNames(
-            styles.prototypeCardContainer,
+            styles.prototypeCardContainerGrid,
             styles.prototypeCardBg,
           )}
         >
@@ -329,13 +331,7 @@ const PrototypeReleaseData = () => {
               in our data catalogue
             </p>
           </div>
-        </div>
-        <div
-          className={classNames(
-            styles.prototypeCardContainer,
-            styles.prototypeCardBg,
-          )}
-        >
+
           <div className={classNames(styles.prototypeCardChevron)}>
             <h2
               className={classNames(
@@ -498,80 +494,164 @@ const PrototypeReleaseData = () => {
             </ul>
           </AccordionSection>
         </Accordion>
-        <div style={{ display: 'flex' }}>
+
+        <h2 className={styles.contentsMobile}>Contents</h2>
+
+        {!showContents && (
+          <>
+            <h2 id="contentsNoSideNav">Contents</h2>
+            <p>
+              <a
+                href="#"
+                onClick={e => {
+                  setShowContents(true);
+                  e.preventDefault();
+                }}
+              >
+                Show contents in side panel
+              </a>
+            </p>
+          </>
+        )}
+        <div className={styles.releaseContainer}>
           <div>
-            <div className={styles.stickyLinksContainer}>
-              <div className={classNames(styles.stickyLinks)}>
-                <h3>Release contents</h3>
-                <ul className="govuk-list govuk-list--spaced">
-                  <li>
-                    <a href="#about-these-statistics">About these statistics</a>
-                  </li>
-                  <li>
-                    <a href="#how-to-use-this-release-and-find-data">
-                      How to use this release and find datas
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#interactive-data-visualisation-tool">
-                      Interactive data visualisation tool
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#latest-headline-statistics">
-                      Latest headline statistics
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#annual-time-series">Annual time series</a>
-                  </li>
-                  <li>
-                    <a href="#learner-characteristics">
-                      Learner characteristics
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#subjects-and-levels">Subjects and levels</a>
-                  </li>
-                  <li>
-                    <a href="#geographical-breakdowns">
-                      Geographical breakdowns
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#providers">Providers</a>
-                  </li>
-                  <li>
-                    <a href="#public-sector-apprenticeships">
-                      Public sector apprenticeships
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#Traineeships">Traineeships</a>
-                  </li>
-                  <li>
-                    <a href="#national-achievement-rate-tables">
-                      National achievement rate tables
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#apprenticeship-service-and-monthly-transparency-data">
-                      Apprenticeship Service and monthly transparency data
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#additional-analysis">Additional analysis</a>
-                  </li>
-                  <li>
-                    <a href="#future-changes">Future changes</a>
-                  </li>
-                </ul>
+            {showContents && (
+              <div className={styles.stickyLinksContainer}>
+                <div className={classNames(styles.stickyLinks)}>
+                  <h2 id="contents">Contents</h2>
+                  <ul className="govuk-list govuk-list--spaced">
+                    <li>
+                      <a
+                        className="govuk-link--no-visited-state"
+                        href="#about-these-statistics"
+                      >
+                        About these statistics
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="govuk-link--no-visited-state"
+                        href="#how-to-use-this-release-and-find-data"
+                      >
+                        How to use this release and find data
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="govuk-link--no-visited-state"
+                        href="#interactive-data-visualisation-tool"
+                      >
+                        Interactive data visualisation tool
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="govuk-link--no-visited-state"
+                        href="#latest-headline-statistics"
+                      >
+                        Latest headline statistics
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="govuk-link--no-visited-state"
+                        href="#annual-time-series"
+                      >
+                        Annual time series
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="govuk-link--no-visited-state"
+                        href="#learner-characteristics"
+                      >
+                        Learner characteristics
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="govuk-link--no-visited-state"
+                        href="#subjects-and-levels"
+                      >
+                        Subjects and levels
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="govuk-link--no-visited-state"
+                        href="#geographical-breakdowns"
+                      >
+                        Geographical breakdowns
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="govuk-link--no-visited-state"
+                        href="#providers"
+                      >
+                        Providers
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="govuk-link--no-visited-state"
+                        href="#public-sector-apprenticeships"
+                      >
+                        Public sector apprenticeships
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="govuk-link--no-visited-state"
+                        href="#Traineeships"
+                      >
+                        Traineeships
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="govuk-link--no-visited-state"
+                        href="#national-achievement-rate-tables"
+                      >
+                        National achievement rate tables
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#apprenticeship-service-and-monthly-transparency-data">
+                        Apprenticeship Service and monthly transparency data
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#additional-analysis">Additional analysis</a>
+                    </li>
+                    <li>
+                      <a href="#future-changes">Future changes</a>
+                    </li>
+                  </ul>
+                  <hr />
+                  <ul className="govuk-list">
+                    <li>
+                      <a
+                        href="#contentsNoSideNav"
+                        onClick={e => {
+                          setShowContents(false);
+                        }}
+                      >
+                        Hide contents side panel
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#">Back to top</a>
+                    </li>
+                  </ul>
+                </div>
               </div>
-            </div>
+            )}
           </div>
-          <div style={{ width: '70%' }}>
+          <div className={styles.releaseMainContent}>
             <Accordion id="content">
               <AccordionSection
+                open
                 heading="About these statistics"
                 goToTop={false}
               >
