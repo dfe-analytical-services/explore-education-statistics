@@ -101,6 +101,9 @@ const ReleaseStatusForm = ({
     false,
   );
   const [showScheduleErrorModal, toggleScheduleErrorModal] = useToggle(false);
+  const [showConfirmImmediateModal, toggleConfirmImmediateModal] = useToggle(
+    false,
+  );
 
   const handleSubmit = useFormSubmit<ReleaseStatusFormValues>(
     async ({
@@ -339,17 +342,25 @@ const ReleaseStatusForm = ({
                 onClick={async e => {
                   e.preventDefault();
 
-                  if (
-                    form.values.approvalStatus === 'Approved' &&
-                    form.values.publishMethod === 'Scheduled' &&
-                    form.values.publishScheduled
-                  ) {
-                    // Ensure validation has been run as form state
-                    // may not be up-to-date (seems to only affect tests).
-                    const errors = await form.validateForm();
+                  // Ensure validation has been run as form state
+                  // may not be up-to-date (seems to only affect tests).
+                  const errors = await form.validateForm();
 
-                    if (Object.keys(errors).length === 0) {
+                  if (Object.keys(errors).length !== 0) {
+                    return;
+                  }
+
+                  if (form.values.approvalStatus === 'Approved') {
+                    if (form.values.publishMethod === 'Scheduled') {
                       toggleConfirmScheduleModal.on();
+                      return;
+                    }
+
+                    if (
+                      form.values.publishMethod === 'Immediate' &&
+                      release.preReleaseUsersAdded
+                    ) {
+                      toggleConfirmImmediateModal.on();
                       return;
                     }
                   }
@@ -408,6 +419,19 @@ const ReleaseStatusForm = ({
               </a>{' '}
               if this is an issue.
             </WarningMessage>
+          </ModalConfirm>
+
+          <ModalConfirm
+            title="Confirm immediate publishing"
+            open={showConfirmImmediateModal}
+            onConfirm={async () => {
+              await form.submitForm();
+              toggleConfirmImmediateModal.off();
+            }}
+            onExit={toggleConfirmImmediateModal.off}
+          >
+            <p>No pre-release warning here.</p>
+            <p>Are you sure?</p>
           </ModalConfirm>
         </>
       )}
