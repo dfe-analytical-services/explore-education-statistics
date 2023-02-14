@@ -1,7 +1,9 @@
 #nullable enable
 using System;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -63,8 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     settings: BuildJsonSerializerSettings());
                 return await BuildViewModel(permalink!);
             }
-            catch (StorageException e)
-                when ((HttpStatusCode)e.RequestInformation.HttpStatusCode == HttpStatusCode.NotFound)
+            catch (FileNotFoundException)
             {
                 return new NotFoundResult();
             }
