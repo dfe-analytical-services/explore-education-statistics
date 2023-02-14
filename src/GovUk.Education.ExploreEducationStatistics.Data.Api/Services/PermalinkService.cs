@@ -55,11 +55,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _mapper = mapper;
         }
 
-        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Get(Guid id)
+        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Get(
+            Guid id,
+            CancellationToken cancellationToken = default)
         {
             try
             {
-                var text = await _blobStorageService.DownloadBlobText(Permalinks, id.ToString());
+                var text = await _blobStorageService.DownloadBlobText(
+                    containerName: Permalinks,
+                    path: id.ToString(),
+                    cancellationToken: cancellationToken);
                 var permalink = JsonConvert.DeserializeObject<LegacyPermalink>(
                     value: text,
                     settings: BuildJsonSerializerSettings());

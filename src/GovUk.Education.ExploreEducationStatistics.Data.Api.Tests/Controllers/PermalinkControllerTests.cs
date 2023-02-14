@@ -1,29 +1,72 @@
 #nullable enable
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static Moq.MockBehavior;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers;
+
+public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<TestStartup>>
 {
-    public class PermalinkControllerTests
-    {
-        [Fact]
-        public async Task Get_InvalidIdReturnsNotFound()
-        {
-            var result = await BuildPermalinkController().Get("NotAGuid");
-            result.AssertNotFoundResult();
-        }
+    private readonly WebApplicationFactory<TestStartup> _testApp;
 
-        private static PermalinkController BuildPermalinkController(
-            IPermalinkService? permalinkService = null
-        )
+    public PermalinkControllerTests(TestApplicationFactory<TestStartup> testApp)
+    {
+        _testApp = testApp;
+    }
+
+    [Fact]
+    public async Task Get()
+    {
+        var id = Guid.NewGuid();
+
+        var permalink = new LegacyPermalinkViewModel
         {
-            return new(
-                permalinkService ?? Mock.Of<IPermalinkService>(MockBehavior.Strict)
-            );
-        }
+            Id = id,
+        };
+
+        var permalinkService = new Mock<IPermalinkService>(Strict);
+
+        permalinkService
+            .Setup(s => s.Get(id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(permalink);
+
+        var client = SetupApp(permalinkService: permalinkService.Object)
+            .CreateClient();
+
+        var response = await client.GetAsync($"/api/permalink/{id}");
+
+        VerifyAllMocks(permalinkService);
+
+        response.AssertOk(permalink);
+    }
+
+    [Fact]
+    public async Task Get_InvalidIdReturnsNotFound()
+    {
+        var client = SetupApp().CreateClient();
+
+        var response = await client.GetAsync("/api/permalink/not-a-guid");
+
+        response.AssertNotFound();
+    }
+
+    private WebApplicationFactory<TestStartup> SetupApp(IPermalinkService? permalinkService = null)
+    {
+        return _testApp.ConfigureServices(
+            services =>
+            {
+                services.AddTransient(_ => permalinkService ?? Mock.Of<IPermalinkService>(Strict));
+            }
+        );
     }
 }
