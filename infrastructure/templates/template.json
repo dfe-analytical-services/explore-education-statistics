@@ -1202,6 +1202,7 @@
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
+              "https://ees-pnpm-linux-container.azurewebsites.net",
               "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
               "https://localhost:3000",
               "http://localhost:3000",
