@@ -290,10 +290,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // Copy all current roles apart from Prerelease Users to the Release amendment.
             var newRoles = _context
                 .UserReleaseRoles
-                .AsQueryable()
+                // For auditing purposes, we also want to migrate release roles that have Deleted set (when a role is
+                // manually removed from a Release as opposed to SoftDeleted, which is only set when a Release is
+                // deleted)
+                .IgnoreQueryFilters()
                 .Where(releaseRole => releaseRole.ReleaseId == originalReleaseId 
                                       && releaseRole.Role != ReleaseRole.PrereleaseViewer)
-                .Select(releaseRole => releaseRole.CopyForAmendment(amendment));
+                .Select(releaseRole => releaseRole.CopyForAmendment(amendment))
+                .ToList();
 
             await _context.AddRangeAsync(newRoles);
             await _context.SaveChangesAsync();

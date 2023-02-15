@@ -101,9 +101,6 @@ const ReleaseStatusForm = ({
     false,
   );
   const [showScheduleErrorModal, toggleScheduleErrorModal] = useToggle(false);
-  const [showConfirmImmediateModal, toggleConfirmImmediateModal] = useToggle(
-    false,
-  );
 
   const handleSubmit = useFormSubmit<ReleaseStatusFormValues>(
     async ({
@@ -305,22 +302,39 @@ const ReleaseStatusForm = ({
                     label: 'On a specific date',
                     value: 'Scheduled',
                     conditional: (
-                      <FormFieldDateInput<ReleaseStatusFormValues>
-                        name="publishScheduled"
-                        legend="Publish date"
-                        legendSize="s"
-                      />
+                      <>
+                        {release.preReleaseUsersAdded && (
+                          <WarningMessage className="govuk-!-width-two-thirds">
+                            Pre-release users will have access to a preview of
+                            the release 24 hours before the scheduled publish
+                            date.
+                          </WarningMessage>
+                        )}
+                        <FormFieldDateInput<ReleaseStatusFormValues>
+                          name="publishScheduled"
+                          legend="Publish date"
+                          legendSize="s"
+                        />
+                      </>
                     ),
                   },
                   {
                     label: 'Immediately',
                     value: 'Immediate',
                     conditional: (
-                      <WarningMessage className="govuk-!-width-two-thirds">
-                        The time taken by the release process will vary. Contact
-                        us if the release has not been published within one
-                        hour.
-                      </WarningMessage>
+                      <>
+                        <p className="govuk-!-width-two-thirds">
+                          The time taken by the release process will vary.
+                          Contact us if the release has not been published
+                          within one hour.
+                        </p>
+                        {release.preReleaseUsersAdded && (
+                          <WarningMessage className="govuk-!-width-two-thirds">
+                            Pre-release users will not have access to a preview
+                            of the release if it is published immediately.
+                          </WarningMessage>
+                        )}
+                      </>
                     ),
                   },
                 ]}
@@ -342,25 +356,17 @@ const ReleaseStatusForm = ({
                 onClick={async e => {
                   e.preventDefault();
 
-                  // Ensure validation has been run as form state
-                  // may not be up-to-date (seems to only affect tests).
-                  const errors = await form.validateForm();
+                  if (
+                    form.values.approvalStatus === 'Approved' &&
+                    form.values.publishMethod === 'Scheduled' &&
+                    form.values.publishScheduled
+                  ) {
+                    // Ensure validation has been run as form state
+                    // may not be up-to-date (seems to only affect tests).
+                    const errors = await form.validateForm();
 
-                  if (Object.keys(errors).length !== 0) {
-                    return;
-                  }
-
-                  if (form.values.approvalStatus === 'Approved') {
-                    if (form.values.publishMethod === 'Scheduled') {
+                    if (Object.keys(errors).length === 0) {
                       toggleConfirmScheduleModal.on();
-                      return;
-                    }
-
-                    if (
-                      form.values.publishMethod === 'Immediate' &&
-                      release.preReleaseUsersAdded
-                    ) {
-                      toggleConfirmImmediateModal.on();
                       return;
                     }
                   }
@@ -419,19 +425,6 @@ const ReleaseStatusForm = ({
               </a>{' '}
               if this is an issue.
             </WarningMessage>
-          </ModalConfirm>
-
-          <ModalConfirm
-            title="Confirm immediate publishing"
-            open={showConfirmImmediateModal}
-            onConfirm={async () => {
-              await form.submitForm();
-              toggleConfirmImmediateModal.off();
-            }}
-            onExit={toggleConfirmImmediateModal.off}
-          >
-            <p>No pre-release warning here.</p>
-            <p>Are you sure?</p>
           </ModalConfirm>
         </>
       )}

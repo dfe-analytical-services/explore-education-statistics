@@ -19,6 +19,16 @@ interface State {
 class PageErrorBoundary extends Component<RouteComponentProps, State> {
   public state: State = {};
 
+  private unregisterCallback?: () => void;
+
+  private errorPages = {
+    forbidden: () => {
+      this.setState({
+        errorCode: 403,
+      });
+    },
+  };
+
   public constructor(props: RouteComponentProps) {
     super(props);
   }
@@ -44,16 +54,6 @@ class PageErrorBoundary extends Component<RouteComponentProps, State> {
       this.handlePromiseRejections,
     );
   }
-
-  private unregisterCallback?: () => void;
-
-  private errorPages = {
-    forbidden: () => {
-      this.setState({
-        errorCode: 403,
-      });
-    },
-  };
 
   private handlePromiseRejections = (event: PromiseRejectionEvent) => {
     this.handleError(event.reason);

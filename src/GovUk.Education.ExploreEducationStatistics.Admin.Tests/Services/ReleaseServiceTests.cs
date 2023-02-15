@@ -764,12 +764,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     release
                 }
             };
+            
+            var nonPreReleaseUserRole = new UserReleaseRole
+            {
+                Role = ReleaseRole.Contributor,
+                Release = release
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(publication);
+                await context.Publications.AddAsync(publication);
+                await context.UserReleaseRoles.AddAsync(nonPreReleaseUserRole);
                 await context.SaveChangesAsync();
             }
 
@@ -804,6 +811,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(viewModel.Amendment);
                 Assert.True(viewModel.NotifySubscribers);
                 Assert.True(viewModel.UpdatePublishedDate);
+                Assert.False(viewModel.PreReleaseUsersAdded);
+            }
+        }
+
+        [Fact]
+        public async Task GetRelease_WithPreReleaseUsers()
+        {
+            var release = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.January,
+                ReleaseName = "2035",
+            };
+
+            var publication = new Publication
+            {
+                Contact = new Contact(),
+                Releases =
+                {
+                    release
+                }
+            };
+
+            var preReleaseUserRole = new UserReleaseRole
+            {
+                Role = ReleaseRole.PrereleaseViewer,
+                Release = release
+            };
+            
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.UserReleaseRoles.AddAsync(preReleaseUserRole);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(context);
+
+                var result = await releaseService.GetRelease(release.Id);
+
+                var viewModel = result.AssertRight();
+                Assert.True(viewModel.PreReleaseUsersAdded);
             }
         }
 

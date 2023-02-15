@@ -438,6 +438,60 @@ describe('ReleaseStatusForm', () => {
       expect(publishDate.getByLabelText('Year')).toHaveValue(2020);
     });
 
+    test('shows pre-release warnings when pre-release users have been added', () => {
+      render(
+        <ReleaseStatusForm
+          release={{
+            ...testRelease,
+            approvalStatus: 'Approved',
+            preReleaseUsersAdded: true,
+          }}
+          statusPermissions={testStatusPermissions}
+          onCancel={noop}
+          onSubmit={noop}
+        />,
+      );
+
+      expect(
+        screen.getByText(
+          'Pre-release users will have access to a preview of the release 24 hours before the scheduled publish date.',
+        ),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByText(
+          'Pre-release users will not have access to a preview of the release if it is published immediately.',
+        ),
+      ).toBeInTheDocument();
+    });
+
+    test('does not show pre-release warnings when pre-release users have not been added', () => {
+      render(
+        <ReleaseStatusForm
+          release={{
+            ...testRelease,
+            approvalStatus: 'Approved',
+            preReleaseUsersAdded: false,
+          }}
+          statusPermissions={testStatusPermissions}
+          onCancel={noop}
+          onSubmit={noop}
+        />,
+      );
+
+      expect(
+        screen.queryByText(
+          'Pre-release users will have access to a preview of the release 24 hours before the scheduled publish date.',
+        ),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByText(
+          'Pre-release users will not have access to a preview of the release if it is published immediately.',
+        ),
+      ).not.toBeInTheDocument();
+    });
+
     test('shows error message when internal note is empty', async () => {
       render(
         <ReleaseStatusForm

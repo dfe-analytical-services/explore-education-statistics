@@ -119,6 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Created = createdDate,
                 CreatedBy = createdBy,
                 CreatedById = createdById,
+                PreReleaseAccessList = "Some Pre-release details",
                 ReleaseStatuses = new List<ReleaseStatus>
                 {
                     new()
@@ -285,7 +286,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 }
                             }
                         }
-
                     }
                 },
 
@@ -341,11 +341,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 DeletedById = Guid.NewGuid(),
             };
 
+            var prereleaseReleaseRole = new UserReleaseRole
+            {
+                Id = Guid.NewGuid(),
+                UserId = Guid.NewGuid(),
+                Role = ReleaseRole.PrereleaseViewer,
+                Release = release,
+                ReleaseId = releaseId,
+                Deleted = DateTime.UtcNow,
+                DeletedById = Guid.NewGuid(),
+            };
+
             var userReleaseRoles = new List<UserReleaseRole>
             {
                 approverReleaseRole,
                 contributorReleaseRole,
                 deletedReleaseRole,
+                prereleaseReleaseRole
             };
 
             var dataFile1 = new File
@@ -570,7 +582,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Where(r => r.ReleaseId == amendment.Id)
                     .ToList();
 
-                Assert.Equal(userReleaseRoles.Count, amendmentReleaseRoles.Count);
+                // Expect one less UserReleaseRole on the Amendment, as the Pre-release role shouldn't be copied over
+                Assert.Equal(userReleaseRoles.Count - 1, amendmentReleaseRoles.Count);
                 var approverAmendmentRole = amendmentReleaseRoles.First(r => r.Role == ReleaseRole.Approver);
                 AssertAmendedReleaseRoleCorrect(approverReleaseRole, approverAmendmentRole, amendment);
 
@@ -599,6 +612,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var originalFile2 = releaseFiles.First(f =>
                     f.File.Filename == amendmentDataFile2.File.Filename);
                 AssertAmendedReleaseFileCorrect(originalFile2, amendmentDataFile2, amendment);
+                
+                // Assert that the amendment does not have the PreReleaseAccessList copied over from the 
+                // original Release.
+                Assert.Null(amendment.PreReleaseAccessList);
 
                 Assert.True(amendment.Amendment);
             }
