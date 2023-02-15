@@ -10,8 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -39,10 +37,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             GetFilterItems
         }
 
-        private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly StatisticsDbContext _statisticsDbContext;
-        private readonly ContentDbContext _contentDbContext;
         private readonly IBlobCacheService _cacheService;
+        private readonly IReleaseSubjectService _releaseSubjectService;
         private readonly IFilterRepository _filterRepository;
         private readonly IFilterItemRepository _filterItemRepository;
         private readonly IIndicatorGroupRepository _indicatorGroupRepository;
@@ -54,10 +51,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly LocationsOptions _locationOptions;
 
         public SubjectMetaService(
-            IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             StatisticsDbContext statisticsDbContext,
-            ContentDbContext contentDbContext,
             IBlobCacheService cacheService,
+            IReleaseSubjectService releaseSubjectService,
             IFilterRepository filterRepository,
             IFilterItemRepository filterItemRepository,
             IIndicatorGroupRepository indicatorGroupRepository,
@@ -68,10 +64,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IUserService userService,
             IOptions<LocationsOptions> locationOptions)
         {
-            _persistenceHelper = persistenceHelper;
             _statisticsDbContext = statisticsDbContext;
-            _contentDbContext = contentDbContext;
             _cacheService = cacheService;
+            _releaseSubjectService = releaseSubjectService;
             _filterRepository = filterRepository;
             _filterItemRepository = filterItemRepository;
             _indicatorGroupRepository = indicatorGroupRepository;
@@ -85,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public async Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(Guid releaseId, Guid subjectId)
         {
-            return await CheckReleaseSubjectExists(releaseId, subjectId)
+            return await _releaseSubjectService.Find(subjectId: subjectId, releaseId: releaseId)
                 .OnSuccess(GetSubjectMeta);
         }
 
@@ -99,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ObservationQueryContext query,
             CancellationToken cancellationToken)
         {
-            return await CheckReleaseSubjectExists(releaseId, query.SubjectId)
+            return await _releaseSubjectService.Find(subjectId: query.SubjectId, releaseId: releaseId)
                 .OnSuccess(_userService.CheckCanViewSubjectData)
                 .OnSuccess(releaseSubject =>
                     GetSubjectMetaViewModelFromQuery(query, releaseSubject, cancellationToken));
@@ -110,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             Guid subjectId,
             List<FilterUpdateViewModel> request)
         {
-            return await CheckReleaseSubjectExists(releaseId: releaseId, subjectId: subjectId)
+            return await _releaseSubjectService.Find(subjectId: subjectId, releaseId: releaseId)
                 .OnSuccessDo(() => ValidateFiltersForSubject(subjectId, request))
                 .OnSuccessVoid(async rs =>
                 {
@@ -137,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             Guid subjectId,
             List<IndicatorGroupUpdateViewModel> request)
         {
-            return await CheckReleaseSubjectExists(releaseId: releaseId, subjectId: subjectId)
+            return await _releaseSubjectService.Find(subjectId: subjectId, releaseId: releaseId)
                 .OnSuccessDo(() => ValidateIndicatorGroupsForSubject(subjectId, request))
                 .OnSuccessVoid(async releaseSubject =>
                 {
@@ -152,42 +147,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     await _statisticsDbContext.SaveChangesAsync();
                     await InvalidateCachedReleaseSubjectMetadata(releaseId, subjectId);
                 });
-        }
-
-        public async Task<ReleaseSubject?> GetReleaseSubjectForLatestPublishedVersion(Guid subjectId)
-        {
-            // Find all versions of a Release that this Subject is linked to.
-            var releaseSubjects = await _statisticsDbContext
-                .ReleaseSubject
-                .AsNoTracking()
-                .Where(releaseSubject => releaseSubject.SubjectId == subjectId)
-                .ToListAsync();
-
-            var releaseIdsLinkedToSubject = releaseSubjects
-                .Select(releaseSubject => releaseSubject.ReleaseId)
-                .ToList();
-
-            // Find all versions of the Release that this Subject is linked to that are currently live
-            // or in the past have been live before being amended. Order them by Version to get the latest
-            // Live one at the end of the list.
-            var latestLiveReleaseVersionLinkedToSubject = _contentDbContext
-                .Releases
-                .AsNoTracking()
-                .Where(release => releaseIdsLinkedToSubject.Contains(release.Id))
-                .ToList()
-                .Where(release => release.Live)
-                .OrderBy(release => release.Version)
-                .LastOrDefault();
-
-            if (latestLiveReleaseVersionLinkedToSubject == null)
-            {
-                return null;
-            }
-
-            // Finally, now that we have identified the latest Release version linked to this Subject, return the
-            // appropriate ReleaseSubject record.
-            return releaseSubjects
-                .SingleOrDefault(releaseSubject => releaseSubject.ReleaseId == latestLiveReleaseVersionLinkedToSubject.Id);
         }
 
         private async Task<SubjectMetaViewModel> GetSubjectMetaViewModel(ReleaseSubject releaseSubject)
@@ -323,18 +282,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 Legend = "",
                 Options = options
             };
-        }
-
-        private async Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid? releaseId,
-            Guid subjectId)
-        {
-            return releaseId.HasValue
-                ? await _persistenceHelper.CheckEntityExists<ReleaseSubject>(
-                    query => query
-                        .Where(rs => rs.ReleaseId == releaseId && rs.SubjectId == subjectId)
-                )
-                : await GetReleaseSubjectForLatestPublishedVersion(subjectId) ??
-                  new Either<ActionResult, ReleaseSubject>(new NotFoundResult());
         }
 
         private Task InvalidateCachedReleaseSubjectMetadata(Guid releaseId, Guid subjectId)

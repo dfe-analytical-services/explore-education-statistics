@@ -585,6 +585,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 Content.Model.Repository.PublicationRepository>();
             services.AddTransient<ISubjectRepository, SubjectRepository>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
+            services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
             services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
