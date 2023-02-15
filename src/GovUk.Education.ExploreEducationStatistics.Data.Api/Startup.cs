@@ -138,6 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();
+            services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
             services.AddSingleton<IBlobStorageService, BlobStorageService>(provider =>
                 new BlobStorageService(
