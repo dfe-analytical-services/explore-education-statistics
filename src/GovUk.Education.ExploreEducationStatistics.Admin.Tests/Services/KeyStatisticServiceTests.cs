@@ -347,6 +347,164 @@ public class KeyStatisticServiceTests
     }
 
     [Fact]
+    public async Task CreateKeyStatisticText()
+    {
+        var release = new Release();
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            await context.Releases.AddRangeAsync(release);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var keyStatisticService = SetupKeyStatisticService(context);
+
+            var result = await keyStatisticService.CreateKeyStatisticText(
+                release.Id,
+                new KeyStatisticTextCreateRequest
+                {
+                    Title = "title",
+                    Statistic = "Over 9000!",
+                    Trend = "trend",
+                    GuidanceTitle = "guidanceTitle",
+                    GuidanceText = "guidanceText",
+                });
+
+            var viewModel = result.AssertRight();
+
+            Assert.Equal("title", viewModel.Title);
+            Assert.Equal("Over 9000!", viewModel.Statistic);
+            Assert.Equal("trend", viewModel.Trend);
+            Assert.Equal("guidanceTitle", viewModel.GuidanceTitle);
+            Assert.Equal("guidanceText", viewModel.GuidanceText);
+            Assert.Equal(0, viewModel.Order);
+            Assert.InRange(DateTime.UtcNow.Subtract(viewModel.Created).Milliseconds, 0, 1500);
+            Assert.Null(viewModel.Updated);
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var keyStatistics = context.KeyStatistics.ToList();
+            var keyStat = Assert.Single(keyStatistics);
+            var keyStatText = Assert.IsType<KeyStatisticText>(keyStat);
+
+            Assert.Equal("title", keyStatText.Title);
+            Assert.Equal("Over 9000!", keyStatText.Statistic);
+            Assert.Equal(release.Id, keyStatText.ReleaseId);
+            Assert.Equal("trend", keyStatText.Trend);
+            Assert.Equal("guidanceTitle", keyStatText.GuidanceTitle);
+            Assert.Equal("guidanceText", keyStatText.GuidanceText);
+            Assert.Equal(0, keyStatText.Order);
+            Assert.Equal(_userId, keyStatText.CreatedById);
+            Assert.Null(keyStatText.UpdatedById);
+            Assert.InRange(DateTime.UtcNow.Subtract(keyStatText.Created).Milliseconds, 0, 1500);
+            Assert.Null(keyStatText.Updated);
+        }
+    }
+
+    [Fact]
+    public async Task CreateKeyStatisticText_NoRelease()
+    {
+        var release = new Release();
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            await context.Releases.AddRangeAsync(release);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var keyStatisticService = SetupKeyStatisticService(context);
+            var result = await keyStatisticService.CreateKeyStatisticText(
+                Guid.NewGuid(),
+                new KeyStatisticTextCreateRequest
+                {
+                    Title = "title",
+                    Statistic = "Over 9000!",
+                });
+
+            result.AssertNotFound();
+        }
+    }
+
+    [Fact]
+    public async Task CreateKeyStatisticText_Order()
+    {
+        var release = new Release
+        {
+            KeyStatistics = new List<KeyStatistic>
+            {
+                new KeyStatisticText { Order = 0 },
+                new KeyStatisticText { Order = 1 },
+                new KeyStatisticDataBlock { Order = 2 },
+            },
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            await context.Releases.AddRangeAsync(release);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var keyStatisticService = SetupKeyStatisticService(context);
+
+            var result = await keyStatisticService.CreateKeyStatisticText(
+                release.Id,
+                new KeyStatisticTextCreateRequest
+                {
+                    Title = "title",
+                    Statistic = "Over 9000!",
+                });
+
+            var viewModel = result.AssertRight();
+
+
+            Assert.Equal("title", viewModel.Title);
+            Assert.Equal("Over 9000!", viewModel.Statistic);
+            Assert.Null(viewModel.Trend);
+            Assert.Null(viewModel.GuidanceTitle);
+            Assert.Null(viewModel.GuidanceText);
+            Assert.Equal(3, viewModel.Order);
+            Assert.InRange(DateTime.UtcNow.Subtract(viewModel.Created).Milliseconds, 0, 1500);
+            Assert.Null(viewModel.Updated);
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var keyStatistics = context.KeyStatistics
+                .OrderBy(ks => ks.Order)
+                .ToList();
+            Assert.Equal(4, keyStatistics.Count);
+
+            Assert.Equal(0, keyStatistics[0].Order);
+            Assert.Equal(1, keyStatistics[1].Order);
+            Assert.Equal(2, keyStatistics[2].Order);
+
+            var keyStatText = Assert.IsType<KeyStatisticText>(keyStatistics[3]);
+
+            Assert.Equal("title", keyStatText.Title);
+            Assert.Equal("Over 9000!", keyStatText.Statistic);
+            Assert.Equal(release.Id, keyStatText.ReleaseId);
+            Assert.Null(keyStatText.Trend);
+            Assert.Null(keyStatText.GuidanceTitle);
+            Assert.Null(keyStatText.GuidanceText);
+            Assert.Equal(3, keyStatText.Order);
+            Assert.Equal(_userId, keyStatText.CreatedById);
+            Assert.Null(keyStatText.UpdatedById);
+            Assert.InRange(DateTime.UtcNow.Subtract(keyStatText.Created).Milliseconds, 0, 1500);
+            Assert.Null(keyStatText.Updated);
+        }
+    }
+
+    [Fact]
     public async Task UpdateKeyStatisticDataBlock()
     {
         var releaseId = Guid.NewGuid();

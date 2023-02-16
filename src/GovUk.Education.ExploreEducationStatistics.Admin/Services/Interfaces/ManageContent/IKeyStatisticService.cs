@@ -14,6 +14,9 @@ public interface IKeyStatisticService
     Task<Either<ActionResult, KeyStatisticDataBlockViewModel>> CreateKeyStatisticDataBlock(
         Guid releaseId, KeyStatisticDataBlockCreateRequest request);
 
+    Task<Either<ActionResult, KeyStatisticTextViewModel>> CreateKeyStatisticText(
+        Guid releaseId, KeyStatisticTextCreateRequest request);
+
     Task<Either<ActionResult, KeyStatisticDataBlockViewModel>> UpdateKeyStatisticDataBlock(
         Guid releaseId,
         Guid keyStatisticId,

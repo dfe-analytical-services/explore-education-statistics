@@ -82,6 +82,31 @@ public class KeyStatisticService : IKeyStatisticService
             });
     }
 
+    public async Task<Either<ActionResult, KeyStatisticTextViewModel>> CreateKeyStatisticText(
+        Guid releaseId,
+        KeyStatisticTextCreateRequest request)
+    {
+        return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
+            .OnSuccess(_userService.CheckCanUpdateRelease)
+            .OnSuccess(async _ =>
+            {
+                var keyStatisticText = _mapper.Map<KeyStatisticText>(request);
+                keyStatisticText.ReleaseId = releaseId;
+                keyStatisticText.CreatedById = _userService.GetUserId();
+
+                var order = await _context.KeyStatistics
+                    .Where(ks => ks.ReleaseId == releaseId)
+                    .Select(ks => ks.Order)
+                    .MaxAsync(order => (int?)order);
+                keyStatisticText.Order = order.HasValue ? order.Value + 1 : 0;
+
+                await _context.KeyStatisticsText.AddAsync(keyStatisticText);
+                await _context.SaveChangesAsync();
+
+                return _mapper.Map<KeyStatisticTextViewModel>(keyStatisticText);
+            });
+    }
+
     public async Task<Either<ActionResult, KeyStatisticDataBlockViewModel>> UpdateKeyStatisticDataBlock(
         Guid releaseId,
         Guid keyStatisticId,
