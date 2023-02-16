@@ -132,6 +132,33 @@ public class KeyStatisticService : IKeyStatisticService
             });
     }
 
+    public async Task<Either<ActionResult, KeyStatisticTextViewModel>> UpdateKeyStatisticText(
+        Guid releaseId,
+        Guid keyStatisticId,
+        KeyStatisticTextUpdateRequest request)
+    {
+        return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
+            .OnSuccess(_userService.CheckCanUpdateRelease)
+            .OnSuccess(async release =>
+                await _persistenceHelper.CheckEntityExists<KeyStatisticText>(keyStatisticId, query =>
+                    query.Where(keyStat => keyStat.ReleaseId == release.Id)))
+            .OnSuccess(async keyStat =>
+            {
+                _context.KeyStatisticsText.Update(keyStat);
+
+                keyStat.UpdatedById = _userService.GetUserId();
+                keyStat.Title = request.Title;
+                keyStat.Statistic = request.Statistic;
+                keyStat.Trend = request.Trend;
+                keyStat.GuidanceTitle = request.GuidanceTitle;
+                keyStat.GuidanceText = request.GuidanceText;
+
+                await _context.SaveChangesAsync();
+
+                return _mapper.Map<KeyStatisticTextViewModel>(keyStat);
+            });
+    }
+
     public async Task<Either<ActionResult, Unit>> Delete(Guid releaseId, Guid keyStatisticId)
     {
         return await _persistenceHelper.CheckEntityExists<Release>(releaseId)

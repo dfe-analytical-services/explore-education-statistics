@@ -766,6 +766,257 @@ public class KeyStatisticServiceTests
     }
 
     [Fact]
+    public async Task UpdateKeyStatisticText()
+    {
+        var releaseId = Guid.NewGuid();
+
+        var keyStatisticText = new KeyStatisticText
+        {
+            ReleaseId = releaseId,
+            Title = "title",
+            Statistic = "statistic",
+            Trend = "trend",
+            GuidanceTitle = "guidanceTitle",
+            GuidanceText = "guidanceText",
+            Created = new DateTime(2000, 1, 1),
+            Updated = null,
+            CreatedById = Guid.NewGuid(),
+            UpdatedById = Guid.NewGuid(),
+        };
+
+        var release = new Release
+        {
+            Id = releaseId,
+            KeyStatistics = new List<KeyStatistic>
+            {
+                keyStatisticText,
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            await context.Releases.AddRangeAsync(release);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var keyStatisticService = SetupKeyStatisticService(context);
+            var result = await keyStatisticService.UpdateKeyStatisticText(
+                release.Id,
+                keyStatisticText.Id,
+                new KeyStatisticTextUpdateRequest
+                {
+                    Title = "new title",
+                    Statistic = "new statistic",
+                    Trend = "new trend",
+                    GuidanceTitle = "new guidanceTitle",
+                    GuidanceText = "new guidanceText",
+                });
+
+            var viewModel = result.AssertRight();
+
+            Assert.Equal("new title", viewModel.Title);
+            Assert.Equal("new statistic", viewModel.Statistic);
+            Assert.Equal("new trend", viewModel.Trend);
+            Assert.Equal("new guidanceTitle", viewModel.GuidanceTitle);
+            Assert.Equal("new guidanceText", viewModel.GuidanceText);
+            Assert.Equal(0, viewModel.Order);
+            Assert.Equal(new DateTime(2000, 1, 1), viewModel.Created);
+            Assert.NotNull(viewModel.Updated);
+            Assert.InRange(DateTime.UtcNow.Subtract(viewModel.Updated!.Value).Milliseconds, 0, 1500);
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var keyStatistics = context.KeyStatistics.ToList();
+            var keyStat = Assert.Single(keyStatistics);
+            var keyStatText = Assert.IsType<KeyStatisticText>(keyStat);
+
+            Assert.Equal(release.Id, keyStatText.ReleaseId);
+            Assert.Equal("new title", keyStatText.Title);
+            Assert.Equal("new statistic", keyStatText.Statistic);
+            Assert.Equal("new trend", keyStatText.Trend);
+            Assert.Equal("new guidanceTitle", keyStatText.GuidanceTitle);
+            Assert.Equal("new guidanceText", keyStatText.GuidanceText);
+            Assert.Equal(0, keyStatText.Order);
+            Assert.Equal(new DateTime(2000, 1, 1), keyStatText.Created);
+            Assert.NotNull(keyStatText.Updated);
+            Assert.Equal(keyStatisticText.CreatedById, keyStatText.CreatedById);
+            Assert.Equal(_userId, keyStatText.UpdatedById);
+            Assert.InRange(DateTime.UtcNow.Subtract(keyStatText.Updated!.Value).Milliseconds, 0, 1500);
+        }
+    }
+
+    [Fact]
+    public async Task UpdateKeyStatisticText_NoRelease()
+    {
+        var releaseId = Guid.NewGuid();
+
+        var keyStatisticText = new KeyStatisticText
+        {
+            ReleaseId = releaseId,
+            Title = "title",
+            Statistic = "statistic",
+            Trend = "trend",
+            GuidanceTitle = "guidanceTitle",
+            GuidanceText = "guidanceText",
+            Created = new DateTime(2000, 1, 1),
+            Updated = null,
+        };
+
+        var release = new Release
+        {
+            Id = releaseId,
+            KeyStatistics = new List<KeyStatistic>
+            {
+                keyStatisticText,
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            await context.Releases.AddRangeAsync(release);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var keyStatisticService = SetupKeyStatisticService(context);
+            var result = await keyStatisticService.UpdateKeyStatisticText(
+                Guid.NewGuid(),
+                keyStatisticText.Id,
+                new KeyStatisticTextUpdateRequest
+                {
+                    Title = "new title",
+                    Statistic = "new statistic",
+                    Trend = "new trend",
+                    GuidanceTitle = "new guidanceTitle",
+                    GuidanceText = "new guidanceText",
+                });
+
+            result.AssertNotFound();
+        }
+    }
+
+    [Fact]
+    public async Task UpdateKeyStatisticText_NoKeyStatisticText()
+    {
+        var releaseId = Guid.NewGuid();
+
+        var keyStatisticText = new KeyStatisticText
+        {
+            ReleaseId = releaseId,
+            Title = "title",
+            Statistic = "statistic",
+            Trend = "trend",
+            GuidanceTitle = "guidanceTitle",
+            GuidanceText = "guidanceText",
+            Created = new DateTime(2000, 1, 1),
+            Updated = null,
+        };
+
+        var release = new Release
+        {
+            Id = releaseId,
+            KeyStatistics = new List<KeyStatistic>
+            {
+                keyStatisticText,
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            await context.Releases.AddRangeAsync(release);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var keyStatisticService = SetupKeyStatisticService(context);
+            var result = await keyStatisticService.UpdateKeyStatisticText(
+                release.Id,
+                Guid.NewGuid(),
+                new KeyStatisticTextUpdateRequest
+                {
+                    Title = "new title",
+                    Statistic = "new statistic",
+                    Trend = "new trend",
+                    GuidanceTitle = "new guidanceTitle",
+                    GuidanceText = "new guidanceText",
+                });
+
+            result.AssertNotFound();
+        }
+    }
+
+    [Fact]
+    public async Task UpdateKeyStatisticText_KeyStatWrongType()
+    {
+        var releaseId = Guid.NewGuid();
+        var dataBlockId = Guid.NewGuid();
+
+        var keyStatisticDataBlock = new KeyStatisticDataBlock
+        {
+            ReleaseId = releaseId,
+            DataBlockId = dataBlockId,
+            Trend = "trend",
+            GuidanceTitle = "guidanceTitle",
+            GuidanceText = "guidanceText",
+            Created = new DateTime(2000, 1, 1),
+            Updated = null,
+        };
+
+        var release = new Release
+        {
+            Id = releaseId,
+            ContentBlocks = new List<ReleaseContentBlock>
+            {
+                new()
+                {
+                    ContentBlock = new DataBlock
+                    {
+                        Id = dataBlockId,
+                    },
+                },
+            },
+            KeyStatistics = new List<KeyStatistic>
+            {
+                keyStatisticDataBlock,
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            await context.Releases.AddRangeAsync(release);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var keyStatisticService = SetupKeyStatisticService(context);
+            var result = await keyStatisticService.UpdateKeyStatisticText(
+                release.Id,
+                keyStatisticDataBlock.Id,
+                new KeyStatisticTextUpdateRequest
+                {
+                    Title = "new title",
+                    Statistic = "new statistic",
+                    Trend = "new trend",
+                    GuidanceTitle = "new guidanceTitle",
+                    GuidanceText = "new guidanceText",
+                });
+
+            result.AssertNotFound();
+        }
+    }
+
+
+    [Fact]
     public async Task Delete_KeyStatisticDataBlock()
     {
         var releaseId = Guid.NewGuid();

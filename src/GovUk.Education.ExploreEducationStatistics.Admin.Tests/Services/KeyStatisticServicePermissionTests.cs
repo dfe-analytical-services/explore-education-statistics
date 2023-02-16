@@ -72,6 +72,22 @@ public class KeyStatisticServicePermissionTests
     }
 
     [Fact]
+    public async Task UpdateKeyStatisticText()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            .AssertForbidden(
+                userService =>
+                {
+                    var service = SetupKeyStatisticService(userService: userService.Object);
+                    return service.CreateKeyStatisticText(
+                        _release.Id,
+                        new KeyStatisticTextCreateRequest());
+                }
+            );
+    }
+
+    [Fact]
     public async Task Delete()
     {
         await PolicyCheckBuilder<SecurityPolicies>()

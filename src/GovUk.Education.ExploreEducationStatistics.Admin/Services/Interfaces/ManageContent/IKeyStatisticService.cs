@@ -22,6 +22,11 @@ public interface IKeyStatisticService
         Guid keyStatisticId,
         KeyStatisticDataBlockUpdateRequest request);
 
+    Task<Either<ActionResult, KeyStatisticTextViewModel>> UpdateKeyStatisticText(
+        Guid releaseId,
+        Guid keyStatisticId,
+        KeyStatisticTextUpdateRequest request);
+
     Task<Either<ActionResult, Unit>> Delete(Guid releaseId, Guid keyStatisticId);
 
     Task DeleteAssociatedKeyStatisticDataBlock(Guid dataBlockId);

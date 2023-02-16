@@ -55,6 +55,17 @@ public class KeyStatisticController : ControllerBase
             .HandleFailuresOrOk();
     }
 
+    [HttpPut("release/{releaseId:guid}/key-statistic-text/{keyStatisticId:guid}")]
+    public async Task<ActionResult<KeyStatisticTextViewModel>> UpdateKeyStatisticText(
+        Guid releaseId,
+        Guid keyStatisticId,
+        KeyStatisticTextUpdateRequest request)
+    {
+        return await _keyStatisticService
+            .UpdateKeyStatisticText(releaseId, keyStatisticId, request)
+            .HandleFailuresOrOk();
+    }
+
     [HttpDelete("release/{releaseId:guid}/key-statistic/{keyStatisticId:guid}")]
     public async Task<ActionResult<Unit>> Delete(
         Guid releaseId,
