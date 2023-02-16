@@ -141,11 +141,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? MultiAcademyTrust_Name { get; set; }
 
         [NotMapped]
-        public Mat? MultiAcademyTrust
+        public MultiAcademyTrust? MultiAcademyTrust
         {
             get => MultiAcademyTrust_Code == null && MultiAcademyTrust_Name == null
                 ? null
-                : new Mat(MultiAcademyTrust_Code, MultiAcademyTrust_Name);
+                : new MultiAcademyTrust(MultiAcademyTrust_Code, MultiAcademyTrust_Name);
             init
             {
                 MultiAcademyTrust_Code = value?.Code;

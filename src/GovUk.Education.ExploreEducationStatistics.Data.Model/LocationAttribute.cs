@@ -120,7 +120,7 @@ public record LocalEnterprisePartnership(string? Code, string? Name) : LocationA
     public override int CsvPriority => 7;
 }
 
-public record Mat(string? Code, string? Name) : LocationAttribute(Code, Name)
+public record MultiAcademyTrust(string? Code, string? Name) : LocationAttribute(Code, Name)
 {
     public override KeyValuePair<string, string>[] CsvValues
         => new KeyValuePair<string, string>[]
