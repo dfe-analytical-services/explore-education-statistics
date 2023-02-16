@@ -411,7 +411,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IEnumerable<TSecond> second,
             Func<TFirst, TId> firstIdSelector,
             Func<TSecond, TId> secondIdSelector,
-            ValidationErrorMessages error)
+            ValidationErrorMessages error) where TId : IComparable
         {
             var firstIdList = first.Select(firstIdSelector);
             var secondIdList = second.Select(secondIdSelector);
@@ -420,9 +420,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private static Either<ActionResult, Unit> AssertCollectionsAreSameIgnoringOrder<T>(IEnumerable<T> first,
             IEnumerable<T> second,
-            ValidationErrorMessages error)
+            ValidationErrorMessages error) where T : IComparable
         {
-            if (first.IsSameAsIgnoringOrder(second))
+            if(ComparerUtils.SequencesAreEqualIgnoringOrder(first, second))
             {
                 return Unit.Instance;
             }

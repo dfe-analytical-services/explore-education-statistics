@@ -1,4 +1,8 @@
 import { EditableRelease } from '@admin/services/releaseContentService';
+import {
+  KeyStatisticDataBlock,
+  KeyStatisticText,
+} from '@common/services/publicationService';
 import { Table } from '@common/services/types/blocks';
 
 const emptyTable: Table = {
@@ -50,6 +54,35 @@ export const testEditableRelease: EditableRelease = {
       id: '262cf6c8-db96-40d8-8fb1-b55028a9f55b',
       reason: 'First published',
       on: new Date(),
+    },
+  ],
+  keyStatistics: [
+    {
+      type: 'KeyStatisticDataBlock',
+      id: 'keyStat-1',
+      dataBlockId: 'dataBlock-1',
+      trend: 'keyStat-1 trend',
+      order: 0,
+      created: '2023-01-01',
+    },
+    {
+      type: 'KeyStatisticText',
+      id: 'keyStat-2',
+      title: 'KeyStat-2 title',
+      statistic: 'KeyStat-2 value',
+      trend: 'KeyStat-2 trend',
+      guidanceTitle: 'keyStat-2 guidanceTitle',
+      guidanceText: 'keyStat-2 guidanceText',
+      order: 1,
+      created: '2023-01-02',
+    },
+    {
+      type: 'KeyStatisticDataBlock',
+      id: 'keyStat-3',
+      dataBlockId: 'dataBlock-2',
+      guidanceText: 'KeyStat-3 guidanceText',
+      order: 2,
+      created: '2023-01-03',
     },
   ],
   content: [
@@ -142,38 +175,6 @@ export const testEditableRelease: EditableRelease = {
         type: 'MarkDownBlock',
         body: '',
         order: 0,
-        comments: [],
-      },
-    ],
-  },
-  keyStatisticsSection: {
-    id: '10e39b93-0304-43fb-d1b3-08d7bec1ba1b',
-    order: 0,
-    heading: '',
-    content: [
-      {
-        heading:
-          "Main reason for issue: Unauthorised family holiday absence for 'prma' from 'My Pub' in England for 2017/18",
-        name: 'Holiday (Key Stat)',
-        source: '',
-        query: {
-          subjectId: '36aa28ce-83ca-49b5-8c27-b34e77b062c9',
-          timePeriod: {
-            startYear: 2017,
-            startCode: 'AY',
-            endYear: 2017,
-            endCode: 'AY',
-          },
-          filters: ['5a1b6c93-c9c3-4710-f71f-08d7bec1ddb3'],
-          indicators: ['272f4b12-9dfe-45ef-fdf9-08d7bec1dd71'],
-          locationIds: ['dd590fcf-b0c1-4fa3-8599-d13c0f540793'],
-          includeGeoJson: true,
-        },
-        charts: [],
-        table: emptyTable,
-        type: 'DataBlock',
-        id: 'e2db1389-8220-41f0-a29a-bb8dd1ccfc9c',
-        order: 0,
         comments: [
           {
             id: 'comment-3',
@@ -187,56 +188,6 @@ export const testEditableRelease: EditableRelease = {
             created: '2020-03-09T12:00:00.000',
           },
         ],
-      },
-      {
-        heading:
-          "Main reason for issue: Arriving late for 'prma' from 'My Pub' in England for 2017/18",
-        name: 'Main Reason (Key Stat)',
-        source: '',
-        query: {
-          subjectId: '36aa28ce-83ca-49b5-8c27-b34e77b062c9',
-          timePeriod: {
-            startYear: 2017,
-            startCode: 'AY',
-            endYear: 2017,
-            endCode: 'AY',
-          },
-          filters: ['5a1b6c93-c9c3-4710-f71f-08d7bec1ddb3'],
-          indicators: ['d314e2a9-5069-4d79-fdfa-08d7bec1dd71'],
-          locationIds: ['dd590fcf-b0c1-4fa3-8599-d13c0f540793'],
-          includeGeoJson: true,
-        },
-        charts: [],
-        table: emptyTable,
-        type: 'DataBlock',
-        id: 'aa9f1b63-abb3-41a2-bd57-fcf24dfd71ed',
-        order: 1,
-        comments: [],
-      },
-      {
-        heading:
-          "Main reason for issue: Absence due to other unauthorised circumstances for 'prma' from 'My Pub' in England for 2017/18",
-        name: "Unauth'd (Key Stat)",
-        source: '',
-        query: {
-          subjectId: '36aa28ce-83ca-49b5-8c27-b34e77b062c9',
-          timePeriod: {
-            startYear: 2017,
-            startCode: 'AY',
-            endYear: 2017,
-            endCode: 'AY',
-          },
-          filters: ['5a1b6c93-c9c3-4710-f71f-08d7bec1ddb3'],
-          indicators: ['214f5fb8-c12b-411e-fdfb-08d7bec1dd71'],
-          locationIds: ['dd590fcf-b0c1-4fa3-8599-d13c0f540793'],
-          includeGeoJson: true,
-        },
-        charts: [],
-        table: emptyTable,
-        type: 'DataBlock',
-        id: 'ba1ff405-1f44-4509-9dcf-5822df5b6f8c',
-        order: 2,
-        comments: [],
       },
     ],
   },

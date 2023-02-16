@@ -116,7 +116,7 @@ const ReleaseContentPage = ({
   >(async () => {
     const {
       release,
-      availableDataBlocks,
+      unattachedDataBlocks,
     } = await releaseContentService.getContent(releaseId);
 
     const canUpdateRelease = await permissionService.canUpdateRelease(
@@ -125,7 +125,7 @@ const ReleaseContentPage = ({
 
     return {
       release,
-      availableDataBlocks,
+      unattachedDataBlocks,
       canUpdateRelease,
     };
   }, [releaseId]);

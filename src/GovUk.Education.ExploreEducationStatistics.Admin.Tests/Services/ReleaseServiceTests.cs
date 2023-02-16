@@ -254,7 +254,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Empty(contentSections[0].Content.AsReadOnly());
                 Assert.Equal(ContentSectionType.ReleaseSummary, newRelease.SummarySection.Type);
                 Assert.Equal(ContentSectionType.Headlines, newRelease.HeadlinesSection.Type);
-                Assert.Equal(ContentSectionType.KeyStatistics, newRelease.KeyStatisticsSection.Type);
                 Assert.Equal(ContentSectionType.KeyStatisticsSecondary, newRelease.KeyStatisticsSecondarySection.Type);
             }
         }

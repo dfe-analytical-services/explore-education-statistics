@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -245,6 +244,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessVoid(async () =>
                 {
                     _contentContext.Releases.Remove(contentRelease);
+
+                    var keyStats = _contentContext.KeyStatistics
+                        .Where(ks => ks.ReleaseId == releaseId);
+                    _contentContext.KeyStatistics.RemoveRange(keyStats);
+
                     await _contentContext.SaveChangesAsync();
 
                     await DeleteStatsDbRelease(releaseId);

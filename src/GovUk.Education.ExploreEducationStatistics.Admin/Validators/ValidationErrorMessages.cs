@@ -16,8 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         IncorrectContentBlockTypeForUpdate,
         ContentBlockAlreadyAttachedToContentSection,
         IncorrectContentBlockTypeForAttach,
-        ContentBlockAlreadyDetached,
-        ContentBlockNotAttachedToThisContentSection,
         ContentSectionNotAttachedToRelease,
         ContentBlockNotAttachedToRelease,
         EmbedBlockUrlDomainNotPermitted,
@@ -111,6 +109,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
         // Footnotes
         FootnotesDifferFromReleaseFootnotes,
+
+        // Key statistics
+        DataBlockShouldBeUnattached,
+        ProvidedKeyStatIdsDifferFromReleaseKeyStatIds,
 
         // TODO EES-3755 Remove after Permalink snapshot migration work is complete
         NullMessageCountForPermalinksMigrationQueue,

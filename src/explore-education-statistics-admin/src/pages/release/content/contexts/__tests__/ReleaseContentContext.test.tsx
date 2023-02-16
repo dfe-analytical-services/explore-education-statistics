@@ -10,7 +10,10 @@ import {
   EditableBlock,
   EditableContentBlock,
 } from '@admin/services/types/content';
-import { ContentSection } from '@common/services/publicationService';
+import {
+  ContentSection,
+  KeyStatisticDataBlock,
+} from '@common/services/publicationService';
 import { DataBlock, Table } from '@common/services/types/blocks';
 import { produce } from 'immer';
 
@@ -63,37 +66,37 @@ const releaseReducer = (
 ) => produce(initial, draft => originalReleaseReducer(draft, action));
 
 describe('ReleaseContentContext', () => {
-  test('SET_AVAILABLE_DATABLOCKS sets data blocks', () => {
+  test('SET_UNATTACHED_DATABLOCKS sets data blocks', () => {
     expect(
       releaseReducer(
         {
           release: testEditableRelease,
           canUpdateRelease: false,
-          availableDataBlocks: [],
+          unattachedDataBlocks: [],
         },
         {
-          type: 'SET_AVAILABLE_DATABLOCKS',
+          type: 'SET_UNATTACHED_DATABLOCKS',
           payload: [basicDataBlock],
         },
       ),
     ).toEqual({
       release: testEditableRelease,
       canUpdateRelease: false,
-      availableDataBlocks: [basicDataBlock],
+      unattachedDataBlocks: [basicDataBlock],
     });
   });
 
   test('REMOVE_SECTION_BLOCK removes a block from a named section', () => {
-    const keyStatsSection = testEditableRelease.keyStatisticsSection;
+    const keyStatsSection = testEditableRelease.headlinesSection;
     const removingBlockId = keyStatsSection.content[0].id;
 
-    expect(testEditableRelease.keyStatisticsSection.content.length).toEqual(3);
+    expect(testEditableRelease.headlinesSection.content.length).toEqual(1);
 
     const { release } = releaseReducer(
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'REMOVE_SECTION_BLOCK',
@@ -101,16 +104,13 @@ describe('ReleaseContentContext', () => {
           meta: {
             blockId: removingBlockId,
             sectionId: keyStatsSection.id,
-            sectionKey: 'keyStatisticsSection',
+            sectionKey: 'headlinesSection',
           },
         },
       },
     );
 
-    expect(release.keyStatisticsSection.content).toEqual([
-      keyStatsSection.content[1],
-      keyStatsSection.content[2],
-    ]);
+    expect(release.headlinesSection.content).toEqual([]);
   });
 
   test('REMOVE_SECTION_BLOCK removes a block from generic content section', () => {
@@ -123,7 +123,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'REMOVE_SECTION_BLOCK',
@@ -151,7 +151,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'UPDATE_SECTION_BLOCK',
@@ -183,7 +183,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'UPDATE_SECTION_BLOCK',
@@ -222,7 +222,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: false,
-        availableDataBlocks: [],
+        unattachedDataBlocks: [],
       },
       {
         type: 'ADD_SECTION_BLOCK',
@@ -256,7 +256,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'ADD_SECTION_BLOCK',
@@ -344,7 +344,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'UPDATE_SECTION_CONTENT',
@@ -376,7 +376,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'ADD_CONTENT_SECTION',
@@ -398,7 +398,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'SET_CONTENT',
@@ -429,7 +429,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'UPDATE_CONTENT_SECTION',
@@ -444,14 +444,14 @@ describe('ReleaseContentContext', () => {
   });
 
   test('ADD_BLOCK_COMMENT adds a comment to named section block', () => {
-    const sectionId = testEditableRelease.keyStatisticsSection.id;
-    const block = testEditableRelease.keyStatisticsSection.content[0];
+    const sectionId = testEditableRelease.headlinesSection.id;
+    const block = testEditableRelease.headlinesSection.content[0];
 
     const { release } = releaseReducer(
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'ADD_BLOCK_COMMENT',
@@ -459,14 +459,14 @@ describe('ReleaseContentContext', () => {
           meta: {
             blockId: block.id,
             sectionId,
-            sectionKey: 'keyStatisticsSection',
+            sectionKey: 'headlinesSection',
           },
           comment: testComment,
         },
       },
     );
 
-    expect(release.keyStatisticsSection.content[0].comments).toEqual([
+    expect(release.headlinesSection.content[0].comments).toEqual([
       ...block.comments,
       testComment,
     ]);
@@ -480,7 +480,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'ADD_BLOCK_COMMENT',
@@ -502,8 +502,8 @@ describe('ReleaseContentContext', () => {
   });
 
   test('UPDATE_BLOCK_COMMENT updates a comment in named section block', () => {
-    const sectionId = testEditableRelease.keyStatisticsSection.id;
-    const block = testEditableRelease.keyStatisticsSection.content[0];
+    const sectionId = testEditableRelease.headlinesSection.id;
+    const block = testEditableRelease.headlinesSection.content[0];
 
     expect(block.comments).toHaveLength(1);
 
@@ -516,7 +516,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'UPDATE_BLOCK_COMMENT',
@@ -524,14 +524,14 @@ describe('ReleaseContentContext', () => {
           meta: {
             blockId: block.id,
             sectionId,
-            sectionKey: 'keyStatisticsSection',
+            sectionKey: 'headlinesSection',
           },
           comment: updatedComment,
         },
       },
     );
 
-    expect(release.keyStatisticsSection.content[0].comments).toEqual([
+    expect(release.headlinesSection.content[0].comments).toEqual([
       updatedComment,
     ]);
   });
@@ -551,7 +551,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'UPDATE_BLOCK_COMMENT',
@@ -573,8 +573,8 @@ describe('ReleaseContentContext', () => {
   });
 
   test('REMOVE_BLOCK_COMMENT removes a comment from named section block', () => {
-    const sectionId = testEditableRelease.keyStatisticsSection.id;
-    const block = testEditableRelease.keyStatisticsSection.content[0];
+    const sectionId = testEditableRelease.headlinesSection.id;
+    const block = testEditableRelease.headlinesSection.content[0];
 
     expect(block.comments).toHaveLength(1);
 
@@ -582,7 +582,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'REMOVE_BLOCK_COMMENT',
@@ -590,14 +590,14 @@ describe('ReleaseContentContext', () => {
           meta: {
             blockId: block.id,
             sectionId,
-            sectionKey: 'keyStatisticsSection',
+            sectionKey: 'headlinesSection',
           },
           commentId: block.comments[0].id,
         },
       },
     );
 
-    expect(release.keyStatisticsSection.content[0].comments).toEqual([]);
+    expect(release.headlinesSection.content[0].comments).toEqual([]);
   });
 
   test('UPDATE_BLOCK_COMMENT removes a comment from generic content section block', () => {
@@ -610,7 +610,7 @@ describe('ReleaseContentContext', () => {
       {
         release: testEditableRelease,
         canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
+        unattachedDataBlocks: [basicDataBlock],
       },
       {
         type: 'REMOVE_BLOCK_COMMENT',
@@ -626,5 +626,114 @@ describe('ReleaseContentContext', () => {
     );
 
     expect(release.content[0].content[0].comments).toEqual([block.comments[1]]);
+  });
+
+  test('ADD_KEY_STATISTIC adds a key statistic to release.keyStatistics array', () => {
+    expect(testEditableRelease.keyStatistics).toHaveLength(3);
+    const newKeyStat: KeyStatisticDataBlock = {
+      type: 'KeyStatisticDataBlock',
+      id: 'keyStat-4',
+      dataBlockId: 'dataBlock-0',
+      trend: 'keyStat-4 trend',
+      guidanceTitle: 'keyStat-4 guidanceTitle',
+      guidanceText: 'keyStat-4 guidanceText',
+      order: 1,
+      created: '2022-02-01T12:00:00Z',
+    };
+
+    const { release } = releaseReducer(
+      {
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        unattachedDataBlocks: [basicDataBlock],
+      },
+      {
+        type: 'ADD_KEY_STATISTIC',
+        payload: {
+          keyStatistic: newKeyStat,
+        },
+      },
+    );
+
+    expect(release.keyStatistics).toEqual([
+      ...testEditableRelease.keyStatistics,
+      newKeyStat,
+    ]);
+  });
+
+  test('UPDATE_KEY_STATISTIC updates a key statistic in release.keyStatistics array', () => {
+    expect(testEditableRelease.keyStatistics).toHaveLength(3);
+    const updatedKeyStat1 = {
+      ...testEditableRelease.keyStatistics[0],
+      trend: 'keyStat-1 trend updated',
+      guidanceTitle: 'keyStat-1 new guidance title',
+      guidanceText: 'keyStat-1 new guidance text',
+    };
+    const { release } = releaseReducer(
+      {
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        unattachedDataBlocks: [basicDataBlock],
+      },
+      {
+        type: 'UPDATE_KEY_STATISTIC',
+        payload: { keyStatistic: updatedKeyStat1 },
+      },
+    );
+
+    expect(release.keyStatistics).toEqual([
+      updatedKeyStat1,
+      testEditableRelease.keyStatistics[1],
+      testEditableRelease.keyStatistics[2],
+    ]);
+  });
+
+  test('REMOVE_KEY_STATISTIC removes a key statistic from release.keyStatistics array', () => {
+    expect(testEditableRelease.keyStatistics).toHaveLength(3);
+    const { release } = releaseReducer(
+      {
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        unattachedDataBlocks: [basicDataBlock],
+      },
+      {
+        type: 'REMOVE_KEY_STATISTIC',
+        payload: {
+          keyStatisticId: 'keyStat-2',
+        },
+      },
+    );
+
+    expect(release.keyStatistics).toEqual([
+      testEditableRelease.keyStatistics[0],
+      testEditableRelease.keyStatistics[2],
+    ]);
+  });
+
+  test('SET_KEY_STATISTICS used to reorder existing key stats', () => {
+    expect(testEditableRelease.keyStatistics).toHaveLength(3);
+    const { release } = releaseReducer(
+      {
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        unattachedDataBlocks: [basicDataBlock],
+      },
+      {
+        type: 'SET_KEY_STATISTICS',
+        payload: {
+          keyStatistics: [
+            testEditableRelease.keyStatistics[2],
+            testEditableRelease.keyStatistics[1],
+            testEditableRelease.keyStatistics[0],
+          ],
+        },
+      },
+    );
+
+    expect(release.keyStatistics).toEqual([
+      testEditableRelease.keyStatistics[2],
+      testEditableRelease.keyStatistics[1],
+      testEditableRelease.keyStatistics[0],
+    ]);
   });
 });

@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Xunit;
@@ -516,6 +517,106 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         }
 
         [Fact]
+        public void CreateAmendment_CopiesKeyStatistics()
+        {
+            var dataBlock = new DataBlock
+            {
+                Name = "DataBlock name",
+            };
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                Version = 1,
+                Published = DateTime.Parse("2020-10-10T13:00:00"),
+                PublishScheduled = DateTime.Parse("2020-10-09T12:00:00"),
+                KeyStatistics = new List<KeyStatistic>
+                {
+                    new KeyStatisticText
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "KeyStatText title",
+                        Statistic = "KeyStatText statistic",
+                        Trend = "KeyStatText trend",
+                        GuidanceTitle = "KeyStatText guidance title",
+                        GuidanceText = "KeyStatText guidance text",
+                        Order = 0,
+                        Created = new DateTime(2023, 01, 01),
+                        Updated = new DateTime(2023, 01, 02),
+                    },
+                    new KeyStatisticDataBlock
+                    {
+                        Id = Guid.NewGuid(),
+                        DataBlock = dataBlock,
+                        Trend = "KeyStatDataBlock trend",
+                        GuidanceTitle = "KeyStatDataBlock guidance title",
+                        GuidanceText = "KeyStatDataBlock guidance text",
+                        Order = 1,
+                        Created = new DateTime(2023, 01, 03),
+                        Updated = new DateTime(2023, 01, 04),
+                    },
+                },
+                ContentBlocks = new List<ReleaseContentBlock>
+                {
+                    new ()
+                    {
+                        ContentBlock = dataBlock,
+                    },
+                },
+            };
+
+            var createdDate = DateTime.Now;
+            var createdById = Guid.NewGuid();
+
+            var amendment = release.CreateAmendment(createdDate, createdById);
+
+            Assert.NotEqual(release.Id, amendment.Id);
+            Assert.Equal(2, amendment.Version);
+            Assert.Equal(release.Id, amendment.PreviousVersionId);
+
+            Assert.Null(amendment.Published);
+            Assert.Null(amendment.PublishScheduled);
+            Assert.Equal(ReleaseApprovalStatus.Draft, amendment.ApprovalStatus);
+
+            Assert.Equal(2, amendment.KeyStatistics.Count);
+
+            var amendmentKeyStatText = Assert.IsType<KeyStatisticText>(amendment.KeyStatistics[0]);
+            var originalKeyStatText = (KeyStatisticText)release.KeyStatistics[0];
+            Assert.NotEqual(originalKeyStatText.Id, amendmentKeyStatText.Id);
+            Assert.Equal(originalKeyStatText.Title, amendmentKeyStatText.Title);
+            Assert.Equal(originalKeyStatText.Statistic, amendmentKeyStatText.Statistic);
+            Assert.Equal(originalKeyStatText.Trend, amendmentKeyStatText.Trend);
+            Assert.Equal(originalKeyStatText.GuidanceTitle, amendmentKeyStatText.GuidanceTitle);
+            Assert.Equal(originalKeyStatText.GuidanceText, amendmentKeyStatText.GuidanceText);
+            Assert.Equal(originalKeyStatText.Order, amendmentKeyStatText.Order);
+            Assert.Equal(originalKeyStatText.Created, amendmentKeyStatText.Created);
+            Assert.Equal(originalKeyStatText.Updated, amendmentKeyStatText.Updated);
+
+            var amendmentKeyStatDataBlock = Assert.IsType<KeyStatisticDataBlock>(amendment.KeyStatistics[1]);
+            var originalKeyStatDataBlock = (KeyStatisticDataBlock)release.KeyStatistics[1];
+            Assert.NotEqual(originalKeyStatDataBlock.Id, amendmentKeyStatDataBlock.Id);
+            Assert.Equal(originalKeyStatDataBlock.Trend, amendmentKeyStatDataBlock.Trend);
+            Assert.Equal(originalKeyStatDataBlock.GuidanceTitle, amendmentKeyStatDataBlock.GuidanceTitle);
+            Assert.Equal(originalKeyStatDataBlock.GuidanceText, amendmentKeyStatDataBlock.GuidanceText);
+            Assert.Equal(originalKeyStatDataBlock.Order, amendmentKeyStatDataBlock.Order);
+            Assert.Equal(originalKeyStatDataBlock.Created, amendmentKeyStatDataBlock.Created);
+            Assert.Equal(originalKeyStatDataBlock.Updated, amendmentKeyStatDataBlock.Updated);
+
+            var originalDataBlock = (DataBlock)release.ContentBlocks.Single().ContentBlock;
+            var amendmentDataBlock = Assert.IsType<DataBlock>(amendment.ContentBlocks.Single().ContentBlock);
+            Assert.Equal(originalDataBlock.Name, amendmentDataBlock.Name);
+            Assert.NotEqual(
+                originalDataBlock.Id,
+                amendmentDataBlock.Id);
+
+            // Check original and amendment data blocks are linked to correct key stats
+            Assert.Equal(originalDataBlock.Id, originalKeyStatDataBlock.DataBlockId);
+            Assert.Equal(
+                amendmentDataBlock.Id,
+                amendmentKeyStatDataBlock.DataBlockId);
+        }
+
+
+        [Fact]
         public void CreateAmendment_UpdatesFastTrackLinkIds()
         {
             var release = new Release
@@ -678,7 +779,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void CreateAmendment_FiltersContent()
         {
-              var release = new Release
+            var release = new Release
             {
                 Id = Guid.NewGuid(),
             };

@@ -1,8 +1,5 @@
 import Details from '@common/components/Details';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
-import useKeyStatQuery from '@common/modules/find-statistics/hooks/useKeyStatQuery';
-import { Summary } from '@common/services/types/blocks';
 import React, { ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
@@ -30,69 +27,55 @@ export const KeyStatColumn = ({ children, testId }: KeyStatColumnProps) => {
 
 export interface KeyStatProps {
   children?: ReactNode;
-  releaseId: string;
-  dataBlockId: string;
-  summary?: Summary;
+  title: string;
+  statistic: string;
+  trend?: string;
+  guidanceTitle?: string;
+  guidanceText?: string;
+  hasColumn?: boolean;
   testId?: string;
 }
 
 const KeyStat = ({
   children,
-  summary,
-  releaseId,
-  dataBlockId,
+  title,
+  statistic,
+  trend,
+  guidanceTitle = 'Help',
+  guidanceText,
+  hasColumn = true,
   testId = 'keyStat',
 }: KeyStatProps) => {
-  const { value: keyStat, isLoading, error } = useKeyStatQuery(
-    releaseId,
-    dataBlockId,
+  const body = (
+    <>
+      <KeyStatTile title={title} value={statistic} testId={testId}>
+        {trend && (
+          <p className="govuk-body-s" data-testid={`${testId}-trend`}>
+            {trend}
+          </p>
+        )}
+      </KeyStatTile>
+
+      {guidanceText && (
+        <Details
+          summary={guidanceTitle}
+          className={styles.guidanceTitle}
+          hiddenText={guidanceTitle === 'Help' ? `for ${title}` : undefined}
+        >
+          <div data-testid={`${testId}-guidanceText`}>
+            <ReactMarkdown key={guidanceText}>{guidanceText}</ReactMarkdown>
+          </div>
+        </Details>
+      )}
+
+      {children}
+    </>
   );
 
-  if (error) {
-    return null;
-  }
-
-  const dataDefinitionTitle = summary?.dataDefinitionTitle[0] || 'Help';
-
-  return (
-    <KeyStatColumn testId={testId}>
-      <LoadingSpinner loading={isLoading}>
-        {keyStat && (
-          <>
-            <KeyStatTile
-              title={keyStat.title}
-              value={keyStat.value}
-              testId={testId}
-            >
-              {summary?.dataSummary[0] && (
-                <p className="govuk-body-s" data-testid={`${testId}-summary`}>
-                  {summary.dataSummary[0]}
-                </p>
-              )}
-            </KeyStatTile>
-
-            {summary?.dataDefinition[0] && (
-              <Details
-                summary={dataDefinitionTitle}
-                className={styles.definition}
-                hiddenText={
-                  dataDefinitionTitle === 'Help'
-                    ? `for ${keyStat.title}`
-                    : undefined
-                }
-              >
-                <div data-testid={`${testId}-definition`}>
-                  {summary.dataDefinition.map(data => (
-                    <ReactMarkdown key={data}>{data}</ReactMarkdown>
-                  ))}
-                </div>
-              </Details>
-            )}
-            {children}
-          </>
-        )}
-      </LoadingSpinner>
-    </KeyStatColumn>
+  return hasColumn ? (
+    <KeyStatColumn testId={testId}>{body}</KeyStatColumn>
+  ) : (
+    body
   );
 };
 

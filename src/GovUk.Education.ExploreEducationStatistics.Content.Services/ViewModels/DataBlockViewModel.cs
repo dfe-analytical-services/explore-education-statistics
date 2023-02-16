@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
                 {
                     if (chart is MapChart { BoundaryLevel: null } mapChart)
                     {
-                        mapChart.BoundaryLevel = Query.BoundaryLevel;       
+                        mapChart.BoundaryLevel = Query.BoundaryLevel;
                     }
                 });
                 ChartsInternal = value;

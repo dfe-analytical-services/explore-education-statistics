@@ -14,9 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
     {
         public Task<Either<ActionResult, List<T>>> GetContentBlocks<T>(Guid releaseId) where T : ContentBlock;
 
-        Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSections(
-            Guid releaseId);
-
         Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSections(
             Guid releaseId, Dictionary<Guid, int> newSectionOrder);
 
@@ -27,9 +24,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
             Guid releaseId, Guid contentSectionId, string newHeading);
 
         Task<Either<ActionResult, List<ContentSectionViewModel>>> RemoveContentSection(
-            Guid releaseId, Guid contentSectionId);
-
-        Task<Either<ActionResult, ContentSectionViewModel>> GetContentSection(
             Guid releaseId, Guid contentSectionId);
 
         Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocks(
@@ -44,12 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 
         Task<Either<ActionResult, IContentBlockViewModel>> UpdateTextBasedContentBlock(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request);
-
-        Task<Either<ActionResult, DataBlockViewModel>> UpdateDataBlock(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, DataBlockUpdateRequest request);
-
-        Task<Either<ActionResult, List<T>>> GetUnattachedContentBlocks<T>(Guid releaseId)
-            where T : ContentBlock;
 
         Task<Either<ActionResult, IContentBlockViewModel>> AttachDataBlock(
             Guid releaseId, Guid contentSectionId, ContentBlockAttachRequest request);

@@ -27,6 +27,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
     public class ReleaseServiceTests
     {
+        private static readonly DataBlock Release1DataBlock = new()
+        {
+            Id = Guid.NewGuid(),
+        };
+
         private static readonly Release Release1V1 = new()
         {
             Id = Guid.NewGuid(),
@@ -55,7 +60,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 }
             },
             Version = 0,
-            PreviousVersionId = null
+            PreviousVersionId = null,
+            KeyStatistics = new List<KeyStatistic>
+            {
+                new KeyStatisticDataBlock
+                {
+                    Order = 1,
+                    DataBlock = Release1DataBlock,
+                },
+                new KeyStatisticText { Order = 0 },
+            },
         };
 
         private static readonly Release Release1V2Deleted = new()
@@ -151,11 +165,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             Order = 1,
         };
 
-        private static readonly ContentBlock Release1KeyStatsDataBlock = new DataBlock
-        {
-            Id = Guid.NewGuid(),
-        };
-
         private static readonly ContentSection Release1SummarySection = new()
         {
             Id = Guid.NewGuid(),
@@ -215,19 +224,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             Type = ContentSectionType.Generic
         };
 
-        private static readonly ContentSection Release1KeyStatsSection = new()
-        {
-            Id = Guid.NewGuid(),
-            Order = 2,
-            Heading = "Release 1 key stats section",
-            Caption = "",
-            Type = ContentSectionType.KeyStatistics,
-            Content = new List<ContentBlock>
-            {
-                Release1KeyStatsDataBlock
-            }
-        };
-
         private static readonly List<ReleaseContentSection> ReleaseContentSections = new()
         {
             new ReleaseContentSection
@@ -254,11 +250,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Release = Release1V1,
                 ContentSection = Release1Section3
-            },
-            new ReleaseContentSection
-            {
-                Release = Release1V1,
-                ContentSection = Release1KeyStatsSection
             },
         };
 
@@ -330,12 +321,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal("Academic Year Q1 2018/19", viewModel.Title);
                 Assert.Equal(Release1V1.Published, viewModel.Published);
 
-                var keyStatisticsSection = viewModel.KeyStatisticsSection;
-                Assert.NotNull(keyStatisticsSection);
-                Assert.Equal(Release1KeyStatsSection.Id, keyStatisticsSection.Id);
-                var keyStatisticsSectionContent = keyStatisticsSection.Content;
-                Assert.Single(keyStatisticsSectionContent);
-                Assert.Equal(Release1KeyStatsDataBlock.Id, keyStatisticsSectionContent[0].Id);
+                Assert.Equal(2, viewModel.KeyStatistics.Count);
+
+                Assert.Equal(Release1V1.KeyStatistics[1].Id, viewModel.KeyStatistics[0].Id);
+                Assert.Equal(0, viewModel.KeyStatistics[0].Order);
+                Assert.IsType<KeyStatisticTextViewModel>(viewModel.KeyStatistics[0]);
+
+                Assert.Equal(Release1V1.KeyStatistics[0].Id, viewModel.KeyStatistics[1].Id);
+                Assert.Equal(1, viewModel.KeyStatistics[1].Order);
+                var keyStatDataBlockViewModel = Assert.IsType<KeyStatisticDataBlockViewModel>(viewModel.KeyStatistics[1]);
+                Assert.Equal(Release1DataBlock.Id ,keyStatDataBlockViewModel.DataBlockId);
 
                 var summarySection = viewModel.SummarySection;
                 Assert.NotNull(summarySection);

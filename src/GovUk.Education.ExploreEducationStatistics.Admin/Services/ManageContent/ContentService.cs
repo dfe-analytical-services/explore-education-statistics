@@ -29,6 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     {
         private readonly ContentDbContext _context;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
+        private readonly IKeyStatisticService _keyStatisticService;
         private readonly IReleaseContentSectionRepository _releaseContentSectionRepository;
         private readonly IContentBlockService _contentBlockService;
         private readonly IHubContext<ReleaseContentHub, IReleaseContentHubClient> _hubContext;
@@ -37,6 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
         public ContentService(ContentDbContext context,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
+            IKeyStatisticService keyStatisticService,
             IReleaseContentSectionRepository releaseContentSectionRepository,
             IContentBlockService contentBlockService,
             IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext,
@@ -45,6 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             _context = context;
             _persistenceHelper = persistenceHelper;
+            _keyStatisticService = keyStatisticService;
             _releaseContentSectionRepository = releaseContentSectionRepository;
             _contentBlockService = contentBlockService;
             _hubContext = hubContext;
@@ -58,14 +61,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(release => _releaseContentSectionRepository.GetAllContentBlocks<T>(release.Id));
-        }
-
-        public Task<Either<ActionResult, List<ContentSectionViewModel>>> GetContentSections(
-            Guid releaseId)
-        {
-            return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
-                .OnSuccess(OrderedContentSections);
         }
 
         public Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSections(
@@ -176,12 +171,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     });
         }
 
-        public Task<Either<ActionResult, ContentSectionViewModel>> GetContentSection(Guid releaseId, Guid contentSectionId)
-        {
-            return CheckContentSectionExists(releaseId, contentSectionId)
-                    .OnSuccess(tuple => _mapper.Map<ContentSectionViewModel>(tuple.Item2));
-        }
-
         public Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocks(
             Guid releaseId,
             Guid contentSectionId,
@@ -249,44 +238,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return NotFound<List<IContentBlockViewModel>>();
                     }
 
-                    if (!blockToRemove.ContentSectionId.HasValue)
-                    {
-                        return ValidationActionResult(ContentBlockAlreadyDetached);
-                    }
-
-                    if (blockToRemove.ContentSectionId != contentSectionId)
-                    {
-                        return ValidationActionResult(ContentBlockNotAttachedToThisContentSection);
-                    }
-
                     await _contentBlockService.DeleteContentBlockAndReorder(blockToRemove.Id);
 
+                    if (blockToRemove is DataBlock)
+                    {
+                        // NOTE: Should never be necessary, as data blocks attached to key stats don't have ContentSectionId set
+                        // and we are guaranteed the data block has a ContentSectionId set here
+                        // Remove in EES-3988?
+                        await _keyStatisticService.DeleteAssociatedKeyStatisticDataBlock(blockToRemove.Id);
+                    }
+
+                    _context.ContentSections.Update(section);
+                    await _context.SaveChangesAsync();
                     return OrderedContentBlocks(section);
-                });
-        }
-
-        public Task<Either<ActionResult, DataBlockViewModel>> UpdateDataBlock(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, DataBlockUpdateRequest request)
-        {
-            return CheckContentSectionExists(releaseId, contentSectionId)
-                .OnSuccess(CheckCanUpdateRelease)
-                .OnSuccess(async tuple =>
-                {
-                    var (_, section) = tuple;
-
-                    var blockToUpdate = section.Content.Find(block => block.Id == contentBlockId);
-
-                    if (blockToUpdate == null)
-                    {
-                        return NotFound<DataBlockViewModel>();
-                    }
-
-                    if (!(blockToUpdate is DataBlock dataBlock))
-                    {
-                        return ValidationActionResult(IncorrectContentBlockTypeForUpdate);
-                    }
-
-                    return await UpdateDataBlock(dataBlock, request);
                 });
         }
 
@@ -315,30 +279,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     };
                 })
                 .OnSuccessDo(block => _hubContext.Clients.Group(releaseId.ToString()).ContentBlockUpdated(block));
-        }
-
-        public async Task<Either<ActionResult, List<T>>> GetUnattachedContentBlocks<T>(Guid releaseId)
-            where T : ContentBlock
-        {
-            var unattachedContentBlocks = await _context
-                .ReleaseContentBlocks
-                .Include(join => join.ContentBlock)
-                .Where(join => join.ReleaseId == releaseId)
-                .Select(join => join.ContentBlock)
-                .Where(contentBlock => contentBlock.ContentSectionId == null)
-                .OfType<T>()
-                .ToListAsync();
-
-            if (typeof(T) == typeof(DataBlock))
-            {
-                return unattachedContentBlocks
-                    .OfType<DataBlock>()
-                    .OrderBy(contentBlock => contentBlock.Name)
-                    .OfType<T>()
-                    .ToList();
-            }
-
-            return unattachedContentBlocks;
         }
 
         public Task<Either<ActionResult, IContentBlockViewModel>> AttachDataBlock(Guid releaseId, Guid contentSectionId,
@@ -431,32 +371,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             blockToUpdate.Body = body;
             return await SaveContentBlock<HtmlBlockViewModel>(blockToUpdate);
-        }
-
-        private async Task<Either<ActionResult, DataBlockViewModel>> UpdateDataBlock(DataBlock blockToUpdate,
-            DataBlockUpdateRequest request)
-        {
-            if (blockToUpdate.Summary == null)
-            {
-                blockToUpdate.Summary = new DataBlockSummary();
-            }
-
-            blockToUpdate.Summary.DataDefinitionTitle = new List<string>
-            {
-                request.DataDefinitionTitle
-            };
-
-            blockToUpdate.Summary.DataDefinition = new List<string>
-            {
-                request.DataDefinition
-            };
-
-            blockToUpdate.Summary.DataSummary = new List<string>
-            {
-                request.DataSummary
-            };
-
-            return await SaveContentBlock<DataBlockViewModel>(blockToUpdate);
         }
 
         private async Task<T> SaveContentBlock<T>(ContentBlock blockToUpdate)

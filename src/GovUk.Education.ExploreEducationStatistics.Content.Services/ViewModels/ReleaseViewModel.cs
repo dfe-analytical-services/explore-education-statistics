@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public ContentSectionViewModel? HeadlinesSection { get; }
 
-        public ContentSectionViewModel? KeyStatisticsSection { get; }
+        public List<KeyStatisticViewModel> KeyStatistics { get; }
 
         public ContentSectionViewModel? KeyStatisticsSecondarySection { get; }
 
@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             Content = release.Content;
             SummarySection = release.SummarySection;
             HeadlinesSection = release.HeadlinesSection;
-            KeyStatisticsSection = release.KeyStatisticsSection;
+            KeyStatistics = release.KeyStatistics;
             KeyStatisticsSecondarySection = release.KeyStatisticsSecondarySection;
             RelatedDashboardsSection = release.RelatedDashboardsSection;
             DownloadFiles = release.DownloadFiles;

@@ -1,4 +1,3 @@
-import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStat';
 import { useReleaseContentDispatch } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { ContentSectionKeys } from '@admin/pages/release/content/contexts/ReleaseContentContextActionTypes';
 import releaseContentCommentService, {
@@ -15,19 +14,24 @@ import {
 } from '@admin/services/types/content';
 import { Dictionary } from '@admin/types';
 import { useCallback, useMemo } from 'react';
+import keyStatisticService, {
+  KeyStatisticDataBlockUpdateRequest,
+} from '@admin/services/keyStatisticService';
+import { KeyStatistic } from '@common/services/publicationService';
+import dataBlockService from '@admin/services/dataBlockService';
 
 export default function useReleaseContentActions() {
   const dispatch = useReleaseContentDispatch();
 
-  const updateAvailableDataBlocks = useCallback(
+  const updateUnattachedDataBlocks = useCallback(
     async ({ releaseId }: { releaseId: string }) => {
-      const availableDataBlocks = await releaseContentService.getAvailableDataBlocks(
+      const unattachedDataBlocks = await dataBlockService.getUnattachedDataBlocks(
         releaseId,
       );
 
       dispatch({
-        type: 'SET_AVAILABLE_DATABLOCKS',
-        payload: availableDataBlocks,
+        type: 'SET_UNATTACHED_DATABLOCKS',
+        payload: unattachedDataBlocks,
       });
     },
     [dispatch],
@@ -55,40 +59,9 @@ export default function useReleaseContentActions() {
         payload: { meta: { sectionId, blockId, sectionKey } },
       });
 
-      await updateAvailableDataBlocks({ releaseId });
+      await updateUnattachedDataBlocks({ releaseId });
     },
-    [dispatch, updateAvailableDataBlocks],
-  );
-
-  const updateContentSectionDataBlock = useCallback(
-    async ({
-      releaseId,
-      sectionId,
-      blockId,
-      sectionKey,
-      values,
-    }: {
-      releaseId: string;
-      sectionId: string;
-      blockId: string;
-      sectionKey: ContentSectionKeys;
-      values: KeyStatsFormValues;
-    }) => {
-      const updateBlock = await releaseContentService.updateContentSectionDataBlock(
-        releaseId,
-        sectionId,
-        blockId,
-        values,
-      );
-      dispatch({
-        type: 'UPDATE_SECTION_BLOCK',
-        payload: {
-          meta: { sectionId, blockId, sectionKey },
-          block: updateBlock,
-        },
-      });
-    },
-    [dispatch],
+    [dispatch, updateUnattachedDataBlocks],
   );
 
   const updateContentSectionBlock = useCallback(
@@ -234,9 +207,9 @@ export default function useReleaseContentActions() {
         payload: { meta: { sectionId, sectionKey }, block: newBlock },
       });
 
-      await updateAvailableDataBlocks({ releaseId });
+      await updateUnattachedDataBlocks({ releaseId });
     },
-    [dispatch, updateAvailableDataBlocks],
+    [dispatch, updateUnattachedDataBlocks],
   );
 
   const addEmbedSectionBlock = useCallback(
@@ -339,9 +312,9 @@ export default function useReleaseContentActions() {
         payload: { meta: { sectionId, sectionKey }, block: newBlock },
       });
 
-      await updateAvailableDataBlocks({ releaseId });
+      await updateUnattachedDataBlocks({ releaseId });
     },
-    [dispatch, updateAvailableDataBlocks],
+    [dispatch, updateUnattachedDataBlocks],
   );
 
   const updateSectionBlockOrder = useCallback(
@@ -462,44 +435,126 @@ export default function useReleaseContentActions() {
     [dispatch],
   );
 
+  const addKeyStatisticDataBlock = useCallback(
+    async ({ releaseId, dataBlockId }) => {
+      const keyStatisticDataBlock = await keyStatisticService.createKeyStatisticDataBlock(
+        releaseId,
+        { dataBlockId },
+      );
+      dispatch({
+        type: 'ADD_KEY_STATISTIC',
+        payload: { keyStatistic: keyStatisticDataBlock },
+      });
+    },
+    [dispatch],
+  );
+
+  const updateKeyStatisticDataBlock = useCallback(
+    async ({
+      releaseId,
+      keyStatisticId,
+      request,
+    }: {
+      releaseId: string;
+      keyStatisticId: string;
+      request: KeyStatisticDataBlockUpdateRequest;
+    }) => {
+      const updatedKeyStatisticDataBlock = await keyStatisticService.updateKeyStatisticDataBlock(
+        releaseId,
+        keyStatisticId,
+        request,
+      );
+      dispatch({
+        type: 'UPDATE_KEY_STATISTIC',
+        payload: { keyStatistic: updatedKeyStatisticDataBlock },
+      });
+    },
+    [dispatch],
+  );
+
+  const deleteKeyStatistic = useCallback(
+    async ({
+      releaseId,
+      keyStatisticId,
+    }: {
+      releaseId: string;
+      keyStatisticId: string;
+    }) => {
+      await keyStatisticService.deleteKeyStatistic(releaseId, keyStatisticId);
+
+      dispatch({
+        type: 'REMOVE_KEY_STATISTIC',
+        payload: { keyStatisticId },
+      });
+    },
+    [dispatch],
+  );
+
+  const reorderKeyStatistics = useCallback(
+    async ({
+      releaseId,
+      keyStatistics,
+    }: {
+      releaseId: string;
+      keyStatistics: KeyStatistic[];
+    }) => {
+      const reorderedKeyStatistics = await keyStatisticService.reorderKeyStatistics(
+        releaseId,
+        keyStatistics.map(ks => ks.id),
+      );
+
+      dispatch({
+        type: 'SET_KEY_STATISTICS',
+        payload: { keyStatistics: reorderedKeyStatistics },
+      });
+    },
+    [dispatch],
+  );
+
   return useMemo(
     () => ({
       addBlockComment,
       addContentSection,
       addContentSectionBlock,
       addEmbedSectionBlock,
+      addKeyStatisticDataBlock,
       attachContentSectionBlock,
       deleteBlockComment,
       deleteContentSectionBlock,
       deleteEmbedSectionBlock,
+      deleteKeyStatistic,
       removeContentSection,
-      updateAvailableDataBlocks,
+      reorderKeyStatistics,
+      updateUnattachedDataBlocks,
       updateBlockComment,
       updateContentSectionBlock,
-      updateContentSectionDataBlock,
       updateContentSectionHeading,
       updateContentSectionsOrder,
       updateEmbedSectionBlock,
       updateSectionBlockOrder,
+      updateKeyStatisticDataBlock,
     }),
     [
       addBlockComment,
       addContentSection,
       addContentSectionBlock,
       addEmbedSectionBlock,
+      addKeyStatisticDataBlock,
       attachContentSectionBlock,
       deleteBlockComment,
       deleteContentSectionBlock,
       deleteEmbedSectionBlock,
+      deleteKeyStatistic,
       removeContentSection,
-      updateAvailableDataBlocks,
+      reorderKeyStatistics,
+      updateUnattachedDataBlocks,
       updateBlockComment,
       updateContentSectionBlock,
-      updateContentSectionDataBlock,
       updateContentSectionHeading,
       updateContentSectionsOrder,
       updateEmbedSectionBlock,
       updateSectionBlockOrder,
+      updateKeyStatisticDataBlock,
     ],
   );
 }

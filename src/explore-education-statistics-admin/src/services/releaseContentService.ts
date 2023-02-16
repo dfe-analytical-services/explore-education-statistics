@@ -1,4 +1,3 @@
-import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStat';
 import {
   ContentBlockPostModel,
   ContentBlockPutModel,
@@ -29,7 +28,7 @@ export interface EditableRelease
 
 export interface ReleaseContent {
   release: EditableRelease;
-  availableDataBlocks: DataBlock[];
+  unattachedDataBlocks: DataBlock[];
 }
 
 export interface ContentBlockAttachRequest {
@@ -40,11 +39,6 @@ export interface ContentBlockAttachRequest {
 const releaseContentService = {
   getContent(releaseId: string): Promise<ReleaseContent> {
     return client.get<ReleaseContent>(`/release/${releaseId}/content`);
-  },
-  getContentSections(releaseId: string): Promise<ContentSectionViewModel[]> {
-    return client.get<ContentSectionViewModel[]>(
-      `/release/${releaseId}/content/sections`,
-    );
   },
   addContentSection(
     releaseId: string,
@@ -69,15 +63,6 @@ const releaseContentService = {
     sectionId: string,
   ): Promise<ContentSectionViewModel[]> {
     return client.delete<ContentSectionViewModel[]>(
-      `/release/${releaseId}/content/section/${sectionId}`,
-    );
-  },
-
-  getContentSection(
-    releaseId: string,
-    sectionId: string,
-  ): Promise<ContentSectionViewModel> {
-    return client.get<ContentSectionViewModel>(
       `/release/${releaseId}/content/section/${sectionId}`,
     );
   },
@@ -141,18 +126,6 @@ const releaseContentService = {
     );
   },
 
-  updateContentSectionDataBlock(
-    releaseId: string,
-    contentSectionId: string,
-    contentBlockId: string,
-    newSummary: KeyStatsFormValues,
-  ): Promise<EditableDataBlock> {
-    return client.put<EditableDataBlock>(
-      `/release/${releaseId}/content/section/${contentSectionId}/data-block/${contentBlockId}`,
-      newSummary,
-    );
-  },
-
   updateContentSectionBlocksOrder(
     releaseId: string,
     sectionId: string,
@@ -172,10 +145,6 @@ const releaseContentService = {
     return client.delete(
       `/release/${releaseId}/content/section/${sectionId}/block/${blockId}`,
     );
-  },
-
-  getAvailableDataBlocks(releaseId: string): Promise<DataBlock[]> {
-    return client.get(`/release/${releaseId}/content/available-datablocks`);
   },
 
   attachContentSectionBlock(

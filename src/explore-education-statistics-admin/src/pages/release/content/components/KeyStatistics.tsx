@@ -1,21 +1,19 @@
-import EditableKeyStat from '@admin/components/editable/EditableKeyStat';
-import KeyStatSelectForm from '@admin/pages/release/content/components/KeyStatSelectForm';
+import BlockDroppable from '@admin/components/editable/BlockDroppable';
+import EditableKeyStat from '@admin/pages/release/content/components/EditableKeyStat';
+import KeyStatDataBlockSelectForm from '@admin/pages/release/content/components/KeyStatDataBlockSelectForm';
+import styles from '@admin/pages/release/content/components/KeyStatistics.module.scss';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableRelease } from '@admin/services/releaseContentService';
-import BlockDroppable from '@admin/components/editable/BlockDroppable';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import WarningMessage from '@common/components/WarningMessage';
-import { KeyStatContainer } from '@common/modules/find-statistics/components/KeyStat';
-import styles from '@admin/pages/release/content/components/KeyStatistics.module.scss';
-import keyStatStyles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import useToggle from '@common/hooks/useToggle';
-import React, { useCallback, useState, useEffect } from 'react';
-import { Draggable, DragDropContext, DropResult } from 'react-beautiful-dnd';
-import classNames from 'classnames';
+import { KeyStatContainer } from '@common/modules/find-statistics/components/KeyStat';
+import keyStatStyles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import reorder from '@common/utils/reorder';
-import { Dictionary } from '@admin/types';
-import { ReleaseDataBlock } from '@admin/services/dataBlockService';
+import classNames from 'classnames';
+import React, { useCallback, useEffect, useState } from 'react';
+import { DragDropContext, Draggable, DropResult } from 'react-beautiful-dnd';
 
 export interface KeyStatisticsProps {
   release: EditableRelease;
@@ -23,33 +21,19 @@ export interface KeyStatisticsProps {
 }
 
 const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
-  const {
-    deleteContentSectionBlock,
-    updateContentSectionDataBlock,
-  } = useReleaseContentActions();
-
-  const [keyStatisticsBlocks, setKeyStatisticsBlocks] = useState(
-    release.keyStatisticsSection.content.filter(
-      block => block.type === 'DataBlock',
-    ),
-  );
+  const { reorderKeyStatistics } = useReleaseContentActions();
+  const [keyStatistics, setKeyStatistics] = useState(release.keyStatistics);
 
   useEffect(() => {
-    setKeyStatisticsBlocks(
-      release.keyStatisticsSection.content.filter(
-        block => block.type === 'DataBlock',
-      ),
-    );
+    setKeyStatistics(release.keyStatistics);
   }, [release]);
 
   const [isReordering, toggleReordering] = useToggle(false);
 
-  const { updateSectionBlockOrder } = useReleaseContentActions();
-
   const ReorderKeyStatisticsButton = () => {
     return !isReordering ? (
       <Button variant="secondary" onClick={toggleReordering.on}>
-        Reorder <span className="govuk-visually-hidden">key statistics</span>
+        Reorder<span className="govuk-visually-hidden"> key statistics</span>
       </Button>
     ) : (
       <Button variant="secondary" onClick={saveOrder}>
@@ -58,38 +42,25 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
     );
   };
 
-  const reorderKeyStatistics = useCallback(
-    async (blocks: ReleaseDataBlock[]) => {
-      const order = blocks.reduce<Dictionary<number>>((acc, block, index) => {
-        acc[block.id] = index;
-        return acc;
-      }, {});
-      await updateSectionBlockOrder({
-        releaseId: release.id,
-        sectionId: release.keyStatisticsSection.id,
-        sectionKey: 'keyStatisticsSection',
-        order,
-      });
-    },
-    [release.id, release.keyStatisticsSection.id, updateSectionBlockOrder],
-  );
-
   const saveOrder = useCallback(async () => {
     if (reorderKeyStatistics) {
-      await reorderKeyStatistics(keyStatisticsBlocks);
+      await reorderKeyStatistics({
+        releaseId: release.id,
+        keyStatistics,
+      });
       toggleReordering.off();
     }
-  }, [reorderKeyStatistics, keyStatisticsBlocks, toggleReordering]);
+  }, [reorderKeyStatistics, release.id, keyStatistics, toggleReordering]);
 
   const handleDragEnd = useCallback(
     ({ source, destination }: DropResult) => {
       if (source && destination) {
-        setKeyStatisticsBlocks(
-          reorder(keyStatisticsBlocks, source.index, destination.index),
+        setKeyStatistics(
+          reorder(keyStatistics, source.index, destination.index),
         );
       }
     },
-    [keyStatisticsBlocks],
+    [keyStatistics],
   );
 
   return (
@@ -105,7 +76,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
           </WarningMessage>
           <ButtonGroup className={styles.buttons}>
             <AddKeyStatistics release={release} />
-            {keyStatisticsBlocks.length > 1 && <ReorderKeyStatisticsButton />}
+            {keyStatistics.length > 1 && <ReorderKeyStatisticsButton />}
           </ButtonGroup>
         </>
       )}
@@ -116,13 +87,13 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
         >
           <div className="govuk-!-margin-bottom-9">
             <KeyStatContainer>
-              {keyStatisticsBlocks.map((block, index) => {
+              {keyStatistics.map((keyStat, index) => {
                 return (
                   <Draggable
-                    draggableId={block.id}
+                    draggableId={keyStat.id}
                     index={index}
                     isDragDisabled={!isReordering}
-                    key={block.id}
+                    key={keyStat.id}
                   >
                     {(draggableProvided, snapshot) => (
                       <div
@@ -146,30 +117,11 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                           />
                         )}
                         <EditableKeyStat
-                          key={block.id}
-                          name={block.name}
+                          key={keyStat.id}
+                          keyStat={keyStat}
                           releaseId={release.id}
-                          dataBlockId={block.id}
-                          summary={block.summary}
                           isEditing={isEditing}
                           isReordering={isReordering}
-                          onRemove={async () => {
-                            await deleteContentSectionBlock({
-                              releaseId: release.id,
-                              sectionId: release.keyStatisticsSection.id,
-                              blockId: block.id,
-                              sectionKey: 'keyStatisticsSection',
-                            });
-                          }}
-                          onSubmit={async values => {
-                            await updateContentSectionDataBlock({
-                              releaseId: release.id,
-                              sectionId: release.keyStatisticsSection.id,
-                              blockId: block.id,
-                              sectionKey: 'keyStatisticsSection',
-                              values,
-                            });
-                          }}
                         />
                       </div>
                     )}
@@ -186,33 +138,29 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
 
 const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
-  const { attachContentSectionBlock } = useReleaseContentActions();
+  const {
+    updateUnattachedDataBlocks,
+    addKeyStatisticDataBlock,
+  } = useReleaseContentActions();
 
-  const { keyStatisticsSection } = release;
+  const { keyStatistics } = release;
 
-  const addKeyStatToSection = useCallback(
+  const addKeyStatDataBlock = useCallback(
     async (dataBlockId: string) => {
-      await attachContentSectionBlock({
-        releaseId: release.id,
-        sectionId: release.keyStatisticsSection.id,
-        sectionKey: 'keyStatisticsSection',
-        block: {
-          contentBlockId: dataBlockId,
-          order: release.keyStatisticsSection.content.length || 0,
-        },
-      });
+      await addKeyStatisticDataBlock({ releaseId: release.id, dataBlockId });
+      await updateUnattachedDataBlocks({ releaseId: release.id });
       setIsFormOpen(false);
     },
-    [release.id, release.keyStatisticsSection, attachContentSectionBlock],
+    [release.id, addKeyStatisticDataBlock, updateUnattachedDataBlocks],
   );
 
   return (
     <>
       {isFormOpen ? (
         <div className={styles.formContainer}>
-          <KeyStatSelectForm
+          <KeyStatDataBlockSelectForm
             releaseId={release.id}
-            onSelect={addKeyStatToSection}
+            onSelect={addKeyStatDataBlock}
             onCancel={() => setIsFormOpen(false)}
           />
         </div>
@@ -222,9 +170,7 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
             setIsFormOpen(true);
           }}
         >
-          {`Add ${
-            keyStatisticsSection.content.length > 0 ? 'another ' : ''
-          }key statistic`}
+          {`Add ${keyStatistics.length > 0 ? 'another ' : ''}key statistic`}
         </Button>
       )}
     </>

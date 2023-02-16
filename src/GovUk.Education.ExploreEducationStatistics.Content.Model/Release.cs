@@ -82,6 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [JsonIgnore]
         public List<ReleaseContentBlock> ContentBlocks { get; set; } = new();
 
+        public List<KeyStatistic> KeyStatistics { get; set; } = new();
+
         public string PreReleaseAccessList { get; set; } = string.Empty;
 
         public string DataGuidance { get; set; } = string.Empty;
@@ -108,9 +110,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 }
 
                 return Content
-                    .Select(join => join.ContentSection)
-                    .ToList()
-                    .FindAll(section => section.Type == ContentSectionType.Generic)
+                    .Where(rcs => rcs.ContentSection.Type == ContentSectionType.Generic)
+                    .Select(rcs => rcs.ContentSection)
                     .ToImmutableList();
             }
             set => ReplaceContentSectionsOfType(ContentSectionType.Generic, value);
@@ -142,13 +143,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 Release = this,
                 ContentBlock = contentBlock
             });
-        }
-
-        [NotMapped]
-        public ContentSection KeyStatisticsSection
-        {
-            get => FindSingleSectionByType(ContentSectionType.KeyStatistics);
-            set => ReplaceContentSectionsOfType(ContentSectionType.KeyStatistics, new List<ContentSection> { value });
         }
 
         [NotMapped]
@@ -202,8 +196,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             Content.RemoveAll(join => join.ContentSection.Type == type);
             Content.AddRange(replacementSections.Select(section => new ReleaseContentSection
             {
-               Release = this,
-               ContentSection = section,
+                Release = this,
+                ContentSection = section,
             }));
         }
 
@@ -250,7 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             // shouldn't have to deal with the same content blocks being
             // referenced in multiple places.
             // TODO: EES-1306 may be possible to remove this as part of this ticket
-            public Dictionary<ContentBlock, ContentBlock> ContentBlocks { get; } = new();
+            public Dictionary<ContentBlock, ContentBlock> OriginalToAmendmentContentBlockMap { get; } = new();
 
             public Release NewRelease { get; }
 

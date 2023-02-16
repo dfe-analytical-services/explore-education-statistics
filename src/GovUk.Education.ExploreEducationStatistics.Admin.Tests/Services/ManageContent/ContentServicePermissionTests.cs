@@ -217,27 +217,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 );
         }
 
-        [Fact]
-        public async Task UpdateDataBlock()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupContentService(userService: userService.Object);
-                        return service.UpdateDataBlock(
-                            _release.Id,
-                            ContentSectionId,
-                            ContentBlockId,
-                            new DataBlockUpdateRequest());
-                    }
-                );
-        }
-
         private ContentService SetupContentService(
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
+            IKeyStatisticService keyStatisticService = null,
             IReleaseContentSectionRepository releaseContentSectionRepository = null,
             IContentBlockService contentBlockService = null,
             IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext = null,
@@ -246,6 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             return new ContentService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
+                keyStatisticService ?? Mock.Of<IKeyStatisticService>(),
                 releaseContentSectionRepository ?? new ReleaseContentSectionRepository(contentDbContext),
                 contentBlockService ?? Mock.Of<IContentBlockService>(),
                 hubContext ?? Mock.Of<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(),

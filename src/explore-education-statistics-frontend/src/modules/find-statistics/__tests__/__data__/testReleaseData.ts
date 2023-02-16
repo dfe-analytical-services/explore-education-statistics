@@ -187,13 +187,7 @@ export const testRelease: Release = {
       },
     ],
   },
-  keyStatisticsSection: {
-    id: 'key-stats-id',
-    order: 1,
-    heading: '',
-    caption: '',
-    content: [],
-  },
+  keyStatistics: [],
   keyStatisticsSecondarySection: {
     id: 'key-stats-secondary-id',
     order: 1,

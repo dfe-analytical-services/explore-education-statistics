@@ -24,13 +24,13 @@ const DataBlockSelectForm = ({
   hideCancel = false,
   label = 'Select a data block',
 }: Props) => {
-  const { availableDataBlocks, release } = useReleaseContentState();
+  const { unattachedDataBlocks, release } = useReleaseContentState();
   const [selectedDataBlockId, setSelectedDataBlockId] = useState('');
 
   const getChartFile = useGetChartFile(release.id);
 
   const getDataBlockPreview = (dataBlockId: string) => {
-    const selectedDataBlock = availableDataBlocks.find(
+    const selectedDataBlock = unattachedDataBlocks.find(
       dataBlock => dataBlock.id === dataBlockId,
     );
     return selectedDataBlock ? (
@@ -66,7 +66,7 @@ const DataBlockSelectForm = ({
             label: 'Select a data block',
             value: '',
           },
-          ...availableDataBlocks.map(dataBlock => ({
+          ...unattachedDataBlocks.map(dataBlock => ({
             label: dataBlock.name || '',
             value: dataBlock.id || '',
           })),

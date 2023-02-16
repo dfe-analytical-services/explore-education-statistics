@@ -134,13 +134,13 @@ Add a key statistics tile
 
 Edit the guidance information for the key statistics tile
     user clicks the nth key stats tile button    1    Edit
-    user enters text into element    css:input[name="dataSummary"]    Down from last year
+    user enters text into element    css:input[name="trend"]    Down from last year
     user enters text into element    label:Guidance title    Learn more about open settings
     # Tab into the CK Editor guidance text editor
     user presses keys    TAB
     user presses keys    Some information about about open settings
     user clicks the nth key stats tile button    1    Save
-    user waits until page does not contain element    css:input[name="dataSummary"]    %{WAIT_MEDIUM}
+    user waits until page does not contain element    css:input[name="trend"]    %{WAIT_MEDIUM}
 
 Check the guidance information for the key statistics tile
     user waits until page contains    Down from last year    %{WAIT_MEDIUM}
@@ -208,4 +208,4 @@ user clicks the nth key stats tile button
     [Arguments]
     ...    ${tile_number}
     ...    ${button_text}
-    user clicks element    //*[@data-testid="keyStat"][${tile_number}]//button[.="${button_text}"]
+    user clicks element    //*[@data-testid="keyStat"][${tile_number}]//button[contains(., "${button_text}")]

@@ -248,12 +248,7 @@ export const testPublicationRelease: Release = {
     heading: '',
     content: [],
   },
-  keyStatisticsSection: {
-    id: '',
-    order: 0,
-    heading: '',
-    content: [],
-  },
+  keyStatistics: [],
   keyStatisticsSecondarySection: {
     id: '',
     order: 0,

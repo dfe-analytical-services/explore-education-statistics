@@ -3,9 +3,9 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Details from '@common/components/Details';
 import { FormSelect } from '@common/components/form';
-import KeyStat from '@common/modules/find-statistics/components/KeyStat';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo, useState } from 'react';
+import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStatDataBlock';
 
 interface Props {
   releaseId: string;
@@ -15,18 +15,18 @@ interface Props {
   label?: string;
 }
 
-const KeyStatSelectForm = ({
+const KeyStatDataBlockSelectForm = ({
   releaseId,
   onSelect,
   onCancel = () => {},
   hideCancel = false,
   label = 'Select a key statistic',
 }: Props) => {
-  const { availableDataBlocks } = useReleaseContentState();
+  const { unattachedDataBlocks } = useReleaseContentState();
   const [selectedDataBlockId, setSelectedDataBlockId] = useState('');
 
   const keyStatDataBlocks = useMemo(() => {
-    return availableDataBlocks.filter(dataBlock => {
+    return unattachedDataBlocks.filter(dataBlock => {
       const { indicators, locationIds, timePeriod } = dataBlock.query;
 
       return (
@@ -37,10 +37,10 @@ const KeyStatSelectForm = ({
         // there is a single result
       );
     });
-  }, [availableDataBlocks]);
+  }, [unattachedDataBlocks]);
 
   function getKeyStatPreview() {
-    const selectedDataBlock = availableDataBlocks.find(
+    const selectedDataBlock = unattachedDataBlocks.find(
       dataBlock => dataBlock.id === selectedDataBlockId,
     );
     return selectedDataBlock ? (
@@ -50,8 +50,7 @@ const KeyStatSelectForm = ({
           summary="Key statistic preview"
           open
         >
-          <KeyStat
-            summary={selectedDataBlock.summary}
+          <KeyStatDataBlock
             releaseId={releaseId}
             dataBlockId={selectedDataBlock.id}
           />
@@ -100,4 +99,4 @@ const KeyStatSelectForm = ({
   );
 };
 
-export default KeyStatSelectForm;
+export default KeyStatDataBlockSelectForm;
