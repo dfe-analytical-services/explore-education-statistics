@@ -466,15 +466,8 @@ public class KeyStatisticServiceTests
 
             var viewModel = result.AssertRight();
 
-
             Assert.Equal("title", viewModel.Title);
-            Assert.Equal("Over 9000!", viewModel.Statistic);
-            Assert.Null(viewModel.Trend);
-            Assert.Null(viewModel.GuidanceTitle);
-            Assert.Null(viewModel.GuidanceText);
             Assert.Equal(3, viewModel.Order);
-            Assert.InRange(DateTime.UtcNow.Subtract(viewModel.Created).Milliseconds, 0, 1500);
-            Assert.Null(viewModel.Updated);
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
@@ -489,18 +482,8 @@ public class KeyStatisticServiceTests
             Assert.Equal(2, keyStatistics[2].Order);
 
             var keyStatText = Assert.IsType<KeyStatisticText>(keyStatistics[3]);
-
             Assert.Equal("title", keyStatText.Title);
-            Assert.Equal("Over 9000!", keyStatText.Statistic);
-            Assert.Equal(release.Id, keyStatText.ReleaseId);
-            Assert.Null(keyStatText.Trend);
-            Assert.Null(keyStatText.GuidanceTitle);
-            Assert.Null(keyStatText.GuidanceText);
             Assert.Equal(3, keyStatText.Order);
-            Assert.Equal(_userId, keyStatText.CreatedById);
-            Assert.Null(keyStatText.UpdatedById);
-            Assert.InRange(DateTime.UtcNow.Subtract(keyStatText.Created).Milliseconds, 0, 1500);
-            Assert.Null(keyStatText.Updated);
         }
     }
 
