@@ -1,7 +1,10 @@
 import EditableKeyStatDataBlock from '@admin/pages/release/content/components/EditableKeyStatDataBlock';
 import { KeyStatDataBlockFormValues } from '@admin/pages/release/content/components/EditableKeyStatDataBlockForm';
 import _keyStatisticService from '@admin/services/keyStatisticService';
-import { KeyStatisticDataBlock } from '@common/services/publicationService';
+import {
+  KeyStatisticDataBlock,
+  KeyStatisticType,
+} from '@common/services/publicationService';
 import _tableBuilderService, {
   TableDataResponse,
 } from '@common/services/tableBuilderService';
@@ -70,7 +73,7 @@ describe('EditableKeyStatDataBlock', () => {
   };
 
   const keyStatDataBlock: KeyStatisticDataBlock = {
-    type: 'KeyStatisticDataBlock',
+    type: KeyStatisticType.DATABLOCK,
     id: 'keyStatDataBlock-1',
     trend: 'DataBlock trend',
     guidanceTitle: 'DataBlock guidance title',

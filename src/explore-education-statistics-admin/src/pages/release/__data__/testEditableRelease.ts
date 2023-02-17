@@ -1,8 +1,5 @@
 import { EditableRelease } from '@admin/services/releaseContentService';
-import {
-  KeyStatisticDataBlock,
-  KeyStatisticText,
-} from '@common/services/publicationService';
+import { KeyStatisticType } from '@common/services/publicationService';
 import { Table } from '@common/services/types/blocks';
 
 const emptyTable: Table = {
@@ -58,7 +55,7 @@ export const testEditableRelease: EditableRelease = {
   ],
   keyStatistics: [
     {
-      type: 'KeyStatisticDataBlock',
+      type: KeyStatisticType.DATABLOCK,
       id: 'keyStat-1',
       dataBlockId: 'dataBlock-1',
       trend: 'keyStat-1 trend',
@@ -66,7 +63,7 @@ export const testEditableRelease: EditableRelease = {
       created: '2023-01-01',
     },
     {
-      type: 'KeyStatisticText',
+      type: KeyStatisticType.TEXT,
       id: 'keyStat-2',
       title: 'KeyStat-2 title',
       statistic: 'KeyStat-2 value',
@@ -77,7 +74,7 @@ export const testEditableRelease: EditableRelease = {
       created: '2023-01-02',
     },
     {
-      type: 'KeyStatisticDataBlock',
+      type: KeyStatisticType.DATABLOCK,
       id: 'keyStat-3',
       dataBlockId: 'dataBlock-2',
       guidanceText: 'KeyStat-3 guidanceText',

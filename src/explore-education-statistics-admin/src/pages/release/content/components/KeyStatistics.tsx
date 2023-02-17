@@ -5,7 +5,6 @@ import styles from '@admin/pages/release/content/components/KeyStatistics.module
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
-import ButtonGroup from '@common/components/ButtonGroup';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { KeyStatContainer } from '@common/modules/find-statistics/components/KeyStat';
@@ -14,6 +13,9 @@ import reorder from '@common/utils/reorder';
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useState } from 'react';
 import { DragDropContext, Draggable, DropResult } from 'react-beautiful-dnd';
+import { KeyStatisticType } from '@common/services/publicationService';
+import { KeyStatisticTextCreateRequest } from '@admin/services/keyStatisticService';
+import EditableKeyStatTextForm from '@admin/pages/release/content/components/EditableKeyStatTextForm';
 
 export interface KeyStatisticsProps {
   release: EditableRelease;
@@ -67,17 +69,9 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
     <>
       {isEditing && (
         <>
-          <WarningMessage>
-            In order to add a key statistic you first need to create a data
-            block with just one value.
-            <br />
-            Any data blocks with more than one value cannot be selected as a key
-            statistic.
-          </WarningMessage>
-          <ButtonGroup className={styles.buttons}>
-            <AddKeyStatistics release={release} />
-            {keyStatistics.length > 1 && <ReorderKeyStatisticsButton />}
-          </ButtonGroup>
+          <AddKeyStatistics release={release} />
+          <hr />
+          {keyStatistics.length > 1 && <ReorderKeyStatisticsButton />}
         </>
       )}
       <DragDropContext onDragEnd={handleDragEnd}>
@@ -137,44 +131,93 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
 };
 
 const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
-  const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
+  const [formOpenForType, setFormOpenForType] = useState<
+    KeyStatisticType | undefined
+  >(undefined);
   const {
     updateUnattachedDataBlocks,
     addKeyStatisticDataBlock,
+    addKeyStatisticText,
   } = useReleaseContentActions();
-
-  const { keyStatistics } = release;
 
   const addKeyStatDataBlock = useCallback(
     async (dataBlockId: string) => {
       await addKeyStatisticDataBlock({ releaseId: release.id, dataBlockId });
       await updateUnattachedDataBlocks({ releaseId: release.id });
-      setIsFormOpen(false);
+      setFormOpenForType(undefined);
     },
     [release.id, addKeyStatisticDataBlock, updateUnattachedDataBlocks],
   );
 
-  return (
-    <>
-      {isFormOpen ? (
-        <div className={styles.formContainer}>
+  const addKeyStatText = useCallback(
+    async (newKeyStatText: KeyStatisticTextCreateRequest) => {
+      await addKeyStatisticText({
+        releaseId: release.id,
+        keyStatisticText: newKeyStatText,
+      });
+      setFormOpenForType(undefined);
+    },
+    [release.id, addKeyStatisticText],
+  );
+
+  switch (formOpenForType) {
+    case KeyStatisticType.DATABLOCK:
+      return (
+        <div className={styles.keyStatDataBlockFormContainer}>
+          <WarningMessage>
+            In order to add a key statistic from a data block, you first need to
+            create a data block with just one value.
+            <br />
+            Any data blocks with more than one value cannot be selected as a key
+            statistic.
+          </WarningMessage>
           <KeyStatDataBlockSelectForm
             releaseId={release.id}
             onSelect={addKeyStatDataBlock}
-            onCancel={() => setIsFormOpen(false)}
+            onCancel={() => setFormOpenForType(undefined)}
           />
         </div>
-      ) : (
-        <Button
-          onClick={() => {
-            setIsFormOpen(true);
-          }}
-        >
-          {`Add ${keyStatistics.length > 0 ? 'another ' : ''}key statistic`}
-        </Button>
-      )}
-    </>
-  );
+      );
+    case KeyStatisticType.TEXT:
+      return (
+        <div className={styles.keyStatTextFormContainer}>
+          <EditableKeyStatTextForm
+            onSubmit={values =>
+              addKeyStatText(values as KeyStatisticTextCreateRequest)
+            }
+            onCancel={() => setFormOpenForType(undefined)}
+            testId="keyStatText-createForm"
+          />
+        </div>
+      );
+    default:
+      return (
+        <>
+          <ul className="govuk-list">
+            <li>
+              <Button
+                onClick={() => {
+                  setFormOpenForType(KeyStatisticType.DATABLOCK);
+                }}
+                className="govuk-!-margin-bottom-2"
+              >
+                Add key statistic from data block
+              </Button>
+            </li>
+            <li>
+              <Button
+                onClick={() => {
+                  setFormOpenForType(KeyStatisticType.TEXT);
+                }}
+                className="govuk-!-margin-bottom-2"
+              >
+                Add free text key statistic
+              </Button>
+            </li>
+          </ul>
+        </>
+      );
+  }
 };
 
 export default KeyStatistics;

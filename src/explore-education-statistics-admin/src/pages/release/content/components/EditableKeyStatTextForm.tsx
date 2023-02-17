@@ -7,10 +7,12 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import { Form, FormFieldTextInput } from '@common/components/form';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
-import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
+import tileStyles from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
 import { KeyStatisticText } from '@common/services/publicationService';
 import { Formik } from 'formik';
 import React from 'react';
+import classNames from 'classnames';
+import Yup from '@common/validation/yup';
 
 export interface KeyStatTextFormValues {
   title: string;
@@ -21,19 +23,19 @@ export interface KeyStatTextFormValues {
 }
 
 interface EditableKeyStatTextFormProps {
-  keyStat: KeyStatisticText;
-  isReordering?: boolean;
+  keyStat?: KeyStatisticText;
   onSubmit: (values: KeyStatTextFormValues) => void;
   onCancel: () => void;
-  testId?: string;
+  isReordering?: boolean;
+  testId: string;
 }
 
 export default function EditableKeyStatTextForm({
   keyStat,
-  isReordering,
-  testId = 'keyStat',
   onSubmit,
   onCancel,
+  isReordering,
+  testId,
 }: EditableKeyStatTextFormProps) {
   const handleSubmit = useFormSubmit<KeyStatTextFormValues>(async values => {
     await onSubmit({
@@ -44,62 +46,84 @@ export default function EditableKeyStatTextForm({
   });
 
   return (
-    <Formik<KeyStatTextFormValues>
-      initialValues={{
-        title: keyStat.title ?? '',
-        statistic: keyStat.statistic ?? '',
-        trend: keyStat.trend ?? '',
-        guidanceTitle: keyStat.guidanceTitle ?? 'Help',
-        guidanceText: keyStat.guidanceText ? toHtml(keyStat.guidanceText) : '',
-      }}
-      onSubmit={handleSubmit}
-    >
-      {form => (
-        <Form id={`editableKeyStatForm-${keyStat.id}`}>
-          <KeyStatTile
-            title={keyStat.title}
-            value={keyStat.statistic}
-            titleTag="h4"
-            testId={testId}
-            isReordering={isReordering}
+    <div data-testId={testId}>
+      <Formik<KeyStatTextFormValues>
+        initialValues={{
+          title: keyStat?.title ?? '',
+          statistic: keyStat?.statistic ?? '',
+          trend: keyStat?.trend ?? '',
+          guidanceTitle: keyStat?.guidanceTitle ?? 'Help',
+          guidanceText: keyStat?.guidanceText
+            ? toHtml(keyStat.guidanceText)
+            : '',
+        }}
+        validationSchema={Yup.object<KeyStatTextFormValues>({
+          title: Yup.string().required('Enter a title'),
+          statistic: Yup.string().required('Enter a statistic'),
+          trend: Yup.string(),
+          guidanceTitle: Yup.string(),
+          guidanceText: Yup.string(),
+        })}
+        onSubmit={handleSubmit}
+      >
+        {form => (
+          <Form
+            id={
+              keyStat
+                ? `editableKeyStatTextForm-${keyStat.id}`
+                : 'editableKeyStatTextForm-create'
+            }
           >
-            {/* TODO: EES-2469 Inputs for title/statistic have just been added with no testing / consideration for styling / user experience etc. */}
-            <FormFieldTextInput<KeyStatTextFormValues>
-              name="title"
-              label={<span className={styles.trendText}>Title</span>}
-            />
-            <FormFieldTextInput<KeyStatTextFormValues>
-              name="statistic"
-              label={<span className={styles.trendText}>Statistic</span>}
-            />
-            <FormFieldTextInput<KeyStatTextFormValues>
-              name="trend"
-              label={<span className={styles.trendText}>Trend</span>}
-            />
-          </KeyStatTile>
+            <div className={tileStyles.tile}>
+              <FormFieldTextInput<KeyStatTextFormValues>
+                name="title"
+                className={classNames(
+                  'govuk-!-margin-bottom-6',
+                  isReordering && 'govuk-!-width-one-third',
+                )}
+                label={<span className={styles.titleText}>Title</span>}
+              />
+              <FormFieldTextInput<KeyStatTextFormValues>
+                name="statistic"
+                className={classNames(
+                  'govuk-!-margin-bottom-6',
+                  isReordering && 'govuk-!-width-one-third',
+                )}
+                label={<span className={styles.statisticText}>Statistic</span>}
+              />
+              <FormFieldTextInput<KeyStatTextFormValues>
+                name="trend"
+                className={classNames(
+                  isReordering && 'govuk-!-width-one-third',
+                )}
+                label={<span className={styles.trendText}>Trend</span>}
+              />
+            </div>
 
-          <FormFieldTextInput<KeyStatTextFormValues>
-            formGroupClass="govuk-!-margin-top-2"
-            name="guidanceTitle"
-            label="Guidance title"
-          />
+            <FormFieldTextInput<KeyStatTextFormValues>
+              formGroupClass="govuk-!-margin-top-2"
+              name="guidanceTitle"
+              className={classNames(isReordering && 'govuk-!-width-one-third')}
+              label="Guidance title"
+            />
 
-          <FormFieldEditor<KeyStatTextFormValues>
-            name="guidanceText"
-            toolbarConfig={toolbarConfigs.simple}
-            label="Guidance text"
-          />
+            <FormFieldEditor<KeyStatTextFormValues>
+              name="guidanceText"
+              toolbarConfig={toolbarConfigs.simple}
+              label="Guidance text"
+            />
 
-          <ButtonGroup>
-            <Button disabled={form.isSubmitting} type="submit">
-              Save
-            </Button>
-            <Button variant="secondary" onClick={onCancel}>
-              Cancel
-            </Button>
-          </ButtonGroup>
-        </Form>
-      )}
-    </Formik>
+            <ButtonGroup>
+              <Button disabled={form.isSubmitting} type="submit">
+                Save
+              </Button>
+              <Button variant="secondary" onClick={onCancel}>
+                Cancel
+              </Button>
+            </ButtonGroup>
+          </Form>
+        )}
+      </Formik>
+    </div>
   );
 }

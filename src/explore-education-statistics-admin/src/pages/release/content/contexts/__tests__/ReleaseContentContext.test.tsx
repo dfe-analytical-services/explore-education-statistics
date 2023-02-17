@@ -13,6 +13,7 @@ import {
 import {
   ContentSection,
   KeyStatisticDataBlock,
+  KeyStatisticType,
 } from '@common/services/publicationService';
 import { DataBlock, Table } from '@common/services/types/blocks';
 import { produce } from 'immer';
@@ -631,7 +632,7 @@ describe('ReleaseContentContext', () => {
   test('ADD_KEY_STATISTIC adds a key statistic to release.keyStatistics array', () => {
     expect(testEditableRelease.keyStatistics).toHaveLength(3);
     const newKeyStat: KeyStatisticDataBlock = {
-      type: 'KeyStatisticDataBlock',
+      type: KeyStatisticType.DATABLOCK,
       id: 'keyStat-4',
       dataBlockId: 'dataBlock-0',
       trend: 'keyStat-4 trend',

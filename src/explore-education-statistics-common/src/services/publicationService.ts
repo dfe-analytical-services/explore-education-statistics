@@ -93,13 +93,19 @@ export interface KeyStatisticBase {
   updated?: string;
 }
 
+// eslint-disable-next-line no-shadow
+export enum KeyStatisticType {
+  DATABLOCK = 'KeyStatisticDataBlock',
+  TEXT = 'KeyStatisticText',
+}
+
 export interface KeyStatisticDataBlock extends KeyStatisticBase {
-  type: 'KeyStatisticDataBlock';
+  type: KeyStatisticType.DATABLOCK;
   dataBlockId: string;
 }
 
 export interface KeyStatisticText extends KeyStatisticBase {
-  type: 'KeyStatisticText';
+  type: KeyStatisticType.TEXT;
   title: string;
   statistic: string;
 }

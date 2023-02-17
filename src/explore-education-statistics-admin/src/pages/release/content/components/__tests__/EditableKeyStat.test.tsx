@@ -6,6 +6,7 @@ import _keyStatisticService from '@admin/services/keyStatisticService';
 import {
   KeyStatisticDataBlock,
   KeyStatisticText,
+  KeyStatisticType,
 } from '@common/services/publicationService';
 import _tableBuilderService, {
   TableDataResponse,
@@ -37,15 +38,15 @@ const dataBlockService = _dataBlockService as jest.Mocked<
 describe('EditableKeyStat', () => {
   describe('for `KeyStatisticText` type', () => {
     const keyStatText: KeyStatisticText = {
-      type: 'KeyStatisticText',
+      type: KeyStatisticType.TEXT,
       id: 'keyStatDataBlock-1',
+      title: 'Text title',
+      statistic: 'Over 9000',
       trend: 'Text trend',
       guidanceTitle: 'Text guidance title',
       guidanceText: 'Text guidance text',
       order: 0,
       created: '2023-01-01',
-      title: 'Text title',
-      statistic: 'Over 9000',
     };
 
     test('renders correctly', async () => {
@@ -138,7 +139,7 @@ describe('EditableKeyStat', () => {
     };
 
     const keyStatDataBlock: KeyStatisticDataBlock = {
-      type: 'KeyStatisticDataBlock',
+      type: KeyStatisticType.DATABLOCK,
       id: 'keyStatDataBlock-1',
       trend: 'Trend',
       guidanceTitle: 'Guidance title',
