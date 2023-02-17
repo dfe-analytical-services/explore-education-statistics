@@ -16,52 +16,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
     public class FootnoteRepositoryTests
     {
         private readonly DataFixture _fixture = new();
-        private readonly Generator<Release> _releaseGenerator;
-        private readonly Generator<Footnote> _footnoteGenerator;
-        private readonly Generator<ReleaseFootnote> _releaseFootnoteGenerator;
-        private readonly Generator<ReleaseSubject> _releaseSubjectGenerator;
-        private readonly Generator<Subject> _subjectsGenerator;
-        private readonly Generator<Filter> _filterGenerator;
-        private readonly Generator<FilterGroup> _filterGroupGenerator;
-        private readonly Generator<FilterItem> _filterItemGenerator;
-        private readonly Generator<IndicatorGroup> _indicatorGroupGenerator;
-        private readonly Generator<Indicator> _indicatorGenerator;
-
-        public FootnoteRepositoryTests()
-        {
-            _releaseGenerator = _fixture.Generator<Release>();
-            _footnoteGenerator = _fixture.DefaultFootnote();
-            _releaseFootnoteGenerator = _fixture.Generator<ReleaseFootnote>();
-            _releaseSubjectGenerator = _fixture.Generator<ReleaseSubject>();
-            _subjectsGenerator = _fixture.DefaultSubject();
-            _filterGenerator = _fixture.DefaultFilter();
-            _filterGroupGenerator = _fixture.DefaultFilterGroup();
-            _filterItemGenerator = _fixture.DefaultFilterItem();
-            _indicatorGroupGenerator = _fixture.DefaultIndicatorGroup();
-            _indicatorGenerator = _fixture.DefaultIndicator();
-        }
 
         [Fact]
         public async Task GetFilteredFootnotes()
         {
-            var release = _releaseGenerator.Generate();
+            var release = _fixture.DefaultRelease().Generate();
             
-            var subject1Filters = _filterGenerator
-                .WithFilterGroups(_ => _filterGroupGenerator
-                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+            var subject1Filters = _fixture.DefaultFilter()
+                .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
+                    .WithFilterItems(_ => _fixture.DefaultFilterItem().GenerateList(1))
                     .GenerateList(1))
                 .GenerateList(3);
             
-            var (subject1, subject2) = _subjectsGenerator
+            var (subject1, subject2) = _fixture.DefaultSubject()
                 .ForIndex(0, s => s.SetFilters(subject1Filters))
                 .GenerateTuple2();
 
-            var subject1IndicatorGroup1 = _indicatorGroupGenerator
-                .WithIndicators(_indicatorGenerator.GenerateList(1))
+            var subject1IndicatorGroup1 = _fixture.DefaultIndicatorGroup()
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
                 .WithSubject(subject1)
                 .Generate();
 
-            var footnotes = _footnoteGenerator
+            var footnotes = _fixture.DefaultFootnote()
                 .ForIndex(0, s => s
                     .Set(f => f.Content, "Applies to subject 1")
                     .SetSubjects(_ => ListOf(subject1)))
@@ -93,12 +69,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     .SetSubjects(_ => ListOf(subject2)))
                 .GenerateList();
             
-            var releaseFootnotes = _releaseFootnoteGenerator
+            var releaseFootnotes = _fixture.DefaultReleaseFootnote()
                 .ForInstance(s => s.Set(rf => rf.Release, release))
                 .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
                 .GenerateList(footnotes.Count);
 
-            var releaseSubjects = _releaseSubjectGenerator
+            var releaseSubjects = _fixture.DefaultReleaseSubject()
                 .ForInstance(s => s.Set(rs => rs.Release, release))
                 .ForIndex(0, s => s.Set(rs => rs.Subject, subject1))
                 .ForIndex(1, s => s.Set(rs => rs.Subject, subject2))
@@ -165,38 +141,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task GetFilteredFootnotes_FilterBySubject()
         {
-            var release = _releaseGenerator.Generate();
+            var release = _fixture.DefaultRelease().Generate();
             
             // todo a default one with new filtergroups and all?
-            var subject1Filter = _filterGenerator
-                .WithFilterGroups(_ => _filterGroupGenerator
-                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+            var subject1Filter = _fixture.DefaultFilter()
+                .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
+                    .WithFilterItems(_ => _fixture.DefaultFilterItem().GenerateList(1))
                     .GenerateList(1))
                 .Generate();
             
-            var subject2Filter = _filterGenerator
-                .WithFilterGroups(_ => _filterGroupGenerator
-                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+            var subject2Filter = _fixture.DefaultFilter()
+                .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
+                    .WithFilterItems(_ => _fixture.DefaultFilterItem().GenerateList(1))
                     .GenerateList(1))
                 .Generate();
             
-            var (subject1, subject2) = _subjectsGenerator
+            var (subject1, subject2) = _fixture.DefaultSubject()
                 .ForIndex(0, s => s.SetFilters(ListOf(subject1Filter)))
                 .ForIndex(1, s => s.SetFilters(ListOf(subject2Filter)))
                 .GenerateTuple2();
 
-            var subject1IndicatorGroup = _indicatorGroupGenerator
-                .WithIndicators(_indicatorGenerator.GenerateList(1))
+            var subject1IndicatorGroup = _fixture.DefaultIndicatorGroup()
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
                 .WithSubject(subject1)
                 .Generate();
 
-            var subject2IndicatorGroup = _indicatorGroupGenerator
-                .WithIndicators(_indicatorGenerator.GenerateList(1))
+            var subject2IndicatorGroup = _fixture.DefaultIndicatorGroup()
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
                 .WithSubject(subject2)
                 .Generate();
             
             // Set up a release with footnotes that apply to either subject 1 or subject 2 but not both
-            var footnotes = _footnoteGenerator
+            var footnotes = _fixture.DefaultFootnote()
                 .ForIndex(0, s => s
                     .Set(f => f.Content, "Applies to subject 1")
                     .SetSubjects(_ => ListOf(subject1)))
@@ -229,12 +205,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     .SetIndicators(_ => ListOf(subject2IndicatorGroup.Indicators[0])))
                 .GenerateList();
             
-            var releaseFootnotes = _releaseFootnoteGenerator
+            var releaseFootnotes = _fixture.DefaultReleaseFootnote()
                 .ForInstance(s => s.Set(rf => rf.Release, release))
                 .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
                 .GenerateList(footnotes.Count);
 
-            var releaseSubjects = _releaseSubjectGenerator
+            var releaseSubjects = _fixture.DefaultReleaseSubject()
                 .ForInstance(s => s.Set(rs => rs.Release, release))
                 .ForIndex(0, s => s.Set(rs => rs.Subject, subject1))
                 .ForIndex(1, s => s.Set(rs => rs.Subject, subject2))
@@ -293,25 +269,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task GetFilteredFootnotes_FilterByFiltersAndIndicators()
         {
-            var release = _releaseGenerator.Generate();
+            var release = _fixture.DefaultRelease().Generate();
             
             // todo a default one with new filtergroups and all?
-            var filter = _filterGenerator
-                .WithFilterGroups(_ => _filterGroupGenerator
-                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(2))
+            var filter = _fixture.DefaultFilter()
+                .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
+                    .WithFilterItems(_ => _fixture.DefaultFilterItem().GenerateList(2))
                     .GenerateList(1))
                 .Generate();
             
-            var subject = _subjectsGenerator
+            var subject = _fixture.DefaultSubject()
                 .WithFilters(ListOf(filter))
                 .Generate();
 
-            var indicatorGroup = _indicatorGroupGenerator
-                .WithIndicators(_indicatorGenerator.GenerateList(2))
+            var indicatorGroup = _fixture.DefaultIndicatorGroup()
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(2))
                 .WithSubject(subject)
                 .Generate();
             
-            var footnotes = _footnoteGenerator
+            var footnotes = _fixture.DefaultFootnote()
                 .ForIndex(0, s => s
                     .Set(f => f.Content, "Applies to filter 1")
                     .SetFilters(_ => ListOf(filter)))
@@ -356,12 +332,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     .SetIndicators(_ => ListOf(indicatorGroup.Indicators[1])))
                 .GenerateList();
                 
-            var releaseFootnotes = _releaseFootnoteGenerator
+            var releaseFootnotes = _fixture.DefaultReleaseFootnote()
                 .ForInstance(s => s.Set(rf => rf.Release, release))
                 .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
                 .GenerateList(footnotes.Count);
 
-            var releaseSubject = _releaseSubjectGenerator
+            var releaseSubject = _fixture.DefaultReleaseSubject()
                 .ForInstance(s => s.Set(rs => rs.Release, release))
                 .ForInstance(s => s.Set(rs => rs.Subject, subject))
                 .Generate();
@@ -422,19 +398,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task GetFilteredFootnotes_FilterByFilterItems()
         {
-            var release = _releaseGenerator.Generate();
+            var release = _fixture.DefaultRelease().Generate();
             
-            var (filter1, filter2, filter3) = _filterGenerator
-                .WithFilterGroups(_ => _filterGroupGenerator
-                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(3))
+            var (filter1, filter2, filter3) = _fixture.DefaultFilter()
+                .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
+                    .WithFilterItems(_ => _fixture.DefaultFilterItem().GenerateList(3))
                     .GenerateList(1))
                 .GenerateTuple3();
             
-            var subject = _subjectsGenerator
+            var subject = _fixture.DefaultSubject()
                 .WithFilters(ListOf(filter1, filter2, filter3))
                 .Generate();
             
-            var footnotes = _footnoteGenerator
+            var footnotes = _fixture.DefaultFootnote()
                 .ForIndex(0, s => s
                     .Set(f => f.Content, "Applies to filter 1")
                     .SetFilters(_ => ListOf(filter1)))
@@ -496,12 +472,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     .SetFilterItems(_ => ListOf(filter1.FilterGroups[0].FilterItems[0], filter1.FilterGroups[0].FilterItems[2])))
                 .GenerateList();
                 
-            var releaseFootnotes = _releaseFootnoteGenerator
+            var releaseFootnotes = _fixture.DefaultReleaseFootnote()
                 .ForInstance(s => s.Set(rf => rf.Release, release))
                 .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
                 .GenerateList(footnotes.Count);
 
-            var releaseSubject = _releaseSubjectGenerator
+            var releaseSubject = _fixture.DefaultReleaseSubject()
                 .ForInstance(s => s.Set(rs => rs.Release, release))
                 .ForInstance(s => s.Set(rs => rs.Subject, subject))
                 .Generate();
@@ -584,17 +560,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task GetFilteredFootnotes_FilterByIndicators()
         {
-            var release = _releaseGenerator.Generate();
+            var release = _fixture.DefaultRelease().Generate();
             
-            var indicatorGroup = _indicatorGroupGenerator
-                .WithIndicators(_indicatorGenerator.GenerateList(3))
+            var indicatorGroup = _fixture.DefaultIndicatorGroup()
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(3))
                 .Generate();
             
-            var subject = _subjectsGenerator
+            var subject = _fixture.DefaultSubject()
                 .WithIndicatorGroups(ListOf(indicatorGroup))
                 .Generate();
             
-            var footnotes = _footnoteGenerator
+            var footnotes = _fixture.DefaultFootnote()
                 .ForIndex(0, s => s
                     .Set(f => f.Content, "Applies to indicator 1")
                     .SetIndicators(_ => ListOf(indicatorGroup.Indicators[0])))
@@ -606,12 +582,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     .SetIndicators(_ => ListOf(indicatorGroup.Indicators[0], indicatorGroup.Indicators[2])))
                 .GenerateList();
                 
-            var releaseFootnotes = _releaseFootnoteGenerator
+            var releaseFootnotes = _fixture.DefaultReleaseFootnote()
                 .ForInstance(s => s.Set(rf => rf.Release, release))
                 .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
                 .GenerateList(footnotes.Count);
 
-            var releaseSubject = _releaseSubjectGenerator
+            var releaseSubject = _fixture.DefaultReleaseSubject()
                 .ForInstance(s => s.Set(rs => rs.Release, release))
                 .ForInstance(s => s.Set(rs => rs.Subject, subject))
                 .Generate();
@@ -657,35 +633,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task GetFilteredFootnotes_FootnotesApplyToMultipleSubjects()
         {
-            var release = _releaseGenerator.Generate();
+            var release = _fixture.DefaultRelease().Generate();
             
             // todo a default one with new filtergroups and all?
-            var filters = _filterGenerator
-                .WithFilterGroups(_ => _filterGroupGenerator
-                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+            var filters = _fixture.DefaultFilter()
+                .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
+                    .WithFilterItems(_ => _fixture.DefaultFilterItem().GenerateList(1))
                     .GenerateList(1))
                 .GenerateList(4);
 
             var subject1Filters = ListOf(filters[0]);
             var subject2Filters = filters.GetRange(1, 3);
             
-            var (subject1, subject2) = _subjectsGenerator
+            var (subject1, subject2) = _fixture.DefaultSubject()
                 .ForIndex(0, s => s.SetFilters(subject1Filters))
                 .ForIndex(1, s => s.SetFilters(subject2Filters))
                 .GenerateTuple2();
 
-            var subject1IndicatorGroup = _indicatorGroupGenerator
-                .WithIndicators(_indicatorGenerator.GenerateList(1))
+            var subject1IndicatorGroup = _fixture.DefaultIndicatorGroup()
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
                 .WithSubject(subject1)
                 .Generate();
             
-            var subject2IndicatorGroup = _indicatorGroupGenerator
-                .WithIndicators(_indicatorGenerator.GenerateList(1))
+            var subject2IndicatorGroup = _fixture.DefaultIndicatorGroup()
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
                 .WithSubject(subject2)
                 .Generate();
             
             // Set up a release with footnotes that apply to both subject 1 and subject 2
-            var footnotes = _footnoteGenerator
+            var footnotes = _fixture.DefaultFootnote()
                 .ForIndex(0, s => s
                     .Set(f => f.Content, "Applies to subject 1 and subject 2")
                     .SetSubjects(_ => ListOf(subject1, subject2)))
@@ -712,12 +688,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     .SetIndicators(_ => ListOf(subject1IndicatorGroup.Indicators[0], subject2IndicatorGroup.Indicators[0])))
                 .GenerateList();
                 
-            var releaseFootnotes = _releaseFootnoteGenerator
+            var releaseFootnotes = _fixture.DefaultReleaseFootnote()
                 .ForInstance(s => s.Set(rf => rf.Release, release))
                 .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
                 .GenerateList(footnotes.Count);
 
-            var releaseSubjects = _releaseSubjectGenerator
+            var releaseSubjects = _fixture.DefaultReleaseSubject()
                 .ForInstance(s => s.Set(rs => rs.Release, release))
                 .ForIndex(0, s => s.Set(rs => rs.Subject, subject1))
                 .ForIndex(1, s => s.Set(rs => rs.Subject, subject2))
@@ -779,25 +755,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task GetFilteredFootnotes_FilterByEmptyListOfFiltersAndIndicators()
         {
-            var release = _releaseGenerator.Generate();
+            var release = _fixture.DefaultRelease().Generate();
             
             // todo a default one with new filtergroups and all?
-            var subject1Filters = _filterGenerator
-                .WithFilterGroups(_ => _filterGroupGenerator
-                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+            var subject1Filters = _fixture.DefaultFilter()
+                .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
+                    .WithFilterItems(_ => _fixture.DefaultFilterItem().GenerateList(1))
                     .GenerateList(1))
                 .GenerateList(3);
             
-            var (subject1, subject2) = _subjectsGenerator
+            var (subject1, subject2) = _fixture.DefaultSubject()
                 .ForIndex(0, s => s.SetFilters(subject1Filters))
                 .GenerateTuple2();
 
-            var subject1IndicatorGroup = _indicatorGroupGenerator
-                .WithIndicators(_indicatorGenerator.GenerateList(1))
+            var subject1IndicatorGroup = _fixture.DefaultIndicatorGroup()
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
                 .WithSubject(subject1)
                 .Generate();
             
-            var footnotes = _footnoteGenerator
+            var footnotes = _fixture.DefaultFootnote()
                 .ForIndex(0, s => s
                     .Set(f => f.Content, "Applies to subject 1")
                     .SetSubjects(_ => ListOf(subject1)))
@@ -818,12 +794,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     .SetSubjects(_ => ListOf(subject2)))
                 .GenerateList();
                 
-            var releaseFootnotes = _releaseFootnoteGenerator
+            var releaseFootnotes = _fixture.DefaultReleaseFootnote()
                 .ForInstance(s => s.Set(rf => rf.Release, release))
                 .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
                 .GenerateList(footnotes.Count);
 
-            var releaseSubjects = _releaseSubjectGenerator
+            var releaseSubjects = _fixture.DefaultReleaseSubject()
                 .ForInstance(s => s.Set(rs => rs.Release, release))
                 .ForIndex(0, s => s.Set(rs => rs.Subject, subject1))
                 .ForIndex(1, s => s.Set(rs => rs.Subject, subject2))
@@ -866,25 +842,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         public async Task GetFilteredFootnotes_IgnoresFootnotesUnrelatedToRelease()
         {
             // Create one release with footnotes and another without
-            var (release1, release2) = _releaseGenerator.GenerateTuple2();
+            var (release1, release2) = _fixture.DefaultRelease().GenerateTuple2();
             
             // todo a default one with new filtergroups and all?
-            var filters = _filterGenerator
-                .WithFilterGroups(_ => _filterGroupGenerator
-                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+            var filters = _fixture.DefaultFilter()
+                .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
+                    .WithFilterItems(_ => _fixture.DefaultFilterItem().GenerateList(1))
                     .GenerateList(1))
                 .GenerateList(3);
             
-            var subject = _subjectsGenerator
+            var subject = _fixture.DefaultSubject()
                 .WithFilters(filters)
                 .Generate();
 
-            var indicatorGroup = _indicatorGroupGenerator
-                .WithIndicators(_indicatorGenerator.GenerateList(1))
+            var indicatorGroup = _fixture.DefaultIndicatorGroup()
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
                 .WithSubject(subject)
                 .Generate();
             
-            var footnotes = _footnoteGenerator
+            var footnotes = _fixture.DefaultFootnote()
                 .ForIndex(0, s => s
                     .Set(f => f.Content, "Applies to subject 1")
                     .SetSubjects(_ => ListOf(subject)))
@@ -902,12 +878,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     .SetIndicators(_ => ListOf(indicatorGroup.Indicators[0])))
                 .GenerateList();
                 
-            var releaseFootnotes = _releaseFootnoteGenerator
+            var releaseFootnotes = _fixture.DefaultReleaseFootnote()
                 .ForInstance(s => s.Set(rf => rf.Release, release1))
                 .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
                 .GenerateList(footnotes.Count);
             
-            var releaseSubjects = _releaseSubjectGenerator
+            var releaseSubjects = _fixture.DefaultReleaseSubject()
                 .ForIndex(0, s => s.Set(rs => rs.Release, release1))
                 .ForIndex(0, s => s.Set(rs => rs.Subject, subject))
                 .ForIndex(1, s => s.Set(rs => rs.Release, release2))
@@ -954,30 +930,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task GetFilteredFootnotes_IgnoresRequestedFilterItemsAndIndicatorsUnrelatedToSubject()
         {
-            var release = _releaseGenerator.Generate();
+            var release = _fixture.DefaultRelease().Generate();
             
             // todo a default one with new filtergroups and all?
-            var subject1Filters = _filterGenerator
-                .WithFilterGroups(_ => _filterGroupGenerator
-                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+            var subject1Filters = _fixture.DefaultFilter()
+                .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
+                    .WithFilterItems(_ => _fixture.DefaultFilterItem().GenerateList(1))
                     .GenerateList(1))
                 .GenerateList(3);
             
-            var (subject1, subject2) = _subjectsGenerator
+            var (subject1, subject2) = _fixture.DefaultSubject()
                 .ForIndex(0, s => s.SetFilters(subject1Filters))
                 .GenerateTuple2();
 
-            var subject1IndicatorGroup = _indicatorGroupGenerator
-                .WithIndicators(_indicatorGenerator.GenerateList(1))
+            var subject1IndicatorGroup = _fixture.DefaultIndicatorGroup()
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
                 .WithSubject(subject1)
                 .Generate();
 
-            var subject2IndicatorGroup = _indicatorGroupGenerator
-                .WithIndicators(_indicatorGenerator.GenerateList(1))
+            var subject2IndicatorGroup = _fixture.DefaultIndicatorGroup()
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
                 .WithSubject(subject2)
                 .Generate();
             
-            var footnotes = _footnoteGenerator
+            var footnotes = _fixture.DefaultFootnote()
                 .ForIndex(0, s => s
                     .Set(f => f.Content, "Applies to subject 1")
                     .SetSubjects(_ => ListOf(subject1)))
@@ -1001,12 +977,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     .SetIndicators(_ => ListOf(subject2IndicatorGroup.Indicators[0])))
                 .GenerateList();
                 
-            var releaseFootnotes = _releaseFootnoteGenerator
+            var releaseFootnotes = _fixture.DefaultReleaseFootnote()
                 .ForInstance(s => s.Set(rf => rf.Release, release))
                 .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
                 .GenerateList(footnotes.Count);
 
-            var releaseSubjects = _releaseSubjectGenerator
+            var releaseSubjects = _fixture.DefaultReleaseSubject()
                 .ForInstance(s => s.Set(rs => rs.Release, release))
                 .ForIndex(0, s => s.Set(rs => rs.Subject, subject1))
                 .ForIndex(1, s => s.Set(rs => rs.Subject, subject2))
@@ -1060,37 +1036,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task GetFootnotes_MapsAllCriteria()
         {
-            var (release1, release2) = _releaseGenerator.GenerateTuple2();
+            var (release1, release2) = _fixture.DefaultRelease().GenerateTuple2();
 
             // todo a default one with new filtergroups and all?
-            var subject1Filters = _filterGenerator
-                .WithFilterGroups(_ => _filterGroupGenerator
-                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+            var subject1Filters = _fixture.DefaultFilter()
+                .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
+                    .WithFilterItems(_ => _fixture.DefaultFilterItem().GenerateList(1))
                     .GenerateList(1))
                 .GenerateList(3);
             
-            var subject2Filters = _filterGenerator
-                .WithFilterGroups(_ => _filterGroupGenerator
-                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+            var subject2Filters = _fixture.DefaultFilter()
+                .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
+                    .WithFilterItems(_ => _fixture.DefaultFilterItem().GenerateList(1))
                     .GenerateList(1))
                 .GenerateList(3);
             
-            var (subject1, subject2) = _subjectsGenerator
+            var (subject1, subject2) = _fixture.DefaultSubject()
                 .ForIndex(0, s => s.SetFilters(subject1Filters))
                 .ForIndex(1, s => s.SetFilters(subject2Filters))
                 .GenerateTuple2();
 
-            var subject1IndicatorGroup = _indicatorGroupGenerator
-                .WithIndicators(_indicatorGenerator.GenerateList(1))
+            var subject1IndicatorGroup = _fixture.DefaultIndicatorGroup()
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
                 .WithSubject(subject1)
                 .Generate();
 
-            var subject2IndicatorGroup = _indicatorGroupGenerator
-                .WithIndicators(_indicatorGenerator.GenerateList(1))
+            var subject2IndicatorGroup = _fixture.DefaultIndicatorGroup()
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
                 .WithSubject(subject2)
                 .Generate();
             
-            var footnotes = _footnoteGenerator
+            var footnotes = _fixture.DefaultFootnote()
                 .ForIndex(0, s => s
                     .Set(f => f.Content, "Applies to all criteria")
                     .SetSubjects(_ => ListOf(subject1, subject2))
@@ -1100,12 +1076,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     .SetIndicators(_ => ListOf(subject1IndicatorGroup.Indicators[0], subject2IndicatorGroup.Indicators[0])))
                 .GenerateList();
                 
-            var releaseFootnotes = _releaseFootnoteGenerator
+            var releaseFootnotes = _fixture.DefaultReleaseFootnote()
                 .ForInstance(s => s.Set(rf => rf.Release, release1))
                 .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
                 .GenerateList(footnotes.Count);
 
-            var releaseSubjects = _releaseSubjectGenerator
+            var releaseSubjects = _fixture.DefaultReleaseSubject()
                 .ForInstance(s => s.Set(rs => rs.Release, release1))
                 .ForIndex(0, s => s.Set(rs => rs.Subject, subject1))
                 .ForIndex(1, s => s.Set(rs => rs.Subject, subject2))
@@ -1173,37 +1149,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task GetFootnotes_FiltersByRelease()
         {
-            var (release1, release2) = _releaseGenerator.GenerateTuple2();
+            var (release1, release2) = _fixture.DefaultRelease().GenerateTuple2();
 
             // todo a default one with new filtergroups and all?
-            var subject1Filters = _filterGenerator
-                .WithFilterGroups(_ => _filterGroupGenerator
-                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+            var subject1Filters = _fixture.DefaultFilter()
+                .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
+                    .WithFilterItems(_ => _fixture.DefaultFilterItem().GenerateList(1))
                     .GenerateList(1))
                 .GenerateList(3);
             
-            var subject2Filters = _filterGenerator
-                .WithFilterGroups(_ => _filterGroupGenerator
-                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+            var subject2Filters = _fixture.DefaultFilter()
+                .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
+                    .WithFilterItems(_ => _fixture.DefaultFilterItem().GenerateList(1))
                     .GenerateList(1))
                 .GenerateList(3);
             
-            var (release1Subject1, release1Subject2, release2Subject) = _subjectsGenerator
+            var (release1Subject1, release1Subject2, release2Subject) = _fixture.DefaultSubject()
                 .ForIndex(0, s => s.SetFilters(subject1Filters))
                 .ForIndex(1, s => s.SetFilters(subject2Filters))
                 .GenerateTuple3();
 
-            var subject1IndicatorGroup = _indicatorGroupGenerator
-                .WithIndicators(_indicatorGenerator.GenerateList(1))
+            var subject1IndicatorGroup = _fixture.DefaultIndicatorGroup()
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
                 .WithSubject(release1Subject1)
                 .Generate();
 
-            var subject2IndicatorGroup = _indicatorGroupGenerator
-                .WithIndicators(_indicatorGenerator.GenerateList(1))
+            var subject2IndicatorGroup = _fixture.DefaultIndicatorGroup()
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
                 .WithSubject(release1Subject2)
                 .Generate();
             
-            var release1Footnotes = _footnoteGenerator
+            var release1Footnotes = _fixture.DefaultFootnote()
                 .ForIndex(0, s => s
                     .Set(f => f.Content, "Applied to release 1 subject 1")
                     .SetSubjects(_ => ListOf(release1Subject1)))
@@ -1212,13 +1188,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     .SetSubjects(_ => ListOf(release1Subject2)))
                 .GenerateList();
             
-            var release2Footnotes = _footnoteGenerator
+            var release2Footnotes = _fixture.DefaultFootnote()
                 .ForIndex(0, s => s
                     .Set(f => f.Content, "Applied to release 2 subject")
                     .SetSubjects(_ => ListOf(release2Subject)))
                 .GenerateList();
                 
-            var releaseFootnotes = _releaseFootnoteGenerator
+            var releaseFootnotes = _fixture.DefaultReleaseFootnote()
                 .ForIndex(0, s => s
                     .Set(rf => rf.Release, release1)
                     .Set(rf => rf.Footnote, release1Footnotes[0]))
@@ -1230,7 +1206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     .Set(rf => rf.Footnote, release2Footnotes[0]))
                 .GenerateList();
 
-            var releaseSubjects = _releaseSubjectGenerator
+            var releaseSubjects = _fixture.DefaultReleaseSubject()
                 .ForInstance(s => s.Set(rs => rs.Release, release1))
                 .ForIndex(0, s => s.Set(rs => rs.Subject, release1Subject1))
                 .ForIndex(1, s => s.Set(rs => rs.Subject, release1Subject2))
@@ -1285,12 +1261,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task GetFootnotes_FiltersBySubjectId()
         {
-            var release = _releaseGenerator.Generate();
+            var release = _fixture.DefaultRelease().Generate();
             
-            var (subject1, subject2) = _subjectsGenerator
+            var (subject1, subject2) = _fixture.DefaultSubject()
                 .GenerateTuple2();
 
-            var footnotes = _footnoteGenerator
+            var footnotes = _fixture.DefaultFootnote()
                 .ForIndex(0, s => s
                     .Set(f => f.Content, "Applied to subject 1")
                     .SetSubjects(_ => ListOf(subject1)))
@@ -1299,12 +1275,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     .SetSubjects(_ => ListOf(subject2)))
                 .GenerateList();
             
-            var releaseFootnotes = _releaseFootnoteGenerator
+            var releaseFootnotes = _fixture.DefaultReleaseFootnote()
                 .ForInstance(s => s.Set(rf => rf.Release, release))
                 .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
                 .GenerateList(footnotes.Count);
 
-            var releaseSubjects = _releaseSubjectGenerator
+            var releaseSubjects = _fixture.DefaultReleaseSubject()
                 .ForInstance(s => s.Set(rs => rs.Release, release))
                 .ForIndex(0, s => s.Set(rs => rs.Subject, subject1))
                 .ForIndex(1, s => s.Set(rs => rs.Subject, subject2))
@@ -1334,37 +1310,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task GetFootnotes_FiltersCriteriaBySubjectId()
         {
-            var (release1, release2) = _releaseGenerator.GenerateTuple2();
+            var (release1, release2) = _fixture.DefaultRelease().GenerateTuple2();
 
             // todo a default one with new filtergroups and all?
-            var subject1Filters = _filterGenerator
-                .WithFilterGroups(_ => _filterGroupGenerator
-                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+            var subject1Filters = _fixture.DefaultFilter()
+                .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
+                    .WithFilterItems(_ => _fixture.DefaultFilterItem().GenerateList(1))
                     .GenerateList(1))
                 .GenerateList(3);
             
-            var subject2Filters = _filterGenerator
-                .WithFilterGroups(_ => _filterGroupGenerator
-                    .WithFilterItems(_ => _filterItemGenerator.GenerateList(1))
+            var subject2Filters = _fixture.DefaultFilter()
+                .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
+                    .WithFilterItems(_ => _fixture.DefaultFilterItem().GenerateList(1))
                     .GenerateList(1))
                 .GenerateList(3);
             
-            var (subject1, subject2) = _subjectsGenerator
+            var (subject1, subject2) = _fixture.DefaultSubject()
                 .ForIndex(0, s => s.SetFilters(subject1Filters))
                 .ForIndex(1, s => s.SetFilters(subject2Filters))
                 .GenerateTuple2();
 
-            var subject1IndicatorGroup = _indicatorGroupGenerator
-                .WithIndicators(_indicatorGenerator.GenerateList(1))
+            var subject1IndicatorGroup = _fixture.DefaultIndicatorGroup()
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
                 .WithSubject(subject1)
                 .Generate();
 
-            var subject2IndicatorGroup = _indicatorGroupGenerator
-                .WithIndicators(_indicatorGenerator.GenerateList(1))
+            var subject2IndicatorGroup = _fixture.DefaultIndicatorGroup()
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
                 .WithSubject(subject2)
                 .Generate();
             
-            var footnotes = _footnoteGenerator
+            var footnotes = _fixture.DefaultFootnote()
                 .ForIndex(0, s => s
                     .Set(f => f.Content, "Applies to all types of element")
                     .SetSubjects(_ => ListOf(subject1, subject2))
@@ -1374,12 +1350,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     .SetIndicators(_ => ListOf(subject1IndicatorGroup.Indicators[0], subject2IndicatorGroup.Indicators[0])))
                 .GenerateList();
                 
-            var releaseFootnotes = _releaseFootnoteGenerator
+            var releaseFootnotes = _fixture.DefaultReleaseFootnote()
                 .ForInstance(s => s.Set(rf => rf.Release, release1))
                 .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
                 .GenerateList(footnotes.Count);
 
-            var releaseSubjects = _releaseSubjectGenerator
+            var releaseSubjects = _fixture.DefaultReleaseSubject()
                 .ForInstance(s => s.Set(rs => rs.Release, release1))
                 .ForIndex(0, s => s.Set(rs => rs.Subject, subject1))
                 .ForIndex(1, s => s.Set(rs => rs.Subject, subject2))
@@ -1441,10 +1417,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task GetFootnotes_OrdersFootnotes()
         {
-            var release = _releaseGenerator.Generate();
-            var subject = _subjectsGenerator.Generate();
+            var release = _fixture.DefaultRelease().Generate();
+            var subject = _fixture.DefaultSubject().Generate();
 
-            var footnotes = _footnoteGenerator
+            var footnotes = _fixture.DefaultFootnote()
                 .ForIndex(0, s => s
                     .Set(f => f.Content, "Footnote 3")
                     .Set(f => f.Order, 2)
@@ -1459,12 +1435,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     .SetSubjects(_ => ListOf(subject)))
                 .GenerateList();
                 
-            var releaseFootnotes = _releaseFootnoteGenerator
+            var releaseFootnotes = _fixture.DefaultReleaseFootnote()
                 .ForInstance(s => s.Set(rf => rf.Release, release))
                 .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
                 .GenerateList(footnotes.Count);
 
-            var releaseSubjects = _releaseSubjectGenerator
+            var releaseSubjects = _fixture.DefaultReleaseSubject()
                 .ForInstance(s => s.Set(rs => rs.Release, release))
                 .ForInstance(s => s.Set(rs => rs.Subject, subject))
                 .GenerateList(1);
@@ -1500,12 +1476,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task GetSubjectsWithNoFootnotes_FootnotePerSubject()
         {
-            var release = _releaseGenerator.Generate();
+            var release = _fixture.DefaultRelease().Generate();
             
-            var subjects = _subjectsGenerator
-                .WithFilters(_ => _filterGenerator
-                    .WithFilterGroups(_ => _filterGroupGenerator
-                        .WithFilterItems(_ => _filterItemGenerator
+            var subjects = _fixture.DefaultSubject()
+                .WithFilters(_ => _fixture.DefaultFilter()
+                    .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
+                        .WithFilterItems(_ => _fixture.DefaultFilterItem()
                             .GenerateList(1))
                         .GenerateList(1))
                     .GenerateList(3))
@@ -1513,12 +1489,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             
             var subjectWithNoFootnotes = subjects[5];
 
-            var subject5IndicatorGroup = _indicatorGroupGenerator
+            var subject5IndicatorGroup = _fixture.DefaultIndicatorGroup()
                 .WithSubject(subjects[4])
-                .WithIndicators(_indicatorGenerator.GenerateList(1))
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
                 .Generate();
 
-            var footnotes = _footnoteGenerator
+            var footnotes = _fixture.DefaultFootnote()
                 .ForIndex(0, s => s
                     .SetSubjects(_ => ListOf(subjects[0])))
                 .ForIndex(1, s => s
@@ -1531,12 +1507,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     .SetIndicators(_ => ListOf(subject5IndicatorGroup.Indicators[0])))
                 .GenerateList();
                 
-            var releaseFootnotes = _releaseFootnoteGenerator
+            var releaseFootnotes = _fixture.DefaultReleaseFootnote()
                 .ForInstance(s => s.Set(rf => rf.Release, release))
                 .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
                 .GenerateList(footnotes.Count);
 
-            var releaseSubjects = _releaseSubjectGenerator
+            var releaseSubjects = _fixture.DefaultReleaseSubject()
                 .ForInstance(s => s.Set(rs => rs.Release, release))
                 .ForInstance(s => s.Set(rs => rs.Subject, (_, _, context) => subjects[context.Index]))
                 .GenerateList(subjects.Count);
@@ -1566,12 +1542,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         [Fact]
         public async Task GetSubjectsWithNoFootnotes_FootnoteForMultipleSubjects()
         {
-            var release = _releaseGenerator.Generate();
+            var release = _fixture.DefaultRelease().Generate();
             
-            var subjects = _subjectsGenerator
-                .WithFilters(_ => _filterGenerator
-                    .WithFilterGroups(_ => _filterGroupGenerator
-                        .WithFilterItems(_ => _filterItemGenerator
+            var subjects = _fixture.DefaultSubject()
+                .WithFilters(_ => _fixture.DefaultFilter()
+                    .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
+                        .WithFilterItems(_ => _fixture.DefaultFilterItem()
                             .GenerateList(1))
                         .GenerateList(1))
                     .GenerateList(3))
@@ -1580,12 +1556,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             var subjectWithFootnotes = subjects[0];
             var subjectWithNoFootnotes = subjects[1];
             
-            var subjectWithFootnotesIndicatorGroup = _indicatorGroupGenerator
+            var subjectWithFootnotesIndicatorGroup = _fixture.DefaultIndicatorGroup()
                 .WithSubject(subjectWithFootnotes)
-                .WithIndicators(_indicatorGenerator.GenerateList(1))
+                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
                 .Generate();
 
-            var footnotes = _footnoteGenerator
+            var footnotes = _fixture.DefaultFootnote()
                 .ForIndex(0, s => s
                     .SetSubjects(_ => ListOf(subjectWithFootnotes))
                     .SetFilters(_ => ListOf(subjectWithFootnotes.Filters[0]))
@@ -1594,12 +1570,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     .SetIndicators(_ => ListOf(subjectWithFootnotesIndicatorGroup.Indicators[0])))
                 .GenerateList(1);
                 
-            var releaseFootnotes = _releaseFootnoteGenerator
+            var releaseFootnotes = _fixture.DefaultReleaseFootnote()
                 .ForInstance(s => s.Set(rf => rf.Release, release))
                 .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
                 .GenerateList(footnotes.Count);
 
-            var releaseSubjects = _releaseSubjectGenerator
+            var releaseSubjects = _fixture.DefaultReleaseSubject()
                 .ForInstance(s => s.Set(rs => rs.Release, release))
                 .ForInstance(s => s.Set(rs => rs.Subject, (_, _, context) => subjects[context.Index]))
                 .GenerateList(subjects.Count);
