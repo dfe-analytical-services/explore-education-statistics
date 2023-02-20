@@ -1,5 +1,6 @@
 import argparse
 import subprocess
+from tests.libs.slack import SlackService
 
 # NOTE(mark): The admin and analyst passwords to access the Admin app are
 # stored in the CI pipeline as secret variables, which means they cannot be accessed as normal
@@ -9,30 +10,37 @@ import subprocess
 # Our current solution to this is to escape any dollars where the password is stored
 # i.e. password "hello$world" should be stored as "hello\$world"
 
-
-def run_tests_pipeline():
+def run_tests_pipeline() -> bool:
     assert args.admin_pass, "Provide an admin password with an '--admin-pass PASS' argument"
     assert args.analyst_pass, "Provide an analyst password with an '--analyst-pass PASS' argument"
     assert args.expiredinvite_pass, "Provide an expiredinvite password with an '--expiredinvite-pass PASS' argument"
     assert args.env, "Provide an environment with an '--env ENV' argument"
     assert args.file, "Provide a file/dir to run with an '--file FILE/DIR' argument"
     assert args.processes, "Provide a number of processes to run with the '--processes NUM' argument"
-    valid_environments = ["dev", "test", "preprod", "prod", "ci"]
 
-    if args.env not in valid_environments:
-        raise Exception(f"Invalid environment provided: {args.env}. Valid environments: {valid_environments}")
+    # subprocess.check_call(["google-chrome-stable", "--version"])
+    # subprocess.check_call("python -m pip install --upgrade pip", shell=True)
+    # subprocess.check_call("pip install pipenv", shell=True)
+    # subprocess.check_call("pipenv install", shell=True)
 
-    subprocess.check_call(["google-chrome-stable", "--version"])
-    subprocess.check_call("python -m pip install --upgrade pip", shell=True)
-    subprocess.check_call("pip install pipenv", shell=True)
-    subprocess.check_call("pipenv install", shell=True)
+    run_tests_command = f"pipenv run python3 run_tests.py --admin-pass {args.admin_pass} --analyst-pass {args.analyst_pass} --expiredinvite-pass {args.expiredinvite_pass} --env {args.env} --file {args.file} --ci --processes {args.processes}"
 
-    run_tests_command = f"pipenv run python run_tests.py --admin-pass {args.admin_pass} --analyst-pass {args.analyst_pass} --expiredinvite-pass {args.expiredinvite_pass} --env {args.env} --file {args.file} --ci --processes {args.processes} --enable-slack-notifications"
+    result = subprocess.run(run_tests_command, shell=True)
 
-    if args.rerun_failed_suites:
+    if (result.returncode == 0):
+        return True
+
+    if args.reruns is not None and args.reruns > 0:
+        
         run_tests_command += " --rerun-failed-suites"
-
-    subprocess.check_call(run_tests_command, shell=True)
+    
+        for rerun in range(args.reruns):
+            result = subprocess.run(run_tests_command, shell=True)
+    
+            if (result.returncode == 0):
+                return True
+    
+    return False
 
 
 if __name__ == "__main__":
@@ -50,20 +58,21 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--env", dest="env", help=f"environment to run tests against (dev, test, pre-prod, prod & ci)", required=True
+        "--env", dest="env", help=f"environment to run tests against (local, dev, test, pre-prod, prod & ci)", required=True,
+        choices=["local", "dev", "test", "preprod", "prod", "ci"]
     )
 
     parser.add_argument("--file", dest="file", help="the directory or file to test", required=True)
 
-    parser.add_argument("--processes", dest="processes", help="number of processes to run", required=True)
+    parser.add_argument("--processes", dest="processes", help="number of processes to run", type=int, required=True)
 
-    parser.add_argument(
-        "--rerun-failed-suites",
-        dest="rerun_failed_suites",
-        help="rerun any failed suites from a previous run",
-        required=False,
-        action="store_true",
-    )
+    parser.add_argument("--reruns", dest="reruns", help="number of reruns to attempt upon failure", type=int, required=False)
 
     args = parser.parse_args()
-    run_tests_pipeline()
+    result=run_tests_pipeline()
+
+    slack_service = SlackService()
+    slack_service.send_test_report(args.env, args.file)
+    
+    if not result:
+        raise Exception('Failure running tests')

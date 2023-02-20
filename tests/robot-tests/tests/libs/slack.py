@@ -17,11 +17,14 @@ class SlackService:
     def __init__(self):
         self.slack_bot_token = os.getenv("SLACK_BOT_TOKEN")
         self.report_webhook_url = os.getenv("SLACK_TEST_REPORT_WEBHOOK_URL")
-        self.client = WebClient(token=self.slack_bot_token)
 
-        for env_var in [self.slack_bot_token, self.report_webhook_url]:
-            if env_var is None:
-                raise AssertionError(f"{env_var} is not set")
+        if self.slack_bot_token is None:
+            raise AssertionError("Environment variable 'slack_bot_token' is not set")
+
+        if self.report_webhook_url is None:
+            raise AssertionError("Environment variable 'report_webhook_url' is not set")
+        
+        self.client = WebClient(token=self.slack_bot_token)
 
     def _build_attachments(self, env: str, suite: str):
         with open(f"{PATH}{os.sep}output.xml", "rb") as report:

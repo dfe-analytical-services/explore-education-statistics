@@ -22,7 +22,6 @@ from scripts.get_webdriver import get_webdriver
 from tests.libs.create_emulator_release_files import ReleaseFilesGenerator
 from tests.libs.logger import get_logger
 from tests.libs.setup_auth_variables import setup_auth_variables
-from tests.libs.slack import SlackService
 
 current_dir = Path(__file__).absolute().parent
 os.chdir(current_dir)
@@ -120,12 +119,6 @@ parser.add_argument(
     dest="print_keywords",
     action="store_true",
     help="choose to print out keywords as they are started",
-)
-parser.add_argument(
-    "--enable-slack-notifications",
-    dest="enable_slack_notifications",
-    action="store_true",
-    help="enable Slack notifications to be sent for test reports",
 )
 parser.add_argument(
     "--prompt-to-continue",
@@ -237,6 +230,7 @@ if args.print_keywords:
 if args.ci:
     robotArgs += ["--xunit", "xunit"]
     # NOTE(mark): Ensure secrets aren't visible in CI logs/reports
+    # NOTE(dunc): Including these and using Pabot results in a FileNotFoundError which is logged btu causes no issues
     robotArgs += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
     robotArgs += ["--removekeywords", "name:common.user goes to url"]  # To hide basic auth credentials
 
@@ -417,6 +411,8 @@ try:
         if args.processes:
             robotArgs = ["--processes", int(args.processes)] + robotArgs
 
+        # Note(dunc): passing --rerunfailedsuites argument to Pabot logs "Invalid option 'rerunfailedsuites'" during
+        # the test run but causes no harm, and the behaviour of the flag still works.
         pabot_run_cli(robotArgs)
 
 finally:
@@ -442,7 +438,3 @@ finally:
     logger.info(f"\nLog available at: file://{os.getcwd()}{os.sep}test-results{os.sep}log.html")
     logger.info(f"Report available at: file://{os.getcwd()}{os.sep}test-results{os.sep}report.html")
     logger.info("\nTests finished!")
-
-    if args.enable_slack_notifications:
-        slack_service = SlackService()
-        slack_service.send_test_report(args.env, args.tests)
