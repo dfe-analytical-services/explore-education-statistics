@@ -36,7 +36,7 @@ describe('EditableKeyStatText', () => {
         'Text title',
       );
 
-      expect(screen.getByTestId('keyStat-value')).toHaveTextContent(
+      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
         'Over 9000',
       );
 
@@ -76,7 +76,7 @@ describe('EditableKeyStatText', () => {
         'Text title',
       );
 
-      expect(screen.getByTestId('keyStat-value')).toHaveTextContent(
+      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
         'Over 9000',
       );
 
@@ -111,7 +111,7 @@ describe('EditableKeyStatText', () => {
         'Text title',
       );
 
-      expect(screen.getByTestId('keyStat-value')).toHaveTextContent(
+      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
         'Over 9000',
       );
 
@@ -148,7 +148,7 @@ describe('EditableKeyStatText', () => {
         'Text title',
       );
 
-      expect(screen.getByTestId('keyStat-value')).toHaveTextContent(
+      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
         'Over 9000',
       );
 
@@ -182,7 +182,7 @@ describe('EditableKeyStatText', () => {
         expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
           'Text title',
         );
-        expect(screen.getByTestId('keyStat-value')).toHaveTextContent(
+        expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
           'Over 9000',
         );
         expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
@@ -301,7 +301,7 @@ describe('EditableKeyStatText', () => {
       expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'Text title',
       );
-      expect(screen.getByTestId('keyStat-value')).toHaveTextContent(
+      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
         'Over 9000',
       );
       expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(

@@ -815,12 +815,12 @@ get release id from url
     [Return]    ${release_id}
 
 user adds free text key stat
-    [Arguments]    ${title}    ${value}    ${trend}    ${guidance_title}    ${guidance_text}
+    [Arguments]    ${title}    ${statistic}    ${trend}    ${guidance_title}    ${guidance_text}
     user clicks button    Add free text key statistic
     user waits until page contains element    id:editableKeyStatTextForm-create-title
 
     user enters text into element    id:editableKeyStatTextForm-create-title    ${title}
-    user enters text into element    id:editableKeyStatTextForm-create-statistic    ${value}
+    user enters text into element    id:editableKeyStatTextForm-create-statistic    ${statistic}
     user enters text into element    id:editableKeyStatTextForm-create-trend    ${trend}
     user enters text into element    id:editableKeyStatTextForm-create-guidanceTitle    ${guidance_title}
 

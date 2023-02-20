@@ -750,13 +750,13 @@ user checks publication bullet does not contain link
     ...    xpath://details[@open]//*[text()="${publication}"]/..//a[text()="${link}"]
 
 user checks key stat contents
-    [Arguments]    ${tile}    ${title}    ${value}    ${trend}    ${wait}=${timeout}
+    [Arguments]    ${tile}    ${title}    ${statistic}    ${trend}    ${wait}=${timeout}
     user waits until element is visible
     ...    css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-title"]    ${wait}
     user waits until element contains    css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-title"]
     ...    ${title}
-    user waits until element contains    css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-value"]
-    ...    ${value}
+    user waits until element contains
+    ...    css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-statistic"]    ${statistic}
     user waits until element contains
     ...    css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-trend"]    ${trend}
 

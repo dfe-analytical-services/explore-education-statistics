@@ -100,7 +100,9 @@ describe('EditableKeyStatDataBlock', () => {
       expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'DataBlock indicator',
       );
-      expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
+      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+        '608,180',
+      );
       expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
         'DataBlock trend',
       );
@@ -142,7 +144,9 @@ describe('EditableKeyStatDataBlock', () => {
       expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'DataBlock indicator',
       );
-      expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
+      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+        '608,180',
+      );
       expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
     });
 
@@ -178,7 +182,9 @@ describe('EditableKeyStatDataBlock', () => {
       expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'DataBlock indicator',
       );
-      expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
+      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+        '608,180',
+      );
       expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
         'DataBlock trend',
       );
@@ -216,7 +222,9 @@ describe('EditableKeyStatDataBlock', () => {
       expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'DataBlock indicator',
       );
-      expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
+      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+        '608,180',
+      );
       expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
         'DataBlock trend',
       );
@@ -288,7 +296,7 @@ describe('EditableKeyStatDataBlock', () => {
         expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
           'DataBlock indicator',
         );
-        expect(screen.getByTestId('keyStat-value')).toHaveTextContent(
+        expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
           '608,180',
         );
         expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
@@ -414,7 +422,9 @@ describe('EditableKeyStatDataBlock', () => {
       expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'DataBlock indicator',
       );
-      expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
+      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+        '608,180',
+      );
       expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
         'DataBlock trend',
       );
@@ -462,7 +472,9 @@ describe('EditableKeyStatDataBlock', () => {
         ).toBeInTheDocument();
 
         expect(screen.queryByTestId('keyStat-title')).not.toBeInTheDocument();
-        expect(screen.queryByTestId('keyStat-value')).not.toBeInTheDocument();
+        expect(
+          screen.queryByTestId('keyStat-statistic'),
+        ).not.toBeInTheDocument();
         expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
         expect(
           screen.queryByTestId('keyStat-guidanceText'),

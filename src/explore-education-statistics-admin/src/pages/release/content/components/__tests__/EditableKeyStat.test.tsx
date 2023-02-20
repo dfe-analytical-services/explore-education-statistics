@@ -61,7 +61,7 @@ describe('EditableKeyStat', () => {
           'Text title',
         );
 
-        expect(screen.getByTestId('keyStat-value')).toHaveTextContent(
+        expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
           'Over 9000',
         );
 
@@ -170,7 +170,7 @@ describe('EditableKeyStat', () => {
         expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
           'Indicator',
         );
-        expect(screen.getByTestId('keyStat-value')).toHaveTextContent(
+        expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
           '608,180',
         );
         expect(screen.getByTestId('keyStat-trend')).toHaveTextContent('Trend');
