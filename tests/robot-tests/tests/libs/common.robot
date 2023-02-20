@@ -760,13 +760,16 @@ user checks key stat contents
     user waits until element contains
     ...    css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-trend"]    ${trend}
 
-user checks key stat definition
+user checks key stat guidance
     [Arguments]    ${tile}    ${guidance_title}    ${guidance_text}
     user opens details dropdown    ${guidance_title}    css:[data-testid="keyStat"]:nth-of-type(${tile})
     user waits until element is visible
     ...    css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-guidanceText"]
     user checks element should contain
     ...    css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-guidanceText"]    ${guidance_text}
+
+    # The guidance text dropdown can hide the key stat Edit and Remove buttons
+    user closes details dropdown    ${guidance_title}    css:[data-testid="keyStat"]:nth-of-type(${tile})
 
 user checks page contains radio
     [Arguments]    ${label}

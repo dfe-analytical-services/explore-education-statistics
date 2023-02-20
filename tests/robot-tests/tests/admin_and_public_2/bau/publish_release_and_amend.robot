@@ -124,6 +124,13 @@ Navigate to 'Content' page
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
 
+Add free text key stat
+    user adds free text key stat    Free text key stat title    9001%    Trend    Guidance title    Guidance text
+
+    User Checks Element Count Is X    testid:keyStat    1
+    user checks key stat contents    1    Free text key stat title    9001%    Trend
+    user checks key stat guidance    1    Guidance title    Guidance text
+
 Add three accordion sections to release
     user waits for page to finish loading
     user waits until page does not contain loading spinner
@@ -366,8 +373,14 @@ Verify public pre-release access list
     user waits until page contains    Published ${EXPECTED_PUBLISHED_DATE}
     user waits until page contains    Test public access list
 
-Verify accordions are correct
+Verify free text key stat is correct
     user goes to release page via breadcrumb    ${PUBLICATION_NAME}    ${RELEASE_NAME}
+
+    User Checks Element Count Is X    testid:keyStat    1
+    user checks key stat contents    1    Free text key stat title    9001%    Trend
+    user checks key stat guidance    1    Guidance title    Guidance text
+
+Verify accordions are correct
     user checks there are x accordion sections    1    id:data-accordion
     user checks accordion is in position    Explore data and files    1    id:data-accordion
 
@@ -624,6 +637,14 @@ Navigate to 'Content' page for amendment
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits until page contains button    Add a summary text block
 
+Update free text key stat
+    user updates free text key stat    1    Updated title    Updated statistic    Updated trend
+    ...    Updated guidance title    Updated guidance text
+
+    User Checks Element Count Is X    testid:keyStat    1
+    user checks key stat contents    1    Updated title    Updated statistic    Updated trend
+    user checks key stat guidance    1    Updated guidance title    Updated guidance text
+
 Verify amended Dates data block table has footnotes
     ${accordion}=    user opens accordion section    Dates data block    id:releaseMainContent
     ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
@@ -729,6 +750,11 @@ Verify amendment is displayed as the latest release
 Verify amendment is published
     user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
     user checks summary list contains    Next update    December 3001
+
+Verify amendment free text key stat is updated
+    User Checks Element Count Is X    testid:keyStat    1
+    user checks key stat contents    1    Updated title    Updated statistic    Updated trend
+    user checks key stat guidance    1    Updated guidance title    Updated guidance text
 
 Verify amendment files
     user opens accordion section    Explore data and files

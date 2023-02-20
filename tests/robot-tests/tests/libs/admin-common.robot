@@ -813,3 +813,46 @@ get release id from url
     ...    release\/([0-9A-Fa-f]{8}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{12})    1
     ${release_id}=    Get From List    ${release_id_match}    0
     [Return]    ${release_id}
+
+user adds free text key stat
+    [Arguments]    ${title}    ${value}    ${trend}    ${guidance_title}    ${guidance_text}
+    user clicks button    Add free text key statistic
+    user waits until page contains element    id:editableKeyStatTextForm-create-title
+
+    user enters text into element    id:editableKeyStatTextForm-create-title    ${title}
+    user enters text into element    id:editableKeyStatTextForm-create-statistic    ${value}
+    user enters text into element    id:editableKeyStatTextForm-create-trend    ${trend}
+    user enters text into element    id:editableKeyStatTextForm-create-guidanceTitle    ${guidance_title}
+
+    user clicks element    id:editableKeyStatTextForm-create-guidanceText
+    user presses keys    ${guidance_text}
+
+    user clicks button    Save
+    user waits until page does not contain button    Save
+
+user updates free text key stat
+    [Arguments]    ${tile_num}    ${title}    ${statistic}    ${trend}    ${guidance_title}    ${guidance_text}
+    user waits until page contains element    xpath://*[@data-testid="keyStat"][${tile_num}]
+
+    user clicks element    xpath://*[@data-testid="keyStat"][${tile_num}]//button[contains(text(), "Edit")]
+
+    user waits until page contains button    Save
+
+    user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//input[@name="title"]    ${title}
+    user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//input[@name="statistic"]
+    ...    ${statistic}
+    user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//input[@name="trend"]    ${trend}
+    user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//input[@name="guidanceTitle"]
+    ...    ${guidance_title}
+
+    user clicks element    xpath://*[@data-testid="keyStat"][${tile_num}]//*[contains(@class, "ck-content")]
+    user presses keys    CTRL+a+BACKSPACE
+    user presses keys    ${guidance_text}
+
+    user clicks button    Save
+    user waits until page does not contain button    Save
+
+user removes key stat
+    [Arguments]    ${tile_num}
+    user waits until page contains element    xpath://*[@data-testid="keyStat"][${tile_num}]
+    user clicks element    xpath://*[@data-testid="keyStat"][${tile_num}]//button[contains(text(), "Remove")]
