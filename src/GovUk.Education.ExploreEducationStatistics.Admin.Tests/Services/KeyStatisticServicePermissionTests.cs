@@ -40,6 +40,22 @@ public class KeyStatisticServicePermissionTests
     }
 
     [Fact]
+    public async Task CreateKeyStatisticText()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            .AssertForbidden(
+                userService =>
+                {
+                    var service = SetupKeyStatisticService(userService: userService.Object);
+                    return service.CreateKeyStatisticText(
+                        _release.Id,
+                        new KeyStatisticTextCreateRequest());
+                }
+            );
+    }
+
+    [Fact]
     public async Task UpdateKeyStatisticDataBlock()
     {
         await PolicyCheckBuilder<SecurityPolicies>()
@@ -51,6 +67,22 @@ public class KeyStatisticServicePermissionTests
                     return service.CreateKeyStatisticDataBlock(
                         _release.Id,
                         new KeyStatisticDataBlockCreateRequest());
+                }
+            );
+    }
+
+    [Fact]
+    public async Task UpdateKeyStatisticText()
+    {
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+            .AssertForbidden(
+                userService =>
+                {
+                    var service = SetupKeyStatisticService(userService: userService.Object);
+                    return service.CreateKeyStatisticText(
+                        _release.Id,
+                        new KeyStatisticTextCreateRequest());
                 }
             );
     }

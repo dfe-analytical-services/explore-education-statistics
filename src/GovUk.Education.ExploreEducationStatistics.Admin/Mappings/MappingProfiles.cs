@@ -98,6 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .IncludeAllDerived();
 
             CreateMap<KeyStatisticDataBlockCreateRequest, KeyStatisticDataBlock>();
+            CreateMap<KeyStatisticTextCreateRequest, KeyStatisticText>();
 
             CreateMap<Release, Data.Model.Release>()
                 .ForMember(dest => dest.TimeIdentifier, m => m.MapFrom(r => r.TimePeriodCoverage));

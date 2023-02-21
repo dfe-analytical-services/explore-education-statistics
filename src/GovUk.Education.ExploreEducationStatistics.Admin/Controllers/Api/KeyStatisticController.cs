@@ -34,6 +34,16 @@ public class KeyStatisticController : ControllerBase
             .HandleFailuresOrOk();
     }
 
+    [HttpPost("release/{releaseId:guid}/key-statistic-text")]
+    public async Task<ActionResult<KeyStatisticTextViewModel>> CreateKeyStatisticText(
+        Guid releaseId,
+        KeyStatisticTextCreateRequest request)
+    {
+        return await _keyStatisticService
+            .CreateKeyStatisticText(releaseId, request)
+            .HandleFailuresOrOk();
+    }
+
     [HttpPut("release/{releaseId:guid}/key-statistic-data-block/{keyStatisticId:guid}")]
     public async Task<ActionResult<KeyStatisticDataBlockViewModel>> UpdateKeyStatisticDataBlock(
         Guid releaseId,
@@ -42,6 +52,17 @@ public class KeyStatisticController : ControllerBase
     {
         return await _keyStatisticService
             .UpdateKeyStatisticDataBlock(releaseId, keyStatisticId, request)
+            .HandleFailuresOrOk();
+    }
+
+    [HttpPut("release/{releaseId:guid}/key-statistic-text/{keyStatisticId:guid}")]
+    public async Task<ActionResult<KeyStatisticTextViewModel>> UpdateKeyStatisticText(
+        Guid releaseId,
+        Guid keyStatisticId,
+        KeyStatisticTextUpdateRequest request)
+    {
+        return await _keyStatisticService
+            .UpdateKeyStatisticText(releaseId, keyStatisticId, request)
             .HandleFailuresOrOk();
     }
 
