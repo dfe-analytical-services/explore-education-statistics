@@ -42,8 +42,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             }
         }
 
-        public DataBlockSummaryViewModel Summary { get; set; }
-
         public TableBuilderConfiguration Table { get; set; }
     }
 }

@@ -33,8 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public int Order { get; init; }
 
-        public DataBlockSummary? Summary { get; init; }
-
         public TableBuilderConfiguration Table { get; init; } = null!;
 
         public DateTimeOffset? Locked { get; init; }
@@ -60,8 +58,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public List<IChart> Charts { get; init; } = new();
 
-        public DataBlockSummary? Summary { get; init; }
-
         public TableBuilderConfiguration Table { get; init; } = null!;
     }
 
@@ -82,8 +78,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public ObservationQueryContext Query { get; init; } = null!;
 
         public List<IChart> Charts { get; init; } = new();
-
-        public DataBlockSummary? Summary { get; init; }
 
         public TableBuilderConfiguration Table { get; init; } = null!;
     }
