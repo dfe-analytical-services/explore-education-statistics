@@ -31,4 +31,13 @@ public record IndicatorCsvMetaViewModel
         Name = indicator.Name;
         Unit = indicator.Unit;
     }
+
+    public IndicatorCsvMetaViewModel(IndicatorMetaViewModel indicator)
+    {
+        Id = indicator.Value;
+        DecimalPlaces = indicator.DecimalPlaces;
+        Label = indicator.Label;
+        Name = indicator.Name;
+        Unit = indicator.Unit;
+    }
 }

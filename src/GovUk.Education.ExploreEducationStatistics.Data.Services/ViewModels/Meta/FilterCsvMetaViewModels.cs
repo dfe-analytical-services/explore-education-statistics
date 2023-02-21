@@ -28,6 +28,16 @@ public record FilterCsvMetaViewModel
             .Select(filterItem => new FilterItemCsvMetaViewModel(filterItem))
             .ToDictionary(filterItem => filterItem.Id);
     }
+
+    public FilterCsvMetaViewModel(FilterMetaViewModel filter)
+    {
+        Id = filter.Id;
+        Name = filter.Name;
+        Items = filter.Options
+            .SelectMany(filterGroup => filterGroup.Value.Options)
+            .Select(filterItem => new FilterItemCsvMetaViewModel(filterItem))
+            .ToDictionary(filterItem => filterItem.Id);
+    }
 }
 
 public record FilterItemCsvMetaViewModel
@@ -43,6 +53,12 @@ public record FilterItemCsvMetaViewModel
     public FilterItemCsvMetaViewModel(FilterItem filterItem)
     {
         Id = filterItem.Id;
+        Label = filterItem.Label;
+    }
+
+    public FilterItemCsvMetaViewModel(FilterItemMetaViewModel filterItem)
+    {
+        Id = filterItem.Value;
         Label = filterItem.Label;
     }
 }
