@@ -24,6 +24,11 @@ public static class SubjectGeneratorExtensions
         this Generator<Subject> generator,
         IEnumerable<IndicatorGroup> indicatorGroups)
         => generator.ForInstance(s => s.SetIndicatorGroups(indicatorGroups));
+
+    public static Generator<Subject> WithIndicatorGroups(
+        this Generator<Subject> generator,
+        Func<SetterContext, IEnumerable<IndicatorGroup>> indicatorGroups)
+        => generator.ForInstance(s => s.SetIndicatorGroups(indicatorGroups));
     
     public static Generator<Subject> WithObservations(
         this Generator<Subject> generator,
@@ -61,11 +66,16 @@ public static class SubjectGeneratorExtensions
     public static InstanceSetters<Subject> SetIndicatorGroups(
         this InstanceSetters<Subject> setters,
         IEnumerable<IndicatorGroup> indicatorGroups)
+        => setters.SetIndicatorGroups(_ => indicatorGroups);
+
+    public static InstanceSetters<Subject> SetIndicatorGroups(
+        this InstanceSetters<Subject> setters,
+        Func<SetterContext, IEnumerable<IndicatorGroup>> indicatorGroups)
         => setters.Set(
             s => s.IndicatorGroups,
-            (_, subject) =>
+            (_, subject, context) =>
             {
-                var list = indicatorGroups.ToList();
+                var list = indicatorGroups.Invoke(context).ToList();
 
                 list.ForEach(indicatorGroup => indicatorGroup.Subject = subject);
 

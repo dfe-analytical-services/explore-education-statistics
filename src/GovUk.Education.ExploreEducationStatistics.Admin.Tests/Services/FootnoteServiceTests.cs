@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
@@ -9,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -23,6 +23,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 
@@ -37,25 +38,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = _fixture.DefaultRelease().Generate();
             
-            var subjects = _fixture.DefaultSubject()
-                .ForIndex(1, s => s
-                    .SetFilters(_ => _fixture.DefaultFilter()
-                        .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
-                            .WithFilterItems(_ => _fixture.DefaultFilterItem()
-                                .GenerateList(1))
-                            .GenerateList(1))
-                        .GenerateList(3)))
-                .GenerateList(2);
-            
-            var subject2IndicatorGroup = _fixture.DefaultIndicatorGroup()
-                .WithSubject(subjects[1])
-                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
-                .Generate();
-
-            var releaseSubjects = _fixture.DefaultReleaseSubject()
-                .ForInstance(s => s.Set(rs => rs.Release, release))
-                .ForInstance(s => s.Set(rs => rs.Subject, (_, _, context) => subjects[context.Index]))
-                .GenerateList(subjects.Count);
+            var releaseSubjects = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(release)
+                .WithSubjects(_fixture
+                    .DefaultSubject()
+                    .ForIndex(1, s => s
+                        .SetFilters(_fixture
+                            .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+                            .Generate(3))
+                        .SetIndicatorGroups(_fixture.DefaultIndicatorGroup()
+                            .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                            .Generate(1)))
+                    .Generate(2))
+                .GenerateList();
             
             var contextId = Guid.NewGuid().ToString();
 
@@ -64,7 +60,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await statisticsDbContext.Release.AddAsync(release);
                 await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubjects);
-                await statisticsDbContext.IndicatorGroup.AddRangeAsync(subject2IndicatorGroup);
                 await statisticsDbContext.SaveChangesAsync();
 
                 await contentDbContext.AddAsync(new Content.Model.Release
@@ -111,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     subjectIds: SetOf(subject.Id)
                 )).AssertRight();
 
-                MockUtils.VerifyAllMocks(dataBlockService);
+                VerifyAllMocks(dataBlockService);
 
                 Assert.Equal("Test footnote", result.Content);
                 Assert.Equal(0, result.Order);
@@ -175,29 +170,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task CreateFootnote_MultipleFootnotesHaveExpectedOrder()
         {
             var release = _fixture.DefaultRelease().Generate();
-            var subject = _fixture.DefaultSubject().Generate();
 
-            var footnotes = _fixture.DefaultFootnote()
-                .WithSubjects(ListOf(subject))
-                .GenerateList(2);
-
-            var releaseSubject = _fixture.DefaultReleaseSubject()
-                .ForInstance(s => s.Set(rs => rs.Release, release))
-                .ForInstance(s => s.Set(rs => rs.Subject, subject))
+            var releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(release)
+                .WithSubject(_fixture.DefaultSubject().Generate())
                 .Generate();
 
             // Create a release which already has some existing footnotes
-            var releaseFootnotes = _fixture.DefaultReleaseFootnote()
-                .ForInstance(s => s.Set(rf => rf.Release, release))
-                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
-                .GenerateList(footnotes.Count);
+            var releaseFootnotes = _fixture
+                .DefaultReleaseFootnote()
+                .WithRelease(release)
+                .WithFootnotes(_fixture
+                    .DefaultFootnote()
+                    .WithSubjects(ListOf(releaseSubject.Subject))
+                    .GenerateList(2))
+                .GenerateList();
             
             var contextId = Guid.NewGuid().ToString();
         
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.Subject.AddAsync(subject);
+                await statisticsDbContext.Subject.AddAsync(releaseSubject.Subject);
                 await statisticsDbContext.Release.AddAsync(release);
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
@@ -229,10 +224,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     filterGroupIds: SetOf<Guid>(),
                     filterItemIds: SetOf<Guid>(),
                     indicatorIds: SetOf<Guid>(),
-                    subjectIds: SetOf(subject.Id)
+                    subjectIds: SetOf(releaseSubject.Subject.Id)
                 )).AssertRight();
         
-                MockUtils.VerifyAllMocks(dataBlockService);
+                VerifyAllMocks(dataBlockService);
         
                 // Check that the created footnote is assigned the next order in sequence
                 Assert.Equal("New Footnote", result.Content);
@@ -260,37 +255,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetFootnote()
         {
             var release = _fixture.DefaultRelease().Generate();
+
+            var releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(release)
+                .WithSubject(_fixture
+                    .DefaultSubject()
+                    .WithFilters(_fixture
+                        .DefaultFilter(1, 1)
+                        .Generate(1))
+                    .WithIndicatorGroups(_fixture.DefaultIndicatorGroup()
+                        .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                        .Generate(1))
+                    .Generate())
+                .Generate();
             
-            var subject = _fixture.DefaultSubject()
-                .WithFilters(_ => _fixture.DefaultFilter()
-                    .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
-                        .WithFilterItems(_ => _fixture.DefaultFilterItem()
-                            .GenerateList(1))
-                        .GenerateList(1))
-                    .GenerateList(1))
-                .Generate();
-            
-            var indicatorGroup = _fixture.DefaultIndicatorGroup()
-                .WithSubject(subject)
-                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
-                .Generate();
-
-            var footnote = _fixture.DefaultFootnote()
-                .WithSubjects(ListOf(subject))
-                .WithFilters(subject.Filters)
-                .WithFilterGroups(subject.Filters[0].FilterGroups)
-                .WithFilterItems(subject.Filters[0].FilterGroups[0].FilterItems)
-                .WithIndicators(indicatorGroup.Indicators)
-                .Generate();
-
-            var releaseSubject = _fixture.DefaultReleaseSubject()
-                .ForInstance(s => s.Set(rs => rs.Release, release))
-                .ForInstance(s => s.Set(rs => rs.Subject, subject))
-                .Generate();
-
-            var releaseFootnote = _fixture.DefaultReleaseFootnote()
-                .ForInstance(s => s.Set(rf => rf.Release, release))
-                .ForInstance(s => s.Set(rf => rf.Footnote, footnote))
+            var releaseFootnote = _fixture
+                .DefaultReleaseFootnote()
+                .WithRelease(release)
+                .WithFootnote(_fixture
+                    .DefaultFootnote()
+                    .WithSubjects(ListOf(releaseSubject.Subject))
+                    .WithFilters(releaseSubject.Subject.Filters)
+                    .WithFilterGroups(releaseSubject.Subject.Filters[0].FilterGroups)
+                    .WithFilterItems(releaseSubject.Subject.Filters[0].FilterGroups[0].FilterItems)
+                    .WithIndicators(releaseSubject.Subject.IndicatorGroups[0].Indicators)
+                    .Generate())
                 .Generate();
             
             var contextId = Guid.NewGuid().ToString();
@@ -299,7 +289,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 await statisticsDbContext.Release.AddAsync(release);
-                await statisticsDbContext.Footnote.AddAsync(footnote);
                 await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.ReleaseFootnote.AddAsync(releaseFootnote);
                 await statisticsDbContext.SaveChangesAsync();
@@ -317,33 +306,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupFootnoteService(statisticsDbContext, contentDbContext: contentDbContext);
         
-                var result = await service.GetFootnote(release.Id, footnote.Id);
+                var result = await service.GetFootnote(release.Id, releaseFootnote.FootnoteId);
                 var retrievedFootnote = result.AssertRight();
         
-                Assert.Equal(footnote.Id, retrievedFootnote.Id);
+                Assert.Equal(releaseFootnote.FootnoteId, retrievedFootnote.Id);
                 Assert.Equal("Content of Footnote 0", retrievedFootnote.Content);
         
                 Assert.Single(retrievedFootnote.Releases);
                 Assert.Equal(release.Id, retrievedFootnote.Releases.First().ReleaseId);
         
                 Assert.Single(retrievedFootnote.Subjects);
-                Assert.Equal(subject.Id, retrievedFootnote.Subjects.First().SubjectId);
+                Assert.Equal(releaseSubject.Subject.Id, retrievedFootnote.Subjects.First().SubjectId);
         
                 Assert.Single(retrievedFootnote.Filters);
-                Assert.Equal(subject.Filters[0].Id, retrievedFootnote.Filters.First().Filter.Id);
-                Assert.Equal(subject.Filters[0].Label, retrievedFootnote.Filters.First().Filter.Label);
+                Assert.Equal(releaseSubject.Subject.Filters[0].Id, retrievedFootnote.Filters.First().Filter.Id);
+                Assert.Equal(releaseSubject.Subject.Filters[0].Label, retrievedFootnote.Filters.First().Filter.Label);
         
                 Assert.Single(retrievedFootnote.FilterGroups);
-                Assert.Equal(subject.Filters[0].FilterGroups[0].Id, retrievedFootnote.FilterGroups.First().FilterGroup.Id);
-                Assert.Equal(subject.Filters[0].FilterGroups[0].Label, retrievedFootnote.FilterGroups.First().FilterGroup.Label);
+                Assert.Equal(releaseSubject.Subject.Filters[0].FilterGroups[0].Id, retrievedFootnote.FilterGroups.First().FilterGroup.Id);
+                Assert.Equal(releaseSubject.Subject.Filters[0].FilterGroups[0].Label, retrievedFootnote.FilterGroups.First().FilterGroup.Label);
         
                 Assert.Single(retrievedFootnote.FilterItems);
-                Assert.Equal(subject.Filters[0].FilterGroups[0].FilterItems[0].Id, retrievedFootnote.FilterItems.First().FilterItem.Id);
-                Assert.Equal(subject.Filters[0].FilterGroups[0].FilterItems[0].Label, retrievedFootnote.FilterItems.First().FilterItem.Label);
+                Assert.Equal(releaseSubject.Subject.Filters[0].FilterGroups[0].FilterItems[0].Id, retrievedFootnote.FilterItems.First().FilterItem.Id);
+                Assert.Equal(releaseSubject.Subject.Filters[0].FilterGroups[0].FilterItems[0].Label, retrievedFootnote.FilterItems.First().FilterItem.Label);
         
                 Assert.Single(retrievedFootnote.Indicators);
-                Assert.Equal(indicatorGroup.Indicators[0].Id, retrievedFootnote.Indicators.First().Indicator.Id);
-                Assert.Equal(indicatorGroup.Indicators[0].Label, retrievedFootnote.Indicators.First().Indicator.Label);
+                Assert.Equal(releaseSubject.Subject.IndicatorGroups[0].Indicators[0].Id, retrievedFootnote.Indicators.First().Indicator.Id);
+                Assert.Equal(releaseSubject.Subject.IndicatorGroups[0].Indicators[0].Label, retrievedFootnote.Indicators.First().Indicator.Label);
             }
         }
         
@@ -351,17 +340,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetFootnote_ReleaseNotFound()
         {
             var release = _fixture.DefaultRelease().Generate();
-            var footnote = _fixture.DefaultFootnote().Generate();
-            var releaseFootnote = _fixture.DefaultReleaseFootnote()
-                .ForInstance(s => s.Set(rf => rf.Release, release))
-                .ForInstance(s => s.Set(rf => rf.Footnote, footnote))
+            
+            var releaseFootnote = _fixture
+                .DefaultReleaseFootnote()
+                .WithRelease(release)
+                .WithFootnote(_fixture.DefaultFootnote().Generate())
                 .Generate();
             
             var contextId = Guid.NewGuid().ToString();
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.Footnote.AddAsync(footnote);
                 await statisticsDbContext.ReleaseFootnote.AddAsync(releaseFootnote);
                 await statisticsDbContext.SaveChangesAsync();
             }
@@ -374,7 +363,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var invalidReleaseId = Guid.NewGuid();
                 var result = await service.GetFootnote(
                     releaseId: invalidReleaseId,
-                    footnoteId: footnote.Id);
+                    footnoteId: releaseFootnote.FootnoteId);
         
                 result.AssertNotFound();
             }
@@ -383,11 +372,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetFootnote_ReleaseAndFootnoteNotRelated()
         {
-            var (release, otherRelease) = _fixture.DefaultRelease().GenerateTuple2();
-            var footnote = _fixture.DefaultFootnote().Generate();
-            var releaseFootnote = _fixture.DefaultReleaseFootnote()
-                .ForInstance(s => s.Set(rf => rf.Release, release))
-                .ForInstance(s => s.Set(rf => rf.Footnote, footnote))
+            var (release, otherRelease) = _fixture.DefaultRelease().GenerateList(2).ToTuple2();
+            
+            var releaseFootnote = _fixture
+                .DefaultReleaseFootnote()
+                .WithRelease(release)
+                .WithFootnote(_fixture.DefaultFootnote().Generate())
                 .Generate();
         
             var contextId = Guid.NewGuid().ToString();
@@ -396,7 +386,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 await statisticsDbContext.Release.AddAsync(release);
-                await statisticsDbContext.Footnote.AddAsync(footnote);
                 await statisticsDbContext.ReleaseFootnote.AddAsync(releaseFootnote);
         
                 await statisticsDbContext.SaveChangesAsync();
@@ -414,7 +403,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupFootnoteService(statisticsDbContext, contentDbContext: contentDbContext);
         
-                var result = await service.GetFootnote(otherRelease.Id, footnote.Id);
+                var result = await service.GetFootnote(otherRelease.Id, releaseFootnote.FootnoteId);
         
                 result.AssertNotFound();
             }
@@ -423,42 +412,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CopyFootnotes()
         {
-            var (release, amendment) = _fixture.DefaultRelease().GenerateTuple2();
-            
-            var subject = _fixture.DefaultSubject()
-                .WithFilters(_ => _fixture.DefaultFilter()
-                    .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
-                        .WithFilterItems(_ => _fixture.DefaultFilterItem()
-                            .GenerateList(1))
-                        .GenerateList(1))
-                    .GenerateList(1))
-                .Generate();
-            
-            var indicatorGroup = _fixture.DefaultIndicatorGroup()
-                .WithSubject(subject)
-                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
-                .Generate();
+            var (release, amendment) = _fixture.DefaultRelease().GenerateList(2).ToTuple2();
 
-            var footnotes = _fixture.DefaultFootnote()
-                .ForIndex(0, s => s
-                    .SetSubjects(ListOf(subject))
-                    .SetFilters(subject.Filters)
-                    .SetFilterGroups(subject.Filters[0].FilterGroups)
-                    .SetFilterItems(subject.Filters[0].FilterGroups[0].FilterItems)
-                    .SetIndicators(indicatorGroup.Indicators))
-                .ForIndex(1, s => s
-                    .SetSubjects(ListOf(subject)))
+            var releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(release)
+                .WithSubject(_fixture
+                    .DefaultSubject()
+                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(1))
+                    .WithIndicatorGroups(_fixture.DefaultIndicatorGroup()
+                        .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                        .Generate(1))
+                    .Generate())
+                .Generate();
+            
+            var releaseFootnotes = _fixture
+                .DefaultReleaseFootnote()
+                .WithRelease(release)
+                .WithFootnotes(_fixture
+                    .DefaultFootnote()
+                    .ForIndex(0, s => s
+                        .SetSubjects(ListOf(releaseSubject.Subject))
+                        .SetFilters(releaseSubject.Subject.Filters)
+                        .SetFilterGroups(releaseSubject.Subject.Filters[0].FilterGroups)
+                        .SetFilterItems(releaseSubject.Subject.Filters[0].FilterGroups[0].FilterItems)
+                        .SetIndicators(releaseSubject.Subject.IndicatorGroups[0].Indicators))
+                    .ForIndex(1, s => s
+                        .SetSubjects(ListOf(releaseSubject.Subject)))
+                    .GenerateList())
                 .GenerateList();
-
-            var releaseSubject = _fixture.DefaultReleaseSubject()
-                .ForInstance(s => s.Set(rs => rs.Release, release))
-                .ForInstance(s => s.Set(rs => rs.Subject, subject))
-                .Generate();
-
-            var releaseFootnotes = _fixture.DefaultReleaseFootnote()
-                .ForInstance(s => s.Set(rf => rf.Release, release))
-                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
-                .GenerateList(footnotes.Count);
             
             var contextId = Guid.NewGuid().ToString();
         
@@ -466,7 +448,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 await statisticsDbContext.Release.AddRangeAsync(release, amendment);
-                await statisticsDbContext.Footnote.AddRangeAsync(footnotes);
                 await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
                 await statisticsDbContext.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
         
@@ -513,8 +494,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ToList();
         
                 Assert.Equal(2, newFootnotesFromDb.Count);
-                AssertFootnoteDetailsCopiedCorrectly(footnotes[0], newFootnotesFromDb[0]);
-                AssertFootnoteDetailsCopiedCorrectly(footnotes[1], newFootnotesFromDb[1]);
+                AssertFootnoteDetailsCopiedCorrectly(releaseFootnotes[0].Footnote, newFootnotesFromDb[0]);
+                AssertFootnoteDetailsCopiedCorrectly(releaseFootnotes[1].Footnote, newFootnotesFromDb[1]);
             }
         
             void AssertFootnoteDetailsCopiedCorrectly(Footnote originalFootnote, Footnote newFootnote)
@@ -578,48 +559,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task DeleteFootnote()
         {
             var release = _fixture.DefaultRelease().Generate();
-            
-            var subjects = _fixture.DefaultSubject()
-                .WithFilters(_ => _fixture.DefaultFilter()
-                    .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
-                        .WithFilterItems(_ => _fixture.DefaultFilterItem()
-                            .GenerateList(1))
-                        .GenerateList(1))
+
+            var releaseSubjects = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(release)
+                .WithSubjects(_fixture
+                    .DefaultSubject()
+                    .WithFilters(_ => _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2))
+                    .WithIndicatorGroups(_ => _fixture
+                        .DefaultIndicatorGroup()
+                        .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                        .Generate(1))
                     .GenerateList(2))
-                .GenerateList(2);
-
-            var subject1 = subjects[0];
-            var subject2 = subjects[1];
+                .GenerateList();
             
-            var subject2IndicatorGroup = _fixture.DefaultIndicatorGroup()
-                .WithSubject(subject2)
-                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
-                .Generate();
-
-            var footnote = _fixture.DefaultFootnote()
-                .WithSubjects(ListOf(subject1))
-                .WithFilters(subject2.Filters)
-                .WithFilterGroups(subject2.Filters[0].FilterGroups)
-                .WithFilterItems(subject2.Filters[0].FilterGroups[0].FilterItems)
-                .WithIndicators(subject2IndicatorGroup.Indicators)
-                .Generate();
-
-            var releaseSubjects = _fixture.DefaultReleaseSubject()
-                .ForInstance(s => s.Set(rs => rs.Release, release))
-                .ForInstance(s => s.Set(rs => rs.Subject, (_, _, context) => subjects[context.Index]))
-                .Generate();
-
-            var releaseFootnote = _fixture.DefaultReleaseFootnote()
-                .ForInstance(s => s.Set(rf => rf.Release, release))
-                .ForInstance(s => s.Set(rf => rf.Footnote, footnote))
+            var (subject1, subject2) = GetSubjectsTuple2(releaseSubjects);
+            
+            var releaseFootnote = _fixture
+                .DefaultReleaseFootnote()
+                .WithRelease(release)
+                .WithFootnote(_fixture
+                    .DefaultFootnote()
+                    .WithSubjects(ListOf(subject1))
+                    .WithFilters(subject2.Filters)
+                    .WithFilterGroups(subject2.Filters[0].FilterGroups)
+                    .WithFilterItems(subject2.Filters[0].FilterGroups[0].FilterItems)
+                    .WithIndicators(subject2.IndicatorGroups[0].Indicators)
+                    .Generate())
                 .Generate();
             
             var contextId = Guid.NewGuid().ToString();
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.Subject.AddRangeAsync(subject1, subject2);
-                await statisticsDbContext.IndicatorGroup.AddAsync(subject2IndicatorGroup);
                 await statisticsDbContext.Release.AddAsync(release);
                 await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubjects);
                 await statisticsDbContext.ReleaseFootnote.AddRangeAsync(releaseFootnote);
@@ -650,9 +622,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         
                 var result = await service.DeleteFootnote(
                     releaseId: release.Id,
-                    footnoteId: footnote.Id);
+                    footnoteId: releaseFootnote.FootnoteId);
         
-                MockUtils.VerifyAllMocks(dataBlockService);
+                VerifyAllMocks(dataBlockService);
         
                 result.AssertRight();
             }
@@ -673,39 +645,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task DeleteFootnote_MultipleFootnotesHaveExpectedOrder()
         {
             var release = _fixture.DefaultRelease().Generate();
+
+            var releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(release)
+                .WithSubject(_fixture
+                    .DefaultSubject()
+                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2))
+                    .Generate())
+                .Generate();
             
-            var subject = _fixture.DefaultSubject()
-                .WithFilters(_ => _fixture.DefaultFilter()
-                    .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
-                        .WithFilterItems(_ => _fixture.DefaultFilterItem()
-                            .GenerateList(1))
-                        .GenerateList(1))
-                    .GenerateList(2))
-                .Generate();
-
-            var footnotes = _fixture.DefaultFootnote()
-                .WithSubjects(ListOf(subject))
+            var releaseFootnotes = _fixture
+                .DefaultReleaseFootnote()
+                .WithRelease(release)
+                .WithFootnotes(_fixture
+                    .DefaultFootnote()
+                    .WithSubjects(ListOf(releaseSubject.Subject))
+                    .GenerateList(3))
                 .GenerateList(3);
-
-            var releaseSubjects = _fixture.DefaultReleaseSubject()
-                .ForInstance(s => s.Set(rs => rs.Release, release))
-                .ForInstance(s => s.Set(rs => rs.Subject, subject))
-                .Generate();
-
-            var releaseFootnote = _fixture.DefaultReleaseFootnote()
-                .ForInstance(s => s.Set(rf => rf.Release, release))
-                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
-                .GenerateList(footnotes.Count);
             
             var contextId = Guid.NewGuid().ToString();
         
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.Subject.AddRangeAsync(subject);
                 await statisticsDbContext.Release.AddAsync(release);
-                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubjects);
-                await statisticsDbContext.ReleaseFootnote.AddRangeAsync(releaseFootnote);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+                await statisticsDbContext.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
                 await statisticsDbContext.SaveChangesAsync();
         
                 await contentDbContext.AddAsync(new Content.Model.Release
@@ -729,9 +695,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         
                 var result = await service.DeleteFootnote(
                     releaseId: release.Id,
-                    footnoteId: footnotes[0].Id);
+                    footnoteId: releaseFootnotes[0].FootnoteId);
         
-                MockUtils.VerifyAllMocks(dataBlockService);
+                VerifyAllMocks(dataBlockService);
         
                 result.AssertRight();
             }
@@ -756,33 +722,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateFootnote_AddCriteria()
         {
             var release = _fixture.DefaultRelease().Generate();
+
+            var releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(release)
+                .WithSubject(_fixture
+                    .DefaultSubject()
+                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(3))
+                    .WithIndicatorGroups(_fixture.DefaultIndicatorGroup()
+                        .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                        .Generate(1))
+                    .Generate())
+                .Generate();
             
-            var subject = _fixture.DefaultSubject()
-                .WithFilters(_ => _fixture.DefaultFilter()
-                    .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
-                        .WithFilterItems(_ => _fixture.DefaultFilterItem()
-                            .GenerateList(1))
-                        .GenerateList(1))
-                    .GenerateList(3))
-                .Generate();
-            
-            var indicatorGroup = _fixture.DefaultIndicatorGroup()
-                .WithSubject(subject)
-                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
-                .Generate();
-
-            var footnote = _fixture.DefaultFootnote()
-                .ForInstance(s => s.Set(f => f.Order, 1))
-                .Generate();
-
-            var releaseSubject = _fixture.DefaultReleaseSubject()
-                .ForInstance(s => s.Set(rs => rs.Release, release))
-                .ForInstance(s => s.Set(rs => rs.Subject, subject))
-                .Generate();
-
-            var releaseFootnote = _fixture.DefaultReleaseFootnote()
-                .ForInstance(s => s.Set(rf => rf.Release, release))
-                .ForInstance(s => s.Set(rf => rf.Footnote, footnote))
+            var releaseFootnote = _fixture
+                .DefaultReleaseFootnote()
+                .WithRelease(release)
+                .WithFootnote(_fixture
+                    .DefaultFootnote()
+                    .WithOrder(1)
+                    .Generate())
                 .Generate();
             
             var contextId = Guid.NewGuid().ToString();
@@ -790,9 +749,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.Subject.AddRangeAsync(subject);
                 await statisticsDbContext.Release.AddAsync(release);
-                await statisticsDbContext.IndicatorGroup.AddRangeAsync(indicatorGroup);
                 await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
                 await statisticsDbContext.ReleaseFootnote.AddRangeAsync(releaseFootnote);
                 await statisticsDbContext.SaveChangesAsync();
@@ -819,49 +776,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         
                 var result = await service.UpdateFootnote(
                     releaseId: release.Id,
-                    footnoteId: footnote.Id,
+                    footnoteId: releaseFootnote.FootnoteId,
                     "Updated footnote",
-                    filterIds: SetOf(subject.Filters[0].Id),
-                    filterGroupIds: SetOf(subject.Filters[1].FilterGroups[0].Id),
-                    filterItemIds: SetOf(subject.Filters[2].FilterGroups[0].FilterItems[0].Id),
-                    indicatorIds: SetOf(indicatorGroup.Indicators[0].Id),
-                    subjectIds: SetOf(subject.Id));
+                    filterIds: SetOf(releaseSubject.Subject.Filters[0].Id),
+                    filterGroupIds: SetOf(releaseSubject.Subject.Filters[1].FilterGroups[0].Id),
+                    filterItemIds: SetOf(releaseSubject.Subject.Filters[2].FilterGroups[0].FilterItems[0].Id),
+                    indicatorIds: SetOf(releaseSubject.Subject.IndicatorGroups[0].Indicators[0].Id),
+                    subjectIds: SetOf(releaseSubject.Subject.Id));
         
                 result.AssertRight();
             }
         
-            MockUtils.VerifyAllMocks(dataBlockService);
+            VerifyAllMocks(dataBlockService);
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 var savedFootnote = Assert.Single(statisticsDbContext.Footnote);
-                Assert.Equal(footnote.Id, savedFootnote.Id);
+                Assert.Equal(releaseFootnote.FootnoteId, savedFootnote.Id);
                 Assert.Equal("Updated footnote", savedFootnote.Content);
                 Assert.Equal(1, savedFootnote.Order);
         
                 var savedReleaseFootnote = Assert.Single(statisticsDbContext.ReleaseFootnote);
                 Assert.Equal(release.Id, savedReleaseFootnote.ReleaseId);
-                Assert.Equal(footnote.Id, savedReleaseFootnote.FootnoteId);
+                Assert.Equal(releaseFootnote.FootnoteId, savedReleaseFootnote.FootnoteId);
         
                 var savedSubjectFootnote = Assert.Single(statisticsDbContext.SubjectFootnote);
-                Assert.Equal(subject.Id, savedSubjectFootnote.SubjectId);
-                Assert.Equal(footnote.Id, savedSubjectFootnote.FootnoteId);
+                Assert.Equal(releaseSubject.Subject.Id, savedSubjectFootnote.SubjectId);
+                Assert.Equal(releaseFootnote.FootnoteId, savedSubjectFootnote.FootnoteId);
         
                 var savedFilterFootnote = Assert.Single(statisticsDbContext.FilterFootnote);
-                Assert.Equal(subject.Filters[0].Id, savedFilterFootnote.FilterId);
-                Assert.Equal(footnote.Id, savedFilterFootnote.FootnoteId);
+                Assert.Equal(releaseSubject.Subject.Filters[0].Id, savedFilterFootnote.FilterId);
+                Assert.Equal(releaseFootnote.FootnoteId, savedFilterFootnote.FootnoteId);
         
                 var savedFilterGroupFootnote = Assert.Single(statisticsDbContext.FilterGroupFootnote);
-                Assert.Equal(subject.Filters[1].FilterGroups[0].Id, savedFilterGroupFootnote.FilterGroupId);
-                Assert.Equal(footnote.Id, savedFilterGroupFootnote.FootnoteId);
+                Assert.Equal(releaseSubject.Subject.Filters[1].FilterGroups[0].Id, savedFilterGroupFootnote.FilterGroupId);
+                Assert.Equal(releaseFootnote.FootnoteId, savedFilterGroupFootnote.FootnoteId);
         
                 var savedFilterItemFootnote = Assert.Single(statisticsDbContext.FilterItemFootnote);
-                Assert.Equal(subject.Filters[2].FilterGroups[0].FilterItems[0].Id, savedFilterItemFootnote.FilterItemId);
-                Assert.Equal(footnote.Id, savedFilterItemFootnote.FootnoteId);
+                Assert.Equal(releaseSubject.Subject.Filters[2].FilterGroups[0].FilterItems[0].Id, savedFilterItemFootnote.FilterItemId);
+                Assert.Equal(releaseFootnote.FootnoteId, savedFilterItemFootnote.FootnoteId);
         
                 var savedIndicatorFootnote = Assert.Single(statisticsDbContext.IndicatorFootnote);
-                Assert.Equal(indicatorGroup.Indicators[0].Id, savedIndicatorFootnote.IndicatorId);
-                Assert.Equal(footnote.Id, savedIndicatorFootnote.FootnoteId);
+                Assert.Equal(releaseSubject.Subject.IndicatorGroups[0].Indicators[0].Id, savedIndicatorFootnote.IndicatorId);
+                Assert.Equal(releaseFootnote.FootnoteId, savedIndicatorFootnote.FootnoteId);
             }
         }
         
@@ -869,33 +826,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateFootnote_RemoveCriteria()
         {
             var release = _fixture.DefaultRelease().Generate();
+
+            var releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(release)
+                .WithSubject(_fixture
+                    .DefaultSubject()
+                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(3))
+                    .WithIndicatorGroups(_fixture
+                        .DefaultIndicatorGroup()
+                        .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                        .Generate(1))
+                    .Generate())
+                .Generate();
             
-            var subject = _fixture.DefaultSubject()
-                .WithFilters(_ => _fixture.DefaultFilter()
-                    .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
-                        .WithFilterItems(_ => _fixture.DefaultFilterItem()
-                            .GenerateList(1))
-                        .GenerateList(1))
-                    .GenerateList(3))
-                .Generate();
-            
-            var indicatorGroup = _fixture.DefaultIndicatorGroup()
-                .WithSubject(subject)
-                .WithIndicators(_fixture.DefaultIndicator().GenerateList(1))
-                .Generate();
-
-            var footnote = _fixture.DefaultFootnote()
-                .ForInstance(s => s.Set(f => f.Order, 1))
-                .Generate();
-
-            var releaseSubject = _fixture.DefaultReleaseSubject()
-                .ForInstance(s => s.Set(rs => rs.Release, release))
-                .ForInstance(s => s.Set(rs => rs.Subject, subject))
-                .Generate();
-
-            var releaseFootnote = _fixture.DefaultReleaseFootnote()
-                .ForInstance(s => s.Set(rf => rf.Release, release))
-                .ForInstance(s => s.Set(rf => rf.Footnote, footnote))
+            var releaseFootnote = _fixture
+                .DefaultReleaseFootnote()
+                .WithRelease(release)
+                .WithFootnote(_fixture
+                    .DefaultFootnote()
+                    .WithOrder(1)
+                    .Generate())
                 .Generate();
             
             var contextId = Guid.NewGuid().ToString();
@@ -903,9 +854,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.Subject.AddRangeAsync(subject);
                 await statisticsDbContext.Release.AddAsync(release);
-                await statisticsDbContext.IndicatorGroup.AddRangeAsync(indicatorGroup);
                 await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
                 await statisticsDbContext.ReleaseFootnote.AddRangeAsync(releaseFootnote);
                 await statisticsDbContext.SaveChangesAsync();
@@ -932,7 +881,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         
                 var result = await service.UpdateFootnote(
                     releaseId: release.Id,
-                    footnoteId: footnote.Id,
+                    footnoteId: releaseFootnote.FootnoteId,
                     "Updated footnote",
                     filterIds: SetOf<Guid>(),
                     filterGroupIds: SetOf<Guid>(),
@@ -943,18 +892,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 result.AssertRight();
             }
         
-            MockUtils.VerifyAllMocks(dataBlockService);
+            VerifyAllMocks(dataBlockService);
         
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 var savedFootnote = Assert.Single(statisticsDbContext.Footnote);
-                Assert.Equal(footnote.Id, savedFootnote.Id);
+                Assert.Equal(releaseFootnote.FootnoteId, savedFootnote.Id);
                 Assert.Equal("Updated footnote", savedFootnote.Content);
                 Assert.Equal(1, savedFootnote.Order);
         
                 var savedReleaseFootnote = Assert.Single(statisticsDbContext.ReleaseFootnote);
                 Assert.Equal(release.Id, savedReleaseFootnote.ReleaseId);
-                Assert.Equal(footnote.Id, savedReleaseFootnote.FootnoteId);
+                Assert.Equal(releaseFootnote.FootnoteId, savedReleaseFootnote.FootnoteId);
         
                 Assert.Empty(statisticsDbContext.SubjectFootnote);
                 Assert.Empty(statisticsDbContext.FilterFootnote);
@@ -968,39 +917,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateFootnotes()
         {
             var release = _fixture.DefaultRelease().Generate();
-            
-            var subject = _fixture.DefaultSubject()
-                .WithFilters(_ => _fixture.DefaultFilter()
-                    .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
-                        .WithFilterItems(_ => _fixture.DefaultFilterItem()
-                            .GenerateList(1))
-                        .GenerateList(1))
-                    .GenerateList(2))
+
+            var releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(release)
+                .WithSubject(_fixture
+                    .DefaultSubject()
+                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2))
+                    .Generate())
                 .Generate();
 
-            var footnotes = _fixture.DefaultFootnote()
-                .WithSubjects(ListOf(subject))
-                .GenerateList(3);
-
-            var releaseSubjects = _fixture.DefaultReleaseSubject()
-                .ForInstance(s => s.Set(rs => rs.Release, release))
-                .ForInstance(s => s.Set(rs => rs.Subject, subject))
-                .Generate();
-
-            var releaseFootnote = _fixture.DefaultReleaseFootnote()
-                .ForInstance(s => s.Set(rf => rf.Release, release))
-                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
-                .GenerateList(footnotes.Count);
+            var releaseFootnotes = _fixture
+                .DefaultReleaseFootnote()
+                .WithRelease(release)
+                .WithFootnotes(_fixture
+                    .DefaultFootnote()
+                    .WithSubjects(ListOf(releaseSubject.Subject))
+                    .GenerateList(3))
+                .GenerateList();
             
             var contextId = Guid.NewGuid().ToString();
         
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.Subject.AddRangeAsync(subject);
                 await statisticsDbContext.Release.AddAsync(release);
-                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubjects);
-                await statisticsDbContext.ReleaseFootnote.AddRangeAsync(releaseFootnote);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+                await statisticsDbContext.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
                 await statisticsDbContext.SaveChangesAsync();
         
                 await contentDbContext.AddAsync(new Content.Model.Release
@@ -1026,9 +969,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var request = new FootnotesUpdateRequest
                 {
                     FootnoteIds = ListOf(
-                        footnotes[2].Id,
-                        footnotes[0].Id,
-                        footnotes[1].Id
+                        releaseFootnotes[2].FootnoteId,
+                        releaseFootnotes[0].FootnoteId,
+                        releaseFootnotes[1].FootnoteId
                     )
                 };
         
@@ -1036,7 +979,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     release.Id,
                     request);
         
-                MockUtils.VerifyAllMocks(dataBlockService);
+                VerifyAllMocks(dataBlockService);
         
                 result.AssertRight();
             }
@@ -1063,39 +1006,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateFootnotes_ReleaseNotFound()
         {
             var release = _fixture.DefaultRelease().Generate();
+
+            var releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(release)
+                .WithSubject(_fixture
+                    .DefaultSubject()
+                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2))
+                    .Generate())
+                .Generate();
             
-            var subject = _fixture.DefaultSubject()
-                .WithFilters(_ => _fixture.DefaultFilter()
-                    .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
-                        .WithFilterItems(_ => _fixture.DefaultFilterItem()
-                            .GenerateList(1))
-                        .GenerateList(1))
+            var releaseFootnotes = _fixture
+                .DefaultReleaseFootnote()
+                .WithRelease(release)
+                .WithFootnotes(_fixture
+                    .DefaultFootnote()
+                    .WithSubjects(ListOf(releaseSubject.Subject))
                     .GenerateList(2))
-                .Generate();
-
-            var footnotes = _fixture.DefaultFootnote()
-                .WithSubjects(ListOf(subject))
-                .GenerateList(2);
-
-            var releaseSubjects = _fixture.DefaultReleaseSubject()
-                .ForInstance(s => s.Set(rs => rs.Release, release))
-                .ForInstance(s => s.Set(rs => rs.Subject, subject))
-                .Generate();
-
-            var releaseFootnote = _fixture.DefaultReleaseFootnote()
-                .ForInstance(s => s.Set(rf => rf.Release, release))
-                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
-                .GenerateList(footnotes.Count);
+                .GenerateList();
             
             var contextId = Guid.NewGuid().ToString();
         
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.Subject.AddRangeAsync(subject);
                 await statisticsDbContext.Release.AddAsync(release);
-                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubjects);
-                await statisticsDbContext.ReleaseFootnote.AddRangeAsync(releaseFootnote);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+                await statisticsDbContext.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
                 await statisticsDbContext.SaveChangesAsync();
         
                 await contentDbContext.AddAsync(new Content.Model.Release
@@ -1117,8 +1054,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new FootnotesUpdateRequest
                     {
                         FootnoteIds = ListOf(
-                            footnotes[0].Id,
-                            footnotes[1].Id
+                            releaseFootnotes[0].FootnoteId,
+                            releaseFootnotes[1].FootnoteId
                         )
                     });
         
@@ -1144,39 +1081,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateFootnotes_FootnoteMissing()
         {
             var release = _fixture.DefaultRelease().Generate();
+
+            var releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(release)
+                .WithSubject(_fixture
+                    .DefaultSubject()
+                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2))
+                    .Generate())
+                .Generate();
             
-            var subject = _fixture.DefaultSubject()
-                .WithFilters(_ => _fixture.DefaultFilter()
-                    .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
-                        .WithFilterItems(_ => _fixture.DefaultFilterItem()
-                            .GenerateList(1))
-                        .GenerateList(1))
+            var releaseFootnotes = _fixture
+                .DefaultReleaseFootnote()
+                .WithRelease(release)
+                .WithFootnotes(_fixture
+                    .DefaultFootnote()
+                    .WithSubjects(ListOf(releaseSubject.Subject))
                     .GenerateList(2))
-                .Generate();
-
-            var footnotes = _fixture.DefaultFootnote()
-                .WithSubjects(ListOf(subject))
-                .GenerateList(2);
-
-            var releaseSubjects = _fixture.DefaultReleaseSubject()
-                .ForInstance(s => s.Set(rs => rs.Release, release))
-                .ForInstance(s => s.Set(rs => rs.Subject, subject))
-                .Generate();
-
-            var releaseFootnote = _fixture.DefaultReleaseFootnote()
-                .ForInstance(s => s.Set(rf => rf.Release, release))
-                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
-                .GenerateList(footnotes.Count);
+                .GenerateList();
             
             var contextId = Guid.NewGuid().ToString();
         
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.Subject.AddRangeAsync(subject);
                 await statisticsDbContext.Release.AddAsync(release);
-                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubjects);
-                await statisticsDbContext.ReleaseFootnote.AddRangeAsync(releaseFootnote);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+                await statisticsDbContext.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
                 await statisticsDbContext.SaveChangesAsync();
         
                 await contentDbContext.AddAsync(new Content.Model.Release
@@ -1195,7 +1126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Request has the first footnote id missing
                 var request = new FootnotesUpdateRequest
                 {
-                    FootnoteIds = ListOf(footnotes[1].Id)
+                    FootnoteIds = ListOf(releaseFootnotes[1].FootnoteId)
                 };
         
                 var result = await service.UpdateFootnotes(
@@ -1224,39 +1155,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateFootnotes_FootnoteNotForRelease()
         {
             var release = _fixture.DefaultRelease().Generate();
+
+            var releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(release)
+                .WithSubject(_fixture
+                    .DefaultSubject()
+                    .WithFilters(_fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(2))
+                    .Generate())
+                .Generate();
             
-            var subject = _fixture.DefaultSubject()
-                .WithFilters(_ => _fixture.DefaultFilter()
-                    .WithFilterGroups(_ => _fixture.DefaultFilterGroup()
-                        .WithFilterItems(_ => _fixture.DefaultFilterItem()
-                            .GenerateList(1))
-                        .GenerateList(1))
+            var releaseFootnotes = _fixture
+                .DefaultReleaseFootnote()
+                .WithRelease(release)
+                .WithFootnotes(_fixture
+                    .DefaultFootnote()
+                    .WithSubjects(ListOf(releaseSubject.Subject))
                     .GenerateList(2))
-                .Generate();
-
-            var footnotes = _fixture.DefaultFootnote()
-                .WithSubjects(ListOf(subject))
-                .GenerateList(2);
-
-            var releaseSubjects = _fixture.DefaultReleaseSubject()
-                .ForInstance(s => s.Set(rs => rs.Release, release))
-                .ForInstance(s => s.Set(rs => rs.Subject, subject))
-                .Generate();
-
-            var releaseFootnote = _fixture.DefaultReleaseFootnote()
-                .ForInstance(s => s.Set(rf => rf.Release, release))
-                .ForInstance(s => s.Set(rf => rf.Footnote, (_, _, context) => footnotes[context.Index]))
-                .GenerateList(footnotes.Count);
+                .GenerateList();
             
             var contextId = Guid.NewGuid().ToString();
         
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.Subject.AddRangeAsync(subject);
                 await statisticsDbContext.Release.AddAsync(release);
-                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubjects);
-                await statisticsDbContext.ReleaseFootnote.AddRangeAsync(releaseFootnote);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+                await statisticsDbContext.ReleaseFootnote.AddRangeAsync(releaseFootnotes);
                 await statisticsDbContext.SaveChangesAsync();
         
                 await contentDbContext.AddAsync(new Content.Model.Release
@@ -1276,8 +1201,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var request = new FootnotesUpdateRequest
                 {
                     FootnoteIds = ListOf(
-                        footnotes[1].Id,
-                        footnotes[0].Id,
+                        releaseFootnotes[1].FootnoteId,
+                        releaseFootnotes[0].FootnoteId,
                         Guid.NewGuid()
                     )
                 };
@@ -1304,6 +1229,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        private static Tuple<Subject, Subject> GetSubjectsTuple2(List<ReleaseSubject> releaseSubjects)
+        {
+            return releaseSubjects.Select(rs => rs.Subject).ToTuple2();
+        }
+
         private static FootnoteService SetupFootnoteService(
             StatisticsDbContext statisticsDbContext,
             ContentDbContext? contentDbContext = null,
@@ -1318,7 +1248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new FootnoteService(
                 statisticsDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentContext),
-                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                userService ?? AlwaysTrueUserService().Object,
                 dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
                 footnoteRepository ?? new FootnoteRepository(statisticsDbContext),
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext)

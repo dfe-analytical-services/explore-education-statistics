@@ -25,8 +25,7 @@ public static class FilterGroupGeneratorExtensions
     public static Generator<FilterGroup> WithFilterItems(
         this Generator<FilterGroup> generator,
         Func<SetterContext, IEnumerable<FilterItem>> filterItems)
-        => generator.ForInstance(s => s
-            .Set(fg => fg.FilterItems, (_, _, context) => filterItems.Invoke(context)));
+        => generator.ForInstance(s => s.SetFilterItems(filterItems));
 
     public static Generator<FilterGroup> WithFootnotes(
         this Generator<FilterGroup> generator,

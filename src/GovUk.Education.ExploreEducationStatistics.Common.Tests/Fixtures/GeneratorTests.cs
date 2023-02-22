@@ -561,37 +561,6 @@ public class GeneratorTests
     }
 
     [Fact]
-    public void Generate_Tuple2()
-    {
-        var (item1, item2) = new Generator<Test>()
-            .ForIndex(0, s => s
-                .Set(t => t.FirstName, "Test"))
-            .ForIndex(1, s => s
-                .Set(t => t.FirstName, "John"))
-            .GenerateTuple2();
-
-        Assert.Equal("Test", item1.FirstName);
-        Assert.Equal("John", item2.FirstName);
-    }
-
-    [Fact]
-    public void Generate_Tuple3()
-    {
-        var (item1, item2, item3) = new Generator<Test>()
-            .ForIndex(0, s => s
-                .Set(t => t.FirstName, "Test"))
-            .ForIndex(1, s => s
-                .Set(t => t.FirstName, "John"))
-            .ForIndex(2, s => s
-                .Set(t => t.FirstName, "Jane"))
-            .GenerateTuple3();
-
-        Assert.Equal("Test", item1.FirstName);
-        Assert.Equal("John", item2.FirstName);
-        Assert.Equal("Jane", item3.FirstName);
-    }
-
-    [Fact]
     public void FinishWith()
     {
         var items = new Generator<Test>()
