@@ -1,6 +1,6 @@
-#!/usr/bin/env node
-import fs from 'fs';
 import dotenvJson from 'dotenv-json-complex';
+import fs from 'fs';
+// eslint-disable-next-line import/no-cycle
 import { EnvironmentAndUsers } from '../utils/environmentAndUsers';
 import getAuthDetails, { IdpOption } from './getAuthDetails';
 
@@ -24,6 +24,10 @@ const getEnvironmentAndUsers = async (
   environmentName: string,
   userNames: string[],
 ): Promise<EnvironmentAndUsers> => {
+  if (!environmentName || !userNames.length) {
+    throw new Error('Environment name and user names must be provided');
+  }
+
   dotenvJson({ environment: environmentName });
 
   const environment = JSON.parse(

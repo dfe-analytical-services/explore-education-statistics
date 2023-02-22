@@ -1,6 +1,6 @@
-/* eslint-disable no-console */
 /* eslint-disable camelcase */
 import http from 'k6/http';
+import logger from '../utils/logger';
 import { AuthDetails } from './getAuthDetails';
 
 interface RefreshTokenParams {
@@ -34,7 +34,7 @@ export default function refreshAuthTokens({
   const response = http.post(`${adminUrl}/connect/token`, requestBody);
 
   if (response.status !== 200) {
-    console.log(
+    logger.info(
       `Unable to refresh access token. Got response ${response.json()}`,
     );
     return undefined;

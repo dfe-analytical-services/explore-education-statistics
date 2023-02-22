@@ -1,6 +1,6 @@
-const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
+const path = require('path');
 const GlobEntries = require('webpack-glob-entries');
 
 module.exports = {

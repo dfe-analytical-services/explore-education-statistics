@@ -1,6 +1,6 @@
-#!/usr/bin/env node
 /* eslint-disable camelcase */
 import puppeteer, { Page } from 'puppeteer';
+import logger from '../utils/logger';
 import getChromePath from './getChromePath';
 
 export interface AuthTokens {
@@ -15,65 +15,6 @@ export interface AuthDetails {
 }
 
 export type IdpOption = 'azure' | 'keycloak';
-
-export const getAuthTokens = async (
-  email: string,
-  password: string,
-  adminUrl: string,
-  idp: IdpOption,
-): Promise<{
-  id_token: string;
-  access_token: string;
-  refresh_token: string;
-  expires_at: Date;
-}> => {
-  console.log(`Getting authentication details for user ${email}`);
-
-  const browser = await puppeteer.launch({
-    headless: true,
-    ignoreHTTPSErrors: true,
-    product: 'chrome',
-    executablePath: getChromePath(),
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  });
-
-  const page = await browser.newPage();
-
-  await page.goto(adminUrl);
-
-  await page.waitForXPath('//*[.="Sign in"]', {
-    timeout: 5000,
-  });
-
-  await page.click('button[class="govuk-button govuk-button--start"]');
-
-  try {
-    switch (idp) {
-      case 'azure':
-        await getAuthTokensAzure(page, email, password);
-        break;
-      case 'keycloak':
-        await getAuthTokensKeycloak(page, email, password);
-        break;
-      default:
-        throw new Error(`No login strategy for IDP ${idp}`);
-    }
-
-    return await page.evaluate(() => {
-      for (let i = 0; i < localStorage.length; i += 1) {
-        const key = localStorage.key(i) as string;
-        const value = localStorage.getItem(key) as string;
-        const json = JSON.parse(value);
-        if (json.access_token) {
-          return json;
-        }
-      }
-      return null;
-    });
-  } finally {
-    await browser.close();
-  }
-};
 
 const getAuthTokensAzure = async (
   page: Page,
@@ -167,6 +108,65 @@ const getAuthTokensKeycloak = async (
     visible: true,
     timeout: 5000,
   });
+};
+
+export const getAuthTokens = async (
+  email: string,
+  password: string,
+  adminUrl: string,
+  idp: IdpOption,
+): Promise<{
+  id_token: string;
+  access_token: string;
+  refresh_token: string;
+  expires_at: Date;
+}> => {
+  logger.info(`Getting authentication details for user ${email}`);
+
+  const browser = await puppeteer.launch({
+    headless: true,
+    ignoreHTTPSErrors: true,
+    product: 'chrome',
+    executablePath: getChromePath(),
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
+
+  const page = await browser.newPage();
+
+  await page.goto(adminUrl);
+
+  await page.waitForXPath('//*[.="Sign in"]', {
+    timeout: 5000,
+  });
+
+  await page.click('button[class="govuk-button govuk-button--start"]');
+
+  try {
+    switch (idp) {
+      case 'azure':
+        await getAuthTokensAzure(page, email, password);
+        break;
+      case 'keycloak':
+        await getAuthTokensKeycloak(page, email, password);
+        break;
+      default:
+        throw new Error(`No login strategy for IDP ${idp}`);
+    }
+
+    return page.evaluate(() => {
+      for (let i = 0; i < localStorage.length; i += 1) {
+        const key = localStorage.key(i) as string;
+        const value = localStorage.getItem(key) as string;
+        const json = JSON.parse(value);
+        if (json.access_token) {
+          return json;
+        }
+      }
+      return null;
+    });
+  } finally {
+    await browser.close();
+  }
 };
 
 const getAuthDetails = async (

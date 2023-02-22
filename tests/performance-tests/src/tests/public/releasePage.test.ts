@@ -1,10 +1,10 @@
-/* eslint-disable no-console */
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
-import http from 'k6/http';
+import http, { RefinedResponse, ResponseType } from 'k6/http';
 import { check, fail } from 'k6';
 import getEnvironmentAndUsersFromFile from '../../utils/environmentAndUsers';
-import loggingUtils from '../../utils/loggingUtils';
+import logger from '../../utils/logger';
+import logDashboardUrls from '../../utils/logDashboardUrls';
 
 export const options: Options = {
   stages: [
@@ -19,9 +19,6 @@ export const options: Options = {
   ],
   noConnectionReuse: true,
   insecureSkipTLSVerify: true,
-  linger: true,
-  // vus: 5,
-  // duration: '120m',
 };
 
 export const errorRate = new Rate('ees_errors');
@@ -33,19 +30,19 @@ export const getReleaseRequestDuration = new Trend(
 );
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
-  __ENV.TEST_ENVIRONMENT as string,
+  __ENV.TEST_ENVIRONMENT,
 );
 
 export function setup() {
-  loggingUtils.logDashboardUrls();
+  logDashboardUrls();
 }
 
 const performTest = () => {
   const startTime = Date.now();
-  let response;
+  let response: RefinedResponse<ResponseType | undefined>;
   try {
     response = http.get(
-      `${environmentAndUsers.environment.contentApiUrl}/publications/pupil-absence-in-schools-in-england/releases/2016-17`,
+      `${environmentAndUsers.environment.publicUrl}/find-statistics/pupil-absence-in-schools-in-england/2016-17`,
       {
         timeout: '120s',
       },
@@ -54,27 +51,26 @@ const performTest = () => {
     getReleaseFailureCount.add(1);
     errorRate.add(1);
     fail(`Failure to get Release page - ${JSON.stringify(e)}`);
-    return;
   }
 
   if (
     check(response, {
-      'response code was 200': ({ status }) => status === 200,
-      'response should have contained body': ({ body }) => body != null,
-    }) &&
-    check(response, {
-      'response contains expected text': res =>
+      'response code is 200': ({ status }) => status === 200,
+      'response should contain body': ({ body }) => body !== null,
+      'response contains expected title': res =>
         res.html().text().includes('Pupil absence in schools in England'),
+      'response contains expected content': res =>
+        res.html().text().includes('pupils missed on average 8.2 school days'),
     })
   ) {
-    console.log('SUCCESS!');
+    logger.info('Passed');
     getReleaseSuccessCount.add(1);
     getReleaseRequestDuration.add(Date.now() - startTime);
   } else {
-    console.log(
-      `FAILURE!  Got ${response.status} response code - ${JSON.stringify(
-        response.body,
-      )}`,
+    logger.info(
+      `Failed. Received ${
+        response.status
+      } response code & body ${JSON.stringify(response.body)}`,
     );
     getReleaseFailureCount.add(1);
     getReleaseRequestDuration.add(Date.now() - startTime);

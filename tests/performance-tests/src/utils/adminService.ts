@@ -1,7 +1,8 @@
 import { sleep } from 'k6';
 import http, { RefinedResponse } from 'k6/http';
-import HttpClient from './httpClient';
 import TestData from '../tests/testData';
+import HttpClient from './httpClient';
+import logger from './logger';
 
 const applicationJsonHeaders = {
   'Content-Type': 'application/json',
@@ -115,8 +116,7 @@ export class AdminService {
       applicationJsonHeaders,
     );
 
-    /* eslint-disable-next-line no-console */
-    console.log(`Created Theme ${title}`);
+    logger.info(`Created Theme ${title}`);
 
     return {
       id: json.id,
@@ -156,8 +156,7 @@ export class AdminService {
       applicationJsonHeaders,
     );
 
-    /* eslint-disable-next-line no-console */
-    console.log(`Created Topic ${title}`);
+    logger.info(`Created Topic ${title}`);
 
     return {
       id: json.id,
@@ -226,8 +225,7 @@ export class AdminService {
       applicationJsonHeaders,
     );
 
-    /* eslint-disable-next-line no-console */
-    console.log(`Created Publication ${title}`);
+    logger.info(`Created Publication ${title}`);
 
     return {
       id: json.id,
@@ -298,8 +296,7 @@ export class AdminService {
       applicationJsonHeaders,
     );
 
-    /* eslint-disable-next-line no-console */
-    console.log(`Created Release ${year}`);
+    logger.info(`Created Release ${year}`);
 
     return {
       id: json.id,
@@ -401,7 +398,9 @@ export class AdminService {
         dataFile.file,
         dataFile.filename,
       ),
-      metaFile: !zipUpload ? http.file(metaFile!.file, metaFile!.filename) : '',
+      metaFile: !zipUpload
+        ? http.file(metaFile?.file as ArrayBuffer, metaFile?.filename)
+        : '',
     };
 
     const { response, json } = this.client.post<{ id: string }>(

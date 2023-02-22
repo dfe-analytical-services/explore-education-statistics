@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { check } from 'k6';
 import exec from 'k6/execution';
 import { Counter, Rate, Trend } from 'k6/metrics';
@@ -9,7 +8,9 @@ import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
 import createDataService from '../../../utils/dataService';
 import utils from '../../../utils/utils';
-import loggingUtils from '../../../utils/loggingUtils';
+import logger from '../../../utils/logger';
+import logDashboardUrls from '../../../utils/logDashboardUrls';
+import { AuthDetails } from '../../../auth/getAuthDetails';
 
 const tearDownData = false;
 const publicationTitle =
@@ -56,7 +57,7 @@ export const tableQueryFailureCount = new Counter(
 );
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
-  __ENV.TEST_ENVIRONMENT as string,
+  __ENV.TEST_ENVIRONMENT,
 );
 const {
   adminUrl,
@@ -64,16 +65,12 @@ const {
   supportsRefreshTokens,
 } = environmentAndUsers.environment;
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const { authTokens, userName } = environmentAndUsers.users.find(
   user => user.userName === 'bau1',
-)!;
+) as AuthDetails;
 
 function getOrCreateReleaseWithSubject() {
-  const adminService = createAdminService(
-    adminUrl,
-    authTokens?.accessToken as string,
-  );
+  const adminService = createAdminService(adminUrl, authTokens?.accessToken);
 
   const { id: themeId } = adminService.getOrCreateTheme({
     title: testData.themeName,
@@ -102,21 +99,21 @@ function getOrCreateReleaseWithSubject() {
   });
 
   if (!existingSubjects.length) {
-    console.log('Importing data file');
+    logger.info('Importing data file');
 
     const { id: fileId } = uploadFileStrategy.getOrImportSubject(
       adminService,
       releaseId,
     );
 
-    console.log('Waiting for data file to import');
+    logger.info('Waiting for data file to import');
 
     adminService.waitForDataFileToImport({
       releaseId,
       fileId,
     });
 
-    console.log('Data file imported successfully');
+    logger.info('Data file imported successfully');
   }
 
   const { subjects } = adminService.getSubjects({ releaseId });
@@ -133,15 +130,15 @@ function getOrCreateReleaseWithSubject() {
       ],
     });
 
-    console.log('Approving Release');
+    logger.info('Approving Release');
 
     adminService.approveRelease({ releaseId });
 
-    console.log(`Waiting for Release to be published`);
+    logger.info(`Waiting for Release to be published`);
 
     adminService.waitForReleaseToBePublished({ releaseId });
 
-    console.log(`Release published successfully`);
+    logger.info(`Release published successfully`);
   }
 
   return {
@@ -166,8 +163,7 @@ export function setup(): SetupData {
 
   const { subjectMeta } = adminService.getSubjectMeta({ releaseId, subjectId });
 
-  loggingUtils.logDashboardUrls();
-
+  logDashboardUrls();
   return {
     themeId,
     topicId,
@@ -224,7 +220,7 @@ const performTest = ({ publicationId, subjectId, subjectMeta }: SetupData) => {
         if (location.options) {
           return location.options.flatMap(o => o.id);
         }
-        return [location.id!];
+        return [location.id];
       }),
   );
 
@@ -242,20 +238,20 @@ const performTest = ({ publicationId, subjectId, subjectMeta }: SetupData) => {
 
   const startTimeMillis = Date.now();
 
-  console.log(`Starting table query ${exec.scenario.iterationInTest}`);
+  logger.info(`Starting table query ${exec.scenario.iterationInTest}`);
 
   const { response, results } = dataService.tableQuery({
     publicationId,
     subjectId,
     filterIds: someFilterItemIds,
     indicatorIds: allIndicationIds,
-    locationIds: someLocationIds,
+    locationIds: someLocationIds as string[],
     ...someTimePeriods,
   });
 
   if (
     check(response, {
-      'response code was 200': res => res.status === 200,
+      'response code is 200': res => res.status === 200,
       'response should contain table builder results': _ => results.length > 0,
     })
   ) {
@@ -263,14 +259,14 @@ const performTest = ({ publicationId, subjectId, subjectMeta }: SetupData) => {
     tableQueryCompleteCount.add(1);
     tableQuerySpeedTrend.add(tableQuerySpeed);
 
-    console.log(
+    logger.info(
       `Table query ${exec.scenario.iterationInTest} completed in ${
         tableQuerySpeed / 1000
       } seconds`,
     );
   } else {
     tableQueryFailureCount.add(1);
-    console.log(`Table query ${exec.scenario.iterationInTest} failed`);
+    logger.info(`Table query ${exec.scenario.iterationInTest} failed`);
   }
 };
 
@@ -288,7 +284,7 @@ export const teardown = ({ themeId, topicId }: SetupData) => {
     adminService.deleteTopic({ topicId });
     adminService.deleteTheme({ themeId });
 
-    console.log(`Deleted Theme ${themeId}, Topic ${topicId}`);
+    logger.info(`Deleted Theme ${themeId}, Topic ${topicId}`);
   }
 };
 

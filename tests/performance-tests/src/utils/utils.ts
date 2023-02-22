@@ -22,18 +22,19 @@ const utils = {
     const isZip = filename.endsWith('.zip');
     const subjectName = filename;
 
-    /* eslint-disable no-restricted-globals */
+    // eslint-disable-next-line no-restricted-globals
     const zipFile = isZip ? open(`admin/import/assets/${filename}`, 'b') : null;
     const subjectFile = !isZip
-      ? open(`admin/import/assets/${filename}`, 'b')
+      ? // eslint-disable-next-line no-restricted-globals
+        open(`admin/import/assets/${filename}`, 'b')
       : null;
     const subjectMetaFile = !isZip
-      ? open(
+      ? // eslint-disable-next-line no-restricted-globals
+        open(
           `admin/import/assets/${filename.replace('.csv', '.meta.csv')}`,
           'b',
         )
       : null;
-    /* eslint-enable no-restricted-globals */
 
     return {
       isZip,
@@ -45,7 +46,7 @@ const utils = {
               title: subjectName,
               releaseId,
               zipFile: {
-                file: zipFile!,
+                file: zipFile as ArrayBuffer,
                 filename: `${subjectName}.zip`,
               },
             })
@@ -53,11 +54,11 @@ const utils = {
               title: subjectName,
               releaseId,
               dataFile: {
-                file: subjectFile!,
+                file: subjectFile as ArrayBuffer,
                 filename: `${subjectName}.csv`,
               },
               metaFile: {
-                file: subjectMetaFile!,
+                file: subjectMetaFile as ArrayBuffer,
                 filename: `${subjectName}.meta.csv`,
               },
             }),

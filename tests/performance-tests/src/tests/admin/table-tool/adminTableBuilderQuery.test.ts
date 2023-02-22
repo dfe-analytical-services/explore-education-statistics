@@ -1,14 +1,16 @@
 /* eslint-disable no-restricted-globals */
-/* eslint-disable no-console */
+
 import { check } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
+import { AuthDetails } from '../../../auth/getAuthDetails';
 import createAdminService, { SubjectMeta } from '../../../utils/adminService';
-import testData from '../../testData';
-import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
+import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
+import logDashboardUrls from '../../../utils/logDashboardUrls';
+import logger from '../../../utils/logger';
 import utils from '../../../utils/utils';
-import loggingUtils from '../../../utils/loggingUtils';
+import testData from '../../testData';
 
 const tearDownData = false;
 const publicationTitle =
@@ -56,20 +58,16 @@ export const tableQueryFailureCount = new Counter(
 );
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
-  __ENV.TEST_ENVIRONMENT as string,
+  __ENV.TEST_ENVIRONMENT,
 );
 const { adminUrl, supportsRefreshTokens } = environmentAndUsers.environment;
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const { authTokens, userName } = environmentAndUsers.users.find(
   user => user.userName === 'bau1',
-)!;
+) as AuthDetails;
 
 function getOrCreateReleaseWithSubject() {
-  const adminService = createAdminService(
-    adminUrl,
-    authTokens?.accessToken as string,
-  );
+  const adminService = createAdminService(adminUrl, authTokens?.accessToken);
 
   const { id: themeId } = adminService.getOrCreateTheme({
     title: testData.themeName,
@@ -124,7 +122,7 @@ export function setup(): SetupData {
 
   const { subjectMeta } = adminService.getSubjectMeta({ releaseId, subjectId });
 
-  loggingUtils.logDashboardUrls();
+  logDashboardUrls();
 
   return {
     themeId,
@@ -163,7 +161,7 @@ const performTest = ({ releaseId, subjectId, subjectMeta }: SetupData) => {
         if (location.options) {
           return location.options.flatMap(o => o.id);
         }
-        return [location.id!];
+        return [location.id];
       }),
   );
 
@@ -181,13 +179,13 @@ const performTest = ({ releaseId, subjectId, subjectMeta }: SetupData) => {
     subjectId,
     filterIds: allFilterIds,
     indicatorIds: allIndicationIds,
-    locationIds: allLocationIds,
+    locationIds: allLocationIds as string[],
     ...someTimePeriods,
   });
 
   if (
     check(response, {
-      'response code was 200': res => res.status === 200,
+      'response code is 200': res => res.status === 200,
       'response should contain table builder results': _ => results.length > 0,
     })
   ) {
@@ -212,7 +210,7 @@ export const teardown = ({ themeId, topicId }: SetupData) => {
     adminService.deleteTopic({ topicId });
     adminService.deleteTheme({ themeId });
 
-    console.log(`Deleted Theme ${themeId}, Topic ${topicId}`);
+    logger.info(`Deleted Theme ${themeId}, Topic ${topicId}`);
   }
 };
 

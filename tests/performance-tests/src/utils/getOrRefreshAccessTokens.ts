@@ -1,8 +1,9 @@
-import refreshAuthTokens from '../auth/refreshAuthTokens';
 import { AuthTokens } from '../auth/getAuthDetails';
+import refreshAuthTokens from '../auth/refreshAuthTokens';
 
-// Note that this would be best invoked from within httpClient.ts prior to any HTTP requests going out.  Currently
-// it is invoked directly from the tests themselves.
+// Note that this would be best invoked from within httpClient.ts
+// prior to any HTTP requests going out. Currently it is invoked
+// directly from the tests themselves.
 export default function getOrRefreshAccessTokens(
   supportsRefreshTokens: boolean,
   userName: string,

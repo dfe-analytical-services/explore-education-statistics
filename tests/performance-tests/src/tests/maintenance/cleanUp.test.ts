@@ -1,8 +1,9 @@
-/* eslint-disable no-console */
 import { Options } from 'k6/options';
+import { AuthDetails } from '../../auth/getAuthDetails';
 import createAdminService from '../../utils/adminService';
-import getOrRefreshAccessTokens from '../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../utils/environmentAndUsers';
+import getOrRefreshAccessTokens from '../../utils/getOrRefreshAccessTokens';
+import logger from '../../utils/logger';
 import testData from '../testData';
 
 export const options: Options = {
@@ -11,18 +12,19 @@ export const options: Options = {
 };
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
-  __ENV.TEST_ENVIRONMENT as string,
+  __ENV.TEST_ENVIRONMENT,
 );
 
-const performTest = () => {};
+const performTest = () => {
+  return true;
+};
 
 export const teardown = () => {
   const { adminUrl, supportsRefreshTokens } = environmentAndUsers.environment;
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const { authTokens, userName } = environmentAndUsers.users.find(
     user => user.userName === 'bau1',
-  )!;
+  ) as AuthDetails;
 
   const accessToken = getOrRefreshAccessTokens(
     supportsRefreshTokens,
@@ -42,10 +44,10 @@ export const teardown = () => {
     });
     if (testTopic) {
       adminService.deleteTopic({ topicId: testTopic.id });
-      console.log(`Deleted Topic ${testData.topicName}`);
+      logger.info(`Deleted Topic ${testData.topicName}`);
     }
     adminService.deleteTheme({ themeId: testTheme.id });
-    console.log(`Deleted Theme ${testData.themeName}`);
+    logger.info(`Deleted Theme ${testData.themeName}`);
   }
 };
 

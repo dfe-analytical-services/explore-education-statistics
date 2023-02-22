@@ -1,14 +1,15 @@
-/* eslint-disable no-console */
 import { check, fail } from 'k6';
+import exec from 'k6/execution';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
-import exec from 'k6/execution';
+import { AuthDetails } from '../../../auth/getAuthDetails';
 import createAdminService from '../../../utils/adminService';
-import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
-import testData from '../../testData';
+import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
+import logDashboardUrls from '../../../utils/logDashboardUrls';
+import logger from '../../../utils/logger';
 import utils from '../../../utils/utils';
-import loggingUtils from '../../../utils/loggingUtils';
+import testData from '../../testData';
 
 const IMPORT_STATUS_POLLING_DELAY_SECONDS = 5;
 
@@ -82,14 +83,13 @@ const processingStages: {
 );
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
-  __ENV.TEST_ENVIRONMENT as string,
+  __ENV.TEST_ENVIRONMENT,
 );
 const { adminUrl, supportsRefreshTokens } = environmentAndUsers.environment;
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const { authTokens, userName } = environmentAndUsers.users.find(
   user => user.userName === 'bau1',
-)!;
+) as AuthDetails;
 
 export function setup(): SetupData {
   const adminService = createAdminService(adminUrl, authTokens.accessToken);
@@ -108,11 +108,11 @@ export function setup(): SetupData {
     title: publicationTitle,
   });
 
-  console.log(
+  logger.info(
     `Created Theme ${themeId}, Topic ${topicId}, Publication ${publicationId}`,
   );
 
-  loggingUtils.logDashboardUrls();
+  logDashboardUrls();
 
   return {
     themeId,
@@ -136,7 +136,7 @@ const performTest = ({ topicId, publicationId }: SetupData) => {
 
   const year = 2000 + exec.scenario.iterationInTest;
 
-  console.log(`Creating Release ${year} for file import to be uploaded to`);
+  logger.info(`Creating Release ${year} for file import to be uploaded to`);
 
   const { id: releaseId } = adminService.getOrCreateRelease({
     topicId,
@@ -146,22 +146,22 @@ const performTest = ({ topicId, publicationId }: SetupData) => {
     timePeriodCoverage: 'AY',
   });
 
-  console.log(`Uploading subject ${subjectName}`);
+  logger.info(`Uploading subject ${subjectName}`);
 
   const {
     response: uploadResponse,
     id: fileId,
   } = uploadFileStrategy.getOrImportSubject(adminService, releaseId);
 
-  console.log(`Subject ${subjectName} finished uploading`);
+  logger.info(`Subject ${subjectName} finished uploading`);
 
   if (
     check(uploadResponse, {
-      'response code was 200': res => res.status === 200,
+      'response code is 200': res => res.status === 200,
       'response should contain the uploaded file id': _ => !!fileId,
     })
   ) {
-    console.log(`Subject ${subjectName} finished uploading`);
+    logger.info(`Subject ${subjectName} finished uploading`);
   } else {
     fail(
       `Subject ${subjectName} failed to upload successfully - got response ${JSON.stringify(
@@ -203,24 +203,24 @@ const performTest = ({ topicId, publicationId }: SetupData) => {
         });
 
         if (unreportedStages.length) {
-          console.log(`Import "${fileId}" - stage ${importStatus} reached`);
+          logger.info(`Import "${fileId}" - stage ${importStatus} reached`);
         }
       }
     },
     onImportFailed: importStatus => {
-      console.log(`Import "${fileId}" - FAILED with status ${importStatus}`);
+      logger.info(`Import "${fileId}" - FAILED with status ${importStatus}`);
       errorRate.add(1);
       importFailureCount.add(1);
     },
     onImportCompleted: () => {
-      console.log(
+      logger.info(
         `Import "${fileId}" - COMPLETE after ${
           (Date.now() - importStartTime) / 1000
         } seconds`,
       );
     },
     onImportExceededTimeout: () => {
-      console.log(
+      logger.info(
         `Import "${fileId}" -  EXCEEDED TEST TIMEOUT after ${
           (Date.now() - importStartTime) / 1000
         } seconds`,
@@ -244,7 +244,7 @@ export const teardown = ({ themeId, topicId }: SetupData) => {
     adminService.deleteTopic({ topicId });
     adminService.deleteTheme({ themeId });
 
-    console.log(`Deleted Theme ${themeId}, Topic ${topicId}`);
+    logger.info(`Deleted Theme ${themeId}, Topic ${topicId}`);
   }
 };
 
