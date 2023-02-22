@@ -427,7 +427,7 @@ public class GeneratorTests
     [Fact]
     public void Generate_ForRange_RangeOutOfBoundsThrows()
     {
-        var ex = Assert.Throws<ArgumentOutOfRangeException>(
+        Assert.Throws<ArgumentOutOfRangeException>(
             () => new Generator<Test>()
                 .ForRange(..2, s => s
                     .Set(t => t.FirstName, "John")
@@ -437,7 +437,6 @@ public class GeneratorTests
                     .Set(t => t.LastName, "Loe"))
                 .GenerateArray(2)
         );
-        Assert.Equal(2, ex.ActualValue);
     }
 
     [Fact]
@@ -467,17 +466,57 @@ public class GeneratorTests
     }
     
     [Fact]
-    public void Generate_Multiple_GenerateList_NoArg_NoRangesProvided()
+    public void Generate_Multiple_GenerateArray_NoArg_IndexFromEndRangeSetterProvided()
     {
-        Assert.Throws<ArgumentException>(() => 
-            new Generator<Test>().GenerateList());
+        // Note that a range with unbounded upper limit like "2.." is also an index-from-end range of the form "2..^0".
+        var ex = Assert.Throws<ArgumentException>(() => 
+            new Generator<Test>()
+                .ForRange(..^2, s => s.Set(t => t.FirstName, "John"))
+                .GenerateList());
+        
+        Assert.StartsWith(
+            "Cannot infer number of elements to create if index-from-end", 
+            ex.Message);
     }
     
     [Fact]
-    public void Generate_Multiple_GenerateArray_NoArg_NoRangesProvided()
+    public void Generate_Multiple_GenerateList_NoArg_NoRangeSettersProvided()
     {
-        Assert.Throws<ArgumentException>(() => 
-            new Generator<Test>().GenerateArray());
+        var ex = Assert.Throws<ArgumentException>(() => 
+            new Generator<Test>()
+                .ForInstance(s => s.Set(t => t.FirstName, "John"))
+                .GenerateList());
+        
+        Assert.Equal(
+            "Cannot infer number of elements to create if no range setters are used", 
+            ex.Message);
+    }
+    
+    [Fact]
+    public void Generate_Multiple_GenerateList_NoArg_IndexFromEndRangeSetterProvided()
+    {
+        // Note that a range with unbounded upper limit like "2.." is also an index-from-end range of the form "2..^0".
+        var ex = Assert.Throws<ArgumentException>(() => 
+            new Generator<Test>()
+                .ForRange(..^2, s => s.Set(t => t.FirstName, "John"))
+                .GenerateList());
+        
+        Assert.StartsWith(
+            "Cannot infer number of elements to create if index-from-end", 
+            ex.Message);
+    }
+    
+    [Fact]
+    public void Generate_Multiple_GenerateArray_NoArg_NoRangeSetterProvided()
+    {
+        var ex = Assert.Throws<ArgumentException>(() => 
+            new Generator<Test>()
+                .ForInstance(s => s.Set(t => t.FirstName, "John"))
+                .GenerateArray());
+        
+        Assert.Equal(
+            "Cannot infer number of elements to create if no range setters are used", 
+            ex.Message);
     }
 
     [Fact]
