@@ -29,6 +29,12 @@ public static class FootnoteGeneratorExtensions
     public static Generator<Footnote> WithIndicators(this Generator<Footnote> generator, IEnumerable<Indicator> indicators)
         => generator.ForInstance(s => s.SetIndicators(indicators));
 
+    public static Generator<Footnote> WithContent(this Generator<Footnote> generator, string content)
+        => generator.ForInstance(s => s.SetContent(content));
+
+    public static Generator<Footnote> WithOrder(this Generator<Footnote> generator, int order)
+        => generator.ForInstance(s => s.SetOrder(order));
+
     public static InstanceSetters<Footnote> SetDefaults(this InstanceSetters<Footnote> setters)
         => setters
             .SetDefault(f => f.Id)
@@ -159,4 +165,14 @@ public static class FootnoteGeneratorExtensions
     
         return instanceSetter;
     }
+    
+    public static InstanceSetters<Footnote> SetContent(
+        this InstanceSetters<Footnote> instanceSetter, 
+        string content)
+        => instanceSetter.Set(f => f.Content, content);
+    
+    public static InstanceSetters<Footnote> SetOrder(
+        this InstanceSetters<Footnote> instanceSetter, 
+        int order)
+        => instanceSetter.Set(f => f.Order, order);
 }
