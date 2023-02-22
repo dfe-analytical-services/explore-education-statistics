@@ -22,8 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql("DROP VIEW dbo.ObservationSubjectIdGeographicLevel");
-            migrationBuilder.Sql("DROP VIEW dbo.ObservationSubjectIdYearTimeIdentifier");
+            migrationBuilder.Sql("DROP VIEW dbo.vObservationSubjectIdGeographicLevel");
+            migrationBuilder.Sql("DROP VIEW dbo.vObservationSubjectIdYearTimeIdentifier");
         }
     }
 }
