@@ -150,15 +150,6 @@ public class Generator<T> where T : class
     /// <param name="count">The number of instances.</param>
     public IEnumerable<T> Generate(int count) {
 
-        if (_rangeSetters.Count > 0 && count < GetMaximumIndex() - 1)
-        {
-            throw new ArgumentOutOfRangeException(
-                nameof(count),
-                count,
-                $"Expected a count of at least {GetMaximumIndex() - 1} " +
-                $"based on the Range and Index setters provided, but received {count}");
-        }
-        
         return Enumerable.Range(1, count)
             .Select(i => GenerateWithRange(index: i - 1, length: count));
     }
@@ -172,14 +163,30 @@ public class Generator<T> where T : class
     /// the maximum index of any Range and Index setters used rather than a manually
     /// provided count.
     /// </summary>
-    public List<T> GenerateList() => Generate(GetMaximumIndex() + 1).ToList();
+    public List<T> GenerateList()
+    {
+        if (_rangeSetters.Count == 0)
+        {
+            throw new ArgumentException(
+                "Cannot infer number of elements to create if no range setters are used");
+        }
+        
+        if (_rangeSetters.Any(setter => setter.Range.End.IsFromEnd))
+        {
+            throw new ArgumentException(
+                "Cannot infer number of elements to create if index-from-end range setters or range setters " +
+                "with unbounded upper limits are used");
+        }
+        
+        return Generate(GetMaximumIndex() + 1).ToList();
+    }
 
     /// <summary>
     /// Identical to <see cref="GenerateArray(int)"/> but uses a count derived from
     /// the maximum index of any Range and Index setters used rather than a manually
     /// provided count.
     /// </summary>
-    public T[] GenerateArray() => Generate(GetMaximumIndex() + 1).ToArray();
+    public T[] GenerateArray() => GenerateList().ToArray();
 
     /// <summary>
     /// Get the maximum index specified by any use of <see cref="ForRange"/> or
