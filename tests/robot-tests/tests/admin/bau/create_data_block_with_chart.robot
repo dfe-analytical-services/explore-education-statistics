@@ -63,7 +63,7 @@ Select subject "UI test subject"
     user checks previous table tool step contains    1    Subject    UI test subject
 
 Select locations
-    user opens details dropdown    Opportunity Area
+    user opens details dropdown    Opportunity area
     user clicks checkbox    Bolton 001
     user clicks checkbox    Bolton 002
     user clicks checkbox    Bolton 003

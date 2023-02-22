@@ -23,7 +23,7 @@ Validate "Absence in prus" subject details
     user opens details dropdown    More details    css:[data-testid="Radio item for Absence in prus"]
     ${details}=    user gets details content element    More details
     ...    css:[data-testid="Radio item for Absence in prus"]
-    user checks summary list contains    Geographic levels    Local Authority; National; Regional    ${details}
+    user checks summary list contains    Geographic levels    Local authority; National; Regional    ${details}
     user checks summary list contains    Time period    2013/14 to 2016/17    ${details}
 
 Select subject "Absence in prus"
@@ -91,16 +91,16 @@ Unselect England as a location
     user closes details dropdown    National
 
 Select locations LAs Barnet, Barnsley, Bedford
-    user opens details dropdown    Local Authority
+    user opens details dropdown    Local authority
     user clicks checkbox    Barnet
     user clicks checkbox    Barnsley
     user clicks checkbox    Bedford
 
     user clicks element    id:locationFiltersForm-submit
     user waits until table tool wizard step is available    4    Choose time period
-    user checks previous table tool step contains    3    Local Authority    Barnet
-    user checks previous table tool step contains    3    Local Authority    Barnsley
-    user checks previous table tool step contains    3    Local Authority    Bedford
+    user checks previous table tool step contains    3    Local authority    Barnet
+    user checks previous table tool step contains    3    Local authority    Barnsley
+    user checks previous table tool step contains    3    Local authority    Bedford
 
 Select new start and end date
     user chooses select option    id:timePeriodForm-start    2014/15

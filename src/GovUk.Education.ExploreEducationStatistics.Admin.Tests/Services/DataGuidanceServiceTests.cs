@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Name = "Subject",
                     GeographicLevels = new List<string>
                     {
-                        "National", "Local Authority", "Local Authority District"
+                        "National", "Local authority", "Local authority district"
                     },
                     TimePeriods = new TimePeriodLabels("2020/21 Q3", "2021/22 Q1"),
                     Variables = new List<LabelValue>

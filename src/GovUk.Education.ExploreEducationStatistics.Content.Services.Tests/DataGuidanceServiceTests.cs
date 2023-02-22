@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Name = "Subject",
                     GeographicLevels = new List<string>
                     {
-                        "National", "Local Authority", "Local Authority District"
+                        "National", "Local authority", "Local authority district"
                     },
                     TimePeriods = new TimePeriodLabels("2020_AYQ3", "2021_AYQ1"),
                     Variables = new List<LabelValue>
