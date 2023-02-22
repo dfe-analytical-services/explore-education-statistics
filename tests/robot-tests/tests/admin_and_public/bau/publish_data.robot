@@ -330,7 +330,7 @@ Select subject "${SUBJECT_2_NAME}"
 
 Select locations
     user waits until table tool wizard step is available    2    Choose locations
-    user opens details dropdown    Opportunity Area
+    user opens details dropdown    Opportunity area
     user clicks checkbox    Bolton 001
     user clicks checkbox    Bolton 004
     user opens details dropdown    Ward
@@ -479,15 +479,15 @@ Select subject "${SUBJECT_2_NAME}" in table tool
     user checks previous table tool step contains    2    Subject    ${SUBJECT_2_NAME}
 
 Select locations in table tool
-    user clicks element    testid:Expand Details Section Local Authority
+    user clicks element    testid:Expand Details Section Local authority
     user clicks checkbox    Barnsley
     user clicks checkbox    Birmingham
 
     user clicks element    id:locationFiltersForm-submit
 
     user waits until table tool wizard step is available    4    Choose time period
-    user checks previous table tool step contains    3    Local Authority    Barnsley
-    user checks previous table tool step contains    3    Local Authority    Birmingham
+    user checks previous table tool step contains    3    Local authority    Barnsley
+    user checks previous table tool step contains    3    Local authority    Birmingham
 
     user waits until table tool wizard step is available    4    Choose time period
 
@@ -642,7 +642,7 @@ Validate data guidance document file details
     ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
     user checks summary list contains    Filename    upload-file-test.csv    ${subject_2_content}
     user checks summary list contains    Geographic levels
-    ...    Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; RSC Region; Regional; Ward
+    ...    Local authority; Local authority district; Local enterprise partnership; Opportunity area; Parliamentary constituency; RSC region; Regional; Ward
     ...    ${subject_2_content}
     user checks summary list contains    Time period    2005 to 2020    ${subject_2_content}
     user checks summary list contains    Content    UI test subject 2 data guidance content    ${subject_2_content}

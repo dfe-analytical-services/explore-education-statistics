@@ -321,8 +321,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(new List<string>
                 {
                     "National",
-                    "Local Authority",
-                    "Local Authority District"
+                    "Local authority",
+                    "Local authority district"
                 }, result[0].GeographicLevels);
 
                 Assert.Equal(2, result[0].Variables.Count);
@@ -972,8 +972,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.Equal(3, result.Count);
                 Assert.Equal("National", result[0]);
-                Assert.Equal("Local Authority", result[1]);
-                Assert.Equal("Local Authority District", result[2]);
+                Assert.Equal("Local authority", result[1]);
+                Assert.Equal("Local authority district", result[2]);
             }
         }
 

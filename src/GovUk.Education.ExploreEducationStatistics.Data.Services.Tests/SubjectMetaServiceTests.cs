@@ -295,7 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 // Expect a hierarchy of Country-Region-LA within the Local Authority level
                 var localAuthorities = locationViewModels["localAuthority"];
-                Assert.Equal("Local Authority", localAuthorities.Legend);
+                Assert.Equal("Local authority", localAuthorities.Legend);
 
                 var laOption1 = Assert.Single(localAuthorities.Options);
                 Assert.NotNull(laOption1);

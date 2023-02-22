@@ -39,7 +39,7 @@ Add metadata guidance
 
     user checks summary list contains    Filename    upload-file-test.csv
     user checks summary list contains    Geographic levels
-    ...    Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; RSC Region; Regional; Ward
+    ...    Local authority; Local authority district; Local enterprise partnership; Opportunity area; Parliamentary constituency; RSC region; Regional; Ward
     user checks summary list contains    Time period    2005 to 2020
 
     user opens details dropdown    Variable names and descriptions
@@ -312,7 +312,7 @@ Validate metadata guidance page
     user opens accordion section    UI test subject
     user checks summary list contains    Filename    upload-file-test.csv
     user checks summary list contains    Geographic levels
-    ...    Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; RSC Region; Regional; Ward
+    ...    Local authority; Local authority district; Local enterprise partnership; Opportunity area; Parliamentary constituency; RSC region; Regional; Ward
     user checks summary list contains    Time period    2005 to 2020
     user checks summary list contains    Content    Test file guidance content
 
@@ -425,7 +425,7 @@ Validate public metdata guidance for Analyst user
     user opens accordion section    UI test subject
     user checks summary list contains    Filename    upload-file-test.csv
     user checks summary list contains    Geographic levels
-    ...    Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; RSC Region; Regional; Ward
+    ...    Local authority; Local authority district; Local enterprise partnership; Opportunity area; Parliamentary constituency; RSC region; Regional; Ward
     user checks summary list contains    Time period    2005 to 2020
     user checks summary list contains    Content    Test file guidance content
 
