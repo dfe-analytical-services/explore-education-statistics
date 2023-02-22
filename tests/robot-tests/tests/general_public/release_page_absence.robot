@@ -45,14 +45,14 @@ Validate Email alerts link
 
 Validate "About these statistics" -- Number of other releases
     user checks number of other releases is correct    6
-    user opens details dropdown    See other releases (6)
+    user opens details dropdown    View previous releases (6)
     user checks other release is shown in position    Academic Year 2014/15    1
     user checks other release is shown in position    Academic Year 2013/14    2
     user checks other release is shown in position    Academic Year 2012/13    3
     user checks other release is shown in position    Academic Year 2011/12    4
     user checks other release is shown in position    Academic Year 2010/11    5
     user checks other release is shown in position    Academic Year 2009/10    6
-    user closes details dropdown    See other releases (6)
+    user closes details dropdown    View previous releases (6)
 
 Validate "About these statistics" -- "Last updated"
     user checks summary list contains    Last updated    22 August 2022
@@ -66,10 +66,11 @@ Validate "About these statistics" -- "Last updated"
     user checks release update    3    22 March 2018    First published.
     user closes details dropdown    See all updates (3)
 
-Check data downloads navigation contains links
-    user checks element contains link    testid:data-downloads    Explore data and files
-    user checks element contains link    testid:data-downloads    View data guidance
-    user checks element contains link    testid:data-downloads    Download all data (zip)
+Check quick links navigation contains links
+    user checks element contains link    testid:quick-links    Explore data
+    user checks element contains link    testid:quick-links    Release contents
+    user checks element contains link    testid:quick-links    Help and support
+    user checks element contains link    testid:quick-links    Download all data (zip)
 
 Check supporting information contains methodology link
     user checks page contains link with text and url    Pupil absence statistics: methodology
@@ -246,9 +247,9 @@ Validate accordion sections order
 
     user checks there are x accordion sections    3    id:help-and-support
 
-Check explore data and files link opens accordion section
+Check explore data link opens accordion section
     user verifies accordion is closed    Explore data and files
-    user clicks link    Explore data and files    testid:data-downloads
+    user clicks link    Explore data    testid:quick-links
     user verifies accordion is open    Explore data and files
     user closes accordion section    Explore data and files    id:data-accordion
 

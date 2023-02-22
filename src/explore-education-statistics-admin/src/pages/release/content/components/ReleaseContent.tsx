@@ -176,45 +176,19 @@ const ReleaseContent = () => {
 
         <div className="govuk-grid-column-one-third">
           <RelatedAside>
-            <h2 className="govuk-heading-m" id="data-downloads">
-              Data downloads
+            <h2 className="govuk-heading-m" id="quick-links">
+              Quick links
             </h2>
             <nav
               role="navigation"
-              aria-labelledby="data-downloads"
-              data-testid="data-downloads"
+              aria-labelledby="quick-links"
+              data-testid="quick-links"
             >
-              <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
-                <li>
-                  <a href="#explore-data-and-files">Explore data and files</a>
-                </li>
-                <li>
-                  <Link
-                    to={{
-                      pathname: generatePath<ReleaseRouteParams>(
-                        releaseDataGuidanceRoute.path,
-                        {
-                          publicationId: release.publication.id,
-                          releaseId: release.id,
-                        },
-                      ),
-                      state: {
-                        backLink: location.pathname,
-                      },
-                    }}
-                  >
-                    View data guidance
-                  </Link>
-                </li>
-                {!!release.relatedDashboardsSection?.content.length && (
-                  <li>
-                    <a href="#related-dashboards">View related dashboard(s)</a>
-                  </li>
-                )}
+              <ul className="govuk-list">
                 {hasAllFilesButton && (
                   <li>
                     <Button
-                      className="govuk-!-width-full govuk-!-margin-bottom-3"
+                      className="govuk-!-margin-bottom-3"
                       disableDoubleClick
                       onClick={() =>
                         releaseFileService.downloadAllFilesZip(release.id)
@@ -224,11 +198,44 @@ const ReleaseContent = () => {
                     </Button>
                   </li>
                 )}
+                <li>
+                  <a href="#releaseMainContent">Release contents</a>
+                </li>
+                <li>
+                  <a href="#explore-data-and-files">Explore data</a>
+                </li>
+                {!!release.relatedDashboardsSection?.content.length && (
+                  <li>
+                    <a href="#related-dashboards">View related dashboard(s)</a>
+                  </li>
+                )}
+                <li>
+                  <a href="#help-and-support">Help and support</a>
+                </li>
               </ul>
             </nav>
 
-            <h2 className="govuk-heading-m">Supporting information</h2>
-            <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
+            <h2 className="govuk-heading-s">Related information</h2>
+            <ul className="govuk-list">
+              <li>
+                <Link
+                  to={{
+                    pathname: generatePath<ReleaseRouteParams>(
+                      releaseDataGuidanceRoute.path,
+                      {
+                        publicationId: release.publication.id,
+                        releaseId: release.id,
+                      },
+                    ),
+                    state: {
+                      backLink: location.pathname,
+                    },
+                  }}
+                >
+                  Data guidance
+                </Link>
+              </li>
+
               {release.hasPreReleaseAccessList && (
                 <li>
                   <Link
@@ -256,16 +263,14 @@ const ReleaseContent = () => {
 
             {!!releaseCount && (
               <>
-                <h3
-                  className="govuk-heading-s govuk-!-margin-top-6"
-                  id="past-releases"
-                >
+                <h3 className="govuk-heading-s" id="past-releases">
                   Past releases
                 </h3>
-                <p className="govuk-!-margin-bottom-0">
-                  {release.coverageTitle} <strong>{release.yearTitle}</strong>
-                </p>
-                <Details summary={`See other releases (${releaseCount})`}>
+
+                <Details
+                  className="govuk-!-margin-bottom-4"
+                  summary={`View previous releases (${releaseCount})`}
+                >
                   <ScrollableContainer maxHeight={300}>
                     <ul className="govuk-list">
                       {[
@@ -297,12 +302,12 @@ const ReleaseContent = () => {
             {allMethodologies.length > 0 && (
               <>
                 <h3
-                  className="govuk-heading-s govuk-!-margin-top-6"
+                  className="govuk-heading-s govuk-!-padding-top-0"
                   id="methodologies"
                 >
                   Methodologies
                 </h3>
-                <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
+                <ul className="govuk-list">
                   {allMethodologies.map(methodology => (
                     <li key={methodology.key}>
                       {editingMode === 'edit' ? (
