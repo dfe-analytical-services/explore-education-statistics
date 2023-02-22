@@ -6,7 +6,7 @@ const PrototypePage = ({ children, ...props }: PageProps) => {
   return (
     <Page
       {...props}
-      homePath="./homepage5"
+      homePath="./homepageDashboard"
       pageBanner={<PrototypePageBanner />}
     >
       {children}

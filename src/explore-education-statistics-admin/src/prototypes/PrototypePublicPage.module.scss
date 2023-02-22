@@ -53,8 +53,29 @@
   @include govuk-media-query($from: 1280px) {
     grid-template-columns: 1fr 1fr 1fr 1fr;
   }
+
+  &.col3 {
+    @include govuk-media-query($from: desktop) {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+    @include govuk-media-query($from: 1280px) {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
 }
 
+.prototypeCardDashboardContainerGrid {
+  display: grid;
+  grid-gap: 1rem;
+  grid-template-columns: 1fr;
+  margin-bottom: 3rem;
+  @include govuk-media-query($from: tablet) {
+    grid-template-columns: 1fr 1fr;
+  }
+  @include govuk-media-query($from: 1280px) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
 .prototypeCard {
   //background: govuk-colour('light-grey');
   //@function: 1px solid $govuk-border-colour;
@@ -66,6 +87,20 @@
   .prototypeCardBg & {
     background: govuk-colour('light-grey');
     padding: 1.6rem;
+  }
+}
+.prototypeDashboardCard {
+  background: govuk-colour('light-grey');
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1rem;
+  position: relative;
+
+  em {
+    font-size: 1.5rem;
+    font-style: normal;
+    font-weight: 900;
   }
 }
 .prototypeCardChevron {
@@ -443,5 +478,33 @@
 .contentsMobile {
   @include govuk-media-query($from: tablet) {
     display: none;
+  }
+}
+
+.prototypeLinkNoUnderline {
+  text-decoration: none;
+
+  &:focus,
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.prototypeDashboardCardLink {
+  text-decoration: none;
+
+  &::after {
+    bottom: 0;
+    content: '';
+    display: block;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  &:focus,
+  &:hover {
+    text-decoration: underline;
   }
 }

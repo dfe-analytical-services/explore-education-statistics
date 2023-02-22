@@ -522,7 +522,10 @@ const PrototypeReleaseData = () => {
                   <ul className="govuk-list govuk-list--spaced">
                     <li>
                       <a
-                        className="govuk-link--no-visited-state"
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
                         href="#about-these-statistics"
                       >
                         About these statistics
@@ -530,7 +533,10 @@ const PrototypeReleaseData = () => {
                     </li>
                     <li>
                       <a
-                        className="govuk-link--no-visited-state"
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
                         href="#how-to-use-this-release-and-find-data"
                       >
                         How to use this release and find data
@@ -538,7 +544,10 @@ const PrototypeReleaseData = () => {
                     </li>
                     <li>
                       <a
-                        className="govuk-link--no-visited-state"
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
                         href="#interactive-data-visualisation-tool"
                       >
                         Interactive data visualisation tool
@@ -546,7 +555,10 @@ const PrototypeReleaseData = () => {
                     </li>
                     <li>
                       <a
-                        className="govuk-link--no-visited-state"
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
                         href="#latest-headline-statistics"
                       >
                         Latest headline statistics
@@ -554,7 +566,10 @@ const PrototypeReleaseData = () => {
                     </li>
                     <li>
                       <a
-                        className="govuk-link--no-visited-state"
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
                         href="#annual-time-series"
                       >
                         Annual time series
@@ -562,7 +577,10 @@ const PrototypeReleaseData = () => {
                     </li>
                     <li>
                       <a
-                        className="govuk-link--no-visited-state"
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
                         href="#learner-characteristics"
                       >
                         Learner characteristics
@@ -570,7 +588,10 @@ const PrototypeReleaseData = () => {
                     </li>
                     <li>
                       <a
-                        className="govuk-link--no-visited-state"
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
                         href="#subjects-and-levels"
                       >
                         Subjects and levels
@@ -578,7 +599,10 @@ const PrototypeReleaseData = () => {
                     </li>
                     <li>
                       <a
-                        className="govuk-link--no-visited-state"
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
                         href="#geographical-breakdowns"
                       >
                         Geographical breakdowns
@@ -586,7 +610,10 @@ const PrototypeReleaseData = () => {
                     </li>
                     <li>
                       <a
-                        className="govuk-link--no-visited-state"
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
                         href="#providers"
                       >
                         Providers
@@ -594,7 +621,10 @@ const PrototypeReleaseData = () => {
                     </li>
                     <li>
                       <a
-                        className="govuk-link--no-visited-state"
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
                         href="#public-sector-apprenticeships"
                       >
                         Public sector apprenticeships
@@ -602,7 +632,10 @@ const PrototypeReleaseData = () => {
                     </li>
                     <li>
                       <a
-                        className="govuk-link--no-visited-state"
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
                         href="#Traineeships"
                       >
                         Traineeships
@@ -610,28 +643,57 @@ const PrototypeReleaseData = () => {
                     </li>
                     <li>
                       <a
-                        className="govuk-link--no-visited-state"
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
                         href="#national-achievement-rate-tables"
                       >
                         National achievement rate tables
                       </a>
                     </li>
                     <li>
-                      <a href="#apprenticeship-service-and-monthly-transparency-data">
+                      <a
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
+                        href="#apprenticeship-service-and-monthly-transparency-data"
+                      >
                         Apprenticeship Service and monthly transparency data
                       </a>
                     </li>
                     <li>
-                      <a href="#additional-analysis">Additional analysis</a>
+                      <a
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
+                        href="#additional-analysis"
+                      >
+                        Additional analysis
+                      </a>
                     </li>
                     <li>
-                      <a href="#future-changes">Future changes</a>
+                      <a
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
+                        href="#future-changes"
+                      >
+                        Future changes
+                      </a>
                     </li>
                   </ul>
                   <hr />
                   <ul className="govuk-list">
                     <li>
                       <a
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
                         href="#contentsNoSideNav"
                         onClick={e => {
                           setShowContents(false);
@@ -641,7 +703,15 @@ const PrototypeReleaseData = () => {
                       </a>
                     </li>
                     <li>
-                      <a href="#">Back to top</a>
+                      <a
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
+                        href="#"
+                      >
+                        Back to top
+                      </a>
                     </li>
                   </ul>
                 </div>

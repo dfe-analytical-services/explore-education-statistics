@@ -38,6 +38,9 @@ import PrototypeTableHighlightsV2c from './PrototypeTableHighlightsUpdateV2-c';
 import PrototypeDataCatalog from './PrototypeDataCatalog';
 import PrototypeDataSelected from './PrototypeDataSelected';
 import PrototypeMethodology from './PrototypeMethodology';
+import PrototypeDashboard from './PrototypeDashboard';
+import PrototypeDashboard2 from './PrototypeDashboard2';
+import PrototypeHomepageDashboard from './PrototypeHomepageDashboard';
 
 interface PrototypeRoute extends RouteProps {
   name: string;
@@ -239,6 +242,21 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'ReleaseData',
     path: '/prototypes/releaseData',
     component: PrototypeReleaseData,
+  },
+  {
+    name: 'Dashboard',
+    path: '/prototypes/dashboard',
+    component: PrototypeDashboard,
+  },
+  {
+    name: 'Dashboard2',
+    path: '/prototypes/dashboard2',
+    component: PrototypeDashboard2,
+  },
+  {
+    name: 'Homepage Dashboard',
+    path: '/prototypes/homepageDashboard',
+    component: PrototypeHomepageDashboard,
   },
 ];
 
