@@ -42,6 +42,7 @@ import PrototypeDashboard from './PrototypeDashboard';
 import PrototypeDashboard2 from './PrototypeDashboard2';
 import PrototypeHomepageDashboard from './PrototypeHomepageDashboard';
 import PrototypeHomepageDashboard2 from './PrototypeHomepageDashboard2';
+import PrototypeReleasePage from './admin-api/PrototypeReleasePage';
 
 interface PrototypeRoute extends RouteProps {
   name: string;
@@ -263,6 +264,51 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'Homepage Dashboard2',
     path: '/prototypes/homepageDashboard2',
     component: PrototypeHomepageDashboard2,
+  },
+  {
+    name: 'API admin',
+    path: '/prototypes/admin-api',
+    component: PrototypeReleasePage,
+  },
+  {
+    name: 'API admin summary',
+    path: '/prototypes/admin-api/summary/:id',
+    component: PrototypeReleasePage,
+  },
+  {
+    name: 'API admin data',
+    path: '/prototypes/admin-api/data/:id',
+    component: PrototypeReleasePage,
+  },
+  {
+    name: 'API admin data',
+    path: '/prototypes/admin-api/data/:id/prepare-subject/:psid',
+    component: PrototypeReleasePage,
+  },
+  {
+    name: 'API admin footnotes',
+    path: '/prototypes/admin-api/footnotes/:id',
+    component: PrototypeReleasePage,
+  },
+  {
+    name: 'API admin data-blocks',
+    path: '/prototypes/admin-api/data-blocks/:id',
+    component: PrototypeReleasePage,
+  },
+  {
+    name: 'API admin content',
+    path: '/prototypes/admin-api/content/:id',
+    component: PrototypeReleasePage,
+  },
+  {
+    name: 'API admin status',
+    path: '/prototypes/admin-api/status/:id',
+    component: PrototypeReleasePage,
+  },
+  {
+    name: 'API admin pre-release',
+    path: '/prototypes/admin-api/pre-release/:id',
+    component: PrototypeReleasePage,
   },
 ];
 
