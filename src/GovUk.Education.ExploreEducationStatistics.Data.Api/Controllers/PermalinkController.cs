@@ -21,11 +21,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpGet("permalink/{id:guid}")]
-        public async Task<ActionResult<LegacyPermalinkViewModel>> Get(
+        [Produces("application/json", "text/csv")]
+        public async Task Get(
             Guid id,
             CancellationToken cancellationToken)
         {
-            return await _permalinkService.Get(id, cancellationToken).HandleFailuresOrOk();
+            if (Request.AcceptsCsv(exact: true))
+            {
+                Response.ContentDispositionAttachment(
+                    contentType: "text/csv",
+                    filename: $"permalink-{id}.csv");
+
+                await _permalinkService.DownloadCsvToStream(id, Response.BodyWriter.AsStream(), cancellationToken);
+
+                return;
+            }
+
+            var result = await _permalinkService
+                .Get(id, cancellationToken)
+                .HandleFailuresOr(Ok);
+
+            await result.ExecuteResultAsync(ControllerContext);
         }
 
         [HttpPost]

@@ -1,14 +1,17 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -18,19 +21,27 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Snapshooter.Xunit;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
+using static Moq.MockBehavior;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using MapperUtils = GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
@@ -38,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 {
     public class PermalinkServiceTests
     {
+        private readonly DataFixture _fixture = new();
         private readonly Guid _publicationId = Guid.NewGuid();
 
         [Fact]
@@ -51,8 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
+            var releaseRepository = new Mock<IReleaseRepository>(Strict);
+            var subjectRepository = new Mock<ISubjectRepository>(Strict);
 
             releaseRepository
                 .Setup(s => s.GetLatestPublishedRelease(_publicationId))
@@ -94,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                TimePeriodCoverage = AcademicYear,
                 ReleaseName = "2000",
                 Published = DateTime.UtcNow,
             };
@@ -114,10 +126,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
-            var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var releaseRepository = new Mock<IReleaseRepository>(Strict);
+            var subjectRepository = new Mock<ISubjectRepository>(Strict);
+            var tableBuilderService = new Mock<ITableBuilderService>(Strict);
 
             // Permalink id is assigned on creation and used as the blob path
             // Capture it so we can compare it with the view model result
@@ -225,7 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
                 ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                TimePeriodCoverage = AcademicYear,
                 Published = DateTime.UtcNow,
             };
 
@@ -235,8 +247,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 LatestPublishedRelease = release 
             };
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var tableBuilderService = new Mock<ITableBuilderService>(Strict);
 
             // Permalink id is assigned on creation and used as the blob path
             // Capture it so we can compare it with the view model result
@@ -313,7 +325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = Guid.NewGuid(),
                 ReleaseName = "2000",
                 PublicationId = _publicationId,
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                TimePeriodCoverage = AcademicYear,
                 Published = DateTime.UtcNow,
             };
 
@@ -338,7 +350,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     SubjectId = subjectId
                 });
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
@@ -436,7 +448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var legacyLocationsJsonArray = JArray.FromObject(legacyLocations);
             subjectMetaJsonObject!.Add("Locations", legacyLocationsJsonArray);
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
@@ -500,7 +512,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         {
             var permalinkId = Guid.NewGuid();
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService.SetupDownloadBlobTextNotFound(
                 container: Permalinks,
@@ -531,7 +543,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     SubjectId = Guid.NewGuid()
                 });
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
@@ -562,7 +574,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
                 ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                TimePeriodCoverage = AcademicYear,
                 Published = DateTime.UtcNow,
                 PreviousVersionId = null
             };
@@ -572,7 +584,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
                 ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                TimePeriodCoverage = AcademicYear,
                 Published = DateTime.UtcNow,
                 PreviousVersionId = previousVersion.Id
             };
@@ -598,7 +610,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     SubjectId = subjectId
                 });
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
@@ -656,7 +668,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
                 ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                TimePeriodCoverage = AcademicYear,
                 Published = DateTime.UtcNow,
             };
 
@@ -665,7 +677,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
                 ReleaseName = "2001",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                TimePeriodCoverage = AcademicYear,
                 Published = DateTime.UtcNow,
             };
 
@@ -690,7 +702,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     SubjectId = subjectId
                 });
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
@@ -739,7 +751,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
                 ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.January,
+                TimePeriodCoverage = January,
                 Published = DateTime.UtcNow,
             };
 
@@ -748,7 +760,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
                 ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.February,
+                TimePeriodCoverage = February,
                 Published = DateTime.UtcNow,
             };
 
@@ -773,7 +785,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     SubjectId = subjectId
                 });
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
@@ -822,7 +834,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
                 ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                TimePeriodCoverage = AcademicYear,
                 Published = DateTime.UtcNow,
                 PreviousVersionId = null
             };
@@ -832,7 +844,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
                 ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                TimePeriodCoverage = AcademicYear,
                 Published = DateTime.UtcNow,
                 PreviousVersionId = previousVersion.Id
             };
@@ -858,7 +870,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     SubjectId = subjectId
                 });
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
@@ -907,7 +919,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = Guid.NewGuid(),
                 PublicationId = _publicationId,
                 ReleaseName = "2000",
-                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                TimePeriodCoverage = AcademicYear,
                 Published = DateTime.UtcNow,
             };
 
@@ -936,7 +948,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     SubjectId = subjectId
                 });
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
@@ -977,9 +989,162 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task DownloadCsvToStream()
+        {
+            var subject = _fixture.DefaultSubject().Generate();
+
+            var filters = _fixture.DefaultFilter().GenerateList(2);
+
+            var filterItems = _fixture.DefaultFilterItem()
+                .ForRange(..2, fi => fi
+                    .SetFilterGroup(_fixture.DefaultFilterGroup()
+                        .WithFilter(filters[0])
+                        .Generate()))
+                .ForRange(2..4, fi => fi
+                    .SetFilterGroup(_fixture.DefaultFilterGroup()
+                        .WithFilter(filters[1])
+                        .Generate()))
+                .GenerateArray(4);
+
+            var indicators = _fixture.DefaultIndicator()
+                .ForRange(..1, i => i
+                    .SetIndicatorGroup(_fixture.DefaultIndicatorGroup()
+                        .WithSubject(subject))
+                )
+                .ForRange(1..3, i => i
+                    .SetIndicatorGroup(_fixture.DefaultIndicatorGroup()
+                        .WithSubject(subject))
+                )
+                .GenerateList(3);
+
+            var locations = _fixture.DefaultLocation()
+                .ForRange(..2, l => l.SetPresetRegion())
+                .ForRange(2..4, l => l.SetPresetRegionAndLocalAuthority())
+                .GenerateList(4);
+
+            var observations = _fixture.DefaultObservation()
+                .WithSubject(subject)
+                .WithMeasures(indicators)
+                .ForRange(..2, o => o
+                    .SetFilterItems(filterItems[0], filterItems[2])
+                    .SetLocation(locations[0])
+                    .SetTimePeriod(2022, AcademicYear))
+                .ForRange(2..4, o => o
+                    .SetFilterItems(filterItems[0], filterItems[2])
+                    .SetLocation(locations[1])
+                    .SetTimePeriod(2022, AcademicYear))
+                .ForRange(4..6, o => o
+                    .SetFilterItems(filterItems[1], filterItems[3])
+                    .SetLocation(locations[2])
+                    .SetTimePeriod(2023, AcademicYear))
+                .ForRange(6..8, o => o
+                    .SetFilterItems(filterItems[1], filterItems[3])
+                    .SetLocation(locations[3])
+                    .SetTimePeriod(2023, AcademicYear))
+                .GenerateList(8);
+
+            var permalink = new LegacyPermalink
+            {
+                Id = Guid.NewGuid(),
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = subject.Id
+                },
+                FullTable = new PermalinkTableBuilderResult
+                {
+                    Results = observations
+                        .Select(o =>
+                            ObservationViewModelBuilder.BuildObservation(o, indicators.Select(i => i.Id)))
+                        .ToList()
+                }
+            };
+
+            var csvMeta = new PermalinkCsvMetaViewModel
+            {
+                Filters = FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(filterItems),
+                Indicators = indicators
+                    .Select(i => new IndicatorCsvMetaViewModel(i))
+                    .ToDictionary(i => i.Name),
+                Locations = locations.ToDictionary(l => l.Id, l => l.GetCsvValues()),
+                Headers = new List<string>
+                {
+                    "time_period",
+                    "time_identifier",
+                    "geographic_level",
+                    "country_code",
+                    "country_name",
+                    "region_code",
+                    "region_name",
+                    "new_la_code",
+                    "old_la_code",
+                    "la_name",
+                    filters[0].Name,
+                    filters[1].Name,
+                    indicators[0].Name,
+                    indicators[1].Name,
+                    indicators[2].Name
+                }
+            };
+
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+
+            blobStorageService.SetupDownloadBlobText(
+                container: Permalinks,
+                path: permalink.Id.ToString(),
+                blobText: JsonConvert.SerializeObject(permalink));
+
+            var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(Strict);
+
+            permalinkCsvMetaService
+                .Setup(s => s
+                    .GetCsvMeta(
+                        It.Is<LegacyPermalink>(p => p.IsDeepEqualTo(permalink)),
+                        default))
+                .ReturnsAsync(csvMeta);
+
+            var service = BuildService(
+                blobStorageService: blobStorageService.Object,
+                permalinkCsvMetaService: permalinkCsvMetaService.Object
+            );
+
+            using var stream = new MemoryStream();
+
+            var result = await service.DownloadCsvToStream(permalink.Id, stream);
+
+            MockUtils.VerifyAllMocks(blobStorageService, permalinkCsvMetaService);
+
+            result.AssertRight();
+
+            stream.Seek(0L, SeekOrigin.Begin);
+            var csv = stream.ReadToEnd();
+
+            Snapshot.Match(csv);
+        }
+
+        [Fact]
+        public async Task DownloadCsvToStream_BlobNotFound()
+        {
+            var permalinkId = Guid.NewGuid();
+
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+
+            blobStorageService.SetupDownloadBlobTextNotFound(
+                container: Permalinks,
+                path: permalinkId.ToString());
+
+            var service = BuildService(blobStorageService: blobStorageService.Object);
+            var result = await service.DownloadCsvToStream(permalinkId, new MemoryStream());
+
+            MockUtils.VerifyAllMocks(blobStorageService);
+
+            result.AssertNotFound();
+        }
+
         private static PermalinkService BuildService(
             ContentDbContext? contentDbContext = null,
             ITableBuilderService? tableBuilderService = null,
+            IPermalinkCsvMetaService? permalinkCsvMetaService = null,
             IBlobStorageService? blobStorageService = null,
             IReleaseRepository? releaseRepository = null,
             ISubjectRepository? subjectRepository = null,
@@ -988,12 +1153,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             contentDbContext ??= InMemoryContentDbContext();
 
             return new(
-                contentDbContext ?? Mock.Of<ContentDbContext>(),
-                tableBuilderService ?? Mock.Of<ITableBuilderService>(MockBehavior.Strict),
-                blobStorageService ?? Mock.Of<IBlobStorageService>(MockBehavior.Strict),
-                subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
+                contentDbContext,
+                tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict),
+                permalinkCsvMetaService ?? Mock.Of<IPermalinkCsvMetaService>(Strict),
+                blobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
+                subjectRepository ?? Mock.Of<ISubjectRepository>(Strict),
                 publicationRepository ?? new PublicationRepository(contentDbContext),
-                releaseRepository ?? Mock.Of<IReleaseRepository>(MockBehavior.Strict),
+                releaseRepository ?? Mock.Of<IReleaseRepository>(Strict),
                 MapperUtils.MapperForProfile<MappingProfiles>()
             );
         }

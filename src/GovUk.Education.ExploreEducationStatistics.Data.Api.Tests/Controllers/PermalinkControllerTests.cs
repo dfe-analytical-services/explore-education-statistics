@@ -1,13 +1,18 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Net.Http.Headers;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -48,6 +53,37 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
         VerifyAllMocks(permalinkService);
 
         response.AssertOk(permalink);
+    }
+
+    [Fact]
+    public async Task Get_Csv()
+    {
+        var id = Guid.NewGuid();
+
+        var permalinkService = new Mock<IPermalinkService>(Strict);
+
+        permalinkService
+            .Setup(s => s
+                .DownloadCsvToStream(id, It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Unit.Instance)
+            .Callback<Guid, Stream, CancellationToken>(
+                (_, stream, _) => { stream.WriteText("Test csv"); }
+            );;
+
+        var client = SetupApp(permalinkService: permalinkService.Object)
+            .CreateClient();
+
+        var response = await client.GetAsync(
+            uri: $"/api/permalink/{id}",
+            headers: new Dictionary<string, string>
+            {
+                { HeaderNames.Accept, "text/csv" }
+            }
+        );
+
+        VerifyAllMocks(permalinkService);
+
+        response.AssertOk("Test csv");
     }
 
     [Fact]
