@@ -233,7 +233,7 @@ Check subject order in data guidance
     user clicks link    ${PUBLICATION_NAME}
 
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
-    user clicks link    View data guidance
+    user clicks link    Data guidance
 
     user waits until page contains element    id:dataFiles
     user checks accordion is in position    One    1    id:dataFiles

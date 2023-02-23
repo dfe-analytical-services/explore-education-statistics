@@ -228,49 +228,19 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
 
         <div className="govuk-grid-column-one-third">
           <RelatedAside>
-            <h2 className="govuk-heading-m" id="data-downloads">
-              Data downloads
+            <h2 className="govuk-heading-m" id="quick-links">
+              Quick links
             </h2>
             <nav
               role="navigation"
-              aria-labelledby="data-downloads"
-              data-testid="data-downloads"
+              aria-labelledby="quick-links"
+              data-testid="quick-links"
             >
-              <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
-                <li>
-                  <a
-                    href="#explore-data-and-files"
-                    onClick={() => {
-                      logEvent({
-                        category: `${release.publication.title} release page`,
-                        action: `View data and files clicked`,
-                        label: window.location.pathname,
-                      });
-                    }}
-                  >
-                    Explore data and files
-                  </a>
-                </li>
-                <li>
-                  <Link
-                    to={
-                      release.latestRelease
-                        ? `/find-statistics/${release.publication.slug}/data-guidance`
-                        : `/find-statistics/${release.publication.slug}/${release.slug}/data-guidance`
-                    }
-                  >
-                    View data guidance
-                  </Link>
-                </li>
-                {!!release.relatedDashboardsSection?.content.length && (
-                  <li>
-                    <a href="#related-dashboards">View related dashboard(s)</a>
-                  </li>
-                )}
+              <ul className="govuk-list">
                 {showAllFilesButton && (
                   <li>
                     <ButtonLink
-                      className="govuk-button govuk-!-width-full govuk-!-margin-bottom-3"
+                      className="govuk-button  govuk-!-margin-bottom-3"
                       to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files`}
                       onClick={() => {
                         logEvent({
@@ -284,10 +254,70 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     </ButtonLink>
                   </li>
                 )}
+                <li>
+                  <a
+                    href="#content"
+                    onClick={() => {
+                      logEvent({
+                        category: `${release.publication.title} release page`,
+                        action: `Release contents clicked`,
+                        label: window.location.pathname,
+                      });
+                    }}
+                  >
+                    Release contents
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#explore-data-and-files"
+                    onClick={() => {
+                      logEvent({
+                        category: `${release.publication.title} release page`,
+                        action: `View data and files clicked`,
+                        label: window.location.pathname,
+                      });
+                    }}
+                  >
+                    Explore data
+                  </a>
+                </li>
+                {!!release.relatedDashboardsSection?.content.length && (
+                  <li>
+                    <a href="#related-dashboards">View related dashboard(s)</a>
+                  </li>
+                )}
+                <li>
+                  <a
+                    href="#help-and-support"
+                    onClick={() => {
+                      logEvent({
+                        category: `${release.publication.title} release page`,
+                        action: `Help and support clicked`,
+                        label: window.location.pathname,
+                      });
+                    }}
+                  >
+                    Help and support
+                  </a>
+                </li>
               </ul>
             </nav>
-            <h2 className="govuk-heading-m">Supporting information</h2>
-            <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
+
+            <h2 className="govuk-heading-s">Related information</h2>
+            <ul className="govuk-list">
+              <li>
+                <Link
+                  to={
+                    release.latestRelease
+                      ? `/find-statistics/${release.publication.slug}/data-guidance`
+                      : `/find-statistics/${release.publication.slug}/${release.slug}/data-guidance`
+                  }
+                >
+                  Data guidance
+                </Link>
+              </li>
+
               {release.hasPreReleaseAccessList && (
                 <li>
                   <Link
@@ -307,20 +337,13 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             </ul>
             {!!otherReleasesCount && (
               <>
-                <h3
-                  className="govuk-heading-s govuk-!-margin-top-6"
-                  id="past-releases"
-                >
+                <h3 className="govuk-heading-s" id="past-releases">
                   Past releases
                 </h3>
-                <p
-                  className="govuk-!-margin-bottom-0"
-                  data-testid="current-release-title"
-                >
-                  {release.coverageTitle} <strong>{release.yearTitle}</strong>
-                </p>
+
                 <Details
-                  summary={`See other releases (${otherReleasesCount})`}
+                  className="govuk-!-margin-bottom-4"
+                  summary={`View previous releases (${otherReleasesCount})`}
                   hiddenText={`for ${release.publication.title}`}
                   onToggle={open =>
                     open &&
@@ -363,12 +386,12 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               release.publication.externalMethodology) && (
               <>
                 <h3
-                  className="govuk-heading-s govuk-!-margin-top-6"
+                  className="govuk-heading-s govuk-!-padding-top-0"
                   id="methodologies"
                 >
                   Methodologies
                 </h3>
-                <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
+                <ul className="govuk-list">
                   {release.publication.methodologies.map(methodology => (
                     <li key={methodology.id}>
                       <Link to={`/methodology/${methodology.slug}`}>
@@ -392,10 +415,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             )}
             {release.relatedInformation.length > 0 && (
               <>
-                <h3
-                  className="govuk-heading-s govuk-!-margin-top-6"
-                  id="related-pages"
-                >
+                <h3 className="govuk-heading-s" id="related-pages">
                   Related pages
                 </h3>
                 <nav role="navigation" aria-labelledby="related-pages">

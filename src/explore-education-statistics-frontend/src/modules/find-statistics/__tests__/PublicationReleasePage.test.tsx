@@ -89,7 +89,7 @@ describe('PublicationReleasePage', () => {
     expect(screen.queryByTestId('superseded-warning')).not.toBeInTheDocument();
   });
 
-  test('renders data downloads links', async () => {
+  test('renders quick links', async () => {
     render(
       <PublicationReleasePage
         release={{
@@ -100,31 +100,28 @@ describe('PublicationReleasePage', () => {
     );
 
     expect(
-      screen.getByRole('navigation', { name: 'Data downloads' }),
+      screen.getByRole('navigation', { name: 'Quick links' }),
     ).toBeInTheDocument();
 
-    const dataDownloadsNav = screen.getByRole('navigation', {
-      name: 'Data downloads',
+    const quickLinksNav = screen.getByRole('navigation', {
+      name: 'Quick links',
     });
 
-    const dataDownloadsLinks = within(dataDownloadsNav).getAllByRole('link');
+    const quickLinks = within(quickLinksNav).getAllByRole('link');
 
-    expect(dataDownloadsLinks).toHaveLength(2);
+    expect(quickLinks).toHaveLength(3);
 
-    expect(dataDownloadsLinks[0]).toHaveTextContent('Explore data and files');
-    expect(dataDownloadsLinks[0]).toHaveAttribute(
-      'href',
-      '#explore-data-and-files',
-    );
+    expect(quickLinks[0]).toHaveTextContent('Release contents');
+    expect(quickLinks[0]).toHaveAttribute('href', '#content');
 
-    expect(dataDownloadsLinks[1]).toHaveTextContent('View data guidance');
-    expect(dataDownloadsLinks[1]).toHaveAttribute(
-      'href',
-      '/find-statistics/pupil-absence-in-schools-in-england/data-guidance',
-    );
+    expect(quickLinks[1]).toHaveTextContent('Explore data');
+    expect(quickLinks[1]).toHaveAttribute('href', '#explore-data-and-files');
+
+    expect(quickLinks[2]).toHaveTextContent('Help and support');
+    expect(quickLinks[2]).toHaveAttribute('href', '#help-and-support');
   });
 
-  test(`renders data download link to view related dashboard(s) when section exists`, async () => {
+  test(`renders quick link to view related dashboard(s) when section exists`, async () => {
     render(
       <PublicationReleasePage
         release={{
@@ -147,36 +144,28 @@ describe('PublicationReleasePage', () => {
     );
 
     expect(
-      screen.getByRole('navigation', { name: 'Data downloads' }),
+      screen.getByRole('navigation', { name: 'Quick links' }),
     ).toBeInTheDocument();
 
-    const dataDownloadsNav = screen.getByRole('navigation', {
-      name: 'Data downloads',
+    const quickLinksNav = screen.getByRole('navigation', {
+      name: 'Quick links',
     });
 
-    const dataDownloadsLinks = within(dataDownloadsNav).getAllByRole('link');
+    const quickLinks = within(quickLinksNav).getAllByRole('link');
 
-    expect(dataDownloadsLinks).toHaveLength(3);
+    expect(quickLinks).toHaveLength(4);
 
-    expect(dataDownloadsLinks[0]).toHaveTextContent('Explore data and files');
-    expect(dataDownloadsLinks[0]).toHaveAttribute(
-      'href',
-      '#explore-data-and-files',
-    );
+    expect(quickLinks[0]).toHaveTextContent('Release contents');
+    expect(quickLinks[0]).toHaveAttribute('href', '#content');
 
-    expect(dataDownloadsLinks[1]).toHaveTextContent('View data guidance');
-    expect(dataDownloadsLinks[1]).toHaveAttribute(
-      'href',
-      '/find-statistics/pupil-absence-in-schools-in-england/data-guidance',
-    );
+    expect(quickLinks[1]).toHaveTextContent('Explore data');
+    expect(quickLinks[1]).toHaveAttribute('href', '#explore-data-and-files');
 
-    expect(dataDownloadsLinks[2]).toHaveTextContent(
-      'View related dashboard(s)',
-    );
-    expect(dataDownloadsLinks[2]).toHaveAttribute(
-      'href',
-      '#related-dashboards',
-    );
+    expect(quickLinks[2]).toHaveTextContent('View related dashboard(s)');
+    expect(quickLinks[2]).toHaveAttribute('href', '#related-dashboards');
+
+    expect(quickLinks[3]).toHaveTextContent('Help and support');
+    expect(quickLinks[3]).toHaveAttribute('href', '#help-and-support');
   });
 
   test(`renders other releases including legacy releases`, async () => {
@@ -188,15 +177,12 @@ describe('PublicationReleasePage', () => {
       usefulInfo.getByRole('heading', { name: 'Past releases' }),
     ).toBeInTheDocument();
 
-    expect(usefulInfo.getByTestId('current-release-title')).toHaveTextContent(
-      'Academic Year 2016/17',
-    );
-
     const details = within(usefulInfo.getByRole('group'));
 
     userEvent.click(
       details.getByRole('button', {
-        name: 'See other releases (5) for Pupil absence in schools in England',
+        name:
+          'View previous releases (5) for Pupil absence in schools in England',
       }),
     );
 
