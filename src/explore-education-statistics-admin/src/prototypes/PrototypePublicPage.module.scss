@@ -508,3 +508,20 @@
     text-decoration: underline;
   }
 }
+
+.prototypeMasthead {
+  background: $govuk-link-colour;
+  color: govuk-colour('white');
+  margin-top: -10px;
+  padding: 3rem 0 2rem;
+
+  h1,
+  p {
+    color: govuk-colour('white') !important;
+  }
+}
+
+.prototypeMastheadLower {
+  background: govuk-colour('light-grey');
+  padding: 2rem 0;
+}
