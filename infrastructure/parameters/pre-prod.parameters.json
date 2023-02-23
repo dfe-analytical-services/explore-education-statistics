@@ -56,6 +56,27 @@
     "tableBuilderMaxTableCellsAllowed": {
       "value": 1000000
     },
+    "skuContentDb": {
+      "value": "Standard"
+    },
+    "tierContentDb": {
+      "value": "Standard"
+    },
+    "capacityContentDb": {
+      "value": 50
+    },
+    "skuStatisticsDb": {
+      "value": "GP_S_Gen5"
+    },
+    "tierStatisticsDb": {
+      "value": "GeneralPurpose"
+    },
+    "capacityStatisticsDb": {
+      "value": 4
+    },
+    "minCapacityStatisticsDb": {
+      "value": "0.5"
+    },
     "maxContentDbSizeBytes": {
       "value": 1073741824
     },
