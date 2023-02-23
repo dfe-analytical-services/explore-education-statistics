@@ -340,7 +340,7 @@ public class Generator<T> where T : class
                 return;
             }
 
-            SetterCache.Add(Property, setter);
+            SetterCache.TryAdd(Property, setter);
             setter(instance, value);
         }
     }
