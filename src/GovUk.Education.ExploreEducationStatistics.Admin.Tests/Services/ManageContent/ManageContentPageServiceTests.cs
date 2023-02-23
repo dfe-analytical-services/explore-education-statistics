@@ -249,7 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
                 Assert.NotNull(contentRelease);
                 Assert.Equal(release.Id, contentRelease.Id);
-                Assert.Equal("Academic Year", contentRelease.CoverageTitle);
+                Assert.Equal("Academic year", contentRelease.CoverageTitle);
                 Assert.True(contentRelease.HasDataGuidance);
                 Assert.True(contentRelease.HasPreReleaseAccessList);
 
@@ -280,7 +280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal(DateTime.Parse("2020-09-09T00:00:00.00"), contentRelease.PublishScheduled);
                 Assert.Equal("2020-21", contentRelease.Slug);
                 Assert.Equal(release.SummarySection.Id, contentRelease.SummarySection.Id);
-                Assert.Equal("Academic Year 2020/21", contentRelease.Title);
+                Assert.Equal("Academic year 2020/21", contentRelease.Title);
                 Assert.Equal(ReleaseType.OfficialStatistics, contentRelease.Type);
                 Assert.Equal("2020/21", contentRelease.YearTitle);
                 Assert.Empty(contentRelease.Updates);
@@ -341,7 +341,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Single(contentPublicationReleases);
                 Assert.Equal(otherRelease.Id, contentPublicationReleases[0].Id);
                 Assert.Equal("2019-20", contentPublicationReleases[0].Slug);
-                Assert.Equal("Academic Year 2019/20", contentPublicationReleases[0].Title);
+                Assert.Equal("Academic year 2019/20", contentPublicationReleases[0].Title);
 
                 Assert.Equal(2, contentPublication.Methodologies.Count);
                 Assert.Equal(methodologies[0].Id, contentPublication.Methodologies[0].Id);

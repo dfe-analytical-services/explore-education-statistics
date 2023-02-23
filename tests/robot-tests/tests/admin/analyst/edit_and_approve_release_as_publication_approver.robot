@@ -14,7 +14,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - publication release approver %{RUN_IDENTIFIER}
-${RELEASE_NAME}=        Financial Year 3000-01
+${RELEASE_NAME}=        Financial year 3000-01
 ${DATABLOCK_NAME}=      Dates data block name
 
 

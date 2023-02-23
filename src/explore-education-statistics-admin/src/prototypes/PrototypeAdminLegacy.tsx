@@ -64,7 +64,7 @@ const PrototypeManagePublication = () => {
           <tbody>
             <tr>
               <td>2</td>
-              <td>Academic Year 2015/16</td>
+              <td>Academic year 2015/16</td>
               <td>
                 <a href="#">
                   https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2015-to-2016
@@ -81,7 +81,7 @@ const PrototypeManagePublication = () => {
             </tr>
             <tr>
               <td>1</td>
-              <td>Academic Year 2014/15</td>
+              <td>Academic year 2014/15</td>
               <td>
                 <a href="#">
                   https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2014-to-2015
@@ -98,7 +98,7 @@ const PrototypeManagePublication = () => {
             </tr>
             <tr>
               <td>0</td>
-              <td>Academic Year 2013/14</td>
+              <td>Academic year 2013/14</td>
               <td>
                 <a href="#">
                   https://www.gov.uk/government/statistics/permanent-and-fixed-period-exclusions-in-england-2013-to-2014

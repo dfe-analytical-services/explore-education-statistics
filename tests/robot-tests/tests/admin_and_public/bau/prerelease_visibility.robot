@@ -10,7 +10,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${RELEASE_NAME}=        Calendar Year 2000
+${RELEASE_NAME}=        Calendar year 2000
 ${PUBLICATION_NAME}=    UI tests - public release visibility %{RUN_IDENTIFIER}
 
 
@@ -22,7 +22,7 @@ Create test publication and release via API
 Verify release summary
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
-    user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary    Calendar Year    2000
+    user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary    Calendar year    2000
     ...    UI test contact name    National statistics
 
 Upload subject

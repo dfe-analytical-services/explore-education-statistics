@@ -13,7 +13,7 @@ Test Setup          fail test fast if required
 
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - data catalogue %{RUN_IDENTIFIER}
-${RELEASE_NAME}=        Academic Year Q1
+${RELEASE_NAME}=        Academic year Q1
 ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
 ${SUBJECT_NAME_3}=      UI test subject 3

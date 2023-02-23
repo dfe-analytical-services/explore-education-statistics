@@ -737,7 +737,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.NotNull(viewModel.ScheduledWithRelease);
                 Assert.Equal(methodologyVersion.ScheduledWithReleaseId, viewModel.ScheduledWithRelease!.Id);
-                Assert.Equal("Owning publication - Calendar Year 2021", viewModel.ScheduledWithRelease.Title);
+                Assert.Equal("Owning publication - Calendar year 2021", viewModel.ScheduledWithRelease.Title);
             }
         }
 
@@ -868,11 +868,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(expectedReleaseAtIndex3.Id, result[3].Id);
                 Assert.Equal(expectedReleaseAtIndex4.Id, result[4].Id);
 
-                Assert.Equal("Publication A - Financial Year Q2 2021-22", result[0].Title);
-                Assert.Equal("Publication A - Financial Year Q1 2021-22", result[1].Title);
-                Assert.Equal("Publication A - Financial Year Q4 2020-21", result[2].Title);
-                Assert.Equal("Publication B - Calendar Year 2021", result[3].Title);
-                Assert.Equal("Publication B - Calendar Year 2020", result[4].Title);
+                Assert.Equal("Publication A - Financial year Q2 2021-22", result[0].Title);
+                Assert.Equal("Publication A - Financial year Q1 2021-22", result[1].Title);
+                Assert.Equal("Publication A - Financial year Q4 2020-21", result[2].Title);
+                Assert.Equal("Publication B - Calendar year 2021", result[3].Title);
+                Assert.Equal("Publication B - Calendar year 2020", result[4].Title);
             }
         }
 

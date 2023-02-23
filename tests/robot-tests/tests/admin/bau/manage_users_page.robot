@@ -13,9 +13,9 @@ Test Setup          fail test fast if required
 
 *** Variables ***
 ${PUBLICATION_NAME}=        UI tests - manage users %{RUN_IDENTIFIER}
-${RELEASE_NAME}=            Calendar Year 2000
+${RELEASE_NAME}=            Calendar year 2000
 ${PUBLICATION_2_NAME}=      UI tests - manage users second %{RUN_IDENTIFIER}
-${RELEASE_2_NAME}=          Academic Year 2000/01
+${RELEASE_2_NAME}=          Academic year 2000/01
 
 
 *** Test Cases ***

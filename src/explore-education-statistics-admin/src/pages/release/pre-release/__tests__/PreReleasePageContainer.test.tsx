@@ -26,7 +26,7 @@ describe('PreReleasePageContainer', () => {
   const testPreReleaseSummary: PreReleaseSummary = {
     publicationTitle: 'Test publication',
     publicationSlug: 'test-publication',
-    releaseTitle: 'Calendar Year 2018',
+    releaseTitle: 'Calendar year 2018',
     releaseSlug: '2018',
     contactEmail: 'test@test.com',
     contactTeam: 'Test team',

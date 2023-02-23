@@ -20,7 +20,7 @@ Create publicly accessible Publication
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user creates test release via api    ${PUBLICATION_ID}    AY    2021
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Academic Year 2021/22
+    ...    Academic year 2021/22
     user approves original release for immediate publication
 
 Create Methodology with some content and images

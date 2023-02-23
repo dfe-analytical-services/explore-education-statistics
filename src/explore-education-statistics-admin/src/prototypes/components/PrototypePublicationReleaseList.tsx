@@ -99,7 +99,7 @@ const PrototypePublicationReleaseList = () => {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Academic Year 2020/21 (Not live)</td>
+                    <td>Academic year 2020/21 (Not live)</td>
                     <td>
                       <Tag colour="red">Started</Tag>
                     </td>
@@ -131,7 +131,7 @@ const PrototypePublicationReleaseList = () => {
                       <a href="#">
                         View{' '}
                         <span className="govuk-visually-hidden">
-                          Academic Year 2019/20 (Not live)
+                          Academic year 2019/20 (Not live)
                         </span>
                       </a>
                     </td>
@@ -232,7 +232,7 @@ const PrototypePublicationReleaseList = () => {
                   </thead>
                   <tbody>
                     <tr>
-                      <td>Academic Year 2021/22 (Not live)</td>
+                      <td>Academic year 2021/22 (Not live)</td>
                       <td>
                         <Tag>Draft</Tag>
                       </td>
@@ -243,13 +243,13 @@ const PrototypePublicationReleaseList = () => {
                         <Link to="/prototypes/admin-release-summary">
                           Edit{' '}
                           <span className="govuk-visually-hidden">
-                            Academic Year 2021/22
+                            Academic year 2021/22
                           </span>
                         </Link>
                       </td>
                     </tr>
                     <tr>
-                      <td>Academic Year 2020/21 (Not live)</td>
+                      <td>Academic year 2020/21 (Not live)</td>
                       <td>
                         <Tag>in review</Tag>
                       </td>
@@ -260,13 +260,13 @@ const PrototypePublicationReleaseList = () => {
                         <Link to="/prototypes/admin-release-summary">
                           Edit{' '}
                           <span className="govuk-visually-hidden">
-                            Academic Year 2020/21 (Not live)
+                            Academic year 2020/21 (Not live)
                           </span>
                         </Link>
                       </td>
                     </tr>
                     <tr>
-                      <td>Academic Year 2019/20 (Not live)</td>
+                      <td>Academic year 2019/20 (Not live)</td>
                       <td>
                         <Tag>Amendment</Tag>
                       </td>
@@ -277,7 +277,7 @@ const PrototypePublicationReleaseList = () => {
                         <Link to="/prototypes/admin-release-summary">
                           Edit{' '}
                           <span className="govuk-visually-hidden">
-                            Academic Year 2020/21 (Not live)
+                            Academic year 2020/21 (Not live)
                           </span>
                         </Link>
                       </td>
@@ -365,7 +365,7 @@ const PrototypePublicationReleaseList = () => {
               </thead>
               <tbody>
                 <tr>
-                  <td>Academic Year 2019/20 (Live - Latest release)</td>
+                  <td>Academic year 2019/20 (Live - Latest release)</td>
                   <td>
                     <Tag colour="green">Published</Tag>
                   </td>
@@ -378,7 +378,7 @@ const PrototypePublicationReleaseList = () => {
                   </td>
                 </tr>
                 <tr>
-                  <td>Academic Year 2018/19 (Live)</td>
+                  <td>Academic year 2018/19 (Live)</td>
                   <td>
                     <Tag colour="green">Published</Tag>
                   </td>
@@ -391,7 +391,7 @@ const PrototypePublicationReleaseList = () => {
                   </td>
                 </tr>
                 <tr>
-                  <td>Academic Year 2017/18 (Live)</td>
+                  <td>Academic year 2017/18 (Live)</td>
                   <td>
                     <Tag colour="green">Published</Tag>
                   </td>
@@ -404,7 +404,7 @@ const PrototypePublicationReleaseList = () => {
                   </td>
                 </tr>
                 <tr>
-                  <td>Academic Year 2015/16 (Live)</td>
+                  <td>Academic year 2015/16 (Live)</td>
                   <td>
                     <Tag colour="green">Published</Tag>
                   </td>
@@ -417,7 +417,7 @@ const PrototypePublicationReleaseList = () => {
                   </td>
                 </tr>
                 <tr>
-                  <td>Academic Year 2014/15 (Live)</td>
+                  <td>Academic year 2014/15 (Live)</td>
                   <td>
                     <Tag colour="green">Published</Tag>
                   </td>
@@ -432,7 +432,7 @@ const PrototypePublicationReleaseList = () => {
                 {showMore && (
                   <>
                     <tr>
-                      <td>Academic Year 2013/14 (Live)</td>
+                      <td>Academic year 2013/14 (Live)</td>
                       <td>
                         <Tag colour="green">Published</Tag>
                       </td>
@@ -446,7 +446,7 @@ const PrototypePublicationReleaseList = () => {
                       </td>
                     </tr>
                     <tr>
-                      <td>Academic Year 2016/17 (Live)</td>
+                      <td>Academic year 2016/17 (Live)</td>
                       <td>
                         <Tag colour="green">Published</Tag>
                       </td>
@@ -460,7 +460,7 @@ const PrototypePublicationReleaseList = () => {
                       </td>
                     </tr>
                     <tr>
-                      <td>Academic Year 2015/16 (Live)</td>
+                      <td>Academic year 2015/16 (Live)</td>
                       <td>
                         <Tag colour="green">Published</Tag>
                       </td>
@@ -474,7 +474,7 @@ const PrototypePublicationReleaseList = () => {
                       </td>
                     </tr>
                     <tr>
-                      <td>Academic Year 2014/15 (Live)</td>
+                      <td>Academic year 2014/15 (Live)</td>
                       <td>
                         <Tag colour="green">Published</Tag>
                       </td>
@@ -488,7 +488,7 @@ const PrototypePublicationReleaseList = () => {
                       </td>
                     </tr>
                     <tr>
-                      <td>Academic Year 2013/14 (Live)</td>
+                      <td>Academic year 2013/14 (Live)</td>
                       <td>
                         <Tag colour="green">Published</Tag>
                       </td>

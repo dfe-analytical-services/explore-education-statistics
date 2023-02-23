@@ -318,7 +318,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(Release1V1.Id, viewModel.Id);
-                Assert.Equal("Academic Year Q1 2018/19", viewModel.Title);
+                Assert.Equal("Academic year Q1 2018/19", viewModel.Title);
                 Assert.Equal(Release1V1.Published, viewModel.Published);
 
                 Assert.Equal(2, viewModel.KeyStatistics.Count);
@@ -724,7 +724,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(Release1V3NotPublished.Id, viewModel.Id);
-                Assert.Equal("Academic Year Q1 2018/19", viewModel.Title);
+                Assert.Equal("Academic year Q1 2018/19", viewModel.Title);
 
                 Assert.Equal(2, viewModel.Updates.Count);
                 Assert.Equal(new DateTime(2020, 2, 1), viewModel.Updates[0].On);

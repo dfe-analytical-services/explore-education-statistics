@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 )).AssertRight();
 
-                Assert.Equal("Academic Year 2018/19", result.Title);
+                Assert.Equal("Academic year 2018/19", result.Title);
                 Assert.Equal("2018/19", result.YearTitle);
                 Assert.Equal(TimeIdentifier.AcademicYear, result.TimePeriodCoverage);
                 Assert.Equal(ReleaseType.OfficialStatistics, result.Type);
@@ -915,7 +915,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.NotNull(latestIdTitleViewModel);
                 Assert.Equal(publication.LatestPublishedReleaseId, latestIdTitleViewModel!.Id);
-                Assert.Equal("Calendar Year 2022", latestIdTitleViewModel.Title);
+                Assert.Equal("Calendar year 2022", latestIdTitleViewModel.Title);
             }
         }
 

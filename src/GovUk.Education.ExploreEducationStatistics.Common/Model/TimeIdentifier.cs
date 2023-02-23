@@ -11,34 +11,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public enum TimeIdentifier
     {
-        [TimeIdentifierMeta("Academic Year", "AY", Category.AcademicYear, Academic, NoLabel)]
+        [TimeIdentifierMeta("Academic year", "AY", Category.AcademicYear, Academic, NoLabel)]
         AcademicYear,
 
-        [TimeIdentifierMeta("Academic Year Q1", "AYQ1", Category.AcademicYear, Academic, ShortLabel, "Q1")]
+        [TimeIdentifierMeta("Academic year Q1", "AYQ1", Category.AcademicYear, Academic, ShortLabel, "Q1")]
         AcademicYearQ1,
 
-        [TimeIdentifierMeta("Academic Year Q2", "AYQ2", Category.AcademicYear, Academic, ShortLabel, "Q2")]
+        [TimeIdentifierMeta("Academic year Q2", "AYQ2", Category.AcademicYear, Academic, ShortLabel, "Q2")]
         AcademicYearQ2,
 
-        [TimeIdentifierMeta("Academic Year Q3", "AYQ3", Category.AcademicYear, Academic, ShortLabel, "Q3")]
+        [TimeIdentifierMeta("Academic year Q3", "AYQ3", Category.AcademicYear, Academic, ShortLabel, "Q3")]
         AcademicYearQ3,
 
-        [TimeIdentifierMeta("Academic Year Q4", "AYQ4", Category.AcademicYear, Academic, ShortLabel, "Q4")]
+        [TimeIdentifierMeta("Academic year Q4", "AYQ4", Category.AcademicYear, Academic, ShortLabel, "Q4")]
         AcademicYearQ4,
 
-        [TimeIdentifierMeta("Calendar Year", "CY", Category.CalendarYear, Default, NoLabel)]
+        [TimeIdentifierMeta("Calendar year", "CY", Category.CalendarYear, Default, NoLabel)]
         CalendarYear,
 
-        [TimeIdentifierMeta("Calendar Year Q1", "CYQ1", Category.CalendarYear, Default, ShortLabel, "Q1")]
+        [TimeIdentifierMeta("Calendar year Q1", "CYQ1", Category.CalendarYear, Default, ShortLabel, "Q1")]
         CalendarYearQ1,
 
-        [TimeIdentifierMeta("Calendar Year Q2", "CYQ2", Category.CalendarYear, Default, ShortLabel, "Q2")]
+        [TimeIdentifierMeta("Calendar year Q2", "CYQ2", Category.CalendarYear, Default, ShortLabel, "Q2")]
         CalendarYearQ2,
 
-        [TimeIdentifierMeta("Calendar Year Q3", "CYQ3", Category.CalendarYear, Default, ShortLabel, "Q3")]
+        [TimeIdentifierMeta("Calendar year Q3", "CYQ3", Category.CalendarYear, Default, ShortLabel, "Q3")]
         CalendarYearQ3,
 
-        [TimeIdentifierMeta("Calendar Year Q4", "CYQ4", Category.CalendarYear, Default, ShortLabel, "Q4")]
+        [TimeIdentifierMeta("Calendar year Q4", "CYQ4", Category.CalendarYear, Default, ShortLabel, "Q4")]
         CalendarYearQ4,
 
         [TimeIdentifierMeta("Part 1 (April to September)", "P1", FinancialYearPart, Fiscal, ShortLabel,
@@ -49,49 +49,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             "Part 2 (Oct to Mar)")]
         FinancialYearPart2,
 
-        [TimeIdentifierMeta("Financial Year", "FY", Category.FinancialYear, Fiscal, NoLabel)]
+        [TimeIdentifierMeta("Financial year", "FY", Category.FinancialYear, Fiscal, NoLabel)]
         FinancialYear,
 
-        [TimeIdentifierMeta("Financial Year Q1", "FYQ1", Category.FinancialYear, Fiscal, ShortLabel, "Q1")]
+        [TimeIdentifierMeta("Financial year Q1", "FYQ1", Category.FinancialYear, Fiscal, ShortLabel, "Q1")]
         FinancialYearQ1,
 
-        [TimeIdentifierMeta("Financial Year Q2", "FYQ2", Category.FinancialYear, Fiscal, ShortLabel, "Q2")]
+        [TimeIdentifierMeta("Financial year Q2", "FYQ2", Category.FinancialYear, Fiscal, ShortLabel, "Q2")]
         FinancialYearQ2,
 
-        [TimeIdentifierMeta("Financial Year Q3", "FYQ3", Category.FinancialYear, Fiscal, ShortLabel, "Q3")]
+        [TimeIdentifierMeta("Financial year Q3", "FYQ3", Category.FinancialYear, Fiscal, ShortLabel, "Q3")]
         FinancialYearQ3,
 
-        [TimeIdentifierMeta("Financial Year Q4", "FYQ4", Category.FinancialYear, Fiscal, ShortLabel, "Q4")]
+        [TimeIdentifierMeta("Financial year Q4", "FYQ4", Category.FinancialYear, Fiscal, ShortLabel, "Q4")]
         FinancialYearQ4,
 
-        [TimeIdentifierMeta("Tax Year", "TY", Category.TaxYear, Fiscal, NoLabel)]
+        [TimeIdentifierMeta("Tax year", "TY", Category.TaxYear, Fiscal, NoLabel)]
         TaxYear,
 
-        [TimeIdentifierMeta("Tax Year Q1", "TYQ1", Category.TaxYear, Fiscal, ShortLabel, "Q1")]
+        [TimeIdentifierMeta("Tax year Q1", "TYQ1", Category.TaxYear, Fiscal, ShortLabel, "Q1")]
         TaxYearQ1,
 
-        [TimeIdentifierMeta("Tax Year Q2", "TYQ2", Category.TaxYear, Fiscal, ShortLabel, "Q2")]
+        [TimeIdentifierMeta("Tax year Q2", "TYQ2", Category.TaxYear, Fiscal, ShortLabel, "Q2")]
         TaxYearQ2,
 
-        [TimeIdentifierMeta("Tax Year Q3", "TYQ3", Category.TaxYear, Fiscal, ShortLabel, "Q3")]
+        [TimeIdentifierMeta("Tax year Q3", "TYQ3", Category.TaxYear, Fiscal, ShortLabel, "Q3")]
         TaxYearQ3,
 
-        [TimeIdentifierMeta("Tax Year Q4", "TYQ4", Category.TaxYear, Fiscal, ShortLabel, "Q4")]
+        [TimeIdentifierMeta("Tax year Q4", "TYQ4", Category.TaxYear, Fiscal, ShortLabel, "Q4")]
         TaxYearQ4,
 
-        [TimeIdentifierMeta("Reporting Year", "RY", Category.ReportingYear, Default, NoLabel)]
+        [TimeIdentifierMeta("Reporting year", "RY", Category.ReportingYear, Default, NoLabel)]
         ReportingYear,
 
-        [TimeIdentifierMeta("Autumn Term", "T1", Term, Academic)]
+        [TimeIdentifierMeta("Autumn term", "T1", Term, Academic)]
         AutumnTerm,
 
-        [TimeIdentifierMeta("Autumn and Spring Term", "T1T2", Term, Academic)]
+        [TimeIdentifierMeta("Autumn and spring term", "T1T2", Term, Academic)]
         AutumnSpringTerm,
 
-        [TimeIdentifierMeta("Spring Term", "T2", Term, Academic)]
+        [TimeIdentifierMeta("Spring term", "T2", Term, Academic)]
         SpringTerm,
 
-        [TimeIdentifierMeta("Summer Term", "T3", Term, Academic)]
+        [TimeIdentifierMeta("Summer term", "T3", Term, Academic)]
         SummerTerm,
 
         [TimeIdentifierMeta("Week 1", "W1", Week)]
@@ -291,7 +291,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         // is ordered after all the other monthly releases
         // https://explore-education-statistics.service.gov.uk/find-statistics/national-tutoring-programme/2022-23,
         // TODO remove this once we've got a solution for ordering releases which mix categories of time periods
-        [TimeIdentifierMeta("Academic Year ", "AYNTP", NationalTutoringProgramme, Academic, NoLabel)]
+        [TimeIdentifierMeta("Academic year ", "AYNTP", NationalTutoringProgramme, Academic, NoLabel)]
         AcademicYearNationalTutoringProgramme,
 
     }

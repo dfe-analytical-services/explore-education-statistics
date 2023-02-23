@@ -22,7 +22,7 @@ Create Publication as bau1
 
 Publish release
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Academic Year 2046/47
+    ...    Academic year 2046/47
     user approves release for immediate publication
 
 Update publication details

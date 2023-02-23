@@ -23,7 +23,7 @@ Create test publication and release via API
 
 Upload a subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Academic Year 2025/26
+    ...    Academic year 2025/26
 
     user uploads subject    Dates test subject    dates.csv    dates.meta.csv
 
@@ -51,7 +51,7 @@ Create 4 data blocks
 
 Navigate to 'Content' page
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Academic Year 2025/26
+    ...    Academic year 2025/26
     user clicks link    Content
     user waits until h1 is visible    ${PUBLICATION_NAME}
     user waits until h2 is visible    ${PUBLICATION_NAME}
