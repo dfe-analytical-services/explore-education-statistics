@@ -578,7 +578,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseContentBlockRepository, ReleaseContentBlockRepository>();
             services.AddTransient<IReleaseContentSectionRepository, ReleaseContentSectionRepository>();
             services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
-            services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
             services.AddTransient<Content.Model.Repository.Interfaces.IReleaseRepository,
                 Content.Model.Repository.ReleaseRepository>();
             services.AddTransient<Content.Model.Repository.Interfaces.IPublicationRepository,

@@ -22,6 +22,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +44,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ISubjectCsvMetaService _subjectCsvMetaService;
         private readonly ISubjectRepository _subjectRepository;
         private readonly IUserService _userService;
-        private readonly IResultBuilder<Observation, ObservationViewModel> _resultBuilder;
         private readonly IReleaseRepository _releaseRepository;
         private readonly TableBuilderOptions _options;
 
@@ -56,7 +56,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ISubjectCsvMetaService subjectCsvMetaService,
             ISubjectRepository subjectRepository,
             IUserService userService,
-            IResultBuilder<Observation, ObservationViewModel> resultBuilder,
             IReleaseRepository releaseRepository,
             IOptions<TableBuilderOptions> options)
         {
@@ -68,7 +67,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _subjectCsvMetaService = subjectCsvMetaService;
             _subjectRepository = subjectRepository;
             _userService = userService;
-            _resultBuilder = resultBuilder;
             _releaseRepository = releaseRepository;
             _options = options.Value;
         }
@@ -105,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             {
                                 SubjectMeta = subjectMetaViewModel,
                                 Results = observations.Select(observation =>
-                                    _resultBuilder.BuildResult(observation, queryContext.Indicators))
+                                    ObservationViewModelBuilder.BuildObservation(observation, queryContext.Indicators))
                             };
                         });
                 });

@@ -4,14 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Utils
 {
-    public class ResultBuilder : IResultBuilder<Observation, ObservationViewModel>
+    public static class ObservationViewModelBuilder
     {
-        public ObservationViewModel BuildResult(Observation observation, IEnumerable<Guid> indicators)
+        public static ObservationViewModel BuildObservation(Observation observation, IEnumerable<Guid> indicators)
         {
             return new ObservationViewModel
             {

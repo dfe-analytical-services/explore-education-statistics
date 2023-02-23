@@ -132,7 +132,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
 
             services.AddTransient<IBlobCacheService, BlobCacheService>();
-            services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
             services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
             services.AddTransient<IDataBlockService, DataBlockService>();

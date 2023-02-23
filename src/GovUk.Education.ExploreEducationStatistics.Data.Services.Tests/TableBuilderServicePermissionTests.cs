@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
@@ -116,7 +115,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             ISubjectCsvMetaService? subjectCsvMetaService = null,
             ISubjectRepository? subjectRepository = null,
             IUserService? userService = null,
-            IResultBuilder<Observation, ObservationViewModel>? resultBuilder = null,
             IReleaseRepository? releaseRepository = null,
             IOptions<TableBuilderOptions>? options = null)
         {
@@ -129,7 +127,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 subjectCsvMetaService ?? Mock.Of<ISubjectCsvMetaService>(MockBehavior.Strict),
                 subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
                 userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
-                resultBuilder ?? new ResultBuilder(),
                 releaseRepository ?? Mock.Of<IReleaseRepository>(MockBehavior.Strict),
                 options ?? Options.Create(new TableBuilderOptions())
             );
