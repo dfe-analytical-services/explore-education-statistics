@@ -12,27 +12,22 @@ export interface KeyStatisticDataBlockCreateRequest {
   guidanceText?: string;
 }
 
-export interface KeyStatisticTextCreateRequest {
-  title: string;
-  statistic: string;
-  trend?: string;
-  guidanceTitle?: string;
-  guidanceText?: string;
-}
-
 export interface KeyStatisticDataBlockUpdateRequest {
   trend?: string;
   guidanceTitle?: string;
   guidanceText?: string;
 }
 
-export interface KeyStatisticTextUpdateRequest {
+interface KeyStatisticTextSaveRequest {
   title: string;
   statistic: string;
   trend?: string;
   guidanceTitle?: string;
   guidanceText?: string;
 }
+
+export type KeyStatisticTextCreateRequest = KeyStatisticTextSaveRequest;
+export type KeyStatisticTextUpdateRequest = KeyStatisticTextSaveRequest;
 
 const keyStatisticService = {
   createKeyStatisticDataBlock(

@@ -845,8 +845,7 @@ user updates free text key stat
     user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//input[@name="guidanceTitle"]
     ...    ${guidance_title}
 
-    user clicks element    xpath://*[@data-testid="keyStat"][${tile_num}]//*[contains(@class, "ck-content")]
-    user presses keys    CTRL+a+BACKSPACE
+    user clears element text    xpath://*[@data-testid="keyStat"][${tile_num}]//*[contains(@class, "ck-content")]
     user presses keys    ${guidance_text}
 
     user clicks button    Save

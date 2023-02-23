@@ -84,6 +84,7 @@ export interface ReleaseNote {
 }
 
 export interface KeyStatisticBase {
+  type: KeyStatisticType;
   id: string;
   trend?: string;
   guidanceTitle?: string;
@@ -93,19 +94,20 @@ export interface KeyStatisticBase {
   updated?: string;
 }
 
-// eslint-disable-next-line no-shadow
-export enum KeyStatisticType {
-  DATABLOCK = 'KeyStatisticDataBlock',
-  TEXT = 'KeyStatisticText',
-}
+export const KeyStatisticTypes = {
+  DataBlock: 'KeyStatisticDataBlock',
+  Text: 'KeyStatisticText',
+} as const;
+
+export type KeyStatisticType = typeof KeyStatisticTypes[keyof typeof KeyStatisticTypes];
 
 export interface KeyStatisticDataBlock extends KeyStatisticBase {
-  type: KeyStatisticType.DATABLOCK;
+  type: 'KeyStatisticDataBlock';
   dataBlockId: string;
 }
 
 export interface KeyStatisticText extends KeyStatisticBase {
-  type: KeyStatisticType.TEXT;
+  type: 'KeyStatisticText';
   title: string;
   statistic: string;
 }

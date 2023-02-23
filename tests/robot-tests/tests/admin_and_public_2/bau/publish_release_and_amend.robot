@@ -127,7 +127,7 @@ Navigate to 'Content' page
 Add free text key stat
     user adds free text key stat    Free text key stat title    9001%    Trend    Guidance title    Guidance text
 
-    User Checks Element Count Is X    testid:keyStat    1
+    user checks element count is x    testid:keyStat    1
     user checks key stat contents    1    Free text key stat title    9001%    Trend
     user checks key stat guidance    1    Guidance title    Guidance text
 
@@ -376,7 +376,7 @@ Verify public pre-release access list
 Verify free text key stat is correct
     user goes to release page via breadcrumb    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
-    User Checks Element Count Is X    testid:keyStat    1
+    user checks element count is x    testid:keyStat    1
     user checks key stat contents    1    Free text key stat title    9001%    Trend
     user checks key stat guidance    1    Guidance title    Guidance text
 
@@ -641,7 +641,7 @@ Update free text key stat
     user updates free text key stat    1    Updated title    Updated statistic    Updated trend
     ...    Updated guidance title    Updated guidance text
 
-    User Checks Element Count Is X    testid:keyStat    1
+    user checks element count is x    testid:keyStat    1
     user checks key stat contents    1    Updated title    Updated statistic    Updated trend
     user checks key stat guidance    1    Updated guidance title    Updated guidance text
 
@@ -752,7 +752,7 @@ Verify amendment is published
     user checks summary list contains    Next update    December 3001
 
 Verify amendment free text key stat is updated
-    User Checks Element Count Is X    testid:keyStat    1
+    user checks element count is x    testid:keyStat    1
     user checks key stat contents    1    Updated title    Updated statistic    Updated trend
     user checks key stat guidance    1    Updated guidance title    Updated guidance text
 

@@ -170,7 +170,7 @@ Remove newly added key statistics data block tile
 Add free text key stat
     user adds free text key stat    Free text key stat title    9001%    Trend    Guidance title    Guidance text
 
-    User Checks Element Count Is X    testid:keyStat    2
+    user checks element count is x    testid:keyStat    2
     user checks key stat contents    1    Proportion of settings open    1%    Down from last year
     user checks key stat guidance    1    Learn more about open settings    Some information about about open settings
     user checks key stat contents    2    Free text key stat title    9001%    Trend
@@ -180,7 +180,7 @@ Update free text key stat
     user updates free text key stat    2    Updated title    9002%    Updated trend    Updated guidance title
     ...    Updated guidance text
 
-    User Checks Element Count Is X    testid:keyStat    2
+    user checks element count is x    testid:keyStat    2
     user checks key stat contents    1    Proportion of settings open    1%    Down from last year
     user checks key stat guidance    1    Learn more about open settings    Some information about about open settings
     user checks key stat contents    2    Updated title    9002%    Updated trend
@@ -190,7 +190,7 @@ Remove free text key stat
     user removes key stat    2
     user waits until page does not contain    Updated title
 
-    User Checks Element Count Is X    testid:keyStat    1
+    user checks element count is x    testid:keyStat    1
     user checks key stat contents    1    Proportion of settings open    1%    Down from last year
     user checks key stat guidance    1    Learn more about open settings    Some information about about open settings
 

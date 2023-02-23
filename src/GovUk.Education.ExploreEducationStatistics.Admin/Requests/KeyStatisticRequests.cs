@@ -14,19 +14,6 @@ public record KeyStatisticDataBlockCreateRequest
     public string? GuidanceText { get; set; }
 }
 
-public record KeyStatisticTextCreateRequest
-{
-    public string Title { get; set; } = string.Empty;
-
-    public string Statistic { get; set; } = string.Empty;
-
-    public string? Trend { get; set; }
-
-    public string? GuidanceTitle { get; set; }
-
-    public string? GuidanceText { get; set; }
-}
-
 public record KeyStatisticDataBlockUpdateRequest
 {
     public string? Trend { get; set; }
@@ -36,7 +23,7 @@ public record KeyStatisticDataBlockUpdateRequest
     public string? GuidanceText { get; set; }
 }
 
-public record KeyStatisticTextUpdateRequest
+public abstract record KeyStatisticTextSaveRequest
 {
     public string Title { get; set; } = string.Empty;
 
@@ -48,3 +35,6 @@ public record KeyStatisticTextUpdateRequest
 
     public string? GuidanceText { get; set; }
 }
+
+public record KeyStatisticTextCreateRequest : KeyStatisticTextSaveRequest;
+public record KeyStatisticTextUpdateRequest : KeyStatisticTextSaveRequest;

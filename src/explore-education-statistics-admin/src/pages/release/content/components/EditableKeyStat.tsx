@@ -5,10 +5,7 @@ import {
   KeyStatisticDataBlockUpdateRequest,
   KeyStatisticTextUpdateRequest,
 } from '@admin/services/keyStatisticService';
-import {
-  KeyStatistic,
-  KeyStatisticType,
-} from '@common/services/publicationService';
+import { KeyStatistic } from '@common/services/publicationService';
 import React from 'react';
 
 interface EditableKeyStatProps {
@@ -34,7 +31,7 @@ const EditableKeyStat = ({
   } = useReleaseContentActions();
 
   switch (keyStat.type) {
-    case KeyStatisticType.DATABLOCK:
+    case 'KeyStatisticDataBlock':
       return (
         <EditableKeyStatDataBlock
           keyStat={keyStat}
@@ -53,9 +50,7 @@ const EditableKeyStat = ({
           }}
           onSubmit={async values => {
             const request: KeyStatisticDataBlockUpdateRequest = {
-              trend: values.trend,
-              guidanceTitle: values.guidanceTitle,
-              guidanceText: values.guidanceText,
+              ...values,
             };
 
             await updateKeyStatisticDataBlock({
@@ -66,7 +61,7 @@ const EditableKeyStat = ({
           }}
         />
       );
-    case KeyStatisticType.TEXT:
+    case 'KeyStatisticText':
       return (
         <EditableKeyStatText
           keyStat={keyStat}

@@ -1,10 +1,7 @@
 import EditableKeyStatText from '@admin/pages/release/content/components/EditableKeyStatText';
-import {
-  KeyStatisticText,
-  KeyStatisticType,
-} from '@common/services/publicationService';
+import { KeyStatisticText } from '@common/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
-import { noop } from 'lodash';
+import noop from 'lodash/noop';
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { KeyStatTextFormValues } from '@admin/pages/release/content/components/EditableKeyStatTextForm';
@@ -17,7 +14,7 @@ const keyStatisticService = _keyStatisticService as jest.Mocked<
 
 describe('EditableKeyStatText', () => {
   const keyStatText: KeyStatisticText = {
-    type: KeyStatisticType.TEXT,
+    type: 'KeyStatisticText',
     id: 'keyStatDataBlock-1',
     trend: 'Text trend',
     guidanceTitle: 'Text guidance title',
@@ -31,19 +28,13 @@ describe('EditableKeyStatText', () => {
   test('renders preview correctly', async () => {
     render(<EditableKeyStatText keyStat={keyStatText} onSubmit={noop} />);
 
-    await waitFor(() => {
-      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
-        'Text title',
-      );
+    expect(screen.getByTestId('keyStat-title')).toHaveTextContent('Text title');
 
-      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-        'Over 9000',
-      );
+    expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+      'Over 9000',
+    );
 
-      expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
-        'Text trend',
-      );
-    });
+    expect(screen.getByTestId('keyStat-trend')).toHaveTextContent('Text trend');
 
     expect(
       screen.getByRole('button', {
@@ -71,17 +62,13 @@ describe('EditableKeyStatText', () => {
       />,
     );
 
-    await waitFor(() => {
-      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
-        'Text title',
-      );
+    expect(screen.getByTestId('keyStat-title')).toHaveTextContent('Text title');
 
-      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-        'Over 9000',
-      );
+    expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+      'Over 9000',
+    );
 
-      expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
-    });
+    expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
 
     expect(
       screen.getByRole('button', {
@@ -106,19 +93,13 @@ describe('EditableKeyStatText', () => {
       />,
     );
 
-    await waitFor(() => {
-      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
-        'Text title',
-      );
+    expect(screen.getByTestId('keyStat-title')).toHaveTextContent('Text title');
 
-      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-        'Over 9000',
-      );
+    expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+      'Over 9000',
+    );
 
-      expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
-        'Text trend',
-      );
-    });
+    expect(screen.getByTestId('keyStat-trend')).toHaveTextContent('Text trend');
 
     expect(
       screen.getByRole('button', {
@@ -139,23 +120,18 @@ describe('EditableKeyStatText', () => {
     render(
       <EditableKeyStatText
         keyStat={{ ...keyStatText, guidanceText: undefined }}
+        onRemove={noop}
         onSubmit={noop}
       />,
     );
 
-    await waitFor(() => {
-      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
-        'Text title',
-      );
+    expect(screen.getByTestId('keyStat-title')).toHaveTextContent('Text title');
 
-      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-        'Over 9000',
-      );
+    expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+      'Over 9000',
+    );
 
-      expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
-        'Text trend',
-      );
-    });
+    expect(screen.getByTestId('keyStat-trend')).toHaveTextContent('Text trend');
 
     expect(
       screen.queryByRole('button', {
@@ -165,6 +141,10 @@ describe('EditableKeyStatText', () => {
 
     expect(
       screen.queryByTestId('keyStat-guidanceText'),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', { name: /Edit/ }),
     ).not.toBeInTheDocument();
 
     expect(
@@ -178,36 +158,43 @@ describe('EditableKeyStatText', () => {
         <EditableKeyStatText keyStat={keyStatText} isEditing onSubmit={noop} />,
       );
 
+      expect(screen.getByText(/Edit/)).toBeInTheDocument();
+
+      userEvent.click(
+        screen.getByRole('button', {
+          name: 'Edit key statistic: Text title',
+        }),
+      );
+
       await waitFor(() => {
-        expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
-          'Text title',
-        );
-        expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-          'Over 9000',
-        );
-        expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
-          'Text trend',
-        );
-        expect(
-          screen.getByRole('button', {
-            name: 'Text guidance title',
-          }),
-        ).toBeInTheDocument();
-
-        expect(screen.getByTestId('keyStat-guidanceText')).toHaveTextContent(
-          'Text guidance text',
-        );
-
-        expect(
-          screen.getByRole('button', {
-            name: 'Edit key statistic: Text title',
-          }),
-        ).toBeInTheDocument();
-
-        expect(
-          screen.queryByRole('button', { name: /Remove/ }),
-        ).not.toBeInTheDocument();
+        expect(screen.getByLabelText('Title')).toHaveValue('Text title');
       });
+
+      expect(screen.getByLabelText('Statistic')).toHaveValue('Over 9000');
+      expect(screen.getByLabelText('Trend')).toHaveValue('Text trend');
+
+      expect(screen.getByLabelText('Guidance title')).toHaveValue(
+        'Text guidance title',
+      );
+
+      expect(screen.getByLabelText('Guidance text')).toHaveTextContent(
+        'Text guidance text',
+      );
+
+      expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Cancel' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', {
+          name: 'Edit key statistic: Text title',
+        }),
+      ).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', { name: /Remove/ }),
+      ).not.toBeInTheDocument();
     });
 
     test('submitting edit form calls `onSubmit` handler with updated values', async () => {
@@ -221,9 +208,7 @@ describe('EditableKeyStatText', () => {
         />,
       );
 
-      await waitFor(() => {
-        expect(screen.getByText(/Edit/)).toBeInTheDocument();
-      });
+      expect(screen.getByText(/Edit/)).toBeInTheDocument();
 
       userEvent.click(
         screen.getByRole('button', {
@@ -235,22 +220,22 @@ describe('EditableKeyStatText', () => {
         expect(screen.getByLabelText('Title')).toBeInTheDocument();
       });
 
-      await userEvent.clear(screen.getByLabelText('Title'));
+      userEvent.clear(screen.getByLabelText('Title'));
       await userEvent.type(screen.getByLabelText('Title'), 'New title');
 
-      await userEvent.clear(screen.getByLabelText('Statistic'));
+      userEvent.clear(screen.getByLabelText('Statistic'));
       await userEvent.type(screen.getByLabelText('Statistic'), 'New statistic');
 
-      await userEvent.clear(screen.getByLabelText('Trend'));
+      userEvent.clear(screen.getByLabelText('Trend'));
       await userEvent.type(screen.getByLabelText('Trend'), 'New trend');
 
-      await userEvent.clear(screen.getByLabelText('Guidance title'));
+      userEvent.clear(screen.getByLabelText('Guidance title'));
       await userEvent.type(
         screen.getByLabelText('Guidance title'),
-        '  New guidance title  ', // Whitespace should be trimmed
+        'New guidance title',
       );
 
-      await userEvent.clear(screen.getByLabelText('Guidance text'));
+      userEvent.clear(screen.getByLabelText('Guidance text'));
       await userEvent.type(
         screen.getByLabelText('Guidance text'),
         'New guidance text',
@@ -259,7 +244,7 @@ describe('EditableKeyStatText', () => {
       userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
       await waitFor(() => {
-        expect(onSubmit).toHaveBeenCalledWith<[KeyStatTextFormValues]>({
+        expect(onSubmit).toHaveBeenCalledWith<KeyStatTextFormValues[]>({
           title: 'New title',
           statistic: 'New statistic',
           trend: 'New trend',
@@ -269,14 +254,52 @@ describe('EditableKeyStatText', () => {
       });
     });
 
+    test('submitting edit form calls `onSubmit` handler with trimmed updated guidance title', async () => {
+      const onSubmit = jest.fn();
+
+      render(
+        <EditableKeyStatText
+          keyStat={keyStatText}
+          isEditing
+          onSubmit={onSubmit}
+        />,
+      );
+
+      userEvent.click(
+        screen.getByRole('button', {
+          name: 'Edit key statistic: Text title',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Title')).toBeInTheDocument();
+      });
+
+      userEvent.clear(screen.getByLabelText('Guidance title'));
+      await userEvent.type(
+        screen.getByLabelText('Guidance title'),
+        '   New guidance title  ',
+      );
+
+      userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+      await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalledWith<KeyStatTextFormValues[]>({
+          title: 'Text title',
+          statistic: 'Over 9000',
+          trend: 'Text trend',
+          guidanceTitle: 'New guidance title',
+          guidanceText: 'Text guidance text',
+        });
+      });
+    });
+
     test('clicking `Cancel` button toggles back to preview', async () => {
       render(
         <EditableKeyStatText keyStat={keyStatText} isEditing onSubmit={noop} />,
       );
 
-      await waitFor(() => {
-        expect(screen.getByText(/Edit/)).toBeInTheDocument();
-      });
+      expect(screen.getByText(/Edit/)).toBeInTheDocument();
 
       userEvent.click(
         screen.getByRole('button', {

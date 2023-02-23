@@ -1,16 +1,13 @@
 import EditableKeyStatDataBlock from '@admin/pages/release/content/components/EditableKeyStatDataBlock';
 import { KeyStatDataBlockFormValues } from '@admin/pages/release/content/components/EditableKeyStatDataBlockForm';
 import _keyStatisticService from '@admin/services/keyStatisticService';
-import {
-  KeyStatisticDataBlock,
-  KeyStatisticType,
-} from '@common/services/publicationService';
+import { KeyStatisticDataBlock } from '@common/services/publicationService';
 import _tableBuilderService, {
   TableDataResponse,
 } from '@common/services/tableBuilderService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { noop } from 'lodash';
+import noop from 'lodash/noop';
 import React from 'react';
 
 jest.mock('@admin/services/keyStatisticService');
@@ -73,7 +70,7 @@ describe('EditableKeyStatDataBlock', () => {
   };
 
   const keyStatDataBlock: KeyStatisticDataBlock = {
-    type: KeyStatisticType.DATABLOCK,
+    type: 'KeyStatisticDataBlock',
     id: 'keyStatDataBlock-1',
     trend: 'DataBlock trend',
     guidanceTitle: 'DataBlock guidance title',
@@ -100,13 +97,14 @@ describe('EditableKeyStatDataBlock', () => {
       expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'DataBlock indicator',
       );
-      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-        '608,180',
-      );
-      expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
-        'DataBlock trend',
-      );
     });
+
+    expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+      '608,180',
+    );
+    expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
+      'DataBlock trend',
+    );
 
     expect(
       screen.getByRole('button', {
@@ -140,15 +138,15 @@ describe('EditableKeyStatDataBlock', () => {
       expect(tableBuilderService.getDataBlockTableData).toHaveBeenCalledTimes(
         1,
       );
-
-      expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
-        'DataBlock indicator',
-      );
-      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-        '608,180',
-      );
-      expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
     });
+
+    expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
+      'DataBlock indicator',
+    );
+    expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+      '608,180',
+    );
+    expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
 
     expect(
       screen.getByRole('button', {
@@ -182,13 +180,14 @@ describe('EditableKeyStatDataBlock', () => {
       expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'DataBlock indicator',
       );
-      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-        '608,180',
-      );
-      expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
-        'DataBlock trend',
-      );
     });
+
+    expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+      '608,180',
+    );
+    expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
+      'DataBlock trend',
+    );
 
     expect(
       screen.getByRole('button', {
@@ -222,13 +221,14 @@ describe('EditableKeyStatDataBlock', () => {
       expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
         'DataBlock indicator',
       );
-      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-        '608,180',
-      );
-      expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
-        'DataBlock trend',
-      );
     });
+
+    expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+      '608,180',
+    );
+    expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
+      'DataBlock trend',
+    );
 
     expect(
       screen.queryByRole('button', {
@@ -293,32 +293,46 @@ describe('EditableKeyStatDataBlock', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
-          'DataBlock indicator',
-        );
-        expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
-          '608,180',
-        );
-        expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
-          'DataBlock trend',
-        );
+        expect(screen.getByText(/Edit/)).toBeInTheDocument();
       });
 
-      expect(
-        screen.getByRole('button', {
-          name: 'DataBlock guidance title',
-        }),
-      ).toBeInTheDocument();
-
-      expect(screen.getByTestId('keyStat-guidanceText')).toHaveTextContent(
-        'DataBlock guidance text',
-      );
-
-      expect(
+      userEvent.click(
         screen.getByRole('button', {
           name: 'Edit key statistic: DataBlock indicator',
         }),
+      );
+
+      await waitFor(() => {
+        expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
+          'DataBlock indicator',
+        );
+      });
+
+      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+        '608,180',
+      );
+
+      expect(screen.getByLabelText('Trend')).toHaveValue('DataBlock trend');
+
+      expect(screen.getByLabelText('Guidance title')).toHaveValue(
+        'DataBlock guidance title',
+      );
+
+      expect(screen.getByLabelText('Guidance text')).toHaveTextContent(
+        'DataBlock guidance text',
+      );
+
+      expect(screen.getByRole('button', { name: /Save/ })).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', { name: /Cancel/ }),
       ).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', {
+          name: 'Edit key statistic: Text title',
+        }),
+      ).not.toBeInTheDocument();
 
       expect(
         screen.queryByRole('button', { name: /Remove/ }),
@@ -355,16 +369,16 @@ describe('EditableKeyStatDataBlock', () => {
         expect(screen.getByLabelText('Trend')).toBeInTheDocument();
       });
 
-      await userEvent.clear(screen.getByLabelText('Trend'));
+      userEvent.clear(screen.getByLabelText('Trend'));
       await userEvent.type(screen.getByLabelText('Trend'), 'New trend');
 
-      await userEvent.clear(screen.getByLabelText('Guidance title'));
+      userEvent.clear(screen.getByLabelText('Guidance title'));
       await userEvent.type(
         screen.getByLabelText('Guidance title'),
-        '  New guidance title  ', // Whitespace should be trimmed
+        'New guidance title',
       );
 
-      await userEvent.clear(screen.getByLabelText('Guidance text'));
+      userEvent.clear(screen.getByLabelText('Guidance text'));
       await userEvent.type(
         screen.getByLabelText('Guidance text'),
         'New guidance text',
@@ -373,10 +387,57 @@ describe('EditableKeyStatDataBlock', () => {
       userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
       await waitFor(() => {
-        expect(onSubmit).toHaveBeenCalledWith<[KeyStatDataBlockFormValues]>({
+        expect(onSubmit).toHaveBeenCalledWith<KeyStatDataBlockFormValues[]>({
           trend: 'New trend',
           guidanceTitle: 'New guidance title',
           guidanceText: 'New guidance text',
+        });
+      });
+    });
+
+    test('submitting edit form calls `onSubmit` handler with trimmed updated guidance title', async () => {
+      tableBuilderService.getDataBlockTableData.mockResolvedValue(
+        testTableDataResponse,
+      );
+
+      const onSubmit = jest.fn();
+
+      render(
+        <EditableKeyStatDataBlock
+          releaseId="release-1"
+          keyStat={keyStatDataBlock}
+          isEditing
+          onSubmit={onSubmit}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText(/Edit/)).toBeInTheDocument();
+      });
+
+      userEvent.click(
+        screen.getByRole('button', {
+          name: 'Edit key statistic: DataBlock indicator',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Trend')).toBeInTheDocument();
+      });
+
+      userEvent.clear(screen.getByLabelText('Guidance title'));
+      await userEvent.type(
+        screen.getByLabelText('Guidance title'),
+        '  New guidance title  ',
+      );
+
+      userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+      await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalledWith<KeyStatDataBlockFormValues[]>({
+          trend: 'DataBlock trend',
+          guidanceTitle: 'New guidance title',
+          guidanceText: 'DataBlock guidance text',
         });
       });
     });
@@ -470,16 +531,14 @@ describe('EditableKeyStatDataBlock', () => {
         expect(
           screen.getByText('Could not load key statistic'),
         ).toBeInTheDocument();
-
-        expect(screen.queryByTestId('keyStat-title')).not.toBeInTheDocument();
-        expect(
-          screen.queryByTestId('keyStat-statistic'),
-        ).not.toBeInTheDocument();
-        expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
-        expect(
-          screen.queryByTestId('keyStat-guidanceText'),
-        ).not.toBeInTheDocument();
       });
+
+      expect(screen.queryByTestId('keyStat-title')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('keyStat-statistic')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('keyStat-guidanceText'),
+      ).not.toBeInTheDocument();
 
       expect(
         screen.queryByRole('button', { name: 'Edit' }),

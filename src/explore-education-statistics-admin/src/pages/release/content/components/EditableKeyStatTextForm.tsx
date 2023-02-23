@@ -7,7 +7,6 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import { Form, FormFieldTextInput } from '@common/components/form';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
-import tileStyles from '@common/modules/find-statistics/components/KeyStatTile.module.scss';
 import { KeyStatisticText } from '@common/services/publicationService';
 import { Formik } from 'formik';
 import React from 'react';
@@ -24,17 +23,17 @@ export interface KeyStatTextFormValues {
 
 interface EditableKeyStatTextFormProps {
   keyStat?: KeyStatisticText;
+  isReordering?: boolean;
   onSubmit: (values: KeyStatTextFormValues) => void;
   onCancel: () => void;
-  isReordering?: boolean;
   testId: string;
 }
 
 export default function EditableKeyStatTextForm({
   keyStat,
+  isReordering,
   onSubmit,
   onCancel,
-  isReordering,
   testId,
 }: EditableKeyStatTextFormProps) {
   const handleSubmit = useFormSubmit<KeyStatTextFormValues>(async values => {
@@ -46,7 +45,7 @@ export default function EditableKeyStatTextForm({
   });
 
   return (
-    <div data-testId={testId}>
+    <div data-testid={testId}>
       <Formik<KeyStatTextFormValues>
         initialValues={{
           title: keyStat?.title ?? '',
@@ -74,36 +73,36 @@ export default function EditableKeyStatTextForm({
                 : 'editableKeyStatTextForm-create'
             }
           >
-            <div className={tileStyles.tile}>
+            <div className={styles.textTile}>
               <FormFieldTextInput<KeyStatTextFormValues>
                 name="title"
-                className={classNames(
-                  'govuk-!-margin-bottom-6',
-                  isReordering && 'govuk-!-width-one-third',
-                )}
-                label={<span className={styles.titleText}>Title</span>}
+                className={classNames({
+                  'govuk-!-width-one-third': isReordering,
+                })}
+                label={<span>Title</span>}
               />
               <FormFieldTextInput<KeyStatTextFormValues>
                 name="statistic"
-                className={classNames(
-                  'govuk-!-margin-bottom-6',
-                  isReordering && 'govuk-!-width-one-third',
-                )}
-                label={<span className={styles.statisticText}>Statistic</span>}
+                className={classNames({
+                  'govuk-!-width-one-third': isReordering,
+                })}
+                label={<span>Statistic</span>}
               />
               <FormFieldTextInput<KeyStatTextFormValues>
                 name="trend"
-                className={classNames(
-                  isReordering && 'govuk-!-width-one-third',
-                )}
-                label={<span className={styles.trendText}>Trend</span>}
+                className={classNames({
+                  'govuk-!-width-one-third': isReordering,
+                })}
+                label={<span>Trend</span>}
               />
             </div>
 
             <FormFieldTextInput<KeyStatTextFormValues>
               formGroupClass="govuk-!-margin-top-2"
               name="guidanceTitle"
-              className={classNames(isReordering && 'govuk-!-width-one-third')}
+              className={classNames({
+                'govuk-!-width-one-third': isReordering,
+              })}
               label="Guidance title"
             />
 
