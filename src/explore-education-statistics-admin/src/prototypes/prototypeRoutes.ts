@@ -26,6 +26,7 @@ import PrototypeFindStats4 from './PrototypeFindStats4';
 import PrototypeFindStats5 from './PrototypeFindStats5';
 import PrototypeFindStats6 from './PrototypeFindStats6';
 import PrototypeTableTool from './PrototypeTableToolPage';
+import PrototypeReleasePage from './admin-api/PrototypeReleasePage';
 
 interface PrototypeRoute extends RouteProps {
   name: string;
@@ -167,6 +168,51 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'Table tool',
     path: '/prototypes/table-tool',
     component: PrototypeTableTool,
+  },
+  {
+    name: 'API admin',
+    path: '/prototypes/admin-api',
+    component: PrototypeReleasePage,
+  },
+  {
+    name: 'API admin summary',
+    path: '/prototypes/admin-api/summary/:id',
+    component: PrototypeReleasePage,
+  },
+  {
+    name: 'API admin data',
+    path: '/prototypes/admin-api/data/:id',
+    component: PrototypeReleasePage,
+  },
+  {
+    name: 'API admin data',
+    path: '/prototypes/admin-api/data/:id/prepare-subject/:psid',
+    component: PrototypeReleasePage,
+  },
+  {
+    name: 'API admin footnotes',
+    path: '/prototypes/admin-api/footnotes/:id',
+    component: PrototypeReleasePage,
+  },
+  {
+    name: 'API admin data-blocks',
+    path: '/prototypes/admin-api/data-blocks/:id',
+    component: PrototypeReleasePage,
+  },
+  {
+    name: 'API admin content',
+    path: '/prototypes/admin-api/content/:id',
+    component: PrototypeReleasePage,
+  },
+  {
+    name: 'API admin status',
+    path: '/prototypes/admin-api/status/:id',
+    component: PrototypeReleasePage,
+  },
+  {
+    name: 'API admin pre-release',
+    path: '/prototypes/admin-api/pre-release/:id',
+    component: PrototypeReleasePage,
   },
 ];
 
