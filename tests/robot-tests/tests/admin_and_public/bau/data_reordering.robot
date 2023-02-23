@@ -12,7 +12,7 @@ Test Setup          fail test fast if required
 
 *** Variables ***
 ${PUBLICATION_NAME}     UI tests - data reordering %{RUN_IDENTIFIER}
-${RELEASE_NAME}         Calendar Year 2022
+${RELEASE_NAME}         Calendar year 2022
 ${SUBJECT_NAME}         UI test subject
 
 

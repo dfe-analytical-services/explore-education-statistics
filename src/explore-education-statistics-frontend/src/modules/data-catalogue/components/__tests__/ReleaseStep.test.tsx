@@ -13,19 +13,19 @@ describe('ReleaseStep', () => {
       id: 'release-3',
       latestRelease: true,
       slug: 'release-3-slug',
-      title: 'Academic Year 2021/22',
+      title: 'Academic year 2021/22',
     } as ReleaseSummary,
     {
       id: 'release-2',
       latestRelease: false,
       slug: 'release-2-slug',
-      title: 'Academic Year 2020/21',
+      title: 'Academic year 2020/21',
     } as ReleaseSummary,
     {
       id: 'release-1',
       latestRelease: false,
       slug: 'release-1-slug',
-      title: 'Academic Year 2019/20',
+      title: 'Academic year 2019/20',
     } as ReleaseSummary,
   ];
 
@@ -56,20 +56,20 @@ describe('ReleaseStep', () => {
     expect(releases[0]).toHaveAttribute('value', 'release-3');
     expect(releases[0]).toBeEnabled();
     expect(releases[0]).not.toBeChecked();
-    expect(releases[0]).toEqual(screen.getByLabelText('Academic Year 2021/22'));
+    expect(releases[0]).toEqual(screen.getByLabelText('Academic year 2021/22'));
     expect(
-      screen.getByTestId('Radio item for Academic Year 2021/22'),
+      screen.getByTestId('Radio item for Academic year 2021/22'),
     ).toHaveTextContent('This is the latest data');
 
     expect(releases[1]).toHaveAttribute('value', 'release-2');
     expect(releases[1]).toBeEnabled();
     expect(releases[1]).not.toBeChecked();
-    expect(releases[1]).toEqual(screen.getByLabelText('Academic Year 2020/21'));
+    expect(releases[1]).toEqual(screen.getByLabelText('Academic year 2020/21'));
 
     expect(releases[2]).toHaveAttribute('value', 'release-1');
     expect(releases[2]).toBeEnabled();
     expect(releases[2]).not.toBeChecked();
-    expect(releases[2]).toEqual(screen.getByLabelText('Academic Year 2019/20'));
+    expect(releases[2]).toEqual(screen.getByLabelText('Academic year 2019/20'));
 
     expect(
       screen.getByRole('button', { name: 'Next step' }),
@@ -89,7 +89,7 @@ describe('ReleaseStep', () => {
       expect(screen.getAllByRole('radio')).toHaveLength(1);
 
       expect(
-        screen.getByLabelText('Academic Year 2020/21'),
+        screen.getByLabelText('Academic year 2020/21'),
       ).toBeInTheDocument();
     });
   });
@@ -164,7 +164,7 @@ describe('ReleaseStep', () => {
       />,
     );
 
-    userEvent.click(screen.getByLabelText('Academic Year 2019/20'));
+    userEvent.click(screen.getByLabelText('Academic year 2019/20'));
     userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     await waitFor(() => {
@@ -188,7 +188,7 @@ describe('ReleaseStep', () => {
     expect(screen.queryAllByRole('radio')).toHaveLength(0);
 
     expect(screen.getByTestId('Release')).toHaveTextContent(
-      'Academic Year 2020/21',
+      'Academic year 2020/21',
     );
   });
 });

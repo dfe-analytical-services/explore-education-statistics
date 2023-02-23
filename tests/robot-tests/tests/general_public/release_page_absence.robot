@@ -26,7 +26,7 @@ Navigate to Absence publication
 
 Validate title
     user waits until h1 is visible    Pupil absence in schools in England    %{WAIT_MEDIUM}
-    user waits until page contains title caption    Academic Year 2016/17
+    user waits until page contains title caption    Academic year 2016/17
 
 Validate URL
     user checks url contains    %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
@@ -46,12 +46,12 @@ Validate Email alerts link
 Validate "About these statistics" -- Number of other releases
     user checks number of other releases is correct    6
     user opens details dropdown    View previous releases (6)
-    user checks other release is shown in position    Academic Year 2014/15    1
-    user checks other release is shown in position    Academic Year 2013/14    2
-    user checks other release is shown in position    Academic Year 2012/13    3
-    user checks other release is shown in position    Academic Year 2011/12    4
-    user checks other release is shown in position    Academic Year 2010/11    5
-    user checks other release is shown in position    Academic Year 2009/10    6
+    user checks other release is shown in position    Academic year 2014/15    1
+    user checks other release is shown in position    Academic year 2013/14    2
+    user checks other release is shown in position    Academic year 2012/13    3
+    user checks other release is shown in position    Academic year 2011/12    4
+    user checks other release is shown in position    Academic year 2010/11    5
+    user checks other release is shown in position    Academic year 2009/10    6
     user closes details dropdown    View previous releases (6)
 
 Validate "About these statistics" -- "Last updated"

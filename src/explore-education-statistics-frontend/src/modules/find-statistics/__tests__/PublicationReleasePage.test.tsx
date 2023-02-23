@@ -42,7 +42,7 @@ describe('PublicationReleasePage', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'View latest data: Academic Year 2018/19',
+        name: 'View latest data: Academic year 2018/19',
       }),
     ).toBeInTheDocument();
   });
@@ -190,31 +190,31 @@ describe('PublicationReleasePage', () => {
 
     expect(otherReleaseLinks).toHaveLength(5);
 
-    expect(otherReleaseLinks[0]).toHaveTextContent('Academic Year 2018/19');
+    expect(otherReleaseLinks[0]).toHaveTextContent('Academic year 2018/19');
     expect(otherReleaseLinks[0]).toHaveAttribute(
       'href',
       '/find-statistics/pupil-absence-in-schools-in-england/2018-19',
     );
 
-    expect(otherReleaseLinks[1]).toHaveTextContent('Academic Year 2017/18');
+    expect(otherReleaseLinks[1]).toHaveTextContent('Academic year 2017/18');
     expect(otherReleaseLinks[1]).toHaveAttribute(
       'href',
       '/find-statistics/pupil-absence-in-schools-in-england/2017-18',
     );
 
-    expect(otherReleaseLinks[2]).toHaveTextContent('Academic Year 2014/15');
+    expect(otherReleaseLinks[2]).toHaveTextContent('Academic year 2014/15');
     expect(otherReleaseLinks[2]).toHaveAttribute(
       'href',
       'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015',
     );
 
-    expect(otherReleaseLinks[3]).toHaveTextContent('Academic Year 2013/14');
+    expect(otherReleaseLinks[3]).toHaveTextContent('Academic year 2013/14');
     expect(otherReleaseLinks[3]).toHaveAttribute(
       'href',
       'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014',
     );
 
-    expect(otherReleaseLinks[4]).toHaveTextContent('Academic Year 2012/13');
+    expect(otherReleaseLinks[4]).toHaveTextContent('Academic year 2012/13');
     expect(otherReleaseLinks[4]).toHaveAttribute(
       'href',
       'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013',
@@ -352,7 +352,7 @@ describe('PublicationReleasePage', () => {
 
     userEvent.click(
       screen.getByRole('button', {
-        name: `See all updates (2) for Academic Year 2016/17`,
+        name: `See all updates (2) for Academic year 2016/17`,
       }),
     );
 

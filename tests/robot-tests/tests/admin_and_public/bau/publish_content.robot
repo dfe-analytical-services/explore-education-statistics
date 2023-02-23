@@ -12,7 +12,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - publish content %{RUN_IDENTIFIER}
-${RELEASE_NAME}=        Calendar Year 2001
+${RELEASE_NAME}=        Calendar year 2001
 
 
 *** Test Cases ***

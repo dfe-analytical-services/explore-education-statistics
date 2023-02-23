@@ -319,7 +319,7 @@ describe('Accordion', () => {
     const { container } = render(
       <Accordion
         id="test-sections"
-        toggleAllHiddenText="Academic Year 2016/17 sections"
+        toggleAllHiddenText="Academic year 2016/17 sections"
       >
         <AccordionSection heading="Test heading">Test content</AccordionSection>
       </Accordion>,
@@ -329,7 +329,7 @@ describe('Accordion', () => {
       1,
     );
     expect(container.querySelector('.govuk-visually-hidden')).toHaveTextContent(
-      'Academic Year 2016/17 sections',
+      'Academic year 2016/17 sections',
     );
   });
 });

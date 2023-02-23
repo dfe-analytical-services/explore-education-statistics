@@ -40,32 +40,32 @@ Validate Analyst1 can see correct legacy releases
     user checks element count is x    css:tbody tr    6
 
     user checks table cell contains    1    1    5
-    user checks table cell contains    1    2    Academic Year 2014/15
+    user checks table cell contains    1    2    Academic year 2014/15
     user checks table cell contains    1    3
     ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015
 
     user checks table cell contains    2    1    4
-    user checks table cell contains    2    2    Academic Year 2013/14
+    user checks table cell contains    2    2    Academic year 2013/14
     user checks table cell contains    2    3
     ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014
 
     user checks table cell contains    3    1    3
-    user checks table cell contains    3    2    Academic Year 2012/13
+    user checks table cell contains    3    2    Academic year 2012/13
     user checks table cell contains    3    3
     ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013
 
     user checks table cell contains    4    1    2
-    user checks table cell contains    4    2    Academic Year 2011/12
+    user checks table cell contains    4    2    Academic year 2011/12
     user checks table cell contains    4    3
     ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics
 
     user checks table cell contains    5    1    1
-    user checks table cell contains    5    2    Academic Year 2010/11
+    user checks table cell contains    5    2    Academic year 2010/11
     user checks table cell contains    5    3
     ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011
 
     user checks table cell contains    6    1    0
-    user checks table cell contains    6    2    Academic Year 2009/10
+    user checks table cell contains    6    2    Academic year 2009/10
     user checks table cell contains    6    3
     ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010
 
@@ -89,14 +89,14 @@ Validate Analyst1 cannot create a release for Pupil absence publication
     user checks page does not contain    link:Create new release
 
 Navigate to Absence release
-    ${ROW}=    user gets table row    Academic Year 2016/17    testid:publication-published-releases
+    ${ROW}=    user gets table row    Academic year 2016/17    testid:publication-published-releases
     user clicks element    xpath://*[text()="View"]    ${ROW}
 
     user waits until h1 is visible    Pupil absence in schools in England
     user waits until h2 is visible    Release summary
 
 Validate Analyst1 can see Absence release summary
-    user verifies release summary    Pupil absence in schools in England    ${EMPTY}    Academic Year    2016/17
+    user verifies release summary    Pupil absence in schools in England    ${EMPTY}    Academic year    2016/17
     ...    Data Analyst    Official statistics
 
 Validate Analyst1 can see 'Content' page

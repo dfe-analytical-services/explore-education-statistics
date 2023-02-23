@@ -5,26 +5,26 @@ export const testPublication: Publication = {
   title: 'Pupil absence in schools in England',
   slug: 'pupil-absence-in-schools-in-england',
   releases: [
-    { id: 'release-3', slug: '2018-19', title: 'Academic Year 2018/19' },
-    { id: 'release-2', slug: '2017-18', title: 'Academic Year 2017/18' },
-    { id: 'release-1', slug: '2016-17', title: 'Academic Year 2016/17' },
+    { id: 'release-3', slug: '2018-19', title: 'Academic year 2018/19' },
+    { id: 'release-2', slug: '2017-18', title: 'Academic year 2017/18' },
+    { id: 'release-1', slug: '2016-17', title: 'Academic year 2016/17' },
   ],
   legacyReleases: [
     {
       id: 'legacy-release-3',
-      description: 'Academic Year 2014/15',
+      description: 'Academic year 2014/15',
       url:
         'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015',
     },
     {
       id: 'legacy-release-2',
-      description: 'Academic Year 2013/14',
+      description: 'Academic year 2013/14',
       url:
         'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014',
     },
     {
       id: 'legacy-release-1',
-      description: 'Academic Year 2012/13',
+      description: 'Academic year 2012/13',
       url:
         'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013',
     },
@@ -55,9 +55,9 @@ export const testRelease: Release = {
   latestRelease: true,
   publication: testPublication,
   id: 'release-1',
-  title: 'Academic Year 2016/17',
+  title: 'Academic year 2016/17',
   yearTitle: '2016/17',
-  coverageTitle: 'Academic Year',
+  coverageTitle: 'Academic year',
   releaseName: '2016',
   nextReleaseDate: {
     year: '2019',

@@ -8,7 +8,7 @@ Import bootstrap data roles and permissions variables
     Set suite variable    ${PUBLICATION_FOR_RELEASE_VIEWER}    ${IDENTIFIER} Release Viewer
     Set suite variable    ${PUBLICATION_FOR_RELEASE_CONTRIBUTOR}    ${IDENTIFIER} Release Contributor
     Set suite variable    ${PUBLICATION_FOR_RELEASE_APPROVER}    ${IDENTIFIER} Release Approver
-    Set suite variable    ${DRAFT_RELEASE_TYPE}    Academic Year 2022/23
-    Set suite variable    ${HIGHER_REVIEW_RELEASE_TYPE}    Academic Year 2023/24
-    Set suite variable    ${APPROVED_RELEASE_TYPE}    Academic Year 2024/25
-    Set suite variable    ${PUBLISHED_RELEASE_TYPE}    Academic Year 2025/26
+    Set suite variable    ${DRAFT_RELEASE_TYPE}    Academic year 2022/23
+    Set suite variable    ${HIGHER_REVIEW_RELEASE_TYPE}    Academic year 2023/24
+    Set suite variable    ${APPROVED_RELEASE_TYPE}    Academic year 2024/25
+    Set suite variable    ${PUBLISHED_RELEASE_TYPE}    Academic year 2025/26

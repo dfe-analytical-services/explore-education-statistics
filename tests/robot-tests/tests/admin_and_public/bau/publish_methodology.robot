@@ -14,7 +14,7 @@ Force Tags          Admin    Local    Dev    AltersData
 *** Variables ***
 ${PUBLICATION_NAME}=                    UI tests - publish methodology %{RUN_IDENTIFIER}
 ${PUBLIC_METHODOLOGY_URL_ENDING}=       /methodology/ui-tests-publish-methodology-%{RUN_IDENTIFIER}
-${RELEASE_NAME}=                        Academic Year 2021/22
+${RELEASE_NAME}=                        Academic year 2021/22
 
 
 *** Test Cases ***

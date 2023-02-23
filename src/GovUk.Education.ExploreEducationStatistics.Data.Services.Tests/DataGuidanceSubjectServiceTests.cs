@@ -344,8 +344,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("file2.csv", result[1].Filename);
                 Assert.Equal("Subject 2", result[1].Name);
 
-                Assert.Equal("2020/21 Summer Term", result[1].TimePeriods.From);
-                Assert.Equal("2021/22 Spring Term", result[1].TimePeriods.To);
+                Assert.Equal("2020/21 Summer term", result[1].TimePeriods.From);
+                Assert.Equal("2021/22 Spring term", result[1].TimePeriods.To);
                 Assert.Equal(new List<string>
                 {
                     "National",

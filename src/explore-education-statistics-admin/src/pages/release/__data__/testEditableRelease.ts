@@ -14,9 +14,9 @@ const emptyTable: Table = {
 // eslint-disable-next-line import/prefer-default-export
 export const testEditableRelease: EditableRelease = {
   id: '6a97c9b6-eaa2-4d22-7ba9-08d7bec1ba1a',
-  title: 'Academic Year 2020/21',
+  title: 'Academic year 2020/21',
   yearTitle: '2020/21',
-  coverageTitle: 'Academic Year',
+  coverageTitle: 'Academic year',
   releaseName: '2020',
   slug: '2020-21',
   publicationId: '8586c490-7027-4a8b-9df5-cf105c3e88ec',
