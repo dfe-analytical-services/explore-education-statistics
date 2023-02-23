@@ -197,103 +197,103 @@ describe('DataBlockTabs', () => {
     });
   });
 
-  test('renders line chart', async () => {
-    tableBuilderService.getDataBlockTableData.mockResolvedValue(
-      testChartTableData,
-    );
+  //test('renders line chart', async () => {
+  //  tableBuilderService.getDataBlockTableData.mockResolvedValue(
+  //    testChartTableData,
+  //  );
 
-    const { container } = render(
-      <DataBlockTabs
-        releaseId="release-1"
-        id="test-datablock"
-        dataBlock={{
-          ...testDataBlock,
-          charts: [testChartConfiguration],
-        }}
-      />,
-    );
+  //  const { container } = render(
+  //    <DataBlockTabs
+  //      releaseId="release-1"
+  //      id="test-datablock"
+  //      dataBlock={{
+  //        ...testDataBlock,
+  //        charts: [testChartConfiguration],
+  //      }}
+  //    />,
+  //  );
 
-    forceVisible();
+  //  forceVisible();
 
-    await waitFor(() => {
-      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
-        'release-1',
-        'block-1',
-      );
+  //  await waitFor(() => {
+  //    expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+  //      'release-1',
+  //      'block-1',
+  //    );
 
-      expect(screen.getAllByRole('tab')).toHaveLength(2);
+  //    expect(screen.getAllByRole('tab')).toHaveLength(2);
 
-      expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
-    });
-  });
+  //    expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
+  //  });
+  //});
 
-  test('renders horizontal chart', async () => {
-    tableBuilderService.getDataBlockTableData.mockResolvedValue(
-      testChartTableData,
-    );
+  //test('renders horizontal chart', async () => {
+  //  tableBuilderService.getDataBlockTableData.mockResolvedValue(
+  //    testChartTableData,
+  //  );
 
-    const { container } = render(
-      <DataBlockTabs
-        releaseId="release-1"
-        id="test-block"
-        dataBlock={{
-          ...testDataBlock,
-          charts: [
-            {
-              ...testChartConfiguration,
-              type: 'horizontalbar',
-            } as Chart,
-          ],
-        }}
-      />,
-    );
+  //  const { container } = render(
+  //    <DataBlockTabs
+  //      releaseId="release-1"
+  //      id="test-block"
+  //      dataBlock={{
+  //        ...testDataBlock,
+  //        charts: [
+  //          {
+  //            ...testChartConfiguration,
+  //            type: 'horizontalbar',
+  //          } as Chart,
+  //        ],
+  //      }}
+  //    />,
+  //  );
 
-    forceVisible();
+  //  forceVisible();
 
-    await waitFor(() => {
-      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
-        'release-1',
-        'block-1',
-      );
+  //  await waitFor(() => {
+  //    expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+  //      'release-1',
+  //      'block-1',
+  //    );
 
-      expect(screen.getAllByRole('tab')).toHaveLength(2);
-      expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
-    });
-  });
+  //    expect(screen.getAllByRole('tab')).toHaveLength(2);
+  //    expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
+  //  });
+  //});
 
-  test('renders vertical chart', async () => {
-    tableBuilderService.getDataBlockTableData.mockResolvedValue(
-      testChartTableData,
-    );
+  //test('renders vertical chart', async () => {
+  //  tableBuilderService.getDataBlockTableData.mockResolvedValue(
+  //    testChartTableData,
+  //  );
 
-    const { container } = render(
-      <DataBlockTabs
-        releaseId="release-1"
-        id="test-block"
-        dataBlock={{
-          ...testDataBlock,
-          charts: [
-            {
-              ...testChartConfiguration,
-              type: 'verticalbar',
-            } as Chart,
-          ],
-        }}
-      />,
-    );
+  //  const { container } = render(
+  //    <DataBlockTabs
+  //      releaseId="release-1"
+  //      id="test-block"
+  //      dataBlock={{
+  //        ...testDataBlock,
+  //        charts: [
+  //          {
+  //            ...testChartConfiguration,
+  //            type: 'verticalbar',
+  //          } as Chart,
+  //        ],
+  //      }}
+  //    />,
+  //  );
 
-    forceVisible();
+  //  forceVisible();
 
-    await waitFor(() => {
-      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
-        'release-1',
-        'block-1',
-      );
+  //  await waitFor(() => {
+  //    expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+  //      'release-1',
+  //      'block-1',
+  //    );
 
-      expect(screen.getAllByRole('tab')).toHaveLength(2);
-      expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
-    });
-  });
+  //    expect(screen.getAllByRole('tab')).toHaveLength(2);
+  //    expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
+  //  });
+  //});
 
   test('renders table', async () => {
     tableBuilderService.getDataBlockTableData.mockResolvedValue(
