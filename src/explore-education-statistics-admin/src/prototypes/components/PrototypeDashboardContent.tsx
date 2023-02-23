@@ -19,9 +19,9 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/school-pupils-and-their-characteristics"
           >
-            Pupils schools and their characteristics
+            Schools, pupils and their characteristics
           </a>
         </div>
         <div className={styles.prototypeDashboardCard}>
@@ -35,7 +35,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/school-pupils-and-their-characteristics"
           >
             Free school meals
           </a>
@@ -51,7 +51,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/education-provision-children-under-5"
           >
             Education provision: children under 5
           </a>
@@ -68,7 +68,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/school-workforce-in-england"
           >
             Teachers and school workforce
           </a>
@@ -85,7 +85,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/early-years-foundation-stage-profile-results"
           >
             Early years foundation stage profile reults
           </a>
@@ -104,7 +104,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/school-pupils-and-their-characteristics"
           >
             Schools, pupils and their characteristics
           </a>
@@ -119,7 +119,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/pupil-absence-in-schools-in-england"
           >
             Pupil absence
           </a>
@@ -134,7 +134,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/school-pupils-and-their-characteristics"
           >
             Schools, pupils and their characteristics
           </a>
@@ -148,7 +148,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/school-workforce-in-england"
           >
             Teachers and school workforce
           </a>
@@ -163,7 +163,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/key-stage-2-attainment"
           >
             Key stage 2 attainment
           </a>
@@ -178,7 +178,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/special-educational-needs-in-england"
           >
             Special educational needs
           </a>
@@ -198,7 +198,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/a-level-and-other-16-to-18-results"
           >
             A level and other 16 to 18 results
           </a>
@@ -213,7 +213,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/participation-in-education-and-training-and-employment"
           >
             NEET and participation
           </a>
@@ -228,7 +228,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/further-education-and-skills#"
           >
             Further education and skills
           </a>
@@ -243,7 +243,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/progression-to-higher-education-or-training"
           >
             Progession to higher or further education
           </a>
@@ -257,7 +257,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/apprenticeships-and-traineeships"
           >
             Apprenticeships and traineeships
           </a>
@@ -272,7 +272,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/leo-graduate-and-postgraduate-outcomes"
           >
             LEO graduate and postgrduate outcomes
           </a>
@@ -290,7 +290,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/characteristics-of-children-in-need"
           >
             Characteristics of children in need
           </a>
@@ -305,7 +305,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/children-looked-after-in-england-including-adoptions"
           >
             Children looked after
           </a>
@@ -320,7 +320,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/children-accommodated-in-secure-childrens-homes"
           >
             Children accommodated in secure children's homes
           </a>
@@ -335,7 +335,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/children-s-social-work-workforce-attrition-caseload-and-agency-workforce"
           >
             Children's social work workforce
           </a>
@@ -350,7 +350,7 @@ const DashboardContent = () => {
               'govuk-link--no-visited-state',
               styles.prototypeDashboardCardLink,
             )}
-            href="#"
+            href="https://explore-education-statistics.service.gov.uk/find-statistics/serious-incident-notifications"
           >
             Serious incident notifications
           </a>
