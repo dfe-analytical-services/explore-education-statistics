@@ -680,14 +680,14 @@
     },
     "minCapacityContentDb": {
       "type": "string",
-      "defaultValue": null
+      "defaultValue": ""
     },
     "capacityContentDb": {
       "type": "int"
     },
     "minCapacityStatisticsDb": {
       "type": "string",
-      "defaultValue": null
+      "defaultValue": ""
     },
     "capacityStatisticsDb": {
       "type": "int"
@@ -2179,7 +2179,7 @@
             "zoneRedundant": false,
             "readScale": "Disabled",
             "storageAccountType": "GRS",
-            "minCapacity": "[parameters('minCapacityStatisticsDb')]"
+            "minCapacity": "[if(not(empty(parameters('minCapacityStatisticsDb'))), parameters('minCapacityStatisticsDb'), json('null'))]"
           }
         },
         {
@@ -2215,7 +2215,7 @@
             "zoneRedundant": false,
             "readScale": "Disabled",
             "storageAccountType": "GRS",
-            "minCapacity": "[parameters('minCapacityContentDb')]"
+            "minCapacity": "[if(not(empty(parameters('minCapacityContentDb'))), parameters('minCapacityContentDb'), json('null'))]"
           }
         },
         {
@@ -2423,7 +2423,7 @@
             "zoneRedundant": false,
             "readScale": "Disabled",
             "storageAccountType": "GRS",
-            "minCapacity": "[parameters('minCapacityStatisticsDb')]",
+            "minCapacity": "[if(not(empty(parameters('minCapacityStatisticsDb'))), parameters('minCapacityStatisticsDb'), json('null'))]",
             "createMode": "OnlineSecondary",
             "sourceDatabaseId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('statisticsDbName'))]",
             "secondaryType": "Geo"
