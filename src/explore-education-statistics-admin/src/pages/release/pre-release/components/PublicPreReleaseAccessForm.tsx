@@ -90,7 +90,7 @@ const PublicPreReleaseAccessForm = ({
         <>
           {!canUpdateRelease && (
             <WarningMessage>
-              This release has been published and can no longer be updated.
+              This release has been approved, and can no longer be updated.
             </WarningMessage>
           )}
 
