@@ -444,7 +444,7 @@ describe('ReleaseStatusForm', () => {
           release={{
             ...testRelease,
             approvalStatus: 'Approved',
-            preReleaseUsersAdded: true,
+            preReleaseUsersOrInvitesAdded: true,
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -471,7 +471,7 @@ describe('ReleaseStatusForm', () => {
           release={{
             ...testRelease,
             approvalStatus: 'Approved',
-            preReleaseUsersAdded: false,
+            preReleaseUsersOrInvitesAdded: false,
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}

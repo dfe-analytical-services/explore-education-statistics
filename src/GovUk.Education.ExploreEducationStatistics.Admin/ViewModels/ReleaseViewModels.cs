@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string PreReleaseAccessList { get; set; } = string.Empty;
 
-        public bool PreReleaseUsersAdded { get; set; }
+        public bool PreReleaseUsersOrInvitesAdded { get; set; }
 
         public bool LatestRelease { get; set; }
 
