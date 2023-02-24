@@ -108,10 +108,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(release => _mapper
                     .Map<ReleaseViewModel>(release) with
                     {
-                        PreReleaseUsersAdded = _context
+                        PreReleaseUsersOrInvitesAdded = _context
                             .UserReleaseRoles
                             .Any(role => role.ReleaseId == id 
+                                         && role.Role == ReleaseRole.PrereleaseViewer) ||
+                                                        _context
+                            .UserReleaseInvites
+                            .Any(role => role.ReleaseId == id 
                                          && role.Role == ReleaseRole.PrereleaseViewer)
+                                                        
                     });
         }
 

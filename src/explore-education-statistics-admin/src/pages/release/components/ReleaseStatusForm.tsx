@@ -303,7 +303,7 @@ const ReleaseStatusForm = ({
                     value: 'Scheduled',
                     conditional: (
                       <>
-                        {release.preReleaseUsersAdded && (
+                        {release.preReleaseUsersOrInvitesAdded && (
                           <WarningMessage className="govuk-!-width-two-thirds">
                             Pre-release users will have access to a preview of
                             the release 24 hours before the scheduled publish
@@ -328,7 +328,7 @@ const ReleaseStatusForm = ({
                           Contact us if the release has not been published
                           within one hour.
                         </p>
-                        {release.preReleaseUsersAdded && (
+                        {release.preReleaseUsersOrInvitesAdded && (
                           <WarningMessage className="govuk-!-width-two-thirds">
                             Pre-release users will not have access to a preview
                             of the release if it is published immediately.
@@ -403,9 +403,6 @@ const ReleaseStatusForm = ({
               </FormattedDate>
               .
             </p>
-            {release.preReleaseUsersAdded && (
-              <p>A pre-release window will be available.</p>
-            )}
             <p>Are you sure?</p>
           </ModalConfirm>
 
