@@ -121,9 +121,6 @@
     },
     "immediatePublicationOfScheduledReleasesEnabled": {
       "value": true
-    },
-    "tableBuilderMaxTableCellsAllowed": {
-      "value": 6000000
     }
   }
 }
