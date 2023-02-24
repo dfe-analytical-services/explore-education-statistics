@@ -14,6 +14,9 @@ const PrototypeReleaseData = () => {
         <div className={styles.releaseContainer}>
           <div>
             <div className={styles.stickyLinksContainer}>
+              <h2 id="contentsNoSideNav" className="govuk-heading-m">
+                Themes
+              </h2>
               <div
                 className={classNames(styles.stickyLinks)}
                 style={{ border: 'none' }}
@@ -79,17 +82,10 @@ const PrototypeReleaseData = () => {
             </div>
           </div>
           <div className={styles.releaseMainContent}>
-            <span className="govuk-caption-xl">Reporting year 2021</span>
             <h1 className="govuk-heading-xl">Education in numbers</h1>
             <div className="govuk-grid-row govuk-!-margin-bottom-6">
               <div className="govuk-grid-column-two-thirds">
                 <dl className="govuk-summary-list">
-                  <div className="govuk-summary-list__row">
-                    <dt className="govuk-summary-list__key">Published: </dt>
-                    <dd className="govuk-summary-list__value">
-                      <time>28 October 2021</time>
-                    </dd>
-                  </div>
                   <div className="govuk-summary-list__row">
                     <dt className="govuk-summary-list__key">Last updated: </dt>
                     <dd className="govuk-summary-list__value">
@@ -111,8 +107,6 @@ const PrototypeReleaseData = () => {
                     </dd>
                   </div>
                 </dl>
-
-                <PageSearchForm inputLabel="Search this page" />
               </div>
             </div>
             <PrototypeDashboardContent />

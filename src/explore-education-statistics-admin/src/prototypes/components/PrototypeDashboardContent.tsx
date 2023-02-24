@@ -4,9 +4,10 @@ import styles from '../PrototypePublicPage.module.scss';
 
 interface Props {
   headlines?: boolean;
+  hideLink?: boolean;
 }
 
-const DashboardContent = ({ headlines }: Props) => {
+const DashboardContent = ({ headlines, hideLink }: Props) => {
   return (
     <div className={styles.releaseMainContent}>
       {!headlines && (
@@ -43,7 +44,7 @@ const DashboardContent = ({ headlines }: Props) => {
                 )}
                 href="https://explore-education-statistics.service.gov.uk/find-statistics/school-pupils-and-their-characteristics"
               >
-                Free school meals
+                Schools, pupils and their characteristics
               </a>
             </div>
             <div className={styles.prototypeDashboardCard}>
@@ -97,6 +98,11 @@ const DashboardContent = ({ headlines }: Props) => {
               </a>
             </div>
           </div>
+
+          <a href="https://explore-education-statistics.service.gov.uk/find-statistics?themeId=e6e31160-fe79-4556-f3a9-08d86094b9e8&sortBy=newest">
+            View all publications in 'Children and early years'
+          </a>
+          <hr className="govuk-!-margin-top-9" />
 
           <h2 id="schools">Primary and secondary schools</h2>
 
@@ -193,6 +199,11 @@ const DashboardContent = ({ headlines }: Props) => {
             </div>
           </div>
 
+          <a href="https://explore-education-statistics.service.gov.uk/find-statistics?themeId=ee1855ca-d1e1-4f04-a795-cbd61d326a1f&sortBy=newest">
+            View all publications in 'Primary and secondary schools'
+          </a>
+          <hr className="govuk-!-margin-top-9" />
+
           <h2 id="destinations">Destinations after school</h2>
 
           <div className={styles.prototypeCardDashboardContainerGrid}>
@@ -287,6 +298,11 @@ const DashboardContent = ({ headlines }: Props) => {
             </div>
           </div>
 
+          <a href="https://explore-education-statistics.service.gov.uk/find-statistics?themeId=6412a76c-cf15-424f-8ebc-3a530132b1b3&sortBy=newest">
+            View all publications in 'Destinations after school'
+          </a>
+          <hr className="govuk-!-margin-top-9" />
+
           <h2 id="children-social-care">Children's social care</h2>
           <div className={styles.prototypeCardDashboardContainerGrid}>
             <div className={styles.prototypeDashboardCard}>
@@ -365,6 +381,10 @@ const DashboardContent = ({ headlines }: Props) => {
               </a>
             </div>
           </div>
+          <a href="https://explore-education-statistics.service.gov.uk/find-statistics?themeId=cc8e02fd-5599-41aa-940d-26bca68eab53&sortBy=newest">
+            View all publications in 'Children's social care'
+          </a>
+          <hr className="govuk-!-margin-top-9" />
         </>
       )}
 
@@ -419,9 +439,11 @@ const DashboardContent = ({ headlines }: Props) => {
               </a>
             </div>
           </div>
-          <a href="/prototypes/dashboard2">
-            View all headlines from education in numbers
-          </a>
+          {!hideLink && (
+            <a href="/prototypes/dashboard2">
+              View all headlines from education in numbers
+            </a>
+          )}
         </>
       )}
     </div>

@@ -62,13 +62,22 @@
       grid-template-columns: 1fr 1fr 1fr;
     }
   }
+
+  &.col2 {
+    @include govuk-media-query($from: desktop) {
+      grid-template-columns: 1fr 1fr;
+    }
+    @include govuk-media-query($from: 1280px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
 }
 
 .prototypeCardDashboardContainerGrid {
   display: grid;
   grid-gap: 1rem;
   grid-template-columns: 1fr;
-  margin-bottom: 3rem;
+  margin-bottom: 1rem;
   @include govuk-media-query($from: tablet) {
     grid-template-columns: 1fr 1fr;
   }
