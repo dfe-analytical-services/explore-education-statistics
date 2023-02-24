@@ -4,6 +4,8 @@ import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
 import PageFooter from '@admin/components/PageFooter';
 import logo from 'govuk-frontend/govuk/assets/images/govuk-logotype-crown.png';
+import PrototypeDashboardContent from '@admin/prototypes/components/PrototypeDashboardContent';
+import Link from '../components/Link';
 import styles from './PrototypePublicPage.module.scss';
 
 const PrototypeHomepage = () => {
@@ -47,12 +49,14 @@ const PrototypeHomepage = () => {
       </header>
       <div className={styles.prototypeMasthead}>
         <div className="govuk-width-container">
-          <h1 className="govuk-heading-xl">
+          <h1 className="govuk-heading-xl  govuk-!-margin-bottom-7">
             Welcome to explore education statistics
           </h1>
-          <p className="govuk-body-l">
+          <p className="govuk-body-l govuk-!-margin-bottom-3">
             Explore and download up to date official educational statistics from
-            England. <br />
+            England.
+          </p>
+          <p className="govuk-body-l">
             <strong>Publications, data downloads, table creation.</strong>
           </p>
         </div>
@@ -144,6 +148,35 @@ const PrototypeHomepage = () => {
       </div>
       <div className={classNames('govuk-width-container')}>
         <div className={styles.prototypePublicPage}>
+          <h2 className="govuk-!-margin-top-9">Featured headlines</h2>
+
+          <PrototypeDashboardContent headlines />
+
+          <h2 className="govuk-!-margin-top-9">Supporting information</h2>
+
+          <h3 className="govuk-!-margin-bottom-1">
+            <Link to="/data-catalogue">Data catalogue</Link>
+          </h3>
+          <p className="govuk-caption-m">
+            View all of the open data available and choose files to download.
+          </p>
+
+          <h3 className="govuk-!-margin-bottom-1">
+            <Link to="/methodology">Methodology</Link>
+          </h3>
+          <p className="govuk-caption-m">
+            Browse to find out more about the methodology behind our statistics
+            and how and why they&apos;re collected and published.
+          </p>
+
+          <h3 className="govuk-!-margin-bottom-1">
+            <Link to="/glossary">Glossary</Link>
+          </h3>
+          <p className="govuk-caption-m">
+            Browse our A to Z list of definitions for terms used across our
+            statistics.
+          </p>
+
           <h2 className="govuk-!-margin-top-9">Related services</h2>
 
           <div className="govuk-grid-row govuk-!-margin-bottom-3">
