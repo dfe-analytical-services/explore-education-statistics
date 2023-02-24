@@ -30,7 +30,7 @@ export const getReleaseRequestDuration = new Trend(
 );
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
-  __ENV.TEST_ENVIRONMENT as string,
+  __ENV.TEST_ENVIRONMENT,
 );
 
 export function setup() {
@@ -51,15 +51,12 @@ const performTest = () => {
     getReleaseFailureCount.add(1);
     errorRate.add(1);
     fail(`Failure to get Release page - ${JSON.stringify(e)}`);
-    return;
   }
 
   if (
     check(response, {
       'response code was 200': ({ status }) => status === 200,
       'response should have contained body': ({ body }) => body != null,
-    }) &&
-    check(response, {
       'response contains expected title': res =>
         res.html().text().includes('Pupil absence in schools in England'),
       'response contains expected content': res =>
@@ -71,9 +68,7 @@ const performTest = () => {
     getReleaseRequestDuration.add(Date.now() - startTime);
   } else {
     console.log(
-      `FAILURE!  Got ${response.status} response code - ${JSON.stringify(
-        response.body,
-      )}`,
+      `FAILURE! Got ${response.status} response code`,
     );
     getReleaseFailureCount.add(1);
     getReleaseRequestDuration.add(Date.now() - startTime);

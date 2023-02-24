@@ -45,7 +45,7 @@ const utils = {
               title: subjectName,
               releaseId,
               zipFile: {
-                file: zipFile!,
+                file: zipFile as ArrayBuffer,
                 filename: `${subjectName}.zip`,
               },
             })
@@ -53,11 +53,11 @@ const utils = {
               title: subjectName,
               releaseId,
               dataFile: {
-                file: subjectFile!,
+                file: subjectFile as ArrayBuffer,
                 filename: `${subjectName}.csv`,
               },
               metaFile: {
-                file: subjectMetaFile!,
+                file: subjectMetaFile as ArrayBuffer,
                 filename: `${subjectName}.meta.csv`,
               },
             }),

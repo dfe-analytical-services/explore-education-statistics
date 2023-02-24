@@ -15,7 +15,7 @@ export const options: Options = {
 export const errorRate = new Rate('errors');
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
-  __ENV.TEST_ENVIRONMENT as string,
+  __ENV.TEST_ENVIRONMENT,
 );
 const { adminUrl } = environmentAndUsers.environment;
 

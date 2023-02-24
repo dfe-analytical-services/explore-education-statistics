@@ -56,7 +56,7 @@ export const tableQueryFailureCount = new Counter(
 );
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
-  __ENV.TEST_ENVIRONMENT as string,
+  __ENV.TEST_ENVIRONMENT,
 );
 const {
   adminUrl,
@@ -224,7 +224,7 @@ const performTest = ({ publicationId, subjectId, subjectMeta }: SetupData) => {
         if (location.options) {
           return location.options.flatMap(o => o.id);
         }
-        return [location.id!];
+        return [location.id];
       }),
   );
 
@@ -249,7 +249,7 @@ const performTest = ({ publicationId, subjectId, subjectMeta }: SetupData) => {
     subjectId,
     filterIds: someFilterItemIds,
     indicatorIds: allIndicationIds,
-    locationIds: someLocationIds,
+    locationIds: someLocationIds as string[],
     ...someTimePeriods,
   });
 
