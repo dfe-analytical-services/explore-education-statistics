@@ -41,6 +41,7 @@ import PrototypeMethodology from './PrototypeMethodology';
 import PrototypeDashboard from './PrototypeDashboard';
 import PrototypeDashboard2 from './PrototypeDashboard2';
 import PrototypeHomepageDashboard from './PrototypeHomepageDashboard';
+import PrototypeHomepageDashboard2 from './PrototypeHomepageDashboard2';
 
 interface PrototypeRoute extends RouteProps {
   name: string;
@@ -257,6 +258,11 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'Homepage Dashboard',
     path: '/prototypes/homepageDashboard',
     component: PrototypeHomepageDashboard,
+  },
+  {
+    name: 'Homepage Dashboard2',
+    path: '/prototypes/homepageDashboard2',
+    component: PrototypeHomepageDashboard2,
   },
 ];
 

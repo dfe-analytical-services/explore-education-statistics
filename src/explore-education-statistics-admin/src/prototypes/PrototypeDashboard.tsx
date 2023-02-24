@@ -10,20 +10,10 @@ const PrototypeReleaseData = () => {
 
   return (
     <div className={styles.prototypePublicPage}>
-      <PrototypePage
-        title="Education in numbers"
-        caption="Reporting year 2021"
-        wide={false}
-      >
+      <PrototypePage title="Education in numbers" wide={false}>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
             <dl className="govuk-summary-list">
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Published: </dt>
-                <dd className="govuk-summary-list__value">
-                  <time>28 October 2021</time>
-                </dd>
-              </div>
               <div className="govuk-summary-list__row">
                 <dt className="govuk-summary-list__key">Last updated: </dt>
                 <dd className="govuk-summary-list__value">
