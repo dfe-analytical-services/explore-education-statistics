@@ -403,9 +403,6 @@ const ReleaseStatusForm = ({
               </FormattedDate>
               .
             </p>
-            {release.preReleaseUsersOrInvitesAdded && (
-              <p>A pre-release window will be available.</p>
-            )}
             <p>Are you sure?</p>
           </ModalConfirm>
 
