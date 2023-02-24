@@ -88,7 +88,7 @@ const PublicPreReleaseAccessForm = ({
         </Formik>
       ) : (
         <>
-          {isReleaseLive && (
+          {!canUpdateRelease && (
             <WarningMessage>
               This release has been published and can no longer be updated.
             </WarningMessage>
@@ -99,12 +99,6 @@ const PublicPreReleaseAccessForm = ({
               <h3 className="govuk-heading-m">
                 Public pre-release access list preview
               </h3>
-
-              {!canUpdateRelease && (
-                <WarningMessage>
-                  This release has been approved, and can no longer be updated
-                </WarningMessage>
-              )}
 
               <PreviewHtml
                 className={styles.preview}
