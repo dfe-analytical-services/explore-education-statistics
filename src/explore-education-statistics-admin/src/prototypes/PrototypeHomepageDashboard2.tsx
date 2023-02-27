@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import PageFooter from '@admin/components/PageFooter';
 import logo from 'govuk-frontend/govuk/assets/images/govuk-logotype-crown.png';
 import PrototypeDashboardContent from '@admin/prototypes/components/PrototypeDashboardContent';
+import Tag from '@common/components/Tag';
 import Link from '../components/Link';
 import styles from './PrototypePublicPage.module.scss';
 
@@ -49,6 +50,18 @@ const PrototypeHomepage = () => {
       </header>
       <div className={styles.prototypeMasthead}>
         <div className="govuk-width-container">
+          <div className="govuk-phase-banner">
+            <p className="govuk-phase-banner__content">
+              <Tag className="govuk-phase-banner__content__tag" strong>
+                Prototype
+              </Tag>
+
+              <span className="govuk-phase-banner__text">
+                This is a prototype page –{' '}
+                <Link to="/prototypes">View prototype index</Link>
+              </span>
+            </p>
+          </div>
           <h1 className="govuk-heading-xl  govuk-!-margin-bottom-7">
             Welcome to explore education statistics
           </h1>

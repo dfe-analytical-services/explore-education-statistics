@@ -522,11 +522,25 @@
   background: $govuk-link-colour;
   color: govuk-colour('white');
   margin-top: -10px;
-  padding: 3rem 0 2rem;
+  padding: 0 0 2rem;
 
   h1,
   p {
     color: govuk-colour('white') !important;
+  }
+
+  :global(.govuk-phase-banner) {
+    border-top: 5px solid govuk-colour('white');
+    margin-bottom: 2.5rem;
+  }
+
+  :global(.govuk-phase-banner) a {
+    color: govuk-colour('white') !important;
+  }
+
+  :global(.govuk-tag) {
+    background: govuk-colour('white');
+    color: $govuk-link-colour;
   }
 }
 
