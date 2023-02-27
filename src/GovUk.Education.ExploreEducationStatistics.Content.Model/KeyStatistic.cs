@@ -6,6 +6,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public abstract class KeyStatistic : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 {
+    public const int TitleMaxLength = 24;
+    public const int StatisticMaxLength = 11;
+    public const int TrendMaxLength = 229;
+    public const int GuidanceTitleMaxLength = 65;
+
     public Guid Id { get; set; }
 
     public Guid ReleaseId { get; set; }

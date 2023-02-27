@@ -638,11 +638,11 @@ Navigate to 'Content' page for amendment
     user waits until page contains button    Add a summary text block
 
 Update free text key stat
-    user updates free text key stat    1    Updated title    Updated statistic    Updated trend
+    user updates free text key stat    1    Updated title    New stat    Updated trend
     ...    Updated guidance title    Updated guidance text
 
     user checks element count is x    testid:keyStat    1
-    user checks key stat contents    1    Updated title    Updated statistic    Updated trend
+    user checks key stat contents    1    Updated title    New stat    Updated trend
     user checks key stat guidance    1    Updated guidance title    Updated guidance text
 
 Verify amended Dates data block table has footnotes
@@ -753,7 +753,7 @@ Verify amendment is published
 
 Verify amendment free text key stat is updated
     user checks element count is x    testid:keyStat    1
-    user checks key stat contents    1    Updated title    Updated statistic    Updated trend
+    user checks key stat contents    1    Updated title    New stat    Updated trend
     user checks key stat guidance    1    Updated guidance title    Updated guidance text
 
 Verify amendment files

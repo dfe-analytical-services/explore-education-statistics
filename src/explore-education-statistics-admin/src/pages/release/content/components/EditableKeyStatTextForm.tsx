@@ -57,10 +57,10 @@ export default function EditableKeyStatTextForm({
             : '',
         }}
         validationSchema={Yup.object<KeyStatTextFormValues>({
-          title: Yup.string().required('Enter a title'),
-          statistic: Yup.string().required('Enter a statistic'),
-          trend: Yup.string(),
-          guidanceTitle: Yup.string(),
+          title: Yup.string().required('Enter a title').max(24),
+          statistic: Yup.string().required('Enter a statistic').max(11),
+          trend: Yup.string().max(229),
+          guidanceTitle: Yup.string().max(65),
           guidanceText: Yup.string(),
         })}
         onSubmit={handleSubmit}
