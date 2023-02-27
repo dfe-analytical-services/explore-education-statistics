@@ -23,7 +23,7 @@ export interface EditableKeyStatDataBlockFormProps {
   title: string;
   statistic: string;
   isReordering?: boolean;
-  testId?: string;
+  testId: string;
   onSubmit: (values: KeyStatDataBlockFormValues) => void;
   onCancel: () => void;
 }
@@ -33,7 +33,7 @@ const EditableKeyStatDataBlockForm = ({
   title,
   statistic,
   isReordering,
-  testId = 'keyStat',
+  testId,
   onSubmit,
   onCancel,
 }: EditableKeyStatDataBlockFormProps) => {
@@ -57,7 +57,7 @@ const EditableKeyStatDataBlockForm = ({
       onSubmit={handleSubmit}
     >
       {form => (
-        <Form id={`editableKeyStatForm-${keyStat.id}`}>
+        <Form id={`editableKeyStatDataBlockForm-${keyStat.id}`}>
           <KeyStatTile
             title={title}
             titleTag="h4"

@@ -19,7 +19,9 @@ describe('KeyStat', () => {
         'Number of applications received',
       );
 
-      expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
+      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+        '608,180',
+      );
 
       expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
         'Down from 620,330 in 2017',
@@ -53,7 +55,9 @@ describe('KeyStat', () => {
         'Number of applications received',
       );
 
-      expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
+      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+        '608,180',
+      );
 
       expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
         'Down from 620,330 in 2017',
@@ -85,7 +89,9 @@ describe('KeyStat', () => {
         'Number of applications received',
       );
 
-      expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
+      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+        '608,180',
+      );
 
       expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
       expect(screen.queryByRole('button')).not.toBeInTheDocument();

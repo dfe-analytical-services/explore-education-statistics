@@ -39,13 +39,13 @@ describe('EditableKeyStat', () => {
     const keyStatText: KeyStatisticText = {
       type: 'KeyStatisticText',
       id: 'keyStatDataBlock-1',
+      title: 'Text title',
+      statistic: 'Over 9000',
       trend: 'Text trend',
       guidanceTitle: 'Text guidance title',
       guidanceText: 'Text guidance text',
       order: 0,
       created: '2023-01-01',
-      title: 'Text title',
-      statistic: 'Over 9000',
     };
 
     test('renders correctly', async () => {
@@ -60,7 +60,7 @@ describe('EditableKeyStat', () => {
           'Text title',
         );
 
-        expect(screen.getByTestId('keyStat-value')).toHaveTextContent(
+        expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
           'Over 9000',
         );
 
@@ -169,7 +169,7 @@ describe('EditableKeyStat', () => {
         expect(screen.getByTestId('keyStat-title')).toHaveTextContent(
           'Indicator',
         );
-        expect(screen.getByTestId('keyStat-value')).toHaveTextContent(
+        expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
           '608,180',
         );
         expect(screen.getByTestId('keyStat-trend')).toHaveTextContent('Trend');

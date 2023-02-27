@@ -84,6 +84,7 @@ export interface ReleaseNote {
 }
 
 export interface KeyStatisticBase {
+  type: KeyStatisticType;
   id: string;
   trend?: string;
   guidanceTitle?: string;
@@ -92,6 +93,13 @@ export interface KeyStatisticBase {
   created: string;
   updated?: string;
 }
+
+export const KeyStatisticTypes = {
+  DataBlock: 'KeyStatisticDataBlock',
+  Text: 'KeyStatisticText',
+} as const;
+
+export type KeyStatisticType = typeof KeyStatisticTypes[keyof typeof KeyStatisticTypes];
 
 export interface KeyStatisticDataBlock extends KeyStatisticBase {
   type: 'KeyStatisticDataBlock';

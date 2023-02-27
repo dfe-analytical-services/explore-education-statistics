@@ -1,8 +1,4 @@
 import { EditableRelease } from '@admin/services/releaseContentService';
-import {
-  KeyStatisticDataBlock,
-  KeyStatisticText,
-} from '@common/services/publicationService';
 import { Table } from '@common/services/types/blocks';
 
 const emptyTable: Table = {

@@ -1,12 +1,9 @@
 import BlockDroppable from '@admin/components/editable/BlockDroppable';
 import EditableKeyStat from '@admin/pages/release/content/components/EditableKeyStat';
-import KeyStatDataBlockSelectForm from '@admin/pages/release/content/components/KeyStatDataBlockSelectForm';
 import styles from '@admin/pages/release/content/components/KeyStatistics.module.scss';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import Button from '@common/components/Button';
-import ButtonGroup from '@common/components/ButtonGroup';
-import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
 import { KeyStatContainer } from '@common/modules/find-statistics/components/KeyStat';
 import keyStatStyles from '@common/modules/find-statistics/components/KeyStat.module.scss';
@@ -14,6 +11,7 @@ import reorder from '@common/utils/reorder';
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useState } from 'react';
 import { DragDropContext, Draggable, DropResult } from 'react-beautiful-dnd';
+import AddKeyStatistics from '@admin/pages/release/content/components/AddKeyStatistics';
 
 export interface KeyStatisticsProps {
   release: EditableRelease;
@@ -67,17 +65,9 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
     <>
       {isEditing && (
         <>
-          <WarningMessage>
-            In order to add a key statistic you first need to create a data
-            block with just one value.
-            <br />
-            Any data blocks with more than one value cannot be selected as a key
-            statistic.
-          </WarningMessage>
-          <ButtonGroup className={styles.buttons}>
-            <AddKeyStatistics release={release} />
-            {keyStatistics.length > 1 && <ReorderKeyStatisticsButton />}
-          </ButtonGroup>
+          <AddKeyStatistics release={release} />
+          <hr />
+          {keyStatistics.length > 1 && <ReorderKeyStatisticsButton />}
         </>
       )}
       <DragDropContext onDragEnd={handleDragEnd}>
@@ -132,47 +122,6 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
           </div>
         </BlockDroppable>
       </DragDropContext>
-    </>
-  );
-};
-
-const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
-  const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
-  const {
-    updateUnattachedDataBlocks,
-    addKeyStatisticDataBlock,
-  } = useReleaseContentActions();
-
-  const { keyStatistics } = release;
-
-  const addKeyStatDataBlock = useCallback(
-    async (dataBlockId: string) => {
-      await addKeyStatisticDataBlock({ releaseId: release.id, dataBlockId });
-      await updateUnattachedDataBlocks({ releaseId: release.id });
-      setIsFormOpen(false);
-    },
-    [release.id, addKeyStatisticDataBlock, updateUnattachedDataBlocks],
-  );
-
-  return (
-    <>
-      {isFormOpen ? (
-        <div className={styles.formContainer}>
-          <KeyStatDataBlockSelectForm
-            releaseId={release.id}
-            onSelect={addKeyStatDataBlock}
-            onCancel={() => setIsFormOpen(false)}
-          />
-        </div>
-      ) : (
-        <Button
-          onClick={() => {
-            setIsFormOpen(true);
-          }}
-        >
-          {`Add ${keyStatistics.length > 0 ? 'another ' : ''}key statistic`}
-        </Button>
-      )}
     </>
   );
 };

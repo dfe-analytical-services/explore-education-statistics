@@ -41,6 +41,12 @@
   }
 }
 
+.textTile {
+  background: govuk-colour('light-grey');
+  border: 3px solid govuk-colour('blue');
+  padding: govuk-spacing(3);
+}
+
 .trendText {
   color: govuk-colour('white');
 }
