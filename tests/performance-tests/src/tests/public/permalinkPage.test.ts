@@ -84,7 +84,7 @@ const performTest = () => {
     fail(
       `Failed to get permalink page. Received ${
         response.status
-      } response code & body ${JSON.stringify(response.body)}`,
+      } response code`,
     );
   }
 };

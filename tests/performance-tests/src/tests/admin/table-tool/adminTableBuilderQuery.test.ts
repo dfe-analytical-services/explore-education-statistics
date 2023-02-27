@@ -163,7 +163,7 @@ const performTest = ({ releaseId, subjectId, subjectMeta }: SetupData) => {
         if (location.options) {
           return location.options.flatMap(o => o.id);
         }
-        return [location.id!];
+        return [location.id];
       }),
   );
 
@@ -181,7 +181,7 @@ const performTest = ({ releaseId, subjectId, subjectMeta }: SetupData) => {
     subjectId,
     filterIds: allFilterIds,
     indicatorIds: allIndicationIds,
-    locationIds: allLocationIds,
+    locationIds: allLocationIds as string[],
     ...someTimePeriods,
   });
 

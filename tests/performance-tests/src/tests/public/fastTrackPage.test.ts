@@ -82,9 +82,7 @@ const performTest = () => {
     getfastTrackFailureCount.add(1);
     errorRate.add(1);
     fail(
-      `Failed to get fast track page. Received ${
-        response.status
-      } response code & body ${JSON.stringify(response.body)}`,
+      `Failed to get fast track page. Received ${response.status} response code`,
     );
   }
 };
