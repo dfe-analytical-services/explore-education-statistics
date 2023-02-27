@@ -5,7 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 
 public static class ReleaseGeneratorExtensions
 {
-    public static Generator<Release> DefaultRelease(this DataFixture fixture)
+    public static Generator<Release> DefaultStatsRelease(this DataFixture fixture)
         => fixture.Generator<Release>().WithDefaults();
 
     public static Generator<Release> WithDefaults(this Generator<Release> generator)

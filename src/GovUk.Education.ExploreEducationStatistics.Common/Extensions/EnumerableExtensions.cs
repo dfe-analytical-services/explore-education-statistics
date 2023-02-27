@@ -280,7 +280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             if (list.Count != 3)
             {
                 throw new ArgumentException(
-                    $"Expected 3 list items when constructing a 2-tuple, but found {list.Count}");
+                    $"Expected 3 list items when constructing a 3-tuple, but found {list.Count}");
             }
             
             return new Tuple<T, T, T>(list[0], list[1], list[2]);

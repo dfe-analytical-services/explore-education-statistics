@@ -45,6 +45,4 @@ public static class ReleaseSubjectGeneratorExtensions
     
     public static InstanceSetters<ReleaseSubject> SetSubject(this InstanceSetters<ReleaseSubject> setters, Subject subject)
         => setters.Set(rs => rs.Subject, subject);
-    
-    
 }
