@@ -2178,6 +2178,7 @@
             "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
             "zoneRedundant": false,
             "readScale": "Disabled",
+            "autoPauseDelay": -1,
             "storageAccountType": "GRS",
             "minCapacity": "[if(not(empty(parameters('minCapacityStatisticsDb'))), parameters('minCapacityStatisticsDb'), json('null'))]"
           }
@@ -2214,6 +2215,7 @@
             "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
             "zoneRedundant": false,
             "readScale": "Disabled",
+            "autoPauseDelay": -1,
             "storageAccountType": "GRS",
             "minCapacity": "[if(not(empty(parameters('minCapacityContentDb'))), parameters('minCapacityContentDb'), json('null'))]"
           }
@@ -2422,6 +2424,7 @@
             "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
             "zoneRedundant": false,
             "readScale": "Disabled",
+            "autoPauseDelay": -1,
             "storageAccountType": "GRS",
             "minCapacity": "[if(not(empty(parameters('minCapacityStatisticsDb'))), parameters('minCapacityStatisticsDb'), json('null'))]",
             "createMode": "OnlineSecondary",
