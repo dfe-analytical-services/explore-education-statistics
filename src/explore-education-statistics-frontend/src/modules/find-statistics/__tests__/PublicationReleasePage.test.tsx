@@ -155,14 +155,14 @@ describe('PublicationReleasePage', () => {
 
     expect(quickLinks).toHaveLength(4);
 
-    expect(quickLinks[0]).toHaveTextContent('Release contents');
-    expect(quickLinks[0]).toHaveAttribute('href', '#content');
+    expect(quickLinks[0]).toHaveTextContent('View related dashboard(s)');
+    expect(quickLinks[0]).toHaveAttribute('href', '#related-dashboards');
 
-    expect(quickLinks[1]).toHaveTextContent('Explore data');
-    expect(quickLinks[1]).toHaveAttribute('href', '#explore-data-and-files');
+    expect(quickLinks[1]).toHaveTextContent('Release contents');
+    expect(quickLinks[1]).toHaveAttribute('href', '#content');
 
-    expect(quickLinks[2]).toHaveTextContent('View related dashboard(s)');
-    expect(quickLinks[2]).toHaveAttribute('href', '#related-dashboards');
+    expect(quickLinks[2]).toHaveTextContent('Explore data');
+    expect(quickLinks[2]).toHaveAttribute('href', '#explore-data-and-files');
 
     expect(quickLinks[3]).toHaveTextContent('Help and support');
     expect(quickLinks[3]).toHaveAttribute('href', '#help-and-support');
