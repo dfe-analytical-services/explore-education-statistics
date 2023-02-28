@@ -444,9 +444,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Id = release.Id,
                     PublicationId = release.PublicationId,
-                    Slug = release.Slug,
-                    Year = release.Year,
-                    TimeIdentifier = release.TimePeriodCoverage
                 });
 
                 statisticsDbContext.Subject.AddRange(subject1, subject2);

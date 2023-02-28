@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [DbContext(typeof(StatisticsDbContext))]
-    partial class StatisticsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230202093808_EES3763_DropUnusedColumnsFromStatisticsRelease")]
+    partial class EES3763_DropUnusedColumnsFromStatisticsRelease
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -984,7 +986,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .IsRequired();
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Release", "Release")
-                        .WithMany()
+                        .WithMany("Footnotes")
                         .HasForeignKey("ReleaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1079,6 +1081,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Observation", b =>
                 {
                     b.Navigation("FilterItems");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Release", b =>
+                {
+                    b.Navigation("Footnotes");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", b =>

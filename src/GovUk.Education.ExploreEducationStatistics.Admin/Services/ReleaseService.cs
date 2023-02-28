@@ -257,7 +257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // create a link row to link back to the original subject
             if (statsRelease != null)
             {
-                var statsAmendment = statsRelease.CreateReleaseAmendment(amendment.Id, amendment.PreviousVersionId);
+                var statsAmendment = statsRelease.CreateReleaseAmendment(amendment.Id);
 
                 var statsAmendmentSubjectLinks = _statisticsDbContext
                     .ReleaseSubject

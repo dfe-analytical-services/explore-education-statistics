@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -15,10 +16,18 @@ public static class SubjectGeneratorExtensions
 
     public static Generator<Subject> WithFilters(this Generator<Subject> generator, IEnumerable<Filter> filters)
         => generator.ForInstance(s => s.SetFilters(filters));
+    
+    public static Generator<Subject> WithFilters(this Generator<Subject> generator, Func<SetterContext, IEnumerable<Filter>> filters)
+        => generator.ForInstance(s => s.SetFilters(filters));
 
     public static Generator<Subject> WithIndicatorGroups(
         this Generator<Subject> generator,
         IEnumerable<IndicatorGroup> indicatorGroups)
+        => generator.ForInstance(s => s.SetIndicatorGroups(indicatorGroups));
+
+    public static Generator<Subject> WithIndicatorGroups(
+        this Generator<Subject> generator,
+        Func<SetterContext, IEnumerable<IndicatorGroup>> indicatorGroups)
         => generator.ForInstance(s => s.SetIndicatorGroups(indicatorGroups));
     
     public static Generator<Subject> WithObservations(
@@ -37,11 +46,16 @@ public static class SubjectGeneratorExtensions
     public static InstanceSetters<Subject> SetFilters(
         this InstanceSetters<Subject> setters,
         IEnumerable<Filter> filters)
+        => setters.SetFilters(_ => filters);
+
+    public static InstanceSetters<Subject> SetFilters(
+        this InstanceSetters<Subject> setters,
+        Func<SetterContext, IEnumerable<Filter>> filters)
         => setters.Set(
             s => s.Filters,
-            (_, subject) =>
+            (_, subject, context) =>
             {
-                var list = filters.ToList();
+                var list = filters.Invoke(context).ToList();
 
                 list.ForEach(filter => filter.Subject = subject);
 
@@ -52,11 +66,16 @@ public static class SubjectGeneratorExtensions
     public static InstanceSetters<Subject> SetIndicatorGroups(
         this InstanceSetters<Subject> setters,
         IEnumerable<IndicatorGroup> indicatorGroups)
+        => setters.SetIndicatorGroups(_ => indicatorGroups);
+
+    public static InstanceSetters<Subject> SetIndicatorGroups(
+        this InstanceSetters<Subject> setters,
+        Func<SetterContext, IEnumerable<IndicatorGroup>> indicatorGroups)
         => setters.Set(
             s => s.IndicatorGroups,
-            (_, subject) =>
+            (_, subject, context) =>
             {
-                var list = indicatorGroups.ToList();
+                var list = indicatorGroups.Invoke(context).ToList();
 
                 list.ForEach(indicatorGroup => indicatorGroup.Subject = subject);
 
