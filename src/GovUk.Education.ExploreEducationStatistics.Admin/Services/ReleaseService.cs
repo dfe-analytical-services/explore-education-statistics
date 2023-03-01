@@ -112,11 +112,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .UserReleaseRoles
                             .Any(role => role.ReleaseId == id 
                                          && role.Role == ReleaseRole.PrereleaseViewer) ||
-                                                        _context
+                            _context
                             .UserReleaseInvites
                             .Any(role => role.ReleaseId == id 
                                          && role.Role == ReleaseRole.PrereleaseViewer)
-                                                        
                     });
         }
 
