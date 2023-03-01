@@ -13,10 +13,10 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${TOPIC_NAME}=          %{TEST_TOPIC_NAME}
-${PUBLICATION_NAME}=    UI tests - prerelease and amend %{RUN_IDENTIFIER}
-${DATABLOCK_NAME}=      UI test table
-${RELEASE_NAME}=        Calendar Year 2000
+${PUBLICATION_NAME}=                UI tests - prerelease and amend %{RUN_IDENTIFIER}
+${RELEASE_NAME}=                    Calendar Year 2000
+${SCHEDULED_PRERELEASE_WARNING}=    Pre-release users will have access to a preview of the release 24 hours before the scheduled publish date.
+${IMMEDIATE_PRERELEASE_WARNING}=    Pre-release users will not have access to a preview of the release if it is published immediately.
 
 
 *** Test Cases ***
@@ -53,7 +53,6 @@ Add metadata guidance
     user enters text into element    id:dataGuidanceForm-subjects-0-content    Test file guidance content
 
     user clicks button    Save guidance
-    user waits until page contains button    Edit guidance
 
 Add public prerelease access list
     user clicks link    Pre-release access
@@ -63,24 +62,21 @@ Add public prerelease access list
 Go to "Sign off" page
     user clicks link    Sign off
     user waits until h2 is visible    Sign off
-    user waits until page contains button    Edit release status
 
-Check that there is no Pre-release warning text on the sign off page
+Check that there are no Pre-release warnings
     user clicks link    Sign off
     user waits until h2 is visible    Sign off
-    user waits until page contains button    Edit release status
+
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status
     user clicks radio    Approved for publication
     user enters text into element    id:releaseStatusForm-internalReleaseNote    Approved by UI tests
     user clicks radio    Immediately
     user checks page does not contain    WARNING
-    user checks page does not contain
-    ...    Pre-release users will not have access to a preview of the release if it is published immediately.
+    user checks page does not contain    ${IMMEDIATE_PRERELEASE_WARNING}
     user clicks radio    On a specific date
     user checks page does not contain    WARNING
-    user checks page does not contain
-    ...    Pre-release users will have access to a preview of the release 24 hours before the scheduled publish date.
+    user checks page does not contain    ${SCHEDULED_PRERELEASE_WARNING}
 
 Invite Pre-release users
     user clicks link    Pre-release access
@@ -104,22 +100,18 @@ Invite Pre-release users
 Go to "Sign off" page again
     user clicks link    Sign off
     user waits until h2 is visible    Sign off
-    user waits until page contains button    Edit release status
 
 Approve release again
     user clicks link    Sign off
     user waits until h2 is visible    Sign off
-    user waits until page contains button    Edit release status
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status
     user clicks radio    Approved for publication
     user enters text into element    id:releaseStatusForm-internalReleaseNote    Approved by UI tests
     user clicks radio    On a specific date
-    user waits until page contains
-    ...    Pre-release users will have access to a preview of the release 24 hours before the scheduled publish date.
+    user waits until page contains    ${SCHEDULED_PRERELEASE_WARNING}
     user clicks radio    Immediately
-    user checks page contains
-    ...    Pre-release users will not have access to a preview of the release if it is published immediately.
+    user checks page contains    ${IMMEDIATE_PRERELEASE_WARNING}
     user clicks button    Update status
     user waits until h2 is visible    Sign off
     user checks summary list contains    Current status    Approved
@@ -151,7 +143,7 @@ Add release note to amendment
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note
 
-Check Pre-release Access page during amendment
+Check that Pre-release users and Public access list are empty in new amendment
     user clicks link    Pre-release access
     user waits until h2 is visible    Manage pre-release user access
     user checks page contains    No pre-release users have been invited.
@@ -161,19 +153,16 @@ Check Pre-release Access page during amendment
 Check that there is no Pre-release warning text on the sign off page during amendment
     user clicks link    Sign off
     user waits until h2 is visible    Sign off
-    user waits until page contains button    Edit release status
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status
     user clicks radio    Approved for publication
     user enters text into element    id:releaseStatusForm-internalReleaseNote    Approved by UI tests
     user clicks radio    Immediately
     user checks page does not contain    WARNING
-    user checks page does not contain
-    ...    Pre-release users will not have access to a preview of the release if it is published immediately.
+    user checks page does not contain    ${IMMEDIATE_PRERELEASE_WARNING}
     user clicks radio    On a specific date
     user checks page does not contain    WARNING
-    user checks page does not contain
-    ...    Pre-release users will have access to a preview of the release 24 hours before the scheduled publish date.
+    user checks page does not contain    ${SCHEDULED_PRERELEASE_WARNING}
 
 Invite Pre-release users during amendment
     user clicks link    Pre-release access
@@ -198,7 +187,7 @@ Create public prerelease access list for amendment
     user waits until h2 is visible    Manage pre-release user access
     user creates public prerelease access list    Amended test public access list
 
-Validate prerelease has not started for Analyst user during amendment
+Validate prerelease has not started for Analyst user during amendment as it is still in draft
     ${current_url}=    get location
     ${RELEASE_URL}=    remove substring from right of string    ${current_url}
     ...    /prerelease-access#preReleaseAccess-publicList
@@ -218,12 +207,10 @@ Approve amendment for a scheduled release and check warning text
     user clicks radio    Approved for publication
     user enters text into element    id:releaseStatusForm-internalReleaseNote    Approved by prerelease UI tests
     user clicks radio    Immediately
-    user checks page contains
-    ...    Pre-release users will not have access to a preview of the release if it is published immediately.
+    user checks page contains    ${IMMEDIATE_PRERELEASE_WARNING}
     user waits until page contains element    xpath://label[text()="On a specific date"]/../input
     user clicks radio    On a specific date
-    user checks page contains
-    ...    Pre-release users will have access to a preview of the release 24 hours before the scheduled publish date.
+    user checks page contains    ${SCHEDULED_PRERELEASE_WARNING}
     user waits until page contains    Publish date
     user enters text into element    id:releaseStatusForm-publishScheduled-day    ${day}
     user enters text into element    id:releaseStatusForm-publishScheduled-month    ${month}
@@ -236,7 +223,7 @@ Approve amendment for a scheduled release and check warning text
     user checks summary list contains    Scheduled release    ${day} ${month_word} ${year}
     user waits for release process status to be    Scheduled    %{WAIT_MEDIUM}
 
-Validate prerelease has not started for Analyst user
+Validate prerelease window is not yet open for Analyst user
     user changes to analyst1
     user navigates to admin frontend    ${RELEASE_URL}/prerelease/content
 
@@ -261,8 +248,7 @@ Start prerelease
     user navigates to admin frontend    ${RELEASE_URL}/status
     user clicks button    Edit release status
     user clicks radio    On a specific date
-    user checks page contains
-    ...    Pre-release users will have access to a preview of the release 24 hours before the scheduled publish date.
+    user checks page contains    ${SCHEDULED_PRERELEASE_WARNING}
     user enters text into element    id:releaseStatusForm-publishScheduled-day    ${day}
     user enters text into element    id:releaseStatusForm-publishScheduled-month    ${month}
     user enters text into element    id:releaseStatusForm-publishScheduled-year    ${year}
