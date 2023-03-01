@@ -3,6 +3,7 @@ import { check } from 'k6';
 import exec from 'k6/execution';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
+import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import createAdminService, { SubjectMeta } from '../../../utils/adminService';
 import testData from '../../testData';
 import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
@@ -291,5 +292,11 @@ export const teardown = ({ themeId, topicId }: SetupData) => {
     console.log(`Deleted Theme ${themeId}, Topic ${topicId}`);
   }
 };
+
+export function handleSummary(data: unknown) {
+  return {
+    'publicTableBuilderQuery.html': htmlReport(data),
+  };
+}
 
 export default performTest;
