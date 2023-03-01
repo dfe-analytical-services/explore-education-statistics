@@ -93,15 +93,15 @@ const PrototypeHomepage = () => {
                   'govuk-!-margin-bottom-2',
                 )}
               >
-                <a
-                  href="/prototypes/find-statistics6"
+                <Link
+                  to="/prototypes/find-statistics6"
                   className={classNames(
                     styles.prototypeCardChevronLink,
                     'govuk-link--no-visited-state',
                   )}
                 >
                   Find statistics and data
-                </a>
+                </Link>
               </h2>
               <p className="govuk-body-l govuk-!-margin-bottom-0">
                 Browse statistical summaries and download associated data to
@@ -118,15 +118,15 @@ const PrototypeHomepage = () => {
                   'govuk-!-margin-bottom-2',
                 )}
               >
-                <a
-                  href="/prototypes/table-tool"
+                <Link
+                  to="/prototypes/table-tool"
                   className={classNames(
                     styles.prototypeCardChevronLink,
                     'govuk-link--no-visited-state',
                   )}
                 >
                   Create your own tables
-                </a>
+                </Link>
               </h2>
               <p className="govuk-body-l govuk-!-margin-bottom-0">
                 Explore our range of data and build your own tables from it.
@@ -140,13 +140,13 @@ const PrototypeHomepage = () => {
           <h2 className="govuk-!-margin-top-9">Education in numbers</h2>
           <p className="govuk-body-l">
             <strong>
-              <a
-                href="/prototypes/dashboard2"
+              <Link
+                to="/prototypes/dashboard2"
                 className="govuk-link--no-visited-state"
               >
                 {' '}
                 View high level statistics across our range of publications
-              </a>
+              </Link>
             </strong>{' '}
           </p>
 
@@ -155,7 +155,7 @@ const PrototypeHomepage = () => {
           <h2 className="govuk-!-margin-top-9">Supporting information</h2>
 
           <h3 className="govuk-!-margin-bottom-1">
-            <Link to="/data-catalogue">Data catalogue</Link>
+            <Link to="/prototypes/data-catalog">Data catalogue</Link>
           </h3>
           <p className="govuk-caption-m">
             View all of the open data available and choose files to download.
