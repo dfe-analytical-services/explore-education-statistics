@@ -1,4 +1,4 @@
-import { useFormContext } from '@common/components/form/contexts/FormContext';
+import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormNumberInput from '@common/components/form/FormNumberInput';
 import { FormGroup } from '@common/components/form/index';
@@ -31,8 +31,8 @@ function FormFieldDateInput<FormValues>({
   partialDateType = 'dayMonthYear',
   type = 'date',
 }: Props<FormValues>) {
-  const { prefixFormId, fieldId } = useFormContext();
-  const id = customId ? prefixFormId(customId) : fieldId(name as string);
+  const { fieldId } = useFormIdContext();
+  const id = fieldId(name as string, customId);
 
   const isFocused = useRef(false);
 

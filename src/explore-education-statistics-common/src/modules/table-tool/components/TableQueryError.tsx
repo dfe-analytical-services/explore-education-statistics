@@ -3,7 +3,12 @@ import { BaseErrorSummary } from '@common/components/ErrorSummary';
 import downloadService from '@common/services/downloadService';
 import { Subject } from '@common/services/tableBuilderService';
 import React, { useEffect, useMemo, useRef } from 'react';
-import { TableQueryErrorCode } from '@common/modules/table-tool/components/FiltersForm';
+import {
+  FormValues,
+  TableQueryErrorCode,
+} from '@common/modules/table-tool/components/FiltersForm';
+import { useWatch } from 'react-hook-form';
+import isEqual from 'lodash/isEqual';
 
 interface Props {
   id: string;
@@ -11,6 +16,7 @@ interface Props {
   showDownloadOption?: boolean;
   subject: Subject;
   errorCode: TableQueryErrorCode;
+  previousValues?: FormValues;
 }
 
 interface ErrorMessageText {
@@ -25,6 +31,7 @@ const TableQueryError = ({
   showDownloadOption = true,
   subject,
   errorCode,
+  previousValues,
 }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -33,6 +40,7 @@ const TableQueryError = ({
     }
   }, []);
 
+  const values = useWatch();
   const {
     errorMessage,
     downloadOptionMessage,
@@ -65,6 +73,10 @@ const TableQueryError = ({
         };
     }
   }, [errorCode]);
+
+  if (!isEqual(values, previousValues)) {
+    return null;
+  }
 
   return (
     <BaseErrorSummary id={id} ref={ref} title="There is a problem">

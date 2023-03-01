@@ -174,7 +174,10 @@ const TimePeriodForm = ({
               />
             </FormFieldset>
 
-            <WizardStepFormActions {...stepProps} />
+            <WizardStepFormActions
+              {...stepProps}
+              isSubmitting={form.isSubmitting}
+            />
           </Form>
         ) : (
           <WizardStepSummary {...stepProps} goToButtonText="Edit time period">
@@ -188,7 +191,7 @@ const TimePeriodForm = ({
               </SummaryListItem>
             </SummaryList>
 
-            <ResetFormOnPreviousStep {...stepProps} />
+            <ResetFormOnPreviousStep {...stepProps} onReset={form.resetForm} />
           </WizardStepSummary>
         );
       }}

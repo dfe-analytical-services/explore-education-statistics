@@ -1,7 +1,7 @@
 import FormSortableList, {
   FormSortableListProps,
 } from '@admin/prototypes/components/PrototypeFormSortableList';
-import { useFormContext } from '@common/components/form/contexts/FormContext';
+import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import { OmitStrict } from '@common/types/util';
 import { Field, FieldProps } from 'formik';
 import React from 'react';
@@ -14,7 +14,7 @@ type Props<FormValues> = {
 function FormFieldSortableList<FormValues>(props: Props<FormValues>) {
   const { name, id } = props;
 
-  const { prefixFormId, fieldId } = useFormContext();
+  const { fieldId } = useFormIdContext();
 
   return (
     <Field name={name}>
@@ -22,7 +22,7 @@ function FormFieldSortableList<FormValues>(props: Props<FormValues>) {
         return (
           <FormSortableList
             {...props}
-            id={id ? prefixFormId(id) : fieldId(name as string)}
+            id={fieldId(name as string, id)}
             value={field.value}
             onChange={value => {
               form.setFieldValue(name as string, value);
