@@ -3,6 +3,7 @@ import { check, fail } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import exec from 'k6/execution';
+import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import createAdminService from '../../../utils/adminService';
 import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
@@ -248,4 +249,9 @@ export const teardown = ({ themeId, topicId }: SetupData) => {
   }
 };
 
+export function handleSummary(data: unknown) {
+  return {
+    'import.html': htmlReport(data),
+  };
+}
 export default performTest;

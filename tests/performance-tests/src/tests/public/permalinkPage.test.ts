@@ -3,6 +3,7 @@ import { check, fail } from 'k6';
 import http, { RefinedResponse, ResponseType } from 'k6/http';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
+import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import getEnvironmentAndUsersFromFile from '../../utils/environmentAndUsers';
 import loggingUtils from '../../utils/loggingUtils';
 
@@ -82,11 +83,13 @@ const performTest = () => {
     getPermalinkFailureCount.add(1);
     errorRate.add(1);
     fail(
-      `Failed to get permalink page. Received ${
-        response.status
-      } response code`,
+      `Failed to get permalink page. Received ${response.status} response code`,
     );
   }
 };
-
+export function handleSummary(data: unknown) {
+  return {
+    'permalinkPage.html': htmlReport(data),
+  };
+}
 export default performTest;

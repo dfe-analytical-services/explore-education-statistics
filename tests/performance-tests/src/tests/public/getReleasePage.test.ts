@@ -3,6 +3,7 @@ import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import http from 'k6/http';
 import { check, fail } from 'k6';
+import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import getEnvironmentAndUsersFromFile from '../../utils/environmentAndUsers';
 import loggingUtils from '../../utils/loggingUtils';
 
@@ -67,14 +68,16 @@ const performTest = () => {
     getReleaseSuccessCount.add(1);
     getReleaseRequestDuration.add(Date.now() - startTime);
   } else {
-    console.log(
-      `FAILURE! Got ${response.status} response code`,
-    );
+    console.log(`FAILURE! Got ${response.status} response code`);
     getReleaseFailureCount.add(1);
     getReleaseRequestDuration.add(Date.now() - startTime);
     errorRate.add(1);
     fail('Failure to Get Release page');
   }
 };
-
+export function handleSummary(data: unknown) {
+  return {
+    'getReleasePage.html': htmlReport(data),
+  };
+}
 export default performTest;

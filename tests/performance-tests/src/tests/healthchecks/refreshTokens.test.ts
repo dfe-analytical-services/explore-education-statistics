@@ -24,7 +24,7 @@ const { authTokens, userName } = environmentAndUsers.users.find(
   user => user.userName === 'bau1',
 )!;
 
-export default function performTest() {
+const performTest = () => {
   const responseWithOriginalAccessToken = http.get(`${adminUrl}/api/themes`, {
     headers: {
       'Content-Type': 'application/json',
@@ -142,4 +142,6 @@ export default function performTest() {
   ) {
     fail('Failed to successfully use re-refreshed accessToken');
   }
-}
+};
+
+export default performTest;
