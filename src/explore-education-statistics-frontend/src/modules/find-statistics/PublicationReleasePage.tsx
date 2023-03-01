@@ -254,6 +254,11 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     </ButtonLink>
                   </li>
                 )}
+                {!!release.relatedDashboardsSection?.content.length && (
+                  <li>
+                    <a href="#related-dashboards">View related dashboard(s)</a>
+                  </li>
+                )}
                 <li>
                   <a
                     href="#content"
@@ -282,11 +287,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     Explore data
                   </a>
                 </li>
-                {!!release.relatedDashboardsSection?.content.length && (
-                  <li>
-                    <a href="#related-dashboards">View related dashboard(s)</a>
-                  </li>
-                )}
+
                 <li>
                   <a
                     href="#help-and-support"

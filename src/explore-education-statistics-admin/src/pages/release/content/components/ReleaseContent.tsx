@@ -198,17 +198,17 @@ const ReleaseContent = () => {
                     </Button>
                   </li>
                 )}
+                {!!release.relatedDashboardsSection?.content.length && (
+                  <li>
+                    <a href="#related-dashboards">View related dashboard(s)</a>
+                  </li>
+                )}
                 <li>
                   <a href="#releaseMainContent">Release contents</a>
                 </li>
                 <li>
                   <a href="#explore-data-and-files">Explore data</a>
                 </li>
-                {!!release.relatedDashboardsSection?.content.length && (
-                  <li>
-                    <a href="#related-dashboards">View related dashboard(s)</a>
-                  </li>
-                )}
                 <li>
                   <a href="#help-and-support">Help and support</a>
                 </li>
