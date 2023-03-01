@@ -530,7 +530,7 @@
   }
 
   :global(.govuk-phase-banner) {
-    border-top: 5px solid govuk-colour('white');
+    border-color: govuk-colour('white') !important;
     margin-bottom: 2.5rem;
   }
 
