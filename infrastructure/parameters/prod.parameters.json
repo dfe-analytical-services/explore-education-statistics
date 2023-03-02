@@ -63,10 +63,10 @@
       "value": "GeneralPurpose"
     },
     "capacityContentDb": {
-      "value": 6
+      "value": 4
     },
     "minCapacityContentDb": {
-      "value": "2"
+      "value": "0.5"
     },
     "skuStatisticsDb": {
       "value": "GP_S_Gen5"
