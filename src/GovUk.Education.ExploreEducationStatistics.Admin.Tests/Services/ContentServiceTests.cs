@@ -622,23 +622,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var keyStatisticService = new Mock<IKeyStatisticService>(MockBehavior.Strict);
-                keyStatisticService
-                    .Setup(s =>
-                        s.DeleteAssociatedKeyStatisticDataBlock(dataBlockId))
-                    .Returns(Task.CompletedTask);
-
-                var service = SetupContentService(
-                    contentDbContext: contentDbContext,
-                    keyStatisticService: keyStatisticService.Object);
+                var service = SetupContentService(contentDbContext: contentDbContext);
                 var result = await service.RemoveContentBlock(
                     releaseContentSection.ReleaseId,
                     releaseContentSection.ContentSectionId,
                     dataBlockId);
 
                 var contentBlockViewModel = result.AssertRight();
-
-                MockUtils.VerifyAllMocks(keyStatisticService);
 
                 Assert.Empty(contentBlockViewModel);
             }
