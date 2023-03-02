@@ -57,7 +57,7 @@ const EditableKeyStatDataBlockForm = ({
         guidanceText: keyStat.guidanceText ? toHtml(keyStat.guidanceText) : '',
       }}
       validationSchema={Yup.object<KeyStatDataBlockFormValues>({
-        trend: Yup.string().max(229),
+        trend: Yup.string().max(230),
         guidanceTitle: Yup.string().max(65),
         guidanceText: Yup.string(),
       })}

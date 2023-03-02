@@ -224,7 +224,7 @@ describe('EditableKeyStatText', () => {
       await userEvent.type(screen.getByLabelText('Title'), 'New title');
 
       userEvent.clear(screen.getByLabelText('Statistic'));
-      await userEvent.type(screen.getByLabelText('Statistic'), 'New statistic');
+      await userEvent.type(screen.getByLabelText('Statistic'), 'New stat');
 
       userEvent.clear(screen.getByLabelText('Trend'));
       await userEvent.type(screen.getByLabelText('Trend'), 'New trend');
@@ -246,7 +246,7 @@ describe('EditableKeyStatText', () => {
       await waitFor(() => {
         expect(onSubmit).toHaveBeenCalledWith<KeyStatTextFormValues[]>({
           title: 'New title',
-          statistic: 'New statistic',
+          statistic: 'New stat',
           trend: 'New trend',
           guidanceTitle: 'New guidance title',
           guidanceText: 'New guidance text',
