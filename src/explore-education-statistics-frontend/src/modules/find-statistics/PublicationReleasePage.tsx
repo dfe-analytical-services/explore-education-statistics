@@ -571,7 +571,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
       )}
 
       <PublicationReleaseHelpAndSupportSection
-        accordionId="help-and-support"
         publicationTitle={release.publication.title}
         methodologies={release.publication.methodologies}
         externalMethodology={release.publication.externalMethodology}
