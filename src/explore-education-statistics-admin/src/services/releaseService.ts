@@ -36,6 +36,7 @@ export interface Release {
   latestInternalReleaseNote?: string;
   previousVersionId: string;
   preReleaseAccessList: string;
+  preReleaseUsersOrInvitesAdded?: boolean;
   year: number;
   yearTitle: string;
   permissions?: ReleasePermissions;

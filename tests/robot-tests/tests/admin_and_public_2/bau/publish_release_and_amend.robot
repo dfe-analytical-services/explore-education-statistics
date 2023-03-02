@@ -705,9 +705,11 @@ Add release note to first amendment
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
 
-Update public prerelease access list for amendment
+Create public prerelease access list for amendment
     user clicks link    Pre-release access
-    user updates public prerelease access list    Amended public access list
+    user clicks link    Public access list
+    user waits until h2 is visible    Public pre-release access list
+    user creates public prerelease access list    Amended public access list
 
 Approve amendment for scheduled release
     ${days_until_release}=    set variable    1

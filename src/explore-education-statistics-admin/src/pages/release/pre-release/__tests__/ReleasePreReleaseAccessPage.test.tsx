@@ -65,24 +65,6 @@ describe('ReleasePreReleaseAccessPage', () => {
     );
   });
 
-  test('only renders the public access list for amendments', async () => {
-    const amendmentRelease = { ...testRelease, amendment: true };
-    releaseService.getRelease.mockResolvedValue(amendmentRelease);
-    permissionService.canUpdateRelease.mockResolvedValue(true);
-
-    renderPage();
-
-    await waitFor(() => {
-      expect(
-        screen.getByText('Public pre-release access list'),
-      ).toBeInTheDocument();
-    });
-
-    expect(screen.queryByRole('tab')).not.toBeInTheDocument();
-    expect(screen.queryByRole('tabpanel')).not.toBeInTheDocument();
-    expect(screen.queryByText('Pre-release users')).not.toBeInTheDocument();
-  });
-
   test('renders the public access list tab', async () => {
     releaseService.getRelease.mockResolvedValue(testRelease);
     permissionService.canUpdateRelease.mockResolvedValue(true);

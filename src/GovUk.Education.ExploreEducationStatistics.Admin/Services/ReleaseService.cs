@@ -105,7 +105,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(id, HydrateRelease)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(release => _mapper.Map<ReleaseViewModel>(release));
+                .OnSuccess(release => _mapper
+                    .Map<ReleaseViewModel>(release) with
+                    {
+                        PreReleaseUsersOrInvitesAdded = _context
+                            .UserReleaseRoles
+                            .Any(role => role.ReleaseId == id 
+                                         && role.Role == ReleaseRole.PrereleaseViewer) ||
+                            _context
+                            .UserReleaseInvites
+                            .Any(role => role.ReleaseId == id 
+                                         && role.Role == ReleaseRole.PrereleaseViewer)
+                    });
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate)
@@ -241,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(originalRelease =>
                     CreateBasicReleaseAmendment(originalRelease)
                     .OnSuccess(CreateStatisticsReleaseAmendment)
-                    .OnSuccess(amendment => CopyReleaseRolePermissions(releaseId, amendment))
+                    .OnSuccess(amendment => CopyReleaseRoles(releaseId, amendment))
                     .OnSuccessDo(amendment => _footnoteService.CopyFootnotes(releaseId, amendment.Id))
                     .OnSuccess(amendment => CopyFileLinks(originalRelease, amendment))
                     .OnSuccess(amendment => GetRelease(amendment.Id)));
@@ -274,16 +285,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return amendment;
         }
 
-        private async Task<Either<ActionResult, Release>> CopyReleaseRolePermissions(Guid originalReleaseId, Release amendment)
+        private async Task<Either<ActionResult, Release>> CopyReleaseRoles(Guid originalReleaseId, Release amendment)
         {
+            // Copy all current roles apart from Prerelease Users to the Release amendment.
             var newRoles = _context
                 .UserReleaseRoles
-                .AsQueryable()
-                .IgnoreQueryFilters() // For auditing purposes, we also want to migrate release roles that have Deleted set
-                .Where(releaseRole =>
-                    !releaseRole.SoftDeleted
-                    && releaseRole.ReleaseId == originalReleaseId)
-                .Select(releaseRole => releaseRole.CopyForAmendment(amendment));
+                // For auditing purposes, we also want to migrate release roles that have Deleted set (when a role is
+                // manually removed from a Release as opposed to SoftDeleted, which is only set when a Release is
+                // deleted)
+                .IgnoreQueryFilters()
+                .Where(releaseRole => releaseRole.ReleaseId == originalReleaseId 
+                                      && releaseRole.Role != ReleaseRole.PrereleaseViewer)
+                .Select(releaseRole => releaseRole.CopyForAmendment(amendment))
+                .ToList();
 
             await _context.AddRangeAsync(newRoles);
             await _context.SaveChangesAsync();
