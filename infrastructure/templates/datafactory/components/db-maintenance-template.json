@@ -17,7 +17,6 @@
   },
   "variables": {
     "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]",
-    "fragmentationPercentage": "30",
     "fragmentationTables": "Observation,ObservationFilterItem",
     "removeSoftDeletedSubjectsObservationLimit": "20000000",
     "removeSoftDeletedSubjectsObservationCommitBatchSize": "1000",
@@ -103,10 +102,6 @@
           }
         ],
         "parameters": {
-          "Percentage": {
-            "type": "int",
-            "defaultValue": 70
-          },
           "Tables": {
             "type": "string",
             "defaultValue": "Observation,ObservationFilterItem"
@@ -242,7 +237,6 @@
               "type": "PipelineReference"
             },
             "parameters": {
-              "Percentage": "[variables('fragmentationPercentage')]",
               "Tables": "[variables('fragmentationTables')]"
             }
           }
