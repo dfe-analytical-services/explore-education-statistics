@@ -11,6 +11,8 @@ import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile'
 import { KeyStatisticDataBlock } from '@common/services/publicationService';
 import { Formik } from 'formik';
 import React from 'react';
+import Yup from '@common/validation/yup';
+import { KeyStatTextFormValues } from '@admin/pages/release/content/components/EditableKeyStatTextForm';
 
 export interface KeyStatDataBlockFormValues {
   trend: string;
@@ -54,6 +56,11 @@ const EditableKeyStatDataBlockForm = ({
         guidanceTitle: keyStat.guidanceTitle ?? 'Help',
         guidanceText: keyStat.guidanceText ? toHtml(keyStat.guidanceText) : '',
       }}
+      validationSchema={Yup.object<KeyStatDataBlockFormValues>({
+        trend: Yup.string().max(230),
+        guidanceTitle: Yup.string().max(65),
+        guidanceText: Yup.string(),
+      })}
       onSubmit={handleSubmit}
     >
       {form => (

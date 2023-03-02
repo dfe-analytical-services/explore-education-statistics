@@ -535,6 +535,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<KeyStatisticDataBlock>()
                 .ToTable("KeyStatisticsDataBlock");
+
+            modelBuilder.Entity<KeyStatisticDataBlock>()
+                .HasOne<DataBlock>(ks => ks.DataBlock)
+                .WithMany()
+                // WARN: This is necessary - otherwise an automatically generated cascade delete is added for when an
+                // associated data block is removed. That cascade delete _only_ removes the KeyStatisticsDataBlock
+                // entry, leaving a KeyStatistics table entry, which should never happen.
+                .OnDelete(DeleteBehavior.NoAction);
+
             modelBuilder.Entity<KeyStatisticText>()
                 .ToTable("KeyStatisticsText");
         }
