@@ -389,9 +389,9 @@ Verify accordions are correct
     user checks accordion is in position    Test text    2    id:content
     user checks accordion is in position    Test embedded dashboard section    3    id:content
 
-    user checks there are x accordion sections    2    id:help-and-support
-    user checks accordion is in position    National statistics    1    id:help-and-support
-    user checks accordion is in position    Contact us    2    id:help-and-support
+    user checks there are x accordion sections    2    id:help-and-support-accordion
+    user checks accordion is in position    National statistics    1    id:help-and-support-accordion
+    user checks accordion is in position    Contact us    2    id:help-and-support-accordion
 
 Verify Dates data block accordion section
     user opens accordion section    Dates data block    id:content
@@ -846,8 +846,8 @@ Verify amendment accordions are correct
     user checks accordion is in position    Dates data block    1    id:content
     user checks accordion is in position    Test text    2    id:content
     user checks accordion is in position    Test embedded dashboard section    3    id:content
-    user checks accordion is in position    Experimental statistics    1    id:help-and-support
-    user checks accordion is in position    Contact us    2    id:help-and-support
+    user checks accordion is in position    Experimental statistics    1    id:help-and-support-accordion
+    user checks accordion is in position    Contact us    2    id:help-and-support-accordion
 
 Verify amendment Dates data block accordion section
     user opens accordion section    Dates data block    id:content

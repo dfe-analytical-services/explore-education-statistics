@@ -241,11 +241,11 @@ Validate accordion sections order
 
     user checks there are x accordion sections    9    id:content
 
-    user checks accordion is in position    Methodology    1    id:help-and-support
-    user checks accordion is in position    Official statistics    2    id:help-and-support
-    user checks accordion is in position    Contact us    3    id:help-and-support
+    user checks accordion is in position    Methodology    1    id:help-and-support-accordion
+    user checks accordion is in position    Official statistics    2    id:help-and-support-accordion
+    user checks accordion is in position    Contact us    3    id:help-and-support-accordion
 
-    user checks there are x accordion sections    3    id:help-and-support
+    user checks there are x accordion sections    3    id:help-and-support-accordion
 
 Check explore data link opens accordion section
     user verifies accordion is closed    Explore data and files
