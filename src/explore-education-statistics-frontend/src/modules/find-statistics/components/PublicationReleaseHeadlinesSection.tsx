@@ -1,17 +1,18 @@
-import glossaryService from '@frontend/services/glossaryService';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import KeyStat, {
   KeyStatContainer,
 } from '@common/modules/find-statistics/components/KeyStat';
+import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStatDataBlock';
+import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
+import { Release } from '@common/services/publicationService';
+import glossaryService from '@frontend/services/glossaryService';
 import {
   logEvent,
   logOutboundLink,
 } from '@frontend/services/googleAnalyticsService';
-import { Release } from '@common/services/publicationService';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
 
@@ -21,28 +22,39 @@ interface Props {
 
 const PublicationReleaseHeadlinesSection = ({
   release: {
-    id,
+    id: releaseId,
     keyStatisticsSecondarySection,
-    keyStatisticsSection,
+    keyStatistics,
     headlinesSection,
   },
 }: Props) => {
-  const getReleaseFile = useGetReleaseFile(id);
+  const getReleaseFile = useGetReleaseFile(releaseId);
 
   const summaryTab = (
     <TabsSection title="Summary" id="releaseHeadlines-summary">
       <KeyStatContainer>
-        {keyStatisticsSection.content.map(block => {
-          if (block.type !== 'DataBlock') {
-            return null;
+        {keyStatistics?.map(keyStat => {
+          if (keyStat.type === 'KeyStatisticDataBlock') {
+            return (
+              <KeyStatDataBlock
+                key={keyStat.id}
+                releaseId={releaseId}
+                dataBlockId={keyStat.dataBlockId}
+                trend={keyStat.trend}
+                guidanceTitle={keyStat.guidanceTitle}
+                guidanceText={keyStat.guidanceText}
+              />
+            );
           }
 
           return (
             <KeyStat
-              key={block.id}
-              releaseId={id}
-              dataBlockId={block.id}
-              summary={block.summary}
+              key={keyStat.id}
+              title={keyStat.title}
+              statistic={keyStat.statistic}
+              trend={keyStat.trend}
+              guidanceTitle={keyStat.guidanceTitle}
+              guidanceText={keyStat.guidanceText}
             />
           );
         })}
@@ -79,7 +91,7 @@ const PublicationReleaseHeadlinesSection = ({
   return (
     <DataBlockTabs
       id="releaseHeadlines"
-      releaseId={id}
+      releaseId={releaseId}
       getInfographic={getReleaseFile}
       dataBlock={keyStatisticsSecondarySection.content[0]}
       firstTabs={summaryTab}

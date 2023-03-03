@@ -12,8 +12,8 @@ Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
 ${PUBLICATION_NAME}=                    UI tests - publish data %{RUN_IDENTIFIER}
-${RELEASE_1_NAME}=                      Financial Year 3000-01
-${RELEASE_2_NAME}=                      Financial Year 3001-02
+${RELEASE_1_NAME}=                      Financial year 3000-01
+${RELEASE_2_NAME}=                      Financial year 3001-02
 ${SUBJECT_1_NAME}=                      UI test subject 1
 ${SUBJECT_2_NAME}=                      UI test subject 2
 ${FOOTNOTE_ALL}=                        Footnote for all subjects
@@ -56,13 +56,13 @@ Go to "Sign off" page and approve release
 
 Create another release for the same publication
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user creates release from publication page    ${PUBLICATION_NAME}    Financial Year    3001
+    user creates release from publication page    ${PUBLICATION_NAME}    Financial year    3001
 
 Verify new release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible    Release summary
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
-    user checks summary list contains    Time period    Financial Year
+    user checks summary list contains    Time period    Financial year
     user checks summary list contains    Release period    3001-02
     user checks summary list contains    Release type    National statistics
 
@@ -330,7 +330,7 @@ Select subject "${SUBJECT_2_NAME}"
 
 Select locations
     user waits until table tool wizard step is available    2    Choose locations
-    user opens details dropdown    Opportunity Area
+    user opens details dropdown    Opportunity area
     user clicks checkbox    Bolton 001
     user clicks checkbox    Bolton 004
     user opens details dropdown    Ward
@@ -442,9 +442,9 @@ Navigate to published release page
 Check latest release is correct
     user waits until page contains title caption    ${RELEASE_2_NAME}    %{WAIT_MEDIUM}
     user checks page contains    This is the latest data
-    user checks page contains    See other releases (1)
+    user checks page contains    View previous releases (1)
 
-    user opens details dropdown    See other releases (1)
+    user opens details dropdown    View previous releases (1)
     user waits until page contains other release    ${RELEASE_1_NAME}
     user checks page does not contain other release    ${RELEASE_2_NAME}
 
@@ -454,7 +454,7 @@ Check other release is correct
     user waits until page contains title caption    ${RELEASE_1_NAME}
 
     user waits until page contains link    View latest data: ${RELEASE_2_NAME}
-    user checks page contains    See other releases (1)
+    user checks page contains    View previous releases (1)
     user waits until page contains other release    ${RELEASE_2_NAME}
     user checks page does not contain other release    ${RELEASE_1_NAME}
 
@@ -479,15 +479,15 @@ Select subject "${SUBJECT_2_NAME}" in table tool
     user checks previous table tool step contains    2    Subject    ${SUBJECT_2_NAME}
 
 Select locations in table tool
-    user clicks element    testid:Expand Details Section Local Authority
+    user clicks element    testid:Expand Details Section Local authority
     user clicks checkbox    Barnsley
     user clicks checkbox    Birmingham
 
     user clicks element    id:locationFiltersForm-submit
 
     user waits until table tool wizard step is available    4    Choose time period
-    user checks previous table tool step contains    3    Local Authority    Barnsley
-    user checks previous table tool step contains    3    Local Authority    Birmingham
+    user checks previous table tool step contains    3    Local authority    Barnsley
+    user checks previous table tool step contains    3    Local authority    Birmingham
 
     user waits until table tool wizard step is available    4    Choose time period
 
@@ -642,7 +642,7 @@ Validate data guidance document file details
     ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
     user checks summary list contains    Filename    upload-file-test.csv    ${subject_2_content}
     user checks summary list contains    Geographic levels
-    ...    Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; RSC Region; Regional; Ward
+    ...    Local authority; Local authority district; Local enterprise partnership; Opportunity area; Parliamentary constituency; RSC region; Regional; Ward
     ...    ${subject_2_content}
     user checks summary list contains    Time period    2005 to 2020    ${subject_2_content}
     user checks summary list contains    Content    UI test subject 2 data guidance content    ${subject_2_content}

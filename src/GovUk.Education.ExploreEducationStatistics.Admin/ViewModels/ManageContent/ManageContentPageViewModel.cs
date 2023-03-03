@@ -11,9 +11,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 {
     public class ManageContentPageViewModel
     {
-        public ReleaseViewModel Release { get; set; } = new ReleaseViewModel();
+        public ReleaseViewModel Release { get; set; } = new ();
 
-        public List<DataBlock> AvailableDataBlocks { get; set; } = new List<DataBlock>();
+        public List<DataBlockViewModel> UnattachedDataBlocks { get; set; } = new ();
 
         public class ReleaseViewModel
         {
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
             public ContentSectionViewModel HeadlinesSection { get; set; } = new();
 
-            public ContentSectionViewModel KeyStatisticsSection { get; set; } = new();
+            public List<KeyStatisticViewModel> KeyStatistics { get; set; } = new();
 
             public ContentSectionViewModel KeyStatisticsSecondarySection { get; set; } = new();
 
@@ -110,13 +110,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
             public string Url { get; set; }
         }
-    }
-
-    public class KeyStatisticsViewModel
-    {
-        public List<DataBlock> KeyIndicators { get; set; }
-
-        public ContentSectionViewModel KeyStatisticsContent { get; set; }
     }
 
     public class ReleaseNoteViewModel

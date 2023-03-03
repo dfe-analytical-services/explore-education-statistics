@@ -28,7 +28,7 @@ Create test publication and release via API
 
 Upload subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Academic Year 2025/26
+    ...    Academic year 2025/26
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
 
 Navigate to 'Footnotes' page
@@ -63,7 +63,7 @@ Select subject "UI test subject"
     user checks previous table tool step contains    1    Subject    UI test subject
 
 Select locations
-    user opens details dropdown    Opportunity Area
+    user opens details dropdown    Opportunity area
     user clicks checkbox    Bolton 001
     user clicks checkbox    Bolton 002
     user clicks checkbox    Bolton 003

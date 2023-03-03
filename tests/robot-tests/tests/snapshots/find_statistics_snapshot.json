@@ -93,7 +93,7 @@
   {
     "publication_summary": "Statistics on children\u2019s social workers, including agency workers, in England. Includes figures on caseload, vacancies, sickness absence, starters and leavers.",
     "publication_title": "Children's social work workforce",
-    "published": "24 Feb 2022",
+    "published": "23 Feb 2023",
     "release_type": "Official statistics",
     "theme": "Children's social care"
   },
@@ -145,6 +145,13 @@
     "published": "24 Nov 2022",
     "release_type": "National statistics",
     "theme": "Early years"
+  },
+  {
+    "publication_summary": "Early career teachers and mentors starting the provider-led ECF-based induction programme and teachers and leaders starting a DfE-funded NPQ in England.",
+    "publication_title": "ECF and NPQ starts",
+    "published": "2 Mar 2023",
+    "release_type": "Management information",
+    "theme": "Teachers and school workforce"
   },
   {
     "publication_summary": "Annual data release on schools, pupils, teachers, qualifications gained, education expenditure, further education and higher education in the UK.",
@@ -352,7 +359,7 @@
   {
     "publication_summary": "Annual estimates from the Labour Force Survey of young people aged 16 to 24 not in education, employment or training (NEET) in England.",
     "publication_title": "NEET age 16 to 24",
-    "published": "3 Mar 2022",
+    "published": "2 Mar 2023",
     "release_type": "National statistics",
     "theme": "Destination of pupils and students"
   },
@@ -457,7 +464,7 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly experimental statistics derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "26 Jan 2023",
+    "published": "23 Feb 2023",
     "release_type": "Experimental statistics",
     "theme": "Pupils and schools"
   },

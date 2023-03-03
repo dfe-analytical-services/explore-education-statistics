@@ -123,6 +123,7 @@ describe('ReleaseDataBlockEditPage', () => {
       highlightDescription: 'Test highlight description 2',
       source: 'Test source 2',
       chartsCount: 0,
+      inContent: false,
     },
     {
       id: testDataBlock.id,
@@ -132,6 +133,7 @@ describe('ReleaseDataBlockEditPage', () => {
       highlightDescription: testDataBlock.highlightDescription,
       source: testDataBlock.source,
       chartsCount: 0,
+      inContent: true,
     },
   ];
 
@@ -230,6 +232,7 @@ describe('ReleaseDataBlockEditPage', () => {
           name: 'Test name',
           contentSectionHeading: 'Test section',
           infographicFilesInfo: [],
+          isKeyStatistic: false,
         },
       ],
     });
@@ -266,6 +269,7 @@ describe('ReleaseDataBlockEditPage', () => {
           name: 'Test name',
           contentSectionHeading: 'Test section',
           infographicFilesInfo: [],
+          isKeyStatistic: false,
         },
       ],
     });
@@ -306,6 +310,7 @@ describe('ReleaseDataBlockEditPage', () => {
           name: 'Test name',
           contentSectionHeading: 'Test section',
           infographicFilesInfo: [],
+          isKeyStatistic: false,
         },
       ],
     });

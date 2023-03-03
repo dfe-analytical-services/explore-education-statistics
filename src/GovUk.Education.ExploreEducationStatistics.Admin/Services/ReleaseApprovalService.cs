@@ -129,7 +129,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     release.ApprovalStatus = request.ApprovalStatus;
                     release.NextReleaseDate = request.NextReleaseDate;
-                    release.NotifySubscribers = release.Version == 0 || request.NotifySubscribers == true;
+                    release.NotifySubscribers = release.Version == 0 || (request.NotifySubscribers ?? false);
+                    release.UpdatePublishedDate = request.UpdatePublishedDate ?? false;
                     release.PublishScheduled = request.PublishMethod == PublishMethod.Immediate
                         ? _dateTimeProvider.UtcNow
                         : request.PublishScheduledDate;

@@ -13,7 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
         Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(string publicationSlug,
             string? releaseSlug);
 
-        Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(Guid releaseId, DateTime? expectedPublishDate);
+        Task<Either<ActionResult, ReleaseCacheViewModel>> GetRelease(Guid releaseId,
+            DateTime? expectedPublishDate = null);
 
         Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> List(string publicationSlug);
     }

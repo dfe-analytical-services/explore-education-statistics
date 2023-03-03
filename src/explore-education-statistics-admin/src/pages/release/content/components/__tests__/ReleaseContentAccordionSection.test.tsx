@@ -60,7 +60,7 @@ describe('ReleaseContentAccordionSection', () => {
           value={{
             release: testEditableRelease,
             canUpdateRelease: true,
-            availableDataBlocks: [],
+            unattachedDataBlocks: [],
           }}
         >
           <ReleaseContentHubContextProvider releaseId={testEditableRelease.id}>
@@ -119,7 +119,7 @@ describe('ReleaseContentAccordionSection', () => {
             value={{
               release: testEditableRelease,
               canUpdateRelease: true,
-              availableDataBlocks: [],
+              unattachedDataBlocks: [],
             }}
           >
             <ReleaseContentHubContextProvider
@@ -172,7 +172,7 @@ describe('ReleaseContentAccordionSection', () => {
           value={{
             release: testEditableRelease,
             canUpdateRelease: true,
-            availableDataBlocks: [],
+            unattachedDataBlocks: [],
           }}
         >
           <ReleaseContentHubContextProvider releaseId={testEditableRelease.id}>
@@ -222,7 +222,7 @@ describe('ReleaseContentAccordionSection', () => {
           value={{
             release: testEditableRelease,
             canUpdateRelease: true,
-            availableDataBlocks: [],
+            unattachedDataBlocks: [],
           }}
         >
           <ReleaseContentHubContextProvider releaseId={testEditableRelease.id}>
@@ -261,7 +261,7 @@ describe('ReleaseContentAccordionSection', () => {
           value={{
             release: testEditableRelease,
             canUpdateRelease: true,
-            availableDataBlocks: [],
+            unattachedDataBlocks: [],
           }}
         >
           <ReleaseContentHubContextProvider releaseId={testEditableRelease.id}>
@@ -297,7 +297,7 @@ describe('ReleaseContentAccordionSection', () => {
           value={{
             release: testEditableRelease,
             canUpdateRelease: true,
-            availableDataBlocks: [],
+            unattachedDataBlocks: [],
           }}
         >
           <ReleaseContentHubContextProvider releaseId={testEditableRelease.id}>

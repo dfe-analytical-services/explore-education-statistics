@@ -2,7 +2,6 @@
  * Enumerates the typical comparison
  * integers of 1, 0 and -1.
  */
-// eslint-disable-next-line no-shadow
 export enum Comparison {
   GreaterThan = 1,
   EqualTo = 0,

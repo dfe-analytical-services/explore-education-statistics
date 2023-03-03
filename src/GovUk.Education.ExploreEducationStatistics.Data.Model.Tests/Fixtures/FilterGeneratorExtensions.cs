@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -10,6 +11,15 @@ public static class FilterGeneratorExtensions
     public static Generator<Filter> DefaultFilter(this DataFixture fixture)
         => fixture.Generator<Filter>().WithDefaults();
 
+    public static Generator<Filter> DefaultFilter(
+        this DataFixture fixture,
+        int filterGroupCount, int filterItemCount)
+        => fixture
+            .DefaultFilter()
+                .WithFilterGroups(_ => fixture.DefaultFilterGroup()
+                    .WithFilterItems(_ => fixture.DefaultFilterItem().Generate(filterItemCount))
+                .Generate(filterGroupCount));
+
     public static Generator<Filter> WithDefaults(this Generator<Filter> generator)
         => generator.ForInstance(s => s.SetDefaults());
 
@@ -20,6 +30,11 @@ public static class FilterGeneratorExtensions
         this Generator<Filter> generator,
         IEnumerable<FilterGroup> filterGroups)
         => generator.ForInstance(s => s.SetFilterGroups(filterGroups));
+
+    public static Generator<Filter> WithFilterGroups(
+        this Generator<Filter> generator,
+        Func<SetterContext, IEnumerable<FilterGroup>> filterGroups)
+        => generator.ForInstance(s => s.SetFilterGroups(filterGroups.Invoke));
 
     public static Generator<Filter> WithFootnotes(
         this Generator<Filter> generator,
@@ -49,12 +64,17 @@ public static class FilterGeneratorExtensions
 
     public static InstanceSetters<Filter> SetFilterGroups(
         this InstanceSetters<Filter> setters,
-        IEnumerable<FilterGroup> filterGroups)
+        IEnumerable<FilterGroup> filterGroups) 
+        => setters.SetFilterGroups(_ => filterGroups);
+    
+    private static InstanceSetters<Filter> SetFilterGroups(
+        this InstanceSetters<Filter> setters,
+        Func<SetterContext, IEnumerable<FilterGroup>> filterGroups)
         => setters.Set(
             f => f.FilterGroups,
-            (_, filter) =>
+            (_, filter, context) =>
             {
-                var list = filterGroups.ToList();
+                var list = filterGroups.Invoke(context).ToList();
 
                 list.ForEach(filterGroup => filterGroup.Filter = filter);
 

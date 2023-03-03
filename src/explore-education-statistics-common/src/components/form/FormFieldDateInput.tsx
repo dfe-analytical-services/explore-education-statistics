@@ -1,4 +1,4 @@
-import { useFormContext } from '@common/components/form/contexts/FormContext';
+import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import FormFieldset from '@common/components/form/FormFieldset';
 import FormNumberInput from '@common/components/form/FormNumberInput';
 import { FormGroup } from '@common/components/form/index';
@@ -31,8 +31,8 @@ function FormFieldDateInput<FormValues>({
   partialDateType = 'dayMonthYear',
   type = 'date',
 }: Props<FormValues>) {
-  const { prefixFormId, fieldId } = useFormContext();
-  const id = customId ? prefixFormId(customId) : fieldId(name as string);
+  const { fieldId } = useFormIdContext();
+  const id = fieldId(name as string, customId);
 
   const isFocused = useRef(false);
 
@@ -125,7 +125,7 @@ function FormFieldDateInput<FormValues>({
         <FormGroup className="govuk-date-input__item">
           <FormNumberInput
             id={`${id}-day`}
-            name={`${name}.day`}
+            name={`${name as string}.day`}
             label="Day"
             width={2}
             value={parseNumber(values.day)}
@@ -137,7 +137,7 @@ function FormFieldDateInput<FormValues>({
       <FormGroup className="govuk-date-input__item">
         <FormNumberInput
           id={`${id}-month`}
-          name={`${name}.month`}
+          name={`${name as string}.month`}
           label="Month"
           width={2}
           value={parseNumber(values.month)}
@@ -148,7 +148,7 @@ function FormFieldDateInput<FormValues>({
       <FormGroup className="govuk-date-input__item">
         <FormNumberInput
           id={`${id}-year`}
-          name={`${name}.year`}
+          name={`${name as string}.year`}
           label="Year"
           width={4}
           value={parseNumber(values.year)}

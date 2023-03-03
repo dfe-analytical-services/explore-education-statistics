@@ -136,7 +136,7 @@ Check Key Stats Table
     user waits until page contains element
     ...    xpath://div[@data-testid="keyStat"][${content_block.content_block_position}]
     user waits until parent contains element
-    ...    xpath://div[@data-testid="keyStat"][${content_block.content_block_position}]    testid:keyStat-value
+    ...    xpath://div[@data-testid="keyStat"][${content_block.content_block_position}]    testid:keyStat-statistic
     ${filepath}=    user takes screenshot of element
     ...    xpath://div[@data-testid="keyStat"][${content_block.content_block_position}]
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${KEY_STATS_FOLDER}/${content_block.content_block_id}-table.png

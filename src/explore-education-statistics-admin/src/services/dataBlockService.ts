@@ -13,7 +13,7 @@ export interface ReleaseDataBlockSummary {
   heading: string;
   source: string;
   chartsCount: number;
-  contentSectionId?: string;
+  inContent: boolean;
 }
 
 export type UpdateReleaseDataBlock = ReleaseDataBlock;
@@ -26,6 +26,7 @@ export interface DependentDataBlock {
   name: string;
   contentSectionHeading?: string;
   infographicFilesInfo: InfographicFileInfo[];
+  isKeyStatistic: boolean;
 }
 
 export interface InfographicFileInfo {
@@ -75,6 +76,10 @@ const dataBlockService = {
       `/releases/${releaseId}/data-blocks/${id}/delete-plan`,
       {},
     );
+  },
+
+  getUnattachedDataBlocks(releaseId: string): Promise<DataBlock[]> {
+    return client.get(`/release/${releaseId}/data-blocks/unattached`);
   },
 };
 

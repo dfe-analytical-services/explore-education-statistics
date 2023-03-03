@@ -6,17 +6,14 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
-using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
@@ -206,12 +203,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var result = await service.GetLatestRelease(publication.Id, Enumerable.Empty<Guid>());
 
                 Assert.Equal(release3V1.Id, result.Id);
-                Assert.Equal("Academic Year Q2 2018/19", result.Title);
+                Assert.Equal("Academic year Q2 2018/19", result.Title);
             }
         }
 
         [Fact]
-        public async Task SetPublishedDates()
+        public async Task SetPublishedDate_FirstVersion()
         {
             var release = new Release
             {
@@ -219,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Version = 0
             };
 
-            var published = DateTime.UtcNow;
+            var actualPublishedDate = DateTime.UtcNow;
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
@@ -229,34 +226,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var methodologyService = new Mock<IMethodologyService>(Strict);
-
-            methodologyService.Setup(mock =>
-                    mock.SetPublishedDatesByPublication(release.PublicationId, published))
-                .Returns(Task.CompletedTask);
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildReleaseService(contentDbContext: contentDbContext,
-                    methodologyService: methodologyService.Object);
-
-                await service.SetPublishedDates(release.Id, published);
-
-                VerifyAllMocks(methodologyService);
+                var service = BuildReleaseService(contentDbContext: contentDbContext);
+                await service.SetPublishedDate(release.Id, actualPublishedDate);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var actualRelease = await contentDbContext
+                var actual = await contentDbContext
                     .Releases
                     .SingleAsync(r => r.Id == release.Id);
 
-                Assert.Equal(published, actualRelease.Published);
+                // Expect the published date to have been updated with the actual published date
+                Assert.Equal(actualPublishedDate, actual.Published);
             }
         }
 
         [Fact]
-        public async Task SetPublishedDates_AmendedReleaseHasPublishedDateOfPreviousVersion()
+        public async Task SetPublishedDate_AmendedRelease()
         {
             var previousRelease = new Release
             {
@@ -280,39 +268,78 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var methodologyService = new Mock<IMethodologyService>(Strict);
-
-            methodologyService.Setup(mock =>
-                    mock.SetPublishedDatesByPublication(release.PublicationId, previousRelease.Published.Value))
-                .Returns(Task.CompletedTask);
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = BuildReleaseService(contentDbContext: contentDbContext,
-                    methodologyService: methodologyService.Object);
-
-                await service.SetPublishedDates(release.Id, DateTime.UtcNow);
-
-                VerifyAllMocks(methodologyService);
+                var service = BuildReleaseService(contentDbContext: contentDbContext);
+                await service.SetPublishedDate(release.Id, DateTime.UtcNow);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var actualRelease = await contentDbContext
+                var actual = await contentDbContext
                     .Releases
                     .SingleAsync(r => r.Id == release.Id);
 
-                Assert.Equal(previousRelease.Published.Value, actualRelease.Published);
+                // Expect the published date to have been copied from the previous version 
+                Assert.Equal(previousRelease.Published, actual.Published);
+            }
+        }
+
+        [Fact]
+        public async Task SetPublishedDate_AmendedReleaseAndUpdatePublishedDateIsTrue()
+        {
+            var previousRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                Published = DateTime.UtcNow.AddDays(-1),
+                PreviousVersionId = null,
+                Version = 0
+            };
+
+            var release = new Release
+            {
+                Published = null,
+                PreviousVersionId = previousRelease.Id,
+                Version = 1,
+                UpdatePublishedDate = true
+            };
+
+            var actualPublishedDate = DateTime.UtcNow;
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddRangeAsync(previousRelease, release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildReleaseService(contentDbContext: contentDbContext);
+                await service.SetPublishedDate(release.Id, actualPublishedDate);
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var actual = await contentDbContext
+                    .Releases
+                    .SingleAsync(r => r.Id == release.Id);
+
+                // Expect the published date to have been updated with the actual published date
+                Assert.Equal(actualPublishedDate, actual.Published);
             }
         }
 
         private static ReleaseService BuildReleaseService(
-            ContentDbContext? contentDbContext = null,
-            IMethodologyService? methodologyService = null)
+            ContentDbContext? contentDbContext = null)
         {
+            contentDbContext ??= InMemoryContentDbContext();
+
             return new(
-                contentDbContext ?? Mock.Of<ContentDbContext>(),
-                methodologyService ?? Mock.Of<IMethodologyService>(Strict));
+                contentDbContext,
+                releaseRepository: new ReleaseRepository(contentDbContext)
+            );
         }
     }
 }

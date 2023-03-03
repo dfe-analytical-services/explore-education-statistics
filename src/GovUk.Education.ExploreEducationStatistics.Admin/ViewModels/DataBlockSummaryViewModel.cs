@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Source { get; set; } = "";
 
-        public Guid? ContentSectionId { get; set; }
+        public bool InContent { get; set; }
 
         public int ChartsCount { get; set; }
     }

@@ -20,16 +20,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             amendment.Published = null;
             amendment.PublishScheduled = null;
             amendment.ApprovalStatus = ReleaseApprovalStatus.Draft;
+            amendment.NotifiedOn = null;
+            amendment.NotifySubscribers = false;
+            amendment.UpdatePublishedDate = false;
             amendment.Created = createdDate;
             amendment.CreatedById = createdByUserId;
             amendment.Version = release.Version + 1;
             amendment.PreviousVersionId = release.Id;
+            amendment.PreReleaseAccessList = null;
 
             var context = new Release.CloneContext(amendment);
 
+            // Copy ReleaseContentSections/ContentSections and ContentBlocks associated with those sections
             amendment.Content = amendment
                 .Content
-                .Select(rcs => rcs.Clone(context))
+                .Select(rcs => rcs.Clone(context)) // Old/New ContentBlock pairs added to context here
+                .ToList();
+
+            // Copy ReleaseContentBlocks/ContentBlocks not associated with any ContentSection
+            // ReleaseContentBlocks only contains DataBlocks - this can be cleaned up in TODO: EES-1568
+            // DataBlocks copied previously are fetched from context so not cloned twice
+            amendment.ContentBlocks = amendment
+                .ContentBlocks
+                .Select(rcb => rcb.Clone(context)) // Old/New ContentBlock pairs added to context here
                 .ToList();
 
             // NOTE: This is to ensure that a RelatedDashboards ContentSection exists on all new amendments.
@@ -50,10 +63,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 });
             }
 
-            amendment.ContentBlocks = amendment
-                .ContentBlocks
-                .Select(rcb => rcb.Clone(context))
-                .ToList();
+            amendment.KeyStatistics = amendment.KeyStatistics.Select(originalKeyStatistic =>
+            {
+                var amendmentKeyStatistic = originalKeyStatistic.Clone(context.NewRelease);
+
+                if (originalKeyStatistic is KeyStatisticDataBlock originalKeyStatDataBlock
+                    && amendmentKeyStatistic is KeyStatisticDataBlock amendmentKeyStatDataBlock)
+                {
+                    var originalDataBlock = originalKeyStatDataBlock.DataBlock;
+                    var amendmentDataBlock = (DataBlock)context.OriginalToAmendmentContentBlockMap[originalDataBlock];
+                    amendmentKeyStatDataBlock.DataBlock = amendmentDataBlock;
+                    amendmentKeyStatDataBlock.DataBlockId = amendmentDataBlock.Id;
+                }
+
+                return amendmentKeyStatistic;
+            }).ToList();
 
             amendment.RelatedInformation = amendment
                 .RelatedInformation
@@ -77,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             // Bit cheeky to re-use the clone context, but it's a nice
             // easy way to access and modify all of the content blocks
             // that we used during the clone.
-            context.ContentBlocks
+            context.OriginalToAmendmentContentBlockMap
                 .ForEach(
                     pair =>
                     {
@@ -95,9 +119,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 RegexOptions.Compiled
             );
 
-            foreach (var contentBlock in context.ContentBlocks.Values)
+            foreach (var amendmentBlock in context.OriginalToAmendmentContentBlockMap.Values)
             {
-                switch (contentBlock)
+                switch (amendmentBlock)
                 {
                     case HtmlBlock block:
                         block.Body = ReplaceContent(block.Body, regex, replacements);

@@ -7,7 +7,7 @@ interface Props<T> {
   onChange?: (value: T, previousValue: T) => void;
 }
 
-const Effect = <T extends unknown>({ onChange, onMount, value }: Props<T>) => {
+export default function Effect<T>({ onChange, onMount, value }: Props<T>) {
   const rendered = useRef<boolean>(false);
   const previousValue = useRef(value);
 
@@ -34,6 +34,4 @@ const Effect = <T extends unknown>({ onChange, onMount, value }: Props<T>) => {
   }, [onChange, onMount, value]);
 
   return null;
-};
-
-export default Effect;
+}

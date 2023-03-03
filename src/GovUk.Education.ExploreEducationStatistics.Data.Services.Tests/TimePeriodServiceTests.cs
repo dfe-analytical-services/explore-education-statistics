@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Xunit;
@@ -37,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = new TimePeriodService(statisticsDbContext);
-                var result = service.GetTimePeriods(subject.Id).ToList();
+                var result = await service.GetTimePeriods(subject.Id);
 
                 Assert.Equal(5, result.Count);
                 Assert.Equal((2000, Week1), result[0]);
@@ -73,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = new TimePeriodService(statisticsDbContext);
-                var result = service.GetTimePeriods(subject.Id).ToList();
+                var result = await service.GetTimePeriods(subject.Id);
 
                 Assert.Equal(5, result.Count);
                 Assert.Equal((2000, February), result[0]);
@@ -104,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var service = new TimePeriodService(statisticsDbContext);
                 var queryableObservations = statisticsDbContext.Observation.AsQueryable();
-                var result = service.GetTimePeriods(queryableObservations).ToList();
+                var result = await service.GetTimePeriods(queryableObservations);
 
                 Assert.Equal(5, result.Count);
                 Assert.Equal((2000, Week1), result[0]);
@@ -168,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var service = new TimePeriodService(statisticsDbContext);
 
-                var result = service.GetTimePeriodLabels(subject.Id);
+                var result = await service.GetTimePeriodLabels(subject.Id);
 
                 Assert.Equal("2020/21 Q4", result.From);
                 Assert.Equal("2030/31 Q3", result.To);
@@ -227,7 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var service = new TimePeriodService(statisticsDbContext);
 
-                var result = service.GetTimePeriodLabels(subject.Id);
+                var result = await service.GetTimePeriodLabels(subject.Id);
 
                 Assert.Equal("2020 Week 8", result.From);
                 Assert.Equal("2020 Week 37", result.To);
@@ -262,7 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var service = new TimePeriodService(statisticsDbContext);
 
-                var result = service.GetTimePeriodLabels(subject.Id);
+                var result = await service.GetTimePeriodLabels(subject.Id);
 
                 Assert.Empty(result.From);
                 Assert.Empty(result.To);

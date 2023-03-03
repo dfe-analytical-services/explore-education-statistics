@@ -46,11 +46,12 @@ const ReleaseHelpAndSupportSection = ({
       <h2
         className="govuk-heading-m govuk-!-margin-top-9"
         data-testid="extra-information"
+        id="help-and-support"
       >
         Help and support
       </h2>
 
-      <Accordion id="helpAndSupport">
+      <Accordion id="help-and-support-accordion">
         <AccordionSection
           heading="Methodology"
           caption="Find out how and why we collect, process and publish these statistics"

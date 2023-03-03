@@ -37,6 +37,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -81,9 +83,11 @@ using ContentGlossaryService = GovUk.Education.ExploreEducationStatistics.Conten
 using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
 using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
 using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
-using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
+using IContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
+using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
+using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using IDataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IDataGuidanceService;
 using IGlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IGlossaryService;
 using IMethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
@@ -96,6 +100,7 @@ using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Service
 using IThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IThemeService;
 using MethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyImageService;
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyService;
+using PublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationRepository;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
 using ReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseFileService;
 using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseRepository;
@@ -421,9 +426,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContentGlossaryService, ContentGlossaryService>();
             services.AddTransient<IContentMethodologyService, ContentMethodologyService>();
             services.AddTransient<IContentPublicationService, ContentPublicationService>();
+            services.AddTransient<IContentReleaseService, ContentReleaseService>();
             services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
             services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
             services.AddTransient<IPublicationCacheService, PublicationCacheService>();
+            services.AddTransient<IPublicationCacheService, PublicationCacheService>();
+            services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
 
             services.AddTransient<IFileRepository, FileRepository>();
             services.AddTransient<IDataImportRepository, DataImportRepository>();
@@ -475,7 +483,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()
                 )
             );
-            services.AddTransient<IPublicationRepository, Services.PublicationRepository>();
+            services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<ILegacyReleaseService, LegacyReleaseService>(provider =>
                 new LegacyReleaseService(
@@ -521,6 +529,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IEmbedBlockService, EmbedBlockService>();
             services.AddTransient<IReleaseContentBlockService, ReleaseContentBlockService>();
+            services.AddTransient<IKeyStatisticService, KeyStatisticService>();
             services.AddTransient<ICommentService, CommentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
             services.AddTransient<IReplacementService, ReplacementService>();
@@ -576,6 +585,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 Content.Model.Repository.PublicationRepository>();
             services.AddTransient<ISubjectRepository, SubjectRepository>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
+            services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
             services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
@@ -585,6 +595,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUserInviteRepository, UserInviteRepository>();
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
+            services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
             services.AddTransient(provider => GetBlobStorageService(provider, "CoreStorage"));
             services.AddTransient<ITableStorageService, TableStorageService>(_ =>
                 new TableStorageService(
@@ -752,7 +763,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseAuthorization();
 
             // Deny access to all /Identity routes other than:
-            // 
+            //
             // /Identity/Account/Login
             // /Identity/Account/ExternalLogin
             // /Identity/Account/InviteExpired
@@ -760,8 +771,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // This Regex is case insensitive.
             var options = new RewriteOptions()
                 .AddRewrite(
-                    @"^(?i)identity/(?!account/(login|externallogin|inviteexpired))", 
-                    replacement: "/", 
+                    @"^(?i)identity/(?!account/(login|externallogin|inviteexpired))",
+                    replacement: "/",
                     skipRemainingRules: true);
             app.UseRewriter(options);
 

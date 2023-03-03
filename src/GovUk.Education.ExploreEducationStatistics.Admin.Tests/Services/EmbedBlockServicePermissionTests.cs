@@ -89,8 +89,7 @@ public class EmbedBlockServicePermissionTests
             contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
             contentBlockService ?? Mock.Of<IContentBlockService>(),
             userService ?? Mock.Of<IUserService>(),
-            AdminMapper()
-        );
+            AdminMapper());
     }
 
     private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()

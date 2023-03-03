@@ -45,14 +45,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToListAsync();
         }
 
-        public async Task SetPublishedDatesByPublication(Guid publicationId, DateTime published)
+        public async Task SetPublishedDatesIfApplicable(Guid publicationId)
         {
-            var methodologies = await _methodologyVersionRepository.GetLatestPublishedVersionByPublication(publicationId);
+            var methodologyVersions =
+                await _methodologyVersionRepository.GetLatestPublishedVersionByPublication(publicationId);
 
-            _context.UpdateRange(methodologies);
-
-            methodologies.ForEach(methodology => { methodology.Published ??= published; });
-
+            _context.MethodologyVersions.UpdateRange(methodologyVersions);
+            methodologyVersions.ForEach(methodology =>
+            {
+                methodology.Published ??= DateTime.UtcNow;
+            });
             await _context.SaveChangesAsync();
         }
     }

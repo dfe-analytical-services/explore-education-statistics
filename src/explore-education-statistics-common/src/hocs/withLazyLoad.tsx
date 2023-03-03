@@ -6,7 +6,7 @@ interface LazyLoadProps<P> extends OmitStrict<BaseLazyLoadProps, 'children'> {
   placeholder?: ((props: P) => ReactNode) | ReactNode;
 }
 
-export default function withLazyLoad<P>(
+export default function withLazyLoad<P extends object>(
   Component: ComponentType<P>,
   lazyLoadProps: LazyLoadProps<P> = {
     once: true,

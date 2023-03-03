@@ -121,7 +121,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IFootnoteRepository, FootnoteRepository>()
                 .AddScoped<IIndicatorRepository, IndicatorRepository>()
                 .AddScoped<IPublishingCompletionService, PublishingCompletionService>()
-                .AddScoped<IPublicationRepository, PublicationRepository>();
+                .AddScoped<IPublicationRepository, PublicationRepository>()
+                .AddScoped<IReleaseRepository, ReleaseRepository>();
 
             AddPersistenceHelper<ContentDbContext>(builder.Services);
             AddPersistenceHelper<StatisticsDbContext>(builder.Services);

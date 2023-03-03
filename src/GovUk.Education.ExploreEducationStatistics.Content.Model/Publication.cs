@@ -25,9 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<LegacyRelease> LegacyReleases { get; set; } = new();
 
-        // TODO EES-4058 Remove unused Published
-        public DateTime? Published { get; set; }
-
         public Guid TopicId { get; set; }
 
         public Topic Topic { get; set; } = null!;

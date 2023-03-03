@@ -257,5 +257,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 
             return !(firstNotInSecond.Any() || secondNotInFirst.Any());
         }
+        
+        public static Tuple<T, T> ToTuple2<T>(this IEnumerable<T> collection)
+            where T : class
+        {
+            var list = collection.ToList();
+
+            if (list.Count != 2)
+            {
+                throw new ArgumentException(
+                    $"Expected 2 list items when constructing a 2-tuple, but found {list.Count}");
+            }
+            
+            return new Tuple<T, T>(list[0], list[1]);
+        }
+        
+        public static Tuple<T, T, T> ToTuple3<T>(this IEnumerable<T> collection)
+            where T : class
+        {
+            var list = collection.ToList();
+
+            if (list.Count != 3)
+            {
+                throw new ArgumentException(
+                    $"Expected 3 list items when constructing a 3-tuple, but found {list.Count}");
+            }
+            
+            return new Tuple<T, T, T>(list[0], list[1], list[2]);
+        }
     }
 }

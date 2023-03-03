@@ -21,8 +21,8 @@ Create test publication and release via API
 
 Verify Release summary
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Tax Year 2020-21
-    user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary    Tax Year    2020-21
+    ...    Tax year 2020-21
+    user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary    Tax year    2020-21
     ...    UI test contact name    National statistics
 
 Upload subject
@@ -100,7 +100,7 @@ Select subject "UI test subject"
     user checks previous table tool step contains    1    Subject    UI test subject
 
 Select locations
-    user opens details dropdown    Opportunity Area
+    user opens details dropdown    Opportunity area
     user clicks checkbox    Bolton 001
     user opens details dropdown    Ward
     user clicks checkbox    Nailsea Youngwood

@@ -231,41 +231,25 @@ user adds data block to editable accordion section
     user clicks button    Embed    ${section}
     user waits until parent does not contain element    ${section}    xpath://button[text()="Embed"]
 
-user adds embedded dashboard to editable accordion section
+user chooses to embed a URL in editable accordion section
     [Arguments]
     ...    ${section_name}
-    ...    ${dashboard_title}
-    ...    ${dashboard_url}
     ...    ${section_parent}=css:[data-testid="accordion"]
 
     user opens accordion section    ${section_name}    ${section_parent}
     ${section}=    user gets accordion section content element    ${section_name}    ${section_parent}
     user clicks button    Embed a URL    ${section}
 
-    user updates embedded dashboard modal
-    ...    ${dashboard_title}
-    ...    ${dashboard_url}
-
-user updates embedded dashboard in editable accordion section
+user chooses to update an embedded URL in editable accordion section
     [Arguments]
     ...    ${section_name}
-    ...    ${dashboard_title}
-    ...    ${dashboard_url}
     ...    ${section_parent}=css:[data-testid="accordion"]
 
     user opens accordion section    ${section_name}    ${section_parent}
-    user waits until page does not contain loading spinner
-    user waits until page contains button    Edit embedded URL
-
     ${section}=    user gets accordion section content element    ${section_name}    ${section_parent}
     user clicks button    Edit embedded URL    ${section}
 
-    user updates embedded dashboard modal
-    ...    ${dashboard_title}
-    ...    ${dashboard_url}
-    ...    Edit embedded URL
-
-user updates embedded dashboard modal
+user updates embedded URL details in modal
     [Arguments]
     ...    ${title}
     ...    ${url}
@@ -278,10 +262,7 @@ user updates embedded dashboard modal
 
     ${url_input}=    get child element    ${modal}    id:embedBlockForm-url
     user enters text into element    ${url_input}    ${url}
-
-    user clicks button    Save    ${modal}
-    user waits until modal is not visible    Embed a URL
-    user waits until page contains element    xpath://iframe[@title="${title}"]
+    [Return]    ${modal}
 
 user starts editing accordion section text block
     [Arguments]
@@ -402,6 +383,13 @@ user removes image from accordion section text block
 
 user saves autosaving text block
     [Arguments]    ${parent}
+    user checks element contains button    ${parent}    Save & close
+
+    # EES-3501 - moving focus out of the autosave textarea to give the onBlur() with the 100ms timeout in
+    # FormEditor.tsx a chance to process prior to processing the form submission when we click "Save & close".
+    user presses keys    TAB
+    sleep    0.2
+
     user clicks button    Save & close    ${parent}
     user waits until parent does not contain button    ${parent}    Save & close    %{WAIT_SMALL}
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -17,6 +18,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -67,21 +70,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         PublicationId = publication.Id,
                         Year = 2018,
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        PublishScheduled = "2050-06-30",
                         Type = ReleaseType.OfficialStatistics
                     }
                 )).AssertRight();
 
-                var publishScheduled = new DateTime(2050, 6, 30, 0, 0, 0, DateTimeKind.Unspecified);
-
-                Assert.Equal("Academic Year 2018/19", result.Title);
-                Assert.Equal(2018, result.Year);
+                Assert.Equal("Academic year 2018/19", result.Title);
                 Assert.Equal("2018/19", result.YearTitle);
-                Assert.Null(result.Published);
-                Assert.Equal(publishScheduled, result.PublishScheduled);
-                Assert.False(result.LatestRelease); // Most recent - but not published yet.
                 Assert.Equal(TimeIdentifier.AcademicYear, result.TimePeriodCoverage);
                 Assert.Equal(ReleaseType.OfficialStatistics, result.Type);
+                Assert.Equal(ReleaseApprovalStatus.Draft, result.ApprovalStatus);
+
+                Assert.False(result.Amendment);
+                Assert.False(result.LatestRelease); // Most recent - but not published yet.
+                Assert.False(result.Live);
+                Assert.Null(result.NextReleaseDate);
+                Assert.Null(result.PublishScheduled);
+                Assert.Null(result.Published);
+                Assert.False(result.NotifySubscribers);
+                Assert.False(result.UpdatePublishedDate);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var actual = await context.Releases
+                    .SingleAsync(r => r.PublicationId == publication.Id);
+
+                Assert.Equal(2018, actual.Year);
+                Assert.Equal(TimeIdentifier.AcademicYear, actual.TimePeriodCoverage);
+                Assert.Equal(ReleaseType.OfficialStatistics, actual.Type);
+                Assert.Equal(ReleaseApprovalStatus.Draft, actual.ApprovalStatus);
+                Assert.Equal(0, actual.Version);
+
+                Assert.Null(actual.PreviousVersionId);
+                Assert.Null(actual.PublishScheduled);
+                Assert.Null(actual.Published);
+                Assert.Null(actual.NextReleaseDate);
+                Assert.Null(actual.NotifiedOn);
+                Assert.False(actual.NotifySubscribers);
+                Assert.False(actual.UpdatePublishedDate);
             }
         }
 
@@ -205,7 +231,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TemplateReleaseId = templateReleaseId,
                         Year = 2018,
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        PublishScheduled = "2050-01-01",
                         Type = ReleaseType.OfficialStatistics
                     }
                 );
@@ -229,7 +254,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Empty(contentSections[0].Content.AsReadOnly());
                 Assert.Equal(ContentSectionType.ReleaseSummary, newRelease.SummarySection.Type);
                 Assert.Equal(ContentSectionType.Headlines, newRelease.HeadlinesSection.Type);
-                Assert.Equal(ContentSectionType.KeyStatistics, newRelease.KeyStatisticsSection.Type);
                 Assert.Equal(ContentSectionType.KeyStatisticsSecondary, newRelease.KeyStatisticsSecondarySection.Type);
             }
         }
@@ -298,7 +322,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             releaseSubjectRepository.Setup(service => service.SoftDeleteReleaseSubject(release.Id, subject.Id))
                 .Returns(Task.CompletedTask);
 
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var releaseService = BuildReleaseService(context,
                     cacheService: cacheService.Object,
@@ -318,7 +342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     subjectRepository,
                     releaseDataFileService,
                     releaseSubjectRepository
-                    );
+                );
 
                 result.AssertRight();
             }
@@ -428,7 +452,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             cacheService.Setup(service => service.DeleteItem(new PrivateSubjectMetaCacheKey(release.Id, subject.Id)))
                 .Returns(Task.CompletedTask);
-            cacheService.Setup(service => service.DeleteItem(new PrivateSubjectMetaCacheKey(release.Id, replacementSubject.Id)))
+            cacheService.Setup(service =>
+                    service.DeleteItem(new PrivateSubjectMetaCacheKey(release.Id, replacementSubject.Id)))
                 .Returns(Task.CompletedTask);
 
             dataBlockService.Setup(service =>
@@ -712,15 +737,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     new()
                     {
-                       InternalReleaseNote = "Latest release note - 1 day ago",
-                       Created = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1))
+                        InternalReleaseNote = "Latest release note - 1 day ago",
+                        Created = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1))
                     },
                     new()
                     {
-                       InternalReleaseNote = "Release note 2 days ago",
-                       Created = DateTime.UtcNow.Subtract(TimeSpan.FromDays(2))
+                        InternalReleaseNote = "Release note 2 days ago",
+                        Created = DateTime.UtcNow.Subtract(TimeSpan.FromDays(2))
                     }
-                }
+                },
+                NotifySubscribers = true,
+                UpdatePublishedDate = true
             };
 
             var publication = new Publication
@@ -736,12 +763,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     release
                 }
             };
+            
+            var nonPreReleaseUserRole = new UserReleaseRole
+            {
+                Role = ReleaseRole.Contributor,
+                Release = release
+            };
+            
+            var nonPreReleaseUserInvite = new UserReleaseInvite
+            {
+                Role = ReleaseRole.Contributor,
+                Release = release
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(publication);
+                await context.Publications.AddAsync(publication);
+                await context.UserReleaseRoles.AddAsync(nonPreReleaseUserRole);
+                await context.UserReleaseInvites.AddAsync(nonPreReleaseUserInvite);
                 await context.SaveChangesAsync();
             }
 
@@ -774,6 +815,97 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(viewModel.LatestRelease);
                 Assert.True(viewModel.Live);
                 Assert.False(viewModel.Amendment);
+                Assert.True(viewModel.NotifySubscribers);
+                Assert.True(viewModel.UpdatePublishedDate);
+                Assert.False(viewModel.PreReleaseUsersOrInvitesAdded);
+            }
+        }
+
+        [Fact]
+        public async Task GetRelease_WithPreReleaseUsers()
+        {
+            var release = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.January,
+                ReleaseName = "2035",
+            };
+
+            var publication = new Publication
+            {
+                Contact = new Contact(),
+                Releases =
+                {
+                    release
+                }
+            };
+
+            var preReleaseUserRole = new UserReleaseRole
+            {
+                Role = ReleaseRole.PrereleaseViewer,
+                Release = release
+            };
+            
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.UserReleaseRoles.AddAsync(preReleaseUserRole);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(context);
+
+                var result = await releaseService.GetRelease(release.Id);
+
+                var viewModel = result.AssertRight();
+                Assert.True(viewModel.PreReleaseUsersOrInvitesAdded);
+            }
+        }
+
+        [Fact]
+        public async Task GetRelease_WithPreReleaseInvites()
+        {
+            var release = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.January,
+                ReleaseName = "2035",
+            };
+
+            var publication = new Publication
+            {
+                Contact = new Contact(),
+                Releases =
+                {
+                    release
+                }
+            };
+
+            var preReleaseUserInvite = new UserReleaseInvite
+            {
+                Role = ReleaseRole.PrereleaseViewer,
+                Release = release
+            };
+            
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.UserReleaseInvites.AddAsync(preReleaseUserInvite);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildReleaseService(context);
+
+                var result = await releaseService.GetRelease(release.Id);
+
+                var viewModel = result.AssertRight();
+                Assert.True(viewModel.PreReleaseUsersOrInvitesAdded);
             }
         }
 
@@ -886,7 +1018,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.NotNull(latestIdTitleViewModel);
                 Assert.Equal(publication.LatestPublishedReleaseId, latestIdTitleViewModel!.Id);
-                Assert.Equal("Calendar Year 2022", latestIdTitleViewModel.Title);
+                Assert.Equal("Calendar year 2022", latestIdTitleViewModel.Title);
             }
         }
 
@@ -1108,7 +1240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 VerifyAllMocks(cacheService,
                     releaseDataFilesService,
                     releaseFileService
-                    );
+                );
 
                 result.AssertRight();
 
@@ -1208,10 +1340,312 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task UpdateReleasePublished()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var publication = new Publication
+            {
+                LatestPublishedReleaseId = Guid.NewGuid(),
+                Releases = new List<Release>
+                {
+                    new()
+                    {
+                        Id = releaseId,
+                        Slug = "release-slug",
+                        Published = DateTime.UtcNow
+                    }
+                },
+                Slug = "publication-slug"
+            };
+
+            var request = new ReleasePublishedUpdateRequest
+            {
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
+
+            releaseCacheService.Setup(s => s.UpdateRelease(releaseId,
+                publication.Slug,
+                publication.Releases[0].Slug
+            )).ReturnsAsync(new ReleaseCacheViewModel(releaseId));
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = BuildReleaseService(contentDbContext: context,
+                    releaseCacheService: releaseCacheService.Object);
+
+                var result = await service
+                    .UpdateReleasePublished(
+                        releaseId,
+                        request
+                    );
+
+                VerifyAllMocks(releaseCacheService);
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var saved = await context.Releases
+                    .SingleAsync(r => r.Id == releaseId);
+
+                Assert.Equal(request.Published, saved.Published);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateReleasePublished_LatestReleaseInPublication()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var publication = new Publication
+            {
+                LatestPublishedReleaseId = releaseId,
+                Releases = new List<Release>
+                {
+                    new()
+                    {
+                        Id = releaseId,
+                        Slug = "release-slug",
+                        Published = DateTime.UtcNow
+                    }
+                },
+                Slug = "publication-slug"
+            };
+
+            var request = new ReleasePublishedUpdateRequest
+            {
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
+
+            releaseCacheService.Setup(s => s.UpdateRelease(releaseId,
+                publication.Slug,
+                publication.Releases[0].Slug
+            )).ReturnsAsync(new ReleaseCacheViewModel(releaseId));
+
+            // As the release is the latest for the publication the separate cache entry for the publication's latest
+            // release should also be updated
+            releaseCacheService.Setup(s => s.UpdateRelease(releaseId,
+                publication.Slug,
+                null
+            )).ReturnsAsync(new ReleaseCacheViewModel(releaseId));
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = BuildReleaseService(contentDbContext: context,
+                    releaseCacheService: releaseCacheService.Object);
+
+                var result = await service
+                    .UpdateReleasePublished(
+                        releaseId,
+                        request
+                    );
+
+                VerifyAllMocks(releaseCacheService);
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var saved = await context.Releases
+                    .SingleAsync(r => r.Id == releaseId);
+
+                Assert.Equal(request.Published, saved.Published);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateReleasePublished_ReleaseNotPublished()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var publication = new Publication
+            {
+                LatestPublishedReleaseId = Guid.NewGuid(),
+                Releases = new List<Release>
+                {
+                    new()
+                    {
+                        Id = releaseId,
+                        Slug = "release-slug",
+                        Published = null
+                    }
+                },
+                Slug = "publication-slug"
+            };
+
+            var request = new ReleasePublishedUpdateRequest
+            {
+                Published = DateTime.UtcNow.AddDays(-1)
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = BuildReleaseService(context);
+
+                var result = await service
+                    .UpdateReleasePublished(
+                        releaseId,
+                        request
+                    );
+
+                result.AssertBadRequest(ReleaseNotPublished);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateReleasePublished_FutureDate()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var publication = new Publication
+            {
+                LatestPublishedReleaseId = Guid.NewGuid(),
+                Releases = new List<Release>
+                {
+                    new()
+                    {
+                        Id = releaseId,
+                        Slug = "release-slug",
+                        Published = DateTime.UtcNow
+                    }
+                },
+                Slug = "publication-slug"
+            };
+
+            var request = new ReleasePublishedUpdateRequest
+            {
+                Published = DateTime.UtcNow.AddDays(1)
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = BuildReleaseService(context);
+
+                var result = await service
+                    .UpdateReleasePublished(
+                        releaseId,
+                        request
+                    );
+
+                result.AssertBadRequest(ReleasePublishedCannotBeFutureDate);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateReleasePublished_ConvertsPublishedFromLocalToUniversalTimezone()
+        {
+            var releaseId = Guid.NewGuid();
+
+            var publication = new Publication
+            {
+                LatestPublishedReleaseId = Guid.NewGuid(),
+                Releases = new List<Release>
+                {
+                    new()
+                    {
+                        Id = releaseId,
+                        Slug = "release-slug",
+                        Published = DateTime.UtcNow
+                    }
+                },
+                Slug = "publication-slug"
+            };
+
+            var request = new ReleasePublishedUpdateRequest
+            {
+                Published = DateTime.Parse("2022-08-08T09:30:00.0000000+01:00") // DateTimeKind: Local
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseCacheService = new Mock<IReleaseCacheService>(Strict);
+
+            releaseCacheService.Setup(s => s.UpdateRelease(releaseId,
+                publication.Slug,
+                publication.Releases[0].Slug
+            )).ReturnsAsync(new ReleaseCacheViewModel(releaseId));
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = BuildReleaseService(contentDbContext: context,
+                    releaseCacheService: releaseCacheService.Object);
+
+                var result = await service
+                    .UpdateReleasePublished(
+                        releaseId,
+                        request
+                    );
+
+                VerifyAllMocks(releaseCacheService);
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var saved = await context.Releases
+                    .SingleAsync(r => r.Id == releaseId);
+
+                // The published date retrieved from the database should always be represented in UTC
+                // because of the conversion setup in the database context config.
+                Assert.Equal(DateTimeKind.Utc, saved.Published!.Value.Kind);
+
+                // Make sure the request date was converted to UTC before it was updated on the release
+                Assert.Equal(DateTime.Parse("2022-08-08T08:30:00Z", styles: DateTimeStyles.AdjustToUniversal), saved.Published);
+            }
+        }
+
         private ReleaseService BuildReleaseService(
             ContentDbContext contentDbContext,
             StatisticsDbContext? statisticsDbContext = null,
             IReleaseRepository? releaseRepository = null,
+            IReleaseCacheService? releaseCacheService = null,
             IReleaseFileRepository? releaseFileRepository = null,
             ISubjectRepository? subjectRepository = null,
             IReleaseFileService? releaseFileService = null,
@@ -1235,6 +1669,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
                 userService.Object,
                 releaseRepository ?? Mock.Of<IReleaseRepository>(Strict),
+                releaseCacheService ?? Mock.Of<IReleaseCacheService>(Strict),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 subjectRepository ?? Mock.Of<ISubjectRepository>(Strict),
                 releaseDataFileService ?? Mock.Of<IReleaseDataFileService>(Strict),

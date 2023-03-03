@@ -26,7 +26,7 @@ Navigate to Absence publication
 
 Validate title
     user waits until h1 is visible    Pupil absence in schools in England    %{WAIT_MEDIUM}
-    user waits until page contains title caption    Academic Year 2016/17
+    user waits until page contains title caption    Academic year 2016/17
 
 Validate URL
     user checks url contains    %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
@@ -45,14 +45,14 @@ Validate Email alerts link
 
 Validate "About these statistics" -- Number of other releases
     user checks number of other releases is correct    6
-    user opens details dropdown    See other releases (6)
-    user checks other release is shown in position    Academic Year 2014/15    1
-    user checks other release is shown in position    Academic Year 2013/14    2
-    user checks other release is shown in position    Academic Year 2012/13    3
-    user checks other release is shown in position    Academic Year 2011/12    4
-    user checks other release is shown in position    Academic Year 2010/11    5
-    user checks other release is shown in position    Academic Year 2009/10    6
-    user closes details dropdown    See other releases (6)
+    user opens details dropdown    View previous releases (6)
+    user checks other release is shown in position    Academic year 2014/15    1
+    user checks other release is shown in position    Academic year 2013/14    2
+    user checks other release is shown in position    Academic year 2012/13    3
+    user checks other release is shown in position    Academic year 2011/12    4
+    user checks other release is shown in position    Academic year 2010/11    5
+    user checks other release is shown in position    Academic year 2009/10    6
+    user closes details dropdown    View previous releases (6)
 
 Validate "About these statistics" -- "Last updated"
     user checks summary list contains    Last updated    22 August 2022
@@ -66,10 +66,11 @@ Validate "About these statistics" -- "Last updated"
     user checks release update    3    22 March 2018    First published.
     user closes details dropdown    See all updates (3)
 
-Check data downloads navigation contains links
-    user checks element contains link    testid:data-downloads    Explore data and files
-    user checks element contains link    testid:data-downloads    View data guidance
-    user checks element contains link    testid:data-downloads    Download all data (zip)
+Check quick links navigation contains links
+    user checks element contains link    testid:quick-links    Explore data
+    user checks element contains link    testid:quick-links    Release contents
+    user checks element contains link    testid:quick-links    Help and support
+    user checks element contains link    testid:quick-links    Download all data (zip)
 
 Check supporting information contains methodology link
     user checks page contains link with text and url    Pupil absence statistics: methodology
@@ -105,15 +106,15 @@ Validate headlines -- Summary tab key stats
     user scrolls to element    xpath://h2[contains(text(), "Headline facts and figures")]
 
     user checks key stat contents    1    Overall absence rate    4.7%    Up from 4.6% in 2015/16    %{WAIT_MEDIUM}
-    user checks key stat definition    1    What is overall absence?
+    user checks key stat guidance    1    What is overall absence?
     ...    Total number of all authorised and unauthorised absences from possible school sessions for all pupils.
 
     user checks key stat contents    2    Authorised absence rate    3.4%    Similar to previous years
-    user checks key stat definition    2    What is authorized absence rate?
+    user checks key stat guidance    2    What is authorized absence rate?
     ...    Number of authorised absences as a percentage of the overall school population.
 
     user checks key stat contents    3    Unauthorised absence rate    1.3%    Up from 1.1% in 2015/16
-    user checks key stat definition    3    What is unauthorized absence rate?
+    user checks key stat guidance    3    What is unauthorized absence rate?
     ...    Number of unauthorised absences as a percentage of the overall school population.
 
 Validate headlines -- Summary tab content
@@ -240,15 +241,15 @@ Validate accordion sections order
 
     user checks there are x accordion sections    9    id:content
 
-    user checks accordion is in position    Methodology    1    id:help-and-support
-    user checks accordion is in position    Official statistics    2    id:help-and-support
-    user checks accordion is in position    Contact us    3    id:help-and-support
+    user checks accordion is in position    Methodology    1    id:help-and-support-accordion
+    user checks accordion is in position    Official statistics    2    id:help-and-support-accordion
+    user checks accordion is in position    Contact us    3    id:help-and-support-accordion
 
-    user checks there are x accordion sections    3    id:help-and-support
+    user checks there are x accordion sections    3    id:help-and-support-accordion
 
-Check explore data and files link opens accordion section
+Check explore data link opens accordion section
     user verifies accordion is closed    Explore data and files
-    user clicks link    Explore data and files    testid:data-downloads
+    user clicks link    Explore data    testid:quick-links
     user verifies accordion is open    Explore data and files
     user closes accordion section    Explore data and files    id:data-accordion
 

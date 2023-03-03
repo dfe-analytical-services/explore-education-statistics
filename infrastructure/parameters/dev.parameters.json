@@ -89,17 +89,35 @@
     "branch": {
        "value": "dev"
     },
+    "skuContentDb": {
+      "value": "Standard"
+    },
+    "tierContentDb": {
+      "value": "Standard"
+    },
+    "capacityContentDb": {
+      "value": 50
+    },
+    "skuStatisticsDb": {
+      "value": "GP_S_Gen5"
+    },
+    "tierStatisticsDb": {
+      "value": "GeneralPurpose"
+    },
+    "capacityStatisticsDb": {
+      "value": 4
+    },
+    "minCapacityStatisticsDb": {
+      "value": "0.5"
+    },
     "maxContentDbSizeBytes": {
       "value": 1073741824
     },
     "maxStatsDbSizeBytes": {
-      "value": 322122547200
+      "value": 268435456000
     },
     "dataFactoryConcurrency": {
       "value": 10
-    },
-    "releaseStatusPollTimeMillis": {
-      "value": 500
     },
     "immediatePublicationOfScheduledReleasesEnabled": {
       "value": true

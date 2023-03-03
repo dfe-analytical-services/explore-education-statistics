@@ -27,6 +27,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
     public class ReleaseServiceTests
     {
+        private static readonly DataBlock Release1DataBlock = new()
+        {
+            Id = Guid.NewGuid(),
+        };
+
         private static readonly Release Release1V1 = new()
         {
             Id = Guid.NewGuid(),
@@ -55,7 +60,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 }
             },
             Version = 0,
-            PreviousVersionId = null
+            PreviousVersionId = null,
+            KeyStatistics = new List<KeyStatistic>
+            {
+                new KeyStatisticDataBlock
+                {
+                    Order = 1,
+                    DataBlock = Release1DataBlock,
+                },
+                new KeyStatisticText { Order = 0 },
+            },
         };
 
         private static readonly Release Release1V2Deleted = new()
@@ -151,11 +165,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             Order = 1,
         };
 
-        private static readonly ContentBlock Release1KeyStatsDataBlock = new DataBlock
-        {
-            Id = Guid.NewGuid(),
-        };
-
         private static readonly ContentSection Release1SummarySection = new()
         {
             Id = Guid.NewGuid(),
@@ -215,19 +224,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             Type = ContentSectionType.Generic
         };
 
-        private static readonly ContentSection Release1KeyStatsSection = new()
-        {
-            Id = Guid.NewGuid(),
-            Order = 2,
-            Heading = "Release 1 key stats section",
-            Caption = "",
-            Type = ContentSectionType.KeyStatistics,
-            Content = new List<ContentBlock>
-            {
-                Release1KeyStatsDataBlock
-            }
-        };
-
         private static readonly List<ReleaseContentSection> ReleaseContentSections = new()
         {
             new ReleaseContentSection
@@ -254,11 +250,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Release = Release1V1,
                 ContentSection = Release1Section3
-            },
-            new ReleaseContentSection
-            {
-                Release = Release1V1,
-                ContentSection = Release1KeyStatsSection
             },
         };
 
@@ -327,15 +318,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(Release1V1.Id, viewModel.Id);
-                Assert.Equal("Academic Year Q1 2018/19", viewModel.Title);
+                Assert.Equal("Academic year Q1 2018/19", viewModel.Title);
                 Assert.Equal(Release1V1.Published, viewModel.Published);
 
-                var keyStatisticsSection = viewModel.KeyStatisticsSection;
-                Assert.NotNull(keyStatisticsSection);
-                Assert.Equal(Release1KeyStatsSection.Id, keyStatisticsSection.Id);
-                var keyStatisticsSectionContent = keyStatisticsSection.Content;
-                Assert.Single(keyStatisticsSectionContent);
-                Assert.Equal(Release1KeyStatsDataBlock.Id, keyStatisticsSectionContent[0].Id);
+                Assert.Equal(2, viewModel.KeyStatistics.Count);
+
+                Assert.Equal(Release1V1.KeyStatistics[1].Id, viewModel.KeyStatistics[0].Id);
+                Assert.Equal(0, viewModel.KeyStatistics[0].Order);
+                Assert.IsType<KeyStatisticTextViewModel>(viewModel.KeyStatistics[0]);
+
+                Assert.Equal(Release1V1.KeyStatistics[0].Id, viewModel.KeyStatistics[1].Id);
+                Assert.Equal(1, viewModel.KeyStatistics[1].Order);
+                var keyStatDataBlockViewModel = Assert.IsType<KeyStatisticDataBlockViewModel>(viewModel.KeyStatistics[1]);
+                Assert.Equal(Release1DataBlock.Id ,keyStatDataBlockViewModel.DataBlockId);
 
                 var summarySection = viewModel.SummarySection;
                 Assert.NotNull(summarySection);
@@ -542,7 +537,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetRelease_NotYetPublished()
+        public async Task GetRelease_NotPublished()
         {
             var release = new Release
             {
@@ -556,7 +551,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(release);
+                await contentDbContext.Releases.AddAsync(release);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -564,40 +559,131 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupReleaseService(contentDbContext: contentDbContext);
 
+                // Test scenario of the publisher getting an unpublished release to cache it in advance of publishing it
+                // on a scheduled date
                 var expectedPublishDate = DateTime.Today.Add(new TimeSpan(9, 30, 0));
                 var result = await service.GetRelease(release.Id, expectedPublishDate);
+
+                var viewModel = result.AssertRight();
+
+                // Published date in the view model should match the expected publish date
+                Assert.Equal(expectedPublishDate, viewModel.Published);
+            }
+        }
+
+        [Fact]
+        public async Task GetRelease_NotPublished_ExpectedPublishDateIsNull()
+        {
+            var release = new Release
+            {
+                ReleaseName = "2022",
+                TimePeriodCoverage = CalendarYear,
+                ApprovalStatus = Approved,
+                Published = null
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseService(contentDbContext: contentDbContext);
+
+                // Test scenario of the publisher getting an unpublished release to cache it in advance of publishing it
+                // immediately.
+                var result = await service.GetRelease(release.Id,
+                    expectedPublishDate: null);
+
+                var viewModel = result.AssertRight();
+
+                // Published date in the view model should match the date now
+                Assert.NotNull(viewModel.Published);
+                Assert.InRange(DateTime.UtcNow.Subtract(viewModel.Published!.Value).Milliseconds, 0, 1500);
+            }
+        }
+
+        [Fact]
+        public async Task GetRelease_AmendedReleaseAndUpdatePublishedDateIsFalse()
+        {
+            var previousRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2023",
+                TimePeriodCoverage = AcademicYear,
+                Published = DateTime.UtcNow.AddDays(-1),
+                PreviousVersionId = null,
+                Version = 0
+            };
+
+            var release = new Release
+            {
+                ReleaseName = "2023",
+                TimePeriodCoverage = AcademicYear,
+                Published = null,
+                PreviousVersionId = previousRelease.Id,
+                Version = 1,
+                UpdatePublishedDate = false
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddRangeAsync(previousRelease, release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseService(contentDbContext: contentDbContext);
+
+                // Test scenario of the publisher getting an unpublished amended release to cache it in advance of
+                // publishing it.
+                // An update to the published date *has not* been requested.
+                var expectedPublishDate = DateTime.Today.Add(new TimeSpan(9, 30, 0));
+                var result = await service.GetRelease(release.Id, expectedPublishDate);
+
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(release.Id, viewModel.Id);
-                Assert.Equal("Calendar Year 2022", viewModel.Title);
-                // Published date in the view model should match the expected publish date
-                Assert.Equal(expectedPublishDate, viewModel.Published);
-
-                Assert.Null(viewModel.KeyStatisticsSection);
-                Assert.Null(viewModel.SummarySection);
-                Assert.Null(viewModel.RelatedDashboardsSection);
-                Assert.Empty(viewModel.Content);
-                Assert.Empty(viewModel.DownloadFiles);
-                Assert.Empty(viewModel.RelatedInformation);
+                // Published date in the view model should match the published date of the previous version
+                Assert.Equal(previousRelease.Published, viewModel.Published);
             }
         }
 
         [Fact]
-        public async Task GetRelease_NotYetPublished_ExpectedPublishDateIsNull()
+        public async Task GetRelease_AmendedReleaseAndUpdatePublishedDateIsTrue()
         {
+            var previousRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2023",
+                TimePeriodCoverage = AcademicYear,
+                Published = DateTime.UtcNow.AddDays(-1),
+                PreviousVersionId = null,
+                Version = 0
+            };
+
             var release = new Release
             {
-                ReleaseName = "2022",
-                TimePeriodCoverage = CalendarYear,
-                ApprovalStatus = Approved,
-                Published = null
+                ReleaseName = "2023",
+                TimePeriodCoverage = AcademicYear,
+                Published = null,
+                PreviousVersionId = previousRelease.Id,
+                Version = 1,
+                UpdatePublishedDate = true
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(release);
+                await contentDbContext.Releases.AddRangeAsync(previousRelease, release);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -605,52 +691,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupReleaseService(contentDbContext: contentDbContext);
 
-                DateTime? expectedPublishDate = null;
-                var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
-                    service.GetRelease(release.Id, expectedPublishDate));
-
-                Assert.Equal(
-                    "Expected published date must be specified for a non-live release (Parameter 'expectedPublishDate')",
-                    exception.Message
-                );
-            }
-        }
-
-        [Fact]
-        public async Task GetRelease_AmendedReleaseNotYetPublishedHasPublishedDateOfPreviousVersion()
-        {
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddRangeAsync(Releases);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupReleaseService(contentDbContext: contentDbContext);
-
-                // The expected publish date for this release should be ignored
+                // Test scenario of the publisher getting an unpublished amended release to cache it in advance of
+                // publishing it.
+                // An update to the published date *has* been requested.
                 var expectedPublishDate = DateTime.Today.Add(new TimeSpan(9, 30, 0));
+                var result = await service.GetRelease(release.Id, expectedPublishDate);
 
-                var result = await service.GetRelease(Release1V3NotPublished.Id, expectedPublishDate);
                 var viewModel = result.AssertRight();
 
-                Assert.Equal(Release1V3NotPublished.Id, viewModel.Id);
-                Assert.Equal("Academic Year Q1 2018/19", viewModel.Title);
-                // Published date in the view model should match the published date of the previous version
-                Assert.Equal(Release1V1.Published, viewModel.Published);
-                Assert.Null(viewModel.KeyStatisticsSection);
-                Assert.Null(viewModel.SummarySection);
-                Assert.Null(viewModel.RelatedDashboardsSection);
-                Assert.Empty(viewModel.Content);
-
-                Assert.Empty(viewModel.DownloadFiles);
-
-                Assert.Equal("Release 1 v3 Guidance", viewModel.DataGuidance);
-
-                Assert.Empty(viewModel.RelatedInformation);
+                Assert.Equal(release.Id, viewModel.Id);
+                // Published date in the view model should match the expected publish date
+                Assert.Equal(expectedPublishDate, viewModel.Published);
             }
         }
 
@@ -673,7 +724,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(Release1V3NotPublished.Id, viewModel.Id);
-                Assert.Equal("Academic Year Q1 2018/19", viewModel.Title);
+                Assert.Equal("Academic year Q1 2018/19", viewModel.Title);
 
                 Assert.Equal(2, viewModel.Updates.Count);
                 Assert.Equal(new DateTime(2020, 2, 1), viewModel.Updates[0].On);

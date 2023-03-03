@@ -58,6 +58,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<File> Files { get; set; }
         public virtual DbSet<ContentSection> ContentSections { get; set; }
         public virtual DbSet<ContentBlock> ContentBlocks { get; set; }
+        public virtual DbSet<KeyStatistic> KeyStatistics { get; set; }
+        public virtual DbSet<KeyStatisticDataBlock> KeyStatisticsDataBlock { get; set; }
+        public virtual DbSet<KeyStatisticText> KeyStatisticsText { get; set; }
         public virtual DbSet<DataBlock> DataBlocks { get; set; }
         public virtual DbSet<DataImport> DataImports { get; set; }
         public virtual DbSet<DataImportError> DataImportErrors { get; set; }
@@ -269,6 +272,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(r => r.CreatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Release>()
+                .Property(r => r.Published)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
             modelBuilder.Entity<Release>()
                 .HasQueryFilter(r => !r.SoftDeleted);
@@ -523,6 +532,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(rs => rs.CreatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<KeyStatisticDataBlock>()
+                .ToTable("KeyStatisticsDataBlock");
+
+            modelBuilder.Entity<KeyStatisticDataBlock>()
+                .HasOne<DataBlock>(ks => ks.DataBlock)
+                .WithMany()
+                // WARN: This is necessary - otherwise an automatically generated cascade delete is added for when an
+                // associated data block is removed. That cascade delete _only_ removes the KeyStatisticsDataBlock
+                // entry, leaving a KeyStatistics table entry, which should never happen.
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<KeyStatisticText>()
+                .ToTable("KeyStatisticsText");
         }
     }
 }

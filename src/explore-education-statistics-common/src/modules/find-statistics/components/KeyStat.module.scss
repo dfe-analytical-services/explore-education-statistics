@@ -6,7 +6,7 @@
   margin: 0 -#{govuk-spacing(1)} govuk-spacing(2);
 }
 
-.definition {
+.guidanceTitle {
   background: govuk-colour('white');
   font-size: 16px !important;
   margin: 0;
@@ -39,6 +39,12 @@
     width: 100%;
     z-index: 2;
   }
+}
+
+.textTile {
+  background: govuk-colour('light-grey');
+  border: 3px solid govuk-colour('blue');
+  padding: govuk-spacing(3);
 }
 
 .trendText {

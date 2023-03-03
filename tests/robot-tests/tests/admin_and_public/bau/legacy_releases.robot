@@ -46,7 +46,7 @@ Navigate to admin dashboard to create new release
 
 Navigate to release in admin
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Academic Year 2020/21
+    ...    Academic year 2020/21
 
 Approve release
     user clicks link    Sign off
@@ -58,9 +58,9 @@ Approve release
 
 Check legacy release appears on public frontend
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
-    user opens details dropdown    See other releases (1)
+    user opens details dropdown    View previous releases (1)
 
-    ${other_releases}=    user gets details content element    See other releases (1)
+    ${other_releases}=    user gets details content element    View previous releases (1)
 
     user checks list has x items    css:ul    1    ${other_releases}
 
@@ -94,9 +94,9 @@ Validate updated legacy release
 Validate public frontend shows changes made to legacy release after saving publication
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
 
-    user opens details dropdown    See other releases (1)
+    user opens details dropdown    View previous releases (1)
 
-    ${other_releases}=    user gets details content element    See other releases (1)
+    ${other_releases}=    user gets details content element    View previous releases (1)
 
     user checks list has x items    css:ul    1    ${other_releases}
 

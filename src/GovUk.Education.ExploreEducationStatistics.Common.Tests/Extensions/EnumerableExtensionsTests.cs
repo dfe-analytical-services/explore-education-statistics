@@ -1,9 +1,11 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
@@ -137,42 +139,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         }
 
         [Fact]
-        public void IsSameAsIgnoringOrder_ListsAreEmpty()
-        {
-            Assert.True(new List<string>().IsSameAsIgnoringOrder(new List<string>()));
-        }
-
-        [Fact]
-        public void IsSameAsIgnoringOrder_ListsAreSame()
-        {
-            Assert.True(ListOf("a", "b").IsSameAsIgnoringOrder(ListOf("a", "b")));
-        }
-
-        [Fact]
-        public void IsSameAsIgnoringOrder_ListsAreSameIgnoringOrder()
-        {
-            Assert.True(ListOf("a", "b").IsSameAsIgnoringOrder(ListOf("b", "a")));
-        }
-
-        [Fact]
-        public void IsSameAsIgnoringOrder_FirstHasElementNotInSecond()
-        {
-            var first = ListOf("a", "b", "c");
-            var second = ListOf("b", "a");
-
-            Assert.False(first.IsSameAsIgnoringOrder(second));
-        }
-
-        [Fact]
-        public void IsSameAsIgnoringOrder_SecondHasElementNotInFirst()
-        {
-            var first = ListOf("a", "b");
-            var second = ListOf("c", "b", "a");
-
-            Assert.False(first.IsSameAsIgnoringOrder(second));
-        }
-
-        [Fact]
         public void JoinToString()
         {
             var list = new List<string> {"foo", "bar", "baz"};
@@ -180,6 +146,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             Assert.Equal("foo-bar-baz", list.JoinToString('-'));
             Assert.Equal("foo - bar - baz", list.JoinToString(" - "));
             Assert.Equal("foo, bar, baz", list.JoinToString(", "));
+        }
+        
+        
+        [Fact]
+        public void Generate_Tuple2()
+        {
+            var (item1, item2) = new[] { "test1", "test2" }.ToTuple2();
+            Assert.Equal("test1", item1);
+            Assert.Equal("test2", item2);
+        }
+        
+        [Fact]
+        public void Generate_Tuple2_LengthTooShort()
+        {
+            Assert.Throws<ArgumentException>(() => new[] { "test1" }.ToTuple2());
+        }
+        
+        [Fact]
+        public void Generate_Tuple2_LengthTooLong()
+        {
+            Assert.Throws<ArgumentException>(() => new[] { "test1", "test2", "test3" }.ToTuple2());
+        }
+        
+        [Fact]
+        public void Generate_Tuple3()
+        {
+            var (item1, item2, item3) = new[] { "test1", "test2", "test3" }.ToTuple3();
+            Assert.Equal("test1", item1);
+            Assert.Equal("test2", item2);
+            Assert.Equal("test3", item3);
+        }
+        
+        [Fact]
+        public void Generate_Tuple3_LengthTooShort()
+        {
+            Assert.Throws<ArgumentException>(() => new[] { "test1", "test2" }.ToTuple3());
+        }
+        
+        [Fact]
+        public void Generate_Tuple3_LengthTooLong()
+        {
+            Assert.Throws<ArgumentException>(() => new[] { "test1", "test2", "test3", "test4" }.ToTuple3());
         }
 
         private static async Task<Either<Unit, int>> GetSuccessfulEither(int value)

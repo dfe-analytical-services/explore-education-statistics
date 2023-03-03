@@ -3,6 +3,7 @@ import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import http from 'k6/http';
 import { check, fail } from 'k6';
+import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import getEnvironmentAndUsersFromFile from '../../utils/environmentAndUsers';
 import loggingUtils from '../../utils/loggingUtils';
 
@@ -30,7 +31,7 @@ export const getReleaseRequestDuration = new Trend(
 );
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
-  __ENV.TEST_ENVIRONMENT as string,
+  __ENV.TEST_ENVIRONMENT,
 );
 
 export function setup() {
@@ -51,15 +52,12 @@ const performTest = () => {
     getReleaseFailureCount.add(1);
     errorRate.add(1);
     fail(`Failure to get Release page - ${JSON.stringify(e)}`);
-    return;
   }
 
   if (
     check(response, {
       'response code was 200': ({ status }) => status === 200,
       'response should have contained body': ({ body }) => body != null,
-    }) &&
-    check(response, {
       'response contains expected title': res =>
         res.html().text().includes('Pupil absence in schools in England'),
       'response contains expected content': res =>
@@ -70,16 +68,16 @@ const performTest = () => {
     getReleaseSuccessCount.add(1);
     getReleaseRequestDuration.add(Date.now() - startTime);
   } else {
-    console.log(
-      `FAILURE!  Got ${response.status} response code - ${JSON.stringify(
-        response.body,
-      )}`,
-    );
+    console.log(`FAILURE! Got ${response.status} response code`);
     getReleaseFailureCount.add(1);
     getReleaseRequestDuration.add(Date.now() - startTime);
     errorRate.add(1);
     fail('Failure to Get Release page');
   }
 };
-
+export function handleSummary(data: unknown) {
+  return {
+    'getReleasePage.html': htmlReport(data),
+  };
+}
 export default performTest;

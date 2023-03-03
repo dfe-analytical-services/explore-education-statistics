@@ -16,6 +16,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Security;
@@ -136,6 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();
+            services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
             services.AddSingleton<IBlobStorageService, BlobStorageService>(provider =>
                 new BlobStorageService(
@@ -143,6 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                         new BlobServiceClient(publicStorageConnectionString),
                         provider.GetRequiredService<ILogger<BlobStorageService>>(),
                         new StorageInstanceCreationUtil()));
+            services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
             services.AddTransient<IFilterItemRepository, FilterItemRepository>();
             services.AddTransient<IFilterRepository, FilterRepository>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();

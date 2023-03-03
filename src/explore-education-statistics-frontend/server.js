@@ -80,6 +80,7 @@ async function startServer(port = process.env.PORT || 3000) {
           frameSrc: [
             "'self'",
             'https://department-for-education.shinyapps.io/',
+            'https://dfe-analytical-services.github.io/',
           ],
           frameAncestors: ["'self'"],
           childSrc: ["'self'"],

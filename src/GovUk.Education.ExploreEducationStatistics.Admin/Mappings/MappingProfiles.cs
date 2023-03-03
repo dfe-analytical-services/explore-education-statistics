@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
@@ -10,8 +11,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using ContactViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContactViewModel;
 using ContentSectionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContentSectionViewModel;
-using DataBlockSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.DataBlockSummaryViewModel;
 using DataBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.DataBlockViewModel;
+using EmbedBlockLinkViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.EmbedBlockLinkViewModel;
 using HtmlBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.HtmlBlockViewModel;
 using IContentBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.IContentBlockViewModel;
 using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
@@ -56,12 +57,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                             ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
                             : (DateTime?)null));
 
-            CreateMap<ReleaseCreateRequest, Release>()
-                .ForMember(dest => dest.PublishScheduled,
-                    m => m.MapFrom(model => model.PublishScheduledDate))
-                .ForMember(dest => dest.ReleaseName,
-                    m => m.MapFrom(r => r.Year.ToString()));
-
             CreateMap<Release, ReleaseSummaryViewModel>()
                 .ForMember(model => model.PublishScheduled,
                     m => m.MapFrom(model =>
@@ -96,13 +91,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateContentBlockMap();
             CreateMap<DataBlockCreateViewModel, DataBlock>();
             CreateMap<DataBlockUpdateViewModel, DataBlock>();
-            CreateMap<DataBlock, DataBlockSummaryViewModel>()
-                .ForMember(
-                    dest => dest.ChartsCount,
-                    m => m.MapFrom(d => d.Charts.Count));
 
-            CreateMap<Release, Data.Model.Release>()
-                .ForMember(dest => dest.TimeIdentifier, m => m.MapFrom(r => r.TimePeriodCoverage));
+            CreateMap<KeyStatisticDataBlock, KeyStatisticDataBlockViewModel>();
+            CreateMap<KeyStatisticText, KeyStatisticTextViewModel>();
+            CreateMap<KeyStatistic, KeyStatisticViewModel>()
+                .IncludeAllDerived();
+
+            CreateMap<KeyStatisticDataBlockCreateRequest, KeyStatisticDataBlock>();
+            CreateMap<KeyStatisticTextCreateRequest, KeyStatisticText>();
+
+            CreateMap<Release, Data.Model.Release>();
 
             CreateMap<Theme, ThemeViewModel>()
                 .ForMember(theme => theme.Topics, m => m.MapFrom(t => t.Topics.OrderBy(topic => topic.Title)));
@@ -114,6 +112,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<Release, ManageContentPageViewModel.ReleaseViewModel>()
                 .ForMember(dest => dest.Content,
                     m => m.MapFrom(r => r.GenericContent.OrderBy(s => s.Order)))
+                .ForMember(dest => dest.KeyStatistics,
+                    m => m.MapFrom(r => r.KeyStatistics.OrderBy(ks => ks.Order)))
                 .ForMember(
                     dest => dest.Updates,
                     m => m.MapFrom(r => r.Updates.OrderByDescending(update => update.On)))
@@ -193,8 +193,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<ContentSection, ContentSectionViewModel>()
                 .ForMember(dest => dest.Content,
-                m => m.MapFrom(section =>
-                    section.Content.OrderBy(contentBlock => contentBlock.Order)));
+                    m => m.MapFrom(section =>
+                        section.Content.OrderBy(contentBlock => contentBlock.Order)));
 
             CreateMap<MethodologyVersion, ManageMethodologyContentViewModel>()
                 .ForMember(dest => dest.Content,

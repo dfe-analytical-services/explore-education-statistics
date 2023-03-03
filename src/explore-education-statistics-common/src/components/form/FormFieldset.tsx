@@ -1,4 +1,4 @@
-import { useFormContext } from '@common/components/form/contexts/FormContext';
+import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import classNames from 'classnames';
 import React, { FocusEventHandler, ReactNode } from 'react';
 import ErrorMessage from '../ErrorMessage';
@@ -37,7 +37,7 @@ const FormFieldset = ({
   onBlur,
   onFocus,
 }: FormFieldsetProps) => {
-  const { prefixFormId } = useFormContext();
+  const { prefixFormId } = useFormIdContext();
   const fieldId = useFormId ? prefixFormId(id) : id;
 
   return (

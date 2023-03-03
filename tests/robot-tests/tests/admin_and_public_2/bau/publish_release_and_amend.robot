@@ -1,4 +1,5 @@
 *** Settings ***
+Library             DateTime
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
@@ -13,8 +14,8 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=    UI tests - publish release %{RUN_IDENTIFIER}
-${RELEASE_NAME}=        Financial Year 3000-01
+${PUBLICATION_NAME}=    UI tests - publish release and amend %{RUN_IDENTIFIER}
+${RELEASE_NAME}=        Financial year 3000-01
 ${DATABLOCK_NAME}=      Dates data block name
 
 
@@ -123,6 +124,13 @@ Navigate to 'Content' page
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
 
+Add free text key stat
+    user adds free text key stat    Free text key stat title    9001%    Trend    Guidance title    Guidance text
+
+    user checks element count is x    testid:keyStat    1
+    user checks key stat contents    1    Free text key stat title    9001%    Trend
+    user checks key stat guidance    1    Guidance title    Guidance text
+
 Add three accordion sections to release
     user waits for page to finish loading
     user waits until page does not contain loading spinner
@@ -160,14 +168,28 @@ Add test text to second accordion section
     ...    id:releaseMainContent
 
 Add embedded dashboard to third accordion section
-    user adds embedded dashboard to editable accordion section
+    user chooses to embed a URL in editable accordion section
     ...    Test embedded dashboard section
-    ...    Test embedded dashboard title
-    ...    https://department-for-education.shinyapps.io/dfe-shiny-template/
     ...    id:releaseMainContent
 
+    ${modal}=    user updates embedded URL details in modal
+    ...    Test embedded dashboard title
+    ...    https://google.com
+
+    user clicks button    Save    ${modal}
+    user waits until page contains    URL must be on a permitted domain
+
+    user updates embedded URL details in modal
+    ...    Test embedded dashboard title
+    ...    https://dfe-analytical-services.github.io/explore-education-statistics
+
+    user waits until page does not contain    URL must be on a permitted domain
+    user clicks button    Save    ${modal}
+    user waits until modal is not visible    Embed a URL
+
+    user waits until page contains element    xpath://iframe[@title="Test embedded dashboard title"]
     select frame    xpath://iframe[@title="Test embedded dashboard title"]
-    user waits until h1 is visible    DfE Analytical Services R-Shiny data dashboard template (h1)    90
+    user waits until h1 is visible    Explore Education Statistics service    %{WAIT_SMALL}
     unselect frame
 
 User navigates to Data blocks page to edit block
@@ -233,14 +255,17 @@ Verify release is scheduled
     user checks summary list contains    Scheduled release    ${EXPECTED_SCHEDULED_DATE}
     user checks summary list contains    Next release expected    December 3001
 
+Get public release link
+    user waits until page contains element    testid:public-release-url
+    ${PUBLIC_RELEASE_LINK}=    Get Value    xpath://*[@data-testid="public-release-url"]
+    check that variable is not empty    PUBLIC_RELEASE_LINK    ${PUBLIC_RELEASE_LINK}
+    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
+
 Publish the scheduled release
     user waits for scheduled release to be published immediately
 
-    ${publish_date_day}=    get current datetime    %-d
-    ${publish_date_month_word}=    get current datetime    %B
-    ${publish_date_year}=    get current datetime    %Y
+    ${EXPECTED_PUBLISHED_DATE}=    get current datetime    ${DATE_FORMAT_MEDIUM}
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
-    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
 
 Verify newly published release is on Find Statistics page
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
@@ -250,7 +275,7 @@ Navigate to newly published release page
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
 
 Verify release URL and page caption
-    user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-%{RUN_IDENTIFIER}
+    user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-and-amend-%{RUN_IDENTIFIER}
     user waits until page contains title caption    ${RELEASE_NAME}
 
 Verify publish and update dates
@@ -348,8 +373,14 @@ Verify public pre-release access list
     user waits until page contains    Published ${EXPECTED_PUBLISHED_DATE}
     user waits until page contains    Test public access list
 
-Verify accordions are correct
+Verify free text key stat is correct
     user goes to release page via breadcrumb    ${PUBLICATION_NAME}    ${RELEASE_NAME}
+
+    user checks element count is x    testid:keyStat    1
+    user checks key stat contents    1    Free text key stat title    9001%    Trend
+    user checks key stat guidance    1    Guidance title    Guidance text
+
+Verify accordions are correct
     user checks there are x accordion sections    1    id:data-accordion
     user checks accordion is in position    Explore data and files    1    id:data-accordion
 
@@ -358,9 +389,9 @@ Verify accordions are correct
     user checks accordion is in position    Test text    2    id:content
     user checks accordion is in position    Test embedded dashboard section    3    id:content
 
-    user checks there are x accordion sections    2    id:help-and-support
-    user checks accordion is in position    National statistics    1    id:help-and-support
-    user checks accordion is in position    Contact us    2    id:help-and-support
+    user checks there are x accordion sections    2    id:help-and-support-accordion
+    user checks accordion is in position    National statistics    1    id:help-and-support-accordion
+    user checks accordion is in position    Contact us    2    id:help-and-support-accordion
 
 Verify Dates data block accordion section
     user opens accordion section    Dates data block    id:content
@@ -405,10 +436,10 @@ Verify embedded dashboard accordion section contains dashboard
     user waits until parent contains element    ${section}    xpath:.//iframe[@title="Test embedded dashboard title"]
 
     select frame    xpath://iframe[@title="Test embedded dashboard title"]
-    user waits until h1 is visible    DfE Analytical Services R-Shiny data dashboard template (h1)    %{WAIT_SMALL}
+    user waits until h1 is visible    Explore Education Statistics service    %{WAIT_SMALL}
     unselect frame
 
-Return to Admin and Create amendment
+Return to Admin and create first amendment
     user navigates to admin dashboard    Bau1
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
 
@@ -423,7 +454,7 @@ Change the Release type
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user verifies release summary    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} summary
-    ...    Financial Year
+    ...    Financial year
     ...    3000-01
     ...    UI test contact name
     ...    Experimental statistics
@@ -606,6 +637,14 @@ Navigate to 'Content' page for amendment
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits until page contains button    Add a summary text block
 
+Update free text key stat
+    user updates free text key stat    1    Updated title    New stat    Updated trend
+    ...    Updated guidance title    Updated guidance text
+
+    user checks element count is x    testid:keyStat    1
+    user checks key stat contents    1    Updated title    New stat    Updated trend
+    user checks key stat guidance    1    Updated guidance title    Updated guidance text
+
 Verify amended Dates data block table has footnotes
     ${accordion}=    user opens accordion section    Dates data block    id:releaseMainContent
     ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
@@ -629,26 +668,48 @@ Update second accordion section text for amendment
     user adds content to autosaving accordion section text block    Test text    1    Amended test text!
     ...    id:releaseMainContent
 
-Update embedded dashboard title
-    user updates embedded dashboard in editable accordion section
+Update embedded dashboard title and url
+    user chooses to update an embedded URL in editable accordion section
     ...    Test embedded dashboard section
-    ...    Amended Test embedded dashboard title
-    ...    https://department-for-education.shinyapps.io/dfe-shiny-template/
     ...    id:releaseMainContent
+
+    ${modal}=    user updates embedded URL details in modal
+    ...    Amended Test embedded dashboard title
+    ...    https://google.com
+    ...    Edit embedded URL
+
+    user clicks button    Save    ${modal}
+    user waits until page contains    URL must be on a permitted domain
+
+    user updates embedded URL details in modal
+    ...    Amended Test embedded dashboard title
+    ...    https://dfe-analytical-services.github.io/explore-education-statistics/tests/robot-tests
+    ...    Edit embedded URL
+
+    user clicks button    Save    ${modal}
+    user waits until page does not contain    URL must be on a permitted domain
+    user waits until modal is not visible    Edit embedded URL
+
+    user waits until page contains element    xpath://iframe[@title="Amended Test embedded dashboard title"]
+    select frame    xpath://iframe[@title="Amended Test embedded dashboard title"]
+    user waits until h1 is visible    Explore Education Statistics Robot Framework tests    %{WAIT_SMALL}
+    unselect frame
 
     user closes accordion section    Test embedded dashboard section    id:releaseMainContent
 
-Add release note to amendment
+Add release note to first amendment
     user clicks button    Add note
     user enters text into element    id:createReleaseNoteForm-reason    Test release note one
     user clicks button    Save note
-    ${date}=    get current datetime    %-d %B %Y
+    ${date}=    get current datetime    ${DATE_FORMAT_MEDIUM}
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
 
-Update public prerelease access list for amendment
+Create public prerelease access list for amendment
     user clicks link    Pre-release access
-    user updates public prerelease access list    Amended public access list
+    user clicks link    Public access list
+    user waits until h2 is visible    Public pre-release access list
+    user creates public prerelease access list    Amended public access list
 
 Approve amendment for scheduled release
     ${days_until_release}=    set variable    1
@@ -666,12 +727,8 @@ Approve amendment for scheduled release
 
     user waits for scheduled release to be published immediately
 
-    ${publish_date_day}=    get current datetime    %-d
-    ${publish_date_month}=    get current datetime    %-m
-    ${publish_date_month_word}=    get current datetime    %B
-    ${publish_date_year}=    get current datetime    %Y
+    ${EXPECTED_PUBLISHED_DATE}=    get current datetime    ${DATE_FORMAT_MEDIUM}
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
-    ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
 
 Verify amendment is on Find Statistics page again
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
@@ -681,7 +738,7 @@ Navigate to amendment release page
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
     user waits until page contains title caption    ${RELEASE_NAME}
 
-    user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-%{RUN_IDENTIFIER}
+    user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-and-amend-%{RUN_IDENTIFIER}
 
     user checks breadcrumb count should be    3
     user checks nth breadcrumb contains    1    Home
@@ -690,11 +747,16 @@ Navigate to amendment release page
 
 Verify amendment is displayed as the latest release
     user checks page does not contain    View latest data:
-    user checks page does not contain    See other releases (1)
+    user checks page does not contain    View previous releases (1)
 
 Verify amendment is published
     user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
     user checks summary list contains    Next update    December 3001
+
+Verify amendment free text key stat is updated
+    user checks element count is x    testid:keyStat    1
+    user checks key stat contents    1    Updated title    New stat    Updated trend
+    user checks key stat guidance    1    Updated guidance title    Updated guidance text
 
 Verify amendment files
     user opens accordion section    Explore data and files
@@ -786,8 +848,8 @@ Verify amendment accordions are correct
     user checks accordion is in position    Dates data block    1    id:content
     user checks accordion is in position    Test text    2    id:content
     user checks accordion is in position    Test embedded dashboard section    3    id:content
-    user checks accordion is in position    Experimental statistics    1    id:help-and-support
-    user checks accordion is in position    Contact us    2    id:help-and-support
+    user checks accordion is in position    Experimental statistics    1    id:help-and-support-accordion
+    user checks accordion is in position    Contact us    2    id:help-and-support-accordion
 
 Verify amendment Dates data block accordion section
     user opens accordion section    Dates data block    id:content
@@ -840,23 +902,40 @@ Verify amendment embedded dashboard accordion section is correct
     ...    xpath:.//iframe[@title="Amended Test embedded dashboard title"]
     user closes accordion section    Test embedded dashboard section    id:content
 
-Check next release date can be updated
+Return to published release page in Admin
+    user navigates to admin dashboard    Bau1
+    user navigates to published release page from dashboard
+    ...    ${PUBLICATION_NAME}
+    ...    ${RELEASE_NAME}
+
+Override release published date to past date
+    ${release_id}=    get release id from url
+    ${published_override}=    Get Current Date    UTC    increment=-1000 days    result_format=datetime
+    user updates release published date via api    ${release_id}    ${published_override}
+    ${EXPECTED_PUBLISHED_DATE}=    format datetime    ${published_override}    ${DATE_FORMAT_MEDIUM}
+    set suite variable    ${EXPECTED_PUBLISHED_DATE}
+
+Verify published date on publication page is overriden with past date
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    ${row}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
+    user checks element contains    ${row}    ${EXPECTED_PUBLISHED_DATE}
+
+Verify public published date is overriden with past date
+    user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
+
+Return to Admin and create second amendment
     user navigates to admin dashboard    Bau1
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
-    user clicks link    Sign off
-    user clicks button    Edit release status
-    user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
-    user enters text into element    releaseStatusForm-nextReleaseDate-month    08
-    user enters text into element    id:releaseStatusForm-nextReleaseDate-year    4001
-    user clicks button    Update status
 
-Leave release note for amendment
+Add release note to second amendment
     user clicks link    Content
     user clicks button    Add note
-    user enters text into element    testid:comment-textarea    updated amendment
+    user enters text into element    id:createReleaseNoteForm-reason    Test release note two
     user clicks button    Save note
 
-Approve release amendment for scheduled publication
+Approve release amendment for scheduled publication and update published date
     ${days_until_release}=    set variable    2
     ${publish_date_day}=    get current datetime    %-d    ${days_until_release}
     ${publish_date_month}=    get current datetime    %-m    ${days_until_release}
@@ -865,18 +944,24 @@ Approve release amendment for scheduled publication
     ...    ${publish_date_day}
     ...    ${publish_date_month}
     ...    ${publish_date_year}
-    ...    8
-    ...    4001
+    ...    next_release_month=8
+    ...    next_release_year=4001
+    ...    update_amendment_published_date=${True}
     user waits for scheduled release to be published immediately
+    ${EXPECTED_PUBLISHED_DATE}=    get current datetime    ${DATE_FORMAT_MEDIUM}
+    set suite variable    ${EXPECTED_PUBLISHED_DATE}
 
-Save public release link for later use
-    user waits until page contains element    testid:public-release-url
-    ${PUBLIC_RELEASE_LINK}=    Get Value    xpath://*[@data-testid="public-release-url"]
-    check that variable is not empty    PUBLIC_RELEASE_LINK    ${PUBLIC_RELEASE_LINK}
-    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
+Verify published date on publication page has been updated
+    user navigates to publication page from dashboard    ${PUBLICATION_NAME}
+    ${row}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
+    user checks element contains    ${row}    ${EXPECTED_PUBLISHED_DATE}
 
 Navigate to amended public release
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
 
-Validate Next update date
+Verify public published date has been updated
+    user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
+
+Validate next update date
     user checks summary list contains    Next update    August 4001

@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import classNames from 'classnames';
+import formatPretty from '@common/utils/number/formatPretty';
 import styles from './KeyStatTile.module.scss';
 
 interface Props {
@@ -29,8 +30,8 @@ const KeyStatTile = ({
         {title}
       </TitleElement>
 
-      <p className="govuk-heading-xl" data-testid={`${testId}-value`}>
-        {value}
+      <p className="govuk-heading-xl" data-testid={`${testId}-statistic`}>
+        {formatPretty(value)}
       </p>
 
       {children}

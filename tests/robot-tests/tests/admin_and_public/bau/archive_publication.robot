@@ -12,11 +12,11 @@ Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
 ${PUBLICATION_NAME_ARCHIVE}=        UI tests - archived publication %{RUN_IDENTIFIER}
-${RELEASE_NAME_ARCHIVE}=            Financial Year 3000-01
+${RELEASE_NAME_ARCHIVE}=            Financial year 3000-01
 ${SUBJECT_NAME_ARCHIVE}=            Subject for archived publication
 
 ${PUBLICATION_NAME_SUPERSEDE}=      UI tests - superseding publication %{RUN_IDENTIFIER}
-${RELEASE_NAME_SUPERSEDE}=          Financial Year 2000-01
+${RELEASE_NAME_SUPERSEDE}=          Financial year 2000-01
 ${SUBJECT_NAME_SUPERSEDE}=          Subject for superseding publication
 
 

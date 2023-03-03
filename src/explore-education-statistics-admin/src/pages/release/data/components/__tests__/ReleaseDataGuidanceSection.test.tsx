@@ -22,7 +22,7 @@ describe('ReleaseDataGuidanceSection', () => {
         name: 'Subject 1',
         filename: 'subject-1.csv',
         content: '<p>Test subject 1 content</p>',
-        geographicLevels: ['Local Authority', 'National'],
+        geographicLevels: ['Local authority', 'National'],
         timePeriods: {
           from: '2018',
           to: '2019',
@@ -167,7 +167,7 @@ describe('ReleaseDataGuidanceSection', () => {
         'subject-1.csv',
       );
       expect(subject1.getByTestId('Geographic levels')).toHaveTextContent(
-        'Local Authority; National',
+        'Local authority; National',
       );
       expect(subject1.getByTestId('Time period')).toHaveTextContent(
         '2018 to 2019',
@@ -300,7 +300,7 @@ describe('ReleaseDataGuidanceSection', () => {
         'subject-1.csv',
       );
       expect(subject1.getByTestId('Geographic levels')).toHaveTextContent(
-        'Local Authority; National',
+        'Local authority; National',
       );
       expect(subject1.getByTestId('Time period')).toHaveTextContent(
         '2018 to 2019',
@@ -764,7 +764,7 @@ describe('ReleaseDataGuidanceSection', () => {
         'subject-1.csv',
       );
       expect(subject1.getByTestId('Geographic levels')).toHaveTextContent(
-        'Local Authority; National',
+        'Local authority; National',
       );
       expect(subject1.getByTestId('Time period')).toHaveTextContent(
         '2018 to 2019',

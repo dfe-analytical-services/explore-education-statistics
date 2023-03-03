@@ -83,6 +83,37 @@ export interface ReleaseNote {
   reason: string;
 }
 
+export interface KeyStatisticBase {
+  type: KeyStatisticType;
+  id: string;
+  trend?: string;
+  guidanceTitle?: string;
+  guidanceText?: string;
+  order: number;
+  created: string;
+  updated?: string;
+}
+
+export const KeyStatisticTypes = {
+  DataBlock: 'KeyStatisticDataBlock',
+  Text: 'KeyStatisticText',
+} as const;
+
+export type KeyStatisticType = typeof KeyStatisticTypes[keyof typeof KeyStatisticTypes];
+
+export interface KeyStatisticDataBlock extends KeyStatisticBase {
+  type: 'KeyStatisticDataBlock';
+  dataBlockId: string;
+}
+
+export interface KeyStatisticText extends KeyStatisticBase {
+  type: 'KeyStatisticText';
+  title: string;
+  statistic: string;
+}
+
+export type KeyStatistic = KeyStatisticDataBlock | KeyStatisticText;
+
 export interface ContentSection<BlockType> {
   id: string;
   order: number;
@@ -131,7 +162,7 @@ export interface Release<
   published: string;
   slug: string;
   summarySection: ContentSection<ContentBlockType>;
-  keyStatisticsSection: ContentSection<DataBlockType>;
+  keyStatistics: KeyStatistic[];
   keyStatisticsSecondarySection: ContentSection<DataBlockType>;
   headlinesSection: ContentSection<ContentBlockType>;
   relatedDashboardsSection?: ContentSection<ContentBlockType>; // optional because older releases may not have this section

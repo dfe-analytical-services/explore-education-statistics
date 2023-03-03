@@ -44,12 +44,13 @@ const testRelease: Release = {
   slug: 'release-slug-1',
   timePeriodCoverage: {
     value: 'AY',
-    label: 'Academic Year',
+    label: 'Academic year',
   },
   title: 'Release 1',
   type: 'AdHocStatistics',
   year: 2000,
   yearTitle: '2000/01',
+  updatePublishedDate: false,
 };
 
 const testPublicationContributors: UserReleaseRole[] = [

@@ -18,7 +18,7 @@ export type ReleaseContentContextDispatch = (
 export interface ReleaseContentContextState {
   release: EditableRelease;
   canUpdateRelease: boolean;
-  availableDataBlocks: DataBlock[];
+  unattachedDataBlocks: DataBlock[];
 }
 
 const ReleaseContentStateContext = createContext<
@@ -68,8 +68,8 @@ export const releaseReducer: Reducer<
   }
 
   switch (action.type) {
-    case 'SET_AVAILABLE_DATABLOCKS': {
-      draft.availableDataBlocks = action.payload;
+    case 'SET_UNATTACHED_DATABLOCKS': {
+      draft.unattachedDataBlocks = action.payload;
       return draft;
     }
     case 'REMOVE_SECTION_BLOCK': {
@@ -190,7 +190,6 @@ export const releaseReducer: Reducer<
 
       return draft;
     }
-
     case 'UPDATE_CONTENT_SECTION': {
       const { section, meta } = action.payload;
       const { sectionId } = meta;
@@ -204,6 +203,38 @@ export const releaseReducer: Reducer<
           draft.release.content[sectionIndex] = section;
         }
       }
+      return draft;
+    }
+    case 'ADD_KEY_STATISTIC': {
+      const { keyStatistic } = action.payload;
+      draft.release.keyStatistics.push(keyStatistic);
+      return draft;
+    }
+    case 'UPDATE_KEY_STATISTIC': {
+      const { keyStatistic } = action.payload;
+
+      const keyStatisticIndex = draft.release.keyStatistics.findIndex(
+        ks => ks.id === keyStatistic.id,
+      );
+
+      if (keyStatisticIndex !== -1) {
+        draft.release.keyStatistics[keyStatisticIndex] = keyStatistic;
+      }
+
+      return draft;
+    }
+    case 'REMOVE_KEY_STATISTIC': {
+      const { keyStatisticId } = action.payload;
+
+      draft.release.keyStatistics = draft.release.keyStatistics.filter(
+        ks => ks.id !== keyStatisticId,
+      );
+
+      return draft;
+    }
+    case 'SET_KEY_STATISTICS': {
+      const { keyStatistics } = action.payload;
+      draft.release.keyStatistics = keyStatistics;
       return draft;
     }
     default: {

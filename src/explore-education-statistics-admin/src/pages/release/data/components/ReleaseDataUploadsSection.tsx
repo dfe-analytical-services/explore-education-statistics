@@ -377,6 +377,12 @@ const ReleaseDataUploadsSection = ({
                           </ul>
                         </p>
                       )}
+                      {block.isKeyStatistic && (
+                        <p>
+                          A key statistic associated with this data block will
+                          also be removed.
+                        </p>
+                      )}
                     </li>
                   ),
                 )}

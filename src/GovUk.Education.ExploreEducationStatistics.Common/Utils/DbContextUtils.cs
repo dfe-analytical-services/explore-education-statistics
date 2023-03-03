@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
                 switch (e.Entry.Entity)
                 {
                     case ICreatedTimestamp<DateTime> entityWithCreated:
-                        if (entityWithCreated.Created == null)
+                        if (entityWithCreated.Created.Equals(default))
                         {
                             entityWithCreated.Created = now;
                         }
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
                         break;
 
                     case ICreatedTimestamp<DateTimeOffset> entityWithCreated:
-                        if (entityWithCreated.Created == null)
+                        if (entityWithCreated.Created.Equals(default))
                         {
                             entityWithCreated.Created = now;
                         }

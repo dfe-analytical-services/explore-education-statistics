@@ -144,7 +144,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureObservationFilterItem(modelBuilder);
             ConfigureObservationRowResultTempTable(modelBuilder);
             ConfigurePublication(modelBuilder);
-            ConfigureRelease(modelBuilder);
             ConfigureReleaseSubject(modelBuilder);
             ConfigureReleaseFootnote(modelBuilder);
             ConfigureSubject(modelBuilder);
@@ -292,14 +291,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .HasIndex(data => data.PublicationId);
         }
 
-        private static void ConfigureRelease(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Release>()
-                .Property(r => r.TimeIdentifier)
-                .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
-                .HasMaxLength(6);
-        }
-
         private static void ConfigureReleaseSubject(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ReleaseSubject>()
@@ -335,8 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
             modelBuilder.Entity<ReleaseFootnote>()
                 .HasOne(rf => rf.Release)
-                .WithMany(release => release.Footnotes)
-                .HasForeignKey(releaseFootnote => releaseFootnote.ReleaseId)
+                .WithMany()
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ReleaseFootnote>()
@@ -352,7 +342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .Property(data => data.Measures)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<Dictionary<Guid, string>>(v));
+                    v => JsonConvert.DeserializeObject<Dictionary<Guid, string>>(v)!);
         }
 
         private static void ConfigureTimePeriod(ModelBuilder modelBuilder)

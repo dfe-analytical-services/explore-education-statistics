@@ -475,7 +475,7 @@ describe('TableToolWizard', () => {
     });
   });
 
-  test('prevent progress to final step step if pre-selected indicators are not in the subject meta', async () => {
+  test('prevent progress to final step if pre-selected indicators are not in the subject meta', async () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     tableBuilderService.filterSubjectMeta.mockResolvedValue(testSubjectMeta);
 

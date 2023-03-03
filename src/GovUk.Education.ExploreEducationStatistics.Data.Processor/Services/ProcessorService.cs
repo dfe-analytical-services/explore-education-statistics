@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -85,8 +85,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var metaFileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
 
-            var metaFileCsvHeaders = await CsvUtil.GetCsvHeaders(metaFileStreamProvider);
-            var metaFileCsvRows = await CsvUtil.GetCsvRows(metaFileStreamProvider);
+            var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
+            var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
 
             await _importerService.ImportMeta(metaFileCsvHeaders, metaFileCsvRows, subject, statisticsDbContext);
             await _fileImportService.ImportFiltersAndLocations(import.Id, statisticsDbContext);

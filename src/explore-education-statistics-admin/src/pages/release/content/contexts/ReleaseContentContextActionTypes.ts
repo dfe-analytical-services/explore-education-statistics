@@ -3,13 +3,16 @@ import {
   EditableBlock,
   EditableContentBlock,
 } from '@admin/services/types/content';
-import { ContentSection, Release } from '@common/services/publicationService';
+import {
+  ContentSection,
+  KeyStatistic,
+  Release,
+} from '@common/services/publicationService';
 import { DataBlock } from '@common/services/types/blocks';
 
 export type ContentSectionKeys = keyof Pick<
   Release<EditableContentBlock>,
   | 'summarySection'
-  | 'keyStatisticsSection'
   | 'keyStatisticsSecondarySection'
   | 'headlinesSection'
   | 'relatedDashboardsSection'
@@ -24,8 +27,8 @@ export interface BlockMeta {
 
 type SectionMeta = Omit<BlockMeta, 'blockId'>;
 
-type SetAvailableDataBlocks = {
-  type: 'SET_AVAILABLE_DATABLOCKS';
+export type SetUnattachedDataBlocks = {
+  type: 'SET_UNATTACHED_DATABLOCKS';
   payload: DataBlock[];
 };
 
@@ -106,15 +109,39 @@ export type RemoveBlockComment = {
   };
 };
 
+export type AddKeyStatistic = {
+  type: 'ADD_KEY_STATISTIC';
+  payload: { keyStatistic: KeyStatistic };
+};
+
+export type UpdateKeyStatistic = {
+  type: 'UPDATE_KEY_STATISTIC';
+  payload: { keyStatistic: KeyStatistic };
+};
+
+export type RemoveKeyStatistic = {
+  type: 'REMOVE_KEY_STATISTIC';
+  payload: { keyStatisticId: string };
+};
+
+export type SetKeyStatistics = {
+  type: 'SET_KEY_STATISTICS';
+  payload: { keyStatistics: KeyStatistic[] };
+};
+
 export type ReleaseDispatchAction =
   | AddBlockComment
   | AddSectionBlock
   | AddContentSection
-  | SetAvailableDataBlocks
+  | AddKeyStatistic
+  | SetUnattachedDataBlocks
   | SetReleaseContent
+  | SetKeyStatistics
   | RemoveBlockComment
   | RemoveSectionBlock
+  | RemoveKeyStatistic
   | UpdateBlockComment
   | UpdateSectionBlock
   | UpdateContentSection
-  | UpdateSectionContent;
+  | UpdateSectionContent
+  | UpdateKeyStatistic;

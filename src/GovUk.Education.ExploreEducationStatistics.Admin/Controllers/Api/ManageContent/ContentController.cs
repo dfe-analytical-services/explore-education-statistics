@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Manag
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,15 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             _contentService = contentService;
         }
 
-        [HttpGet("release/{releaseId}/content/sections")]
-        public async Task<ActionResult<List<ContentSectionViewModel>>> GetContentSections(Guid releaseId)
-        {
-            return await _contentService
-                .GetContentSections(releaseId)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPut("release/{releaseId}/content/sections/order")]
+        [HttpPut("release/{releaseId:guid}/content/sections/order")]
         public async Task<ActionResult<List<ContentSectionViewModel>>> ReorderSections(
             Guid releaseId, Dictionary<Guid, int> newSectionOrder)
         {
@@ -40,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId}/content/sections/add")]
+        [HttpPost("release/{releaseId:guid}/content/sections/add")]
         public async Task<ActionResult<ContentSectionViewModel>> AddContentSection(
             Guid releaseId, ContentSectionAddRequest request = null)
         {
@@ -49,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("release/{releaseId}/content/section/{contentSectionId}/heading")]
+        [HttpPut("release/{releaseId:guid}/content/section/{contentSectionId:guid}/heading")]
         public async Task<ActionResult<ContentSectionViewModel>> UpdateContentSectionHeading(
             Guid releaseId, Guid contentSectionId, ContentSectionHeadingUpdateRequest request)
         {
@@ -58,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("release/{releaseId}/content/section/{contentSectionId}")]
+        [HttpDelete("release/{releaseId:guid}/content/section/{contentSectionId:guid}")]
         public async Task<ActionResult<List<ContentSectionViewModel>>> RemoveContentSection(
             Guid releaseId, Guid contentSectionId)
         {
@@ -67,15 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId}/content/section/{contentSectionId}")]
-        public async Task<ActionResult<ContentSectionViewModel>> GetContentSection(Guid releaseId, Guid contentSectionId)
-        {
-            return await _contentService
-                .GetContentSection(releaseId, contentSectionId)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPut("release/{releaseId}/content/section/{contentSectionId}/blocks/order")]
+        [HttpPut("release/{releaseId:guid}/content/section/{contentSectionId:guid}/blocks/order")]
         public async Task<ActionResult<List<IContentBlockViewModel>>> ReorderContentBlocks(
             Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
         {
@@ -84,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId}/content/section/{contentSectionId}/blocks/add")]
+        [HttpPost("release/{releaseId:guid}/content/section/{contentSectionId:guid}/blocks/add")]
         public async Task<ActionResult<IContentBlockViewModel>> AddContentBlock(
             Guid releaseId, Guid contentSectionId, ContentBlockAddRequest request)
         {
@@ -93,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}")]
+        [HttpDelete("release/{releaseId:guid}/content/section/{contentSectionId:guid}/block/{contentBlockId:guid}")]
         public async Task<ActionResult<List<IContentBlockViewModel>>> RemoveContentBlock(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId)
         {
@@ -102,16 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("release/{releaseId}/content/section/{contentSectionId}/data-block/{contentBlockId}")]
-        public async Task<ActionResult<DataBlockViewModel>> UpdateDataBlock(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId, DataBlockUpdateRequest request)
-        {
-            return await _contentService
-                .UpdateDataBlock(releaseId, contentSectionId, contentBlockId, request)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPut("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}")]
+        [HttpPut("release/{releaseId:guid}/content/section/{contentSectionId:guid}/block/{contentBlockId:guid}")]
         public async Task<ActionResult<IContentBlockViewModel>> UpdateTextBasedContentBlock(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request)
         {
@@ -120,15 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId}/content/available-datablocks")]
-        public async Task<ActionResult<List<DataBlock>>> GetAvailableDataBlocks(Guid releaseId)
-        {
-            return await _contentService
-                .GetUnattachedContentBlocks<DataBlock>(releaseId)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPost("release/{releaseId}/content/section/{contentSectionId}/blocks/attach")]
+        [HttpPost("release/{releaseId:guid}/content/section/{contentSectionId:guid}/blocks/attach")]
         public async Task<ActionResult<IContentBlockViewModel>> AttachDataBlock(
             Guid releaseId, Guid contentSectionId, ContentBlockAttachRequest request)
         {

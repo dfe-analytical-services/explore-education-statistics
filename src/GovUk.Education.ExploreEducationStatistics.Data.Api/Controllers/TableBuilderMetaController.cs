@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
@@ -25,23 +24,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     public class TableBuilderMetaController : ControllerBase
     {
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
-        private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
+        private readonly IReleaseSubjectService _releaseSubjectService;
         private readonly ISubjectMetaService _subjectMetaService;
 
         public TableBuilderMetaController(
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
-            IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
+            IReleaseSubjectService releaseSubjectService,
             ISubjectMetaService subjectMetaService)
         {
             _contentPersistenceHelper = contentPersistenceHelper;
-            _statisticsPersistenceHelper = statisticsPersistenceHelper;
+            _releaseSubjectService = releaseSubjectService;
             _subjectMetaService = subjectMetaService;
         }
 
         [HttpGet("meta/subject/{subjectId:guid}")]
         public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
         {
-            return CheckReleaseSubjectExists(subjectId)
+            return _releaseSubjectService.Find(subjectId)
                 .OnSuccess(GetCacheableReleaseSubject)
                 .OnSuccess(GetSubjectMeta)
                 .HandleFailuresOrOk();
@@ -50,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("release/{releaseId:guid}/meta/subject/{subjectId:guid}")]
         public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(Guid releaseId, Guid subjectId)
         {
-            return CheckReleaseSubjectExists(subjectId, releaseId)
+            return _releaseSubjectService.Find(releaseId: releaseId, subjectId: subjectId)
                 .OnSuccess(GetCacheableReleaseSubject)
                 .OnSuccess(GetSubjectMeta)
                 .HandleFailuresOrOk();
@@ -90,18 +89,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         {
             return _subjectMetaService.FilterSubjectMeta(releaseId, query, cancellationToken)
                 .HandleFailuresOrOk();
-        }
-
-        private async Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid subjectId,
-            Guid? releaseId = null)
-        {
-            return releaseId.HasValue
-                ? await _statisticsPersistenceHelper.CheckEntityExists<ReleaseSubject>(
-                    query => query
-                        .Where(rs => rs.ReleaseId == releaseId && rs.SubjectId == subjectId)
-                )
-                : await _subjectMetaService.GetReleaseSubjectForLatestPublishedVersion(subjectId) ??
-                  new Either<ActionResult, ReleaseSubject>(new NotFoundResult());
         }
     }
 }

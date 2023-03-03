@@ -25,4 +25,5 @@ export const testRelease: Release = {
   },
   previousVersionId: '',
   preReleaseAccessList: '',
+  updatePublishedDate: false,
 };

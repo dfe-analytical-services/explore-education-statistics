@@ -5,11 +5,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
@@ -106,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public static MetaRow GetMetaRow(List<string> cols, List<string> rowValues)
         {
-            return CsvUtil.BuildType(
+            return CsvUtils.BuildType(
                 rowValues, 
                 cols, 
                 Enum.GetNames(typeof(MetaColumns)), 

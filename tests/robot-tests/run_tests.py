@@ -180,6 +180,7 @@ required_env_vars = [
     "IDENTITY_PROVIDER",
     "WAIT_MEMORY_CACHE_EXPIRY",
     "EXPIRED_INVITE_USER_EMAIL",
+    "PUBLISHER_FUNCTIONS_URL",
 ]
 
 for env_var in required_env_vars:

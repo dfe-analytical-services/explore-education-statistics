@@ -338,7 +338,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(new List<Location>());
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
-                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -617,7 +617,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(new List<Location>());
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
-                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -1039,7 +1039,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
-                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>
                 {
                     (2019, CalendarYear),
                     (2020, CalendarYear)
@@ -1271,7 +1271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
-                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>
                 {
                     (2019, CalendarYear),
                     (2020, CalendarYear)
@@ -1528,7 +1528,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
-                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>
                 {
                     (2019, CalendarYear),
                     (2020, CalendarYear)
@@ -1761,7 +1761,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
-                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>
                 {
                     (2019, CalendarYear),
                     (2020, CalendarYear)
@@ -2158,7 +2158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
-                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>
                 {
                     (2019, CalendarYear),
                     (2020, CalendarYear)
@@ -2548,7 +2548,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(new List<Location>());
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
-                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -3001,7 +3001,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
-                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>
                 {
                     (2019, CalendarYear),
                     (2020, CalendarYear)
@@ -3417,7 +3417,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(new List<Location>());
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
-                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             mocks.ReleaseService.Setup(service => service.RemoveDataFiles(
                 contentRelease.Id, originalFile.Id)).ReturnsAsync(Unit.Instance);
@@ -3632,7 +3632,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(new List<Location>());
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
-                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             mocks.ReleaseService.Setup(service => service.RemoveDataFiles(
                 contentRelease.Id, originalFile.Id)).ReturnsAsync(Unit.Instance);

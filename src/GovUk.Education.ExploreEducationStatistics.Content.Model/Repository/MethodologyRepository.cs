@@ -21,7 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         public async Task<List<Methodology>> GetByPublication(Guid publicationId)
         {
             return await _contentDbContext.PublicationMethodologies
-                .AsQueryable()
                 .Where(pm => pm.PublicationId == publicationId)
                 .Select(pm => pm.Methodology)
                 .ToListAsync();

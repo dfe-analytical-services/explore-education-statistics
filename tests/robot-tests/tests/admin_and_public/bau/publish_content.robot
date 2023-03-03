@@ -12,7 +12,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - publish content %{RUN_IDENTIFIER}
-${RELEASE_NAME}=        Calendar Year 2001
+${RELEASE_NAME}=        Calendar year 2001
 
 
 *** Test Cases ***
@@ -86,12 +86,12 @@ Check latest release contains related dashboards section
     user checks accordion is in position    View related dashboard(s)    2    id:data-accordion
     user checks element contains    id:related-dashboards-content    Related dashboards test text
 
-Check data downloads navigation contains link to related dashboards
-    user checks element contains link    testid:data-downloads    View related dashboard(s)
+Check quick links navigation contains link to related dashboards
+    user checks element contains link    testid:quick-links    View related dashboard(s)
 
 Check related dashboard link opens accordion section
     user verifies accordion is closed    View related dashboard(s)
-    user clicks link    View related dashboard(s)    testid:data-downloads
+    user clicks link    View related dashboard(s)    testid:quick-links
     user verifies accordion is open    View related dashboard(s)
     user closes accordion section    View related dashboard(s)    id:data-accordion
 

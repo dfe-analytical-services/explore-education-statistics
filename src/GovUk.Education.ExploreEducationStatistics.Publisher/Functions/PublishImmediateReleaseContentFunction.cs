@@ -2,7 +2,6 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -21,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
         public PublishImmediateReleaseContentFunction(
             IContentService contentService,
-            IReleasePublishingStatusService releasePublishingStatusService, 
+            IReleasePublishingStatusService releasePublishingStatusService,
             IPublishingCompletionService publishingCompletionService)
         {
             _contentService = contentService;
@@ -40,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         /// <param name="executionContext"></param>
         /// <param name="logger"></param>
         /// <returns></returns>
-        [FunctionName("PublishReleaseContent")]
+        [FunctionName("PublishImmediateReleaseContent")]
         // ReSharper disable once UnusedMember.Global
         public async Task PublishImmediateReleaseContent(
             [QueueTrigger(PublishReleaseContentQueue)]
@@ -51,18 +50,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             logger.LogInformation("{FunctionName} triggered at: {DateTime}",
                 executionContext.FunctionName,
                 DateTime.UtcNow);
-            
-            var context = new PublishContext(DateTime.UtcNow, false);
 
             try
             {
                 await UpdateContentStage(message.ReleaseId, message.ReleaseStatusId, Started);
-                await _contentService.UpdateContent(context, message.ReleaseId);
+                await _contentService.UpdateContent(message.ReleaseId);
                 await UpdateContentStage(message.ReleaseId, message.ReleaseStatusId, Complete);
-                
+
                 await _publishingCompletionService.CompletePublishingIfAllPriorStagesComplete(
-                    ListOf((message.ReleaseId, message.ReleaseStatusId)), 
-                    context.Published);
+                    ListOf((message.ReleaseId, message.ReleaseStatusId)));
             }
             catch (Exception e)
             {
@@ -77,8 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         private async Task UpdateContentStage(
-            Guid releaseId, 
-            Guid releaseStatusId, 
+            Guid releaseId,
+            Guid releaseStatusId,
             ReleasePublishingStatusContentStage state,
             ReleasePublishingStatusLogMessage? logMessage = null)
         {

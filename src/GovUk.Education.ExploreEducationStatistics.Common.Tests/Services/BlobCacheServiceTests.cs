@@ -84,7 +84,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
             blobStorageService.Setup(mock =>
-                    mock.GetDeserializedJson(PublicContent, cacheKey.Key, typeof(SampleClass)))
+                    mock.GetDeserializedJson(
+                        PublicContent, cacheKey.Key, typeof(SampleClass), default))
                 .ReturnsAsync(entity);
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
@@ -105,7 +106,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
             blobStorageService.Setup(mock =>
-                    mock.GetDeserializedJson(PublicContent, cacheKey.Key, typeof(SampleClass)))
+                    mock.GetDeserializedJson(
+                        PublicContent, cacheKey.Key, typeof(SampleClass), default))
                 .ThrowsAsync(new JsonException("Could not deserialize"));
 
 
@@ -130,7 +132,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
             blobStorageService.Setup(mock =>
-                    mock.GetDeserializedJson(PublicContent, cacheKey.Key, typeof(SampleClass)))
+                    mock.GetDeserializedJson(
+                        PublicContent, cacheKey.Key, typeof(SampleClass), default))
                 .ThrowsAsync(new FileNotFoundException());
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
@@ -150,7 +153,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
             blobStorageService.Setup(mock =>
-                    mock.GetDeserializedJson(PublicContent, cacheKey.Key, typeof(SampleClass)))
+                    mock.GetDeserializedJson(
+                        PublicContent, cacheKey.Key, typeof(SampleClass), default))
                 .ThrowsAsync(new Exception("Something went wrong"));
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);

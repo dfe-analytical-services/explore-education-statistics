@@ -110,11 +110,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 timePeriodService
                     .Setup(s => s.GetTimePeriodLabels(releaseSubject1.SubjectId))
-                    .Returns(new TimePeriodLabels("2020/21", "2021/22"));
+                    .ReturnsAsync(new TimePeriodLabels("2020/21", "2021/22"));
 
                 timePeriodService
                     .Setup(s => s.GetTimePeriodLabels(releaseSubject2.SubjectId))
-                    .Returns(new TimePeriodLabels("2030", "2031"));
+                    .ReturnsAsync(new TimePeriodLabels("2030", "2031"));
 
                 dataGuidanceSubjectService
                     .Setup(s => s.GetGeographicLevels(releaseSubject1.SubjectId))

@@ -63,19 +63,19 @@ describe('DataCataloguePage', () => {
       id: 'release-3',
       latestRelease: true,
       slug: 'release-3-slug',
-      title: 'Academic Year 2021/22',
+      title: 'Academic year 2021/22',
     } as ReleaseSummary,
     {
       id: 'release-2',
       latestRelease: false,
       slug: 'release-2-slug',
-      title: 'Academic Year 2020/21',
+      title: 'Academic year 2020/21',
     } as ReleaseSummary,
     {
       id: 'release-1',
       latestRelease: false,
       slug: 'release-1-slug',
-      title: 'Academic Year 2019/20',
+      title: 'Academic year 2019/20',
     } as ReleaseSummary,
   ];
 
@@ -226,20 +226,20 @@ describe('DataCataloguePage', () => {
     expect(releaseRadios).toHaveLength(3);
 
     expect(releaseRadios[0]).toEqual(
-      step2.getByLabelText('Academic Year 2021/22'),
+      step2.getByLabelText('Academic year 2021/22'),
     );
 
     expect(
       within(
-        screen.getByTestId('Radio item for Academic Year 2021/22'),
+        screen.getByTestId('Radio item for Academic year 2021/22'),
       ).getByText('This is the latest data'),
     );
 
     expect(releaseRadios[1]).toEqual(
-      step2.getByLabelText('Academic Year 2020/21'),
+      step2.getByLabelText('Academic year 2020/21'),
     );
     expect(releaseRadios[2]).toEqual(
-      step2.getByLabelText('Academic Year 2019/20'),
+      step2.getByLabelText('Academic year 2019/20'),
     );
 
     userEvent.click(releaseRadios[0]);
@@ -421,13 +421,13 @@ describe('DataCataloguePage', () => {
     const releaseRadios = step2.getAllByRole('radio');
     expect(releaseRadios).toHaveLength(3);
     expect(releaseRadios[0]).toEqual(
-      step2.getByLabelText('Academic Year 2021/22'),
+      step2.getByLabelText('Academic year 2021/22'),
     );
     expect(releaseRadios[1]).toEqual(
-      step2.getByLabelText('Academic Year 2020/21'),
+      step2.getByLabelText('Academic year 2020/21'),
     );
     expect(releaseRadios[2]).toEqual(
-      step2.getByLabelText('Academic Year 2019/20'),
+      step2.getByLabelText('Academic year 2019/20'),
     );
   });
 

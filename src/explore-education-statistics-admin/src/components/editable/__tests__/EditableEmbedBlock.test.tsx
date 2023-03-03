@@ -1,9 +1,16 @@
 import EditableEmbedBlock from '@admin/components/editable/EditableEmbedBlock';
 import { EmbedBlock } from '@common/services/types/blocks';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import {
+  render as baseRender,
+  RenderResult,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React from 'react';
+import React, { ReactNode } from 'react';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 
 describe('EditableEmbedBlock', () => {
   const testEmbedBlock: EmbedBlock = {
@@ -148,4 +155,10 @@ describe('EditableEmbedBlock', () => {
       expect(handleDelete).toHaveBeenCalled();
     });
   });
+
+  function render(child: ReactNode): RenderResult {
+    return baseRender(
+      <TestConfigContextProvider>{child}</TestConfigContextProvider>,
+    );
+  }
 });

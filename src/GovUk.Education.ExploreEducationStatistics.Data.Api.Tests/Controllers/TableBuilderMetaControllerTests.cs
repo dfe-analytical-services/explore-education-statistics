@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
@@ -71,8 +70,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .Setup(s => s.SetItem<object>(cacheKey, subjectMetaViewModel))
                 .Returns(Task.CompletedTask);
 
-            mocks.subjectMetaService
-                .Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(SubjectId))
+            mocks.releaseSubjectService
+                .Setup(mock => mock.Find(SubjectId, null))
                 .ReturnsAsync(releaseSubject);
 
             mocks.subjectMetaService
@@ -111,7 +110,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var (controller, mocks) = BuildControllerAndMocks();
 
             SetupCall(mocks.contentPersistenceHelper, ReleaseId, contentRelease);
-            SetupCall(mocks.statisticsPersistenceHelper, releaseSubject);
 
             mocks.cacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(SubjectMetaViewModel)))
@@ -120,6 +118,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             mocks.cacheService
                 .Setup(s => s.SetItem<object>(cacheKey, subjectMetaViewModel))
                 .Returns(Task.CompletedTask);
+
+            mocks.releaseSubjectService
+                .Setup(s => s.Find(SubjectId, ReleaseId))
+                .ReturnsAsync(releaseSubject);
 
             mocks.subjectMetaService
                 .Setup(s => s.GetSubjectMeta(releaseSubject))
@@ -136,9 +138,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         {
             var (controller, mocks) = BuildControllerAndMocks();
 
-            mocks.subjectMetaService
-                .Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(SubjectId))
-                .ReturnsAsync((ReleaseSubject?) null);
+            mocks.releaseSubjectService
+                .Setup(mock => mock.Find(SubjectId, null))
+                .ReturnsAsync(new NotFoundResult());
 
             var result = await controller.GetSubjectMeta(SubjectId);
             VerifyAllMocks(mocks);
@@ -151,11 +153,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         {
             var (controller, mocks) = BuildControllerAndMocks();
 
-            mocks.statisticsPersistenceHelper
-                .Setup(mock => mock.CheckEntityExists(
-                        It.IsAny<Func<IQueryable<ReleaseSubject>, IQueryable<ReleaseSubject>>>()
-                    )
-                )
+            mocks.releaseSubjectService
+                .Setup(mock => mock.Find(SubjectId, ReleaseId))
                 .ReturnsAsync(new NotFoundResult());
 
             var result = await controller.GetSubjectMeta(ReleaseId, SubjectId);
@@ -205,26 +204,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             return new SubjectMetaCacheKey(release.Publication.Slug, release.Slug, releaseSubject.SubjectId);
         }
 
-        private static (TableBuilderMetaController controller,
-            (
+        private static (TableBuilderMetaController controller, (
             Mock<IPersistenceHelper<ContentDbContext>> contentPersistenceHelper,
-            Mock<IPersistenceHelper<StatisticsDbContext>> statisticsPersistenceHelper,
+            Mock<IReleaseSubjectService> releaseSubjectService,
             Mock<ISubjectMetaService> subjectMetaService,
             Mock<IBlobCacheService> cacheService) mocks)
             BuildControllerAndMocks()
         {
             var contentPersistenceHelper = MockPersistenceHelper<ContentDbContext>();
-            var statisticsPersistenceHelper = MockPersistenceHelper<StatisticsDbContext>();
+            var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
             var subjectMetaService = new Mock<ISubjectMetaService>(Strict);
 
             var controller = new TableBuilderMetaController(
                 contentPersistenceHelper.Object,
-                statisticsPersistenceHelper.Object,
+                releaseSubjectService.Object,
                 subjectMetaService.Object);
 
             return (controller, (
                 contentPersistenceHelper,
-                statisticsPersistenceHelper,
+                releaseSubjectService,
                 subjectMetaService,
                 BlobCacheService));
         }

@@ -56,23 +56,29 @@
     "storageAccountPrefix": {
       "value": "sa"
     },
-    "minCapacityStatisticsDb": {
-      "value": "4"
+    "skuContentDb": {
+      "value": "GP_S_Gen5"
     },
-    "maxCapacityStatisticsDb": {
-      "value": 10
+    "tierContentDb": {
+      "value": "GeneralPurpose"
     },
-    "autoPauseDelayStatisticsDb": {
-      "value": -1
+    "capacityContentDb": {
+      "value": 4
     },
     "minCapacityContentDb": {
-      "value": "2"
+      "value": "0.5"
     },
-    "maxCapacityContentDb": {
-      "value": 6
+    "skuStatisticsDb": {
+      "value": "GP_S_Gen5"
     },
-    "autoPauseDelayContentDb": {
-      "value": -1
+    "tierStatisticsDb": {
+      "value": "GeneralPurpose"
+    },
+    "capacityStatisticsDb": {
+      "value": 10
+    },
+    "minCapacityStatisticsDb": {
+      "value": "4"
     },
     "enableAlerts": {
       "value": true

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
 {
@@ -38,6 +39,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
             {
                 return _propertyGetter.Invoke(obj).GetHashCode();
             }
+        }
+
+        public static bool SequencesAreEqualIgnoringOrder<T>(IEnumerable<T> left, IEnumerable<T> right)
+            where T : IComparable
+        {
+            return left.OrderBy(id => id).SequenceEqual(right.OrderBy(id => id));
         }
     }
 }

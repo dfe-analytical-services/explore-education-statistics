@@ -16,10 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         IncorrectContentBlockTypeForUpdate,
         ContentBlockAlreadyAttachedToContentSection,
         IncorrectContentBlockTypeForAttach,
-        ContentBlockAlreadyDetached,
-        ContentBlockNotAttachedToThisContentSection,
         ContentSectionNotAttachedToRelease,
         ContentBlockNotAttachedToRelease,
+        EmbedBlockUrlDomainNotPermitted,
 
         // User Management
         UserAlreadyExists,
@@ -89,6 +88,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         PublishDateCannotBeEmpty,
         PublishDateCannotBeScheduled,
 
+        // Release update
+        ReleasePublishedCannotBeFutureDate,
+        ReleaseNotPublished,
+
         // Release checklist errors
         DataFileImportsMustBeCompleted,
         DataFileReplacementsMustBeCompleted,
@@ -106,6 +109,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
         // Footnotes
         FootnotesDifferFromReleaseFootnotes,
+
+        // Key statistics
+        DataBlockShouldBeUnattached,
+        ProvidedKeyStatIdsDifferFromReleaseKeyStatIds,
 
         // TODO EES-3755 Remove after Permalink snapshot migration work is complete
         NullMessageCountForPermalinksMigrationQueue,

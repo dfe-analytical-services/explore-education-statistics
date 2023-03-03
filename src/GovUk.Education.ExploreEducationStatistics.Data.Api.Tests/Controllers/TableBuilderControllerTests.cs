@@ -364,7 +364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             viewModel.Configuration.AssertDeepEqualTo(TableConfiguration);
             viewModel.FullTable.AssertDeepEqualTo(_tableBuilderResults);
             Assert.True(viewModel.LatestData);
-            Assert.Equal("Academic Year 2020/21", viewModel.LatestReleaseTitle);
+            Assert.Equal("Academic year 2020/21", viewModel.LatestReleaseTitle);
 
             var queryViewModel = viewModel.Query;
             Assert.NotNull(queryViewModel);
@@ -448,7 +448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             Assert.Equal(ReleaseId, viewModel.ReleaseId);
             Assert.Equal("2020-21", viewModel.ReleaseSlug);
             Assert.False(viewModel.LatestData);
-            Assert.Equal("Academic Year 2021/22", viewModel.LatestReleaseTitle);
+            Assert.Equal("Academic year 2021/22", viewModel.LatestReleaseTitle);
         }
 
         private WebApplicationFactory<TestStartup> SetupApp(

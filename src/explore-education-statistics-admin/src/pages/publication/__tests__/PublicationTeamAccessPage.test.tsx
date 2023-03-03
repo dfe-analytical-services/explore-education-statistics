@@ -378,15 +378,15 @@ describe('PublicationTeamAccessPage', () => {
     expect(releaseSelect).toHaveValue('release-1');
     const releases = within(releaseSelect).queryAllByRole('option');
     expect(releases).toHaveLength(3);
-    expect(releases[0]).toHaveTextContent('Academic Year 2023/24');
+    expect(releases[0]).toHaveTextContent('Academic year 2023/24');
     expect(releases[0]).toHaveValue('release-1');
-    expect(releases[1]).toHaveTextContent('Academic Year 2022/23');
+    expect(releases[1]).toHaveTextContent('Academic year 2022/23');
     expect(releases[1]).toHaveValue('release-2');
-    expect(releases[2]).toHaveTextContent('Academic Year 2021/22');
+    expect(releases[2]).toHaveTextContent('Academic year 2021/22');
     expect(releases[2]).toHaveValue('release-3');
 
     expect(screen.getByTestId('Release')).toHaveTextContent(
-      'Academic Year 2023/24 (Not live)',
+      'Academic year 2023/24 (Not live)',
     );
     expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
 
@@ -451,15 +451,15 @@ describe('PublicationTeamAccessPage', () => {
     expect(releaseSelect).toHaveValue('release-1');
     const releases = within(releaseSelect).queryAllByRole('option');
     expect(releases).toHaveLength(3);
-    expect(releases[0]).toHaveTextContent('Academic Year 2023/24');
+    expect(releases[0]).toHaveTextContent('Academic year 2023/24');
     expect(releases[0]).toHaveValue('release-1');
-    expect(releases[1]).toHaveTextContent('Academic Year 2022/23');
+    expect(releases[1]).toHaveTextContent('Academic year 2022/23');
     expect(releases[1]).toHaveValue('release-2');
-    expect(releases[2]).toHaveTextContent('Academic Year 2021/22');
+    expect(releases[2]).toHaveTextContent('Academic year 2021/22');
     expect(releases[2]).toHaveValue('release-3');
 
     expect(screen.getByTestId('Release')).toHaveTextContent(
-      'Academic Year 2023/24 (Not live)',
+      'Academic year 2023/24 (Not live)',
     );
     expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
 
@@ -557,7 +557,7 @@ describe('PublicationTeamAccessPage', () => {
 
     expect(screen.getByLabelText('Select release')).toHaveValue('release-3');
     expect(screen.getByTestId('Release')).toHaveTextContent(
-      'Academic Year 2021/22',
+      'Academic year 2021/22',
     );
     expect(screen.getByTestId('Status')).toHaveTextContent('Approved');
   });
@@ -582,7 +582,7 @@ describe('PublicationTeamAccessPage', () => {
 
     expect(screen.getByLabelText('Select release')).toHaveValue('release-1');
     expect(screen.getByTestId('Release')).toHaveTextContent(
-      'Academic Year 2023/24 (Not live)',
+      'Academic year 2023/24 (Not live)',
     );
     expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
 
@@ -613,7 +613,7 @@ describe('PublicationTeamAccessPage', () => {
 
     expect(screen.getByLabelText('Select release')).toHaveValue('release-1');
     expect(screen.getByTestId('Release')).toHaveTextContent(
-      'Academic Year 2023/24 (Not live)',
+      'Academic year 2023/24 (Not live)',
     );
     expect(screen.getByTestId('Status')).toHaveTextContent('Draft');
 
@@ -630,7 +630,7 @@ describe('PublicationTeamAccessPage', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('Release')).toHaveTextContent(
-        'Academic Year 2022/23 (Not live)',
+        'Academic year 2022/23 (Not live)',
       );
     });
     expect(screen.getByTestId('Status')).toHaveTextContent('Draft');

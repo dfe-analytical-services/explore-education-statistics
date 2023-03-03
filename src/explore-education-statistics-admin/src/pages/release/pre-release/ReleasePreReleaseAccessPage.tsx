@@ -39,55 +39,53 @@ const ReleasePreReleaseAccessPage = () => {
     <LoadingSpinner loading={isLoading}>
       {release && (
         <Tabs id="preReleaseAccess">
-          {!release.amendment && (
-            <TabsSection
-              id={releasePreReleaseAccessPageTabs.users}
-              title="Pre-release users"
-            >
-              <h2>Manage pre-release user access</h2>
-              <InsetText>
-                <h3>Before you start</h3>
+          <TabsSection
+            id={releasePreReleaseAccessPageTabs.users}
+            title="Pre-release users"
+          >
+            <h2>Manage pre-release user access</h2>
+            <InsetText>
+              <h3>Before you start</h3>
+              <p>
+                Pre-release users will receive an email with a link to preview
+                the publication for pre-release as soon as you add them. The
+                preview will show a holding page until 24 hours before the
+                scheduled publication date.
+              </p>
+              <p>
+                Pre-release access via Explore Education Statistics is currently
+                limited to DFE users only, if you need to share your release
+                with external users you will need to do so outside of the
+                system.
+              </p>
+            </InsetText>
+
+            {!release.live && (
+              <>
                 <p>
-                  Pre-release users will receive an email with a link to preview
-                  the publication for pre-release as soon as you add them. The
-                  preview will show a holding page until 24 hours before the
-                  scheduled publication date.
+                  The <strong>pre-release</strong> will be accessible at:
                 </p>
+
                 <p>
-                  Pre-release access via Explore Education Statistics is
-                  currently limited to DFE users only, if you need to share your
-                  release with external users you will need to do so outside of
-                  the system.
+                  <UrlContainer
+                    data-testid="prerelease-url"
+                    url={`${window.location.origin}${generatePath<
+                      ReleaseRouteParams
+                    >(preReleaseContentRoute.path, {
+                      publicationId: release.publicationId,
+                      releaseId: release.id,
+                    })}`}
+                  />
                 </p>
-              </InsetText>
+              </>
+            )}
 
-              {!release.live && (
-                <>
-                  <p>
-                    The <strong>pre-release</strong> will be accessible at:
-                  </p>
-
-                  <p>
-                    <UrlContainer
-                      data-testid="prerelease-url"
-                      url={`${window.location.origin}${generatePath<
-                        ReleaseRouteParams
-                      >(preReleaseContentRoute.path, {
-                        publicationId: release.publicationId,
-                        releaseId: release.id,
-                      })}`}
-                    />
-                  </p>
-                </>
-              )}
-
-              <PreReleaseUserAccessForm
-                releaseId={release.id}
-                isReleaseApproved={release.approvalStatus === 'Approved'}
-                isReleaseLive={release.live}
-              />
-            </TabsSection>
-          )}
+            <PreReleaseUserAccessForm
+              releaseId={release.id}
+              isReleaseApproved={release.approvalStatus === 'Approved'}
+              isReleaseLive={release.live}
+            />
+          </TabsSection>
           <TabsSection
             id={releasePreReleaseAccessPageTabs.publicAccessList}
             title="Public access list"

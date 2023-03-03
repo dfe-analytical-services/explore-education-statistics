@@ -321,8 +321,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(new List<string>
                 {
                     "National",
-                    "Local Authority",
-                    "Local Authority District"
+                    "Local authority",
+                    "Local authority district"
                 }, result[0].GeographicLevels);
 
                 Assert.Equal(2, result[0].Variables.Count);
@@ -344,8 +344,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("file2.csv", result[1].Filename);
                 Assert.Equal("Subject 2", result[1].Name);
 
-                Assert.Equal("2020/21 Summer Term", result[1].TimePeriods.From);
-                Assert.Equal("2021/22 Spring Term", result[1].TimePeriods.To);
+                Assert.Equal("2020/21 Summer term", result[1].TimePeriods.From);
+                Assert.Equal("2021/22 Spring term", result[1].TimePeriods.To);
                 Assert.Equal(new List<string>
                 {
                     "National",
@@ -972,8 +972,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.Equal(3, result.Count);
                 Assert.Equal("National", result[0]);
-                Assert.Equal("Local Authority", result[1]);
-                Assert.Equal("Local Authority District", result[2]);
+                Assert.Equal("Local authority", result[1]);
+                Assert.Equal("Local authority district", result[2]);
             }
         }
 

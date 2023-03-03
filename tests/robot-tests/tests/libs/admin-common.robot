@@ -587,6 +587,7 @@ user approves release for scheduled publication
     ...    ${publish_date_year}
     ...    ${next_release_month}=01
     ...    ${next_release_year}=2200
+    ...    ${update_amendment_published_date}=${False}
     user clicks link    Sign off
     user waits until page does not contain loading spinner
     user waits until h2 is visible    Sign off    %{WAIT_SMALL}
@@ -597,6 +598,10 @@ user approves release for scheduled publication
 
     user clicks radio    Approved for publication
     user enters text into element    id:releaseStatusForm-internalReleaseNote    Approved by UI tests
+    IF    ${update_amendment_published_date}
+        user waits until page contains    Update published date
+        user clicks checkbox    Update published date
+    END
     user clicks radio    On a specific date
     user waits until page contains    Publish date
     user enters text into element    id:releaseStatusForm-publishScheduled-day    ${publish_date_day}
@@ -808,3 +813,45 @@ get release id from url
     ...    release\/([0-9A-Fa-f]{8}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{4}[-]?[0-9A-Fa-f]{12})    1
     ${release_id}=    Get From List    ${release_id_match}    0
     [Return]    ${release_id}
+
+user adds free text key stat
+    [Arguments]    ${title}    ${statistic}    ${trend}    ${guidance_title}    ${guidance_text}
+    user clicks button    Add free text key statistic
+    user waits until page contains element    id:editableKeyStatTextForm-create-title
+
+    user enters text into element    id:editableKeyStatTextForm-create-title    ${title}
+    user enters text into element    id:editableKeyStatTextForm-create-statistic    ${statistic}
+    user enters text into element    id:editableKeyStatTextForm-create-trend    ${trend}
+    user enters text into element    id:editableKeyStatTextForm-create-guidanceTitle    ${guidance_title}
+
+    user clicks element    id:editableKeyStatTextForm-create-guidanceText
+    user presses keys    ${guidance_text}
+
+    user clicks button    Save
+    user waits until page does not contain button    Save
+
+user updates free text key stat
+    [Arguments]    ${tile_num}    ${title}    ${statistic}    ${trend}    ${guidance_title}    ${guidance_text}
+    user waits until page contains element    xpath://*[@data-testid="keyStat"][${tile_num}]
+
+    user clicks element    xpath://*[@data-testid="keyStat"][${tile_num}]//button[contains(text(), "Edit")]
+
+    user waits until page contains button    Save
+
+    user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//input[@name="title"]    ${title}
+    user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//input[@name="statistic"]
+    ...    ${statistic}
+    user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//input[@name="trend"]    ${trend}
+    user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//input[@name="guidanceTitle"]
+    ...    ${guidance_title}
+
+    user clears element text    xpath://*[@data-testid="keyStat"][${tile_num}]//*[contains(@class, "ck-content")]
+    user presses keys    ${guidance_text}
+
+    user clicks button    Save
+    user waits until page does not contain button    Save
+
+user removes key stat
+    [Arguments]    ${tile_num}
+    user waits until page contains element    xpath://*[@data-testid="keyStat"][${tile_num}]
+    user clicks element    xpath://*[@data-testid="keyStat"][${tile_num}]//button[contains(text(), "Remove")]
