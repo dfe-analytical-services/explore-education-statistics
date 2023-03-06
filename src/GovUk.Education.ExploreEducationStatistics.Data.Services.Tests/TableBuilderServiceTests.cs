@@ -791,7 +791,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ForIndex(1, i => i
                     .SetIndicators(_fixture.DefaultIndicator().Generate(2))
                 )
-                .GenerateList(2);
+                .GenerateList();
 
             var indicators = indicatorGroups
                 .SelectMany(ig => ig.Indicators)
@@ -804,7 +804,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ForRange(2..4, l => l
                     .SetPresetRegionAndLocalAuthority()
                     .SetGeographicLevel(GeographicLevel.LocalAuthority))
-                .GenerateList(4);
+                .GenerateList();
 
             var observations = _fixture.DefaultObservation()
                 .WithMeasures(indicators)
@@ -824,7 +824,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .SetFilterItems(filterItems[1], filterItems[3])
                     .SetLocation(locations[3])
                     .SetTimePeriod(2023, AcademicYear))
-                .GenerateList(8);
+                .GenerateList();
 
             var releaseSubject = new ReleaseSubject
             {
@@ -1129,7 +1129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ForIndex(1, i => i
                     .SetIndicators(_fixture.DefaultIndicator().Generate(2))
                 )
-                .GenerateList(2);
+                .GenerateList();
 
             var indicators = indicatorGroups
                 .SelectMany(ig => ig.Indicators)
@@ -1150,7 +1150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .SetFilterItems(filterItems[1], filterItems[3])
                     .SetLocation(locations[1])
                     .SetTimePeriod(2023, AcademicYear))
-                .GenerateList(4);
+                .GenerateList();
 
             var releaseSubject = new ReleaseSubject
             {
@@ -1286,7 +1286,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ForRange(2..4, o => o
                     .SetLocation(locations[1])
                     .SetTimePeriod(2022, AcademicYear))
-                .GenerateList(4);
+                .GenerateList();
 
             var contextId = Guid.NewGuid().ToString();
 

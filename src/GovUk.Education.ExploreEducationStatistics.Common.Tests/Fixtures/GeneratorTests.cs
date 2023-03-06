@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -449,7 +448,7 @@ public class GeneratorTests
                 .Set(t => t.FirstName, "Jane"))
             .GenerateList();
        
-        Assert.Equal(5, items.Count);
+        Assert.Equal(4, items.Count);
     }
 
     [Fact]
@@ -462,7 +461,7 @@ public class GeneratorTests
                 .Set(t => t.FirstName, "Jane"))
             .GenerateArray();
        
-        Assert.Equal(5, items.Length);
+        Assert.Equal(4, items.Length);
     }
     
     [Fact]

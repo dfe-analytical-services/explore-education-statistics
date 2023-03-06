@@ -68,7 +68,7 @@ public class PermalinkCsvMetaServiceTests
                 .SetIndicatorGroup(_fixture.DefaultIndicatorGroup()
                     .WithSubject(subject))
             )
-            .GenerateList(3);
+            .GenerateList();
 
         var locations = _fixture.DefaultLocation()
             .WithGeographicLevel(GeographicLevel.Country)
@@ -209,7 +209,7 @@ public class PermalinkCsvMetaServiceTests
             .ForRange(2..4, l => l
                 .SetPresetRegionAndLocalAuthority()
                 .SetGeographicLevel(GeographicLevel.LocalAuthority))
-            .GenerateList(4);
+            .GenerateList();
 
         var contextId = Guid.NewGuid().ToString();
 
@@ -314,7 +314,7 @@ public class PermalinkCsvMetaServiceTests
             .ForRange(2..3, l => l
                 .SetPresetRegionAndLocalAuthority()
                 .SetGeographicLevel(GeographicLevel.LocalAuthority))
-            .GenerateArray(3);
+            .GenerateArray();
 
         var contextId = Guid.NewGuid().ToString();
 

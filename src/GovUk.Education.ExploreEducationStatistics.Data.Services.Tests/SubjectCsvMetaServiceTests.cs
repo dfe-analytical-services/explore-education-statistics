@@ -66,7 +66,7 @@ public class SubjectCsvMetaServiceTests
             .ForRange(2..4, l => l
                 .SetPresetRegionAndLocalAuthority()
                 .SetGeographicLevel(GeographicLevel.LocalAuthority))
-            .GenerateList(4);
+            .GenerateList();
 
         var observations = _fixture.DefaultObservation()
             .WithMeasures(indicators)
@@ -86,7 +86,7 @@ public class SubjectCsvMetaServiceTests
                 .SetFilterItems(filterItems[1], filterItems[3])
                 .SetLocation(locations[3])
                 .SetTimePeriod(2023, AcademicYear))
-            .GenerateList(8);
+            .GenerateList();
 
         var releaseSubject = new ReleaseSubject
         {
@@ -539,7 +539,7 @@ public class SubjectCsvMetaServiceTests
             .ForRange(2..4, l => l
                 .SetPresetRegionAndLocalAuthority()
                 .SetGeographicLevel(GeographicLevel.LocalAuthority))
-            .GenerateList(4);
+            .GenerateList();
 
         var observations = _fixture.DefaultObservation()
             .WithFilterItems(filterItems)
@@ -548,7 +548,7 @@ public class SubjectCsvMetaServiceTests
                 .SetLocation(locations[0]))
             .ForRange(2..4, o => o
                 .SetLocation(locations[3]))
-            .GenerateList(4);
+            .GenerateList();
 
         var releaseSubject = new ReleaseSubject
         {
@@ -634,7 +634,7 @@ public class SubjectCsvMetaServiceTests
             .ForRange(2..4, l => l
                 .SetPresetRegionAndLocalAuthority()
                 .SetGeographicLevel(GeographicLevel.LocalAuthority))
-            .GenerateList(4);
+            .GenerateList();
 
         var releaseSubject = new ReleaseSubject
         {
