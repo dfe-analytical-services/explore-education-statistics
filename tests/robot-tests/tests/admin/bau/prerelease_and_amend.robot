@@ -14,7 +14,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
 ${PUBLICATION_NAME}=                UI tests - prerelease and amend %{RUN_IDENTIFIER}
-${RELEASE_NAME}=                    Calendar Year 2000
+${RELEASE_NAME}=                    Calendar year 2000
 ${SCHEDULED_PRERELEASE_WARNING}=    Pre-release users will have access to a preview of the release 24 hours before the scheduled publish date.
 ${IMMEDIATE_PRERELEASE_WARNING}=    Pre-release users will not have access to a preview of the release if it is published immediately.
 
@@ -26,7 +26,7 @@ Create test publication and release via API
 
 Upload subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Calendar Year 2000
+    ...    Calendar year 2000
 
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
 
@@ -38,7 +38,7 @@ Add metadata guidance
 
     user checks summary list contains    Filename    upload-file-test.csv
     user checks summary list contains    Geographic levels
-    ...    Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; RSC Region; Regional; Ward
+    ...    Local authority; Local authority district; Local enterprise partnership; Opportunity area; Parliamentary constituency; RSC region; Regional; Ward
     user checks summary list contains    Time period    2005 to 2020
 
     user opens details dropdown    Variable names and descriptions
@@ -268,7 +268,7 @@ Validate prerelease has started for Analyst user after amendment
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
     user waits until element contains    id:releaseSummary    Test summary text for ${PUBLICATION_NAME}
@@ -281,7 +281,7 @@ Validate contact banner is shown
 Validate public prerelease access list as Analyst user
     user clicks link    Pre-release access list
 
-    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
     user waits until h2 is visible    Pre-release access list    %{WAIT_SMALL}
