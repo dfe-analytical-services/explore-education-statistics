@@ -340,7 +340,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task CreateReleaseStatus_Approved_FailsPublishDateCannotBeScheduled_PreviousDay()
+        public async Task CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_PreviousDay()
         {
             var release = new Release
             {
@@ -399,7 +399,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         [Fact]
         public async Task
-            CreateReleaseStatus_Approved_FailsPublishDateCannotBeScheduled_PreviousDay_DaylightSavingTime()
+            CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_PreviousDay_DaylightSavingTime()
         {
             var release = new Release
             {
@@ -459,7 +459,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task CreateReleaseStatus_Approved_FailsPublishDateCannotBeScheduled_SameDay()
+        public async Task CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_SameDay()
         {
             var release = new Release
             {
@@ -518,7 +518,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         [Fact]
         public async Task
-            CreateReleaseStatus_Approved_FailsPublishDateCannotBeScheduled_SameDay_DaylightSavingTime()
+            CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_SameDay_DaylightSavingTime()
         {
             var release = new Release
             {
@@ -578,7 +578,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task CreateReleaseStatus_Approved_FailsPublishDateCannotBeScheduled_FutureDay()
+        public async Task CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_FutureDay()
         {
             var release = new Release
             {
@@ -637,7 +637,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         [Fact]
         public async Task 
-            CreateReleaseStatus_Approved_FailsPublishDateCannotBeScheduled_SecondFunctionHasNoOccurrence()
+            CreateReleaseStatus_Approved_Scheduled_FailsPublishDateCannotBeScheduled_SecondFunctionHasNoOccurrence()
         {
             var release = new Release
             {
@@ -696,7 +696,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task CreateReleaseStatus_Approved_FailsChangingToDraft()
+        public async Task CreateReleaseStatus_Approved_Scheduled_FailsChangingToDraft()
         {
             var release = new Release
             {
@@ -738,7 +738,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task CreateReleaseStatus_Approved()
+        public async Task CreateReleaseStatus_Approved_Scheduled()
         {
             var release = new Release
             {
@@ -747,7 +747,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Publication = new Publication(),
                 ReleaseName = "2030",
                 Slug = "2030",
-                PublishScheduled = DateTime.UtcNow,
                 Version = 0,
             };
 
@@ -824,8 +823,108 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .SingleAsync(r => r.Id == release.Id);
 
                 Assert.Equal(ReleaseApprovalStatus.Approved, saved.ApprovalStatus);
+                
+                // PublishScheduled should have been set to the scheduled date specified in the request.
                 Assert.Equal(new DateTime(2051, 6, 29, 23, 0, 0, DateTimeKind.Utc),
                     saved.PublishScheduled);
+                nextReleaseDateEdited.AssertDeepEqualTo(saved.NextReleaseDate);
+               
+                // NotifySubscribers should default to true for original releases
+                Assert.True(saved.NotifySubscribers);
+                Assert.False(saved.UpdatePublishedDate);
+
+                var savedStatus = Assert.Single(saved.ReleaseStatuses);
+                Assert.Equal(release.Id, savedStatus.ReleaseId);
+                Assert.Equal(ReleaseApprovalStatus.Approved, savedStatus.ApprovalStatus);
+                Assert.Equal(_userId, savedStatus.CreatedById);
+                Assert.Equal("Test note", savedStatus.InternalReleaseNote);
+            }
+        }
+        
+        [Fact]
+        public async Task CreateReleaseStatus_Approved_Immediately()
+        {
+            var release = new Release
+            {
+                ApprovalStatus = ReleaseApprovalStatus.Draft,
+                Type = ReleaseType.AdHocStatistics,
+                Publication = new Publication(),
+                ReleaseName = "2030",
+                Slug = "2030",
+                Version = 0,
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Releases.AddAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            var releaseChecklistService = new Mock<IReleaseChecklistService>(MockBehavior.Strict);
+            var publishingService = new Mock<IPublishingService>(MockBehavior.Strict);
+            var contentService = new Mock<IContentService>(MockBehavior.Strict);
+
+            releaseChecklistService
+                .Setup(s =>
+                    s.GetErrors(It.Is<Release>(r => r.Id == release.Id)))
+                .ReturnsAsync(
+                    new List<ReleaseChecklistIssue>()
+                );
+
+            publishingService
+                .Setup(s => s.ReleaseChanged(
+                    It.Is<Guid>(g => g == release.Id),
+                    It.IsAny<Guid>(),
+                    It.IsAny<bool>()
+                ))
+                .ReturnsAsync(Unit.Instance);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(release.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+
+            var nextReleaseDateEdited = new PartialDate { Month = "12", Year = "2000" };
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var releaseService = BuildService(contentDbContext: context,
+                    releaseChecklistService: releaseChecklistService.Object,
+                    publishingService: publishingService.Object,
+                    contentService: contentService.Object);
+
+                var result = await releaseService
+                    .CreateReleaseStatus(
+                        release.Id,
+                        new ReleaseStatusCreateRequest
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Approved,
+                            InternalReleaseNote = "Test note",
+                            PublishMethod = PublishMethod.Immediate,
+                            NextReleaseDate = nextReleaseDateEdited
+                        }
+                    );
+
+                // We don't expect PrereleaseUserService.SendPreReleaseUserInviteEmails to be called if the
+                // Release is being published immediately.
+                VerifyAllMocks(contentService,
+                    publishingService,
+                    releaseChecklistService);
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var saved = await context.Releases
+                    .Include(r => r.ReleaseStatuses)
+                    .SingleAsync(r => r.Id == release.Id);
+
+                Assert.Equal(ReleaseApprovalStatus.Approved, saved.ApprovalStatus);
+                
+                // PublishScheduled should have been set to "now".
+                Assert.InRange(DateTime.UtcNow.Subtract(saved.PublishScheduled!.Value).Milliseconds, 0, 1500);
+                
                 nextReleaseDateEdited.AssertDeepEqualTo(saved.NextReleaseDate);
                 // NotifySubscribers should default to true for original releases
                 Assert.True(saved.NotifySubscribers);
@@ -858,7 +957,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Publication = publication,
                 ReleaseName = "2035",
                 Slug = "2035",
-                PublishScheduled = DateTime.UtcNow,
                 NotifySubscribers = true,
                 UpdatePublishedDate = false,
                 Version = 1,
@@ -877,7 +975,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseChecklistService = new Mock<IReleaseChecklistService>(MockBehavior.Strict);
             var publishingService = new Mock<IPublishingService>(MockBehavior.Strict);
             var contentService = new Mock<IContentService>(MockBehavior.Strict);
-            var preReleaseUserService = new Mock<IPreReleaseUserService>(MockBehavior.Strict);
 
             releaseChecklistService
                 .Setup(s =>
@@ -898,18 +995,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     mock.GetContentBlocks<HtmlBlock>(amendedRelease.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
-            preReleaseUserService.Setup(mock =>
-                    mock.SendPreReleaseUserInviteEmails(amendedRelease.Id))
-                .ReturnsAsync(Unit.Instance);
-
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildService(
                     context,
                     releaseChecklistService: releaseChecklistService.Object,
                     publishingService: publishingService.Object,
-                    contentService: contentService.Object,
-                    preReleaseUserService: preReleaseUserService.Object);
+                    contentService: contentService.Object);
 
                 // Alter the approval status to Approved,
                 // toggling the values of NotifySubscribers and UpdatePublishedDate from their initial values
@@ -925,7 +1017,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 VerifyAllMocks(contentService,
-                    preReleaseUserService,
                     publishingService,
                     releaseChecklistService);
 
