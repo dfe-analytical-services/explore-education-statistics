@@ -5,5 +5,5 @@ WHERE Type = 'DataBlock'
   AND ContentSectionId IS NOT NULL
   AND ContentSectionId NOT IN (SELECT CS.Id FROM ContentSections CS WHERE CS.Type != 'KeyStatistics'); -- this condition for safety
 
-DELETE ContentSections FROM ContentSections WHERE Type = 'KeyStatistics'
+DELETE FROM ContentSections WHERE Type = 'KeyStatistics'
   AND Id NOT IN (SELECT CB.ContentSectionId FROM ContentBlock CB); -- this condition added for safety

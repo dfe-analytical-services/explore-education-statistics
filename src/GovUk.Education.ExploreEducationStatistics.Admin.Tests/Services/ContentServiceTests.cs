@@ -584,56 +584,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        [Fact]
-        public async Task RemoveContentBlock_AssociatedWithKeyStat()
-        {
-            var dataBlockId = Guid.NewGuid();
-
-            var release = new Release
-            {
-                KeyStatistics = new List<KeyStatistic>
-                {
-                    new KeyStatisticDataBlock
-                    {
-                        DataBlockId = dataBlockId,
-                    },
-                },
-            };
-
-            var releaseContentSection = new ReleaseContentSection()
-            {
-                Release = release,
-                ContentSection = new ContentSection
-                {
-                    Content = new List<ContentBlock>
-                    {
-                        new DataBlock { Id = dataBlockId },
-                    },
-                },
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.ReleaseContentSections.AddRangeAsync(
-                    releaseContentSection, releaseContentSection);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupContentService(contentDbContext: contentDbContext);
-                var result = await service.RemoveContentBlock(
-                    releaseContentSection.ReleaseId,
-                    releaseContentSection.ContentSectionId,
-                    dataBlockId);
-
-                var contentBlockViewModel = result.AssertRight();
-
-                Assert.Empty(contentBlockViewModel);
-            }
-        }
-
         private static ContentService SetupContentService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,

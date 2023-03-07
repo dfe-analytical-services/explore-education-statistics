@@ -164,8 +164,9 @@ public class KeyStatisticService : IKeyStatisticService
         return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
             .OnSuccess(_userService.CheckCanUpdateRelease)
             .OnSuccess(async release =>
-                await _persistenceHelper.CheckEntityExists<KeyStatistic>(keyStatisticId, query =>
-                    query.Where(keyStat => keyStat.ReleaseId == release.Id)))
+                await _persistenceHelper.CheckEntityExists<KeyStatistic>(query =>
+                    query.Where(keyStat => keyStat.Id == keyStatisticId
+                                                     && keyStat.ReleaseId == release.Id)))
             .OnSuccessVoid(async keyStat =>
             {
                 _context.KeyStatistics.Remove(keyStat);

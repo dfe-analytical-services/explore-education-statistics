@@ -1227,6 +1227,42 @@ public class KeyStatisticServiceTests
     }
 
     [Fact]
+    public async Task Delete_KeyStatAttachedToDifferentRelease()
+    {
+        var release = new Release();
+        var incorrectRelease = new Release();
+
+        var keyStatisticText = new KeyStatisticText
+        {
+            Release = release,
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            await context.Releases.AddRangeAsync(incorrectRelease, release);
+            await context.KeyStatistics.AddRangeAsync(keyStatisticText);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var keyStatisticService = SetupKeyStatisticService(context);
+            var result = await keyStatisticService.Delete(
+                incorrectRelease.Id,
+                keyStatisticText.Id);
+
+            result.AssertNotFound();
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var keyStatistics = context.KeyStatistics.ToList();
+            Assert.Single(keyStatistics);
+        }
+    }
+
+    [Fact]
     public async Task Reorder()
     {
         var dataBlockId = Guid.NewGuid();
