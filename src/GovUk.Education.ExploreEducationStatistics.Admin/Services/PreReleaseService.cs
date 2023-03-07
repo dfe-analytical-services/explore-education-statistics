@@ -33,6 +33,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public PreReleaseWindowStatus GetPreReleaseWindowStatus(Release release, DateTime referenceTime)
         {
+            if (release.Live)
+            {
+                return new PreReleaseWindowStatus
+                {
+                    Access = PreReleaseAccess.After
+                };             
+            }
+            
             if (!release.PublishScheduled.HasValue)
             {
                 return new PreReleaseWindowStatus

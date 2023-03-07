@@ -69,16 +69,13 @@
       "value": "0.5"
     },
     "skuStatisticsDb": {
-      "value": "GP_S_Gen5"
+      "value": "GP_Gen5"
     },
     "tierStatisticsDb": {
       "value": "GeneralPurpose"
     },
     "capacityStatisticsDb": {
-      "value": 10
-    },
-    "minCapacityStatisticsDb": {
-      "value": "4"
+      "value": 6
     },
     "enableAlerts": {
       "value": true
