@@ -46,12 +46,12 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
         );
       }
 
-      const { tableJson, showMissingRowsOrColumnsWarning } = mapTableToJson(
+      const { tableJson, hasMissingRowsOrColumns } = mapTableToJson({
         tableHeadersConfig,
         subjectMeta,
         results,
         query,
-      );
+      });
 
       const captionId = dataBlockId
         ? `dataTableCaption-${dataBlockId}`
@@ -59,8 +59,8 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
 
       return (
         <>
-          {showMissingRowsOrColumnsWarning && (
-            <WarningMessage>
+          {hasMissingRowsOrColumns && (
+            <WarningMessage testId="missing-data-warning">
               Some rows and columns are not shown in this table as the data does
               not exist in the underlying file.
             </WarningMessage>

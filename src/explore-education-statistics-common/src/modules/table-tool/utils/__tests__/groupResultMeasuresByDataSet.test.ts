@@ -1,4 +1,4 @@
-import groupResultMeasuresByDataSet from '@common/modules/table-tool/components/utils/groupResultMeasuresByDataSet';
+import groupResultMeasuresByDataSet from '@common/modules/table-tool/utils/groupResultMeasuresByDataSet';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
 
 describe('groupResultMeasuresByDataSet', () => {

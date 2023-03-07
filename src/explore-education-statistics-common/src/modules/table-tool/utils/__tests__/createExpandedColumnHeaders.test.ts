@@ -1,6 +1,7 @@
-import Header from '../Header';
-import createExpandedColumnHeaders from '../createExpandedColumnHeaders';
-import { ExpandedHeader } from '../mapTableToJson';
+import Header from '@common/modules/table-tool/utils/Header';
+import createExpandedColumnHeaders from '@common/modules/table-tool/utils/createExpandedColumnHeaders';
+import { ExpandedHeader } from '@common/modules/table-tool/utils/mapTableToJson';
+
 // these tests cover the test cases for headers that used to be in MultiHeaderDataTable
 
 describe('createExpandedColumnHeaders', () => {

@@ -7,7 +7,7 @@ import {
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import groupResultMeasuresByDataSet, {
   getIndicatorPath,
-} from '@common/modules/table-tool/components/utils/groupResultMeasuresByDataSet';
+} from '@common/modules/table-tool/utils/groupResultMeasuresByDataSet';
 import {
   Filter,
   LocationFilter,

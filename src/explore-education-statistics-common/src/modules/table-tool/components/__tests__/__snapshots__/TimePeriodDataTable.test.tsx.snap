@@ -1,5 +1,302 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`TimePeriodDataTable renders table correctly when region group is missing in column headers 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="1"
+        rowspan="1"
+      />
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        England
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        Barnsley
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        Barnet
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Authorised absence rate
+      </th>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        18.3%
+      </td>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        21.5%
+      </td>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        20.2%
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`TimePeriodDataTable renders table correctly when region group is missing in column headers and other locations have hierarchy 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="1"
+        rowspan="2"
+      />
+      <th
+        colspan="1"
+        rowspan="2"
+        scope="col"
+      >
+        England
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="colgroup"
+      >
+        Yorkshire and the Humber
+      </th>
+      <th
+        colspan="1"
+        rowspan="2"
+        scope="col"
+      >
+        Barnet
+      </th>
+    </tr>
+    <tr>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        Barnsley
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Authorised absence rate
+      </th>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        18.3%
+      </td>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        21.5%
+      </td>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        20.2%
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`TimePeriodDataTable renders table correctly when region group is missing in row headers 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="1"
+        rowspan="1"
+      />
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2014/15
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        England
+      </th>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        18.3%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Barnsley
+      </th>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        21.5%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Barnet
+      </th>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        20.2%
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
+exports[`TimePeriodDataTable renders table correctly when region group is missing in row headers and other locations have hierarchy 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="2"
+        rowspan="1"
+      />
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2014/15
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="2"
+        rowspan="1"
+        scope="row"
+      >
+        England
+      </th>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        18.3%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="rowgroup"
+      >
+        Yorkshire and the Humber
+      </th>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Barnsley
+      </th>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        21.5%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="2"
+        rowspan="1"
+        scope="row"
+      >
+        Barnet
+      </th>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        20.2%
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
 exports[`TimePeriodDataTable renders table with completely empty columns removed 1`] = `
 <table
   aria-labelledby="dataTableCaption"
@@ -452,84 +749,6 @@ exports[`TimePeriodDataTable renders table with completely empty rows removed 1`
         class="govuk-table__cell--numeric"
       >
         no data
-      </td>
-    </tr>
-  </tbody>
-</table>
-`;
-
-exports[`TimePeriodDataTable renders table with empty cells when region group is missing 1`] = `
-<table
-  aria-labelledby="dataTableCaption"
-  class="govuk-table table"
-  data-testid="dataTableCaption-table"
->
-  <thead
-    class="tableHead"
-  >
-    <tr>
-      <td
-        colspan="2"
-        rowspan="1"
-      />
-      <th
-        colspan="1"
-        rowspan="1"
-        scope="col"
-      >
-        2014/15
-      </th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th
-        class=""
-        colspan="2"
-        rowspan="1"
-        scope="row"
-      >
-        England
-      </th>
-      <td
-        class="govuk-table__cell--numeric"
-      >
-        18.3%
-      </td>
-    </tr>
-    <tr>
-      <td
-        class="govuk-table__cell--numeric"
-        colspan="1"
-        rowspan="2"
-      />
-      <th
-        class=""
-        colspan="1"
-        rowspan="1"
-        scope="row"
-      >
-        Barnsley
-      </th>
-      <td
-        class="govuk-table__cell--numeric"
-      >
-        21.5%
-      </td>
-    </tr>
-    <tr>
-      <th
-        class=""
-        colspan="1"
-        rowspan="1"
-        scope="row"
-      >
-        Barnet
-      </th>
-      <td
-        class="govuk-table__cell--numeric"
-      >
-        20.2%
       </td>
     </tr>
   </tbody>

@@ -11,12 +11,10 @@ exports[`TableToolFinalStep renders the final step successfully 1`] = `
   >
     <tr>
       <td
-        class=""
         colspan="2"
         rowspan="1"
       />
       <th
-        class=""
         colspan="1"
         rowspan="1"
         scope="col"

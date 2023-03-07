@@ -1,11 +1,13 @@
 import Header from '@common/modules/table-tool/utils/Header';
+import { ExpandedHeader } from '@common/modules/table-tool/utils/mapTableToJson';
 import last from 'lodash/last';
-import { ExpandedHeader } from './mapTableToJson';
 
 /**
- * TODO: - add description
- * @param rowHeaders
- * @returns
+ * Create the row headers for the table.
+ * We 'expand' our headers so that we create the real table
+ * cells we need to render in array format (instead of a tree).
+ * Duplicate and empty headers are removed and remaining headers are
+ * expanded to ensure the table layout is correct.
  */
 export default function createExpandedRowHeaders(
   rowHeaders: Header[],
@@ -28,24 +30,17 @@ export default function createExpandedRowHeaders(
 
       const prev = last(row);
 
-      // do we have text in the previous header and does it match the current header?
       const matchesPreviousHeader = prev?.text && prev.text === current.text;
-
-      // detect secnario where we're at the root node
 
       // Add the current header to the row when:
       // - it doesn't match the previous header
       // - it does match the previous header, but it's in a sub-group with
       //   siblings so needs to be included or the layout breaks.
-      // - there is some text
-      //
       // Otherwise, we want the previous header to span
       // across where the current header would be in the row.
-
       if (
-        current.text &&
-        (!matchesPreviousHeader ||
-          (matchesPreviousHeader && current.hasSiblings()))
+        !matchesPreviousHeader ||
+        (matchesPreviousHeader && current.hasSiblings())
       ) {
         const isGroup = current.hasChildren();
 
@@ -54,9 +49,7 @@ export default function createExpandedRowHeaders(
           text: current.text,
           span: current.span,
           isGroup,
-          crossSpan: isGroup
-            ? current.crossSpan
-            : calculateLastChildCrossSpan(current),
+          crossSpan: current.crossSpan,
         });
       } else if (!current.hasChildren() && prev && prev.crossSpan > 1) {
         // This one is a bit weird, but we have to directly update
@@ -88,43 +81,5 @@ export default function createExpandedRowHeaders(
     return acc;
   }, []);
 
-  // if there is only one header in the row AND the cross span is below the width of the columns then we can collapse it down to a single header
-
-  // Do some more checks on the headers to check if we can collapse any down
-  // to a single header.
-
-  // We can collapse headers down to a single header if:
-  // - the crosspan is below the width of the columns (the header is by itself in a column)
-
   return headers;
-}
-
-function calculateLastChildCrossSpan(header: Header): number {
-  const { parent } = header;
-  if (header.text === parent?.text && parent.text === parent?.parent?.text) {
-    return 1;
-  }
-
-  if (header.parent && header.parent.crossSpan > 1) {
-    // it's already being front-filled so no point going from children to parent node (as it's already been done)
-    return 1;
-  }
-
-  // back fill here to see if we can find a parent that has the same text
-  let current: Header | undefined = header;
-  let crossSpan = 1;
-
-  while (current) {
-    if (
-      current.text === current.parent?.text ||
-      (current.parent && !current.parent?.text)
-    ) {
-      crossSpan += 1;
-      current = current.parent;
-    } else {
-      break;
-    }
-  }
-
-  return crossSpan;
 }

@@ -1,165 +1,136 @@
 import {
-  CategoryFilter,
   LocationFilter,
-  Indicator,
   Filter,
-} from '../../types/filters';
-import optimizeFilters from '../optimizeFilters';
+  TimePeriodFilter,
+  CategoryFilter,
+} from '@common/modules/table-tool/types/filters';
+import optimizeFilters, {
+  FilterGroup,
+} from '@common/modules/table-tool/utils/optimizeFilters';
 
-export const testCategoryFilter1 = new CategoryFilter({
-  category: 'Duration of fixed period exclusions',
-  group: 'Default',
-  isTotal: false,
-  label: '3',
-  value: '7ec5fc48-5bb5-4896-985e-7d9921bd7e60',
-});
-
-export const testCategoryFilter2 = new CategoryFilter({
-  value: '8fe677c9-f116-4874-90bd-edacf3460d75',
-  label: '1',
-  group: 'Default',
-  isTotal: false,
-  category: 'Duration of fixed period exclusions',
-});
-export const testCategoryFilter3 = new CategoryFilter({
-  value: '6b942ff1-c845-4df1-956d-49ba1c339a5e',
-  label: '2',
-  group: 'Default',
-  isTotal: false,
-  category: 'Duration of fixed period exclusions',
-});
-
-export const testCategoryFilter4 = new CategoryFilter({
-  value: '6d9e22db-fec9-43cf-856e-cd9f5a4886dd',
-  label: 'Total',
-  group: 'Default',
-  isTotal: true,
-  category: 'School type',
-});
-export const testCategoryFilter5 = new CategoryFilter({
-  value: '65845b5d-57a2-451c-a947-a4328e5ee3d8',
-  label: 'Special',
-  group: 'Default',
-  isTotal: false,
-  category: 'School type',
-});
-export const testCategoryFilter6 = new CategoryFilter({
-  value: '1889f1a2-2114-44c2-bf0a-4a9b4a36f462',
-  label: 'State-funded primary',
-  group: 'Default',
-  isTotal: false,
-  category: 'School type',
-});
-export const testCategoryFilter7 = new CategoryFilter({
-  value: 'afcfcc14-27cb-48ee-90da-0aabd3f3af3b',
-  label: 'State-funded secondary',
-  group: 'Default',
-  isTotal: false,
-  category: 'School type',
-});
-
-export const testCategoryFilter8 = new CategoryFilter({
-  value: 'c8b5b431-c308-4e09-9db5-11844e108407',
-  label: 'Total',
-  group: 'Total',
-  isTotal: true,
-  category: 'Characteristic',
-});
-
-export const testLocationFilter1 = new LocationFilter({
-  value: 'd3dd04a9-ecf5-4e87-d270-08dae1c60ac3',
-  label: 'Bexley',
-  group: '',
+const testLocationFilter1 = new LocationFilter({
+  value: 'loc-1',
+  label: 'Darlington',
+  group: 'North East',
   level: 'localAuthority',
 });
-
-export const testIndicator1 = new Indicator({
-  value: '1b09726d-00d0-42ee-81a5-59d07c7dd9ba',
-  label: 'Number of fixed period exclusions',
-  unit: '',
-  name: 'num_fixed_excl',
+const testLocationFilter2 = new LocationFilter({
+  value: 'loc-2',
+  label: 'Durham',
+  group: 'North East',
+  level: 'localAuthority',
 });
-
-export const testIndicator2 = new Indicator({
-  value: '39510778-d87a-4233-8767-539777ca6036',
-  label: 'Number of pupil enrolments',
-  unit: '',
-  name: 'headcount',
+const testLocationFilter3 = new LocationFilter({
+  value: 'loc-4',
+  label: 'England',
+  group: 'England',
+  level: 'country',
 });
-
-export const testIndicator3 = new Indicator({
-  value: '2835ebeb-fdb8-499a-9601-5d2d97f53936',
-  label: 'Number of pupils',
-  unit: '',
-  name: 'headcount',
+const testLocationFilter5 = new LocationFilter({
+  value: 'loc-5',
+  label: 'Wales',
+  group: undefined,
+  level: 'country',
 });
-
-export const testIndicator4 = new Indicator({
-  value: 'e790f56b-61ad-43a7-d427-08dae1c60ac3',
-  label: 'Number of pupil enrolments',
-  unit: '',
-  decimalPlaces: 0,
-  name: 'enrolments',
+const testTimePeriod1 = new TimePeriodFilter({
+  label: '2012/13',
+  year: 2012,
+  code: 'AY',
+  order: 0,
 });
-
-export const testFilters1: Filter[] = [
-  testCategoryFilter1,
-  testCategoryFilter1,
-];
-
-export const testFilters2: Filter[] = [testCategoryFilter4, testIndicator2];
-
-export const testFilters3: Filter[] = [testCategoryFilter8, testIndicator3];
-
-export const testFilters4: Filter[] = [testLocationFilter1, testIndicator4];
-
-export const testHeaderConfig1: Filter[][] = [
-  [testCategoryFilter1, testCategoryFilter1, testCategoryFilter1],
-  [testIndicator1],
-];
-
-export const testHeaderConfig2: Filter[][] = [
-  [
-    testCategoryFilter4,
-    testCategoryFilter5,
-    testCategoryFilter6,
-    testCategoryFilter7,
-  ],
-  [testIndicator2],
-];
-
-export const testHeaderConfig3: Filter[][] = [
-  [testCategoryFilter8],
-  [testIndicator3],
-];
-
-export const testHeaderConfig4: Filter[][] = [
-  [testLocationFilter1],
-  [testIndicator4],
-];
+const testTimePeriod2 = new TimePeriodFilter({
+  label: '2013/14',
+  year: 2013,
+  code: 'AY',
+  order: 1,
+});
+const testCategoryFilter1 = new CategoryFilter({
+  value: 'category-filter-1',
+  label: 'Filter 1',
+  group: 'Filter Group 1',
+  category: 'Category1',
+});
+const testCategoryFilter2 = new CategoryFilter({
+  value: 'category-filter-2',
+  label: 'Filter 2',
+  group: 'Filter Group 1',
+  category: 'Category1',
+});
+const testCategoryFilter3 = new CategoryFilter({
+  value: 'category-filter-3',
+  label: 'Filter 3',
+  group: 'FilterGroup 2',
+  category: 'Category2',
+});
+const testCategoryFilter4 = new CategoryFilter({
+  value: 'category-filter-4',
+  label: 'Filter 4',
+  group: 'Default',
+  category: 'Category3',
+});
 
 describe('optimizeFilters', () => {
-  test('reduces three identical category filters down to one', () => {
-    expect(optimizeFilters(testFilters1, testHeaderConfig1)).toEqual([
+  test('returns the filters unchanged when there are no groups to add or single headers to remove', () => {
+    const testFilters: Filter[] = [testLocationFilter1, testTimePeriod1];
+    const testHeaderConfig: Filter[][] = [
+      [testLocationFilter1, testLocationFilter2],
+      [testTimePeriod1, testTimePeriod2],
+    ];
+    const result = optimizeFilters(testFilters, testHeaderConfig);
+    expect(result).toEqual(testFilters);
+  });
+
+  test('removes the last filter when there are zero filters in the last header array', () => {
+    const testFilters: Filter[] = [testLocationFilter1, testTimePeriod1];
+    const testHeaderConfig: Filter[][] = [
+      [testLocationFilter1, testLocationFilter2],
+      [],
+    ];
+    const result = optimizeFilters(testFilters, testHeaderConfig);
+    expect(result).toEqual([testLocationFilter1]);
+  });
+
+  test('removes the last filter when there is only one filter in the last header array', () => {
+    const testFilters: Filter[] = [testLocationFilter1, testTimePeriod1];
+    const testHeaderConfig: Filter[][] = [
+      [testLocationFilter1, testLocationFilter2],
+      [testTimePeriod1],
+    ];
+    const result = optimizeFilters(testFilters, testHeaderConfig);
+    expect(result).toEqual([testLocationFilter1]);
+  });
+
+  test('adds a filter group when there are multiple subgroups and the group is not `Default`', () => {
+    const testFilters: Filter[] = [testCategoryFilter1, testTimePeriod1];
+    const testHeaderConfig: Filter[][] = [
+      [testCategoryFilter1, testCategoryFilter2, testCategoryFilter3],
+      [testTimePeriod1, testTimePeriod2],
+    ];
+    const result = optimizeFilters(testFilters, testHeaderConfig);
+    expect(result).toEqual([
+      new FilterGroup('Filter Group 1'),
       testCategoryFilter1,
+      testTimePeriod1,
     ]);
   });
 
-  test('adds additional filter subgroups if required', () => {
-    expect(optimizeFilters(testFilters2, testHeaderConfig2)).toEqual([
-      testCategoryFilter4,
-    ]);
+  test('does not add a filter group when there are multiple subgroups and the group is `Default`', () => {
+    const testFilters: Filter[] = [testCategoryFilter4, testTimePeriod1];
+    const testHeaderConfig: Filter[][] = [
+      [testCategoryFilter3, testCategoryFilter4],
+      [testTimePeriod1, testTimePeriod2],
+    ];
+    const result = optimizeFilters(testFilters, testHeaderConfig);
+    expect(result).toEqual([testCategoryFilter4, testTimePeriod1]);
   });
 
-  test("doesn't show a single subgroup as this adds groups to a potentially crowded table", () => {
-    expect(optimizeFilters(testFilters3, testHeaderConfig3)).toEqual([
-      testCategoryFilter8,
-    ]);
-  });
-
-  test('adds an empty header if there is missing location group data', () => {
-    expect(optimizeFilters(testFilters4, testHeaderConfig4)).toEqual([
-      testLocationFilter1,
-    ]);
+  test('does not add a filter group when there are multiple subgroups and the group is undefined', () => {
+    const testFilters: Filter[] = [testLocationFilter5, testTimePeriod1];
+    const testHeaderConfig: Filter[][] = [
+      [testLocationFilter3, testLocationFilter5],
+      [testTimePeriod1, testTimePeriod2],
+    ];
+    const result = optimizeFilters(testFilters, testHeaderConfig);
+    expect(result).toEqual([testLocationFilter5, testTimePeriod1]);
   });
 });

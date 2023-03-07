@@ -1,8 +1,12 @@
-/* eslint-disable no-shadow */
 import Header from '@common/modules/table-tool/utils/Header';
 import { Filter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
+import createExpandedColumnHeaders from '@common/modules/table-tool/utils/createExpandedColumnHeaders';
+import createExpandedRowHeaders from '@common/modules/table-tool/utils/createExpandedRowHeaders';
+import hasMissingRowsOrColumns from '@common/modules/table-tool/utils/hasMissingRowsOrColumns';
+import createTableCartesian from '@common/modules/table-tool/utils/createTableCartesian';
+import optimizeFilters from '@common/modules/table-tool/utils/optimizeFilters';
 import {
   ReleaseTableDataQuery,
   TableDataResult,
@@ -10,11 +14,6 @@ import {
 import cartesian from '@common/utils/cartesian';
 import last from 'lodash/last';
 import sumBy from 'lodash/sumBy';
-import createExpandedColumnHeaders from './createExpandedColumnHeaders';
-import createExpandedRowHeaders from './createExpandedRowHeaders';
-import hasMissingRowsOrColumns from './hasMissingRowsOrColumns';
-import createTableCartesian from './createTableCartesian';
-import optimizeFilters from './optimizeFilters';
 
 export type Scope = 'colgroup' | 'col' | 'rowgroup' | 'row';
 
@@ -39,24 +38,25 @@ export interface TableJson {
   tbody: TableCellJson[][];
 }
 
+interface Props {
+  tableHeadersConfig: TableHeadersConfig;
+  subjectMeta: FullTableMeta;
+  results: TableDataResult[];
+  query?: ReleaseTableDataQuery;
+}
+
 /**
  * Used to convert a table into a JSON representation of the HTML table
  * that can be used to render the table in the frontend.
- *
- * @param tableHeadersConfig
- * @param subjectMeta
- * @param results
- * @param query
- * @returns tableJson: TableJson, showMissingRowsOrColumnsWarning?: boolean
  */
-export default function mapTableToJson(
-  tableHeadersConfig: TableHeadersConfig,
-  subjectMeta: FullTableMeta,
-  results: TableDataResult[],
-  query?: ReleaseTableDataQuery,
-): {
+export default function mapTableToJson({
+  tableHeadersConfig,
+  subjectMeta,
+  results,
+  query,
+}: Props): {
   tableJson: TableJson;
-  showMissingRowsOrColumnsWarning?: boolean;
+  hasMissingRowsOrColumns?: boolean;
 } {
   const rowHeadersCartesian = cartesian(
     ...tableHeadersConfig.rowGroups,
@@ -75,170 +75,21 @@ export default function mapTableToJson(
     ...tableHeadersConfig.rows,
   ].reduce((acc, filter) => acc.add(filter.id), new Set<string>());
 
-  const excludedFilters = getExcludedFilters(tableHeaderFilters, subjectMeta);
+  const excludedFilterIds = getExcludedFilterIds(
+    tableHeaderFilters,
+    subjectMeta,
+  );
 
-  // Create a cartesian table of cells
-  const tableCartesian = createTableCartesian(
+  const tableCartesian = createTableCartesian({
     rowHeadersCartesian,
     columnHeadersCartesian,
     results,
-    excludedFilters,
-  );
-
-  /**
-   * Convert {@param filters} into {@see Header} instances
-   * and add them to {@param headers}.
-   */
-  function addFilters(headers: Header[], filters: Filter[]) {
-    filters.forEach((filter, filterIndex) => {
-      if (!headers.length) {
-        headers.push(new Header(filter.id, filter.label));
-        return;
-      }
-
-      const currentHeader = last(headers);
-
-      if (!currentHeader) {
-        return;
-      }
-
-      if (currentHeader.id === filter.id) {
-        currentHeader.span += 1;
-      } else if (filterIndex === 0) {
-        headers.push(new Header(filter.id, filter.label));
-      } else {
-        currentHeader.addChildToLastParent(
-          new Header(filter.id, filter.label),
-          filterIndex - 1,
-        );
-      }
-    });
-
-    return headers;
-  }
-
-  function getExcludedFilters(
-    tableHeaderFilters: Set<string>,
-    subjectMeta: FullTableMeta,
-  ) {
-    const subjectMetaFilters = [
-      ...Object.values(subjectMeta.filters).flatMap(
-        filterGroup => filterGroup.options,
-      ),
-      ...subjectMeta.timePeriodRange,
-      ...subjectMeta.locations,
-      ...subjectMeta.indicators,
-    ].map(filter => filter.id);
-
-    return new Set(
-      subjectMetaFilters.filter(
-        subjectMetaFilter => !tableHeaderFilters.has(subjectMetaFilter),
-      ),
-    );
-  }
-
-  /**
-   * TODO: - add description
-   * @param expandedColumnHeaders
-   * @param totalColumns
-   * @returns
-   */
-  function mapTableHead(
-    expandedColumnHeaders: ExpandedHeader[][],
-    totalColumns: number,
-  ): TableCellJson[][] {
-    return expandedColumnHeaders.map((columns, rowIndex) => {
-      const row: TableCellJson[] = [];
-      // add a spacer td to the first header row
-      if (rowIndex === 0) {
-        row.push({
-          colSpan: totalColumns,
-          rowSpan: expandedColumnHeaders.length,
-          tag: 'td',
-        });
-      }
-
-      row.push(
-        ...columns.map<TableCellJson>(col => {
-          // Add an empty td instead of a th for empty group headers
-          if (col.id === '') {
-            return {
-              colSpan: col.span,
-              rowSpan: col.crossSpan,
-              text: col.text,
-              tag: 'td',
-            };
-          }
-
-          return {
-            colSpan: col.span,
-            rowSpan: col.crossSpan,
-            scope:
-              rowIndex + col.crossSpan !== expandedColumnHeaders.length
-                ? 'colgroup'
-                : 'col',
-            text: col.text,
-            tag: 'th',
-          };
-        }),
-      );
-
-      return row;
-    });
-  }
-
-  /**
-   * TODO: - add description
-   * @param rows
-   * @param rowHeaders
-   * @returns
-   */
-  function mapTableBody(
-    rows: string[][],
-    rowHeaders: ExpandedHeader[][],
-  ): TableCellJson[][] {
-    return rows.map((row, rowIndex) => {
-      const rowsJson: TableCellJson[] = [];
-
-      // add the row header
-      const rowsHeaderJson: TableCellJson[] = rowHeaders[rowIndex]?.map(
-        header => {
-          if (header.id === '') {
-            return {
-              rowSpan: header.span,
-              colSpan: header.crossSpan,
-              tag: 'td',
-            };
-          }
-          return {
-            rowSpan: header.span,
-            colSpan: header.crossSpan,
-            scope: header.isGroup ? 'rowgroup' : 'row',
-            text: header.text,
-            tag: 'th',
-          };
-        },
-      );
-
-      rowsJson.push(...rowsHeaderJson);
-
-      rowsJson.push(
-        ...row.map<TableCellJson>(cell => {
-          return {
-            tag: 'td',
-            text: cell,
-          };
-        }),
-      );
-
-      return rowsJson;
-    });
-  }
+    excludedFilterIds,
+  });
 
   const rowHeaders = tableCartesian.reduce<Header[]>((acc, row) => {
     // Only need to use first column's rowFilters
     // as they are the same for every column.
-
     const filters = optimizeFilters(row[0].rowFilters, [
       ...tableHeadersConfig.rowGroups,
       tableHeadersConfig.rows,
@@ -260,27 +111,149 @@ export default function mapTableToJson(
 
   const rows = tableCartesian.map(row => row.map(cell => cell.text));
 
-  // We 'expand' our headers so that we create the real table
-  // cells we need to render in array format (instead of a tree).
-
   const expandedColumnHeaders = createExpandedColumnHeaders(columnHeaders);
 
   const expandedRowHeaders = createExpandedRowHeaders(rowHeaders);
 
   const totalColumns = sumBy(expandedRowHeaders[0], header => header.crossSpan);
 
-  const thead = mapTableHead(expandedColumnHeaders, totalColumns);
-
-  const tbody = mapTableBody(rows, expandedRowHeaders);
-
-  const showMissingRowsOrColumnsWarning =
-    query && hasMissingRowsOrColumns(query, subjectMeta, tableHeaderFilters);
-
   return {
     tableJson: {
-      thead,
-      tbody,
+      thead: mapTableHead(expandedColumnHeaders, totalColumns),
+      tbody: mapTableBody(rows, expandedRowHeaders),
     },
-    showMissingRowsOrColumnsWarning,
+    hasMissingRowsOrColumns: query
+      ? hasMissingRowsOrColumns({
+          query,
+          subjectMeta,
+          tableHeaderFilters,
+        })
+      : false,
   };
+}
+
+/**
+ * Gets filters which are in the subjectMeta but not in the tableHeaderFilters.
+ */
+function getExcludedFilterIds(
+  tableHeaderFilters: Set<string>,
+  subjectMeta: FullTableMeta,
+): Set<string> {
+  const subjectMetaFilters = [
+    ...Object.values(subjectMeta.filters).flatMap(
+      filterGroup => filterGroup.options,
+    ),
+    ...subjectMeta.timePeriodRange,
+    ...subjectMeta.locations,
+    ...subjectMeta.indicators,
+  ].map(filter => filter.id);
+
+  return new Set(
+    subjectMetaFilters.filter(
+      subjectMetaFilter => !tableHeaderFilters.has(subjectMetaFilter),
+    ),
+  );
+}
+
+/**
+ * Convert {@param filters} into {@see Header} instances
+ * and add them to {@param headers}.
+ */
+function addFilters(headers: Header[], filters: Filter[]) {
+  filters.forEach((filter, filterIndex) => {
+    if (!headers.length) {
+      headers.push(new Header(filter.id, filter.label));
+      return;
+    }
+
+    const currentHeader = last(headers);
+
+    if (!currentHeader) {
+      return;
+    }
+
+    if (currentHeader.id === filter.id) {
+      currentHeader.span += 1;
+    } else if (filterIndex === 0) {
+      headers.push(new Header(filter.id, filter.label));
+    } else {
+      currentHeader.addChildToLastParent(
+        new Header(filter.id, filter.label),
+        filterIndex - 1,
+      );
+    }
+  });
+
+  return headers;
+}
+
+/**
+ * Maps the expanded column headers to JSON
+ */
+function mapTableHead(
+  expandedColumnHeaders: ExpandedHeader[][],
+  totalColumns: number,
+): TableCellJson[][] {
+  return expandedColumnHeaders.map((columns, rowIndex) => {
+    const row: TableCellJson[] = [];
+    // add a spacer td to the first header row
+    if (rowIndex === 0) {
+      row.push({
+        colSpan: totalColumns,
+        rowSpan: expandedColumnHeaders.length,
+        tag: 'td',
+      });
+    }
+
+    row.push(
+      ...columns.map<TableCellJson>(col => ({
+        colSpan: col.span,
+        rowSpan: col.crossSpan,
+        scope:
+          rowIndex + col.crossSpan !== expandedColumnHeaders.length
+            ? 'colgroup'
+            : 'col',
+        text: col.text,
+        tag: 'th',
+      })),
+    );
+
+    return row;
+  });
+}
+
+/**
+ * Maps the table body to JSON
+ */
+function mapTableBody(
+  rows: string[][],
+  rowHeaders: ExpandedHeader[][],
+): TableCellJson[][] {
+  return rows.map((row, rowIndex) => {
+    const rowsJson: TableCellJson[] = [];
+
+    // add the row header
+    const rowsHeaderJson: TableCellJson[] = rowHeaders[rowIndex]?.map(
+      header => ({
+        rowSpan: header.span,
+        colSpan: header.crossSpan,
+        scope: header.isGroup ? 'rowgroup' : 'row',
+        text: header.text,
+        tag: 'th',
+      }),
+    );
+
+    rowsJson.push(...rowsHeaderJson);
+
+    rowsJson.push(
+      ...row.map<TableCellJson>(cell => {
+        return {
+          tag: 'td',
+          text: cell,
+        };
+      }),
+    );
+
+    return rowsJson;
+  });
 }

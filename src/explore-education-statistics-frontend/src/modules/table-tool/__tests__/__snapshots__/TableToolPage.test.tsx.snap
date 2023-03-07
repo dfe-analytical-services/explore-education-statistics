@@ -11,12 +11,10 @@ exports[`TableToolPage renders the page correctly with pre-built table when a fa
   >
     <tr>
       <td
-        class=""
         colspan="2"
         rowspan="1"
       />
       <th
-        class=""
         colspan="1"
         rowspan="1"
         scope="col"

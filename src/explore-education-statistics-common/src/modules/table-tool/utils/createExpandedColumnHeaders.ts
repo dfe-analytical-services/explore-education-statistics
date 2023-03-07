@@ -1,10 +1,12 @@
 import Header from '@common/modules/table-tool/utils/Header';
-import { ExpandedHeader } from './mapTableToJson';
+import { ExpandedHeader } from '@common/modules/table-tool/utils/mapTableToJson';
 
 /**
- * TODO: - add description
- * @param columnHeaders
- * @returns ExpandederHeader[][]
+ * Create the column headers for the table.
+ * We 'expand' our headers so that we create the real table
+ * cells we need to render in array format (instead of a tree).
+ * Duplicate and empty headers are removed and remaining headers are
+ * expanded to ensure the table layout is correct.
  */
 export default function createExpandedColumnHeaders(
   columnHeaders: Header[],
@@ -53,13 +55,13 @@ export default function createExpandedColumnHeaders(
       });
     }
 
-    if (current.hasChildren()) {
+    if (current.text && current.hasChildren()) {
       queue.push(...current.children);
     }
 
     // There are no more children to iterate
     // through so push the final row.
-    if (queue.length === 0) {
+    if (queue.length === 0 && row.length) {
       acc.push(row);
       row = [];
     }

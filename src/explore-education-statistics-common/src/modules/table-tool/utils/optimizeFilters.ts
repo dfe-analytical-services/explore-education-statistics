@@ -1,7 +1,4 @@
-import {
-  Filter,
-  LocationFilter,
-} from '@common/modules/table-tool/types/filters';
+import { Filter } from '@common/modules/table-tool/types/filters';
 import last from 'lodash/last';
 
 export class FilterGroup extends Filter {
@@ -14,7 +11,7 @@ export class FilterGroup extends Filter {
 }
 
 /**
- * Function to optimize a set of filters for the best viewing experience.
+ * Optimize a set of filters for the best viewing experience.
  *
  * Typically we add or remove filters depending on whether they are
  * actually needed for the user to understand the table.
@@ -49,21 +46,9 @@ export default function optimizeFilters(
           header => header.group !== firstSubGroup,
         );
 
-        // The location hierarchy expects grouping, for example the LAD attribute
-        // is grouped by Region. However, the data screener
-        // (https://rsconnect/rsc/dfe-published-data-qa/) does not require the data
-        // to have all attributes of the hierarchy. When this data is missing the
-        // backend returns an empty string which causes table layout problems as
-        // there is a missing header cell where the group would have been.
-        // To fix this, an empty header for the missing group data is added.
-        // When the table is rendered these empty header cells are converted to
-        // <td> as empty <th>'s cause accessibility problems.
-        const isMissingLocationGroup =
-          filter instanceof LocationFilter && filter.group === '';
-
         return hasMultipleSubGroups &&
-          ((filter.group && filter.group !== 'Default') ||
-            isMissingLocationGroup)
+          filter.group &&
+          filter.group !== 'Default'
           ? [new FilterGroup(filter.group), filter]
           : filter;
       })
