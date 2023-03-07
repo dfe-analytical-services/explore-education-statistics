@@ -655,6 +655,7 @@
         "Basic",
         "Standard",
         "Premium",
+        "GP_Gen5",
         "GP_S_Gen5"
       ]
     },
