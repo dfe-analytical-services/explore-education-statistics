@@ -55,10 +55,11 @@ const BasicReleaseSummary = ({ release }: Props) => {
 
       <SummaryList>
         <SummaryListItem term="Published">
-          {releaseDate && (
+          {releaseDate ? (
             <FormattedDate>{parseISO(releaseDate)}</FormattedDate>
+          ) : (
+            <p>TBA</p>
           )}
-          {!releaseDate && <p>TBA</p>}
         </SummaryListItem>
         {isValidPartialDate(release.nextReleaseDate) && (
           <SummaryListItem term="Next update">
