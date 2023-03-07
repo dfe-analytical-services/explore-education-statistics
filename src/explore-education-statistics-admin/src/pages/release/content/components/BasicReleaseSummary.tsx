@@ -33,6 +33,7 @@ interface Props {
 }
 
 const BasicReleaseSummary = ({ release }: Props) => {
+  const releaseDate = release.published ?? release.publishScheduled;
   return (
     <>
       <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between govuk-!-margin-bottom-3">
@@ -53,9 +54,9 @@ const BasicReleaseSummary = ({ release }: Props) => {
       </div>
 
       <SummaryList>
-        <SummaryListItem term="Publish date">
-          {release.publishScheduled ? (
-            <FormattedDate>{parseISO(release.publishScheduled)}</FormattedDate>
+        <SummaryListItem term="Published">
+          {releaseDate ? (
+            <FormattedDate>{parseISO(releaseDate)}</FormattedDate>
           ) : (
             <p>TBA</p>
           )}
