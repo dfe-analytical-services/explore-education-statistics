@@ -117,7 +117,6 @@ Approve release again
     user checks summary list contains    Current status    Approved
 
 user creates amendment for release
-    [Arguments]    ${PUBLICATION_NAME}    ${RELEASE_NAME}
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
 
     ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
