@@ -53,24 +53,23 @@ const PrototypeHomepage = () => {
           <div className="govuk-phase-banner">
             <p className="govuk-phase-banner__content">
               <Tag className="govuk-phase-banner__content__tag" strong>
-                Prototype
+                Beta
               </Tag>
 
               <span className="govuk-phase-banner__text">
-                This is a prototype page –{' '}
-                <Link to="/prototypes">View prototype index</Link>
+                This is a new service – your{' '}
+                <Link to="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-XMiKzsnr8xJoWM_DeGwIu9UNDJHOEJDRklTNVA1SDdLOFJITEwyWU1OQS4u">
+                  feedback
+                </Link>{' '}
+                will help us to improve it.
               </span>
             </p>
           </div>
           <h1 className="govuk-heading-xl  govuk-!-margin-bottom-7">
-            Welcome to explore education statistics
+            Welcome to Explore education statistics
           </h1>
-          <p className="govuk-body-l govuk-!-margin-bottom-3">
-            Explore and download up to date official educational statistics from
-            England.
-          </p>
-          <p className="govuk-body-l">
-            <strong>Publications, data downloads, table creation.</strong>
+          <p className="govuk-body-l govuk-!-margin-bottom-6">
+            Explore and download official statistics on education in England
           </p>
         </div>
       </div>
@@ -138,31 +137,30 @@ const PrototypeHomepage = () => {
       <div className={classNames('govuk-width-container')}>
         <div className={styles.prototypePublicPage}>
           <h2 className="govuk-!-margin-top-9">Education in numbers</h2>
-          <p className="govuk-body-l">
-            <strong>
-              <Link
-                to="/prototypes/dashboard2"
-                className="govuk-link--no-visited-state"
-              >
-                {' '}
-                View high level statistics across our range of publications
-              </Link>
-            </strong>{' '}
-          </p>
 
           <PrototypeDashboardContent headlines hideLink />
+
+          <p className="govuk-!-margin-top-6">
+            <Link
+              to="/prototypes/dashboard2#"
+              className="govuk-link--no-visited-state"
+            >
+              {' '}
+              Explore more high level statistics from education in numbers
+            </Link>
+          </p>
 
           <h2 className="govuk-!-margin-top-9">Supporting information</h2>
 
           <h3 className="govuk-!-margin-bottom-1">
-            <Link to="/prototypes/data-catalog">Data catalogue</Link>
+            <Link to="/prototypes/data-catalog#">Data catalogue</Link>
           </h3>
           <p className="govuk-caption-m">
             View all of the open data available and choose files to download.
           </p>
 
           <h3 className="govuk-!-margin-bottom-1">
-            <Link to="/methodology">Methodology</Link>
+            <Link to="/methodology#">Methodology</Link>
           </h3>
           <p className="govuk-caption-m">
             Browse to find out more about the methodology behind our statistics
@@ -170,7 +168,7 @@ const PrototypeHomepage = () => {
           </p>
 
           <h3 className="govuk-!-margin-bottom-1">
-            <Link to="/glossary">Glossary</Link>
+            <Link to="/glossary#">Glossary</Link>
           </h3>
           <p className="govuk-caption-m">
             Browse our A to Z list of definitions for terms used across our

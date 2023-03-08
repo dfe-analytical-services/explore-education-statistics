@@ -83,7 +83,7 @@ const PrototypeReleaseData = () => {
           </div>
           <div className={styles.releaseMainContent}>
             <h1 className="govuk-heading-xl">Education in numbers</h1>
-            <div className="govuk-grid-row govuk-!-margin-bottom-6">
+            <div className="govuk-grid-row">
               <div className="govuk-grid-column-two-thirds">
                 <dl className="govuk-summary-list">
                   <div className="govuk-summary-list__row">
@@ -109,6 +109,13 @@ const PrototypeReleaseData = () => {
                 </dl>
               </div>
             </div>
+            <p className="govuk-!-margin-bottom-9">
+              This page gives a high level overview of education statistics in
+              England, with links to specific publications that give more detail
+              on the topic areas. The figures provided are the latest available
+              and may relate to different time periods, please see individual
+              publications for methodological detail.
+            </p>
             <PrototypeDashboardContent />
           </div>
         </div>
