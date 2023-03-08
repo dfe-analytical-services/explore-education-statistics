@@ -79,13 +79,6 @@
             "typeProperties": {
               "storedProcedureName": "[[dbo].[RebuildIndexes]",
               "storedProcedureParameters": {
-                "Percent": {
-                  "value": {
-                    "value": "@pipeline().parameters.Percentage",
-                    "type": "Expression"
-                  },
-                  "type": "Int32"
-                },
                 "Tables": {
                   "value": {
                     "value": "@pipeline().parameters.Tables",
