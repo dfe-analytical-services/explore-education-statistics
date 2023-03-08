@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
@@ -8,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
-    [Route("api/permalink")]
+    [Route("api")]
     [ApiController]
     public class PermalinkController : ControllerBase
     {
@@ -19,15 +20,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             _permalinkService = permalinkService;
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<LegacyPermalinkViewModel>> Get(string id)
+        [HttpGet("permalink/{id:guid}")]
+        [Produces("application/json", "text/csv")]
+        public async Task Get(
+            Guid id,
+            CancellationToken cancellationToken)
         {
-            if (Guid.TryParse(id, out var idAsGuid))
+            if (Request.AcceptsCsv(exact: true))
             {
-                return await _permalinkService.Get(idAsGuid).HandleFailuresOrOk();
+                Response.ContentDispositionAttachment(
+                    contentType: "text/csv",
+                    filename: $"permalink-{id}.csv");
+
+                await _permalinkService.DownloadCsvToStream(id, Response.BodyWriter.AsStream(), cancellationToken);
+
+                return;
             }
 
-            return NotFound();
+            var result = await _permalinkService
+                .Get(id, cancellationToken)
+                .HandleFailuresOr(Ok);
+
+            await result.ExecuteResultAsync(ControllerContext);
         }
 
         [HttpPost]
@@ -36,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return await _permalinkService.Create(request).HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId}")]
+        [HttpPost("permalink/release/{releaseId:guid}")]
         public async Task<ActionResult<LegacyPermalinkViewModel>> Create(Guid releaseId,
             [FromBody] PermalinkCreateViewModel request)
         {

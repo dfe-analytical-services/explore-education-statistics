@@ -28,7 +28,7 @@ using static GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
-    public class ResultSubjectMetaService : IResultSubjectMetaService
+    public class SubjectResultMetaService : ISubjectResultMetaService
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly LocationsOptions _locationOptions;
         private readonly ILogger _logger;
 
-        public ResultSubjectMetaService(
+        public SubjectResultMetaService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             IBoundaryLevelRepository boundaryLevelRepository,
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ISubjectRepository subjectRepository,
             IReleaseDataFileRepository releaseDataFileRepository,
             IOptions<LocationsOptions> locationOptions,
-            ILogger<ResultSubjectMetaService> logger)
+            ILogger<SubjectResultMetaService> logger)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _logger = logger;
         }
 
-        public async Task<Either<ActionResult, ResultSubjectMetaViewModel>> GetSubjectMeta(
+        public async Task<Either<ActionResult, SubjectResultMetaViewModel>> GetSubjectMeta(
             Guid releaseId,
             ObservationQueryContext query,
             IList<Observation> observations)
@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     stopwatch.Restart();
 
                     var filterItems =
-                        _filterItemRepository.GetFilterItemsFromObservationList(observations);
+                        await _filterItemRepository.GetFilterItemsFromObservations(observations);
                     var filterViewModels = FiltersMetaViewModelBuilder.BuildFiltersFromFilterItems(filterItems,
                         releaseSubject.FilterSequence);
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     var geographicLevels = locations.Select(l => l.GeographicLevel).Distinct().ToList();
                     var boundaryLevelViewModels = GetBoundaryLevelViewModels(geographicLevels);
 
-                    return new ResultSubjectMetaViewModel
+                    return new SubjectResultMetaViewModel
                     {
                         Filters = filterViewModels,
                         Footnotes = footnoteViewModels,

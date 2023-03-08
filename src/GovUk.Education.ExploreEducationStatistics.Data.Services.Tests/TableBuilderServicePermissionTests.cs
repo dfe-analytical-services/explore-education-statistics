@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
@@ -112,10 +111,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IFilterItemRepository? filterItemRepository = null,
             IObservationService? observationService = null,
             IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
-            IResultSubjectMetaService? resultSubjectMetaService = null,
+            ISubjectResultMetaService? subjectResultMetaService = null,
+            ISubjectCsvMetaService? subjectCsvMetaService = null,
             ISubjectRepository? subjectRepository = null,
             IUserService? userService = null,
-            IResultBuilder<Observation, ObservationViewModel>? resultBuilder = null,
             IReleaseRepository? releaseRepository = null,
             IOptions<TableBuilderOptions>? options = null)
         {
@@ -124,10 +123,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 filterItemRepository ?? Mock.Of<IFilterItemRepository>(MockBehavior.Strict),
                 observationService ?? Mock.Of<IObservationService>(MockBehavior.Strict),
                 statisticsPersistenceHelper ?? StatisticsPersistenceHelperMock(_subject).Object,
-                resultSubjectMetaService ?? Mock.Of<IResultSubjectMetaService>(MockBehavior.Strict),
+                subjectResultMetaService ?? Mock.Of<ISubjectResultMetaService>(MockBehavior.Strict),
+                subjectCsvMetaService ?? Mock.Of<ISubjectCsvMetaService>(MockBehavior.Strict),
                 subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
                 userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
-                resultBuilder ?? new ResultBuilder(),
                 releaseRepository ?? Mock.Of<IReleaseRepository>(MockBehavior.Strict),
                 options ?? Options.Create(new TableBuilderOptions())
             );

@@ -132,13 +132,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
 
             services.AddTransient<IBlobCacheService, BlobCacheService>();
-            services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
             services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IReleaseService, ReleaseService>();
-            services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();
             services.AddTransient<IReleaseSubjectService, ReleaseSubjectService>();
+            services.AddTransient<ISubjectResultMetaService, SubjectResultMetaService>();
+            services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
             services.AddSingleton<IBlobStorageService, BlobStorageService>(provider =>
                 new BlobStorageService(
@@ -162,6 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IDataGuidanceSubjectService, DataGuidanceSubjectService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IPermalinkService, PermalinkService>();
+            services.AddTransient<IPermalinkCsvMetaService, PermalinkCsvMetaService>();
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();

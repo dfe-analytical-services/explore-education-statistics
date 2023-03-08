@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta
 {
-    public record ResultSubjectMetaViewModel
+    public record SubjectResultMetaViewModel
     {
         public Dictionary<string, FilterMetaViewModel> Filters { get; init; } = new();
 

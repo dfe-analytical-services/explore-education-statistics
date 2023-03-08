@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Data.Api.Cancellation.RequestTimeoutConfigurationKeys;
@@ -35,7 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         private readonly IReleaseRepository _releaseRepository;
         private readonly ITableBuilderService _tableBuilderService;
 
-        public TableBuilderController(IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
+        public TableBuilderController(
+            IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             IDataBlockService dataBlockService,
             IReleaseRepository releaseRepository,
             ITableBuilderService tableBuilderService)
@@ -47,26 +49,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpPost("tablebuilder")]
+        [Produces("application/json", "text/csv")]
         [CancellationTokenTimeout(TableBuilderQuery)]
-        public Task<ActionResult<TableBuilderResultViewModel>> Query(
+        public async Task Query(
             [FromBody] ObservationQueryContext query,
             CancellationToken cancellationToken = default)
         {
-            return _tableBuilderService
+            if (Request.AcceptsCsv(exact: true))
+            {
+                Response.ContentDispositionAttachment("text/csv");
+
+                await _tableBuilderService.QueryToCsvStream(query, Response.BodyWriter.AsStream(), cancellationToken);
+
+                return;
+            }
+
+            var result = await _tableBuilderService
                 .Query(query, cancellationToken)
-                .HandleFailuresOrOk();
+                .HandleFailuresOr(Ok);
+
+            await result.ExecuteResultAsync(ControllerContext);
         }
 
-        [HttpPost("tablebuilder/release/{releaseId}")]
+        [HttpPost("tablebuilder/release/{releaseId:guid}")]
+        [Produces("application/json", "text/csv")]
         [CancellationTokenTimeout(TableBuilderQuery)]
-        public Task<ActionResult<TableBuilderResultViewModel>> Query(
+        public async Task Query(
             Guid releaseId,
             [FromBody] ObservationQueryContext query,
             CancellationToken cancellationToken = default)
         {
-            return _tableBuilderService
+            if (Request.AcceptsCsv(exact: true))
+            {
+                Response.ContentDispositionAttachment(
+                    contentType: "text/csv",
+                    filename: $"{releaseId}.csv");
+
+                await _tableBuilderService.QueryToCsvStream(
+                    releaseId,
+                    query,
+                    Response.BodyWriter.AsStream(),
+                    cancellationToken
+                );
+
+                return;
+            }
+
+            var result = await _tableBuilderService
                 .Query(releaseId, query, cancellationToken)
-                .HandleFailuresOrOk();
+                .HandleFailuresOr(Ok);
+
+            await result.ExecuteResultAsync(ControllerContext);
         }
 
         [ResponseCache(Duration = 300)]

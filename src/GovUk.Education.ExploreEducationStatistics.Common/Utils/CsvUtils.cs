@@ -13,6 +13,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public static class CsvUtils
 {
+    public static Task<List<string>> GetCsvHeaders(Stream stream)
+        => GetCsvHeaders(() => Task.FromResult(stream));
+
+    public static Task<List<string>> GetCsvHeaders(Task<Stream> stream)
+        => GetCsvHeaders(() => stream);
+
     /// <summary>
     /// Gets the header values of the first line of the provided CSV.
     /// </summary>
