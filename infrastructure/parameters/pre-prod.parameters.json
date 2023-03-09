@@ -66,16 +66,13 @@
       "value": 50
     },
     "skuStatisticsDb": {
-      "value": "GP_S_Gen5"
+      "value": "GP_Gen5"
     },
     "tierStatisticsDb": {
       "value": "GeneralPurpose"
     },
     "capacityStatisticsDb": {
-      "value": 4
-    },
-    "minCapacityStatisticsDb": {
-      "value": "0.5"
+      "value": 2
     },
     "maxContentDbSizeBytes": {
       "value": 1073741824
