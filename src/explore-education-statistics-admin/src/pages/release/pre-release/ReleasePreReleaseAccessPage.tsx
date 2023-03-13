@@ -53,10 +53,16 @@ const ReleasePreReleaseAccessPage = () => {
                 scheduled publication date.
               </p>
               <p>
-                Pre-release access via Explore Education Statistics is currently
-                limited to DFE users only, if you need to share your release
-                with external users you will need to do so outside of the
-                system.
+                Pre-release access via Explore Education Statistics is limited
+                to DfE users by default, access for external users can be
+                requested by emailing{' '}
+                <a href="mailto:explore.statistics@education.gov.uk">
+                  explore.statistics@education.gov.uk
+                </a>
+                . If requesting external access, please include the email
+                address of the external user, and contact us at least two weeks
+                in advance as the request requires approval and action from
+                cyber security.
               </p>
             </InsetText>
 
