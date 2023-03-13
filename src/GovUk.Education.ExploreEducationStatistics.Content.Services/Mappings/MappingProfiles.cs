@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
             CreateMap<ContentBlock, IContentBlockViewModel>()
                 .IncludeAllDerived();
 
-            CreateDataBlockMap();
+            CreateMap<DataBlock, DataBlockViewModel>();
 
             CreateMap<EmbedBlockLink, EmbedBlockLinkViewModel>()
                 .ForMember(dest => dest.Title,
@@ -79,13 +79,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
             CreateMap<HtmlBlock, HtmlBlockViewModel>();
 
             CreateMap<MarkDownBlock, MarkDownBlockViewModel>();
-        }
-
-        private void CreateDataBlockMap()
-        {
-            CreateMap<DataBlock, DataBlockViewModel>();
-
-            CreateMap<DataBlockSummary, DataBlockSummaryViewModel>();
         }
     }
 }

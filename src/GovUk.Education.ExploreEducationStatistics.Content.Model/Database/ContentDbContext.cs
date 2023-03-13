@@ -410,13 +410,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => JsonConvert.DeserializeObject<List<IChart>>(v));
 
             modelBuilder.Entity<DataBlock>()
-                .Property(block => block.Summary)
-                .HasColumnName("DataBlock_Summary")
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<DataBlockSummary>(v));
-
-            modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Table)
                 .HasColumnName("DataBlock_Table")
                 .HasConversion(
