@@ -856,7 +856,7 @@
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "physical_data_read_percent",
-        "threshold": 50,
+        "threshold": 85,
         "operator": "GreaterThan",
         "timeAggregation": "Average",
         "criterionType": "StaticThresholdCriterion"
@@ -933,7 +933,7 @@
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('statisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "physical_data_read_percent",
-        "threshold": 50,
+        "threshold": 85,
         "operator": "GreaterThan",
         "timeAggregation": "Average",
         "criterionType": "StaticThresholdCriterion"
@@ -1010,7 +1010,7 @@
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "physical_data_read_percent",
-        "threshold": 50,
+        "threshold": 85,
         "operator": "GreaterThan",
         "timeAggregation": "Average",
         "criterionType": "StaticThresholdCriterion"
