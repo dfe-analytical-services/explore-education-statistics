@@ -8,7 +8,10 @@ services:
       - INFLUXDB_DB=k6
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:9.3.2
+    depends_on:
+      - influxdb
+      - renderer
     networks:
       - k6_performance_test_network
     links:
@@ -19,17 +22,26 @@ services:
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_BASIC_ENABLED=false
+      - GF_RENDERING_SERVER_URL=http://renderer:8081/render
+      - GF_RENDERING_CALLBACK_URL=http://grafana:3005/
+      - GF_LOG_FILTERS=rendering:debug
     volumes:
       - ./dashboards:/var/lib/grafana/dashboards
       - ./grafana-dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
       - ./grafana-datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
       - "./grafana.ini:/etc/grafana/grafana.ini"
 
+  renderer:
+    image: grafana/grafana-image-renderer:latest
+    networks:
+      - k6_performance_test_network
+    ports:
+      - 8081
+
   k6:
     image: loadimpact/k6:latest
     depends_on:
       - influxdb
-      - grafana
     # Add the host IP address to the k6 container to allow it to connect to the host 
     # when running and developing performance tests locally.
     extra_hosts:
