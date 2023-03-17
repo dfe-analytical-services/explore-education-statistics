@@ -21,22 +21,20 @@ export interface PrototypeSubject {
 export const subjectsForRelease1: PrototypeSubject[] = [
   {
     id: 'id1',
-    title:
-      'Children in need and episodes of need by local authority for 2021/22',
+    title: 'Children in need and episodes of need by local authority',
     release: 'Academic Year 2021/22',
   },
   {
     id: 'id2',
     title:
-      "Referrals and re-referrals to children's social care services by local authority 2021/22",
+      "Referrals and re-referrals to children's social care services by local authority",
     release: 'Academic Year 2021/22',
   },
 ];
 export const subjectsForRelease2: PrototypeSubject[] = [
   {
     id: 'id3',
-    title:
-      'Children in need and episodes of need by local authority for 2022/23',
+    title: 'Children in need and episodes of need by local authority',
     release: 'Academic Year 2022/23',
   },
   {
@@ -47,7 +45,7 @@ export const subjectsForRelease2: PrototypeSubject[] = [
   {
     id: 'id5',
     title:
-      "Referrals and re-referrals to children's social care services by local authority 2022/23",
+      "Referrals and re-referrals to children's social care services by local authority",
     release: 'Academic Year 2022/23',
   },
 ];
@@ -141,7 +139,7 @@ const PrototypePublicationSubjects = () => {
       <PrototypePublicationSubjectList
         isCurrentReleasePublished={isCurrentReleasePublished}
         publicationSubjects={publicationSubjects}
-        onEditTitle={setSubjectToEdit}
+        // onEditTitle={setSubjectToEdit}
         onEditSubject={setSubjectToChange}
       />
     </>

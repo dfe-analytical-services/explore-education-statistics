@@ -93,7 +93,7 @@ const PrototypePrepareNextSubjectStep1 = ({
                   </>
                 </FormFieldset>
                 <WizardStepFormActions
-                  submitText="Next step, locations"
+                  submitText="Next step - locations"
                   {...stepProps}
                 />
               </Form>

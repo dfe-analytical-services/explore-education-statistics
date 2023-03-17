@@ -8,6 +8,7 @@ import InsetText from '@common/components/InsetText';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import React from 'react';
+import WarningMessage from '@common/components/WarningMessage';
 import {
   PublicationSubject,
   PrototypeSubject,
@@ -43,7 +44,8 @@ const PrototypeAddPublicationSubject = ({
         <p>Please note the following constraints to using API datasets:</p>
         <ul>
           <li>
-            they <strong>cannot</strong> be deleted once published
+            they <strong>cannot</strong> be deleted once published, however they
+            can be edited or deleted prior to publication.
           </li>
           <li>
             their facets (column variables) <strong>cannot</strong> be deleted
@@ -59,6 +61,10 @@ const PrototypeAddPublicationSubject = ({
           using standard datasets, but note these will not be available in the
           public api.
         </p>
+        <WarningMessage>
+          Changes will not be made in the public API until the next dataset's
+          release has been published.
+        </WarningMessage>
       </InsetText>
 
       {!isCurrentReleasePublished && (

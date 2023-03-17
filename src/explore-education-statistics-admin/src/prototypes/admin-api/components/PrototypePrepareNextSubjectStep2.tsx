@@ -52,6 +52,15 @@ const PrototypePrepareNextSubjectStep2 = ({
     }),
   );
 
+  let nextStep = 'complete linking';
+
+  if (name === 'location') {
+    nextStep = 'filters';
+  }
+  if (name === 'filter') {
+    nextStep = 'indicators';
+  }
+
   const stepHeading = (
     <WizardStepHeading {...stepProps} fieldsetHeading>
       Map {namePlural}
@@ -201,7 +210,7 @@ const PrototypePrepareNextSubjectStep2 = ({
                           },
                         ])}
                         type="mapped"
-                        grouped={name !== 'indicator'}
+                        grouped
                         onClick={id =>
                           setItemToUnmap(
                             mappedItems.find(item => item[0].id === id),
@@ -210,8 +219,10 @@ const PrototypePrepareNextSubjectStep2 = ({
                       />
                     </>
                   )}
-
-                  <WizardStepFormActions {...stepProps} />
+                  <WizardStepFormActions
+                    submitText={`Next -  ${nextStep}`}
+                    {...stepProps}
+                  />
                 </Form>
               )}
             </Formik>
