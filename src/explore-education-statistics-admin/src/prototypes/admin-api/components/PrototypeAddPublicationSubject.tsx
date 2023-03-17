@@ -2,7 +2,7 @@ import Button from '@common/components/Button';
 import {
   Form,
   FormFieldSelect,
-  FormFieldTextInput,
+  // FormFieldTextInput,
 } from '@common/components/form';
 import InsetText from '@common/components/InsetText';
 import Yup from '@common/validation/yup';
@@ -31,33 +31,32 @@ const PrototypeAddPublicationSubject = ({
 }: Props) => {
   return (
     <>
-      <h2>Publication subjects</h2>
+      <h2>API datasets</h2>
       <InsetText>
         <h3>Before you start</h3>
         <p>
-          Publication subjects are available for use in the EES public API for
+          API datasets are available for use in the EES public API for
           third-party applications to consume. They represent a long-lived data
           series where the data structure cannot change in a drastic way between
           each release.
         </p>
-        <p>
-          Please note the following constraints to using publication subjects:
-        </p>
+        <p>Please note the following constraints to using API datasets:</p>
         <ul>
           <li>
             they <strong>cannot</strong> be deleted once published
           </li>
           <li>
-            their facets <strong>cannot</strong> be deleted once published
+            their facets (column variables) <strong>cannot</strong> be deleted
+            once published
           </li>
           <li>
-            existing facets must always map to equivalent facets when linking to
-            new subject data
+            existing facets (column variables) must always map to equivalent
+            facets when linking to new subject data
           </li>
         </ul>
         <p>
-          If your subject cannot meet these criteria, we advise you to continue
-          using standard subjects, but note these will not be available in the
+          If your dataset cannot meet these criteria, we advise you to continue
+          using standard datasets, but note these will not be available in the
           public api.
         </p>
       </InsetText>
@@ -69,8 +68,8 @@ const PrototypeAddPublicationSubject = ({
             subjectId: '',
           }}
           validationSchema={Yup.object({
-            subjectId: Yup.string().required('Enter a subject'),
-            title: Yup.string().required('Enter a title'),
+            subjectId: Yup.string().required('Select a dataset'),
+            // title: Yup.string().required('Enter a title'),
           })}
           onSubmit={(values, { resetForm }) => {
             resetForm();
@@ -79,23 +78,25 @@ const PrototypeAddPublicationSubject = ({
         >
           {() => (
             <Form id="form" showSubmitError>
-              <FormFieldTextInput
-                id="title"
-                name="title"
-                label="Title"
-                width={20}
-              />
+              {/* 
+                <FormFieldTextInput
+                  id="title"
+                  name="title"
+                  label="Title"
+                  width={20}
+                /> 
+              */}
               <FormFieldSelect<FormValues>
                 id="subjectId"
                 name="subjectId"
-                label="Subject"
+                label="Available datasets"
                 options={subjects.map(s => ({
                   label: s.title,
                   value: s.id,
                 }))}
-                placeholder="Choose a subject"
+                placeholder="Select a dataset"
               />
-              <Button type="submit">Create publication subject</Button>
+              <Button type="submit">Create API dataset</Button>
             </Form>
           )}
         </Formik>

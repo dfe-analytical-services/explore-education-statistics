@@ -31,6 +31,15 @@ button.item {
   }
 }
 
+/* stylelint-disable-next-line selector-no-qualifying-type */
+button.itemWarning {
+  background: govuk-colour('red');
+
+  &:hover {
+    background: govuk-colour('light-pink');
+  }
+}
+
 .label {
   color: govuk-colour('dark-grey');
 
@@ -63,6 +72,11 @@ button.item {
 
   @include govuk-media-query($from: tablet) {
     width: 45%;
+  }
+
+  &DisableOption {
+    background: none;
+    border-width: 0;
   }
 }
 

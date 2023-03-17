@@ -27,7 +27,7 @@ const PrototypeUnmapFacetModal = ({
       onExit={onClose}
     >
       <div className={styles.inner}>
-        <h3>Current subject {name}</h3>
+        <h3>Current dataset {name}</h3>
 
         <SummaryList className="govuk-!-margin-bottom-5">
           <SummaryListItem term="Label">{itemToUnmap[0].label}</SummaryListItem>
@@ -59,7 +59,7 @@ const PrototypeUnmapFacetModal = ({
           </SummaryListItem>
         </SummaryList>
 
-        <h3>Next subject {name}</h3>
+        <h3>Next dataset {name}</h3>
 
         <SummaryList className="govuk-!-margin-bottom-5">
           <SummaryListItem term="Label">{itemToUnmap[1].label}</SummaryListItem>

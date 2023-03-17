@@ -21,17 +21,17 @@ const PrototypePrepareNextSubjectStep5 = ({
         <div className="govuk-grid-column-two-thirds">
           <p>
             By completing this step, this publication subject will be updated to
-            use data from the next subject chosen above.
+            use data from the next dataset chosen above.
           </p>
 
           <p>
             All of the above mapping will be applied so that existing facets
-            match to facets on the next subject. Any new facets introduced by
-            the next subject will also be created.
+            match to facets on the next dataset. Any new facets introduced by
+            the next dataset will also be created.
           </p>
 
           <WarningMessage>
-            Changes will not be made in the public API until the next subject's
+            Changes will not be made in the public API until the next dataset's
             release has been published.
           </WarningMessage>
 
@@ -40,7 +40,7 @@ const PrototypePrepareNextSubjectStep5 = ({
               history.push('/prototypes/admin-api/data/2022-23#subjects');
             }}
           >
-            Complete subject linking
+            Complete dataset linking
           </Button>
         </div>
       </div>

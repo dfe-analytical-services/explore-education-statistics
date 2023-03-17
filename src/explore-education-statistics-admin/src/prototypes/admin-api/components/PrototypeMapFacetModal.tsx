@@ -70,7 +70,7 @@ const PrototypeMapFacetModal = ({
       >
         <Form id="form" showSubmitError>
           <div className={styles.inner}>
-            <h3>Current subject {name}</h3>
+            <h3>Current dataset {name}</h3>
 
             <SummaryList className="govuk-!-margin-bottom-5">
               <SummaryListItem term="Label">{itemToMap.label}</SummaryListItem>
@@ -102,9 +102,9 @@ const PrototypeMapFacetModal = ({
               </SummaryListItem>
             </SummaryList>
 
-            <h3>Next subject {name}</h3>
+            <h3>Next dataset {name}</h3>
             <p>
-              Choose a {name} that will be mapped to the current subject
+              Choose a {name} that will be mapped to the current dataset
               location (see above).
             </p>
             <FormTextSearchInput
@@ -147,7 +147,7 @@ const PrototypeMapFacetModal = ({
             className="govuk-!-margin-bottom-0 govuk-!-margin-top-4"
             type="submit"
           >
-            Submit mapping
+            Update mapping
           </Button>
         </Form>
       </Formik>

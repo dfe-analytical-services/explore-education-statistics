@@ -27,8 +27,8 @@ const PrototypeFacetList = ({
   const Inner = () => (
     <div className={styles.container}>
       <div aria-hidden className="dfe-flex">
-        <span className={styles.heading}>Current subject</span>
-        <span className={styles.heading}>Next subject</span>
+        <span className={styles.heading}>Current dataset</span>
+        <span className={styles.heading}>New dataset</span>
       </div>
       {items.map((item, index) => {
         return (
