@@ -6,7 +6,7 @@ The performance test suite is built using [k6](https://k6.io/) and visualised us
 ## How it works
 
 * We run InfluxDB (for collecting data) and Grafana (for visualising the collected data) using docker-compose.
-* We run the K6 tests using docker-compose.  We can choose specific tests to run from the CLI.
+* We run the K6 tests using docker-compose. We can choose specific tests to run from the CLI.
 * The K6 tests run and post data to InfluxDB.
 * Grafana is set up with a Dashboard that consumes and visualises data from the InfluxDB data source.
 
@@ -71,7 +71,7 @@ These files will store environment-specific user credentials for accessing Admin
 
 As a one-off, we will need to copy `tests/performance-tests/.env.example.json` to
 `tests/performance-tests/.env.<environment>.json`, and supply the file with the correct
-environment-specific credentials for the users that we'll be using.  The `<environment>` can
+environment-specific credentials for the users that we'll be using. The `<environment>` can
 be any value that we can load test against. As an example, if doing load testing or test script
 development against a local environment, we would create a file called
 `tests/performance-tests/.env.local.json` and supply the local user credentials within the file.
@@ -105,7 +105,7 @@ npm run store-environment-details --environment=<environment> --users=<user name
 ``` 
 
 This obtains an `access_token` and a `refresh_token` that can be used to access protected resources
-in the Admin API.  The `refresh_token` allows long-running tests to refresh their access token if
+in the Admin API. The `refresh_token` allows long-running tests to refresh their access token if
 it's going to expire mid-test.
 
 This will look in the `.env.<environment>.json` file for a user with `"name": "<user name>"` and use 
@@ -159,11 +159,11 @@ http://localhost:3005/d/k6/k6-load-testing-results?orgId=1&refresh=5s
 This is an out-of-the-box Grafana / K6 Dashboard that captures general low-level performance
 statistics.
 
-## Individual test options
+## Command-line test parameters 
 
 Some variables are available in certain tests to allow the running of the tests with different
 test data should we need to do so, but without needing to alter the test code. We use environment
-variables to supply the tests with variables using the `-e` flag.  All variables have default 
+variables to supply the tests with variables using the `-e` flag. All variables have default 
 values to fall back on.
 
 Note that in various tests that deal with file imports, we allow the selection of data files to 
@@ -172,34 +172,129 @@ convention of `big-file1.zip`, `big-file2.zip` etc, and place them in the
 [imports assets folder](src/tests/admin/import/assets). With this naming convention, they will
 be ignored by Git.
 
+### Profiles
+
+Tests which use the [common configuration generators](src/configuration) can have their configuration
+fine-tuned using the following parameters.
+
+#### Steady request rates
+
+See [steadyRequestRateProfile.ts](src/configuration/steadyRequestRateProfile.ts).
+
+This is typically used for load and soak tests, where a steady volume of traffic is maintained
+for a given duration.
+
+* RPS - the rate of requests generated per second.
+* MAIN_TEST_STAGE_DURATION_MINS - the duration of the main stage of the test. Also the duration of a
+  subsequent cooldown period which allows in-flight requests and responses to finish.
+
+#### Ramping request rates
+
+See [rampingRequestRateProfile.ts](src/configuration/rampingRequestRateProfile.ts).
+
+This is typically used for stress testing, where traffic starts from zero requests per minute and 
+slowly increases over time, to find the point at which the system under test becomes unstable.
+
+* RPS - the rate of requests generated per second at the point of maximum stress (the end of the main
+  test stage).
+* MAIN_TEST_STAGE_DURATION_MINS - the duration of the main stage of the test. Also the duration of a
+  subsequent cooldown period which allows in-flight requests and responses to finish.
+
+#### Spike
+
+See [spikeProfile.ts](src/configuration/spikeProfile.ts).
+
+This is typically used to test sudden spikes in traffic, the immediate effect on the system under test
+and the recovery time post-spike. 
+
+* PRE_SPIKE_DURATION_MINS - the duration of the stage prior to the traffic spike.
+* SPIKE_DURATION_MINS - the duration of the traffic spike.
+* POST_SPIKE_DURATION_MINS - the duration of the recovery stage after the traffic spike.
+* RPS_NORMAL - the rate of requests generated per second under normal traffic conditions.
+* RPS_SPIKE - the rate of requests generated per second during the traffic spike period.
+
+#### Sequential executions
+
+See [sequentialRequestsProfile.ts](src/configuration/sequentialRequestsProfile.ts).
+
+This is used to execute the main test script one at a time, with no concurrency. This is
+typically used to be able to measure performance on an individual request basis.
+
+* MAIN_TEST_STAGE_DURATION_MINS - the duration of the main stage of the test. There is no 
+  cooldown period with this profile.
+
+### Individual test options
+
 Full sets of options per test are available below as examples:
 
-### import.test.js
+#### import.test.js
 
 * PUBLICATION_TITLE - default value is "import.test.ts".
-* DATA_FILE - default value is "small-file.csv" which is in source control.  See notes above on the use 
+* DATA_FILE - default value is "small-file.csv" which is in source control. See notes above on the use 
   of large ZIP files.
 
 `npm run test dist/import.test.js --environment=dev --users=bau1 -- 
 -e PUBLICATION_TITLE="Import publication" -e DATA_FILE="big-file1.zip"`
 
-### publicTableBuilderQuery.test.js
+#### publicTableBuilderQuery.test.js
 
 * PUBLICATION_TITLE - default value is "publicTableBuilderQuery.test.ts".
-* DATA_FILE - default value is "small-file.csv" which is in source control.  See notes above on the use
+* DATA_FILE - default value is "small-file.csv" which is in source control. See notes above on the use
   of large ZIP files.
 
 `npm run test dist/publicTableBuilderQuery.test.js --environment=dev --users=bau1 --
 -e PUBLICATION_TITLE="Public table builder query" -e DATA_FILE="big-file1.zip"`
 
-### adminTableBuilderQuery.test.js
+#### adminTableBuilderQuery.test.js
 
 * PUBLICATION_TITLE - default value is "adminTableBuilderQuery.test.ts".
-* DATA_FILE - default value is "small-file.csv" which is in source control.  See notes above on the use
+* DATA_FILE - default value is "small-file.csv" which is in source control. See notes above on the use
   of large ZIP files.
 
 `npm run test dist/adminTableBuilderQuery.test.js --environment=dev --users=bau1 --
 -e PUBLICATION_TITLE="Admin table builder query" -e DATA_FILE="big-file1.zip"`
+
+#### publicApiDataSetQuery.test.js
+
+##### Profiles
+
+This test supports various different performance testing scenarios.
+
+* PROFILE - supported values are "load", "stress", "spike", "sequential".
+
+Each of these profiles has a default set of configuration out-of-the-box. They can however be
+fine-tuned further using the common override parameters defined in .
+
+##### Query generation
+
+This test generates queries for the Public API. There are 2 out-of-the-box scenarios for the types of 
+queries that can be generated:
+
+* QUERIES - default value is "simple", which generates simple small queries. Other value is "complex"
+  which generates nested queries with more complex operators.
+
+##### Data set selection
+
+This test by default targets any data sets that are discoverable via the Public API. The data sets used 
+by the tests can be filtered down however using the following parameters:
+
+* DATA_SET_NAMES - a comma-separated list of data set names, which will cause the test to only use those
+  data sets during the run. The default value is undefined, which does not filter data sets by name. 
+* DATA_SET_MAX_ROWS - the maximum number of rows for data sets to be used in this run. The default value 
+  is undefined, which does not filter data sets by their size.
+
+##### Max results per data set
+
+This test can be configured to bring back a certain amount of query results for any data set being 
+queried. This may require more than one query depending on the number of results desired and the 
+page size of the query response being used.
+
+* MAX_RESULTS_PER_DATA_SET - the maximum results to retrieve for a data set being queried. For instance,
+  if 20,000 is configured, it would result in 2 queries of the data set for page 1 and 2 at a page size 
+  of 10,000 results (assuming that there were at least 20,000 results that matched the query). 
+
+`npm run test dist/publicApiDataSetQuery.test.js --environment=dev --
+-e PROFILE=load -e QUERIES=complex -e DATA_SET_MAX_ROWS=500000`
 
 ## Transpiling and Bundling
 
@@ -218,11 +313,11 @@ transpiling in the same fashion.
 ### Exceptions and stacktraces in Typescript code
 
 We can use source maps to be able to trace errors back to the original Typescript source when 
-encountering errors in transpiled Javascript code.  This is provided via the `source-map-support` 
+encountering errors in transpiled Javascript code. This is provided via the `source-map-support` 
 package.
 
 To enable this in Node, we can supply the `-r source-map-support/register` option whilst running the 
-problem script.  For example:
+problem script. For example:
 
 ```bash
 node -r source-map-support/register dist/logAuthTokens.js local bau1
@@ -258,4 +353,20 @@ The output should look like:
      ✓ response with re-refreshed tokens contained a new accessToken
      ✓ response with re-refreshed tokens contained a new refreshToken
      ✓ response with re-refreshed access token was 200
+```
+
+### Client-side errors when generating load
+
+Errors can be encountered when generating load from a host machine due to insufficient resources. K6 has 
+a guide for [running large tests](https://k6.io/docs/testing-guides/running-large-tests/) which makes some
+suggestions as to how to fine-tune a machine for load generation. The following settings changes can make 
+a big difference on a Linux machine:
+
+As root:
+
+```
+sysctl -w net.ipv4.ip_local_port_range="1024 65535"
+sysctl -w net.ipv4.tcp_tw_reuse=1
+sysctl -w net.ipv4.tcp_timestamps=1
+ulimit -n 250000
 ```
