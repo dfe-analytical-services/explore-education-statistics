@@ -115,10 +115,12 @@ Approve release again
     user clicks button    Update status
     user waits until h2 is visible    Sign off
     user checks summary list contains    Current status    Approved
+    user waits until page contains element    id:release-process-status-Complete    %{WAIT_MEDIUM}
 
 user creates amendment for release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
 
+    user waits until page contains element    testid:publication-published-releases
     ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
     user clicks element    xpath://*[text()="Amend"]    ${ROW}
 
