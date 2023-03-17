@@ -27,12 +27,12 @@ const PrototypeEditPublicationSubjectTitle = ({
         className="govuk-!-margin-bottom-6 govuk-!-padding-left-3 govuk-link govuk-back-link"
         onClick={onClose}
       >
-        Back
+        Back to API datasets
       </ButtonText>
 
       <section>
         <span className="govuk-caption-l">{publicationSubject.title}</span>
-        <h2>Edit title</h2>
+        <h2>Edit dataset title</h2>
 
         <Formik<FormValues>
           initialValues={{ title: publicationSubject.title }}

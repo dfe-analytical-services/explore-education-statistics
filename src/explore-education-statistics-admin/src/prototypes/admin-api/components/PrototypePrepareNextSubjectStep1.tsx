@@ -28,7 +28,7 @@ const PrototypePrepareNextSubjectStep1 = ({
 
   const stepHeading = (
     <WizardStepHeading {...stepProps} fieldsetHeading>
-      Choose next subject
+      Select new API dataset
     </WizardStepHeading>
   );
 
@@ -45,7 +45,7 @@ const PrototypePrepareNextSubjectStep1 = ({
                 .required('Choose a subject')
                 .test({
                   name: 'whatevs',
-                  message: `Time periods in the next subject should be compatible with the current subject.`,
+                  message: `Time periods in the next dataset should be compatible with the current dataset.`,
                   test(values) {
                     if (values !== 'id4') {
                       return true;
@@ -64,36 +64,38 @@ const PrototypePrepareNextSubjectStep1 = ({
                 <FormFieldset id="downloadFiles" legend={stepHeading}>
                   <>
                     <p>
-                      To make updates to this publication subject, a new subject
-                      needs to be selected to provide the underlying data. The
-                      chosen subject should be a continuation of the current
-                      subject and not have a drastically differing data
-                      structure.
+                      To make updates to this API dataset, a new dataset needs
+                      to be selected to provide the underlying data. The chosen
+                      dataset should be a continuation of the current dataset
+                      and not have a drastically differing data structure.
                     </p>
                     <p>The following rules apply:</p>
                     <ul className="govuk-!-margin-bottom-8">
                       <li>
-                        existing facets should map to equivalent facets in the
-                        new subject
+                        existing facets (column variables) should map to
+                        equivalent facets in the new dataset
                       </li>
                       <li>
-                        existing facets should not have been removed in the new
-                        subject
+                        existing facets (column variables) should not have been
+                        removed in the new dataset
                       </li>
                     </ul>
                     <FormFieldSelect<FormValues>
                       id="subjectId"
                       name="subjectId"
-                      label="Subject"
+                      label="Available datasets"
                       options={subjectsForRelease2.map(s => ({
                         label: s.title,
                         value: s.id,
                       }))}
-                      placeholder="Choose a subject"
+                      placeholder="Select a new dataset"
                     />
                   </>
                 </FormFieldset>
-                <WizardStepFormActions {...stepProps} />
+                <WizardStepFormActions
+                  submitText="Next step, locations"
+                  {...stepProps}
+                />
               </Form>
             )}
           </Formik>
@@ -103,11 +105,14 @@ const PrototypePrepareNextSubjectStep1 = ({
   }
 
   return (
-    <WizardStepSummary {...stepProps} goToButtonText="Change next subjecct">
+    <WizardStepSummary
+      {...stepProps}
+      goToButtonText="Change dataset for next release"
+    >
       {stepHeading}
 
       <SummaryList noBorder>
-        <SummaryListItem term="Next subject">
+        <SummaryListItem term="Dataset for next release">
           {subjectsForRelease2[0].title}
         </SummaryListItem>
         <SummaryListItem term="Next release">

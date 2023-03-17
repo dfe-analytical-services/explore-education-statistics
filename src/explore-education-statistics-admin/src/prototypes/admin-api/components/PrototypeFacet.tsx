@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 import { Facet } from './PrototypeFacetList';
 import styles from './PrototypeFacet.module.scss';
 
@@ -11,15 +12,20 @@ interface Props {
 const PrototypeFacet = ({ item, itemType, onClick }: Props) => {
   const Inner = () => (
     <>
-      <span className={styles.label}>Current subject </span>
-      <span className={styles.map}>
+      <span className={styles.label}>Current dataset </span>
+      <span
+        className={classNames(styles.map, {
+          [styles.mapDisableOption]: itemType === 'new',
+        })}
+      >
+        {itemType === 'new' && <p>Not applicable to current dataset</p>}
         {item[0].label}
         {item[0].caption && (
           <span className={styles.caption}> {item[0].caption}</span>
         )}{' '}
       </span>
       <span className={styles.divider} />
-      <span className={styles.label}>Next subject </span>
+      <span className={styles.label}>Next dataset </span>
       <span className={styles.map}>
         {item[1].label}
         {item[1].caption && (
@@ -38,7 +44,9 @@ const PrototypeFacet = ({ item, itemType, onClick }: Props) => {
           }
         }}
         type="button"
-        className={styles.item}
+        className={classNames(styles.item, {
+          [styles.itemWarning]: itemType === 'unmapped',
+        })}
       >
         <Inner />
       </button>

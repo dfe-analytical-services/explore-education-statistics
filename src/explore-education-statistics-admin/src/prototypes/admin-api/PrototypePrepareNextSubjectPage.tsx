@@ -70,15 +70,15 @@ const PrototypePrepareNextSubjectPage = ({
         className="govuk-!-margin-bottom-6 govuk-!-padding-left-3 govuk-link govuk-back-link"
         to="/prototypes/admin-api/data/2022-23#subjects"
       >
-        Back
+        Back to API Datasets
       </Link>
       {publicationSubject && release ? (
         <section>
           <span className="govuk-caption-l">{publicationSubject.title}</span>
-          <h2>Prepare next subject</h2>
+          <h2>Link a dataset for next release</h2>
 
           <SummaryList className="govuk-!-margin-bottom-8">
-            <SummaryListItem term="Current subject">
+            <SummaryListItem term="Current dataset">
               {release.title}
             </SummaryListItem>
             <SummaryListItem term="Current release">
@@ -90,7 +90,7 @@ const PrototypePrepareNextSubjectPage = ({
             initialStep={initialState.initialStep}
             id="dataCatalogueWizard"
           >
-            <WizardStep>
+            <WizardStep size="l">
               {stepProps => (
                 <PrototypePrepareNextSubjectStep1
                   onSubmit={subjectId => {
@@ -107,7 +107,7 @@ const PrototypePrepareNextSubjectPage = ({
                 />
               )}
             </WizardStep>
-            <WizardStep>
+            <WizardStep size="l">
               {stepProps => (
                 <PrototypePrepareNextSubjectStep2
                   newItems={newLocations}
@@ -118,7 +118,7 @@ const PrototypePrepareNextSubjectPage = ({
                 />
               )}
             </WizardStep>
-            <WizardStep>
+            <WizardStep size="l">
               {stepProps => (
                 <PrototypePrepareNextSubjectStep2
                   newItems={newFilters}
@@ -129,7 +129,7 @@ const PrototypePrepareNextSubjectPage = ({
                 />
               )}
             </WizardStep>
-            <WizardStep>
+            <WizardStep size="l">
               {stepProps => (
                 <PrototypePrepareNextSubjectStep2
                   newItems={newIndicators}
@@ -140,7 +140,7 @@ const PrototypePrepareNextSubjectPage = ({
                 />
               )}
             </WizardStep>
-            <WizardStep>
+            <WizardStep size="l">
               {stepProps => <PrototypePrepareNextSubjectStep5 {...stepProps} />}
             </WizardStep>
           </Wizard>

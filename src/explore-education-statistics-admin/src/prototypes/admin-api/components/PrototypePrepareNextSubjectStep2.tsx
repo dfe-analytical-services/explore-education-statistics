@@ -70,7 +70,7 @@ const PrototypePrepareNextSubjectStep2 = ({
               validationSchema={Yup.object({
                 unmapped: Yup.array().test({
                   name: 'whatevs',
-                  message: `All ${namePlural} from the current subject should be mapped to the next subject`,
+                  message: `All ${namePlural} from the current dataset should be mapped to the next dataset`,
                   test() {
                     if (!unmappedItems.length) {
                       return true;
@@ -88,34 +88,62 @@ const PrototypePrepareNextSubjectStep2 = ({
                   <FormFieldset id="downloadFiles" legend={stepHeading}>
                     <>
                       <p>
-                        Existing {namePlural} in the publication subject need to
-                        be mapped to an equivalent location in the new subject.
+                        Existing {namePlural} in the publication dataset need to
+                        be mapped to an equivalent location in the new dataset.
                         We try to automatically match up {namePlural} that
                         appear to be a good fit, but you should double-check
                         these choices.
                       </p>
                       <p>
-                        Any facets in the new subject that have not been mapped
-                        will become new {namePlural} in the publication subject.
+                        Any facets in the new dataset that have not been mapped
+                        will become new {namePlural} in the publication dataset.
                       </p>
                     </>
                   </FormFieldset>
 
                   {unmappedItems.length > 0 && (
                     <>
+                      <h3>
+                        New {namePlural} ({newItems.length}){' '}
+                        <span className="govuk-tag govuk-tag--grey">
+                          No action required
+                        </span>
+                      </h3>
+
+                      <PrototypeFacetList
+                        heading={`${grouping} (${newItems.length})`}
+                        items={newItems.map(item => [
+                          { label: '' },
+                          {
+                            label: item.label,
+                            id: item.id,
+                            caption: getCaption(item),
+                          },
+                        ])}
+                        type="new"
+                        grouped={name !== 'indicator'}
+                      />
+
                       <FormFieldset
+                        className="govuk-!-margin-top-6"
                         id="unmapped"
                         legend={
                           <>
-                            Unmapped existing {namePlural} (
+                            <span style={{ textTransform: 'capitalize' }}>
+                              {namePlural}{' '}
+                            </span>
+                            that cannot be found in the new dataset (
                             {unmappedItems.length} of{' '}
-                            {mappedItems.length + unmappedItems.length})
+                            {mappedItems.length + unmappedItems.length}){' '}
+                            <span className="govuk-tag govuk-tag--red">
+                              Requires action
+                            </span>
                           </>
                         }
                         legendSize="m"
                         error={
                           form.submitCount > 0 && unmappedItems.length
-                            ? `All ${namePlural} from the current subject should be mapped to the next subject`
+                            ? `All ${namePlural} from the current dataset should be mapped to the next dataset`
                             : undefined
                         }
                       >
@@ -141,30 +169,22 @@ const PrototypePrepareNextSubjectStep2 = ({
                     </>
                   )}
 
-                  <h3>
-                    New {namePlural} ({newItems.length})
-                  </h3>
-
-                  <PrototypeFacetList
-                    heading={`${grouping} (${newItems.length})`}
-                    items={newItems.map(item => [
-                      { label: '' },
-                      {
-                        label: item.label,
-                        id: item.id,
-                        caption: getCaption(item),
-                      },
-                    ])}
-                    type="new"
-                    grouped={name !== 'indicator'}
-                  />
-
                   {mappedItems.length > 0 && (
                     <>
                       <h3>
-                        Mapped existing {namePlural} ({mappedItems.length} of{' '}
-                        {mappedItems.length + unmappedItems.length})
+                        <span style={{ textTransform: 'capitalize' }}>
+                          {namePlural}{' '}
+                        </span>
+                        mapped to the new dataset ({mappedItems.length} of{' '}
+                        {mappedItems.length + unmappedItems.length}){' '}
+                        <span className="govuk-tag">Please check</span>
                       </h3>
+
+                      <div className="govuk-hint">
+                        If you need to make any changes to the list below,
+                        selecting a {name} will allow you to remove the mapping
+                        and choose a new one.
+                      </div>
 
                       <PrototypeFacetList
                         heading={`${grouping} (${mappedItems.length})`}
