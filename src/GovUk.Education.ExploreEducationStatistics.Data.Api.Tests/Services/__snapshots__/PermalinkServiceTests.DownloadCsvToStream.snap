@@ -1,0 +1,9 @@
+﻿time_period,time_identifier,geographic_level,country_code,country_name,region_code,region_name,new_la_code,old_la_code,la_name,name_of_filter_0,name_of_filter_1,name_of_indicator_0,name_of_indicator_1,name_of_indicator_2
+202223,Academic year,English devolved area,E92000001,England,E12000005,West Midlands,,,,Label of FilterItem 0,Label of FilterItem 2,32462,11611,-12151
+202223,Academic year,English devolved area,E92000001,England,E12000005,West Midlands,,,,Label of FilterItem 0,Label of FilterItem 2,7559,13385,13224
+202223,Academic year,English devolved area,E92000001,England,E13000001,Inner London,,,,Label of FilterItem 0,Label of FilterItem 2,-17345,15159,-26935
+202223,Academic year,English devolved area,E92000001,England,E13000001,Inner London,,,,Label of FilterItem 0,Label of FilterItem 2,23287,16933,-1560
+202324,Academic year,English devolved area,E92000001,England,E12000009,South West,E06000025,803,South Gloucestershire,Label of FilterItem 1,Label of FilterItem 3,-1616,18707,23816
+202324,Academic year,English devolved area,E92000001,England,E12000009,South West,E06000025,803,South Gloucestershire,Label of FilterItem 1,Label of FilterItem 3,-26520,20481,-16344
+202324,Academic year,English devolved area,E92000001,England,E12000006,East of England,E10000020,926,Norfolk,Label of FilterItem 1,Label of FilterItem 3,14112,22255,9032
+202324,Academic year,English devolved area,E92000001,England,E12000006,East of England,E10000020,926,Norfolk,Label of FilterItem 1,Label of FilterItem 3,-10791,24029,-31128

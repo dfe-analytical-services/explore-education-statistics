@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -23,13 +24,6 @@ public class Generator<T> where T : class
     private readonly List<RangeSetter> _rangeSetters = new();
 
     private readonly List<Action<T, Faker>> _finalizers = new();
-
-    // Holds reflection metadata about properties on T
-    private static readonly Lazy<Dictionary<string, MemberInfo>> TypeProperties =
-        new(() => new Binder().GetMembers(typeof(T)));
-
-    // Performance optimisation to avoid excessive reflection during property setting
-    private static readonly Dictionary<string, Action<T, object?>> SetterCache = new();
 
     public Generator(
         Faker? faker = null,
@@ -103,7 +97,7 @@ public class Generator<T> where T : class
     /// <param name="builder">A builder for registering setters for the index.</param>
     public Generator<T> ForIndex(Index index, Action<InstanceSetters<T>> builder)
     {
-        _rangeSetters.Add(new RangeSetter(index.Value..index.Value, builder));
+        _rangeSetters.Add(new RangeSetter(index.Value..(index.Value + 1), builder));
         return this;
     }
 
@@ -201,8 +195,9 @@ public class Generator<T> where T : class
                                         "used in order to calculate the maximum index " +
                                         "that setters apply to");
         }
-        return _rangeSetters.Count > 0 
-            ? _rangeSetters.Select(rangeSetter => rangeSetter.Range.End.Value).Max() 
+
+        return _rangeSetters.Count > 0
+            ? _rangeSetters.Max(rangeSetter => rangeSetter.Range.End.Value) - 1
             : 0;
     }
 
@@ -313,6 +308,13 @@ public class Generator<T> where T : class
         string Property,
         Func<Faker, T, SetterContext, object?> Setter) : ISetter
     {
+        // Holds reflection metadata about properties on T
+        private static readonly Lazy<Dictionary<string, MemberInfo>> TypeProperties =
+            new(() => new Binder().GetMembers(typeof(T)));
+
+        // Performance optimisation to avoid excessive reflection during property setting
+        private static readonly ConcurrentDictionary<string, Action<T, object?>> SetterCache = new();
+
         public void Invoke(Faker faker, T instance, SetterContext context)
         {
             var value = Setter(faker, instance, context);
@@ -340,7 +342,7 @@ public class Generator<T> where T : class
                 return;
             }
 
-            SetterCache.Add(Property, setter);
+            SetterCache.TryAdd(Property, setter);
             setter(instance, value);
         }
     }

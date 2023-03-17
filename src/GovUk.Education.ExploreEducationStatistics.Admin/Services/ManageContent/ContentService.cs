@@ -240,14 +240,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                     await _contentBlockService.DeleteContentBlockAndReorder(blockToRemove.Id);
 
-                    if (blockToRemove is DataBlock)
-                    {
-                        // NOTE: Should never be necessary, as data blocks attached to key stats don't have ContentSectionId set
-                        // and we are guaranteed the data block has a ContentSectionId set here
-                        // Remove in EES-3988?
-                        await _keyStatisticService.DeleteAssociatedKeyStatisticDataBlock(blockToRemove.Id);
-                    }
-
                     _context.ContentSections.Update(section);
                     await _context.SaveChangesAsync();
                     return OrderedContentBlocks(section);

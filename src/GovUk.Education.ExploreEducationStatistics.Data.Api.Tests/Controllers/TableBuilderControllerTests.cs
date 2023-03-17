@@ -1,9 +1,11 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -18,6 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
@@ -93,10 +96,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
         private readonly TableBuilderResultViewModel _tableBuilderResults = new()
         {
+            SubjectMeta = new SubjectResultMetaViewModel
+            {
+                TimePeriodRange = new List<TimePeriodMetaViewModel>
+                {
+                    new(2020, AcademicYear),
+                    new(2021, AcademicYear),
+                }
+            },
             Results = new List<ObservationViewModel>
             {
                 new()
-            }
+                {
+                    TimePeriod = "2020_AY"
+                },
+                new()
+                {
+                    TimePeriod = "2021_AY"
+                }
+            },
         };
 
         private readonly WebApplicationFactory<TestStartup> _testApp;
@@ -131,6 +149,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
+        public async Task Query_Csv()
+        {
+            var tableBuilderService = new Mock<ITableBuilderService>(Strict);
+
+            tableBuilderService
+                .Setup(
+                    s => s.QueryToCsvStream(
+                        ItIs.DeepEqualTo(ObservationQueryContext),
+                        It.IsAny<Stream>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(Unit.Instance)
+                .Callback<ObservationQueryContext, Stream, CancellationToken>(
+                    (_, stream, _) => { stream.WriteText("Test csv"); }
+                );
+
+            var client = SetupApp(tableBuilderService: tableBuilderService.Object).CreateClient();
+
+            var response = await client
+                .PostAsync("/api/tablebuilder",
+                    content: new JsonNetContent(ObservationQueryContext),
+                    headers: new Dictionary<string, string>
+                    {
+                        { HeaderNames.Accept, "text/csv" }
+                    }
+                );
+
+            VerifyAllMocks(tableBuilderService);
+
+            response.AssertOk("Test csv");
+        }
+
+        [Fact]
         public async Task Query_ReleaseId()
         {
             var tableBuilderService = new Mock<ITableBuilderService>(Strict);
@@ -156,6 +208,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             response.AssertOk(_tableBuilderResults);
         }
+
+        [Fact]
+        public async Task Query_ReleaseId_Csv()
+        {
+            var tableBuilderService = new Mock<ITableBuilderService>(Strict);
+
+            tableBuilderService
+                .Setup(
+                    s => s.QueryToCsvStream(
+                        ReleaseId,
+                        ItIs.DeepEqualTo(ObservationQueryContext),
+                        It.IsAny<Stream>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(Unit.Instance)
+                .Callback<Guid, ObservationQueryContext, Stream, CancellationToken>(
+                    (_, _, stream, _) => { stream.WriteText("Test csv"); }
+                );
+
+            var client = SetupApp(tableBuilderService: tableBuilderService.Object)
+                .AddContentDbTestData(context => context.Releases.Add(Release))
+                .CreateClient();
+
+            var response = await client
+                .PostAsync($"/api/tablebuilder/release/{ReleaseId}",
+                    content: new JsonNetContent(ObservationQueryContext),
+                    headers: new Dictionary<string, string>
+                    {
+                        { HeaderNames.Accept, "text/csv" }
+                    }
+                );
+
+            VerifyAllMocks(tableBuilderService);
+
+            response.AssertOk("Test csv");
+        }
+
 
         [Fact]
         public async Task QueryForDataBlock()

@@ -28,7 +28,7 @@ using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
-    public class ResultSubjectMetaServiceTests
+    public class SubjectResultMetaServiceTests
     {
         private readonly Country _england = new("E92000001", "England");
         private readonly Region _northEast = new("E12000001", "North East");
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var contextId = Guid.NewGuid().ToString();
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
-            var service = BuildResultSubjectMetaService(statisticsDbContext);
+            var service = BuildService(statisticsDbContext);
 
             var result = await service.GetSubjectMeta(
                 releaseId: Guid.NewGuid(),
@@ -133,8 +133,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(new List<GeographicLevel>()))
                 .Returns(Enumerable.Empty<BoundaryLevel>());
 
-            filterItemRepository.Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(new List<FilterItem>());
+            filterItemRepository.Setup(s => s.GetFilterItemsFromObservations(observations))
+                .ReturnsAsync(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     release.Id,
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = BuildResultSubjectMetaService(
+                var service = BuildService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     boundaryLevelRepository: boundaryLevelRepository.Object,
@@ -310,8 +310,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     _regionsBoundaryLevel
                 });
 
-            filterItemRepository.Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(new List<FilterItem>());
+            filterItemRepository.Setup(s => s.GetFilterItemsFromObservations(observations))
+                .ReturnsAsync(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     release.Id,
@@ -336,7 +336,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = BuildResultSubjectMetaService(
+                var service = BuildService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     boundaryLevelRepository: boundaryLevelRepository.Object,
@@ -533,8 +533,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(new List<BoundaryLevel>());
 
             filterItemRepository
-                .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(new List<FilterItem>());
+                .Setup(s => s.GetFilterItemsFromObservations(observations))
+                .ReturnsAsync(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     release.Id,
@@ -559,7 +559,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = BuildResultSubjectMetaService(
+                var service = BuildService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     boundaryLevelRepository: boundaryLevelRepository.Object,
@@ -771,8 +771,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(ListOf(_regionsBoundaryLevel));
 
             filterItemRepository
-                .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(new List<FilterItem>());
+                .Setup(s => s.GetFilterItemsFromObservations(observations))
+                .ReturnsAsync(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     release.Id,
@@ -819,7 +819,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = BuildResultSubjectMetaService(
+                var service = BuildService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     boundaryLevelRepository: boundaryLevelRepository.Object,
@@ -905,7 +905,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             return Options.Create(new LocationsOptions());
         }
 
-        private static ResultSubjectMetaService BuildResultSubjectMetaService(
+        private static SubjectResultMetaService BuildService(
             StatisticsDbContext statisticsDbContext,
             ContentDbContext? contentDbContext = null,
             IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
@@ -933,7 +933,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
                 releaseDataFileRepository ?? Mock.Of<IReleaseDataFileRepository>(MockBehavior.Strict),
                 options ?? DefaultLocationOptions(),
-                Mock.Of<ILogger<ResultSubjectMetaService>>()
+                Mock.Of<ILogger<SubjectResultMetaService>>()
             );
         }
     }

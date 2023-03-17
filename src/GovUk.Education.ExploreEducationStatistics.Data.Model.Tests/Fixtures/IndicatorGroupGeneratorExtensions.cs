@@ -10,6 +10,11 @@ public static class IndicatorGroupGeneratorExtensions
     public static Generator<IndicatorGroup> DefaultIndicatorGroup(this DataFixture fixture)
         => fixture.Generator<IndicatorGroup>().WithDefaults();
 
+    public static Generator<IndicatorGroup> DefaultIndicatorGroup(this DataFixture fixture, int indicatorCount)
+        => fixture.Generator<IndicatorGroup>()
+            .WithDefaults()
+            .WithIndicators(fixture.DefaultIndicator().Generate(indicatorCount));
+
     public static Generator<IndicatorGroup> WithDefaults(this Generator<IndicatorGroup> generator)
         => generator.ForInstance(s => s.SetDefaults());
 

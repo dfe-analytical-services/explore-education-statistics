@@ -133,10 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         {
             return service.Setup(s =>
                     s.DownloadBlobText(container, path, cancellationToken))
-                .ThrowsAsync(new StorageException(new RequestResult
-                {
-                    HttpStatusCode = (int) HttpStatusCode.NotFound
-                }, null, null));
+                .ThrowsAsync(new FileNotFoundException("Could not find blob"));
         }
     }
 }

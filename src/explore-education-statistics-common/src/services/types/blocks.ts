@@ -32,13 +32,6 @@ export interface Table {
   tableHeaders: UnmappedTableHeadersConfig;
 }
 
-export interface Summary {
-  dataKeys: string[];
-  dataSummary: string[];
-  dataDefinitionTitle: string[];
-  dataDefinition: string[];
-}
-
 export type BlockType =
   | 'MarkDownBlock'
   | 'HtmlBlock'
@@ -79,7 +72,6 @@ export interface DataBlock extends BaseBlock {
   query: TableDataQuery;
   charts: Chart[];
   table: Table;
-  summary?: Summary;
 }
 
 export interface EmbedBlock extends BaseBlock {

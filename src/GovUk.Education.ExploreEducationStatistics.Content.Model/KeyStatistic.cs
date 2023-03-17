@@ -37,8 +37,6 @@ public abstract class KeyStatistic : ICreatedUpdatedTimestamps<DateTime, DateTim
 
     public User? UpdatedBy { get; set; }
 
-    public Guid ContentBlockIdTemp { get; set; } // TODO: Remove in EES-3988
-
     public KeyStatistic Clone(Release newRelease)
     {
         var copy = MemberwiseClone() as KeyStatistic;

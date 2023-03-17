@@ -10,7 +10,7 @@ public static class ReleaseGeneratorExtensions
 
     public static Generator<Release> WithDefaults(this Generator<Release> generator)
         => generator.ForInstance(s => s.SetDefaults());
-    
+
     public static InstanceSetters<Release> SetDefaults(this InstanceSetters<Release> setters)
         => setters
             .SetDefault(r => r.Id)

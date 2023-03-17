@@ -413,7 +413,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             };
         }
 
-        private ICollection<ObservationFilterItem> GetFilterItems(
+        private List<ObservationFilterItem> GetFilterItems(
             StatisticsDbContext context,
             IReadOnlyList<string> rowValues,
             List<string> colValues,
@@ -528,10 +528,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 new MayoralCombinedAuthority(values[0], values[1]));
         }
 
-        private static Mat? GetMultiAcademyTrust(IReadOnlyList<string> rowValues, List<string> colValues)
+        private static MultiAcademyTrust? GetMultiAcademyTrust(IReadOnlyList<string> rowValues, List<string> colValues)
         {
             return CsvUtils.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.MultiAcademyTrust], values =>
-                new Mat(values[0], values[1]));
+                new MultiAcademyTrust(values[0], values[1]));
         }
 
         private static OpportunityArea? GetOpportunityArea(IReadOnlyList<string> rowValues, List<string> colValues)
@@ -598,7 +598,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             LocalAuthorityDistrict? localAuthorityDistrict = null,
             LocalEnterprisePartnership? localEnterprisePartnership = null,
             MayoralCombinedAuthority? mayoralCombinedAuthority = null,
-            Mat? multiAcademyTrust = null,
+            MultiAcademyTrust? multiAcademyTrust = null,
             OpportunityArea? opportunityArea = null,
             ParliamentaryConstituency? parliamentaryConstituency = null,
             PlanningArea? planningArea = null,
