@@ -4,11 +4,12 @@ import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import exec from 'k6/execution';
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
-import createAdminService from '../../../utils/adminService';
+import createAdminService, {
+  getDataFileUploadStrategy,
+} from '../../../utils/adminService';
 import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
 import testData from '../../testData';
-import utils from '../../../utils/utils';
 import loggingUtils from '../../../utils/loggingUtils';
 
 const IMPORT_STATUS_POLLING_DELAY_SECONDS = 5;
@@ -16,7 +17,7 @@ const IMPORT_STATUS_POLLING_DELAY_SECONDS = 5;
 const tearDownData = false;
 const publicationTitle = __ENV.PUBLICATION_TITLE ?? 'import.test.ts';
 const dataFile = __ENV.DATA_FILE ?? 'small-file.csv';
-const uploadFileStrategy = utils.getDataFileUploadStrategy({
+const uploadFileStrategy = getDataFileUploadStrategy({
   filename: dataFile,
 });
 

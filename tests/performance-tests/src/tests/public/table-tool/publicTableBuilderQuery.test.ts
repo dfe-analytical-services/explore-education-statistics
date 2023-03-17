@@ -4,19 +4,21 @@ import exec from 'k6/execution';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
-import createAdminService, { SubjectMeta } from '../../../utils/adminService';
+import createAdminService, {
+  getDataFileUploadStrategy,
+  SubjectMeta,
+} from '../../../utils/adminService';
 import testData from '../../testData';
 import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
 import createDataService from '../../../utils/dataService';
-import utils from '../../../utils/utils';
 import loggingUtils from '../../../utils/loggingUtils';
 
 const tearDownData = false;
 const publicationTitle =
   __ENV.PUBLICATION_TITLE ?? 'publicTableBuilderQuery.test.ts';
 const dataFile = __ENV.DATA_FILE ?? 'small-file.csv';
-const uploadFileStrategy = utils.getDataFileUploadStrategy({
+const uploadFileStrategy = getDataFileUploadStrategy({
   filename: dataFile,
 });
 

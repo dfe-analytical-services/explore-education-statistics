@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 /* eslint-disable camelcase */
+/* eslint-disable no-console */
 import puppeteer, { Page } from 'puppeteer';
 import getChromePath from './getChromePath';
 
