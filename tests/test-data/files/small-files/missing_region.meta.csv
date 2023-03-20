@@ -1,0 +1,9 @@
+col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column
+num_schools,Indicator,Number of schools,Absence fields,,0,,
+enrolments,Indicator,Number of pupil enrolments,Absence fields,,0,,
+sess_overall_percent,Indicator,Overall absence rate,Absence fields,%,0,,
+sess_authorised_percent,Indicator,Authorised absence rate,Absence fields,%,1,,
+sess_unauthorised_percent,Indicator,Unauthorised absence rate,Absence fields,£m,2,,
+enrolments_pa_10_exact,Indicator,Number of persistent absentees,Absence fields,,0,,
+enrolments_pa_10_exact_percent,Indicator,Percentage of persistent absentees,Absence fields,%,3,,
+school_type,Filter,School type,,,,Filter by school type,school_phase

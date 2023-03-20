@@ -1,4 +1,4 @@
-import groupResultMeasuresByCombination from '@common/modules/table-tool/components/utils/groupResultMeasuresByCombination';
+import groupResultMeasuresByCombination from '@common/modules/table-tool/utils/groupResultMeasuresByCombination';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
 
 describe('groupResultMeasuresByCombination', () => {
