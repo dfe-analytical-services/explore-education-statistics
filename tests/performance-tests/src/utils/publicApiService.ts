@@ -34,8 +34,8 @@ export interface Publication {
 
 interface DataSet {
   id: string;
-  name: string;
-  content: string;
+  title: string;
+  description: string;
   timePeriods: {
     start: string;
     end: string;
@@ -116,7 +116,6 @@ export interface DataSetQueryComparablePredicate<T> {
 export interface DataSetQueryCriteria {
   filters?: DataSetQueryIdPredicate;
   locations?: DataSetQueryIdPredicate;
-  parentLocations?: DataSetQueryIdPredicate;
   geographicLevels?: DataSetQueryIdPredicate;
   timePeriods?: DataSetQueryComparablePredicate<TimePeriod>;
 }
@@ -188,8 +187,8 @@ const hiddenDataSets: { [publicationId: string]: { dataSets: DataSet[] } } = {
     dataSets: [
       {
         id: 'a96044e5-2310-4890-a601-8ca0b67d2964',
-        name: 'QUA01',
-        content: '',
+        title: 'QUA01',
+        description: '',
         geographicLevels: ['National'],
         timePeriods: {
           start: '2013/14',

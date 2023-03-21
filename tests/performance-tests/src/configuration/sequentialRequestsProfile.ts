@@ -1,10 +1,11 @@
 import { Options } from 'k6/options';
-import { mergeObjects, parseIntOptional } from '../utils/utils';
+import merge from 'lodash/merge';
+import { parseIntOptional } from '../utils/utils';
 
 interface Config {
   // Total duration of the main stage of the test, providing a steady stream
   // of requests one after another, with no concurrency.
-  mainStageDurationMinutes: number;
+  mainStageDurationMinutes?: number;
 }
 
 const overrides: Partial<Config> = {
@@ -16,9 +17,9 @@ const overrides: Partial<Config> = {
 export default function sequentialRequestProfile(
   defaultConfig: Config,
 ): Options {
-  const { testDurationMinutes } = mergeObjects(defaultConfig, overrides);
+  const { mainStageDurationMinutes } = merge({}, defaultConfig, overrides);
   return {
-    duration: `${testDurationMinutes}m`,
+    duration: `${mainStageDurationMinutes}m`,
     vus: 1,
   };
 }

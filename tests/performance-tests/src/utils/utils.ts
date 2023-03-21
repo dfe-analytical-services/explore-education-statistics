@@ -25,19 +25,6 @@ export function stringifyWithoutNulls(obj: object) {
   return JSON.stringify(obj, (_, value) => (!value ? undefined : value), 2);
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-export function mergeObjects(
-  baseObject: { [key: string]: any },
-  overrideObject: { [key: string]: any },
-) {
-  const result: { [key: string]: any } = {};
-  const allKeys = Object.keys(baseObject).concat(Object.keys(overrideObject));
-  allKeys.forEach(key => {
-    result[key] = overrideObject[key] ?? baseObject[key];
-  });
-  return result;
-}
-
 export function parseIntOptional(int: string) {
   return parseInt(int, 10) || undefined;
 }

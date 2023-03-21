@@ -1,5 +1,6 @@
 import { Options } from 'k6/options';
-import { mergeObjects, parseIntOptional } from '../utils/utils';
+import merge from 'lodash/merge';
+import { parseIntOptional } from '../utils/utils';
 
 interface Config {
   // Name of the scenario.
@@ -23,18 +24,18 @@ const overrides: Partial<Config> = {
 };
 
 export default function steadyRequestRateProfile({
-  scenario,
+  scenario = 'steady_rate',
   ...defaultConfig
 }: Config & { scenario?: string }): Options {
   const {
     steadyRequestRatePerSecond,
     mainStageDurationMinutes,
     cooldownStageDurationMinutes,
-  } = mergeObjects(defaultConfig, overrides);
+  } = merge({}, defaultConfig, overrides);
 
   return {
     scenarios: {
-      [scenario ?? 'steady_rate']: {
+      [scenario]: {
         executor: 'ramping-arrival-rate',
         timeUnit: '1m',
         preAllocatedVUs: 10,

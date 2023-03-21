@@ -278,8 +278,8 @@ queries that can be generated:
 This test by default targets any data sets that are discoverable via the Public API. The data sets used 
 by the tests can be filtered down however using the following parameters:
 
-* DATA_SET_NAMES - a comma-separated list of data set names, which will cause the test to only use those
-  data sets during the run. The default value is undefined, which does not filter data sets by name. 
+* DATA_SET_TITLES - a comma-separated list of data set titles, which will cause the test to only use those
+  data sets during the run. The default value is undefined, which does not filter data sets by title. 
 * DATA_SET_MAX_ROWS - the maximum number of rows for data sets to be used in this run. The default value 
   is undefined, which does not filter data sets by their size.
 

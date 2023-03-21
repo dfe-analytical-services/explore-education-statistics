@@ -84,7 +84,7 @@ const processingStages: {
 );
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
-  __ENV.TEST_ENVIRONMENT as string,
+  __ENV.TEST_ENVIRONMENT,
 );
 const { adminUrl, supportsRefreshTokens } = environmentAndUsers.environment;
 

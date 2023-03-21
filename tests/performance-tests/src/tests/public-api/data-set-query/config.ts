@@ -18,8 +18,8 @@ const profile = (__ENV.PROFILE ?? 'sequential') as
 
 const queries = (__ENV.QUERIES ?? 'simple') as 'simple' | 'complex';
 
-const limitToDataSetNames = __ENV.DATA_SET_NAMES?.split(',');
-const maxDataSetRows = parseIntOptional(__ENV.DATA_SET_MAX_ROWS) || undefined;
+const limitToDataSetTitles = __ENV.DATA_SET_TITLES?.split(',');
+const maxDataSetRows = parseIntOptional(__ENV.DATA_SET_MAX_ROWS);
 const maxResultsToReturnPerDataSet =
   parseIntOptional(__ENV.MAX_RESULTS_PER_DATA_SET) || 10000;
 
@@ -53,9 +53,8 @@ function getOptions(): Options {
         mainStageDurationMinutes: 10,
       });
     }
-    default: {
+    default:
       throw Error(`Unknown profile '${profile}'`);
-    }
   }
 }
 
@@ -77,14 +76,13 @@ function getQueryConfig(): QueryGeneratorConfig {
         comparableOperators: [...dataSetQueryComparableOperators],
       };
     }
-    default: {
+    default:
       throw Error(`Unknown query configuration '${queries}'`);
-    }
   }
 }
 
 export interface DataSetConfig {
-  limitToNames?: string[];
+  limitToTitles?: string[];
   maxRows?: number;
   maxResultsPerDataSet?: number;
 }
@@ -99,7 +97,7 @@ const config: Config = {
   options: getOptions(),
   queryConfig: getQueryConfig(),
   dataSetConfig: {
-    limitToNames: limitToDataSetNames,
+    limitToTitles: limitToDataSetTitles,
     maxRows: maxDataSetRows,
     maxResultsPerDataSet: maxResultsToReturnPerDataSet,
   },

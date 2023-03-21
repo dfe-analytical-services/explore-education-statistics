@@ -61,7 +61,7 @@ interface SetupData {
 }
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
-  __ENV.TEST_ENVIRONMENT as string,
+  __ENV.TEST_ENVIRONMENT,
 );
 
 const { publicApiUrl } = environmentAndUsers.environment;
@@ -86,8 +86,8 @@ export function setup(): SetupData {
 
       const dataSetsFilteredByName = dataSets.filter(
         dataSet =>
-          !dataSetConfig.limitToNames ||
-          dataSetConfig.limitToNames.includes(dataSet.name),
+          !dataSetConfig.limitToTitles ||
+          dataSetConfig.limitToTitles.includes(dataSet.title),
       );
 
       const dataSetMeta = dataSetsFilteredByName.map(dataSet => {
@@ -95,7 +95,7 @@ export function setup(): SetupData {
         return {
           ...meta,
           id: dataSet.id,
-          name: dataSet.name,
+          name: dataSet.title,
         };
       });
 

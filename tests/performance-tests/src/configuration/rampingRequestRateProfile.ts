@@ -1,5 +1,6 @@
 import { Options } from 'k6/options';
-import { mergeObjects, parseIntOptional } from '../utils/utils';
+import merge from 'lodash/merge';
+import { parseIntOptional } from '../utils/utils';
 
 interface Config {
   // Name of the scenario.
@@ -30,7 +31,7 @@ export default function rampingRequestRateProfile({
     mainStageDurationMinutes,
     maxRequestRatePerSecond,
     cooldownStageDurationMinutes,
-  } = mergeObjects(defaultConfig, overrides);
+  } = merge({}, defaultConfig, overrides);
 
   return {
     scenarios: {

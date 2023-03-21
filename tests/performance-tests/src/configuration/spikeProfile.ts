@@ -1,5 +1,6 @@
 import { Options } from 'k6/options';
-import { mergeObjects, parseIntOptional } from '../utils/utils';
+import merge from 'lodash/merge';
+import { parseIntOptional } from '../utils/utils';
 
 interface Config {
   // Duration of normal traffic period prior to spike.
@@ -25,7 +26,7 @@ const overrides: Partial<Config> = {
 };
 
 export default function spikeProfile({
-  scenario,
+  scenario = 'spike',
   ...defaultConfig
 }: Config & { scenario?: string }): Options {
   const {
@@ -34,11 +35,11 @@ export default function spikeProfile({
     postSpikeStageDurationMinutes,
     normalTrafficRequestRatePerSecond,
     spikeRequestRatePerSecond,
-  } = mergeObjects(defaultConfig, overrides);
+  } = merge({}, defaultConfig, overrides);
 
   return {
     scenarios: {
-      [scenario ?? 'spike']: {
+      [scenario]: {
         executor: 'ramping-arrival-rate',
         timeUnit: '1m',
         preAllocatedVUs: 10,

@@ -165,9 +165,8 @@ class DataSetQueryGenerator {
           [operator]: pickRandom(comparableList.slice(1)),
         };
       }
-      default: {
+      default:
         throw new Error(`Unsupported comparable operator ${operator}`);
-      }
     }
   }
 
