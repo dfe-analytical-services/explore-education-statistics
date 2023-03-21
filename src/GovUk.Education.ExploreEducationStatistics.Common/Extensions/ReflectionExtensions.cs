@@ -58,12 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                         break;
 
                     case "Task":
-                        var task = typeof(Task).GetMethod("FromResult")
-                            ?.MakeGenericMethod(boxType.GenericTypeArguments)
-                            .Invoke(null, new[] { boxedValue });
-
-                        boxedValue = task;
-                        break;
+                        throw new ArgumentException("Should never need to box a Task");
 
                     case "Either":
                         var eitherType = typeof(Either<,>).MakeGenericType(boxType.GenericTypeArguments);
@@ -98,6 +93,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                     return true;
                 }
 
+                if (result is Task)
+                {
+                    throw new ArgumentException("Should never need to unbox a Task");
+                }
+
                 var resultType = result.GetType();
 
                 // Stop at the first non-generic result type type.
@@ -111,23 +111,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                 {
                     result = null;
                     return false;
-                }
-
-                if (result is Task task)
-                {
-                    try
-                    {
-                        task.Wait();
-
-                    }
-                    catch (AggregateException)
-                    {
-                        result = null;
-                        return false;
-                    }
-
-                    result = result.GetType().GetProperty("Result")?.GetValue(task);
-                    continue;
                 }
 
                 // Potentially unsafe to use just the name for this,

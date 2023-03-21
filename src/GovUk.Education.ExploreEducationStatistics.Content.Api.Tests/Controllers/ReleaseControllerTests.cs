@@ -28,15 +28,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             MemoryCacheService
                 .Setup(s => s.GetItem(
                     It.IsAny<IMemoryCacheKey>(), typeof(ReleaseViewModel)))
-                .ReturnsAsync(null);
+                .Returns(null);
 
             MemoryCacheService
                 .Setup(s => s.SetItem<object>(
                     It.IsAny<IMemoryCacheKey>(),
                     It.IsAny<ReleaseViewModel>(),
                     It.IsAny<MemoryCacheConfiguration>(),
-                    null))
-                .Returns(Task.CompletedTask);
+                    null));
         }
 
         [Fact]

@@ -71,6 +71,12 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
         {
             return new();
         }
+
+        [MemoryCache(typeof(TestMemoryCacheKey), expiryScheduleCron: HourlyExpirySchedule, durationInSeconds: 45)]
+        public static async Task<TestValue> SingleParamAsync(string param)
+        {
+            return new();
+        }
     }
     // ReSharper enable UnusedParameter.Local
 
@@ -82,7 +88,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .ReturnsAsync(expectedResult);
+            .Returns(expectedResult);
 
         var result = TestMethods.SingleParam("test");
 
@@ -90,7 +96,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
         Assert.Equal(expectedResult, result);
 
         _memoryCacheService.Verify(
-            s => s.GetItem(cacheKey, typeof(TestValue)), 
+            s => s.GetItem(cacheKey, typeof(TestValue)),
             Times.Once);
     }
 
@@ -101,19 +107,18 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .ReturnsAsync(null);
+            .Returns(null);
 
         var args = new List<object>();
 
         var expectedCacheConfiguration = new MemoryCacheConfiguration(45, CrontabSchedule.Parse(HourlyExpirySchedule));
-            
+
         _memoryCacheService
             .Setup(s => s.SetItem(
-                cacheKey, 
-                Capture.In(args), 
-                ItIs.DeepEqualTo(expectedCacheConfiguration), 
-                null))
-            .Returns(Task.CompletedTask);
+                cacheKey,
+                Capture.In(args),
+                ItIs.DeepEqualTo(expectedCacheConfiguration),
+                null));
 
         var result = TestMethods.SingleParam("test");
 
@@ -121,7 +126,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
         Assert.Equal(args[0], result);
 
         _memoryCacheService.Verify(
-            s => s.GetItem(cacheKey, typeof(TestValue)), 
+            s => s.GetItem(cacheKey, typeof(TestValue)),
             Times.Once);
 
         _memoryCacheService
@@ -129,8 +134,8 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
                     cacheKey, 
                     Capture.In(args), 
                     ItIs.DeepEqualTo(expectedCacheConfiguration), 
-                    null), 
-            Times.Once);
+                    null),
+                Times.Once);
     }
 
     [Fact]
@@ -140,15 +145,14 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .ReturnsAsync(null);
+            .Returns(null);
 
         var args = new List<object>();
 
         var expectedDefaultCacheConfiguration = new MemoryCacheConfiguration(135);
-            
+
         _memoryCacheService
-            .Setup(s => s.SetItem(cacheKey, Capture.In(args), expectedDefaultCacheConfiguration, null))
-            .Returns(Task.CompletedTask);
+            .Setup(s => s.SetItem(cacheKey, Capture.In(args), expectedDefaultCacheConfiguration, null));
 
         var result = TestMethods.DefaultCacheConfig("test");
 
@@ -156,11 +160,11 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
         Assert.Equal(args[0], result);
 
         _memoryCacheService.Verify(
-            s => s.GetItem(cacheKey, typeof(TestValue)), 
+            s => s.GetItem(cacheKey, typeof(TestValue)),
             Times.Once);
 
         _memoryCacheService.Verify(
-            s => s.SetItem(cacheKey, Capture.In(args), expectedDefaultCacheConfiguration, null), 
+            s => s.SetItem(cacheKey, Capture.In(args), expectedDefaultCacheConfiguration, null),
             Times.Once);
     }
 
@@ -175,20 +179,19 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         targetMemoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .ReturnsAsync(null);
+            .Returns(null);
 
         var args = new List<object>();
 
         var expectedCacheConfiguration = new MemoryCacheConfiguration(45, CrontabSchedule.Parse(HourlyExpirySchedule));
-            
+
         targetMemoryCacheService
-            .Setup(s => 
+            .Setup(s =>
                 s.SetItem(
-                    cacheKey, 
-                    Capture.In(args), 
-                    ItIs.DeepEqualTo(expectedCacheConfiguration), 
-                    null))
-            .Returns(Task.CompletedTask);
+                    cacheKey,
+                    Capture.In(args),
+                    ItIs.DeepEqualTo(expectedCacheConfiguration),
+                    null));
 
         var result = TestMethods.SpecificCacheService("test");
 
@@ -204,14 +207,14 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
         var configuration = CreateMockConfigurationSection(
             TupleOf("DurationInSeconds", "456"),
             TupleOf("ExpirySchedule", HalfHourlyExpirySchedule));
-        
+
         MemoryCacheAttribute.SetOverrideConfiguration(configuration.Object);
-        
+
         var cacheKey = new TestMemoryCacheKey("test");
 
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .ReturnsAsync(null);
+            .Returns(null);
 
         var args = new List<object>();
 
@@ -219,14 +222,13 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
         // and the ExpirySchedule are different from those on the `TestMethods.SingleParam` method's cache attribute
         // itself, so we know they've both been overridden.
         var expectedCacheConfiguration = new MemoryCacheConfiguration(456, CrontabSchedule.Parse(HalfHourlyExpirySchedule));
-            
+
         _memoryCacheService
-            .Setup(s => 
-                s.SetItem(cacheKey, 
-                    Capture.In(args), 
-                    ItIs.DeepEqualTo(expectedCacheConfiguration), 
-                    null))
-            .Returns(Task.CompletedTask);
+            .Setup(s =>
+                s.SetItem(cacheKey,
+                    Capture.In(args),
+                    ItIs.DeepEqualTo(expectedCacheConfiguration),
+                    null));
 
         var result = TestMethods.SingleParam("test");
 
@@ -242,14 +244,14 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
         var configuration = CreateMockConfigurationSection(
             TupleOf("DurationInSeconds", (string) null),
             TupleOf("ExpirySchedule", (string) null));
-        
+
         MemoryCacheAttribute.SetOverrideConfiguration(configuration.Object);
-        
+
         var cacheKey = new TestMemoryCacheKey("test");
 
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .ReturnsAsync(null);
+            .Returns(null);
 
         var args = new List<object>();
 
@@ -257,15 +259,14 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
         // values have been specified for either override parameter, then the `TestMethods.SingleParam` cache
         // attribute's config values should still be used.
         var expectedCacheConfiguration = new MemoryCacheConfiguration(45, CrontabSchedule.Parse(HourlyExpirySchedule));
-            
+
         _memoryCacheService
-            .Setup(s => 
+            .Setup(s =>
                 s.SetItem(
-                    cacheKey, 
+                    cacheKey,
                     Capture.In(args),
-                    ItIs.DeepEqualTo(expectedCacheConfiguration), 
-                    null))
-            .Returns(Task.CompletedTask);
+                    ItIs.DeepEqualTo(expectedCacheConfiguration),
+                    null));
 
         var result = TestMethods.SingleParam("test");
 
@@ -279,18 +280,18 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
     public void OverrideConfigSectionSpecifiedButEmptyValues()
     {
         // We don't have the ability to provide "null" default values in the ARM templates for "string" and
-        // "int" parameter types, so we represent them as being not set with empty strings and -1. 
+        // "int" parameter types, so we represent them as being not set with empty strings and -1.
         var configuration = CreateMockConfigurationSection(
             TupleOf("DurationInSeconds", "-1"),
             TupleOf("ExpirySchedule", ""));
-        
+
         MemoryCacheAttribute.SetOverrideConfiguration(configuration.Object);
-        
+
         var cacheKey = new TestMemoryCacheKey("test");
 
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .ReturnsAsync(null);
+            .Returns(null);
 
         var args = new List<object>();
 
@@ -298,15 +299,14 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
         // values have been specified for either override parameter, then the `TestMethods.SingleParam` cache
         // attribute's config values should still be used.
         var expectedCacheConfiguration = new MemoryCacheConfiguration(45, CrontabSchedule.Parse(HourlyExpirySchedule));
-            
+
         _memoryCacheService
-            .Setup(s => 
+            .Setup(s =>
                 s.SetItem(
-                    cacheKey, 
+                    cacheKey,
                     Capture.In(args),
-                    ItIs.DeepEqualTo(expectedCacheConfiguration), 
-                    null))
-            .Returns(Task.CompletedTask);
+                    ItIs.DeepEqualTo(expectedCacheConfiguration),
+                    null));
 
         var result = TestMethods.SingleParam("test");
 
@@ -347,4 +347,67 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
         );
     }
 
+    [Fact]
+    public async Task CacheHitAsync()
+    {
+        var cacheKey = new TestMemoryCacheKey("test");
+        var expectedResult = new TestValue();
+
+        // MemoryCache calls aren't async, so we can call sync `GetItem`
+        // in MemoryCacheAttribute#GetAsync
+        _memoryCacheService
+            .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
+            .Returns(expectedResult);
+
+        var result = await TestMethods.SingleParamAsync("test");
+
+        Assert.IsType<TestValue>(result);
+        Assert.Equal(expectedResult, result);
+
+        _memoryCacheService.Verify(
+            s => s.GetItem(cacheKey, typeof(TestValue)),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task CacheMissAsync()
+    {
+        var cacheKey = new TestMemoryCacheKey("test");
+
+        // MemoryCache calls aren't async, so we call sync `GetItem`
+        // in MemoryCacheAttribute#GetAsync
+        _memoryCacheService
+            .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
+            .Returns(null);
+
+        var args = new List<object>();
+
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(45, CrontabSchedule.Parse(HourlyExpirySchedule));
+
+        // MemoryCache calls aren't async, so we call sync `SetItem`
+        // in MemoryCacheAttribute#SetAsync
+        _memoryCacheService
+            .Setup(s => s.SetItem(
+                cacheKey,
+                Capture.In(args),
+                ItIs.DeepEqualTo(expectedCacheConfiguration),
+                null));
+
+        var result = await TestMethods.SingleParamAsync("test");
+
+        Assert.IsType<TestValue>(result);
+        Assert.Equal(args[0], result);
+
+        _memoryCacheService.Verify(
+            s => s.GetItem(cacheKey, typeof(TestValue)),
+            Times.Once);
+
+        _memoryCacheService
+            .Verify(s => s.SetItem(
+                    cacheKey,
+                    Capture.In(args),
+                    ItIs.DeepEqualTo(expectedCacheConfiguration),
+                    null),
+                Times.Once);
+    }
 }

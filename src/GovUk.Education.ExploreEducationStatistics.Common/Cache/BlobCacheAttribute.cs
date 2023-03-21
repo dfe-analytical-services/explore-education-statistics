@@ -39,7 +39,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             Services.Clear();
         }
 
-        public override async Task<object?> Get(ICacheKey cacheKey, Type returnType)
+        public override object? Get(ICacheKey cacheKey, Type returnType)
+        {
+            // Blob cache requires an async call to blob storage, so allowing use of `Get` would inject async code into
+            // the sync attributed method.
+            throw new ArgumentException("The BlobCache attribute cannot be applied to sync methods");
+        }
+
+        public override void Set(ICacheKey cacheKey, object value)
+        {
+            // Blob cache requires an async call to blob storage, so allowing use of `Set` would inject async code into
+            // the sync attributed method.
+            throw new ArgumentException("The BlobCache attribute cannot be applied to sync methods");
+        }
+
+        public override async Task<object?> GetAsync(ICacheKey cacheKey, Type returnType)
         {
             if (cacheKey is IBlobCacheKey key)
             {
@@ -56,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
         }
 
-        public override async Task Set(ICacheKey cacheKey, object value)
+        public override async Task SetAsync(ICacheKey cacheKey, object value)
         {
             if (cacheKey is IBlobCacheKey key)
             {
