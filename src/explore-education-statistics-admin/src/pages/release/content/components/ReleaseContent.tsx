@@ -264,12 +264,12 @@ const ReleaseContent = () => {
             {!!releaseCount && (
               <>
                 <h3 className="govuk-heading-s" id="past-releases">
-                  Past releases
+                  Releases in this series
                 </h3>
 
                 <Details
                   className="govuk-!-margin-bottom-4"
-                  summary={`View previous releases (${releaseCount})`}
+                  summary={`View releases (${releaseCount})`}
                 >
                   <ScrollableContainer maxHeight={300}>
                     <ul className="govuk-list">

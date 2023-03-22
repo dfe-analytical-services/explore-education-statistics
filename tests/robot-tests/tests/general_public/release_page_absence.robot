@@ -45,14 +45,14 @@ Validate Email alerts link
 
 Validate "About these statistics" -- Number of other releases
     user checks number of other releases is correct    6
-    user opens details dropdown    View previous releases (6)
+    user opens details dropdown    View releases (6)
     user checks other release is shown in position    Academic year 2014/15    1
     user checks other release is shown in position    Academic year 2013/14    2
     user checks other release is shown in position    Academic year 2012/13    3
     user checks other release is shown in position    Academic year 2011/12    4
     user checks other release is shown in position    Academic year 2010/11    5
     user checks other release is shown in position    Academic year 2009/10    6
-    user closes details dropdown    View previous releases (6)
+    user closes details dropdown    View releases (6)
 
 Validate "About these statistics" -- "Last updated"
     user checks summary list contains    Last updated    22 August 2022

@@ -58,9 +58,9 @@ Approve release
 
 Check legacy release appears on public frontend
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
-    user opens details dropdown    View previous releases (1)
+    user opens details dropdown    View releases (1)
 
-    ${other_releases}=    user gets details content element    View previous releases (1)
+    ${other_releases}=    user gets details content element    View releases (1)
 
     user checks list has x items    css:ul    1    ${other_releases}
 
@@ -94,9 +94,9 @@ Validate updated legacy release
 Validate public frontend shows changes made to legacy release after saving publication
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
 
-    user opens details dropdown    View previous releases (1)
+    user opens details dropdown    View releases (1)
 
-    ${other_releases}=    user gets details content element    View previous releases (1)
+    ${other_releases}=    user gets details content element    View releases (1)
 
     user checks list has x items    css:ul    1    ${other_releases}
 

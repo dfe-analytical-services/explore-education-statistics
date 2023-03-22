@@ -442,9 +442,9 @@ Navigate to published release page
 Check latest release is correct
     user waits until page contains title caption    ${RELEASE_2_NAME}    %{WAIT_MEDIUM}
     user checks page contains    This is the latest data
-    user checks page contains    View previous releases (1)
+    user checks page contains    View releases (1)
 
-    user opens details dropdown    View previous releases (1)
+    user opens details dropdown    View releases (1)
     user waits until page contains other release    ${RELEASE_1_NAME}
     user checks page does not contain other release    ${RELEASE_2_NAME}
 
@@ -454,7 +454,7 @@ Check other release is correct
     user waits until page contains title caption    ${RELEASE_1_NAME}
 
     user waits until page contains link    View latest data: ${RELEASE_2_NAME}
-    user checks page contains    View previous releases (1)
+    user checks page contains    View releases (1)
     user waits until page contains other release    ${RELEASE_2_NAME}
     user checks page does not contain other release    ${RELEASE_1_NAME}
 
