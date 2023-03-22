@@ -747,7 +747,7 @@ Navigate to amendment release page
 
 Verify amendment is displayed as the latest release
     user checks page does not contain    View latest data:
-    user checks page does not contain    View previous releases (1)
+    user checks page does not contain    View releases (1)
 
 Verify amendment is published
     user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}

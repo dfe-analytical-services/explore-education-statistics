@@ -339,12 +339,12 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             {!!otherReleasesCount && (
               <>
                 <h3 className="govuk-heading-s" id="past-releases">
-                  Past releases
+                  Releases in this series
                 </h3>
 
                 <Details
                   className="govuk-!-margin-bottom-4"
-                  summary={`View previous releases (${otherReleasesCount})`}
+                  summary={`View releases (${otherReleasesCount})`}
                   hiddenText={`for ${release.publication.title}`}
                   onToggle={open =>
                     open &&
