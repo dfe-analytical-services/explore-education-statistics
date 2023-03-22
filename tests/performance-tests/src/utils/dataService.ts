@@ -41,9 +41,9 @@ export interface SubjectMeta {
 class DataService {
   private readonly client: HttpClient;
 
-  constructor(dataApiUrl: string, checkResponseStatus = true) {
+  constructor(baseUrl: string, checkResponseStatus = true) {
     this.client = new HttpClient({
-      baseUrl: dataApiUrl,
+      baseUrl,
       checkResponseStatus,
     });
   }
@@ -111,8 +111,8 @@ class DataService {
 }
 
 export default function createDataService(
-  adminUrl: string,
+  baseUrl: string,
   checkResponseStatus = true,
 ) {
-  return new DataService(adminUrl, checkResponseStatus);
+  return new DataService(baseUrl, checkResponseStatus);
 }
