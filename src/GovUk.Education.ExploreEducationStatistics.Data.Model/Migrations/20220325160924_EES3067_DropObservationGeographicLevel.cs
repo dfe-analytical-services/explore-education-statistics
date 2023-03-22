@@ -23,6 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             // Sql:
             // CREATE NONCLUSTERED INDEX NCI_WI_Observation_SubjectId ON dbo.Observation (SubjectId) INCLUDE (LocationId, TimeIdentifier, Year) WITH (ONLINE = ON, DROP_EXISTING = ON);");
 
+            migrationBuilder.Sql("DROP INDEX NCI_WI_Observation_SubjectId ON Observation;");
+
             // Drop the index on the GeographicLevel column
             migrationBuilder.DropIndex(
                 name: "IX_Observation_GeographicLevel",

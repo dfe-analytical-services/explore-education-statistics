@@ -8,8 +8,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.SqlFromFile(MigrationsPath, 
-                "20221006000000_EES3369_AddContainedDatabaseUsers.sql");
+            // migrationBuilder.SqlFromFile(MigrationsPath, 
+            //     "20221006000000_EES3369_AddContainedDatabaseUsers.sql");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

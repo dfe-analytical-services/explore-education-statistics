@@ -7,7 +7,7 @@
     "RowsPerBatch": 3000
   },
   "ConnectionStrings": {
-    "StatisticsDb": "Server=db;Database=statistics;User=importer;Password=Your_Password123;",
+    "StatisticsDb": "Server=tcp:dw-test-sql-server.database.windows.net,1433;Initial Catalog=dw-test-statistics-db;Persist Security Info=False;User ID=statistics;Password=Your_Password123;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
     "ContentDb": "Server=db;Database=content;User=importer;Password=Your_Password123;"
   },
   "Host": {

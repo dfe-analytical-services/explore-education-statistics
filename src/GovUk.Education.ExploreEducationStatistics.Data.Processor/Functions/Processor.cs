@@ -110,29 +110,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         public async Task ImportObservations(
             [QueueTrigger(ImportsAvailableQueue)] ImportObservationsMessage message)
         {
-            try
-            {
+            Console.WriteLine($"Message received at ${DateTime.UtcNow}");
+            // try
+            // {
                 await _fileImportService.ImportObservations(message, _dbContextSupplier.CreateDbContext<StatisticsDbContext>());
-            }
-            catch (Exception e)
-            {
-                // If deadlock exception then throw & try up to 3 times
-                if (e is SqlException exception && exception.Number == 1205)
-                {
-                    _logger.LogInformation($"{GetType().Name} : Handling known exception when processing Import: " +
-                                           $"{message.Id} : {exception.Message} : transaction will be retried");
-                    throw;
-                }
-
-                var ex = GetInnerException(e);
-
-                _logger.LogError(ex, $"{GetType().Name} function FAILED for : Import: " +
-                                     $"{message.Id} : {ex.Message}");
-
-                _logger.LogError(ex.StackTrace);
-                
-                await _dataImportService.FailImport(message.Id);
-            }
+            // }
+            // catch (Exception e)
+            // {
+            //     // If deadlock exception then throw & try up to 3 times
+            //     if (e is SqlException exception && exception.Number == 1205)
+            //     {
+            //         _logger.LogInformation($"{GetType().Name} : Handling known exception when processing Import: " +
+            //                                $"{message.Id} : {exception.Message} : transaction will be retried");
+            //         throw;
+            //     }
+            //
+            //     var ex = GetInnerException(e);
+            //
+            //     _logger.LogError(ex, $"{GetType().Name} function FAILED for : Import: " +
+            //                          $"{message.Id} : {ex.Message}");
+            //
+            //     _logger.LogError(ex.StackTrace);
+            //     
+            //     await _dataImportService.FailImport(message.Id);
+            // }
         }
 
         [FunctionName("CancelImports")]
