@@ -81,9 +81,8 @@ Navigate to published release page
     user checks page contains    This is the latest data
 
 Check latest release contains related dashboards section
-    user checks there are x accordion sections    2    id:data-accordion
-    user checks accordion is in position    Explore data and files    1    id:data-accordion
-    user checks accordion is in position    View related dashboard(s)    2    id:data-accordion
+    user checks there are x accordion sections    1    id:data-accordion
+    user checks accordion is in position    View related dashboard(s)    1    id:data-accordion
     user checks element contains    id:related-dashboards-content    Related dashboards test text
 
 Check quick links navigation contains link to related dashboards
