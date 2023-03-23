@@ -115,6 +115,7 @@ Select time period
     user waits until table tool wizard step is available    4    Choose your filters
 
 Select categories
+    user opens details dropdown    Random Filter
     user clicks checkbox    Blue
     user clicks checkbox    Orange
 
