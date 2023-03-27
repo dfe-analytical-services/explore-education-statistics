@@ -59,7 +59,7 @@ const PageHeader = ({ wide }: Props) => {
                   src={logo}
                   className="govuk-header__logotype-crown-fallback-image"
                 />
-                <span className="govuk-header__logotype-text"> GOV.UK</span>
+                <span className="govuk-header__logotype-text">GOV.UK</span>
               </span>
             </a>
           </div>

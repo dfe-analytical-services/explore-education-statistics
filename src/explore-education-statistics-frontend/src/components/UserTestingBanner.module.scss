@@ -1,0 +1,24 @@
+@import '~govuk-frontend/govuk/base';
+
+.container {
+  background: govuk-colour('blue');
+}
+
+.heading {
+  color: govuk-colour('white');
+  font-weight: $govuk-font-weight-bold;
+  margin-bottom: govuk-spacing(0);
+}
+
+.link {
+  color: govuk-colour('white') !important;
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &:focus {
+    @include govuk-focused-text;
+    color: govuk-colour('black') !important;
+  }
+}
