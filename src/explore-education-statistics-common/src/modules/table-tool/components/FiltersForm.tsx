@@ -160,6 +160,8 @@ const FiltersForm = ({
 
   const allFilterKeys = orderedFilters.map(([filterKey]) => filterKey);
 
+  const allFiltersOpen = openFilterGroups.length === allFilterKeys.length;
+
   const orderedIndicators = orderBy(
     Object.values(subjectMeta.indicators),
     'order',
@@ -244,19 +246,16 @@ const FiltersForm = ({
                           </span>
                           {orderedFilters.length > 1 && (
                             <ButtonText
+                              ariaExpanded={allFiltersOpen}
+                              ariaControls="filterGroups"
                               className="govuk-!-margin-bottom-2"
                               onClick={() => {
                                 setOpenFilterGroups(
-                                  openFilterGroups.length !==
-                                    allFilterKeys.length
-                                    ? allFilterKeys
-                                    : [],
+                                  allFiltersOpen ? [] : allFilterKeys,
                                 );
                               }}
                             >
-                              {openFilterGroups.length !== allFilterKeys.length
-                                ? 'Expand all'
-                                : 'Collapse all'}
+                              {allFiltersOpen ? 'Collapse all' : 'Expand all'}
                               <VisuallyHidden> categories</VisuallyHidden>
                             </ButtonText>
                           )}
@@ -266,36 +265,40 @@ const FiltersForm = ({
                       legend="Categories"
                       legendSize="m"
                     >
-                      {orderedFilters.map(([filterKey, filterGroup]) => {
-                        const filterName = `filters.${filterKey}`;
-                        const orderedFilterGroupOptions = orderBy(
-                          Object.values(filterGroup.options),
-                          'order',
-                        );
-                        return (
-                          <RHFFormFieldCheckboxGroupsMenu
-                            disabled={formState.isSubmitting}
-                            hint={filterGroup.hint}
-                            id={`${formId}-${filterName}`}
-                            key={filterKey}
-                            legend={filterGroup.legend}
-                            name={filterName}
-                            open={openFilterGroups.includes(filterKey)}
-                            options={orderedFilterGroupOptions.map(group => ({
-                              legend: group.label,
-                              options: group.options,
-                            }))}
-                            order={[]}
-                            onToggle={isOpen => {
-                              setOpenFilterGroups(groups =>
-                                isOpen
-                                  ? [...groups, filterKey]
-                                  : groups.filter(group => group !== filterKey),
-                              );
-                            }}
-                          />
-                        );
-                      })}
+                      <div id="filterGroups">
+                        {orderedFilters.map(([filterKey, filterGroup]) => {
+                          const filterName = `filters.${filterKey}`;
+                          const orderedFilterGroupOptions = orderBy(
+                            Object.values(filterGroup.options),
+                            'order',
+                          );
+                          return (
+                            <RHFFormFieldCheckboxGroupsMenu
+                              disabled={formState.isSubmitting}
+                              hint={filterGroup.hint}
+                              id={`${formId}-${filterName}`}
+                              key={filterKey}
+                              legend={filterGroup.legend}
+                              name={filterName}
+                              open={openFilterGroups.includes(filterKey)}
+                              options={orderedFilterGroupOptions.map(group => ({
+                                legend: group.label,
+                                options: group.options,
+                              }))}
+                              order={[]}
+                              onToggle={isOpen => {
+                                setOpenFilterGroups(groups =>
+                                  isOpen
+                                    ? [...groups, filterKey]
+                                    : groups.filter(
+                                        group => group !== filterKey,
+                                      ),
+                                );
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
                     </FormFieldset>
                   )}
                 </div>
