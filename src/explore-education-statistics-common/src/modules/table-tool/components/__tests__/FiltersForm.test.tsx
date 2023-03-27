@@ -802,4 +802,213 @@ describe('FiltersForm', () => {
       screen.getByRole('group', { name: 'Absence by reason', hidden: true }),
     );
   });
+
+  test('all filter groups are collapsed by default', () => {
+    render(
+      <FiltersForm
+        {...testWizardStepProps}
+        subject={testSubject}
+        subjectMeta={testSubjectMeta}
+        onSubmit={noop}
+      />,
+    );
+
+    expect(
+      screen.getByRole('group', {
+        name: 'School type',
+        hidden: true,
+      }),
+    ).not.toBeVisible();
+
+    expect(
+      screen.getByRole('group', {
+        name: 'Ethnic group major',
+        hidden: true,
+      }),
+    ).not.toBeVisible();
+
+    expect(
+      screen.getByRole('group', {
+        name: 'Gender',
+        hidden: true,
+      }),
+    ).not.toBeVisible();
+
+    expect(
+      screen.getByRole('group', {
+        name: 'Total',
+        hidden: true,
+      }),
+    ).not.toBeVisible();
+  });
+
+  test('shows the expand all button if there are multiple filter groups', () => {
+    render(
+      <FiltersForm
+        {...testWizardStepProps}
+        subject={testSubject}
+        subjectMeta={testSubjectMeta}
+        onSubmit={noop}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Expand all categories' }),
+    ).toBeInTheDocument();
+  });
+
+  test('does not show the expand all button if there is only one filter group', () => {
+    render(
+      <FiltersForm
+        {...testWizardStepProps}
+        subject={testSubject}
+        subjectMeta={{
+          ...testSubjectMeta,
+          filters: {
+            SchoolType: {
+              id: 'school-type',
+              totalValue: '',
+              hint: 'Filter by school type',
+              legend: 'School type',
+              options: {
+                Default: {
+                  id: 'default',
+                  label: 'Default',
+                  options: [
+                    {
+                      label: 'State-funded secondary',
+                      value: 'state-funded-secondary',
+                    },
+                    {
+                      label: 'Special',
+                      value: 'special',
+                    },
+                  ],
+                  order: 0,
+                },
+              },
+              name: 'school_type',
+              order: 0,
+            },
+          },
+        }}
+        onSubmit={noop}
+      />,
+    );
+
+    expect(
+      screen.queryByRole('button', { name: 'Expand all categories' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('toggles expanding and collapsing all filter groups when click the button', async () => {
+    render(
+      <FiltersForm
+        {...testWizardStepProps}
+        subject={testSubject}
+        subjectMeta={testSubjectMeta}
+        onSubmit={noop}
+      />,
+    );
+
+    expect(
+      screen.getByRole('group', {
+        name: 'School type',
+        hidden: true,
+      }),
+    ).not.toBeVisible();
+
+    expect(
+      screen.getByRole('group', {
+        name: 'Ethnic group major',
+        hidden: true,
+      }),
+    ).not.toBeVisible();
+
+    expect(
+      screen.getByRole('group', {
+        name: 'Gender',
+        hidden: true,
+      }),
+    ).not.toBeVisible();
+
+    expect(
+      screen.getByRole('group', {
+        name: 'Total',
+        hidden: true,
+      }),
+    ).not.toBeVisible();
+
+    userEvent.click(
+      screen.getByRole('button', { name: 'Expand all categories' }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Collapse all/)).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByRole('group', {
+        name: 'School type',
+        hidden: true,
+      }),
+    ).toBeVisible();
+
+    expect(
+      screen.getByRole('group', {
+        name: 'Ethnic group major',
+        hidden: true,
+      }),
+    ).toBeVisible();
+
+    expect(
+      screen.getByRole('group', {
+        name: 'Gender',
+        hidden: true,
+      }),
+    ).toBeVisible();
+
+    expect(
+      screen.getByRole('group', {
+        name: 'Total',
+        hidden: true,
+      }),
+    ).toBeVisible();
+
+    userEvent.click(
+      screen.getByRole('button', { name: 'Collapse all categories' }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Expand all/)).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByRole('group', {
+        name: 'School type',
+        hidden: true,
+      }),
+    ).not.toBeVisible();
+
+    expect(
+      screen.getByRole('group', {
+        name: 'Ethnic group major',
+        hidden: true,
+      }),
+    ).not.toBeVisible();
+
+    expect(
+      screen.getByRole('group', {
+        name: 'Gender',
+        hidden: true,
+      }),
+    ).not.toBeVisible();
+
+    expect(
+      screen.getByRole('group', {
+        name: 'Total',
+        hidden: true,
+      }),
+    ).not.toBeVisible();
+  });
 });

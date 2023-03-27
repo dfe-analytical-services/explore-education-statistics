@@ -1,3 +1,5 @@
+import ButtonText from '@common/components/ButtonText';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import CollapsibleList from '@common/components/CollapsibleList';
 import { FormFieldset } from '@common/components/form';
 import FormProvider from '@common/components/form/rhf/FormProvider';
@@ -77,6 +79,7 @@ const FiltersForm = ({
 
   const [tableQueryError, setTableQueryError] = useState<TableQueryErrorCode>();
   const [previousValues, setPreviousValues] = useState<FormValues>();
+  const [openFilterGroups, setOpenFilterGroups] = useState<string[]>([]);
 
   const initialFormValues = useMemo(() => {
     // Automatically select indicator when one indicator group with one option
@@ -155,6 +158,8 @@ const FiltersForm = ({
     ([_, value]) => value.order,
   );
 
+  const allFilterKeys = orderedFilters.map(([filterKey]) => filterKey);
+
   const orderedIndicators = orderBy(
     Object.values(subjectMeta.indicators),
     'order',
@@ -232,7 +237,31 @@ const FiltersForm = ({
                   {orderedFilters.length > 0 && (
                     <FormFieldset
                       error={getError('filters')}
-                      hint="Select at least one option from all categories"
+                      hint={
+                        <div className="dfe-flex dfe-justify-content--space-between dfe-flex-wrap">
+                          <span className="govuk-!-margin-bottom-2">
+                            Select at least one option from all categories
+                          </span>
+                          {orderedFilters.length > 1 && (
+                            <ButtonText
+                              className="govuk-!-margin-bottom-2"
+                              onClick={() => {
+                                setOpenFilterGroups(
+                                  openFilterGroups.length !==
+                                    allFilterKeys.length
+                                    ? allFilterKeys
+                                    : [],
+                                );
+                              }}
+                            >
+                              {openFilterGroups.length !== allFilterKeys.length
+                                ? 'Expand all'
+                                : 'Collapse all'}
+                              <VisuallyHidden> categories</VisuallyHidden>
+                            </ButtonText>
+                          )}
+                        </div>
+                      }
                       id="filters"
                       legend="Categories"
                       legendSize="m"
@@ -251,12 +280,19 @@ const FiltersForm = ({
                             key={filterKey}
                             legend={filterGroup.legend}
                             name={filterName}
-                            open={orderedFilterGroupOptions.length === 1}
+                            open={openFilterGroups.includes(filterKey)}
                             options={orderedFilterGroupOptions.map(group => ({
                               legend: group.label,
                               options: group.options,
                             }))}
                             order={[]}
+                            onToggle={isOpen => {
+                              setOpenFilterGroups(groups =>
+                                isOpen
+                                  ? [...groups, filterKey]
+                                  : groups.filter(group => group !== filterKey),
+                              );
+                            }}
                           />
                         );
                       })}
