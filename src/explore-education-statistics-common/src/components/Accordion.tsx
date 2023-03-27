@@ -21,6 +21,7 @@ import VisuallyHidden from './VisuallyHidden';
 
 export interface AccordionProps {
   children: ReactNode;
+  className?: string;
   id: string;
   openAll?: boolean;
   showOpenAll?: boolean;
@@ -31,6 +32,7 @@ export interface AccordionProps {
 
 const Accordion = ({
   children,
+  className,
   id,
   openAll,
   showOpenAll = true,
@@ -158,7 +160,7 @@ const Accordion = ({
 
   return (
     <div
-      className={classNames('govuk-accordion', styles.accordion)}
+      className={classNames('govuk-accordion', styles.accordion, className)}
       id={id}
       ref={ref}
       data-testid="accordion"

@@ -283,37 +283,32 @@ Verify publish and update dates
     user checks summary list contains    Next update    December 3001
 
 Verify release associated files
-    user opens accordion section    Explore data and files
-    ${downloads}=    user gets accordion section content element    Explore data and files
+    ${downloads}=    user gets testid element    data-and-files
     user waits until page contains element    ${downloads}    %{WAIT_SMALL}
 
-    user checks element should contain    ${downloads}    Download all data (zip)
+    user checks element should contain    ${downloads}    Download all data (ZIP)
     ...    %{WAIT_SMALL}
     user checks element should contain    ${downloads}
-    ...    All data used in this release is available as open data for download
+    ...    Download all data available in this release as a compressed ZIP file
     user checks element should contain    ${downloads}
-    ...    You can view featured tables that we have built for you, or create your own tables from the open data using our table tool
+    ...    View tables that we have built for you, or create your own tables from open data using our table tool
 
     user checks element should contain    ${downloads}
-    ...    Browse and download individual open data files from this release in our data catalogue
+    ...    Browse and download open data files from this release in our data catalogue
     user checks element should contain    ${downloads}
     ...    Learn more about the data files used in this release using our online guidance
 
-    user opens details dropdown    List of all supporting files
-    ${other_files}=    user gets details content element    List of all supporting files
+    user opens accordion section    Additional supporting files
+    ${other_files}=    user gets accordion section content element    Additional supporting files
     ${other_files_1}=    get child element    ${other_files}    css:li:nth-child(1)
 
     user waits until element contains link    ${other_files_1}    Test ancillary file 1 (txt, 12 B)
-    user opens details dropdown    More details    ${other_files_1}
-    ${other_files_1_details}=    user gets details content element    More details    ${other_files_1}
-    user checks element should contain    ${other_files_1_details}    Test ancillary file 1 summary
+    user checks element should contain    ${other_files_1}    Test ancillary file 1 summary
 
     download file    link:Test ancillary file 1 (txt, 12 B)    test_ancillary_file_1.txt
     downloaded file should have first line    test_ancillary_file_1.txt    Test file 1
 
 Verify public metadata guidance document
-    user opens accordion section    Explore data and files
-    user waits until h3 is visible    Open data
     user clicks link    Data guidance
 
     user checks breadcrumb count should be    4
@@ -382,7 +377,7 @@ Verify free text key stat is correct
 
 Verify accordions are correct
     user checks there are x accordion sections    1    id:data-accordion
-    user checks accordion is in position    Explore data and files    1    id:data-accordion
+    user checks accordion is in position    Additional supporting files    1    id:data-accordion
 
     user checks there are x accordion sections    3    id:content
     user checks accordion is in position    Dates data block    1    id:content
@@ -759,34 +754,26 @@ Verify amendment free text key stat is updated
     user checks key stat guidance    1    Updated guidance title    Updated guidance text
 
 Verify amendment files
-    user opens accordion section    Explore data and files
-    ${downloads}=    user gets accordion section content element    Explore data and files
-    user checks element should contain    ${downloads}    Download all data (zip)
+    ${downloads}=    user gets testid element    data-and-files
+    user checks element should contain    ${downloads}    Download all data (ZIP)
     ...    %{WAIT_SMALL}
 
-    user opens details dropdown    List of all supporting files
-    ${other_files}=    user gets details content element    List of all supporting files
+    user opens accordion section    Additional supporting files
+    ${other_files}=    user gets accordion section content element    Additional supporting files
     ${other_files_1}=    get child element    ${other_files}    css:li:nth-child(1)
     ${other_files_2}=    get child element    ${other_files}    css:li:nth-child(2)
 
     user waits until element contains link    ${other_files_1}    Test ancillary file 1 (txt, 12 B)
-    user opens details dropdown    More details    ${other_files_1}
-    ${other_files_1_details}=    user gets details content element    More details    ${other_files_1}
-    user checks element should contain    ${other_files_1_details}    Test ancillary file 1 summary
+    user checks element should contain    ${other_files_1}    Test ancillary file 1 summary
     download file    link:Test ancillary file 1 (txt, 12 B)    test_ancillary_file_1.txt
     downloaded file should have first line    test_ancillary_file_1.txt    Test file 1
 
     user waits until element contains link    ${other_files_2}    Test ancillary file 2 (txt, 24 B)
-    user opens details dropdown    More details    ${other_files_2}
-    ${other_files_2_details}=    user gets details content element    More details    ${other_files_2}
-    user checks element should contain    ${other_files_2_details}    Test ancillary file 2 summary
-
+    user checks element should contain    ${other_files_2}    Test ancillary file 2 summary
     download file    link:Test ancillary file 2 (txt, 24 B)    test_ancillary_file_2.txt
     downloaded file should have first line    test_ancillary_file_2.txt    Test file 2
 
 Verify amendment public metadata guidance document
-    user opens accordion section    Explore data and files
-    user waits until h3 is visible    Open data
     user clicks link    Data guidance
 
     user checks breadcrumb count should be    4
