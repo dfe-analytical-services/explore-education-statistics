@@ -7,7 +7,7 @@ const PageHeader = () => (
       Skip to main content
     </a>
 
-    <header className="govuk-header " role="banner" data-module="header">
+    <header className="govuk-header" role="banner" data-module="header">
       <div className="govuk-header__container">
         <div className="govuk-width-container">
           <div className="govuk-header__logo">
