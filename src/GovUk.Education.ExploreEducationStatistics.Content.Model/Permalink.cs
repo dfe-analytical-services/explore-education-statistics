@@ -16,4 +16,6 @@ public class Permalink
     public Guid SubjectId { get; init; }
 
     public DateTime Created { get; init; }
+    
+    public int ContentLength { get; init; }
 }

@@ -18,9 +18,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
@@ -224,7 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
         }
 
-        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Create(PermalinkCreateViewModel request)
+        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Create(PermalinkCreateRequest request)
         {
             return await _subjectRepository.FindPublicationIdForSubject(request.Query.SubjectId)
                 .OrNotFound()
@@ -233,7 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Create(Guid releaseId,
-            PermalinkCreateViewModel request)
+            PermalinkCreateRequest request)
         {
             return await _tableBuilderService.Query(releaseId, request.Query)
                 .OnSuccess(async result =>

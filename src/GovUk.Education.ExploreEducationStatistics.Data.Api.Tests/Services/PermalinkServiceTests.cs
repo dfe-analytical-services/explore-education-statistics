@@ -20,6 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
@@ -55,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task Create_LatestPublishedReleaseForSubjectNotFound()
         {
-            var request = new PermalinkCreateViewModel
+            var request = new PermalinkCreateRequest
             {
                 Query =
                 {
@@ -94,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = Guid.NewGuid()
             };
 
-            var request = new PermalinkCreateViewModel
+            var request = new PermalinkCreateRequest
             {
                 Query =
                 {
@@ -215,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         {
             var subjectId = Guid.NewGuid();
 
-            var request = new PermalinkCreateViewModel
+            var request = new PermalinkCreateRequest
             {
                 Query =
                 {
