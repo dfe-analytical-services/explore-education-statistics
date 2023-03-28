@@ -374,6 +374,10 @@ const TableToolWizard = ({
     state.response?.tableHeaders,
   ]);
 
+  const showChangeWarningForSteps = hidePublicationSelectionStage
+    ? [1]
+    : [1, 2];
+
   return (
     <ConfirmContextProvider>
       {({ askConfirm }) => (
@@ -383,7 +387,10 @@ const TableToolWizard = ({
             initialStep={state.initialStep}
             id="tableToolWizard"
             onStepChange={async (nextStep, previousStep) => {
-              if (nextStep < previousStep) {
+              if (
+                nextStep < previousStep &&
+                showChangeWarningForSteps.includes(nextStep)
+              ) {
                 const confirmed = await askConfirm();
                 return confirmed ? nextStep : previousStep;
               }
