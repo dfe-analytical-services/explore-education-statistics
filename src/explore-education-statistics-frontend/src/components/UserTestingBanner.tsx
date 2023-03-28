@@ -24,6 +24,8 @@ const UserTestingBanner = () => {
                 <Link
                   className={styles.link}
                   to="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-XMiKzsnr8xJoWM_DeGwIu9UQVNYVkxZSEJVVjhPOURXSjJVMjhZRTdYMi4u"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   Get involved in making this service better
                 </Link>
