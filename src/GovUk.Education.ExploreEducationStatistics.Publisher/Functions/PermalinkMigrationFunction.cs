@@ -22,7 +22,7 @@ public class PermalinkMigrationFunction
     }
 
     /// <summary>
-    /// Azure Function which stores high level details about a Permalink in the database.
+    /// Azure Function which migrates a Permalink.
     /// </summary>
     /// <param name="message"></param>
     /// <param name="executionContext"></param>
@@ -36,7 +36,7 @@ public class PermalinkMigrationFunction
     {
         try
         {
-            await _permalinkMigrationService.AddPermalinkToDbFromStorage(message.PermalinkId);
+            await _permalinkMigrationService.MigratePermalink(message.PermalinkId);
         }
         catch (Exception e)
         {

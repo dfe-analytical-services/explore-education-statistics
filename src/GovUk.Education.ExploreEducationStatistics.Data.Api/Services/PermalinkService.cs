@@ -5,10 +5,13 @@ using System.Dynamic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using CsvHelper;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -26,11 +29,11 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
@@ -210,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             try
             {
                 var text = await _blobStorageService.DownloadBlobText(
-                    containerName: Permalinks,
+                    containerName: BlobContainers.Permalinks,
                     path: id.ToString(),
                     cancellationToken: cancellationToken);
 
@@ -239,17 +242,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 .OnSuccess(async result =>
                 {
                     var permalinkTableResult = new PermalinkTableBuilderResult(result);
+                    var subjectMeta = permalinkTableResult.SubjectMeta;
                     var permalink = new Permalink
                     {
-                        Created = DateTime.UtcNow,
-                        PublicationTitle = result.SubjectMeta.PublicationName,
-                        DataSetTitle = result.SubjectMeta.SubjectName,
+                        PublicationTitle = subjectMeta.PublicationName,
+                        DataSetTitle = subjectMeta.SubjectName,
                         ReleaseId = releaseId,
-                        SubjectId = request.Query.SubjectId
+                        SubjectId = request.Query.SubjectId,
+                        CountFilterItems = CountFilterItems(subjectMeta.Filters),
+                        CountFootnotes = subjectMeta.Footnotes.Count,
+                        CountIndicators = subjectMeta.Indicators.Count,
+                        CountLocations = CountLocations(subjectMeta.LocationsHierarchical),
+                        CountObservations = result.Results.Count(),
+                        CountTimePeriods = subjectMeta.TimePeriodRange.Count,
+                        LegacyHasConfigurationHeaders = true
                     };
 
                     _contentDbContext.Permalinks.Add(permalink);
-                    await _contentDbContext.SaveChangesAsync();
 
                     var legacyPermalink = new LegacyPermalink(
                         permalink.Id,
@@ -258,13 +267,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         permalinkTableResult,
                         request.Query);
 
-                    await _blobStorageService.UploadAsJson(containerName: Permalinks,
+                    var content = JsonConvert.SerializeObject(legacyPermalink,
+                        BuildJsonSerializerSettings());
+
+                    await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+                    permalink.LegacyContentLength = stream.Length;
+
+                    await _blobStorageService.UploadStream(
+                        containerName: BlobContainers.Permalinks,
                         path: permalink.Id.ToString(),
-                        content: legacyPermalink,
-                        settings: BuildJsonSerializerSettings());
+                        stream: stream,
+                        contentType: MediaTypeNames.Application.Json);
+
+                    await _contentDbContext.SaveChangesAsync();
 
                     return await BuildViewModel(legacyPermalink);
                 });
+        }
+
+        private static int CountFilterItems(Dictionary<string, FilterMetaViewModel> filters)
+        {
+            return filters.Values.Sum(filter =>
+                filter.Options.Values.Sum(filterGroup =>
+                    filterGroup.Options.Count));
+        }
+
+        private static int CountLocations(
+            Dictionary<string, List<LocationAttributeViewModel>> subjectMetaLocationsHierarchical)
+        {
+            var locationAttributes = subjectMetaLocationsHierarchical.Values
+                .SelectMany(locationAttributes => locationAttributes);
+
+            return CountLocations(locationAttributes);
+        }
+
+        private static int CountLocations(IEnumerable<LocationAttributeViewModel> locationAttributes)
+        {
+            return locationAttributes.Sum(attribute => attribute.Options is null ? 1 : CountLocations(attribute.Options));
         }
 
         private static JsonSerializerSettings BuildJsonSerializerSettings()

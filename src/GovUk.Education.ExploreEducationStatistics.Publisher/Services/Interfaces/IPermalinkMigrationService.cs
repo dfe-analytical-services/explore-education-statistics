@@ -10,7 +10,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 /// </summary>
 public interface IPermalinkMigrationService
 {
-    Task<Permalink> AddPermalinkToDbFromStorage(Guid permalinkId);
-
-    Task EnumerateAllPermalinksForMigration();
+    Task<Permalink> MigratePermalink(Guid permalinkId);
 }
