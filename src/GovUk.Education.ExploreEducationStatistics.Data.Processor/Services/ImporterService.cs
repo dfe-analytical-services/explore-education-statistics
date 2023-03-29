@@ -306,22 +306,59 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 ctxDelegate => _importerLocationService.CreateIfNotExistsAndCache(ctxDelegate, locations.ToList()));
         }
 
-        public async Task ImportObservations(DataImport import,
+        public async Task ImportObservations(
+            DataImport import,
             Func<Task<Stream>> dataFileStreamProvider,
             Subject subject,
             SubjectMeta subjectMeta,
             int batchNo,
             StatisticsDbContext context)
         {
-            var observations = (await GetObservations(
-                import,
-                context,
-                dataFileStreamProvider,
-                subject,
-                subjectMeta,
-                batchNo)).ToList();
+            var soleGeographicLevel = import.HasSoleGeographicLevel();
+            var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
 
-            await _observationBatchImporter.ImportObservationBatch(context, observations);
+            var batchSize = 3000;
+            var nextPosition = 0L;
+            var numberOfBatches = (import.TotalRows!.Value / batchSize) + 1;
+
+            for (var batchNumber = 0; batchNumber < numberOfBatches; batchNumber++)
+            {
+                var results = await CsvUtils.Select(
+                    dataFileStreamProvider, 
+                    (rowValues, index) =>
+                    {
+                        if (IsRowAllowed(soleGeographicLevel, rowValues, csvHeaders))
+                        {
+                            return ObservationFromCsv(
+                                context,
+                                rowValues,
+                                csvHeaders,
+                                subject,
+                                subjectMeta,
+                                (batchNo - 1) * import.RowsPerBatch + index + 2);
+                        }
+
+                        return null;
+                    },
+                    skipHeaderRow: nextPosition == 0,
+                    startPosition: nextPosition,
+                    numberOfRows: batchSize);
+
+                var observations = results.Results.WhereNotNull();
+
+                await _observationBatchImporter.ImportObservationBatch(context, observations);
+
+                nextPosition = results.Position + 1;
+            }
+
+            
+            // var observations = (await GetObservations(
+            //     import,
+            //     context,
+            //     dataFileStreamProvider,
+            //     subject,
+            //     subjectMeta,
+            //     batchNo)).ToList();
         }
 
         public TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> rowValues, List<string> colValues)
@@ -349,34 +386,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return int.Parse(tp.Substring(0, 4));
         }
 
-        private async Task<IEnumerable<Observation>> GetObservations(
-            DataImport import,
-            StatisticsDbContext context,
-            Func<Task<Stream>> dataFileStreamProvider,
-            Subject subject,
-            SubjectMeta subjectMeta,
-            int batchNo)
-        {
-            var soleGeographicLevel = import.HasSoleGeographicLevel();
-            var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
-
-            return (await CsvUtils.Select(dataFileStreamProvider, (rowValues, index) =>
-            {
-                if (IsRowAllowed(soleGeographicLevel, rowValues, csvHeaders))
-                {
-                    return ObservationFromCsv(
-                        context,
-                        rowValues,
-                        csvHeaders,
-                        subject,
-                        subjectMeta,
-                        (batchNo - 1) * import.RowsPerBatch + index + 2);
-                }
-
-                return null;
-            }))
-                .WhereNotNull();
-        }
+        // private async Task<IEnumerable<Observation>> GetObservations(
+        //     DataImport import,
+        //     StatisticsDbContext context,
+        //     Func<Task<Stream>> dataFileStreamProvider,
+        //     Subject subject,
+        //     SubjectMeta subjectMeta,
+        //     int batchNo)
+        // {
+        //     var soleGeographicLevel = import.HasSoleGeographicLevel();
+        //     var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
+        //
+        //     return (await CsvUtils.Select(dataFileStreamProvider, (rowValues, index) =>
+        //     {
+        //         if (IsRowAllowed(soleGeographicLevel, rowValues, csvHeaders))
+        //         {
+        //             return ObservationFromCsv(
+        //                 context,
+        //                 rowValues,
+        //                 csvHeaders,
+        //                 subject,
+        //                 subjectMeta,
+        //                 (batchNo - 1) * import.RowsPerBatch + index + 2);
+        //         }
+        //
+        //         return null;
+        //     }))
+        //         .WhereNotNull();
+        // }
 
         /// <summary>
         /// Determines if a row should be imported based on geographic level.

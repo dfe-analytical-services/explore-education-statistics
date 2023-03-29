@@ -82,14 +82,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                         break;
                     case DataImportStatus.STAGE_2:
                         await _processorService.ProcessStage2(import.Id);
-                        await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_3, 0);
-                        importStagesMessageQueue.Add(message);
-                        break;
-                    case DataImportStatus.STAGE_3:
-                        await _processorService.ProcessStage3(import.Id);
+                        await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_3, 100);
                         await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_4, 0);
                         importStagesMessageQueue.Add(message);
                         break;
+                    // case DataImportStatus.STAGE_3:
+                    //     await _processorService.ProcessStage3(import.Id);
+                    //     await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_4, 0);
+                    //     importStagesMessageQueue.Add(message);
+                    //     break;
                     case DataImportStatus.STAGE_4:
                         await _processorService.ProcessStage4Messages(import.Id, importObservationsMessageQueue);
                         break;

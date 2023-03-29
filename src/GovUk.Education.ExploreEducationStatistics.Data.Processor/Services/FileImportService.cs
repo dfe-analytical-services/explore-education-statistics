@@ -1,3 +1,4 @@
+# nullable enable
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -70,19 +71,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
             var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
 
-            await _databaseHelper.DoInTransaction(
-                context,
-                async ctxDelegate =>
-                {
+            // await _databaseHelper.DoInTransaction(
+            //     context,
+            //     async ctxDelegate =>
+            //     {
                     await _importerService.ImportObservations(
                         import,
                         datafileStreamProvider,
                         subject,
-                        _importerService.GetMeta(metaFileCsvHeaders, metaFileCsvRows, subject, ctxDelegate),
+                        _importerService.GetMeta(metaFileCsvHeaders, metaFileCsvRows, subject, context),
                         message.BatchNo,
-                        ctxDelegate
+                        context
                     );
-                });
+                // });
 
             if (import.NumBatches > 1)
             {
