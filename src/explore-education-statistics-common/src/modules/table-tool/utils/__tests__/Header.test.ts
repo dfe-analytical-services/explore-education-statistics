@@ -1,4 +1,4 @@
-import Header from '../Header';
+import Header from '@common/modules/table-tool/utils/Header';
 
 describe('Header', () => {
   test('maintains `depth` for nested headers', () => {
@@ -65,6 +65,20 @@ describe('Header', () => {
       );
 
       expect(header.crossSpan).toBe(2);
+    });
+
+    test('return 1 if child doesnt have text', () => {
+      const header = new Header('1', '1').addChild(new Header('2', ''));
+
+      expect(header.crossSpan).toBe(1);
+    });
+
+    test('return 1 if child and grandchild dont have text', () => {
+      const header = new Header('1', '1').addChild(
+        new Header('2', '').addChild(new Header('3', '')),
+      );
+
+      expect(header.crossSpan).toBe(1);
     });
   });
 

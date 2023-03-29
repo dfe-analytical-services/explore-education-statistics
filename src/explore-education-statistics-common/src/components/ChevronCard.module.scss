@@ -1,0 +1,55 @@
+@import '~govuk-frontend/govuk/base';
+
+.card {
+  border-top: 1px solid $govuk-border-colour;
+  margin: 0 govuk-spacing(3);
+  padding: govuk-spacing(1) 0 govuk-spacing(4) 0;
+
+  @include govuk-media-query($from: tablet) {
+    width: calc(50% - #{govuk-spacing(6)});
+  }
+}
+
+.wrapper {
+  padding: govuk-spacing(2) govuk-spacing(6) govuk-spacing(2) 0;
+  position: relative;
+}
+
+.link {
+  font-weight: bold;
+
+  &::after {
+    bottom: 0;
+    content: '';
+    display: block;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+}
+
+.linkWithChevron {
+  &::before {
+    border-right: 3px solid $govuk-link-colour;
+    border-top: 3px solid $govuk-link-colour;
+    content: '';
+    display: block;
+    height: 7px;
+    position: absolute;
+    right: 5px;
+    top: 15px;
+    transform: translateY(0) rotate(45deg) scale(1);
+    width: 7px;
+  }
+  &:focus::before {
+    border-color: $govuk-focus-text-colour;
+  }
+  &:hover::before {
+    border-color: $govuk-link-hover-colour;
+  }
+}
+
+.description {
+  margin: 0 -#{govuk-spacing(6)} 0 0;
+}

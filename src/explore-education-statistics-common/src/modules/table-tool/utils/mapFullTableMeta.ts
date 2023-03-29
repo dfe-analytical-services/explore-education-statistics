@@ -33,8 +33,20 @@ export default function mapFullTableMeta(
   }, {});
 
   const locationEntries = Object.entries(subjectMeta.locations);
-  const hasNestedLocations = locationEntries.some(([, levelOptions]) =>
-    levelOptions.some(levelOption => levelOption.options),
+
+  /**
+   * The location hierarchy expects grouping, for example the LAD attribute
+   * is grouped by Region. However, the data screener
+   * (https://rsconnect/rsc/dfe-published-data-qa/) does not require the data
+   * to have all attributes of the hierarchy. When this data is missing the
+   * backend returns an empty string for the group label. This can cause table
+   * layout problems so we need to not group the locations when this is the
+   * case.
+   */
+  const addLocationGroup = locationEntries.some(
+    ([, levelOptions]) =>
+      levelOptions.some(levelOption => levelOption.options) &&
+      levelOptions.every(levelOption => levelOption.label !== ''),
   );
 
   const locations = locationEntries.flatMap(([level, levelOptions]) =>
@@ -59,7 +71,7 @@ export default function mapFullTableMeta(
         // hierarchy (e.g. local authorities) and are flat (e.g. country).
         // By setting the `group` to itself, the location should have a
         // cross span of 2 and we should get a nice symmetric table.
-        group: hasNestedLocations ? levelOption.label : undefined,
+        group: addLocationGroup ? levelOption.label : undefined,
       });
     }),
   );

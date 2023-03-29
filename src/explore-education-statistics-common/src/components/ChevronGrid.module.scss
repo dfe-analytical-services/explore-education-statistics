@@ -1,0 +1,12 @@
+@import '~govuk-frontend/govuk/base';
+
+.grid {
+  list-style: none;
+  margin: 0 -#{govuk-spacing(3)};
+  padding: 0;
+
+  @include govuk-media-query($from: tablet) {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}

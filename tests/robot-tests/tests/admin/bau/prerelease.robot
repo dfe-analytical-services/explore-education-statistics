@@ -296,8 +296,6 @@ Validate contact banner is shown
     user checks testid element contains    notificationBanner    UI test team name: ui_test@test.com
 
 Validate metadata guidance page
-    user opens accordion section    Explore data and files
-    user waits until h3 is visible    Open data
     user clicks link    Data guidance
 
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
@@ -409,8 +407,6 @@ Validate prerelease has started for Analyst user
     user waits until element contains    id:releaseHeadlines    Test headlines summary text for ${PUBLICATION_NAME}
 
 Validate public metdata guidance for Analyst user
-    user opens accordion section    Explore data and files
-    user waits until h3 is visible    Open data
     user clicks link    Data guidance
 
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}

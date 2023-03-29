@@ -1,4 +1,3 @@
-import ButtonLink from '@admin/components/ButtonLink';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import Link from '@admin/components/Link';
 import PrintThisPage from '@admin/components/PrintThisPage';
@@ -26,7 +25,7 @@ import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
-import ReleaseDataAccordion from '@common/modules/release/components/ReleaseDataAccordion';
+import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
 import React, { useCallback, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
 import ScrollableContainer from '@common/components/ScrollableContainer';
@@ -194,7 +193,7 @@ const ReleaseContent = () => {
                         releaseFileService.downloadAllFilesZip(release.id)
                       }
                     >
-                      Download all data (zip)
+                      Download all data (ZIP)
                     </Button>
                   </li>
                 )}
@@ -264,12 +263,12 @@ const ReleaseContent = () => {
             {!!releaseCount && (
               <>
                 <h3 className="govuk-heading-s" id="past-releases">
-                  Past releases
+                  Releases in this series
                 </h3>
 
                 <Details
                   className="govuk-!-margin-bottom-4"
-                  summary={`View previous releases (${releaseCount})`}
+                  summary={`View releases (${releaseCount})`}
                 >
                   <ScrollableContainer maxHeight={300}>
                     <ul className="govuk-list">
@@ -332,16 +331,15 @@ const ReleaseContent = () => {
       {(release.downloadFiles ||
         release.hasPreReleaseAccessList ||
         !!release.relatedDashboardsSection?.content.length) && (
-        <ReleaseDataAccordion
+        <ReleaseDataAndFiles
           release={release}
-          renderAllFilesButton={
-            <Button
+          renderAllFilesLink={
+            <ButtonText
               disableDoubleClick
-              variant="secondary"
               onClick={() => releaseFileService.downloadAllFilesZip(release.id)}
             >
-              Download all data (zip)
-            </Button>
+              Download all data (ZIP)
+            </ButtonText>
           }
           renderDownloadLink={file => (
             <ButtonText
@@ -357,7 +355,7 @@ const ReleaseContent = () => {
             </ButtonText>
           )}
           renderDataGuidanceLink={
-            <ButtonLink
+            <Link
               to={{
                 pathname: generatePath<ReleaseRouteParams>(
                   releaseDataGuidanceRoute.path,
@@ -370,22 +368,15 @@ const ReleaseContent = () => {
                   backLink: location.pathname,
                 },
               }}
-              variant="secondary"
             >
               Data guidance
-            </ButtonLink>
+            </Link>
           }
           renderDataCatalogueLink={
-            <Button disabled variant="secondary">
-              Browse data files
-              <br /> (public site only)
-            </Button>
+            <span>Data catalogue (public site only)</span>
           }
-          renderCreateTablesButton={
-            <Button disabled>
-              Create tables
-              <br /> (public site only)
-            </Button>
+          renderCreateTablesLink={
+            <span>View or create your own tables (public site only)</span>
           }
           showDownloadFilesList
           renderRelatedDashboards={

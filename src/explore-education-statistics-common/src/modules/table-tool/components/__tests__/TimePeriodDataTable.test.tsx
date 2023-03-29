@@ -14,20 +14,11 @@ import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import {
   ReleaseTableDataQuery,
   TableDataResponse,
-  TableDataResult,
 } from '@common/services/tableBuilderService';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
-import {
-  CategoryFilter,
-  Indicator,
-  LocationFilter,
-  TimePeriodFilter,
-} from '@common/modules/table-tool/types/filters';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
-import { FullTable, FullTableMeta } from '../../types/fullTable';
-import { TableHeadersConfig } from '../../types/tableHeaders';
 
 describe('TimePeriodDataTable', () => {
   test('renders table with two of every option', () => {
@@ -242,7 +233,7 @@ describe('TimePeriodDataTable', () => {
                 options: [
                   {
                     label: 'Ethnicity Major Asian Total',
-                    value: '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
+                    value: 'filter-1',
                   },
                 ],
                 order: 0,
@@ -254,7 +245,7 @@ describe('TimePeriodDataTable', () => {
         footnotes: [],
         indicators: [
           {
-            value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
+            value: 'indicator-6',
             label: 'Authorised absence rate',
             unit: '%',
             name: 'sess_authorised_percent',
@@ -264,7 +255,7 @@ describe('TimePeriodDataTable', () => {
         locations: {
           country: [
             {
-              id: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              id: 'location-5',
               value: 'E92000001',
               label: 'England',
             },
@@ -278,10 +269,10 @@ describe('TimePeriodDataTable', () => {
       },
       results: [
         {
-          filters: ['598ed9fd-b37e-4e08-baec-08d78f6f2c4d'],
+          filters: ['filter-1'],
           geographicLevel: 'country',
-          locationId: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
-          measures: { '6160c4f8-4c9f-40f0-a623-2a4f742860af': '18.3' },
+          locationId: 'location-5',
+          measures: { 'indicator-6': '18.3' },
           timePeriod: '2014_AY',
         },
       ],
@@ -292,7 +283,7 @@ describe('TimePeriodDataTable', () => {
         columnGroups: [
           [
             {
-              value: '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
+              value: 'filter-1',
               type: 'Filter',
             },
           ],
@@ -300,7 +291,7 @@ describe('TimePeriodDataTable', () => {
         rowGroups: [
           [
             {
-              value: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              value: 'location-5',
               type: 'Location',
               level: 'country',
             },
@@ -309,7 +300,7 @@ describe('TimePeriodDataTable', () => {
         columns: [{ value: '2014_AY', type: 'TimePeriod' }],
         rows: [
           {
-            value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
+            value: 'indicator-6',
             type: 'Indicator',
           },
         ],
@@ -358,7 +349,7 @@ describe('TimePeriodDataTable', () => {
         footnotes: [],
         indicators: [
           {
-            value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
+            value: 'indicator-6',
             label: 'Authorised absence rate',
             unit: '%',
             name: 'sess_authorised_percent',
@@ -368,7 +359,7 @@ describe('TimePeriodDataTable', () => {
         locations: {
           country: [
             {
-              id: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              id: 'location-5',
               value: 'E92000001',
               label: 'England',
             },
@@ -384,8 +375,8 @@ describe('TimePeriodDataTable', () => {
         {
           filters: [],
           geographicLevel: 'country',
-          locationId: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
-          measures: { '6160c4f8-4c9f-40f0-a623-2a4f742860af': '18.3' },
+          locationId: 'location-5',
+          measures: { 'indicator-6': '18.3' },
           timePeriod: '2014_AY',
         },
       ],
@@ -397,7 +388,7 @@ describe('TimePeriodDataTable', () => {
         rowGroups: [
           [
             {
-              value: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              value: 'location-5',
               level: 'country',
               type: 'Location',
             },
@@ -406,7 +397,7 @@ describe('TimePeriodDataTable', () => {
         columns: [{ value: '2014_AY', type: 'TimePeriod' }],
         rows: [
           {
-            value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
+            value: 'indicator-6',
             type: 'Indicator',
           },
         ],
@@ -455,7 +446,7 @@ describe('TimePeriodDataTable', () => {
         footnotes: [],
         indicators: [
           {
-            value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
+            value: 'indicator-6',
             label: 'Authorised absence rate',
             name: 'sess_authorised_percent',
             unit: '%',
@@ -464,7 +455,7 @@ describe('TimePeriodDataTable', () => {
         locations: {
           country: [
             {
-              id: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              id: 'location-5',
               value: 'E92000001',
               label: 'England',
             },
@@ -480,8 +471,8 @@ describe('TimePeriodDataTable', () => {
         {
           filters: [],
           geographicLevel: 'country',
-          locationId: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
-          measures: { '6160c4f8-4c9f-40f0-a623-2a4f742860af': '18.3' },
+          locationId: 'location-5',
+          measures: { 'indicator-6': '18.3' },
           timePeriod: '2014_AY',
         },
       ],
@@ -493,7 +484,7 @@ describe('TimePeriodDataTable', () => {
         rowGroups: [
           [
             {
-              value: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              value: 'location-5',
               type: 'Location',
               level: 'country',
             },
@@ -502,7 +493,7 @@ describe('TimePeriodDataTable', () => {
         columns: [{ value: '2014_AY', type: 'TimePeriod' }],
         rows: [
           {
-            value: '6160c4f8-4c9f-40f0-a623-2a4f742860af',
+            value: 'indicator-6',
             type: 'Indicator',
           },
         ],
@@ -562,7 +553,7 @@ describe('TimePeriodDataTable', () => {
         locations: {
           country: [
             {
-              id: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              id: 'location-5',
               value: 'england',
               label: 'England',
             },
@@ -574,7 +565,7 @@ describe('TimePeriodDataTable', () => {
               level: 'region',
               options: [
                 {
-                  id: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+                  id: 'location-2',
                   value: 'barnsley',
                   label: 'Barnsley',
                 },
@@ -586,7 +577,7 @@ describe('TimePeriodDataTable', () => {
               level: 'region',
               options: [
                 {
-                  id: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+                  id: 'location-1',
                   value: 'barnet',
                   label: 'Barnet',
                 },
@@ -604,21 +595,21 @@ describe('TimePeriodDataTable', () => {
         {
           filters: [],
           geographicLevel: 'country',
-          locationId: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+          locationId: 'location-5',
           measures: { 'authorised-absence-rate': '18.3' },
           timePeriod: '2014_AY',
         },
         {
           filters: [],
           geographicLevel: 'localAuthority',
-          locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+          locationId: 'location-1',
           measures: { 'authorised-absence-rate': '20.2' },
           timePeriod: '2014_AY',
         },
         {
           filters: [],
           geographicLevel: 'localAuthority',
-          locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+          locationId: 'location-2',
           measures: { 'authorised-absence-rate': '21.5' },
           timePeriod: '2014_AY',
         },
@@ -631,17 +622,17 @@ describe('TimePeriodDataTable', () => {
         rowGroups: [
           [
             {
-              value: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              value: 'location-5',
               level: 'country',
               type: 'Location',
             },
             {
-              value: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+              value: 'location-2',
               level: 'localAuthority',
               type: 'Location',
             },
             {
-              value: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+              value: 'location-1',
               level: 'localAuthority',
               type: 'Location',
             },
@@ -736,7 +727,7 @@ describe('TimePeriodDataTable', () => {
     expect(screen.getByRole('table')).toMatchSnapshot();
   });
 
-  test('renders table with empty cells when region group is missing', () => {
+  test('renders table correctly when region group is missing in row headers', () => {
     const fullTable = mapFullTable({
       subjectMeta: {
         filters: {},
@@ -754,7 +745,7 @@ describe('TimePeriodDataTable', () => {
         locations: {
           country: [
             {
-              id: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              id: 'location-5',
               value: 'england',
               label: 'England',
             },
@@ -766,12 +757,12 @@ describe('TimePeriodDataTable', () => {
               level: 'region',
               options: [
                 {
-                  id: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+                  id: 'location-2',
                   value: 'barnsley',
                   label: 'Barnsley',
                 },
                 {
-                  id: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+                  id: 'location-1',
                   value: 'barnet',
                   label: 'Barnet',
                 },
@@ -789,21 +780,21 @@ describe('TimePeriodDataTable', () => {
         {
           filters: [],
           geographicLevel: 'country',
-          locationId: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+          locationId: 'location-5',
           measures: { 'authorised-absence-rate': '18.3' },
           timePeriod: '2014_AY',
         },
         {
           filters: [],
           geographicLevel: 'localAuthorityDistrict',
-          locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+          locationId: 'location-1',
           measures: { 'authorised-absence-rate': '20.2' },
           timePeriod: '2014_AY',
         },
         {
           filters: [],
           geographicLevel: 'localAuthorityDistrict',
-          locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+          locationId: 'location-2',
           measures: { 'authorised-absence-rate': '21.5' },
           timePeriod: '2014_AY',
         },
@@ -816,17 +807,17 @@ describe('TimePeriodDataTable', () => {
         rowGroups: [
           [
             {
-              value: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              value: 'location-5',
               level: 'country',
               type: 'Location',
             },
             {
-              value: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+              value: 'location-2',
               level: 'localAuthorityDistrict',
               type: 'Location',
             },
             {
-              value: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+              value: 'location-1',
               level: 'localAuthorityDistrict',
               type: 'Location',
             },
@@ -868,6 +859,181 @@ describe('TimePeriodDataTable', () => {
     expect(rows).toHaveLength(3);
 
     // Row 1
+    const row1Headers = rows[0].querySelectorAll('th');
+    const row1Cells = rows[0].querySelectorAll('td');
+
+    expect(row1Headers).toHaveLength(1);
+
+    expect(row1Headers[0]).toHaveAttribute('scope', 'row');
+    expect(row1Headers[0]).toHaveAttribute('colspan', '1');
+    expect(row1Headers[0]).toHaveTextContent('England');
+
+    expect(row1Cells).toHaveLength(1);
+    expect(row1Cells[0]).toHaveTextContent('18.3%');
+
+    // Row 2
+    const row2Headers = rows[1].querySelectorAll('th');
+    const row2Cells = rows[1].querySelectorAll('td');
+
+    expect(row2Headers).toHaveLength(1);
+
+    expect(row2Headers[0]).toHaveAttribute('scope', 'row');
+    expect(row2Headers[0]).toHaveAttribute('colspan', '1');
+    expect(row2Headers[0]).toHaveTextContent('Barnsley');
+
+    expect(row2Cells).toHaveLength(1);
+    expect(row2Cells[0]).toHaveTextContent('21.5%');
+
+    // Row 3
+    const row3Headers = rows[2].querySelectorAll('th');
+    const row3Cells = rows[2].querySelectorAll('td');
+
+    expect(row3Headers).toHaveLength(1);
+
+    expect(row3Headers[0]).toHaveAttribute('scope', 'row');
+    expect(row3Headers[0]).toHaveAttribute('colspan', '1');
+    expect(row3Headers[0]).toHaveTextContent('Barnet');
+
+    expect(row3Cells).toHaveLength(1);
+    expect(row3Cells[0]).toHaveTextContent('20.2%');
+
+    expect(screen.getByRole('table')).toMatchSnapshot();
+  });
+
+  test('renders table correctly when region group is missing in row headers and other locations have hierarchy', () => {
+    const fullTable = mapFullTable({
+      subjectMeta: {
+        filters: {},
+        footnotes: [],
+        indicators: [
+          {
+            value: 'authorised-absence-rate',
+            label: 'Authorised absence rate',
+            unit: '%',
+            name: 'sess_authorised_percent',
+            decimalPlaces: 1,
+          },
+        ],
+        // Contains a mixture of hierarchical (LAs), flat (country) locations and an LAD with no region
+        locations: {
+          country: [
+            {
+              id: 'location-5',
+              value: 'england',
+              label: 'England',
+            },
+          ],
+          localAuthority: [
+            {
+              value: 'yorkshire',
+              label: 'Yorkshire and the Humber',
+              level: 'region',
+              options: [
+                {
+                  id: 'location-2',
+                  value: 'barnsley',
+                  label: 'Barnsley',
+                },
+              ],
+            },
+          ],
+          localAuthorityDistrict: [
+            {
+              id: 'location-1',
+              value: 'barnet',
+              label: 'Barnet',
+              level: 'localAuthorityDistrict',
+            },
+          ],
+        },
+        boundaryLevels: [],
+        publicationName: 'Pupil absence in schools in England',
+        subjectName: 'Absence in prus',
+        timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
+        geoJsonAvailable: false,
+      },
+      results: [
+        {
+          filters: [],
+          geographicLevel: 'country',
+          locationId: 'location-5',
+          measures: { 'authorised-absence-rate': '18.3' },
+          timePeriod: '2014_AY',
+        },
+        {
+          filters: [],
+          geographicLevel: 'localAuthorityDistrict',
+          locationId: 'location-1',
+          measures: { 'authorised-absence-rate': '20.2' },
+          timePeriod: '2014_AY',
+        },
+        {
+          filters: [],
+          geographicLevel: 'localAuthority',
+          locationId: 'location-2',
+          measures: { 'authorised-absence-rate': '21.5' },
+          timePeriod: '2014_AY',
+        },
+      ],
+    } as TableDataResponse);
+
+    const tableHeadersConfig = mapTableHeadersConfig(
+      {
+        columnGroups: [],
+        rowGroups: [
+          [
+            {
+              value: 'location-5',
+              level: 'country',
+              type: 'Location',
+            },
+            {
+              value: 'location-2',
+              level: 'localAuthority',
+              type: 'Location',
+            },
+            {
+              value: 'location-1',
+              level: 'localAuthorityDistrict',
+              type: 'Location',
+            },
+          ],
+        ],
+        columns: [{ value: '2014_AY', type: 'TimePeriod' }],
+        rows: [
+          {
+            value: 'authorised-absence-rate',
+            type: 'Indicator',
+          },
+        ],
+      },
+      fullTable,
+    );
+
+    render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={tableHeadersConfig}
+      />,
+    );
+
+    const table = screen.getByRole('table');
+
+    expect(table.querySelectorAll('thead tr')).toHaveLength(1);
+    expect(table.querySelectorAll('thead th')).toHaveLength(1);
+    expect(table.querySelectorAll('thead th[scope="colgroup"]')).toHaveLength(
+      0,
+    );
+    expect(table.querySelectorAll('thead th[scope="col"]')).toHaveLength(1);
+    expect(table.querySelector('thead th[scope="col"]')).toHaveTextContent(
+      '2014/15',
+    );
+
+    const rows = table.querySelectorAll('tbody tr');
+
+    expect(rows).toHaveLength(3);
+
+    // Row 1
 
     const row1Headers = rows[0].querySelectorAll('th');
     const row1Cells = rows[0].querySelectorAll('td');
@@ -888,29 +1054,325 @@ describe('TimePeriodDataTable', () => {
     const row2Headers = rows[1].querySelectorAll('th');
     const row2Cells = rows[1].querySelectorAll('td');
 
-    expect(row2Headers).toHaveLength(1);
+    expect(row2Headers).toHaveLength(2);
 
-    expect(row2Headers[0]).toHaveAttribute('scope', 'row');
+    expect(row2Headers[0]).toHaveAttribute('scope', 'rowgroup');
     expect(row2Headers[0]).toHaveAttribute('colspan', '1');
-    expect(row2Headers[0]).toHaveTextContent('Barnsley');
+    expect(row2Headers[0]).toHaveTextContent('Yorkshire and the Humber');
 
-    expect(row2Cells).toHaveLength(2);
-    expect(row2Cells[0]).toHaveTextContent('');
-    expect(row2Cells[0]).toHaveAttribute('rowspan', '2');
-    expect(row2Cells[1]).toHaveTextContent('21.5%');
+    expect(row2Headers[1]).toHaveAttribute('scope', 'row');
+    expect(row2Headers[1]).toHaveAttribute('colspan', '1');
+    expect(row2Headers[1]).toHaveTextContent('Barnsley');
+
+    expect(row2Cells).toHaveLength(1);
+    expect(row2Cells[0]).toHaveTextContent('21.5%');
 
     // Row 3
+
+    // Barnet should take up two columns so that we don't get an
+    // asymmetric table due to the local authority options having hierarchies
     const row3Headers = rows[2].querySelectorAll('th');
     const row3Cells = rows[2].querySelectorAll('td');
 
     expect(row3Headers).toHaveLength(1);
 
     expect(row3Headers[0]).toHaveAttribute('scope', 'row');
-    expect(row3Headers[0]).toHaveAttribute('colspan', '1');
+    expect(row3Headers[0]).toHaveAttribute('colspan', '2');
     expect(row3Headers[0]).toHaveTextContent('Barnet');
 
     expect(row3Cells).toHaveLength(1);
     expect(row3Cells[0]).toHaveTextContent('20.2%');
+
+    expect(screen.getByRole('table')).toMatchSnapshot();
+  });
+
+  test('renders table correctly when region group is missing in column headers', () => {
+    const fullTable = mapFullTable({
+      subjectMeta: {
+        filters: {},
+        footnotes: [],
+        indicators: [
+          {
+            value: 'authorised-absence-rate',
+            label: 'Authorised absence rate',
+            unit: '%',
+            name: 'sess_authorised_percent',
+            decimalPlaces: 1,
+          },
+        ],
+        locations: {
+          country: [
+            {
+              id: 'location-5',
+              value: 'england',
+              label: 'England',
+            },
+          ],
+          // LADs without region info
+          localAuthorityDistrict: [
+            {
+              value: '',
+              label: '',
+              level: 'region',
+              options: [
+                {
+                  id: 'location-2',
+                  value: 'barnsley',
+                  label: 'Barnsley',
+                },
+                {
+                  id: 'location-1',
+                  value: 'barnet',
+                  label: 'Barnet',
+                },
+              ],
+            },
+          ],
+        },
+        boundaryLevels: [],
+        publicationName: 'Pupil absence in schools in England',
+        subjectName: 'Absence in prus',
+        timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
+        geoJsonAvailable: false,
+      },
+      results: [
+        {
+          filters: [],
+          geographicLevel: 'country',
+          locationId: 'location-5',
+          measures: { 'authorised-absence-rate': '18.3' },
+          timePeriod: '2014_AY',
+        },
+        {
+          filters: [],
+          geographicLevel: 'localAuthorityDistrict',
+          locationId: 'location-1',
+          measures: { 'authorised-absence-rate': '20.2' },
+          timePeriod: '2014_AY',
+        },
+        {
+          filters: [],
+          geographicLevel: 'localAuthorityDistrict',
+          locationId: 'location-2',
+          measures: { 'authorised-absence-rate': '21.5' },
+          timePeriod: '2014_AY',
+        },
+      ],
+    } as TableDataResponse);
+
+    const tableHeadersConfig = mapTableHeadersConfig(
+      {
+        columnGroups: [
+          [
+            {
+              value: 'location-5',
+              level: 'country',
+              type: 'Location',
+            },
+            {
+              value: 'location-2',
+              level: 'localAuthorityDistrict',
+              type: 'Location',
+            },
+            {
+              value: 'location-1',
+              level: 'localAuthorityDistrict',
+              type: 'Location',
+            },
+          ],
+        ],
+        rowGroups: [],
+        columns: [{ value: '2014_AY', type: 'TimePeriod' }],
+        rows: [
+          {
+            value: 'authorised-absence-rate',
+            type: 'Indicator',
+          },
+        ],
+      },
+      fullTable,
+    );
+
+    render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={tableHeadersConfig}
+      />,
+    );
+
+    const table = screen.getByRole('table');
+
+    const headerRows = table.querySelectorAll('thead tr');
+    expect(headerRows).toHaveLength(1);
+
+    const headerRow1Headers = headerRows[0].querySelectorAll('th');
+    expect(headerRow1Headers).toHaveLength(3);
+
+    expect(headerRow1Headers[0]).toHaveAttribute('scope', 'col');
+    expect(headerRow1Headers[0]).toHaveAttribute('colspan', '1');
+    expect(headerRow1Headers[0]).toHaveAttribute('rowspan', '1');
+    expect(headerRow1Headers[0]).toHaveTextContent('England');
+
+    expect(headerRow1Headers[1]).toHaveAttribute('scope', 'col');
+    expect(headerRow1Headers[1]).toHaveAttribute('colspan', '1');
+    expect(headerRow1Headers[1]).toHaveAttribute('rowspan', '1');
+    expect(headerRow1Headers[1]).toHaveTextContent('Barnsley');
+
+    expect(headerRow1Headers[2]).toHaveAttribute('scope', 'col');
+    expect(headerRow1Headers[2]).toHaveAttribute('colspan', '1');
+    expect(headerRow1Headers[2]).toHaveAttribute('rowspan', '1');
+    expect(headerRow1Headers[2]).toHaveTextContent('Barnet');
+
+    expect(screen.getByRole('table')).toMatchSnapshot();
+  });
+
+  test('renders table correctly when region group is missing in column headers and other locations have hierarchy', () => {
+    const fullTable = mapFullTable({
+      subjectMeta: {
+        filters: {},
+        footnotes: [],
+        indicators: [
+          {
+            value: 'authorised-absence-rate',
+            label: 'Authorised absence rate',
+            unit: '%',
+            name: 'sess_authorised_percent',
+            decimalPlaces: 1,
+          },
+        ],
+        // Contains a mixture of hierarchical (LAs), flat (country) locations and an LAD with no region
+        locations: {
+          country: [
+            {
+              id: 'location-5',
+              value: 'england',
+              label: 'England',
+            },
+          ],
+          localAuthority: [
+            {
+              value: 'yorkshire',
+              label: 'Yorkshire and the Humber',
+              level: 'region',
+              options: [
+                {
+                  id: 'location-2',
+                  value: 'barnsley',
+                  label: 'Barnsley',
+                },
+              ],
+            },
+          ],
+          localAuthorityDistrict: [
+            {
+              id: 'location-1',
+              value: 'barnet',
+              label: 'Barnet',
+              level: 'localAuthorityDistrict',
+            },
+          ],
+        },
+        boundaryLevels: [],
+        publicationName: 'Pupil absence in schools in England',
+        subjectName: 'Absence in prus',
+        timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
+        geoJsonAvailable: false,
+      },
+      results: [
+        {
+          filters: [],
+          geographicLevel: 'country',
+          locationId: 'location-5',
+          measures: { 'authorised-absence-rate': '18.3' },
+          timePeriod: '2014_AY',
+        },
+        {
+          filters: [],
+          geographicLevel: 'localAuthorityDistrict',
+          locationId: 'location-1',
+          measures: { 'authorised-absence-rate': '20.2' },
+          timePeriod: '2014_AY',
+        },
+        {
+          filters: [],
+          geographicLevel: 'localAuthority',
+          locationId: 'location-2',
+          measures: { 'authorised-absence-rate': '21.5' },
+          timePeriod: '2014_AY',
+        },
+      ],
+    } as TableDataResponse);
+
+    const tableHeadersConfig = mapTableHeadersConfig(
+      {
+        columnGroups: [
+          [
+            {
+              value: 'location-5',
+              level: 'country',
+              type: 'Location',
+            },
+            {
+              value: 'location-2',
+              level: 'localAuthority',
+              type: 'Location',
+            },
+            {
+              value: 'location-1',
+              level: 'localAuthorityDistrict',
+              type: 'Location',
+            },
+          ],
+        ],
+        rowGroups: [],
+        columns: [{ value: '2014_AY', type: 'TimePeriod' }],
+        rows: [
+          {
+            value: 'authorised-absence-rate',
+            type: 'Indicator',
+          },
+        ],
+      },
+      fullTable,
+    );
+
+    render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={tableHeadersConfig}
+      />,
+    );
+
+    const table = screen.getByRole('table');
+
+    const headerRows = table.querySelectorAll('thead tr');
+    expect(headerRows).toHaveLength(2);
+
+    const headerRow1Headers = headerRows[0].querySelectorAll('th');
+    expect(headerRow1Headers).toHaveLength(3);
+
+    expect(headerRow1Headers[0]).toHaveAttribute('scope', 'col');
+    expect(headerRow1Headers[0]).toHaveAttribute('colspan', '1');
+    expect(headerRow1Headers[0]).toHaveAttribute('rowspan', '2');
+    expect(headerRow1Headers[0]).toHaveTextContent('England');
+
+    expect(headerRow1Headers[1]).toHaveAttribute('scope', 'colgroup');
+    expect(headerRow1Headers[1]).toHaveAttribute('colspan', '1');
+    expect(headerRow1Headers[1]).toHaveAttribute('rowspan', '1');
+    expect(headerRow1Headers[1]).toHaveTextContent('Yorkshire and the Humber');
+
+    expect(headerRow1Headers[2]).toHaveAttribute('scope', 'col');
+    expect(headerRow1Headers[2]).toHaveAttribute('colspan', '1');
+    expect(headerRow1Headers[2]).toHaveAttribute('rowspan', '2');
+    expect(headerRow1Headers[2]).toHaveTextContent('Barnet');
+
+    const headerRow2Headers = headerRows[1].querySelectorAll('th');
+    expect(headerRow2Headers).toHaveLength(1);
+
+    expect(headerRow2Headers[0]).toHaveAttribute('scope', 'col');
+    expect(headerRow2Headers[0]).toHaveAttribute('colspan', '1');
+    expect(headerRow2Headers[0]).toHaveAttribute('rowspan', '1');
+    expect(headerRow2Headers[0]).toHaveTextContent('Barnsley');
 
     expect(screen.getByRole('table')).toMatchSnapshot();
   });
@@ -922,7 +1384,7 @@ describe('TimePeriodDataTable', () => {
       columnGroups: [
         [
           {
-            value: 'b3207d77-143b-43d5-8b48-32d29727e96f',
+            value: 'filter-7',
             type: 'Filter',
           },
         ],
@@ -930,23 +1392,23 @@ describe('TimePeriodDataTable', () => {
       rowGroups: [
         [
           {
-            value: '206db2c4-76f9-4dbd-9a96-6927480625ec',
+            value: 'location-3',
             type: 'Location',
             level: 'localAuthority',
           },
           {
-            value: '5c067998-b851-4e03-83b3-c11f71c07a4d',
+            value: 'location-4',
             type: 'Location',
             level: 'localAuthority',
           },
         ],
         [
           {
-            value: '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
+            value: 'filter-5',
             type: 'Filter',
           },
           {
-            value: '53da1e17-184f-43f6-bb27-08d78f6f2c4d',
+            value: 'filter-6',
             type: 'Filter',
           },
         ],
@@ -958,11 +1420,11 @@ describe('TimePeriodDataTable', () => {
       ],
       rows: [
         {
-          value: '0003d2ac-4425-4432-2afb-08d78f6f2b08',
+          value: 'indicator-1',
           type: 'Indicator',
         },
         {
-          value: '829460cd-ae9e-4266-2aff-08d78f6f2b08',
+          value: 'indicator-2',
           type: 'Indicator',
         },
       ],
@@ -1006,11 +1468,11 @@ describe('TimePeriodDataTable', () => {
       columnGroups: [
         [
           {
-            value: '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
+            value: 'filter-5',
             type: 'Filter',
           },
           {
-            value: '53da1e17-184f-43f6-bb27-08d78f6f2c4d',
+            value: 'filter-6',
             type: 'Filter',
           },
         ],
@@ -1018,19 +1480,19 @@ describe('TimePeriodDataTable', () => {
       rowGroups: [
         [
           {
-            value: '206db2c4-76f9-4dbd-9a96-6927480625ec',
+            value: 'location-3',
             type: 'Location',
             level: 'localAuthority',
           },
           {
-            value: '5c067998-b851-4e03-83b3-c11f71c07a4d',
+            value: 'location-4',
             type: 'Location',
             level: 'localAuthority',
           },
         ],
         [
           {
-            value: 'b3207d77-143b-43d5-8b48-32d29727e96f',
+            value: 'filter-7',
             type: 'Filter',
           },
         ],
@@ -1042,11 +1504,11 @@ describe('TimePeriodDataTable', () => {
       ],
       rows: [
         {
-          value: '0003d2ac-4425-4432-2afb-08d78f6f2b08',
+          value: 'indicator-1',
           type: 'Indicator',
         },
         {
-          value: '829460cd-ae9e-4266-2aff-08d78f6f2b08',
+          value: 'indicator-2',
           type: 'Indicator',
         },
       ],
@@ -1090,7 +1552,7 @@ describe('TimePeriodDataTable', () => {
       columnGroups: [
         [
           {
-            value: 'b3207d77-143b-43d5-8b48-32d29727e96f',
+            value: 'filter-7',
             type: 'Filter',
           },
         ],
@@ -1098,23 +1560,23 @@ describe('TimePeriodDataTable', () => {
       rowGroups: [
         [
           {
-            value: '206db2c4-76f9-4dbd-9a96-6927480625ec',
+            value: 'location-3',
             type: 'Location',
             level: 'localAuthority',
           },
           {
-            value: '5c067998-b851-4e03-83b3-c11f71c07a4d',
+            value: 'location-4',
             type: 'Location',
             level: 'localAuthority',
           },
         ],
         [
           {
-            value: '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
+            value: 'filter-5',
             type: 'Filter',
           },
           {
-            value: '53da1e17-184f-43f6-bb27-08d78f6f2c4d',
+            value: 'filter-6',
             type: 'Filter',
           },
         ],
@@ -1126,11 +1588,11 @@ describe('TimePeriodDataTable', () => {
       ],
       rows: [
         {
-          value: '0003d2ac-4425-4432-2afb-08d78f6f2b08',
+          value: 'indicator-1',
           type: 'Indicator',
         },
         {
-          value: '829460cd-ae9e-4266-2aff-08d78f6f2b08',
+          value: 'indicator-2',
           type: 'Indicator',
         },
       ],
@@ -1162,7 +1624,7 @@ describe('TimePeriodDataTable', () => {
       columnGroups: [
         [
           {
-            value: 'b3207d77-143b-43d5-8b48-32d29727e96f',
+            value: 'filter-7',
             type: 'Filter',
           },
         ],
@@ -1170,23 +1632,23 @@ describe('TimePeriodDataTable', () => {
       rowGroups: [
         [
           {
-            value: '206db2c4-76f9-4dbd-9a96-6927480625ec',
+            value: 'location-3',
             type: 'Location',
             level: 'localAuthority',
           },
           {
-            value: '5c067998-b851-4e03-83b3-c11f71c07a4d',
+            value: 'location-4',
             type: 'Location',
             level: 'localAuthority',
           },
         ],
         [
           {
-            value: '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
+            value: 'filter-5',
             type: 'Filter',
           },
           {
-            value: '53da1e17-184f-43f6-bb27-08d78f6f2c4d',
+            value: 'filter-6',
             type: 'Filter',
           },
         ],
@@ -1198,11 +1660,11 @@ describe('TimePeriodDataTable', () => {
       ],
       rows: [
         {
-          value: '0003d2ac-4425-4432-2afb-08d78f6f2b08',
+          value: 'indicator-1',
           type: 'Indicator',
         },
         {
-          value: '829460cd-ae9e-4266-2aff-08d78f6f2b08',
+          value: 'indicator-2',
           type: 'Indicator',
         },
       ],
@@ -1229,361 +1691,73 @@ describe('TimePeriodDataTable', () => {
     );
   });
 
-  describe('excluded rows or columns warning', () => {
-    const testSubjectMeta: FullTableMeta = {
-      filters: {
-        Category1: {
-          name: 'category_1',
-          options: [
-            new CategoryFilter({
-              value: 'filter-1',
-              label: 'Filter 1 Option 1',
-              category: 'Category 1',
-            }),
-          ],
-          order: 0,
-        },
-        Category2: {
-          name: 'category_2',
-          options: [
-            new CategoryFilter({
-              value: 'filter-2',
-              label: 'Filter 2 Option 1',
-              category: 'Category 2',
-            }),
-          ],
-          order: 1,
-        },
+  test('does not show the missing rows or columns warning when none are missing', () => {
+    const fullTable = mapFullTable(testData1Table);
+
+    const testQuery: ReleaseTableDataQuery = {
+      subjectId: 'subject-1-id',
+      timePeriod: {
+        startYear: 2013,
+        startCode: 'AY',
+        endYear: 2014,
+        endCode: 'AY',
       },
-      footnotes: [],
-      indicators: [
-        new Indicator({
-          value: 'indicator-1',
-          label: 'Indicator 1',
-          unit: '',
-          name: 'indicator_1',
-        }),
-      ],
-      locations: [
-        new LocationFilter({
-          value: 'location-1',
-          label: 'England',
-          level: 'country',
-        }),
-      ],
-      boundaryLevels: [],
-      publicationName: 'Permanent and fixed-period exclusions in England',
-      subjectName: 'Duration of fixed exclusions',
-      timePeriodRange: [
-        new TimePeriodFilter({
-          label: '2006/07',
-          year: 2006,
-          code: 'AY',
-          order: 0,
-        }),
-        new TimePeriodFilter({
-          label: '2007/08',
-          year: 2007,
-          code: 'AY',
-          order: 1,
-        }),
-        new TimePeriodFilter({
-          label: '2008/09',
-          year: 2008,
-          code: 'AY',
-          order: 2,
-        }),
-      ],
-      geoJsonAvailable: true,
+      filters: ['filter-1', 'filter-2', 'filter-3', 'filter-4'],
+      indicators: ['indicator-2', 'indicator-1'],
+      locationIds: ['location-2', 'location-1'],
+      includeGeoJson: false,
+      releaseId: 'release-1-id',
     };
 
-    const testResults: TableDataResult[] = [
-      {
-        filters: ['filter-1', 'filter-2'],
-        geographicLevel: 'country',
-        locationId: 'location-1',
-        measures: {
-          'indicator-1': '370',
-        },
-        timePeriod: '2006_AY',
-      },
-      {
-        filters: ['filter-1', 'filter-2'],
-        geographicLevel: 'country',
-        locationId: 'location-1',
-        measures: {
-          'indicator-1': '5',
-        },
-        timePeriod: '2007_AY',
-      },
-      {
-        filters: ['filter-1', 'filter-2'],
-        geographicLevel: 'country',
-        locationId: 'location-1',
-        measures: {
-          'indicator-1': '35',
-        },
-        timePeriod: '2008_AY',
-      },
-    ];
+    render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={mapTableHeadersConfig(
+          testData1TableHeadersConfig,
+          fullTable,
+        )}
+        query={testQuery}
+      />,
+    );
 
-    const testTableHeadersConfig: TableHeadersConfig = {
-      columnGroups: [],
-      rowGroups: [],
-      columns: [
-        new Indicator({
-          value: 'indicator-1',
-          label: 'Indicator 1',
-          name: 'indicator_1_name',
-          unit: '',
-        }),
-      ],
-      rows: [
-        new TimePeriodFilter({
-          label: '2006/07',
-          year: 2006,
-          code: 'AY',
-          order: 0,
-        }),
-        new TimePeriodFilter({
-          label: '2007/08',
-          year: 2007,
-          code: 'AY',
-          order: 1,
-        }),
-        new TimePeriodFilter({
-          label: '2008/09',
-          year: 2008,
-          code: 'AY',
-          order: 2,
-        }),
-      ],
+    expect(
+      screen.queryByTestId('missing-data-warning'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('shows the missing rows or columns warning when some are missing', () => {
+    const fullTable = mapFullTable(testData1Table);
+
+    const testQuery: ReleaseTableDataQuery = {
+      subjectId: 'subject-1-id',
+      timePeriod: {
+        startYear: 2013,
+        startCode: 'AY',
+        endYear: 2014,
+        endCode: 'AY',
+      },
+      filters: ['filter-1', 'filter-4'], // filter-2 and filter-3 are missing
+      indicators: ['indicator-2', 'indicator-1'],
+      locationIds: ['location-2', 'location-1'],
+      includeGeoJson: false,
+      releaseId: 'release-1-id',
     };
 
-    test('shows the warning when a row or column for an indicator is excluded because it has no data', () => {
-      const testFullTable: FullTable = {
-        subjectMeta: testSubjectMeta,
-        results: testResults,
-      };
+    render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={mapTableHeadersConfig(
+          testData1TableHeadersConfig,
+          fullTable,
+        )}
+        query={testQuery}
+      />,
+    );
 
-      const testQuery: ReleaseTableDataQuery = {
-        subjectId: 'subject-1-id',
-        timePeriod: {
-          startYear: 2006,
-          startCode: 'AY',
-          endYear: 2008,
-          endCode: 'AY',
-        },
-        filters: ['filter-2', 'filter-1'],
-        indicators: ['indicator-1', 'indicator-2'],
-        locationIds: ['location-1'],
-        includeGeoJson: false,
-        releaseId: 'release-1-id',
-      };
-
-      render(
-        <TimePeriodDataTable
-          fullTable={testFullTable}
-          query={testQuery}
-          tableHeadersConfig={testTableHeadersConfig}
-        />,
-      );
-
-      expect(
-        screen.getByText(
-          'Some rows and columns are not shown in this table as the data does not exist in the underlying file.',
-        ),
-      ).toBeInTheDocument();
-    });
-
-    test('shows the warning when a row or column for a filter is excluded because it has no data', () => {
-      const testFullTable: FullTable = {
-        subjectMeta: testSubjectMeta,
-        results: testResults,
-      };
-
-      const testQuery: ReleaseTableDataQuery = {
-        subjectId: 'subject-1-id',
-        timePeriod: {
-          startYear: 2006,
-          startCode: 'AY',
-          endYear: 2008,
-          endCode: 'AY',
-        },
-        filters: ['filter-2', 'filter-1', 'filter-3'],
-        indicators: ['indicator-1'],
-        locationIds: ['location-1'],
-        includeGeoJson: false,
-        releaseId: 'release-1-id',
-      };
-
-      render(
-        <TimePeriodDataTable
-          fullTable={testFullTable}
-          query={testQuery}
-          tableHeadersConfig={testTableHeadersConfig}
-        />,
-      );
-
-      expect(
-        screen.getByText(
-          'Some rows and columns are not shown in this table as the data does not exist in the underlying file.',
-        ),
-      ).toBeInTheDocument();
-    });
-
-    test('shows the warning when a row or column for a location is excluded because it has no data', () => {
-      const testFullTable: FullTable = {
-        subjectMeta: testSubjectMeta,
-        results: testResults,
-      };
-
-      const testQuery: ReleaseTableDataQuery = {
-        subjectId: 'subject-1-id',
-        timePeriod: {
-          startYear: 2006,
-          startCode: 'AY',
-          endYear: 2008,
-          endCode: 'AY',
-        },
-        filters: ['filter-2', 'filter-1', 'filter-3'],
-        indicators: ['indicator-1'],
-        locationIds: ['location-1', 'location-2'],
-        includeGeoJson: false,
-        releaseId: 'release-1-id',
-      };
-
-      render(
-        <TimePeriodDataTable
-          fullTable={testFullTable}
-          query={testQuery}
-          tableHeadersConfig={testTableHeadersConfig}
-        />,
-      );
-
-      expect(
-        screen.getByText(
-          'Some rows and columns are not shown in this table as the data does not exist in the underlying file.',
-        ),
-      ).toBeInTheDocument();
-    });
-
-    test('shows the warning when a row or column for a time period is excluded because it has no data', () => {
-      const testFullTable: FullTable = {
-        subjectMeta: testSubjectMeta,
-        results: [
-          {
-            filters: ['filter-1', 'filter-2'],
-            geographicLevel: 'country',
-            locationId: 'location-1',
-            measures: {
-              'indicator-1': '370',
-            },
-            timePeriod: '2006_AY',
-          },
-          {
-            filters: ['filter-1', 'filter-2'],
-            geographicLevel: 'country',
-            locationId: 'location-1',
-            measures: {
-              'indicator-1': '35',
-            },
-            timePeriod: '2008_AY',
-          },
-        ],
-      };
-
-      const testTableHeadersConfigTimePeriods: TableHeadersConfig = {
-        columnGroups: [],
-        rowGroups: [],
-        columns: [
-          new Indicator({
-            value: 'indicator-1',
-            label: 'Indicator 1',
-            name: 'indicator_1_name',
-            unit: '',
-          }),
-        ],
-        rows: [
-          new TimePeriodFilter({
-            label: '2006/07',
-            year: 2006,
-            code: 'AY',
-            order: 0,
-          }),
-          new TimePeriodFilter({
-            label: '2008/09',
-            year: 2008,
-            code: 'AY',
-            order: 2,
-          }),
-        ],
-      };
-
-      const testQuery: ReleaseTableDataQuery = {
-        subjectId: 'subject-1-id',
-        timePeriod: {
-          startYear: 2006,
-          startCode: 'AY',
-          endYear: 2008,
-          endCode: 'AY',
-        },
-        filters: ['filter-2', 'filter-1'],
-        indicators: ['indicator-1'],
-        locationIds: ['location-1'],
-        includeGeoJson: false,
-        releaseId: 'release-1-id',
-      };
-
-      render(
-        <TimePeriodDataTable
-          fullTable={testFullTable}
-          query={testQuery}
-          tableHeadersConfig={testTableHeadersConfigTimePeriods}
-        />,
-      );
-
-      expect(
-        screen.getByText(
-          'Some rows and columns are not shown in this table as the data does not exist in the underlying file.',
-        ),
-      ).toBeInTheDocument();
-    });
-
-    test('does not show the warning when no rows or columns are excluded', () => {
-      const testFullTable: FullTable = {
-        subjectMeta: testSubjectMeta,
-        results: testResults,
-      };
-
-      const testQuery: ReleaseTableDataQuery = {
-        subjectId: 'subject-1-id',
-        timePeriod: {
-          startYear: 2006,
-          startCode: 'AY',
-          endYear: 2008,
-          endCode: 'AY',
-        },
-        filters: ['filter-2', 'filter-1'],
-        indicators: ['indicator-1'],
-        locationIds: ['location-1'],
-        includeGeoJson: false,
-        releaseId: 'release-1-id',
-      };
-
-      render(
-        <TimePeriodDataTable
-          fullTable={testFullTable}
-          query={testQuery}
-          tableHeadersConfig={testTableHeadersConfig}
-        />,
-      );
-
-      expect(
-        screen.queryByText(
-          'Some rows and columns are not shown in this table as the data does not exist in the underlying file.',
-        ),
-      ).not.toBeInTheDocument();
-    });
+    expect(
+      screen.getByText(
+        'Some rows and columns are not shown in this table as the data does not exist in the underlying file.',
+      ),
+    ).toBeInTheDocument();
   });
 });

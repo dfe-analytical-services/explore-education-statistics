@@ -25,6 +25,7 @@ interface Cookie {
 interface AllowedCookies {
   bannerSeen: Cookie;
   disableGA: Cookie;
+  userTestingBannerSeen: Cookie;
 }
 
 export const allowedCookies: AllowedCookies = {
@@ -40,6 +41,13 @@ export const allowedCookies: AllowedCookies = {
     duration: '10 years',
     options: {
       expires: addYears(new Date(), 10),
+    },
+  },
+  userTestingBannerSeen: {
+    name: 'ees_user_testing_banner_seen',
+    duration: '1 year',
+    options: {
+      expires: addYears(new Date(), 1),
     },
   },
 };
@@ -86,6 +94,15 @@ export function useCookies(initialCookies?: Dictionary<string>) {
         allowedCookies.bannerSeen.name,
         value,
         allowedCookies.bannerSeen.options,
+      );
+    },
+    setUserTestingBannerSeenCookie(isSeen: boolean) {
+      const value = isSeen ? 'true' : 'false';
+
+      setCookie(
+        allowedCookies.userTestingBannerSeen.name,
+        value,
+        allowedCookies.userTestingBannerSeen.options,
       );
     },
     setGADisabledCookie(isDisabled: boolean) {

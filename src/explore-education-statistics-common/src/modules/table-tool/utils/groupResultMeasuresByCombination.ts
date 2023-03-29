@@ -1,14 +1,14 @@
+import { TableDataResult } from '@common/services/tableBuilderService';
+import { Dictionary } from '@common/types';
 import {
   getIndicatorPath,
   MeasuresGroupedByDataSet,
-} from '@common/modules/charts/util/groupResultMeasuresByDataSet';
-import { TableDataResult } from '@common/services/tableBuilderService';
-import { Dictionary } from '@common/types';
+} from '@common/modules/table-tool/utils/groupResultMeasuresByDataSet';
 import get from 'lodash/get';
 import set from 'lodash/set';
 
 /**
- * Group {@param results} and their measures by their
+ * Group {@param tableDataResults} and their measures by their
  * associated combination of filters at each level
  * of a nested dictionary.
  *
@@ -25,10 +25,10 @@ import set from 'lodash/set';
  * possible to define one due to the dynamic nature of the result.
  */
 export default function groupResultMeasuresByCombination(
-  results: TableDataResult[],
+  tableDataResults: TableDataResult[],
   excludedFilterIds: Set<string> = new Set(),
 ): Dictionary<unknown> {
-  return results.reduce<MeasuresGroupedByDataSet>((acc, result) => {
+  return tableDataResults.reduce<MeasuresGroupedByDataSet>((acc, result) => {
     const {
       geographicLevel,
       filters,

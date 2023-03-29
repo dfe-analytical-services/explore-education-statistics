@@ -129,31 +129,24 @@ Navigate to 'Content' page
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
 
-Validate 'Explore data and files' accordion
-    user opens accordion section    Explore data and files
-    ${section}=    user gets accordion section content element    Explore data and files
+Validate 'Explore data and files' section
+    ${section}=    user gets testid element    data-and-files
 
     # All files zip
-    user checks element contains button    ${section}    Download all data (zip)
+    user checks element contains button    ${section}    Download all data (ZIP)
 
     # Data files
-    user waits until h3 is visible    Open data
     user opens details dropdown    Download files
     user checks list has x items    testid:data-files    1    ${section}
     ${data_files_1}=    user gets list item element    testid:data-files    1    ${section}
     user checks element contains button    ${data_files_1}    Updated Absence in PRUs (csv, 141 Kb)
 
     # Ancillary files
-    user waits until h3 is visible    All supporting files
-    user opens details dropdown    List of all supporting files
-    ${other_files}=    user gets details content element    List of all supporting files    ${section}
-    ${other_files_1}=    get child element    ${other_files}    css:li:nth-child(1)
+    user opens accordion section    Additional supporting files
+    ${other_files}=    user gets accordion section content element    Additional supporting files
 
-    user checks element contains button    ${other_files_1}    Test 1 (txt, 12 B)
-
-    user opens details dropdown    More details    ${other_files_1}
-    ${other_files_1_details}=    user gets details content element    More details    ${other_files_1}
-    user checks element should contain    ${other_files_1_details}    Test 1 summary
+    user checks element contains button    ${other_files}    Test 1 (txt, 12 B)
+    user checks element should contain    ${other_files}    Test 1 summary
 
 Navigate back to 'Ancillary file uploads' tab
     user clicks link    Data and files

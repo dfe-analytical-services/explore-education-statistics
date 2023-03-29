@@ -45,14 +45,14 @@ Validate Email alerts link
 
 Validate "About these statistics" -- Number of other releases
     user checks number of other releases is correct    6
-    user opens details dropdown    View previous releases (6)
+    user opens details dropdown    View releases (6)
     user checks other release is shown in position    Academic year 2014/15    1
     user checks other release is shown in position    Academic year 2013/14    2
     user checks other release is shown in position    Academic year 2012/13    3
     user checks other release is shown in position    Academic year 2011/12    4
     user checks other release is shown in position    Academic year 2010/11    5
     user checks other release is shown in position    Academic year 2009/10    6
-    user closes details dropdown    View previous releases (6)
+    user closes details dropdown    View releases (6)
 
 Validate "About these statistics" -- "Last updated"
     user checks summary list contains    Last updated    22 August 2022
@@ -225,10 +225,6 @@ Validate Key Statistics data block -- Data tables tab
     ...    x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.    id:releaseHeadlines-tables
 
 Validate accordion sections order
-    user checks accordion is in position    Explore data and files    1    id:data-accordion
-
-    user checks there are x accordion sections    1    id:data-accordion
-
     user checks accordion is in position    About these statistics    1    id:content
     user checks accordion is in position    Pupil absence rates    2    id:content
     user checks accordion is in position    Persistent absence    3    id:content
@@ -246,12 +242,6 @@ Validate accordion sections order
     user checks accordion is in position    Contact us    3    id:help-and-support-accordion
 
     user checks there are x accordion sections    3    id:help-and-support-accordion
-
-Check explore data link opens accordion section
-    user verifies accordion is closed    Explore data and files
-    user clicks link    Explore data    testid:quick-links
-    user verifies accordion is open    Explore data and files
-    user closes accordion section    Explore data and files    id:data-accordion
 
 Validate Regional and local authority (LA) breakdown table
     [Documentation]    BAU-540
@@ -380,9 +370,7 @@ Check Regional and local authority (LA) breakdown chart has footnotes
 
 Clicking "Create tables" takes user to Table Tool page with absence publication selected
     [Documentation]    DFE-898
-    user opens accordion section    Explore data and files
-    user waits until h3 is visible    Create your own tables
-    user clicks link    Create tables
+    user clicks link    View or create your own tables
     user waits until h1 is visible    Create your own tables    %{WAIT_MEDIUM}
     user waits for page to finish loading
 

@@ -79,6 +79,7 @@
     "jest-serializer-html": "^7.0.0",
     "jest-watch-typeahead": "^0.6.1",
     "next-router-mock": "0.8.0",
+    "node-mocks-http": "^1.12.2",
     "normalize.css": "^8.0.1",
     "react-test-renderer": "16.13.1",
     "sass": "1.32.13",
@@ -133,6 +134,7 @@
     "moduleNameMapper": {
       "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
       "^@frontend/(.*)$": "<rootDir>/src/$1",
+      "^@frontend-test/(.*)$": "<rootDir>/test/$1",
       "^@common/(.*)$": "<rootDir>/../explore-education-statistics-common/src/$1",
       "^@common-test/(.*)$": "<rootDir>/../explore-education-statistics-common/test/$1",
       "^react$": "<rootDir>/node_modules/react",

@@ -12,7 +12,6 @@ import { KeyStatisticDataBlock } from '@common/services/publicationService';
 import { Formik } from 'formik';
 import React from 'react';
 import Yup from '@common/validation/yup';
-import { KeyStatTextFormValues } from '@admin/pages/release/content/components/EditableKeyStatTextForm';
 
 export interface KeyStatDataBlockFormValues {
   trend: string;
