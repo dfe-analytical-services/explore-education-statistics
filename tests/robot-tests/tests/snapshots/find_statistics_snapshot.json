@@ -9,7 +9,7 @@
   {
     "publication_summary": "Attainment and retention data for A level and other qualifications by age 16 to 18 in England. Includes region, institution type, characteristics, and subject.",
     "publication_title": "A level and other 16 to 18 results",
-    "published": "10 Nov 2022",
+    "published": "30 Mar 2023",
     "release_type": "National statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -30,7 +30,7 @@
   {
     "publication_summary": "Apprenticeship and traineeship starts, achievements and participation. Includes breakdowns by age, sex, ethnicity, subject, provider, geography etc.",
     "publication_title": "Apprenticeships and traineeships",
-    "published": "26 Jan 2023",
+    "published": "30 Mar 2023",
     "release_type": "National statistics",
     "theme": "Further education"
   },
@@ -168,11 +168,25 @@
     "theme": "Early years"
   },
   {
+    "publication_summary": "An examination of the education, children's social care background of children cautioned or sentenced for offences at national and local authority level. ",
+    "publication_title": "Education, children\u2019s social care and offending: local authority level dashboard",
+    "published": "30 Mar 2023",
+    "release_type": "Ad hoc statistics",
+    "theme": "Pupils and schools"
+  },
+  {
     "publication_summary": "Children and young people in England with an education, health and care plan (EHCP), including annual local authority activity on EHCP requests and assessment.",
     "publication_title": "Education, health and care plans",
     "published": "12 May 2022",
     "release_type": "National statistics",
     "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "Official statistics on vacancies, skills gaps and training, from the Employer Skills Survey 2019.",
+    "publication_title": "Employer Skills Survey",
+    "published": "30 Mar 2023",
+    "release_type": "Official statistics",
+    "theme": "UK education and training statistics"
   },
   {
     "publication_summary": "The number of further education learners going into employment and learning destinations by local authority district in the 2017/18 academic year.",
@@ -191,14 +205,14 @@
   {
     "publication_summary": "Apprenticeship and adult 19+ Further Education and skills learning, including community learning, education and training, and basic skills (English and maths).",
     "publication_title": "Further education and skills",
-    "published": "26 Jan 2023",
+    "published": "30 Mar 2023",
     "release_type": "National statistics",
     "theme": "Further education"
   },
   {
     "publication_summary": "Measures the total value-added of the Further Education system in England over time. Includes provision type breakdown and value-added per learner.",
     "publication_title": "Further education skills index",
-    "published": "31 Mar 2022",
+    "published": "30 Mar 2023",
     "release_type": "Official statistics",
     "theme": "Further education"
   },
@@ -373,7 +387,7 @@
   {
     "publication_summary": "Children in need, including children looked after by local authorities in England, national and local authority level outcomes including key stage 4 and absence",
     "publication_title": "Outcomes for children in need, including children looked after by local authorities in England",
-    "published": "31 Mar 2022",
+    "published": "30 Mar 2023",
     "release_type": "National statistics",
     "theme": "Children's social care"
   },
