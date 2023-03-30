@@ -22,6 +22,7 @@ Optional flags:
   * --basic-auth-user "username" --basic-auth-pass "password"
   * --public-url "public URL"
   * --validate
+  * --ci
   * --slack-webhook-url "slack webhook URL"
 """
 
@@ -226,6 +227,8 @@ class SnapshotService:
                 print(f"Snapshot {name} does not match for {self.public_url}")
                 if self.slack_webhook_url is not None:
                     self._send_slack_notification(f"Snapshot {name} does not match for {self.public_url}")
+        if self.slack_webhook_url is not None:
+            self._send_slack_notification(f"Snapshot test workflow successfully completed for {self.public_url} ✅")
 
     def write_snapshots_to_file(self):
         for name in self.snapshots:
@@ -273,6 +276,13 @@ if __name__ == "__main__":
     )
 
     ap.add_argument(
+        "--ci",
+        dest="ci",
+        action="store_true",
+        help="Signifies that the test is running in a CI environment, which will make the test validate snapshots and write any snapshot files which have changed",
+    )
+
+    ap.add_argument(
         "--slack-webhook-url",
         dest="slack_webhook_url",
         default=None,
@@ -309,9 +319,11 @@ if __name__ == "__main__":
 
     snapshot_service = SnapshotService(public_url=args.public_url, slack_webhook_url=args.slack_webhook_url)
 
+    if args.ci:
+        snapshot_service.validate_snapshots()
+        snapshot_service.write_snapshots_to_file()
+
     if args.validate:
         snapshot_service.validate_snapshots()
-    else:
-        snapshot_service.write_snapshots_to_file()
 
     driver.quit()
