@@ -74,8 +74,7 @@ Validate Number of schools row results
 
 Go back to Locations step
     user clicks element    xpath://button[contains(text(), "Edit locations")]
-    user waits until page contains element    xpath://h2[text()="Go back to previous step"]
-    user clicks element    xpath://button[text()="Confirm"]
+    user waits until table tool wizard step is available    3    Choose locations
 
 Unselect England as a location
     [Documentation]    DFE-1142    EES-231
