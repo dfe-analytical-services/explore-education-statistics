@@ -90,7 +90,7 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
 
           <TableToolWizard
             themeMeta={[]}
-            hidePublicationSelectionStage
+            hidePublicationStep
             initialState={initialState}
             onSubjectStepBack={() => setHighlightId(undefined)}
             renderFeaturedTable={highlight => (

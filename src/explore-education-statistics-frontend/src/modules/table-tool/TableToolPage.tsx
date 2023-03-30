@@ -20,7 +20,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { GetServerSideProps, NextPage } from 'next';
 import dynamic from 'next/dynamic';
 import React, { useEffect, useMemo, useState } from 'react';
-import { TableQueryErrorCode } from '@common/modules/table-tool/components/FiltersForm';
+import { useRouter } from 'next/router';
 
 const TableToolFinalStep = dynamic(
   () => import('@frontend/modules/table-tool/components/TableToolFinalStep'),
@@ -43,7 +43,23 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   subjectMeta,
   themeMeta,
 }) => {
+  const router = useRouter();
   const [loadingFastTrack, setLoadingFastTrack] = useState(false);
+  const [currentStep, setCurrentStep] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    // Intercept the back button and activate the appropriate step
+    router.beforePopState(({ url }) => {
+      if (url === '/data-tables') {
+        // going back to publication step
+        setCurrentStep(1);
+      } else if (url.startsWith('/data-tables/[publicationSlug]')) {
+        // clicking back on any step after step 2 should take you to step 2
+        setCurrentStep(2);
+      }
+      return true;
+    });
+  }, [router]);
 
   useEffect(() => {
     if (fastTrack && subjectMeta) {
@@ -56,10 +72,6 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       return undefined;
     }
 
-    const filteredFeaturedTables = featuredTables.filter(
-      table => table.id !== fastTrack?.id,
-    );
-
     if (fastTrack && subjectMeta) {
       const fullTable = mapFullTable(fastTrack.fullTable);
       const tableHeaders = mapTableHeadersConfig(
@@ -70,7 +82,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       return {
         initialStep: 6,
         subjects,
-        featuredTables: filteredFeaturedTables,
+        featuredTables,
         query: {
           ...fastTrack.query,
           releaseId: selectedPublication?.selectedRelease.id,
@@ -87,7 +99,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
     return {
       initialStep: 2,
       subjects,
-      featuredTables: filteredFeaturedTables,
+      featuredTables,
       query: {
         publicationId: selectedPublication?.id,
         releaseId: selectedPublication?.selectedRelease.id,
@@ -121,6 +133,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             to={`/data-tables/fast-track/${highlight.id}`}
             onClick={() => {
               setLoadingFastTrack(true);
+              setCurrentStep(undefined);
               logEvent({
                 category: 'Table tool',
                 action: 'Clicked to view featured table',
@@ -131,32 +144,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             {highlight.name}
           </Link>
         )}
-        onTableQueryError={(
-          errorCode: TableQueryErrorCode,
-          publicationTitle: string,
-          subjectName: string,
-        ) => {
-          switch (errorCode) {
-            case 'QueryExceedsMaxAllowableTableSize': {
-              logEvent({
-                category: 'Table tool size error',
-                action: 'Table exceeded maximum size',
-                label: `${publicationTitle}/${subjectName}`,
-              });
-              break;
-            }
-            case 'RequestCancelled': {
-              logEvent({
-                category: 'Table tool query timeout error',
-                action: 'Table exceeded maximum timeout duration',
-                label: `${publicationTitle}/${subjectName}`,
-              });
-              break;
-            }
-            default:
-              break;
-          }
-        }}
+        currentStep={currentStep}
         finalStep={({
           query,
           selectedPublication: selectedPublicationDetails,
@@ -189,6 +177,29 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             </WizardStep>
           );
         }}
+        onPublicationFormSubmit={publication => {
+          router.push(`/data-tables/${publication.slug}`, undefined, {
+            shallow: true,
+            scroll: false,
+          });
+        }}
+        onStepChange={() => setCurrentStep(undefined)}
+        onSubjectFormSubmit={({ publication, release, subjectId }) => {
+          router.push(
+            `/data-tables/${publication.slug}/${release.slug}?subjectId=${subjectId}`,
+            undefined,
+            {
+              shallow: true,
+              scroll: false,
+            },
+          );
+        }}
+        onSubjectStepBack={publication => {
+          router.push(`/data-tables/${publication?.slug}`, undefined, {
+            shallow: true,
+            scroll: false,
+          });
+        }}
         onSubmit={table => {
           logEvent({
             category: 'Table tool',
@@ -200,6 +211,28 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             action: 'Table created',
             label: window.location.pathname,
           });
+        }}
+        onTableQueryError={(errorCode, publicationTitle, subjectName) => {
+          switch (errorCode) {
+            case 'QueryExceedsMaxAllowableTableSize': {
+              logEvent({
+                category: 'Table tool size error',
+                action: 'Table exceeded maximum size',
+                label: `${publicationTitle}/${subjectName}`,
+              });
+              break;
+            }
+            case 'RequestCancelled': {
+              logEvent({
+                category: 'Table tool query timeout error',
+                action: 'Table exceeded maximum timeout duration',
+                label: `${publicationTitle}/${subjectName}`,
+              });
+              break;
+            }
+            default:
+              break;
+          }
         }}
       />
     </Page>

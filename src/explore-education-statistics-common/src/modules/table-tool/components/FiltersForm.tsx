@@ -218,7 +218,7 @@ const FiltersForm = ({
               {stepHeading}
 
               <div className="govuk-grid-row">
-                <div className="govuk-grid-column-one-half-from-desktop">
+                <div className="govuk-grid-column-one-half-from-desktop govuk-!-margin-bottom-6">
                   <RHFFormFieldCheckboxSearchSubGroups
                     disabled={formState.isSubmitting}
                     hint="Select at least one indicator below"
