@@ -18,7 +18,7 @@ const UserTestingBanner = () => {
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-three-quarters">
               <p className={styles.heading}>
-                Help develop Explore education Statistics
+                Help develop Explore education statistics
               </p>
               <p>
                 <Link
