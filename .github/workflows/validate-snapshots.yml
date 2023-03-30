@@ -61,7 +61,7 @@ jobs:
         with:
           token: ${{ env.GH_TOKEN }}
           commit-message: 'chore(tests): update test snapshots - ${{ env.DATE }}'
-          committer: dfe-sdt@users.noreply.github.com
+          committer: dfe-sdt <dfe-sdt@users.noreply.github.com>
           branch: chore/update-test-snapshots
           add-paths: |
             tests/robot-tests/tests/snapshots
