@@ -38,5 +38,9 @@
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
           <Link>bin\magic.mgc</Link>
         </Content>
+        <Content Include="libs\libmagic-1.dylib">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <Link>bin\libmagic-1.dylib</Link>
+        </Content>
     </ItemGroup>
 </Project>
