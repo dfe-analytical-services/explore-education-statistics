@@ -45,8 +45,7 @@ public static class CsvUtils
         Func<Task<Stream>> streamProvider,
         bool skipHeaderRow = true)
     {
-        var results = await Select(streamProvider, (cells, _) => cells, skipHeaderRow);
-        return results.Results.ToList();
+        return (await Select(streamProvider, (cells, _) => cells, skipHeaderRow)).ToList();
     }
 
     /// <summary>
@@ -87,13 +86,10 @@ public static class CsvUtils
     /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
     /// </param>
     /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
-    public static async Task<ForEachResult> ForEachRow(
+    public static async Task ForEachRow(
         Func<Task<Stream>> streamProvider,
-        Func<List<string>, int, Task<bool>> func,
-        bool skipHeaderRow = true,
-        long startPosition = 0,
-        int startingRowIndex = 0,
-        int? numberOfRows = null)
+        Func<List<string>, int, bool, Task<bool>> func,
+        bool skipHeaderRow = true)
     {
         var config = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
@@ -103,12 +99,11 @@ public static class CsvUtils
         };
 
         using var dataFileReader = new StreamReader(await streamProvider.Invoke());
-        dataFileReader.BaseStream.Position = startPosition;
-        
         using var csvReader = new CsvReader(dataFileReader, config);
         using var csvDataReader = new CsvDataReader(csvReader);
-        
-        while (await csvReader.ReadAsync())
+        var lastLine = !await csvReader.ReadAsync();
+
+        while (!lastLine)
         {
             var cellCount = csvDataReader.FieldCount;
 
@@ -118,17 +113,52 @@ public static class CsvUtils
                 .OfType<string>()
                 .ToList();
 
-            var currentRowIndex = csvReader.Parser.Row + (skipHeaderRow ? -1 : 0) + startingRowIndex;
-
-            var result = await func.Invoke(cells, currentRowIndex);
+            var currentRowIndex = csvReader.Parser.Row + (skipHeaderRow ? -1 : 0);
+            
+            lastLine = !await csvReader.ReadAsync();
+            
+            var result = await func.Invoke(cells, currentRowIndex, lastLine);
 
             if (!result)
             {
                 break;
             }
         }
+    }
+    
+    public static async Task Batch(
+        Func<Task<Stream>> streamProvider,
+        int batchSize,
+        Func<List<List<string>>, int, Task<bool>> func,
+        bool skipHeaderRow = true)
+    {
+        var linesInBatch = new List<List<string>>();
+        var batchNumber = 1;
+        var rowsProcessed = 0;
+        
+        await ForEachRow(
+            streamProvider,
+            async (cells, _, lastLine) =>
+            {
+                rowsProcessed++;
+                linesInBatch.Add(cells);
 
-        return new ForEachResult(dataFileReader.BaseStream.Position);
+                if (lastLine || rowsProcessed % batchSize == 0)
+                {
+                    var result = await func.Invoke(linesInBatch, batchNumber);
+
+                    if (!result)
+                    {
+                        return false;
+                    }
+
+                    batchNumber++;
+                    linesInBatch.Clear();
+                }
+
+                return true;
+            },
+            skipHeaderRow);
     }
 
     /// <summary>
@@ -144,25 +174,19 @@ public static class CsvUtils
     /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
     /// </param>
     /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
-    public static Task<ForEachResult> ForEachRow(
+    public static Task ForEachRow(
         Func<Task<Stream>> streamProvider,
         Func<List<string>, int, Task> func,
-        bool skipHeaderRow = true,
-        long startPosition = 0,
-        int startingRowIndex = 0,
-        int? numberOfRows = null)
+        bool skipHeaderRow = true)
     {
         return ForEachRow(
             streamProvider,
-            async (cells, index) =>
+            async (cells, index, _) =>
             {
                 await func.Invoke(cells, index);
                 return true;
             },
-            skipHeaderRow,
-            startPosition,
-            startingRowIndex,
-            numberOfRows
+            skipHeaderRow
         );
     }
 
@@ -179,13 +203,10 @@ public static class CsvUtils
     /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
     /// </param>
     /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
-    public static Task<ForEachResult> ForEachRow(
+    public static Task ForEachRow(
         Func<Task<Stream>> streamProvider,
         Func<List<string>, int, bool> action,
-        bool skipHeaderRow = true,
-        long startPosition = 0,
-        int startingRowIndex = 0,
-        int? numberOfRows = null)
+        bool skipHeaderRow = true)
     {
         return ForEachRow(
             streamProvider,
@@ -194,10 +215,7 @@ public static class CsvUtils
                 var result = action.Invoke(cells, index);
                 return Task.FromResult(result);
             },
-            skipHeaderRow,
-            startPosition,
-            startingRowIndex,
-            numberOfRows
+            skipHeaderRow
         );
     }
 
@@ -214,13 +232,10 @@ public static class CsvUtils
     /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
     /// </param>
     /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
-    public static Task<ForEachResult> ForEachRow(
+    public static Task ForEachRow(
         Func<Task<Stream>> streamProvider,
         Action<List<string>, int> action,
-        bool skipHeaderRow = true,
-        long startPosition = 0,
-        int startingRowIndex = 0,
-        int? numberOfRows = null)
+        bool skipHeaderRow = true)
     {
         return ForEachRow(
             streamProvider,
@@ -229,10 +244,7 @@ public static class CsvUtils
                 action.Invoke(cells, index);
                 return Task.FromResult(true);
             },
-            skipHeaderRow,
-            startPosition,
-            startingRowIndex,
-            numberOfRows
+            skipHeaderRow
         );
     }
 
@@ -250,26 +262,20 @@ public static class CsvUtils
     /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
     /// </param>
     /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
-    public static async Task<SelectResult<TResult>> Select<TResult>(
+    public static async Task<List<TResult>> Select<TResult>(
         Func<Task<Stream>> streamProvider,
         Func<List<string>, int, Task<TResult>> func,
-        bool skipHeaderRow = true,
-        long startPosition = 0,
-        int startingRowIndex = 0,
-        int? numberOfRows = null)
+        bool skipHeaderRow = true)
     {
         var list = new List<TResult>();
 
-        var result = await ForEachRow(
+        await ForEachRow(
             streamProvider,
             async (cells, index) => { list.Add(await func.Invoke(cells, index)); },
-            skipHeaderRow,
-            startPosition,
-            startingRowIndex,
-            numberOfRows
+            skipHeaderRow
         );
 
-        return new SelectResult<TResult>(result.Position, list);
+        return list;
     }
 
     /// <summary>
@@ -286,13 +292,10 @@ public static class CsvUtils
     /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
     /// </param>
     /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
-    public static Task<SelectResult<TResult>> Select<TResult>(
+    public static Task<List<TResult>> Select<TResult>(
         Func<Task<Stream>> streamProvider,
         Func<List<string>, int, TResult> func,
-        bool skipHeaderRow = true,
-        long startPosition = 0,
-        int startingRowIndex = 0,
-        int? numberOfRows = null)
+        bool skipHeaderRow = true)
     {
         return Select(
             streamProvider,
@@ -301,10 +304,7 @@ public static class CsvUtils
                 var result = func.Invoke(cells, index);
                 return Task.FromResult(result);
             },
-            skipHeaderRow,
-            startPosition,
-            startingRowIndex,
-            numberOfRows
+            skipHeaderRow
         );
     }
 
@@ -348,8 +348,4 @@ public static class CsvUtils
 
         return cellValue ?? defaultValue;
     }
-
-    public record ForEachResult(long Position);
-    
-    public record SelectResult<TResult>(long Position, IEnumerable<TResult> Results);
 }

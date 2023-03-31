@@ -199,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var filterGroupsFromCsv = new HashSet<FilterGroupMeta>();
             var locations = new HashSet<Location>();
             
-            await CsvUtils.ForEachRow(dataFileStreamProvider, async (rowValues, index) =>
+            await CsvUtils.ForEachRow(dataFileStreamProvider, async (rowValues, index, _) =>
             {
                 if (index % Stage2RowCheck == 0)
                 {
@@ -318,40 +318,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
 
             var batchSize = 3000;
-            var nextPosition = 0L;
-            var numberOfBatches = (import.TotalRows!.Value / batchSize) + 1;
 
-            for (var batchNumber = 0; batchNumber < numberOfBatches; batchNumber++)
-            {
-                var results = await CsvUtils.Select(
-                    dataFileStreamProvider, 
-                    (rowValues, index) =>
+            await CsvUtils.Batch(
+                dataFileStreamProvider,
+                batchSize,
+                async (batchOfRows, batchNumber) =>
+                {
+                    Console.WriteLine($"Processing batch {batchNumber} of {batchOfRows.Count} rows");
+                    var allowedRows = batchOfRows.Select(cells =>
                     {
-                        if (IsRowAllowed(soleGeographicLevel, rowValues, csvHeaders))
+                        if (IsRowAllowed(soleGeographicLevel, cells, csvHeaders))
                         {
                             return ObservationFromCsv(
                                 context,
-                                rowValues,
+                                cells,
                                 csvHeaders,
                                 subject,
                                 subjectMeta,
-                                (batchNo - 1) * import.RowsPerBatch + index + 2);
+                                (batchNo - 1) * import.RowsPerBatch + batchNumber + 2);
                         }
 
                         return null;
-                    },
-                    skipHeaderRow: nextPosition == 0,
-                    startPosition: nextPosition,
-                    numberOfRows: batchSize);
+                    }).WhereNotNull();
 
-                var observations = results.Results.WhereNotNull();
+                    await _observationBatchImporter.ImportObservationBatch(context, allowedRows);
 
-                await _observationBatchImporter.ImportObservationBatch(context, observations);
+                    return true;
+                });
 
-                nextPosition = results.Position + 1;
-            }
 
-            
             // var observations = (await GetObservations(
             //     import,
             //     context,

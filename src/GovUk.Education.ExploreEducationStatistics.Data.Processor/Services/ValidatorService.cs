@@ -229,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var rowCountByGeographicLevel = new Dictionary<GeographicLevel, int>();
             var errors = new List<DataImportError>();
 
-            await CsvUtils.ForEachRow(dataFileStreamProvider, async (cells, index) =>
+            await CsvUtils.ForEachRow(dataFileStreamProvider, async (cells, index, _) =>
             {
                 if (errors.Count == 100)
                 {
