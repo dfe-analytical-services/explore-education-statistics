@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Functions.ConnectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
@@ -47,7 +48,9 @@ public class DbContextSupplier : IDbContextSupplier
         var optionsBuilder = new DbContextOptionsBuilder<StatisticsDbContext>();
         optionsBuilder.UseSqlServer(
             GetAzureSqlConnectionString("StatisticsDb"),
-            providerOptions => providerOptions.EnableCustomRetryOnFailure());
+            providerOptions => providerOptions
+                .EnableCustomRetryOnFailure()
+                .AddBulkOperationSupport());
         return new StatisticsDbContext(optionsBuilder.Options);
     }
 
@@ -63,7 +66,10 @@ public class DbContextSupplier : IDbContextSupplier
     {
         var optionsBuilder = new DbContextOptionsBuilder<StatisticsDbContext>();
         optionsBuilder.UseSqlServer(
-            GetAzureSqlConnectionString("StatisticsDb"));
+            GetAzureSqlConnectionString("StatisticsDb"),
+            providerOptions => providerOptions
+                .EnableCustomRetryOnFailure()
+                .AddBulkOperationSupport());
         return new StatisticsDbContext(optionsBuilder.Options);
     }
 }

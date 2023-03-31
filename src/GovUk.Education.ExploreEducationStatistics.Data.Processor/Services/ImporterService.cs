@@ -21,6 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Thinktecture;
 using static System.StringComparison;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
@@ -132,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _logger = logger;
             _databaseHelper = databaseHelper;
             _importerFilterCache = importerFilterCache;
-            _observationBatchImporter = observationBatchImporter ?? new StoredProcedureObservationBatchImporter();
+            _observationBatchImporter = observationBatchImporter ?? new BulkInsertObservationBatchImporter();
         }
 
         public Task<SubjectMeta> ImportMeta(
@@ -317,14 +318,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var soleGeographicLevel = import.HasSoleGeographicLevel();
             var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
 
-            var batchSize = 3000;
-
+            var batchSize = 30000;
+            var totalBatches = Math.Ceiling((decimal) import.TotalRows!.Value / batchSize);
+            
             await CsvUtils.Batch(
                 dataFileStreamProvider,
                 batchSize,
                 async (batchOfRows, batchNumber) =>
                 {
-                    Console.WriteLine($"Processing batch {batchNumber} of {batchOfRows.Count} rows");
+                    Console.WriteLine($"Processing batch {batchNumber} of {totalBatches}");
                     var allowedRows = batchOfRows.Select(cells =>
                     {
                         if (IsRowAllowed(soleGeographicLevel, cells, csvHeaders))
@@ -341,7 +343,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         return null;
                     }).WhereNotNull();
 
-                    await _observationBatchImporter.ImportObservationBatch(context, allowedRows);
+                    await _databaseHelper.DoInTransaction(context, async contextDelegate =>
+                    {
+                        await _observationBatchImporter.ImportObservationBatch(contextDelegate, allowedRows);
+                    });
 
                     return true;
                 });
@@ -719,6 +724,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             await context.Database.ExecuteSqlRawAsync(
                 "EXEC [dbo].[InsertObservationFilterItems] @ObservationFilterItems", parameter);
+        }
+    }
+
+    public class BulkInsertObservationBatchImporter : IObservationBatchImporter
+    {
+        public async Task ImportObservationBatch(StatisticsDbContext context, IEnumerable<Observation> observations)
+        {
+            await context.BulkInsertAsync(observations);
+            await context.BulkInsertAsync(observations.SelectMany(observation => observation.FilterItems));
         }
     }
 
