@@ -41,6 +41,13 @@ export default function createTableCartesian({
   // as we want to remove empty ones later.
   const columnsWithText = columnHeadersCartesian.map(() => false);
 
+  // Group measures by their respective combination of filters
+  // allowing lookups later on to be MUCH faster.
+  const measuresByFilterCombination = groupResultMeasuresByCombination(
+    results,
+    excludedFilterIds,
+  );
+
   const tableCartesian = rowHeadersCartesian.map(rowFilterCombination => {
     return columnHeadersCartesian.map(
       (columnFilterCombination, columnIndex) => {
@@ -79,13 +86,6 @@ export default function createTableCartesian({
         if (!dataSet.indicator) {
           throw new Error('No indicator for filter combination');
         }
-
-        // Group measures by their respective combination of filters
-        // allowing lookups later on to be MUCH faster.
-        const measuresByFilterCombination = groupResultMeasuresByCombination(
-          results,
-          excludedFilterIds,
-        );
 
         const text = getCellText(
           measuresByFilterCombination,
