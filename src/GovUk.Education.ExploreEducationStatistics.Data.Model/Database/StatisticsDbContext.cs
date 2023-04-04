@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             // are what get used in real application scenarios.
         }
 
-        public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options) : this(options, int.MaxValue)
+        public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options) : this(options, timeout: 300)
         {
         }
 
