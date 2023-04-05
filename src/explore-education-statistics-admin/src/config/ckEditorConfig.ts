@@ -1,4 +1,8 @@
-import { HeadingOption, ResizeOption } from '@admin/types/ckeditor';
+import {
+  AlignmentConfig,
+  HeadingOption,
+  ResizeOption,
+} from '@admin/types/ckeditor';
 import { Dictionary } from '@admin/types';
 
 export const toolbarConfigs: Dictionary<string[]> = {
@@ -16,6 +20,7 @@ export const toolbarConfigs: Dictionary<string[]> = {
     'insertTable',
     'toggleTableCaption',
     'imageUpload',
+    'alignment',
     '|',
     'redo',
     'undo',
@@ -104,3 +109,7 @@ export const tableContentToolbar: string[] = [
   'tableRow',
   'mergeTableCells',
 ];
+
+export const alignmentOptions: AlignmentConfig = {
+  options: ['left', 'right', 'center'],
+};
