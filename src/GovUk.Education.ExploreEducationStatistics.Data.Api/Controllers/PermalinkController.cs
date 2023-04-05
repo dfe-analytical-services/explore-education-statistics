@@ -3,6 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -45,14 +46,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<LegacyPermalinkViewModel>> Create([FromBody] PermalinkCreateViewModel request)
+        public async Task<ActionResult<LegacyPermalinkViewModel>> Create([FromBody] PermalinkCreateRequest request)
         {
             return await _permalinkService.Create(request).HandleFailuresOrOk();
         }
 
         [HttpPost("permalink/release/{releaseId:guid}")]
         public async Task<ActionResult<LegacyPermalinkViewModel>> Create(Guid releaseId,
-            [FromBody] PermalinkCreateViewModel request)
+            [FromBody] PermalinkCreateRequest request)
         {
             return await _permalinkService.Create(releaseId, request).HandleFailuresOrOk();
         }

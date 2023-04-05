@@ -464,6 +464,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             context.ShouldTransferCallbackAsync += options?.ShouldTransferCallbackAsync;
             context.ShouldOverwriteCallbackAsync += options?.ShouldOverwriteCallbackAsync;
 
+            // TODO EES-4202 Find alternative to copying directory since TransferManager
+            // depends on deprecated Microsoft.Azure.Storage.Blob SDK v11
             await TransferManager.CopyDirectoryAsync(
                 sourceDirectory,
                 destinationDirectory,
@@ -584,6 +586,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         /**
+         * TODO EES-4202
          * We still need to use the older CloudBlobContainer implementation as we
          * need to interop with DataMovement.TransferManager which hasn't been
          * updated to work with Azure SDK 12 yet.

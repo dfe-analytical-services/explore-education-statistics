@@ -16,6 +16,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.14" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.2" />
+        <!-- TODO EES-4202 DataMovement depends on deprecated Microsoft.Azure.Storage.Blob SDK v11 -->
         <PackageReference Include="Microsoft.Azure.Storage.DataMovement" Version="2.0.4" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.2" />
