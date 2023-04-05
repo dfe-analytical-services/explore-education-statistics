@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 
         public static string PublicPath(this ReleaseFile releaseFile)
         {
-            return releaseFile.File.PublicPath(releaseFile.Release);
+            return releaseFile.File.PublicPath(releaseFile.ReleaseId);
         }
 
         public static FileInfo ToPublicFileInfo(this ReleaseFile releaseFile)

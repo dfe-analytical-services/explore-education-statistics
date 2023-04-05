@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -464,7 +465,8 @@ public class PermalinkCsvMetaServiceTests
             },
             File = new File
             {
-                SubjectId = releaseSubject.Subject.Id
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data
             }
         };
 
@@ -591,6 +593,198 @@ public class PermalinkCsvMetaServiceTests
             Assert.Equal(2, viewModel.Locations.Count);
             Assert.Equal(locations[0].GetCsvValues(), viewModel.Locations[locations[0].Id]);
             Assert.Equal(locations[1].GetCsvValues(), viewModel.Locations[locations[1].Id]);
+
+            // Ordering of headers is same as original data file.
+            var expectedHeaders = new List<string>
+            {
+                "time_period",
+                "time_identifier",
+                "geographic_level",
+                "country_name",
+                "country_code",
+                "la_name",
+                "new_la_code",
+                "old_la_code",
+                "region_name",
+                "region_code",
+                filters[1].Name,
+                filters[0].Name,
+                indicators[2].Name,
+                indicators[0].Name,
+                indicators[1].Name,
+            };
+
+            Assert.Equal(expectedHeaders, viewModel.Headers);
+        }
+    }
+
+    [Fact]
+    public async Task GetCsvMeta_SubjectExists_MultipleReleaseFilesExist()
+    {
+        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+            .GenerateList(2);
+
+        var indicatorGroups = _fixture.DefaultIndicatorGroup()
+            .ForIndex(0, ig => ig
+                .SetIndicators(_fixture.DefaultIndicator().Generate(1))
+            )
+            .ForIndex(1, ig => ig
+                .SetIndicators(_fixture.DefaultIndicator().Generate(2))
+            )
+            .GenerateList();
+
+        var indicators = indicatorGroups
+            .SelectMany(ig => ig.Indicators)
+            .ToList();
+
+        var locations = _fixture.DefaultLocation()
+            .ForIndex(0, l => l
+                .SetPresetRegion()
+                .SetGeographicLevel(GeographicLevel.Region))
+            .ForIndex(1, l => l
+                .SetPresetRegionAndLocalAuthority()
+                .SetGeographicLevel(GeographicLevel.LocalAuthority))
+            .GenerateList();
+
+        var releaseSubject = new ReleaseSubject
+        {
+            Release = _fixture.DefaultStatsRelease(),
+            Subject = _fixture.DefaultSubject()
+                .WithFilters(filters)
+                .WithIndicatorGroups(indicatorGroups)
+        };
+
+        var release = new Content.Model.Release
+        {
+            Id = releaseSubject.Release.Id
+        };
+
+        var releaseDataFile = new ReleaseFile
+        {
+            Release = release,
+            File = new File
+            {
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data
+            }
+        };
+
+        // Create a file for the subject and release which is not a data file
+        var releaseMetadataFile = new ReleaseFile
+        {
+            Release = release,
+            File = new File
+            {
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Metadata
+            }
+        };
+
+        // Create a data file for the subject but for a different release
+        var releaseDataFileOtherRelease = new ReleaseFile
+        {
+            Release = new Content.Model.Release
+            {
+                Id = Guid.NewGuid()
+            },
+            File = new File
+            {
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            await contentDbContext.Releases.AddRangeAsync(release);
+            await contentDbContext.ReleaseFiles.AddRangeAsync(releaseDataFile,
+                releaseMetadataFile,
+                releaseDataFileOtherRelease);
+            await contentDbContext.SaveChangesAsync();
+
+            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Location.AddRangeAsync(locations);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
+
+            releaseSubjectService
+                .Setup(s => s.FindForLatestPublishedVersion(releaseSubject.SubjectId))
+                .ReturnsAsync(releaseSubject);
+
+            // Ordering of CSV headers in meta should reflect the
+            // column ordering in the original data file's header.
+            var csv = string.Join(
+                ',',
+                "time_period",
+                "time_identifier",
+                "country_name",
+                "country_code",
+                "la_name",
+                "new_la_code",
+                "old_la_code",
+                "region_name",
+                "region_code",
+                filters[1].Name,
+                filters[0].Name,
+                indicators[2].Name,
+                indicators[0].Name,
+                indicators[1].Name
+            );
+
+            var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
+
+            releaseFileBlobService
+                .Setup(s => s.StreamBlob(
+                        It.Is<ReleaseFile>(rf =>
+                            rf.FileId == releaseDataFile.FileId && rf.ReleaseId == releaseDataFile.ReleaseId),
+                        null,
+                        default
+                ))
+                .ReturnsAsync(csv.ToStream());
+
+            var service = BuildService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext,
+                releaseSubjectService: releaseSubjectService.Object,
+                releaseFileBlobService: releaseFileBlobService.Object
+            );
+
+            var query = new ObservationQueryContext
+            {
+                SubjectId = releaseSubject.SubjectId
+            };
+
+            var permalink = new LegacyPermalink
+            {
+                Query = query,
+                FullTable = new PermalinkTableBuilderResult
+                {
+                    SubjectMeta = new PermalinkResultSubjectMeta
+                    {
+                        Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
+                        Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
+                        LocationsHierarchical = LocationViewModelBuilder
+                            .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
+                            .ToDictionary(
+                                level => level.Key.ToString().CamelCase(),
+                                level => level.Value)
+                    }
+                }
+            };
+
+            var result = await service.GetCsvMeta(permalink);
+
+            VerifyAllMocks(releaseSubjectService, releaseFileBlobService);
+
+            var viewModel = result.AssertRight();
 
             // Ordering of headers is same as original data file.
             var expectedHeaders = new List<string>
@@ -773,7 +967,8 @@ public class PermalinkCsvMetaServiceTests
             },
             File = new File
             {
-                SubjectId = releaseSubject.Subject.Id
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data
             }
         };
 
@@ -869,7 +1064,6 @@ public class PermalinkCsvMetaServiceTests
             Assert.Equal(expectedHeaders, viewModel.Headers);
         }
     }
-
 
     private static void AssertIndicatorCsvViewModel(Indicator indicator, IndicatorCsvMetaViewModel viewModel)
     {
