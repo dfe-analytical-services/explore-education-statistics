@@ -12,14 +12,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
 
 public interface IPermalinkService
 {
-    Task<Either<ActionResult, LegacyPermalinkViewModel>> Get(Guid id, CancellationToken cancellationToken = default);
+    Task<Either<ActionResult, LegacyPermalinkViewModel>> GetLegacy(Guid id, CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, Unit>> DownloadCsvToStream(
+    Task<Either<ActionResult, Unit>> LegacyDownloadCsvToStream(
         Guid id,
         Stream stream,
         CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, LegacyPermalinkViewModel>> Create(PermalinkCreateRequest request);
+    Task<Either<ActionResult, LegacyPermalinkViewModel>> CreateLegacy(PermalinkCreateRequest request);
 
-    Task<Either<ActionResult, LegacyPermalinkViewModel>> Create(Guid releaseId, PermalinkCreateRequest request);
+    Task<Either<ActionResult, LegacyPermalinkViewModel>> CreateLegacy(Guid releaseId, PermalinkCreateRequest request);
 }

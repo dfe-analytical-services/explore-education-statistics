@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var service = BuildService(releaseRepository: releaseRepository.Object,
                 subjectRepository: subjectRepository.Object);
 
-            var result = await service.Create(request);
+            var result = await service.CreateLegacy(request);
 
             MockUtils.VerifyAllMocks(
                 releaseRepository,
@@ -200,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     subjectRepository: subjectRepository.Object,
                     tableBuilderService: tableBuilderService.Object);
 
-                var result = (await service.Create(request)).AssertRight();
+                var result = (await service.CreateLegacy(request)).AssertRight();
 
                 MockUtils.VerifyAllMocks(
                     blobStorageService,
@@ -310,7 +310,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     blobStorageService: blobStorageService.Object,
                     tableBuilderService: tableBuilderService.Object);
 
-                var result = (await service.Create(release.Id, request)).AssertRight();
+                var result = (await service.CreateLegacy(release.Id, request)).AssertRight();
 
                 MockUtils.VerifyAllMocks(
                     blobStorageService,
@@ -541,7 +541,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     subjectRepository: subjectRepository.Object,
                     tableBuilderService: tableBuilderService.Object);
 
-                var result = await service.Create(request);
+                var result = await service.CreateLegacy(request);
                 result.AssertRight();
 
                 MockUtils.VerifyAllMocks(
@@ -640,7 +640,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = (await service.Get(permalink.Id)).AssertRight();
+                var result = (await service.GetLegacy(permalink.Id)).AssertRight();
 
                 MockUtils.VerifyAllMocks(blobStorageService);
 
@@ -736,7 +736,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = (await service.Get(permalink.Id)).AssertRight();
+                var result = (await service.GetLegacy(permalink.Id)).AssertRight();
 
                 MockUtils.VerifyAllMocks(blobStorageService);
 
@@ -777,7 +777,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 path: permalinkId.ToString());
 
             var service = BuildService(blobStorageService: blobStorageService.Object);
-            var result = await service.Get(permalinkId);
+            var result = await service.GetLegacy(permalinkId);
 
             MockUtils.VerifyAllMocks(
                 blobStorageService);
@@ -815,7 +815,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = (await service.Get(permalink.Id)).AssertRight();
+                var result = (await service.GetLegacy(permalink.Id)).AssertRight();
 
                 MockUtils.VerifyAllMocks(blobStorageService);
 
@@ -909,7 +909,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = (await service.Get(permalink.Id)).AssertRight();
+                var result = (await service.GetLegacy(permalink.Id)).AssertRight();
 
                 MockUtils.VerifyAllMocks(blobStorageService);
 
@@ -992,7 +992,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = (await service.Get(permalink.Id)).AssertRight();
+                var result = (await service.GetLegacy(permalink.Id)).AssertRight();
 
                 MockUtils.VerifyAllMocks(blobStorageService);
 
@@ -1075,7 +1075,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = (await service.Get(permalink.Id)).AssertRight();
+                var result = (await service.GetLegacy(permalink.Id)).AssertRight();
 
                 MockUtils.VerifyAllMocks(blobStorageService);
 
@@ -1160,7 +1160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = (await service.Get(permalink.Id)).AssertRight();
+                var result = (await service.GetLegacy(permalink.Id)).AssertRight();
 
                 MockUtils.VerifyAllMocks(blobStorageService);
 
@@ -1238,7 +1238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object);
 
-                var result = (await service.Get(permalink.Id)).AssertRight();
+                var result = (await service.GetLegacy(permalink.Id)).AssertRight();
 
                 MockUtils.VerifyAllMocks(blobStorageService);
 
@@ -1368,7 +1368,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             using var stream = new MemoryStream();
 
-            var result = await service.DownloadCsvToStream(permalink.Id, stream);
+            var result = await service.LegacyDownloadCsvToStream(permalink.Id, stream);
 
             MockUtils.VerifyAllMocks(blobStorageService, permalinkCsvMetaService);
 
@@ -1392,7 +1392,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 path: permalinkId.ToString());
 
             var service = BuildService(blobStorageService: blobStorageService.Object);
-            var result = await service.DownloadCsvToStream(permalinkId, new MemoryStream());
+            var result = await service.LegacyDownloadCsvToStream(permalinkId, new MemoryStream());
 
             MockUtils.VerifyAllMocks(blobStorageService);
 

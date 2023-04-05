@@ -69,19 +69,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _mapper = mapper;
         }
 
-        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Get(
+        // TODO EES-3755 Remove after Permalink snapshot work is complete
+        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> GetLegacy(
             Guid id,
             CancellationToken cancellationToken = default)
         {
-            return await Find(id, cancellationToken).OnSuccess(BuildViewModel);
+            return await FindLegacy(id, cancellationToken).OnSuccess(BuildLegacyViewModel);
         }
 
-        public async Task<Either<ActionResult, Unit>> DownloadCsvToStream(
+        // TODO EES-3755 Remove after Permalink snapshot work is complete
+        public async Task<Either<ActionResult, Unit>> LegacyDownloadCsvToStream(
             Guid id,
             Stream stream,
             CancellationToken cancellationToken = default)
         {
-            return await Find(id, cancellationToken)
+            return await FindLegacy(id, cancellationToken)
                 .OnSuccessCombineWith(permalink => _permalinkCsvMetaService.GetCsvMeta(permalink, cancellationToken))
                 .OnSuccessVoid(
                     async tuple =>
@@ -206,7 +208,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return string.Empty;
         }
 
-        private async Task<Either<ActionResult, LegacyPermalink>> Find(
+        // TODO EES-3755 Remove after Permalink snapshot work is complete
+        private async Task<Either<ActionResult, LegacyPermalink>> FindLegacy(
             Guid id,
             CancellationToken cancellationToken)
         {
@@ -227,15 +230,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
         }
 
-        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Create(PermalinkCreateRequest request)
+        // TODO EES-3755 Remove after Permalink snapshot work is complete
+        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> CreateLegacy(PermalinkCreateRequest request)
         {
             return await _subjectRepository.FindPublicationIdForSubject(request.Query.SubjectId)
                 .OrNotFound()
                 .OnSuccess(publicationId => _releaseRepository.GetLatestPublishedRelease(publicationId))
-                .OnSuccess(release => Create(release.Id, request));
+                .OnSuccess(release => CreateLegacy(release.Id, request));
         }
 
-        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Create(Guid releaseId,
+        // TODO EES-3755 Remove after Permalink snapshot work is complete
+        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> CreateLegacy(Guid releaseId,
             PermalinkCreateRequest request)
         {
             return await _tableBuilderService.Query(releaseId, request.Query)
@@ -281,7 +286,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
                     await _contentDbContext.SaveChangesAsync();
 
-                    return await BuildViewModel(legacyPermalink);
+                    return await BuildLegacyViewModel(legacyPermalink);
                 });
         }
 
@@ -303,7 +308,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private static int CountLocations(IEnumerable<LocationAttributeViewModel> locationAttributes)
         {
-            return locationAttributes.Sum(attribute => attribute.Options is null ? 1 : CountLocations(attribute.Options));
+            return locationAttributes.Sum(
+                attribute => attribute.Options is null ? 1 : CountLocations(attribute.Options));
         }
 
         private static JsonSerializerSettings BuildJsonSerializerSettings()
@@ -315,7 +321,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        private async Task<LegacyPermalinkViewModel> BuildViewModel(LegacyPermalink permalink)
+        // TODO EES-3755 Remove after Permalink snapshot work is complete
+        private async Task<LegacyPermalinkViewModel> BuildLegacyViewModel(LegacyPermalink permalink)
         {
             var viewModel = _mapper.Map<LegacyPermalinkViewModel>(permalink);
 
