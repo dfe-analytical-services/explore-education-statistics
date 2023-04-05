@@ -28,6 +28,7 @@ describe('MapBlockInternal', () => {
     data: testFullTable.results,
     height: 600,
     width: 900,
+    map: { dataSetConfigs: [] },
   };
 
   const testMixedLocationsAxes: MapBlockProps['axes'] = {
@@ -466,6 +467,7 @@ describe('MapBlockInternal', () => {
         legend: testMapConfiguration.legend as LegendConfiguration,
         meta: testsMixedLocationsFullTableMeta,
         data: testsMixedLocationsTableData,
+        map: { dataSetConfigs: [] },
       };
 
       render(<MapBlockInternal {...testBlockProps2} />);
@@ -514,6 +516,7 @@ describe('MapBlockInternal', () => {
         legend: testMapConfiguration.legend as LegendConfiguration,
         meta: testsMixedLocationsFullTableMeta,
         data: testsMixedLocationsTableDataWithLADs,
+        map: { dataSetConfigs: [] },
       };
 
       render(<MapBlockInternal {...testBlockProps2} />);

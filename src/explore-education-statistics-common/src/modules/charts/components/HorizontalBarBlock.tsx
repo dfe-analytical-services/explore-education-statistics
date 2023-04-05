@@ -84,11 +84,11 @@ const HorizontalBarBlock = ({
   const yAxisWidth = parseNumber(axes.major.size);
   const xAxisHeight = parseNumber(axes.minor.size);
 
-  const dataSetCategoryConfigs = getDataSetCategoryConfigs(
+  const dataSetCategoryConfigs = getDataSetCategoryConfigs({
     dataSetCategories,
-    legend.items,
+    legendItems: legend.items,
     meta,
-  );
+  });
 
   const minorAxisDecimals = getMinorAxisDecimalPlaces(dataSetCategoryConfigs);
   const minorAxisUnit = axes.minor.unit || getUnit(dataSetCategoryConfigs);

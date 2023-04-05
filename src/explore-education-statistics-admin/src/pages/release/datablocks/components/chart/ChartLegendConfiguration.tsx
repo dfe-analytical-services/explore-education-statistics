@@ -124,11 +124,11 @@ const ChartLegendConfiguration = ({
       meta,
     );
 
-    const dataSetCategoryConfigs = getDataSetCategoryConfigs(
+    const dataSetCategoryConfigs = getDataSetCategoryConfigs({
       dataSetCategories,
-      legendItems.current,
+      legendItems: legendItems.current,
       meta,
-    );
+    });
 
     const defaultConfig: Partial<LegendItemConfiguration> = {
       symbol: capabilities.hasSymbols ? 'none' : undefined,

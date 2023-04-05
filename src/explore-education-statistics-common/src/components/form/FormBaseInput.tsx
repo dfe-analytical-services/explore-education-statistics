@@ -47,6 +47,25 @@ const FormBaseInput = ({
   type = 'text',
   ...props
 }: FormBaseInputProps & HiddenProps) => {
+  const input = (
+    <input
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...props}
+      aria-describedby={
+        classNames({
+          [`${id}-error`]: !!error,
+          [`${id}-hint`]: !!hint,
+        }) || undefined
+      }
+      className={classNames('govuk-input', className, {
+        [`govuk-input--width-${width}`]: width !== undefined,
+        'govuk-input--error': !!error,
+      })}
+      id={id}
+      type={type}
+    />
+  );
+
   return (
     <>
       <FormLabel
@@ -63,32 +82,14 @@ const FormBaseInput = ({
       )}
 
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
-      <div
-        className={classNames(
-          {
-            'dfe-flex': !!addOn,
-          },
-          addOnContainerClassName,
-        )}
-      >
-        <input
-          // eslint-disable-next-line react/jsx-props-no-spreading
-          {...props}
-          aria-describedby={
-            classNames({
-              [`${id}-error`]: !!error,
-              [`${id}-hint`]: !!hint,
-            }) || undefined
-          }
-          className={classNames('govuk-input', className, {
-            [`govuk-input--width-${width}`]: width !== undefined,
-            'govuk-input--error': !!error,
-          })}
-          id={id}
-          type={type}
-        />
-        {addOn}
-      </div>
+      {addOn ? (
+        <div className={classNames('dfe-flex', addOnContainerClassName)}>
+          {input}
+          {addOn}
+        </div>
+      ) : (
+        input
+      )}
     </>
   );
 };
