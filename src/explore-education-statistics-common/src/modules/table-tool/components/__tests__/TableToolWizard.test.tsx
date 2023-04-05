@@ -215,7 +215,7 @@ describe('TableToolWizard', () => {
   test('does not render publication step if instructed to hide it', async () => {
     render(
       <TableToolWizard
-        hidePublicationSelectionStage
+        hidePublicationStep
         themeMeta={testThemeMeta}
         initialState={{
           initialStep: 1,

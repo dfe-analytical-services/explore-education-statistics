@@ -73,7 +73,7 @@ export interface FinalStepRenderProps {
 export interface PrototypeTableToolWizardProps {
   themeMeta?: Theme[];
   initialState?: Partial<InitialTableToolState>;
-  hidePublicationSelectionStage?: boolean;
+  hidePublicationStep?: boolean;
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
   loadingFastTrack?: boolean;
   renderFeaturedTable?: (featuredTable: FeaturedTable) => ReactNode;
@@ -92,7 +92,7 @@ const PrototypeTableToolWizard = ({
   themeMeta = [],
   initialState = {},
   scrollOnMount,
-  hidePublicationSelectionStage,
+  hidePublicationStep,
   renderFeaturedTable,
   finalStep,
   showTableQueryErrorDownload = true,
@@ -377,7 +377,7 @@ const PrototypeTableToolWizard = ({
               return nextStep;
             }}
           >
-            {!hidePublicationSelectionStage && (
+            {!hidePublicationStep && (
               <WizardStep onBack={handlePublicationStepBack}>
                 {stepProps => (
                   <PrototypePublicationForm
