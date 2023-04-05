@@ -88,25 +88,25 @@ public class PermalinkMigrationService : IPermalinkMigrationService
             throw new InvalidOperationException($"Blob does not match expected Permalink id {permalinkId}");
         }
 
-        var configuration = jsonObject["Configuration"];
-        var fullTable = jsonObject["FullTable"];
-        var subjectMeta = fullTable?["SubjectMeta"];
+        var configuration = jsonObject.SelectToken("Configuration");
+        var fullTable = jsonObject.SelectToken("FullTable");
+        var subjectMeta = fullTable?.SelectToken("SubjectMeta");
 
         var filterGroupsOptions = subjectMeta?.SelectTokens("$.Filters.*.Options.*.Options");
 
         var countFilterItems =
             filterGroupsOptions?.Sum(filterGroupOptions => (filterGroupOptions as JArray)?.Count) ?? 0;
-        var countFootnotes = (subjectMeta?["Footnotes"] as JArray)?.Count ?? 0;
-        var countIndicators = (subjectMeta?["Indicators"] as JArray)?.Count ?? 0;
-        var countTimePeriods = (subjectMeta?["TimePeriodRange"] as JArray)?.Count ?? 0;
-        var countObservations = (fullTable?["Results"] as JArray)?.Count ?? 0;
-        var hasConfigurationHeaders = configuration?["TableHeaders"]?.HasValues ?? false;
+        var countFootnotes = (subjectMeta?.SelectToken("Footnotes") as JArray)?.Count ?? 0;
+        var countIndicators = (subjectMeta?.SelectToken("Indicators") as JArray)?.Count ?? 0;
+        var countTimePeriods = (subjectMeta?.SelectToken("TimePeriodRange") as JArray)?.Count ?? 0;
+        var countObservations = (fullTable?.SelectToken("Results") as JArray)?.Count ?? 0;
+        var hasConfigurationHeaders = configuration?.SelectToken("TableHeaders")?.HasValues ?? false;
 
         // Presence of elements in 'LocationsHierarchical' means 'Locations' is ignored
-        var locationsHierarchical = subjectMeta?["LocationsHierarchical"];
+        var locationsHierarchical = subjectMeta?.SelectToken("LocationsHierarchical");
         var countLocations = locationsHierarchical != null
             ? CountLocationsHierarchical(locationsHierarchical)
-            : (subjectMeta?["Locations"] as JArray)?.Count ?? 0;
+            : (subjectMeta?.SelectToken("Locations") as JArray)?.Count ?? 0;
 
         return new PermalinkStatistics(CountFilterItems: countFilterItems,
             CountFootnotes: countFootnotes,

@@ -376,7 +376,49 @@ public class PermalinkMigrationServiceTests
     }
 
     [Fact]
-    public async Task MigratePermalink_HasConfigurationWithoutTableHeaders()
+    public async Task MigratePermalink_HasNullConfiguration()
+    {
+        var permalinkId = Guid.NewGuid();
+
+        // Create a permalink with a null Configuration element
+        var permalinkAsJson = $@"
+        {{
+            ""Id"": ""{permalinkId}"",
+            ""Configuration"": null
+        }}";
+
+        var blobServiceClient = MockBlobServiceClientForPermalink(permalinkId, permalinkAsJson);
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            await contentDbContext.Permalinks.AddAsync(new Permalink
+            {
+                Id = permalinkId
+            });
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var service = SetupService(contentDbContext: contentDbContext,
+                blobServiceClient: blobServiceClient.Object
+            );
+
+            await service.MigratePermalink(permalinkId);
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var saved = contentDbContext.Permalinks.SingleOrDefault(permalink => permalink.Id == permalinkId);
+            Assert.NotNull(saved);
+
+            Assert.False(saved.LegacyHasConfigurationHeaders);
+        }
+    }
+
+    [Fact]
+    public async Task MigratePermalink_HasConfigurationWithNoTableHeaders()
     {
         var permalinkId = Guid.NewGuid();
 
@@ -385,6 +427,50 @@ public class PermalinkMigrationServiceTests
         {{
             ""Id"": ""{permalinkId}"",
             ""Configuration"": {{
+            }}
+        }}";
+
+        var blobServiceClient = MockBlobServiceClientForPermalink(permalinkId, permalinkAsJson);
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            await contentDbContext.Permalinks.AddAsync(new Permalink
+            {
+                Id = permalinkId
+            });
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var service = SetupService(contentDbContext: contentDbContext,
+                blobServiceClient: blobServiceClient.Object
+            );
+
+            await service.MigratePermalink(permalinkId);
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var saved = contentDbContext.Permalinks.SingleOrDefault(permalink => permalink.Id == permalinkId);
+            Assert.NotNull(saved);
+
+            Assert.False(saved.LegacyHasConfigurationHeaders);
+        }
+    }
+
+    [Fact]
+    public async Task MigratePermalink_HasConfigurationWithNullTableHeaders()
+    {
+        var permalinkId = Guid.NewGuid();
+
+        // Create a permalink with a Configuration element with null TableHeaders
+        var permalinkAsJson = $@"
+        {{
+            ""Id"": ""{permalinkId}"",
+            ""Configuration"": {{
+                ""TableHeaders"": null
             }}
         }}";
 
@@ -467,6 +553,53 @@ public class PermalinkMigrationServiceTests
     }
 
     [Fact]
+    public async Task MigratePermalink_HasNullFullTable()
+    {
+        var permalinkId = Guid.NewGuid();
+
+        // Create a permalink with an empty FullTable element
+        var permalinkAsJson = $@"
+        {{
+            ""Id"": ""{permalinkId}"",
+            ""FullTable"": null
+        }}";
+
+        var blobServiceClient = MockBlobServiceClientForPermalink(permalinkId, permalinkAsJson);
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            await contentDbContext.Permalinks.AddAsync(new Permalink
+            {
+                Id = permalinkId
+            });
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var service = SetupService(contentDbContext: contentDbContext,
+                blobServiceClient: blobServiceClient.Object
+            );
+
+            await service.MigratePermalink(permalinkId);
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var saved = contentDbContext.Permalinks.SingleOrDefault(permalink => permalink.Id == permalinkId);
+            Assert.NotNull(saved);
+            
+            Assert.Equal(0, saved.CountFilterItems);
+            Assert.Equal(0, saved.CountFootnotes);
+            Assert.Equal(0, saved.CountIndicators);
+            Assert.Equal(0, saved.CountLocations);
+            Assert.Equal(0, saved.CountObservations);
+            Assert.Equal(0, saved.CountTimePeriods);
+        }
+    }
+
+    [Fact]
     public async Task MigratePermalink_HasSubjectMetaWithNoContent()
     {
         var permalinkId = Guid.NewGuid();
@@ -478,6 +611,60 @@ public class PermalinkMigrationServiceTests
             ""FullTable"": {{
                 ""SubjectMeta"": {{
                 }},
+                ""Results"": [
+                    {{
+                        ""Id"": """"
+                    }}
+                ]
+            }}
+        }}";
+
+        var blobServiceClient = MockBlobServiceClientForPermalink(permalinkId, permalinkAsJson);
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            await contentDbContext.Permalinks.AddAsync(new Permalink
+            {
+                Id = permalinkId
+            });
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var service = SetupService(contentDbContext: contentDbContext,
+                blobServiceClient: blobServiceClient.Object
+            );
+
+            await service.MigratePermalink(permalinkId);
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var saved = contentDbContext.Permalinks.SingleOrDefault(permalink => permalink.Id == permalinkId);
+            Assert.NotNull(saved);
+            
+            Assert.Equal(0, saved.CountFilterItems);
+            Assert.Equal(0, saved.CountFootnotes);
+            Assert.Equal(0, saved.CountIndicators);
+            Assert.Equal(0, saved.CountLocations);
+            Assert.Equal(1, saved.CountObservations);
+            Assert.Equal(0, saved.CountTimePeriods);
+        }
+    }
+
+    [Fact]
+    public async Task MigratePermalink_HasNullSubjectMeta()
+    {
+        var permalinkId = Guid.NewGuid();
+
+        // Create a permalink with an empty SubjectMeta element
+        var permalinkAsJson = $@"
+        {{
+            ""Id"": ""{permalinkId}"",
+            ""FullTable"": {{
+                ""SubjectMeta"": null,
                 ""Results"": [
                     {{
                         ""Id"": """"
