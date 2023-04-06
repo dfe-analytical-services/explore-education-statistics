@@ -3,7 +3,6 @@ import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { OmitStrict } from '@common/types';
 import React, { forwardRef, ReactNode, Ref, useEffect, useRef } from 'react';
 import styles from './FixedMultiHeaderDataTable.module.scss';
-import multiHeaderStyles from './MultiHeaderTable.module.scss';
 import MultiHeaderTable, { MultiHeaderTableProps } from './MultiHeaderTable';
 
 const mobileWidth = 1024;

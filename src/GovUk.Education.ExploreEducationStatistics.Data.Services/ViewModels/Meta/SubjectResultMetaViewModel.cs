@@ -5,6 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
 {
     public record SubjectResultMetaViewModel
     {
+        // doybble check types line up fe + be
         public Dictionary<string, FilterMetaViewModel> Filters { get; init; } = new();
 
         public List<FootnoteViewModel> Footnotes { get; init; } = new();
