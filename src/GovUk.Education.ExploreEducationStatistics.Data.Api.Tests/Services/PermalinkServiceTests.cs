@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
@@ -35,6 +37,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -1560,7 +1563,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 subjectRepository ?? Mock.Of<ISubjectRepository>(Strict),
                 publicationRepository ?? new PublicationRepository(contentDbContext),
                 releaseRepository ?? Mock.Of<IReleaseRepository>(Strict),
-                MapperUtils.MapperForProfile<MappingProfiles>()
+                MapperUtils.MapperForProfile<MappingProfiles>(),
+                Mock.Of<IPersistenceHelper<ContentDbContext>>(Strict),
+                Mock.Of<HttpClient>(Strict),
+                Mock.Of<ILogger<PermalinkService>>(Strict)
             );
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using AutoMapper;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
@@ -31,10 +32,10 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -121,7 +122,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "Explore education statistics - Data API", Version = "v1"});
             });
+            //
+            // services.AddHttpClient<IFrontendService, FrontendService>(httpClient =>
+            // {
+            //     httpClient.BaseAddress = new Uri(Configuration.GetValue<string>("PublicFrontendUrl"));
+            //     httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "DataApi");
+            // });
             
+
             //
             // Services
             //
@@ -168,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<ICacheKeyService, CacheKeyService>();
-
+            services.AddHttpClient();
             services
                 .AddAuthentication(options => {
                     options.DefaultAuthenticateScheme = "defaultScheme";
@@ -246,6 +254,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 
             app.UseMvc();
             app.UseHealthChecks("/api/health");
+            
+            var serverAddressesFeature = app.ServerFeatures.Get<IServerAddressesFeature>();
+            var address = serverAddressesFeature.Addresses.First();
+            var port = int.Parse(address.Split(':').Last());
+            
+            Console.WriteLine("Server listening on port: " + string.Join(",", port.ToString()));
         }
     }
 }

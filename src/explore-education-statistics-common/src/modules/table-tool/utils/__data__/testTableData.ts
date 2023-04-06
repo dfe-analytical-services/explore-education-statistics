@@ -103,6 +103,7 @@ const timePeriod2 = new TimePeriodFilter({
   order: 1,
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const timePeriod3 = new TimePeriodFilter({
   label: '2014/15',
   year: 2014,

@@ -52,33 +52,46 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
         LegacyPermalink permalink,
         CancellationToken cancellationToken = default)
     {
+        return await GetCsvMeta(permalink.Query.SubjectId,
+            permalink.FullTable.SubjectMeta.LocationsHierarchical,
+            permalink.FullTable.SubjectMeta.Filters,
+            permalink.FullTable.SubjectMeta.Indicators,
+            cancellationToken);
+    }
+
+    public async Task<Either<ActionResult, PermalinkCsvMetaViewModel>> GetCsvMeta(
+        Guid subjectId,
+        Dictionary<string, List<LocationAttributeViewModel>> locationsHierarchical,
+        Dictionary<string, FilterMetaViewModel> filters,
+        List<IndicatorMetaViewModel> indicators,
+        CancellationToken cancellationToken = default)
+    {
         var releaseSubject = await _releaseSubjectService
-            .FindForLatestPublishedVersion(subjectId: permalink.Query.SubjectId);
+            .FindForLatestPublishedVersion(subjectId: subjectId);
 
         var csvStream = releaseSubject is not null
             ? await GetCsvStream(releaseSubject, cancellationToken)
             : null;
 
-        var subjectMeta = permalink.FullTable.SubjectMeta;
+        var locations = await GetLocations(locationsHierarchical);
 
-        var locations = await GetLocations(subjectMeta.LocationsHierarchical);
-
-        var filters = subjectMeta.Filters.Values.ToDictionary(
+        var csvFilters = filters.Values.ToDictionary(
             filter => filter.Name,
             filter => new FilterCsvMetaViewModel(filter)
         );
-        var indicators = subjectMeta.Indicators.ToDictionary(
+
+        var csvIndicators = indicators.ToDictionary(
             indicator => indicator.Name,
             indicator => new IndicatorCsvMetaViewModel(indicator)
         );
 
-        var headers = await ListCsvHeaders(csvStream, filters, indicators, locations);
+        var headers = await ListCsvHeaders(csvStream, csvFilters, csvIndicators, locations);
 
         return new PermalinkCsvMetaViewModel
         {
             Locations = locations,
-            Filters = filters,
-            Indicators = indicators,
+            Filters = csvFilters,
+            Indicators = csvIndicators,
             Headers = headers
         };
     }

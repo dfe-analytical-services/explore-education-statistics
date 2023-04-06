@@ -38,6 +38,7 @@ using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
+using ReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 {
@@ -109,9 +110,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             // Register the Swagger generator, defining 1 or more Swagger documents
-            services.AddSwaggerGen(swag =>
+            services.AddSwaggerGen(c =>
             {
-                swag.SwaggerDoc("v1",
+                c.SwaggerDoc("v1",
                     new OpenApiInfo {Title = "Explore education statistics - Content API", Version = "v1"});
             });
 
@@ -158,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
             services.AddTransient<IReleaseCacheService, ReleaseCacheService>();
             services.AddTransient<IReleaseRepository, ReleaseRepository>();
-            services.AddTransient<IReleaseService, Services.ReleaseService>();
+            services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IReleaseFileRepository, ReleaseFileRepository>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
