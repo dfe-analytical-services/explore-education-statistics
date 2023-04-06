@@ -107,7 +107,7 @@ const PreReleaseTableToolPage = ({
         {tableToolState && (
           <TableToolWizard
             themeMeta={[]}
-            hidePublicationSelectionStage
+            hidePublicationStep
             scrollOnMount
             initialState={tableToolState}
             renderFeaturedTable={highlight => (

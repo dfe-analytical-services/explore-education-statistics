@@ -1,8 +1,13 @@
 name: Validate snapshots
 on:
   workflow_dispatch:
-  schedule: 
-    - cron: '35 9,12,16 * * 1-5'
+  schedule:
+    # Actions are scheduled in UTC
+    # Until Actions supports timezones, we need to update this cron
+    # twice a year (at the start and end of daylight saving time) 
+    # to account for daylight saving time in the UK
+    # This action is intended to run at 9:35AM, 12:35PM & 4:35PM
+    - cron: '35 8,11,15 * * 1-5'
 env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -19,7 +24,7 @@ jobs:
 
       # https://github.com/actions/virtual-environments/issues/1187
       - name: tune linux network
-        run: sudo ethtool -K eth0 tx off rx off            
+        run: sudo ethtool -K eth0 tx off rx off
 
       - name: checkout
         uses: actions/checkout@v3
@@ -38,7 +43,7 @@ jobs:
 
       - name: Validate snapshots
         working-directory: tests/robot-tests
-        run: pipenv run python scripts/create_snapshots.py --validate --slack-webhook-url ${{ env.SLACK_WEBHOOK_URL }}
+        run: pipenv run python scripts/create_snapshots.py --ci --slack-webhook-url ${{ env.SLACK_WEBHOOK_URL }}
 
       - name: Set output variables
         id: vars
@@ -55,12 +60,12 @@ jobs:
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ env.GH_TOKEN }}
-          commit-message: 'chore(tests): update test snapshots - ${{ env.DATE }}'
-          committer: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          commit-message: 'chore(tests): update test snapshots'
+          committer: dfe-sdt <dfe-sdt@users.noreply.github.com>
           branch: chore/update-test-snapshots
           add-paths: |
             tests/robot-tests/tests/snapshots
           reviewers: rmbielby, lauraselby, cjrace, chfoster, twilliams24
           title: ${{ steps.vars.outputs.pr_title }}
-          body: ${{ steps.vars.outputs.pr_body }}          
+          body: ${{ steps.vars.outputs.pr_body }}
           draft: false

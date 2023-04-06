@@ -42,7 +42,7 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
         var permalinkService = new Mock<IPermalinkService>(Strict);
 
         permalinkService
-            .Setup(s => s.Get(id, It.IsAny<CancellationToken>()))
+            .Setup(s => s.GetLegacy(id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(permalink);
 
         var client = SetupApp(permalinkService: permalinkService.Object)
@@ -64,11 +64,11 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
 
         permalinkService
             .Setup(s => s
-                .DownloadCsvToStream(id, It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
+                .LegacyDownloadCsvToStream(id, It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Unit.Instance)
             .Callback<Guid, Stream, CancellationToken>(
                 (_, stream, _) => { stream.WriteText("Test csv"); }
-            );;
+            );
 
         var client = SetupApp(permalinkService: permalinkService.Object)
             .CreateClient();

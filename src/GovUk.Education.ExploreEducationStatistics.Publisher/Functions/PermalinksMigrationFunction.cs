@@ -1,8 +1,10 @@
 ﻿#nullable enable
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
@@ -14,16 +16,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions;
 /// </summary>
 public class PermalinksMigrationFunction
 {
-    private readonly IPermalinkMigrationService _permalinkMigrationService;
+    private readonly ContentDbContext _contentDbContext;
+    private readonly IStorageQueueService _storageQueueService;
 
-    public PermalinksMigrationFunction(IPermalinkMigrationService permalinkMigrationService)
+    public PermalinksMigrationFunction(ContentDbContext contentDbContext,
+        IStorageQueueService storageQueueService)
     {
-        _permalinkMigrationService = permalinkMigrationService;
+        _contentDbContext = contentDbContext;
+        _storageQueueService = storageQueueService;
     }
 
     /// <summary>
-    /// Azure Function which enumerates all the permalink blobs in the permalinks storage container,
-    /// and queues a message to migrate each individual permalink.
+    /// Azure Function which enumerates all the permalinks and queues a message to migrate each individual permalink.
     /// </summary>
     /// <param name="message"></param>
     /// <param name="executionContext"></param>
@@ -39,7 +43,13 @@ public class PermalinksMigrationFunction
 
         try
         {
-            await _permalinkMigrationService.EnumerateAllPermalinksForMigration();
+            await _contentDbContext.Permalinks
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async permalink =>
+                {
+                    await _storageQueueService.AddMessageAsync(PermalinkMigrationQueue,
+                        new PermalinkMigrationMessage(permalink.Id));
+                });
         }
         catch (Exception e)
         {

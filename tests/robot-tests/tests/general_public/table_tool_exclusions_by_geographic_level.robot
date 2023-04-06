@@ -90,8 +90,7 @@ Validate the query could exceed the maximum allowable table size
 
 Go back to Locations step
     user clicks button    Edit locations
-    user waits until page contains element    xpath://h2[text()="Go back to previous step"]
-    user clicks button    Confirm
+    user waits until table tool wizard step is available    3    Choose locations
 
 Unselect all LA Locations
     user opens details dropdown    Local authority

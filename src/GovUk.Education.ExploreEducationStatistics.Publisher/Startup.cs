@@ -112,17 +112,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     new PermalinkMigrationService(
                         contentDbContext: provider.GetRequiredService<ContentDbContext>(),
                         blobServiceClient: new BlobServiceClient(
-                            GetConfigurationValue(provider, "PublicStorage")),
-                        storageQueueService: new StorageQueueService(
-                            GetConfigurationValue(provider, "PublisherStorage"),
-                            new StorageInstanceCreationUtil()
-                        )))
+                            GetConfigurationValue(provider, "PublicStorage"))))
                 .AddScoped<IFilterRepository, FilterRepository>()
                 .AddScoped<IFootnoteRepository, FootnoteRepository>()
                 .AddScoped<IIndicatorRepository, IndicatorRepository>()
                 .AddScoped<IPublishingCompletionService, PublishingCompletionService>()
                 .AddScoped<IPublicationRepository, PublicationRepository>()
-                .AddScoped<IReleaseRepository, ReleaseRepository>();
+                .AddScoped<IReleaseRepository, ReleaseRepository>()
+
+                // TODO EES-3755 Remove after Permalink snapshot migration work is complete
+                // Configure the IStorageQueueService dependency in PermalinksMigrationFunction
+                .AddScoped<IStorageQueueService, StorageQueueService>(provider =>
+                    new StorageQueueService(
+                        GetConfigurationValue(provider, "PublisherStorage"),
+                        new StorageInstanceCreationUtil()));
 
             AddPersistenceHelper<ContentDbContext>(builder.Services);
             AddPersistenceHelper<StatisticsDbContext>(builder.Services);

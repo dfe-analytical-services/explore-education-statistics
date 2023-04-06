@@ -45,14 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void PublicPath()
         {
-            var release = new Release
-            {
-                Id = Guid.NewGuid()
-            };
-
             var releaseFile = new ReleaseFile
             {
-                Release = release,
+                ReleaseId = Guid.NewGuid(),
                 File = new File
                 {
                     Id = Guid.NewGuid(),
@@ -62,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 }
             };
 
-            Assert.Equal(releaseFile.File.PublicPath(release), releaseFile.PublicPath());
+            Assert.Equal($"{releaseFile.ReleaseId}/ancillary/{releaseFile.File.Id}", releaseFile.PublicPath());
         }
 
         [Fact]

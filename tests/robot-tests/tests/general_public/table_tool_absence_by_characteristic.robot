@@ -27,11 +27,21 @@ Validate "Absence by characteristic" subject details
     ...    ${details}
     user checks summary list contains    Time period    2012/13 to 2016/17    ${details}
 
+Validate back takes you to step 1
+    user goes back
+    user waits until table tool wizard step is available    1    Choose a publication
+    user clicks element    id:publicationForm-submit
+
 Select subject "Absence by characteristic"
     user clicks radio    Absence by characteristic
     user clicks element    id:publicationSubjectForm-submit
     user waits until table tool wizard step is available    3    Choose locations
     user checks previous table tool step contains    2    Subject    Absence by characteristic
+
+Validate back takes you to step 2
+    user goes back
+    user waits until table tool wizard step is available    2    Choose a subject
+    user clicks element    id:publicationSubjectForm-submit
 
 Select Location Country, England
     user opens details dropdown    National

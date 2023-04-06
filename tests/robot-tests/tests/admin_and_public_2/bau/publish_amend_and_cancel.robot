@@ -273,7 +273,6 @@ Edit data block for amendment
     user waits until h2 is visible    Data block details
 
     user clicks element    testid:wizardStep-4-goToButton
-    user clicks button    Confirm
 
     user opens details dropdown    Date
     user clicks category checkbox    Date    24/03/2020

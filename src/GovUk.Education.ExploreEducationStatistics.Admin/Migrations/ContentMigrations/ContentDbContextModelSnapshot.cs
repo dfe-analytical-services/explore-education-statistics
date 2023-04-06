@@ -593,12 +593,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("CountFilterItems")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CountFootnotes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CountIndicators")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CountLocations")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CountObservations")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CountTimePeriods")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DataSetTitle")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("LegacyContentLength")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool?>("LegacyHasConfigurationHeaders")
+                        .HasColumnType("bit");
 
                     b.Property<string>("PublicationTitle")
                         .IsRequired()

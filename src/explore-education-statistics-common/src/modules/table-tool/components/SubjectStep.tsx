@@ -75,7 +75,7 @@ const SubjectStep = ({
       <>
         {stepHeading}
 
-        <Tabs id={subjectTabsId}>
+        <Tabs id={subjectTabsId} modifyHash={false}>
           <TabsSection
             title="Featured tables"
             id={subjectTabIds.featuredTables}
