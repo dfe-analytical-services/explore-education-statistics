@@ -8,6 +8,7 @@ export interface ModalProps {
   className?: string;
   closeOnOutsideClick?: boolean;
   closeOnEsc?: boolean;
+  // eslint-disable-next-line react/no-unused-prop-types
   disabled?: boolean;
   fullScreen?: boolean;
   hideTitle?: boolean;

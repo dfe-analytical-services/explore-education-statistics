@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import PageSearchForm, {

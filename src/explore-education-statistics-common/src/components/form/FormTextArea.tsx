@@ -17,6 +17,7 @@ export interface FormTextAreaProps extends FormLabelProps {
   error?: ReactNode | string;
   hint?: string;
   id: string;
+  // eslint-disable-next-line react/no-unused-prop-types
   testId?: string;
   maxLength?: number;
   name: string;

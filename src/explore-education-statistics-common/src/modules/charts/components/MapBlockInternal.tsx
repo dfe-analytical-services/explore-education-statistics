@@ -59,12 +59,14 @@ export interface MapBlockProps extends ChartProps {
   axes: {
     major: AxisConfiguration;
   };
+  // eslint-disable-next-line react/no-unused-prop-types
   boundaryLevel?: number;
   customDataGroups?: CustomDataGroup[];
   dataGroups?: number;
   dataClassification?: DataClassification;
   id: string;
   legend: LegendConfiguration;
+  // eslint-disable-next-line react/no-unused-prop-types
   maxBounds?: LatLngBounds;
   position?: { lat: number; lng: number };
 }

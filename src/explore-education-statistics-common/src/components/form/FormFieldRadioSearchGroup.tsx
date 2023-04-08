@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 import FormField, {
   FormFieldComponentProps,
 } from '@common/components/form/FormField';

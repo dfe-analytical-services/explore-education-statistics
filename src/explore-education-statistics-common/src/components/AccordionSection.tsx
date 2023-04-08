@@ -31,6 +31,7 @@ export interface AccordionSectionProps {
   id?: string;
   anchorLinkIdPrefix?: string;
   open?: boolean;
+  // eslint-disable-next-line react/no-unused-prop-types
   testId?: string;
   onToggle?: ToggleHandler;
 }
