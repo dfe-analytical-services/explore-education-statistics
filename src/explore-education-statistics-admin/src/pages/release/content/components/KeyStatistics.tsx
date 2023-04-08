@@ -15,6 +15,7 @@ import AddKeyStatistics from '@admin/pages/release/content/components/AddKeyStat
 
 export interface KeyStatisticsProps {
   release: EditableRelease;
+  // eslint-disable-next-line react/no-unused-prop-types
   isEditing?: boolean;
 }
 

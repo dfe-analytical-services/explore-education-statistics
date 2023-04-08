@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 import { ArrowLeft, ArrowRight } from '@common/components/ArrowIcons';
 import generatePageNumbers from '@common/components/util/generatePageNumbers';
 import { useMobileMedia } from '@common/hooks/useMedia';

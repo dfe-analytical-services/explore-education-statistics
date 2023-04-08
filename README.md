@@ -250,7 +250,26 @@ password `password` to log in.
 The [Keycloak Admin login](http://ees.local:5030/auth/admin/) is available with username `admin` and password
 `admin`. From here, users and OpenID Connect settings can be administered.
 
+<<<<<<< HEAD
 ##### Adding additional users to Keycloak manually
+=======
+1. To run the out-of-the-box Keycloak identity provider:
+
+  ```bash
+  pnpm start idp 
+  ```
+   
+2. To then get Admin to use Keycloak, run:
+
+  ```bash
+  
+  pnpm start adminKeycloak # this sets the environment variable "IdpProviderConfiguration=Keycloak" for us
+  ```
+
+The environment variable `IdpProviderConfiguration` lets Admin know to use 
+[appsettings.Keycloak.json](src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Keycloak.json) 
+for its Open ID Connect configuration.
+>>>>>>> 7f64dcf6c (EES-3976, EES-4081 - migrate to PNPM)
 
 Additional seed data users can be added to Keycloak by manually adding new entries to the "users" array in
 [keycloak-ees-realm.json](src/keycloak/keycloak-ees-realm.json), ensuring to supply unique GUIDs to the `user` and
@@ -322,12 +341,19 @@ Examples:
 
 - To run the public frontend services:
 
+<<<<<<< HEAD
 ```bash
 pnpm start data content
 ```
+=======
+  ```bash
+  pnpm start data content
+  ```
+>>>>>>> 7f64dcf6c (EES-3976, EES-4081 - migrate to PNPM)
 
 - To run the admin:
 
+<<<<<<< HEAD
 ```bash
 pnpm start admin
 pnpm start frontend
@@ -338,14 +364,61 @@ pnpm start frontend
 ```bash
 pnpm start publisher processor
 ```
+=======
+  ```bash
+  pnpm start admin
+  ```
+
+- To run other services:
+  
+  ```bash
+  pnpm start publisher processor
+  ```
+
+### Running the frontend
+
+1. Run the following to install all project dependencies:
+
+   ```bash
+   pnpm i
+   ```
+>>>>>>> 7f64dcf6c (EES-3976, EES-4081 - migrate to PNPM)
 
 2. Startup any required backend services (see [Running the backend](#running-the-backend))
 
 3. Run the frontend applications using the following:
     
+<<<<<<< HEAD
 ```bash
 pnpm start frontend
 ```
+=======
+     ```bash
+     # Admin frontend
+     pnpm start admin   # or pnpm start adminKeycloak if using the Keycloak IdP
+     
+     # Public frontend
+     pnpm start frontend
+     ```
+
+   - Running from the project root:
+
+     ```bash
+     # Admin frontend
+     pnpm start:admin
+    
+     # Public frontend
+     pnpm start:frontend
+     ```
+ 
+    - Going into each of the sub-project directories and starting it directly e.g.
+    
+     ```bash
+     cd src/explore-education-statistics-frontend
+     pnpm start
+     ```
+
+>>>>>>> 7f64dcf6c (EES-3976, EES-4081 - migrate to PNPM)
 4. Access frontend applications at:
 
    - `http://localhost:3000` for the public frontend
@@ -419,9 +492,15 @@ To install new dependencies, you will need to use PNPM to do this, with the foll
 
 2. Run the following:
 
+<<<<<<< HEAD
 ```bash
 pnpm i
 ```
+=======
+    ```bash
+    pnpm i
+    ```
+>>>>>>> 7f64dcf6c (EES-3976, EES-4081 - migrate to PNPM)
 
 #### Cleaning dependencies
 
@@ -456,6 +535,12 @@ These scripts can generally be run from most `package.json` files across the pro
 These can only be run from the project root `package.json`.
 
 - `pnpm clean` - Remove any `node_modules` directories across any sub-projects.
+<<<<<<< HEAD
+=======
+
+- `pnpm start:admin` - Run admin frontend dev server.
+- `pnpm start:frontend` - Run public frontend dev server.
+>>>>>>> 7f64dcf6c (EES-3976, EES-4081 - migrate to PNPM)
 
 #### Sub-project scripts
 

@@ -1,0 +1,242 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.5.6.12127",
+      "templateHash": "10602523904429381366"
+    }
+  },
+  "parameters": {
+    // EES existing frontend environment variables start
+    "publicAppBasicAuthUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Username protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
+      }
+    },
+    "publicAppBasicAuthPassword": {
+      "type": "string",
+      "metadata": {
+        "description": "Password protecting the public app, no requirement to be secret, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
+      }
+    },
+    "contentApiUrl": {
+      "type": "string"
+    },
+    "dataApiUrl": {
+      "type": "string"
+    },
+    "notifyApiUrl": {
+      "type": "string"
+    },
+    // EES existing frontend environment variables end
+    "webAppName": {
+      "type": "string",
+      "defaultValue": "ees-pnpm-linux-container",
+      "minLength": 2,
+      "metadata": {
+        "description": "Web app name."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "B1",
+      "metadata": {
+        "description": "The SKU of App Service Plan."
+      }
+    },
+    "repoUrl": {
+      "type": "string",
+      "defaultValue": "https://github.com/luke-h1/container-security-ees",
+      "metadata": {
+        "description": "Optional Git Repo URL"
+      }
+    },
+    "DOCKER_REGISTER_SERVER_URL": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The URL of the Docker registry."
+      }
+    },
+    "DOCKER_REGISTRY_SERVER_USERNAME": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The username to log in to the Docker registry."
+      }
+    },
+    "DOCKER_REGISTRY_SERVER_PASSWORD": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The password to log in to the Docker registry."
+      }
+    },
+    "DOCKER_IMAGE_NAME": {
+      "type": "string",
+      "defaultValue": "eesfrontendcontainer",
+      "metadata": {
+        "description": "The name of the Docker image."
+      }
+    },
+    "publicAppInsights": {
+      "type": "string",
+      "defaultValue": "ees-pnpm-linux-container-app-insights",
+      "metadata": {
+        "description": "The name of the public app insights instance."
+      }
+    }
+  },
+  "variables": {
+    "appServicePlanPortalName": "[format('AppServicePlan-{0}', parameters('webAppName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ContainerRegistry/registries",
+      "apiVersion": "2022-12-01",
+      "name": "eesdev2",
+      "location": "[parameters('location')]",
+      "tags": {
+        "test": "ees",
+        "test2": "dev2"
+      },
+      "sku": {
+        "name": "Standard"
+      },
+      "properties": {
+        "adminUserEnabled": true
+        // standard sku doesn't support below options
+        // "dataEndpointEnabled": false,
+        // "encryption": {
+        //   // https://learn.microsoft.com/en-us/azure/templates/microsoft.containerregistry/registries?pivots=deployment-language-arm-template#keyvaultproperties-1
+        //   "keyVaultProperties": {
+        //     "identity": "string",
+        //     "keyIdentifier": "string"
+        //   },
+        //   "status": "enabled"
+        // },
+        // Whether to allow trusted Azure services to access a network restricted registry
+        // "networkRuleBypassOptions": "AzureServices",
+        // "networkRuleSet": {
+        //   "defaultAction": "Allow",
+        //   "ipRules": [
+        //     {
+        //       "action": "Allow",
+        //       "value": "string"
+        //     }
+        //   ]
+        // },
+        // "policies": {
+        //   // "exportPolicy": {
+        //   //   "status": "string"
+        //   // },
+        //   "quarantinePolicy": {
+        //     "status": "enabled"
+        //   },
+        //   "retentionPolicy": {
+        //     "days": 20,
+        //     "status": "enabled"
+        //   }
+        //   // "trustPolicy": {
+        //   //   "status": "string",
+        //   //   "type": "Notary"
+        //   // }
+        // }
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2022-03-01",
+      "name": "[variables('appServicePlanPortalName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('sku')]"
+      },
+      "kind": "app,linux,container",
+      "dependsOn": [],
+      "properties": {
+        "reserved": true,
+        "workerSizeId": "0",
+        "numberOfWorkers": "1"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2021-02-01",
+      "name": "ees-pnpm-linux-container",
+      "kind": "app,linux,container",
+      "location": "[parameters('location')]",
+      "properties": {
+        "enabled": true,
+        "reserved": true,
+        "httpsOnly": true,
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanPortalName'))]",
+        "siteConfig": {
+          "acrUseManagedIdentityCreds": false,
+          "alwaysOn": true,
+          "http20Enabled": true,
+          "preWarmedInstanceCount": 1,
+          "minTlsVersion": "1.2",
+          "ftpsState": "FtpsOnly",
+          "framework": "node",
+          "nodeVersion": "16-lts",
+          "WEBSITES_PORT": 3000,
+          "DOCKER_REGISTRY_SERVER_URL": "[parameters('DOCKER_REGISTER_SERVER_URL')]",
+          "DOCKER_REGISTRY_SERVER_USERNAME": "[parameters('DOCKER_REGISTRY_SERVER_USERNAME')]",
+          "DOCKER_REGISTRY_SERVER_PASSWORD": "[parameters('DOCKER_REGISTRY_SERVER_PASSWORD')]"
+        }
+      },
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "dependsOn": []
+    },
+    {
+      "name": "ees-pnpm-linux-container/appsettings",
+      "type": "Microsoft.Web/sites/config",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2021-02-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+      ],
+      "properties": {
+        "APP_ENV": "development",
+        "BASIC_AUTH": "true",
+        "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
+        "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",
+        "CONTENT_API_BASE_URL": "[parameters('contentApiUrl')]",
+        "DATA_API_BASE_URL": "[parameters('dataApiUrl')]",
+        "NOTIFICATION_API_BASE_URL": "[parameters('notifyApiUrl')]",
+        "NEXT_CONFIG_MODE": "server",
+        "NODE_ENV": "production",
+        "PUBLIC_URL": "https://ees-pnpm-linux-container.azurewebsites.net/",
+        "WEBSITE_NODE_DEFAULT_VERSION": "16.14.2"
+      }
+    },
+    {
+      "condition": "[contains(parameters('repoUrl'), 'https')]",
+      "type": "Microsoft.Web/sites/sourcecontrols",
+      "apiVersion": "2021-02-01",
+      "name": "[format('{0}/{1}', parameters('webAppName'), 'web')]",
+      "properties": {
+        "repoUrl": "[parameters('repoUrl')]",
+        "branch": "main",
+        "isManualIntegration": true,
+        "deploymentRollbackEnabled": true
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+      ]
+    }
+  ]
+}
