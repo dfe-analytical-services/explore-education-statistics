@@ -318,7 +318,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var soleGeographicLevel = import.HasSoleGeographicLevel();
             var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
 
-            var batchSize = 30000;
+            var batchSize = 5000;
             var totalBatches = Math.Ceiling((decimal) import.TotalRows!.Value / batchSize);
             
             await CsvUtils.Batch(
