@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             _logger = logger;
             _databaseHelper = databaseHelper;
             _importerFilterCache = importerFilterCache;
-            _observationBatchImporter = observationBatchImporter ?? new BulkInsertObservationBatchImporter();
+            _observationBatchImporter = observationBatchImporter ?? new StoredProcedureObservationBatchImporter();
         }
 
         public Task<SubjectMeta> ImportMeta(
