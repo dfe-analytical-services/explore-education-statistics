@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
+    // TODO EES-3755 Remove after Permalink snapshot work is complete
     public class PermalinkResultSubjectMeta
     {
         public Dictionary<string, FilterMetaViewModel> Filters { get; init; } = new();

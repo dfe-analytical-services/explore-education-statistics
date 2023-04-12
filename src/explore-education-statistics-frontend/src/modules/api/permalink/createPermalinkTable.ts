@@ -36,11 +36,6 @@ export default async function createPermalinkTable(
     body: { configuration, fullTable: unmappedFullTable },
   } = req;
 
-  // eslint-disable-next-line no-console
-  console.log('typeof unmappedFullTable', typeof unmappedFullTable);
-  // eslint-disable-next-line no-console
-  console.log('typeof configuration', typeof configuration);
-
   if (!unmappedFullTable || !configuration) {
     return res
       .status(400)
@@ -63,7 +58,6 @@ export default async function createPermalinkTable(
     const title = generateTableTitle(fullTable.subjectMeta);
 
     if (tableJson && title) {
-      console.log(JSON.stringify(tableJson, null, 2));
       return res.status(200).send({ table: tableJson, title });
     }
     return res.status(500).send({ message: 'Cannot build table', status: 500 });

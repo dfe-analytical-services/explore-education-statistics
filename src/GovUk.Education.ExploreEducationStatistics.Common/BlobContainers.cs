@@ -18,7 +18,7 @@
         public static readonly IBlobContainer PrivateMethodologyFiles = new PrivateBlobContainer("methodologies");
         public static readonly IBlobContainer PublicMethodologyFiles = new PublicBlobContainer("methodologies");
     }
-    
+
     /// <summary>
     /// Blob container with an immutable name that doesn't change when used with emulator storage
     /// </summary>
