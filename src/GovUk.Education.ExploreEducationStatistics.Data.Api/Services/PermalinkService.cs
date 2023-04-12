@@ -213,21 +213,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             Guid id,
             CancellationToken cancellationToken)
         {
-            try
-            {
-                var text = await _blobStorageService.DownloadBlobText(
-                    containerName: BlobContainers.Permalinks,
-                    path: id.ToString(),
-                    cancellationToken: cancellationToken);
+            return await _contentDbContext.Permalinks
+                .SingleOrNotFoundAsync(
+                    predicate: permalink => permalink.Id == id &&
+                                            permalink.Legacy == true,
+                    cancellationToken: cancellationToken)
+                .OnSuccess<ActionResult, Permalink, LegacyPermalink>(async () =>
+                {
+                    try
+                    {
+                        var text = await _blobStorageService.DownloadBlobText(
+                            containerName: BlobContainers.Permalinks,
+                            path: id.ToString(),
+                            cancellationToken: cancellationToken);
 
-                return JsonConvert.DeserializeObject<LegacyPermalink>(
-                    value: text,
-                    settings: BuildJsonSerializerSettings())!;
-            }
-            catch (FileNotFoundException)
-            {
-                return new NotFoundResult();
-            }
+                        return JsonConvert.DeserializeObject<LegacyPermalink>(
+                            value: text,
+                            settings: BuildJsonSerializerSettings())!;
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        return new NotFoundResult();
+                    }
+                });
         }
 
         // TODO EES-3755 Remove after Permalink snapshot work is complete
@@ -250,6 +258,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     var subjectMeta = permalinkTableResult.SubjectMeta;
                     var permalink = new Permalink
                     {
+                        Legacy = true,
                         PublicationTitle = subjectMeta.PublicationName,
                         DataSetTitle = subjectMeta.SubjectName,
                         ReleaseId = releaseId,
