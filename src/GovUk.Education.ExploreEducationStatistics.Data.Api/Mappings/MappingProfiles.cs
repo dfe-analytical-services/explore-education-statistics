@@ -1,5 +1,6 @@
 #nullable enable
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
@@ -17,9 +18,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
             // Null collections will be mapped to null collections instead of empty collections.
             AllowNullCollections = true;
 
+            CreateMap<Permalink, PermalinkViewModel>();
+
             ConfigureForLegacyPermalinks();
         }
 
+        // TODO EES-3755 Remove after Permalink snapshot migration work is complete
         private void ConfigureForLegacyPermalinks()
         {
             CreateMap<LegacyPermalink, LegacyPermalinkViewModel>();

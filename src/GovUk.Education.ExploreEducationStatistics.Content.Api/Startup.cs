@@ -110,10 +110,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             // Register the Swagger generator, defining 1 or more Swagger documents
-            services.AddSwaggerGen(c =>
+            services.AddSwaggerGen(options =>
             {
-                c.SwaggerDoc("v1",
-                    new OpenApiInfo {Title = "Explore education statistics - Content API", Version = "v1"});
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Explore education statistics - Content API",
+                    Version = "v1"
+                });
             });
 
             services.AddCors();

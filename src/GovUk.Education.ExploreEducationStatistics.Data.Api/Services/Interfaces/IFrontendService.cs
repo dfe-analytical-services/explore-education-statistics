@@ -1,13 +1,16 @@
 #nullable enable
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
-
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 
 public interface IFrontendService
 {
-    Task<Stream> CreateUniversalTableFormat(PermalinkTableCreateRequest request, CancellationToken cancellationToken);
+    Task<Either<ActionResult, dynamic>> CreateUniversalTableFormat(TableBuilderResultViewModel tableResult,
+        TableBuilderConfiguration tableConfiguration,
+        CancellationToken cancellationToken);
 }

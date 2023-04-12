@@ -5,7 +5,6 @@ using System.Dynamic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
 using System.Threading;
@@ -17,7 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -34,9 +32,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
@@ -48,224 +44,177 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly ITableBuilderService _tableBuilderService;
         private readonly IPermalinkCsvMetaService _permalinkCsvMetaService;
         private readonly IBlobStorageService _blobStorageService;
+        private readonly IFrontendService _frontendService;
         private readonly ISubjectRepository _subjectRepository;
         private readonly IPublicationRepository _publicationRepository;
         private readonly IReleaseRepository _releaseRepository;
         private readonly IMapper _mapper;
-        private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
-        private readonly HttpClient _httpClient;
-        private readonly ILogger<PermalinkService> _logger;
 
         public PermalinkService(
             ContentDbContext contentDbContext,
             ITableBuilderService tableBuilderService,
             IPermalinkCsvMetaService permalinkCsvMetaService,
             IBlobStorageService blobStorageService,
+            IFrontendService frontendService,
             ISubjectRepository subjectRepository,
             IPublicationRepository publicationRepository,
             IReleaseRepository releaseRepository,
-            IMapper mapper,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
-            HttpClient httpClient,
-            ILogger<PermalinkService> logger)
+            IMapper mapper)
         {
             _contentDbContext = contentDbContext;
             _tableBuilderService = tableBuilderService;
             _permalinkCsvMetaService = permalinkCsvMetaService;
             _blobStorageService = blobStorageService;
+            _frontendService = frontendService;
             _subjectRepository = subjectRepository;
             _publicationRepository = publicationRepository;
             _releaseRepository = releaseRepository;
             _mapper = mapper;
-            _contentPersistenceHelper = contentPersistenceHelper;
-            _httpClient = httpClient;
-            _logger = logger;
         }
 
-        public async Task<Either<ActionResult, PermalinkSnapshotViewModel>> Get(Guid id,
+        public async Task<Either<ActionResult, PermalinkViewModel>> GetPermalink(Guid permalinkId,
             CancellationToken cancellationToken = default)
         {
-            var subjectId = await _contentDbContext.Permalinks
-                .Where(permalink => permalink.Id == id)
-                .Select(permalink => permalink.SubjectId)
-                .FirstOrDefaultAsync(cancellationToken);
-
-            // do we want to return not found here?
-            // can a permalink exist without an existing subject? 
-            // assume not but worth double checking
-            if (subjectId == null)
-            {
-                return new NotFoundResult();
-            }
-
-            return await Find(id, cancellationToken)
-                .OnSuccess(
-                    async permalink =>
-                        await BuildPermalinkSnapshotViewModel(
-                            permalink with { Status = await GetPermalinkStatus(permalink.Id) }, subjectId));
+            return await Find(permalinkId, cancellationToken).OnSuccess(BuildViewModel);
         }
 
-        private async Task<Either<ActionResult, PermalinkSnapshotViewModel>?> Find(Guid permalinkId,
+        private async Task<Either<ActionResult, Permalink>> Find(Guid permalinkId,
             CancellationToken cancellationToken)
         {
-            try
-            {
-                await _contentPersistenceHelper.CheckEntityExists<PermalinkSnapshotViewModel>(permalinkId).OnSuccess(
-                        async permalink =>
-                        {
-                            var text = await _blobStorageService.DownloadBlobText(
-                                containerName: BlobContainers.PermalinkSnapshots,
-                                path: permalink.Id.ToString(),
-                                cancellationToken: cancellationToken
-                            );
+            return await _contentDbContext.Permalinks
+                .SingleOrNotFoundAsync(
+                    predicate: permalink => permalink.Id == permalinkId &&
+                                            (!permalink.Legacy || permalink.LegacyHasSnapshot == true),
+                    cancellationToken: cancellationToken)
+                .OnSuccess<ActionResult, Permalink, Permalink>(async permalink =>
+                {
+                    try
+                    {
+                        var tableJson = await _blobStorageService.DownloadBlobText(
+                            containerName: BlobContainers.PermalinkSnapshots,
+                            path: $"{permalink.Id}.json",
+                            cancellationToken: cancellationToken);
 
-                            return JsonConvert.DeserializeObject<PermalinkSnapshotViewModel>(
-                                value: text
-                            );
-                        })
-                    .OrNotFound();
-            }
-            catch (FileNotFoundException)
-            {
-                return new NotFoundResult();
-            }
-
-            return null;
+                        permalink.Table = JsonConvert.DeserializeObject<dynamic>(tableJson);
+                        return permalink;
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        return new NotFoundResult();
+                    }
+                });
         }
 
-        public async Task<Either<ActionResult, PermalinkSnapshotViewModel>> Create(PermalinkCreateRequest request,
+        public async Task<Either<ActionResult, PermalinkViewModel>> CreatePermalink(PermalinkCreateRequest request,
             CancellationToken cancellationToken = default)
         {
             return await _subjectRepository.FindPublicationIdForSubject(request.Query.SubjectId)
                 .OrNotFound()
                 .OnSuccess(publicationId => _releaseRepository.GetLatestPublishedRelease(publicationId))
-                .OnSuccess(release => Create(release.Id, request, cancellationToken));
+                .OnSuccess(release => CreatePermalink(release.Id, request, cancellationToken));
         }
 
-        public async Task<Either<ActionResult, PermalinkSnapshotViewModel>> Create(Guid releaseId,
-            PermalinkCreateRequest request, CancellationToken cancellationToken = default)
+        public async Task<Either<ActionResult, PermalinkViewModel>> CreatePermalink(Guid releaseId,
+            PermalinkCreateRequest request,
+            CancellationToken cancellationToken = default)
         {
-            return _tableBuilderService.Query(releaseId, request.Query, cancellationToken)
-                .OnSuccess(async result =>
+            return await _tableBuilderService.Query(releaseId, request.Query, cancellationToken)
+                .OnSuccessCombineWith(tableResult => _frontendService.CreateUniversalTableFormat(tableResult,
+                    request.Configuration,
+                    cancellationToken))
+                .OnSuccessCombineWith(async tuple =>
                 {
-                    var permalinkTableCreateRequest = new PermalinkTableCreateRequest
-                    {
-                        FullTable = new TableBuilderResultViewModel
-                        {
-                            Results = result.Results.ToList(),
-                            SubjectMeta = result.SubjectMeta
-                        },
-                        Configuration = request.Configuration
-                    };
-
-                    var camelCaseJsonSerializerSettings = new JsonSerializerSettings
-                    {
-                        ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                        NullValueHandling = NullValueHandling.Ignore
-                    };
-
-                    _logger.LogInformation("Calling frontend API endpoint to create permalink");
-
-                    var response = await _httpClient.PostAsync("http://localhost:3000/api/permalink",
-                        new JsonNetContent(permalinkTableCreateRequest, camelCaseJsonSerializerSettings),
+                    var (tableResult, _) = tuple;
+                    return await _permalinkCsvMetaService.GetCsvMeta(request.Query.SubjectId,
+                        tableResult.SubjectMeta.Locations,
+                        tableResult.SubjectMeta.Filters,
+                        tableResult.SubjectMeta.Indicators,
                         cancellationToken);
-
-                    response.EnsureSuccessStatusCode();
-
-                    _logger.LogInformation("sent following json to frontend: " +
-                                           JsonConvert.SerializeObject(permalinkTableCreateRequest));
-
-                    _logger.LogInformation("Got response from frontend:" + response.StatusCode);
-
-                    var content = await response.Content.ReadAsStringAsync(cancellationToken);
-
-                    dynamic json = JToken.Parse(content);
-
-                    _logger.LogInformation("Got response from frontend:" + response.Content);
-
+                })
+                .OnSuccess(async tuple =>
+                {
+                    var (tableResult, universalTable, csvMeta) = tuple;
+                    var subjectMeta = tableResult.SubjectMeta;
                     var permalink = new Permalink
                     {
-                        Created = DateTime.UtcNow,
-                        PublicationTitle = result.SubjectMeta.PublicationName,
-                        DataSetTitle = result.SubjectMeta.SubjectName,
+                        Legacy = false,
                         ReleaseId = releaseId,
-                        SubjectId = request.Query.SubjectId
+                        SubjectId = request.Query.SubjectId,
+                        PublicationTitle = subjectMeta.PublicationName,
+                        DataSetTitle = subjectMeta.SubjectName,
+                        CountFilterItems = CountFilterItems(subjectMeta.Filters),
+                        CountFootnotes = subjectMeta.Footnotes.Count,
+                        CountIndicators = subjectMeta.Indicators.Count,
+                        CountLocations = CountLocations(subjectMeta.Locations),
+                        CountObservations = tableResult.Results.Count(),
+                        CountTimePeriods = subjectMeta.TimePeriodRange.Count,
+                        Table = universalTable
                     };
 
                     _contentDbContext.Permalinks.Add(permalink);
 
-                    await _permalinkCsvMetaService.GetCsvMeta(request.Query.SubjectId,
-                        result.SubjectMeta.Locations,
-                        result.SubjectMeta.Filters,
-                        result.SubjectMeta.Indicators,
-                        cancellationToken).OnSuccessVoid(async meta =>
-                    {
-                        // TODO - think about not loading the whole thing into memory & stream it instead
-                        var csvMemoryStream = new MemoryStream();
+                    // Upload table CSV
+                    await using var csvStream = new MemoryStream();
+                    await using var csvWriter = new CsvWriter(new StreamWriter(csvStream, leaveOpen: true),
+                        CultureInfo.InvariantCulture);
+                    await WriteCsvHeaderRow(csvWriter, csvMeta);
+                    await WriteCsvRows(csvWriter, tableResult.Results.ToList(), csvMeta, cancellationToken);
+                    await csvWriter.FlushAsync();
 
-                        await using var writer = new StreamWriter(csvMemoryStream, leaveOpen: true);
-                        await using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+                    await _blobStorageService.UploadStream(
+                        containerName: BlobContainers.PermalinkSnapshots,
+                        path: $"{permalink.Id}.csv",
+                        stream: csvStream,
+                        contentType: "text/csv",
+                        cancellationToken: cancellationToken
+                    );
 
-                        await WriteCsvHeaderRow(csv, meta);
-                        await WriteCsvRows(csv, result.Results.ToList(), meta, cancellationToken);
+                    // Upload table json
+                    await using var tableStream = new MemoryStream();
+                    await using var jsonWriter = new JsonTextWriter(new StreamWriter(tableStream, leaveOpen: true));
+                    JsonSerializer.CreateDefault().Serialize(jsonWriter, permalink.Table);
+                    await jsonWriter.FlushAsync(cancellationToken);
 
-                        // CSV
-                        await _blobStorageService.UploadStream(
-                            containerName: BlobContainers.PermalinkSnapshots,
-                            path: permalink.Id.ToString(),
-                            stream: csvMemoryStream,
-                            contentType: MediaTypeNames.Text.Plain
-                        );
+                    await _blobStorageService.UploadStream(
+                        containerName: BlobContainers.PermalinkSnapshots,
+                        path: $"{permalink.Id}.json",
+                        stream: tableStream,
+                        contentType: MediaTypeNames.Application.Json,
+                        cancellationToken: cancellationToken
+                    );
 
-                        var jsonStream = new MemoryStream(json);
-
-                        // Universal table format
-                        await _blobStorageService.UploadStream(
-                            containerName: BlobContainers.PermalinkSnapshots,
-                            path: permalink.Id.ToString(),
-                            stream: jsonStream,
-                            contentType: MediaTypeNames.Application.Json
-                        );
-
-                        await _contentDbContext.SaveChangesAsync(cancellationToken);
-                    });
-
-                    return new PermalinkSnapshotViewModel
-                    {
-                        Id = permalink.Id,
-                        Created = permalink.Created,
-                        Status = await GetPermalinkStatus(permalink.SubjectId),
-                        Table = json
-                    };
+                    await _contentDbContext.SaveChangesAsync(cancellationToken);
+                    return await BuildViewModel(permalink);
                 });
         }
 
-        public Task<Either<ActionResult, Stream>> StreamPermalinkCsv(Guid id, Stream stream,
+        public Task<Either<ActionResult, Unit>> DownloadCsvToStream(Guid permalinkId,
+            Stream stream,
             CancellationToken cancellationToken = default)
         {
-            // Look in DB here (pt) first to avoid downloading the blob if we don't need to
-            return _blobStorageService.DownloadToStream(
-                containerName: BlobContainers.PermalinkSnapshots,
-                path: id.ToString(),
-                stream: new MemoryStream()
-            );
+            return Find(permalinkId, cancellationToken)
+                .OnSuccessVoid(() => _blobStorageService.DownloadToStream(
+                    containerName: BlobContainers.PermalinkSnapshots,
+                    path: $"{permalinkId}.csv",
+                    stream: stream
+                ));
         }
 
         // TODO EES-3755 Remove after Permalink snapshot work is complete
         public async Task<Either<ActionResult, LegacyPermalinkViewModel>> GetLegacy(
-            Guid id,
+            Guid permalinkId,
             CancellationToken cancellationToken = default)
         {
-            return await FindLegacy(id, cancellationToken).OnSuccess(BuildLegacyViewModel);
+            return await FindLegacy(permalinkId, cancellationToken).OnSuccess(BuildLegacyViewModel);
         }
 
         // TODO EES-3755 Remove after Permalink snapshot work is complete
         public async Task<Either<ActionResult, Unit>> LegacyDownloadCsvToStream(
-            Guid id,
+            Guid permalinkId,
             Stream stream,
             CancellationToken cancellationToken = default)
         {
-            return await FindLegacy(id, cancellationToken)
+            return await FindLegacy(permalinkId, cancellationToken)
                 .OnSuccessCombineWith(permalink => _permalinkCsvMetaService.GetCsvMeta(permalink, cancellationToken))
                 .OnSuccessVoid(
                     async tuple =>
@@ -387,12 +336,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         // TODO EES-3755 Remove after Permalink snapshot work is complete
         private async Task<Either<ActionResult, LegacyPermalink>> FindLegacy(
-            Guid id,
+            Guid permalinkId,
             CancellationToken cancellationToken)
         {
             return await _contentDbContext.Permalinks
                 .SingleOrNotFoundAsync(
-                    predicate: permalink => permalink.Id == id &&
+                    predicate: permalink => permalink.Id == permalinkId &&
                                             permalink.Legacy == true,
                     cancellationToken: cancellationToken)
                 .OnSuccess<ActionResult, Permalink, LegacyPermalink>(async () =>
@@ -401,7 +350,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     {
                         var text = await _blobStorageService.DownloadBlobText(
                             containerName: BlobContainers.Permalinks,
-                            path: id.ToString(),
+                            path: permalinkId.ToString(),
                             cancellationToken: cancellationToken);
 
                         return JsonConvert.DeserializeObject<LegacyPermalink>(
@@ -428,11 +377,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         public async Task<Either<ActionResult, LegacyPermalinkViewModel>> CreateLegacy(Guid releaseId,
             PermalinkCreateRequest request)
         {
-            return _tableBuilderService.Query(releaseId, request.Query)
+            return await _tableBuilderService.Query(releaseId, request.Query)
                 .OnSuccess(async result =>
                 {
-                    var subjectMeta = result.SubjectMeta;
                     var permalinkTableResult = new PermalinkTableBuilderResult(result);
+                    var subjectMeta = permalinkTableResult.SubjectMeta;
                     var permalink = new Permalink
                     {
                         Legacy = true,
@@ -443,9 +392,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         CountFilterItems = CountFilterItems(subjectMeta.Filters),
                         CountFootnotes = subjectMeta.Footnotes.Count,
                         CountIndicators = subjectMeta.Indicators.Count,
-                        CountLocations =
-                            CountLocations(subjectMeta
-                                .LocationsHierarchical), // due to ambiguous invocation of onSuccess
+                        CountLocations = CountLocations(subjectMeta.LocationsHierarchical),
                         CountObservations = result.Results.Count(),
                         CountTimePeriods = subjectMeta.TimePeriodRange.Count,
                         LegacyHasConfigurationHeaders = true
@@ -509,13 +456,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        private async Task<PermalinkSnapshotViewModel> BuildPermalinkSnapshotViewModel(
-            PermalinkSnapshotViewModel permalinkSnapshot,
-            Guid subjectId)
+        private async Task<PermalinkViewModel> BuildViewModel(Permalink permalink)
         {
-            var viewModel = _mapper.Map<PermalinkSnapshotViewModel>(permalinkSnapshot);
-
-            viewModel.Status = await GetPermalinkStatus(subjectId);
+            var viewModel = _mapper.Map<PermalinkViewModel>(permalink);
+            viewModel.Status = await GetPermalinkStatus(permalink.SubjectId);
 
             return viewModel;
         }
@@ -524,7 +468,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private async Task<LegacyPermalinkViewModel> BuildLegacyViewModel(LegacyPermalink permalink)
         {
             var viewModel = _mapper.Map<LegacyPermalinkViewModel>(permalink);
-
             viewModel.Status = await GetPermalinkStatus(permalink.Query.SubjectId);
 
             return viewModel;
@@ -541,8 +484,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 .Where(rf =>
                     rf.File.SubjectId == subjectId
                     && rf.File.Type == FileType.Data
-                    && rf.Release.Published.HasValue && DateTime.UtcNow >= rf.Release.Published.Value
-                )
+                    && rf.Release.Published.HasValue && DateTime.UtcNow >= rf.Release.Published.Value)
                 .Select(rf => rf.Release)
                 .ToListAsync();
 
@@ -574,7 +516,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             {
                 return PermalinkStatus.PublicationSuperseded;
             }
-
 
             return PermalinkStatus.Current;
         }

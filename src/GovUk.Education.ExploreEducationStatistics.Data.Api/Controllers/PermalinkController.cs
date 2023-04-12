@@ -1,10 +1,8 @@
 #nullable enable
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
@@ -22,8 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         {
             _permalinkService = permalinkService;
         }
-        
-        // Legacy endpoints
+
+        // TODO EES-3755 Remove after Permalink snapshot migration work is complete
         [HttpGet("permalink/{id:guid}")]
         [Produces("application/json", "text/csv")]
         public async Task GetLegacyPermalink(
@@ -49,6 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             await result.ExecuteResultAsync(ControllerContext);
         }
 
+        // TODO EES-3755 Remove after Permalink snapshot migration work is complete
         [HttpPost]
         public async Task<ActionResult<LegacyPermalinkViewModel>> CreateLegacyPermalink(
             [FromBody] PermalinkCreateRequest request)
@@ -56,6 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return await _permalinkService.CreateLegacy(request).HandleFailuresOrOk();
         }
 
+        // TODO EES-3755 Remove after Permalink snapshot migration work is complete
         [HttpPost("permalink/release/{releaseId:guid}")]
         public async Task<ActionResult<LegacyPermalinkViewModel>> CreateLegacyPermalink(Guid releaseId,
             [FromBody] PermalinkCreateRequest request)
@@ -63,32 +63,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return await _permalinkService.CreateLegacy(releaseId, request).HandleFailuresOrOk();
         }
 
-        // snapshot endpoints
-        [HttpPost("permalink-snapshot/{id:guid}")]
+        [HttpGet("permalink-snapshot/{permalinkId:guid}")]
         [ProducesResponseType(200)]
-        public async Task<Either<ActionResult, PermalinkSnapshotViewModel>> Get(Guid id,
+        [Produces("application/json", "text/csv")]
+        public async Task GetPermalink(Guid permalinkId,
             CancellationToken cancellationToken = default)
         {
-            return await _permalinkService.Get(id, cancellationToken);
+            if (Request.AcceptsCsv(exact: true))
+            {
+                Response.ContentDispositionAttachment(
+                    contentType: "text/csv",
+                    filename: $"permalink-{permalinkId}.csv");
+
+                await _permalinkService.DownloadCsvToStream(permalinkId, Response.BodyWriter.AsStream(),
+                    cancellationToken);
+
+                return;
+            }
+
+            var result = await _permalinkService
+                .GetPermalink(permalinkId, cancellationToken)
+                .HandleFailuresOr(Ok);
+
+            await result.ExecuteResultAsync(ControllerContext);
         }
-        
+
         [HttpPost("permalink-snapshot")]
         [ProducesResponseType(201)]
-        public async Task<Either<ActionResult, PermalinkSnapshotViewModel>> Create(
+        public async Task<ActionResult<PermalinkViewModel>> CreatePermalink(
             [FromBody] PermalinkCreateRequest request,
             CancellationToken cancellationToken = default)
         {
-            return await _permalinkService.Create(request, cancellationToken);
-        }
-        
-        [HttpGet("permalink-snapshot/{id:guid}/csv")]
-        [Produces("text/csv")]
-        // Correct status code?? streaming partial content?
-        [ProducesResponseType(206)]
-        public async Task<Either<ActionResult, Stream>> StreamPermalinkCsv(Guid id, Stream stream,
-            CancellationToken cancellationToken = default)
-        {
-            return await _permalinkService.StreamPermalinkCsv(id, stream, cancellationToken);
+            return await _permalinkService
+                .CreatePermalink(request, cancellationToken)
+                .HandleFailuresOrOk();
         }
     }
 }
