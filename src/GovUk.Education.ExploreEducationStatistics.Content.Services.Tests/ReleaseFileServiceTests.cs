@@ -983,7 +983,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                             PublicReleaseFiles,
                             allFilesZipPath,
                             It.IsAny<Stream>(),
-                            "application/zip"
+                            "application/zip",
+                            It.IsAny<CancellationToken>()
                         )
                 )
                 .Returns(Task.CompletedTask);
@@ -1187,7 +1188,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                             PublicReleaseFiles,
                             allFilesZipPath,
                             It.IsAny<Stream>(),
-                            "application/zip"
+                            "application/zip",
+                            It.IsAny<CancellationToken>()
                         )
                 )
                 .Returns(Task.CompletedTask);

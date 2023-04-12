@@ -12,28 +12,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
 
 public interface IPermalinkService
 {
-    Task<Either<ActionResult, LegacyPermalinkViewModel>> GetLegacy(Guid id,
+    // TODO EES-3755 Remove after Permalink snapshot migration work is complete
+    Task<Either<ActionResult, LegacyPermalinkViewModel>> GetLegacy(Guid permalinkId,
         CancellationToken cancellationToken = default);
 
+    // TODO EES-3755 Remove after Permalink snapshot migration work is complete
     Task<Either<ActionResult, Unit>> LegacyDownloadCsvToStream(
-        Guid id,
+        Guid permalinkId,
         Stream stream,
         CancellationToken cancellationToken = default);
 
+    // TODO EES-3755 Remove after Permalink snapshot migration work is complete
     Task<Either<ActionResult, LegacyPermalinkViewModel>> CreateLegacy(PermalinkCreateRequest request);
 
+    // TODO EES-3755 Remove after Permalink snapshot migration work is complete
     Task<Either<ActionResult, LegacyPermalinkViewModel>> CreateLegacy(Guid releaseId, PermalinkCreateRequest request);
 
-    // Snapshot methods
-    Task<Either<ActionResult, PermalinkSnapshotViewModel>> Create(PermalinkCreateRequest request,
+    Task<Either<ActionResult, PermalinkViewModel>> CreatePermalink(PermalinkCreateRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, PermalinkSnapshotViewModel>> Create(Guid releaseId,
-        PermalinkCreateRequest request, CancellationToken cancellationToken = default);
-
-    Task<Either<ActionResult, Stream>> StreamPermalinkCsv(Guid id, Stream stream,
+    Task<Either<ActionResult, PermalinkViewModel>> CreatePermalink(Guid releaseId,
+        PermalinkCreateRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, PermalinkSnapshotViewModel>> Get(Guid id,
+    Task<Either<ActionResult, PermalinkViewModel>> GetPermalink(Guid permalinkId,
+        CancellationToken cancellationToken = default);
+
+    Task<Either<ActionResult, Unit>> DownloadCsvToStream(Guid permalinkId,
+        Stream stream,
         CancellationToken cancellationToken = default);
 }

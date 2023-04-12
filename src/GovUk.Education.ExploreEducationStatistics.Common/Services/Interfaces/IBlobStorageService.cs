@@ -47,7 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
             IBlobContainer containerName,
             string path,
             Stream stream,
-            string contentType);
+            string contentType,
+            CancellationToken cancellationToken = default);
 
         public Task UploadAsJson<T>(
             IBlobContainer containerName,

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
@@ -37,7 +35,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -146,9 +143,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     Permalinks,
                     Capture.With(blobPathCapture),
                     It.IsAny<Stream>(),
-                    MediaTypeNames.Application.Json
+                    MediaTypeNames.Application.Json,
+                    It.IsAny<CancellationToken>()
                 ))
-                .Callback<IBlobContainer, string, Stream, string>((_, _, stream, _) =>
+                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, _, stream, _, _) =>
                 {
                     // Convert captured stream to string
                     using var reader = new StreamReader(stream);
@@ -266,9 +264,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     Permalinks,
                     Capture.With(blobPathCapture),
                     It.IsAny<Stream>(),
-                    MediaTypeNames.Application.Json
+                    MediaTypeNames.Application.Json,
+                    It.IsAny<CancellationToken>()
                 ))
-                .Callback<IBlobContainer, string, Stream, string>((_, _, stream, _) =>
+                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, _, stream, _, _) =>
                 {
                     // Convert captured stream to string
                     using var reader = new StreamReader(stream);
@@ -487,9 +486,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     Permalinks,
                     Capture.With(blobPathCapture),
                     It.IsAny<Stream>(),
-                    MediaTypeNames.Application.Json
+                    MediaTypeNames.Application.Json,
+                    It.IsAny<CancellationToken>()
                 ))
-                .Callback<IBlobContainer, string, Stream, string>((_, _, stream, _) =>
+                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, _, stream, _, _) =>
                 {
                     // Convert captured stream to string
                     using var reader = new StreamReader(stream);
@@ -789,7 +789,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         public async Task GetLegacy_PermalinkNotFound()
         {
             var service = BuildService();
-            var result = await service.GetLegacy(id: Guid.NewGuid());
+            var result = await service.GetLegacy(permalinkId: Guid.NewGuid());
 
             result.AssertNotFound();
         }
@@ -1502,7 +1502,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         public async Task LegacyDownloadCsvToStream_PermalinkNotFound()
         {
             var service = BuildService();
-            var result = await service.LegacyDownloadCsvToStream(id: Guid.NewGuid(), new MemoryStream());
+            var result = await service.LegacyDownloadCsvToStream(permalinkId: Guid.NewGuid(), new MemoryStream());
 
             result.AssertNotFound();
         }
@@ -1549,6 +1549,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             ITableBuilderService? tableBuilderService = null,
             IPermalinkCsvMetaService? permalinkCsvMetaService = null,
             IBlobStorageService? blobStorageService = null,
+            IFrontendService? frontendService = null,
             IReleaseRepository? releaseRepository = null,
             ISubjectRepository? subjectRepository = null,
             IPublicationRepository? publicationRepository = null)
@@ -1560,13 +1561,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict),
                 permalinkCsvMetaService ?? Mock.Of<IPermalinkCsvMetaService>(Strict),
                 blobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
+                frontendService ?? Mock.Of<IFrontendService>(Strict),
                 subjectRepository ?? Mock.Of<ISubjectRepository>(Strict),
                 publicationRepository ?? new PublicationRepository(contentDbContext),
                 releaseRepository ?? Mock.Of<IReleaseRepository>(Strict),
-                MapperUtils.MapperForProfile<MappingProfiles>(),
-                Mock.Of<IPersistenceHelper<ContentDbContext>>(Strict),
-                Mock.Of<HttpClient>(Strict),
-                Mock.Of<ILogger<PermalinkService>>(Strict)
+                MapperUtils.MapperForProfile<MappingProfiles>()
             );
         }
     }
