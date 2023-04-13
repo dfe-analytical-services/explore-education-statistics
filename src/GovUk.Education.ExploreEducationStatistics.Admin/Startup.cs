@@ -613,14 +613,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<AuthorizationHandlerResourceRoleService>();
             services.AddScoped<DateTimeProvider>();
 
-            // TODO EES-3755 Remove after Permalink snapshot migration work is complete
-            services.AddTransient<IPermalinkMigrationService, PermalinkMigrationService>(provider =>
-                new PermalinkMigrationService(
-                    storageQueueService: new StorageQueueService(
-                        Configuration.GetValue<string>("PublisherStorage"),
-                        new StorageInstanceCreationUtil()),
-                    userService: provider.GetRequiredService<IUserService>()));
-
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
 
