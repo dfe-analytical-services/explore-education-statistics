@@ -1108,7 +1108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _cacheKeyService
                 .CreateCacheKeyForDataBlock(releaseId, plan.Id)
-                .OnSuccessVoid(_cacheService.DeleteItem);
+                .OnSuccessVoid(_cacheService.DeleteItemAsync);
         }
 
         private static Guid ReplacementPlanOriginalId(TargetableReplacementViewModel plan)

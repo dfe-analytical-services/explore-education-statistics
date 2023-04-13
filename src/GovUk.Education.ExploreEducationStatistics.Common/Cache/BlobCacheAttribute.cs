@@ -41,16 +41,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 
         public override object? Get(ICacheKey cacheKey, Type returnType)
         {
-            // Blob cache requires an async call to blob storage, so allowing use of `Get` would inject async code into
-            // the sync attributed method.
-            throw new ArgumentException("The BlobCache attribute cannot be applied to sync methods");
-        }
+            if (cacheKey is IBlobCacheKey key)
+            {
+                var service = GetService();
 
-        public override void Set(ICacheKey cacheKey, object value)
-        {
-            // Blob cache requires an async call to blob storage, so allowing use of `Set` would inject async code into
-            // the sync attributed method.
-            throw new ArgumentException("The BlobCache attribute cannot be applied to sync methods");
+                if (service is null)
+                {
+                    return null;
+                }
+
+                return service.GetItem(key, returnType);
+            }
+
+            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
         }
 
         public override async Task<object?> GetAsync(ICacheKey cacheKey, Type returnType)
@@ -64,7 +67,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
                     return null;
                 }
 
-                return await service.GetItem(key, returnType);
+                return await service.GetItemAsync(key, returnType);
+            }
+
+            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+        }
+
+        public override void Set(ICacheKey cacheKey, object value)
+        {
+            if (cacheKey is IBlobCacheKey key)
+            {
+                var service = GetService();
+
+                if (service is null)
+                {
+                    return;
+                }
+
+                service.SetItem(key, value);
+
+                return;
             }
 
             throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
@@ -81,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
                     return;
                 }
 
-                await service.SetItem(key, value);
+                await service.SetItemAsync(key, value);
 
                 return;
             }

@@ -973,7 +973,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
 
             cacheService
-                .Setup(service => service.DeleteItem(new PrivateSubjectMetaCacheKey(releaseSubject.ReleaseId,
+                .Setup(service => service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseSubject.ReleaseId,
                     releaseSubject.SubjectId)))
                 .Returns(Task.CompletedTask);
 
@@ -1799,7 +1799,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
 
             cacheService
-                .Setup(service => service.DeleteItem(new PrivateSubjectMetaCacheKey(releaseSubject.ReleaseId,
+                .Setup(service => service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseSubject.ReleaseId,
                     releaseSubject.SubjectId)))
                 .Returns(Task.CompletedTask);
 

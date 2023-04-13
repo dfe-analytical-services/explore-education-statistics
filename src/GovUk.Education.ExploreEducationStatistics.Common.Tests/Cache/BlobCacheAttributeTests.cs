@@ -50,31 +50,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
         private static class TestMethods
         {
             [BlobCache(typeof(TestBlobCacheKey))]
-            public static async Task<TestValue> SingleParam(string param1)
+            public static async Task<TestValue> SingleParamAsync(string param1)
             {
                 return new();
             }
 
             [BlobCache(typeof(TestBlobCacheKey), ServiceName = "target")]
-            public static async Task<TestValue> SpecificCacheService(string param1)
+            public static async Task<TestValue> SpecificCacheServiceAsync(string param1)
             {
                 return new();
             }
 
             [BlobCache(null!)]
-            public static async Task<TestValue> NullKeyType()
+            public static async Task<TestValue> NullKeyTypeAsync()
             {
                 return new();
             }
 
             [BlobCache(typeof(object))]
-            public static async Task<TestValue> InvalidKeyType()
+            public static async Task<TestValue> InvalidKeyTypeAsync()
             {
                 return new();
             }
 
             [BlobCache(typeof(TestBlobCacheKey))]
-            public static TestValue SingleParamSync(string param1)
+            public static TestValue SingleParam(string param1)
             {
                 return new();
             }
@@ -83,51 +83,99 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
         // ReSharper enable UnusedParameter.Local
 
         [Fact]
-        public async Task CacheHit()
+        public void CacheHit()
         {
             var cacheKey = new TestBlobCacheKey("test");
             var expectedResult = new TestValue();
 
             _blobCacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-                .ReturnsAsync(expectedResult);
+                .Returns(expectedResult);
 
-            var result = await TestMethods.SingleParam("test");
+            var result = TestMethods.SingleParam("test");
 
             Assert.IsType<TestValue>(result);
             Assert.Equal(expectedResult, result);
 
             _blobCacheService.Verify(
-                s => s.GetItem(cacheKey, typeof(TestValue)), 
+                s => s.GetItem(cacheKey, typeof(TestValue)),
                 Times.Once);
         }
 
         [Fact]
-        public async Task CacheMiss()
+        public async Task CacheHitAsync()
+        {
+            var cacheKey = new TestBlobCacheKey("test");
+            var expectedResult = new TestValue();
+
+            _blobCacheService
+                .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
+                .ReturnsAsync(expectedResult);
+
+            var result = await TestMethods.SingleParamAsync("test");
+
+            Assert.IsType<TestValue>(result);
+            Assert.Equal(expectedResult, result);
+
+            _blobCacheService.Verify(
+                s => s.GetItemAsync(cacheKey, typeof(TestValue)), 
+                Times.Once);
+        }
+
+        [Fact]
+        public void CacheMiss()
         {
             var cacheKey = new TestBlobCacheKey("test");
 
             _blobCacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-                .ReturnsAsync(null);
+                .Returns(null);
 
             var args = new List<object>();
 
             _blobCacheService
-                .Setup(s => s.SetItem(cacheKey, Capture.In(args)))
-                .Returns(Task.CompletedTask);
+                .Setup(s => s.SetItem(cacheKey, Capture.In(args)));
 
-            var result = await TestMethods.SingleParam("test");
+            var result = TestMethods.SingleParam("test");;
 
             Assert.IsType<TestValue>(result);
             Assert.Equal(args[0], result);
 
             _blobCacheService.Verify(
-                s => s.GetItem(cacheKey, typeof(TestValue)), 
+                s => s.GetItem(cacheKey, typeof(TestValue)),
                 Times.Once);
 
             _blobCacheService.Verify(
-                s => s.SetItem(cacheKey, Capture.In(args)), 
+                s => s.SetItem(cacheKey, Capture.In(args)),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task CacheMissAsync()
+        {
+            var cacheKey = new TestBlobCacheKey("test");
+
+            _blobCacheService
+                .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
+                .ReturnsAsync(null);
+
+            var args = new List<object>();
+
+            _blobCacheService
+                .Setup(s => s.SetItemAsync(cacheKey, Capture.In(args)))
+                .Returns(Task.CompletedTask);
+
+            var result = await TestMethods.SingleParamAsync("test");
+
+            Assert.IsType<TestValue>(result);
+            Assert.Equal(args[0], result);
+
+            _blobCacheService.Verify(
+                s => s.GetItemAsync(cacheKey, typeof(TestValue)), 
+                Times.Once);
+
+            _blobCacheService.Verify(
+                s => s.SetItemAsync(cacheKey, Capture.In(args)), 
                 Times.Once);
         }
 
@@ -141,16 +189,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             var cacheKey = new TestBlobCacheKey("test");
 
             targetBlobCacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
+                .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
                 .ReturnsAsync(null);
 
             var args = new List<object>();
 
             targetBlobCacheService
-                .Setup(s => s.SetItem(cacheKey, Capture.In(args)))
+                .Setup(s => s.SetItemAsync(cacheKey, Capture.In(args)))
                 .Returns(Task.CompletedTask);
 
-            var result = await TestMethods.SpecificCacheService("test");
+            var result = await TestMethods.SpecificCacheServiceAsync("test");
 
             VerifyAllMocks(_blobCacheService, targetBlobCacheService);
 
@@ -163,7 +211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
         {
             BlobCacheAttribute.ClearServices();
 
-            var result = await TestMethods.SingleParam("test");
+            var result = await TestMethods.SingleParamAsync("test");
 
             VerifyAllMocks(_blobCacheService);
 
@@ -173,7 +221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
         [Fact]
         public async Task NullCacheKeyType()
         {
-            var exception = await Assert.ThrowsAsync<ArgumentException>(TestMethods.NullKeyType);
+            var exception = await Assert.ThrowsAsync<ArgumentException>(TestMethods.NullKeyTypeAsync);
 
             Assert.Equal($"Cache key type cannot be null", exception.Message);
         }
@@ -181,19 +229,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
         [Fact]
         public async Task InvalidKeyType()
         {
-            var exception = await Assert.ThrowsAsync<ArgumentException>(TestMethods.InvalidKeyType);
+            var exception = await Assert.ThrowsAsync<ArgumentException>(TestMethods.InvalidKeyTypeAsync);
 
             Assert.Equal(
                 $"Cache key type {typeof(object).FullName} must be assignable to {typeof(IBlobCacheKey).GetPrettyFullName()}",
                 exception.Message
             );
-        }
-
-        [Fact]
-        public void CannotApplyToSyncMethod()
-        {
-            var exception = Assert.Throws<ArgumentException>(() => TestMethods.SingleParamSync("test"));
-            Assert.Equal("The BlobCache attribute cannot be applied to sync methods", exception.Message);
         }
     }
 }

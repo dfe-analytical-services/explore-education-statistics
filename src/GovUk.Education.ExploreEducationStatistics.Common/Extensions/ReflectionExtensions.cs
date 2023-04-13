@@ -58,7 +58,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                         break;
 
                     case "Task":
-                        throw new ArgumentException("Should never need to box a Task");
+                        var task = typeof(Task).GetMethod("FromResult")
+                            ?.MakeGenericMethod(boxType.GenericTypeArguments)
+                            .Invoke(null, new[] { boxedValue });
+
+                        boxedValue = task;
+                        break;
 
                     case "Either":
                         var eitherType = typeof(Either<,>).MakeGenericType(boxType.GenericTypeArguments);
@@ -95,7 +100,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 
                 if (result is Task)
                 {
-                    throw new ArgumentException("Should never need to unbox a Task");
+                    // TODO: EES-4268 Create async variant of this method
+                    throw new ArgumentException("Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.");
                 }
 
                 var resultType = result.GetType();

@@ -92,7 +92,6 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         var result = TestMethods.SingleParam("test");
 
-        Assert.IsType<TestValue>(result);
         Assert.Equal(expectedResult, result);
 
         _memoryCacheService.Verify(
@@ -122,7 +121,6 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         var result = TestMethods.SingleParam("test");
 
-        Assert.IsType<TestValue>(result);
         Assert.Equal(args[0], result);
 
         _memoryCacheService.Verify(
@@ -156,7 +154,6 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         var result = TestMethods.DefaultCacheConfig("test");
 
-        Assert.IsType<TestValue>(result);
         Assert.Equal(args[0], result);
 
         _memoryCacheService.Verify(
@@ -197,7 +194,6 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         VerifyAllMocks(_memoryCacheService, targetMemoryCacheService);
 
-        Assert.IsType<TestValue>(result);
         Assert.Equal(args[0], result);
     }
 
@@ -234,7 +230,6 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         VerifyAllMocks(_memoryCacheService);
 
-        Assert.IsType<TestValue>(result);
         Assert.Equal(args[0], result);
     }
 
@@ -272,7 +267,6 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         VerifyAllMocks(_memoryCacheService);
 
-        Assert.IsType<TestValue>(result);
         Assert.Equal(args[0], result);
     }
 
@@ -312,7 +306,6 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         VerifyAllMocks(_memoryCacheService);
 
-        Assert.IsType<TestValue>(result);
         Assert.Equal(args[0], result);
     }
 
@@ -361,7 +354,6 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         var result = await TestMethods.SingleParamAsync("test");
 
-        Assert.IsType<TestValue>(result);
         Assert.Equal(expectedResult, result);
 
         _memoryCacheService.Verify(
@@ -395,7 +387,6 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         var result = await TestMethods.SingleParamAsync("test");
 
-        Assert.IsType<TestValue>(result);
         Assert.Equal(args[0], result);
 
         _memoryCacheService.Verify(
