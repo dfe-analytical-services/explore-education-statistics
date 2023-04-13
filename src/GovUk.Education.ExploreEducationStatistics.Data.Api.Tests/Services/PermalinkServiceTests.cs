@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         private readonly Guid _publicationId = Guid.NewGuid();
 
         [Fact]
-        public async Task Create_LatestPublishedReleaseForSubjectNotFound()
+        public async Task CreateLegacy_LatestPublishedReleaseForSubjectNotFound()
         {
             var request = new PermalinkCreateRequest
             {
@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
-        public async Task Create_UploadsPermalink_WithoutReleaseId()
+        public async Task CreateLegacy_UploadsPermalink_WithoutReleaseId()
         {
             var subject = new Subject
             {
@@ -215,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
-        public async Task Create_UploadsPermalink_WithReleaseId()
+        public async Task CreateLegacy_UploadsPermalink_WithReleaseId()
         {
             var subjectId = Guid.NewGuid();
 
@@ -323,7 +323,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
-        public async Task Create_SavesPermalink()
+        public async Task CreateLegacy_SavesPermalink()
         {
             var subject = new Subject
             {
@@ -404,9 +404,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                         },
                         new()
                         {
-                        Label = "A label",
-                        Name = "A name",
-                        Value = Guid.NewGuid()
+                            Label = "A label",
+                            Name = "A name",
+                            Value = Guid.NewGuid()
                         }
                     },
                     Locations = new Dictionary<string, List<LocationAttributeViewModel>>
@@ -555,6 +555,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 // Verify details of the created permalink have been saved
                 var permalink = contentDbContext.Permalinks.Single(permalink => permalink.Id == expectedPermalinkId);
+                Assert.True(permalink.Legacy);
                 Assert.InRange(DateTime.UtcNow.Subtract(permalink.Created).Milliseconds, 0, 1500);
                 Assert.Equal("Test publication", permalink.PublicationTitle);
                 Assert.Equal("Test data set", permalink.DataSetTitle);
@@ -576,7 +577,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
-        public async Task Get()
+        public async Task GetLegacy()
         {
             var release = new Release
             {
@@ -595,9 +596,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var subjectId = Guid.NewGuid();
 
-            var permalink = new LegacyPermalink(
-                Guid.NewGuid(),
-                DateTime.UtcNow,
+            var permalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                Created = DateTime.UtcNow,
+                Legacy = true
+            };
+
+            var permalinkForSerialization = new LegacyPermalink(
+                permalink.Id,
+                permalink.Created,
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -613,11 +621,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
                 path: permalink.Id.ToString(),
-                blobText: JsonConvert.SerializeObject(permalink));
+                blobText: JsonConvert.SerializeObject(permalinkForSerialization));
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                await contentDbContext.Permalinks.AddAsync(permalink);
                 await contentDbContext.Publications.AddAsync(publication);
                 await contentDbContext.Releases.AddAsync(release);
                 await contentDbContext.ReleaseFiles.AddRangeAsync(
@@ -651,7 +660,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
-        public async Task Get_LegacyLocationsFieldIsTransformed()
+        public async Task GetLegacy_LegacyLocationsFieldIsTransformed()
         {
             var releaseId = Guid.NewGuid();
 
@@ -687,9 +696,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var permalink = new LegacyPermalink(
-                Guid.NewGuid(),
-                DateTime.UtcNow,
+            var permalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                Created = DateTime.UtcNow,
+                Legacy = true
+            };
+
+            var permalinkForSerialization = new LegacyPermalink(
+                permalink.Id,
+                permalink.Created,
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -701,7 +717,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 });
 
             // Set the legacy locations field on the Permalink table subject meta
-            var permalinkJsonObject = JObject.FromObject(permalink);
+            var permalinkJsonObject = JObject.FromObject(permalinkForSerialization);
             var subjectMetaJsonObject = permalinkJsonObject.SelectToken("FullTable.SubjectMeta") as JObject;
             var legacyLocationsJsonArray = JArray.FromObject(legacyLocations);
             subjectMetaJsonObject!.Add("Locations", legacyLocationsJsonArray);
@@ -716,6 +732,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                await contentDbContext.Permalinks.AddAsync(permalink);
                 await contentDbContext.ReleaseFiles.AddRangeAsync(
                     new ReleaseFile
                     {
@@ -766,31 +783,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
-        public async Task Get_PermalinkNotFound()
+        public async Task GetLegacy_PermalinkNotFound()
         {
-            var permalinkId = Guid.NewGuid();
-
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
-
-            blobStorageService.SetupDownloadBlobTextNotFound(
-                container: Permalinks,
-                path: permalinkId.ToString());
-
-            var service = BuildService(blobStorageService: blobStorageService.Object);
-            var result = await service.GetLegacy(permalinkId);
-
-            MockUtils.VerifyAllMocks(
-                blobStorageService);
+            var service = BuildService();
+            var result = await service.GetLegacy(id: Guid.NewGuid());
 
             result.AssertNotFound();
         }
 
         [Fact]
-        public async Task Get_SubjectNotFound()
+        public async Task GetLegacy_BlobNotFound()
         {
-            var permalink = new LegacyPermalink(
-                Guid.NewGuid(),
-                DateTime.UtcNow,
+            var permalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                Created = DateTime.UtcNow,
+                Legacy = true
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Permalinks.AddAsync(permalink);
+
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+
+            blobStorageService.SetupDownloadBlobTextNotFound(
+                container: Permalinks,
+                path: permalink.Id.ToString());
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildService(contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object);
+
+                var result = await service.GetLegacy(permalink.Id);
+
+                MockUtils.VerifyAllMocks(blobStorageService);
+
+                result.AssertNotFound();
+            }
+        }
+
+        [Fact]
+        public async Task GetLegacy_SubjectNotFound()
+        {
+            var permalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                Created = DateTime.UtcNow,
+                Legacy = true
+            };
+
+            var permalinkForSerialization = new LegacyPermalink(
+                permalink.Id,
+                permalink.Created,
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -806,9 +856,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
                 path: permalink.Id.ToString(),
-                blobText: JsonConvert.SerializeObject(permalink));
+                blobText: JsonConvert.SerializeObject(permalinkForSerialization));
 
             var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Permalinks.AddAsync(permalink);
+                await contentDbContext.SaveChangesAsync();
+            }
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildService(
@@ -825,7 +881,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
-        public async Task Get_SubjectIsForMultipleVersions()
+        public async Task GetLegacy_SubjectIsForMultipleVersions()
         {
             var previousVersion = new Release
             {
@@ -855,9 +911,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var subjectId = Guid.NewGuid();
 
-            var permalink = new LegacyPermalink(
-                Guid.NewGuid(),
-                DateTime.UtcNow,
+            var permalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                Created = DateTime.UtcNow,
+                Legacy = true
+            };
+
+            var permalinkForSerialization = new LegacyPermalink(
+                permalink.Id,
+                permalink.Created,
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -873,11 +936,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
                 path: permalink.Id.ToString(),
-                blobText: JsonConvert.SerializeObject(permalink));
+                blobText: JsonConvert.SerializeObject(permalinkForSerialization));
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                await contentDbContext.Permalinks.AddAsync(permalink);
                 await contentDbContext.Publications.AddAsync(publication);
                 await contentDbContext.Releases.AddRangeAsync(previousVersion, latestVersion);
                 await contentDbContext.ReleaseFiles.AddRangeAsync(
@@ -919,7 +983,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
-        public async Task Get_SubjectIsNotForLatestRelease_OlderByYear()
+        public async Task GetLegacy_SubjectIsNotForLatestRelease_OlderByYear()
         {
             var release = new Release
             {
@@ -947,9 +1011,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var subjectId = Guid.NewGuid();
 
-            var permalink = new LegacyPermalink(
-                Guid.NewGuid(),
-                DateTime.UtcNow,
+            var permalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                Created = DateTime.UtcNow,
+                Legacy = true
+            };
+
+            var permalinkForSerialization = new LegacyPermalink(
+                permalink.Id,
+                permalink.Created,
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -965,11 +1036,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
                 path: permalink.Id.ToString(),
-                blobText: JsonConvert.SerializeObject(permalink));
+                blobText: JsonConvert.SerializeObject(permalinkForSerialization));
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                await contentDbContext.Permalinks.AddAsync(permalink);
                 await contentDbContext.Publications.AddAsync(publication);
                 await contentDbContext.Releases.AddRangeAsync(release, latestRelease);
                 await contentDbContext.ReleaseFiles.AddRangeAsync(
@@ -1002,7 +1074,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
-        public async Task Get_SubjectIsNotForLatestRelease_OlderByTimePeriod()
+        public async Task GetLegacy_SubjectIsNotForLatestRelease_OlderByTimePeriod()
         {
             var release = new Release
             {
@@ -1030,9 +1102,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var subjectId = Guid.NewGuid();
 
-            var permalink = new LegacyPermalink(
-                Guid.NewGuid(),
-                DateTime.UtcNow,
+            var permalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                Created = DateTime.UtcNow,
+                Legacy = true
+            };
+
+            var permalinkForSerialization = new LegacyPermalink(
+                permalink.Id,
+                permalink.Created,
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -1048,11 +1127,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
                 path: permalink.Id.ToString(),
-                blobText: JsonConvert.SerializeObject(permalink));
+                blobText: JsonConvert.SerializeObject(permalinkForSerialization));
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                await contentDbContext.Permalinks.AddAsync(permalink);
                 await contentDbContext.Publications.AddAsync(publication);
                 await contentDbContext.Releases.AddRangeAsync(release, latestRelease);
                 await contentDbContext.ReleaseFiles.AddRangeAsync(
@@ -1085,7 +1165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
-        public async Task Get_SubjectIsNotForLatestVersion()
+        public async Task GetLegacy_SubjectIsNotForLatestVersion()
         {
             var previousVersion = new Release
             {
@@ -1115,9 +1195,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var subjectId = Guid.NewGuid();
 
-            var permalink = new LegacyPermalink(
-                Guid.NewGuid(),
-                DateTime.UtcNow,
+            var permalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                Created = DateTime.UtcNow,
+                Legacy = true
+            };
+
+            var permalinkForSerialization = new LegacyPermalink(
+                permalink.Id,
+                permalink.Created,
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -1133,11 +1220,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
                 path: permalink.Id.ToString(),
-                blobText: JsonConvert.SerializeObject(permalink));
+                blobText: JsonConvert.SerializeObject(permalinkForSerialization));
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                await contentDbContext.Permalinks.AddAsync(permalink);
                 await contentDbContext.Publications.AddAsync(publication);
                 await contentDbContext.Releases.AddRangeAsync(previousVersion, latestVersion);
                 await contentDbContext.ReleaseFiles.AddRangeAsync(
@@ -1170,7 +1258,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
-        public async Task Get_SubjectIsFromSupersededPublication()
+        public async Task GetLegacy_SubjectIsFromSupersededPublication()
         {
             var release = new Release
             {
@@ -1193,9 +1281,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var subjectId = Guid.NewGuid();
 
-            var permalink = new LegacyPermalink(
-                Guid.NewGuid(),
-                DateTime.UtcNow,
+            var permalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                Created = DateTime.UtcNow,
+                Legacy = true
+            };
+
+            var permalinkForSerialization = new LegacyPermalink(
+                permalink.Id,
+                permalink.Created,
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
@@ -1211,11 +1306,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
                 path: permalink.Id.ToString(),
-                blobText: JsonConvert.SerializeObject(permalink));
+                blobText: JsonConvert.SerializeObject(permalinkForSerialization));
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                await contentDbContext.Permalinks.AddAsync(permalink);
                 await contentDbContext.Publications.AddAsync(publication);
                 await contentDbContext.Releases.AddAsync(release);
                 await contentDbContext.ReleaseFiles.AddRangeAsync(
@@ -1248,7 +1344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
-        public async Task DownloadCsvToStream()
+        public async Task LegacyDownloadCsvToStream()
         {
             var subject = _fixture.DefaultSubject().Generate();
 
@@ -1302,9 +1398,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     .SetTimePeriod(2023, AcademicYear))
                 .GenerateList(8);
 
-            var permalink = new LegacyPermalink
+            var permalink = new Permalink
             {
                 Id = Guid.NewGuid(),
+                Created = DateTime.UtcNow,
+                Legacy = true
+            };
+
+            var permalinkForSerialization = new LegacyPermalink
+            {
+                Id = permalink.Id,
                 Query = new ObservationQueryContext
                 {
                     SubjectId = subject.Id
@@ -1350,53 +1453,92 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
                 path: permalink.Id.ToString(),
-                blobText: JsonConvert.SerializeObject(permalink));
+                blobText: JsonConvert.SerializeObject(permalinkForSerialization));
 
             var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(Strict);
 
             permalinkCsvMetaService
                 .Setup(s => s
                     .GetCsvMeta(
-                        It.Is<LegacyPermalink>(p => p.IsDeepEqualTo(permalink)),
+                        It.Is<LegacyPermalink>(p => p.IsDeepEqualTo(permalinkForSerialization)),
                         default))
                 .ReturnsAsync(csvMeta);
 
-            var service = BuildService(
-                blobStorageService: blobStorageService.Object,
-                permalinkCsvMetaService: permalinkCsvMetaService.Object
-            );
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Permalinks.AddAsync(permalink);
 
-            using var stream = new MemoryStream();
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var result = await service.LegacyDownloadCsvToStream(permalink.Id, stream);
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                using var stream = new MemoryStream();
 
-            MockUtils.VerifyAllMocks(blobStorageService, permalinkCsvMetaService);
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object,
+                    permalinkCsvMetaService: permalinkCsvMetaService.Object
+                );
 
-            result.AssertRight();
+                var result = await service.LegacyDownloadCsvToStream(permalink.Id, stream);
 
-            stream.Seek(0L, SeekOrigin.Begin);
-            var csv = stream.ReadToEnd();
+                MockUtils.VerifyAllMocks(blobStorageService, permalinkCsvMetaService);
 
-            Snapshot.Match(csv);
+                result.AssertRight();
+
+                stream.Seek(0L, SeekOrigin.Begin);
+                var csv = stream.ReadToEnd();
+
+                Snapshot.Match(csv);
+            }
         }
 
         [Fact]
-        public async Task DownloadCsvToStream_BlobNotFound()
+        public async Task LegacyDownloadCsvToStream_PermalinkNotFound()
         {
-            var permalinkId = Guid.NewGuid();
+            var service = BuildService();
+            var result = await service.LegacyDownloadCsvToStream(id: Guid.NewGuid(), new MemoryStream());
+
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task LegacyDownloadCsvToStream_BlobNotFound()
+        {
+            var permalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                Created = DateTime.UtcNow,
+                Legacy = true
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Permalinks.AddAsync(permalink);
+
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService.SetupDownloadBlobTextNotFound(
                 container: Permalinks,
-                path: permalinkId.ToString());
+                path: permalink.Id.ToString());
 
-            var service = BuildService(blobStorageService: blobStorageService.Object);
-            var result = await service.LegacyDownloadCsvToStream(permalinkId, new MemoryStream());
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildService(contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object);
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+                var result = await service.LegacyDownloadCsvToStream(permalink.Id, new MemoryStream());
 
-            result.AssertNotFound();
+                MockUtils.VerifyAllMocks(blobStorageService);
+
+                result.AssertNotFound();
+            }
         }
 
         private static PermalinkService BuildService(
