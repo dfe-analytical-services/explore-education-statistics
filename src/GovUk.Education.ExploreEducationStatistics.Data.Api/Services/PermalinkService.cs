@@ -303,33 +303,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         // TODO EES-3755 Remove after Permalink snapshot work is complete
-        private async Task<Either<ActionResult, LegacyPermalink>> FindLegacy(
+        private Task<Either<ActionResult, LegacyPermalink>> FindLegacy(
             Guid permalinkId,
             CancellationToken cancellationToken)
         {
-            return await _contentDbContext.Permalinks
+            return _contentDbContext.Permalinks
                 .SingleOrNotFoundAsync(
                     predicate: permalink => permalink.Id == permalinkId &&
                                             permalink.Legacy == true,
                     cancellationToken: cancellationToken)
-                .OnSuccess<ActionResult, Permalink, LegacyPermalink>(async () =>
-                {
-                    try
-                    {
-                        var text = await _blobStorageService.DownloadBlobText(
-                            containerName: BlobContainers.Permalinks,
-                            path: permalinkId.ToString(),
-                            cancellationToken: cancellationToken);
-
-                        return JsonConvert.DeserializeObject<LegacyPermalink>(
-                            value: text,
-                            settings: BuildJsonSerializerSettings())!;
-                    }
-                    catch (FileNotFoundException)
-                    {
-                        return new NotFoundResult();
-                    }
-                });
+                .OnSuccess(() => DownloadLegacyPermalink(permalinkId, cancellationToken));
         }
 
         // TODO EES-3755 Remove after Permalink snapshot work is complete
@@ -486,6 +469,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
 
             return PermalinkStatus.Current;
+        }
+
+        private async Task<Either<ActionResult, LegacyPermalink>> DownloadLegacyPermalink(Guid permalinkId,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject<LegacyPermalink>(
+                    value: await _blobStorageService.DownloadBlobText(
+                        containerName: BlobContainers.Permalinks,
+                        path: permalinkId.ToString(),
+                        cancellationToken: cancellationToken),
+                    settings: BuildJsonSerializerSettings())!;
+            }
+            catch (FileNotFoundException)
+            {
+                return new NotFoundResult();
+            }
         }
 
         private Task UploadSnapshot(Permalink permalink,
