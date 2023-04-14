@@ -137,7 +137,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     var subjectMeta = tableResult.SubjectMeta;
                     var permalink = new Permalink
                     {
-                        Legacy = false,
                         ReleaseId = releaseId,
                         SubjectId = request.Query.SubjectId,
                         PublicationTitle = subjectMeta.PublicationName,
@@ -150,39 +149,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         CountTimePeriods = subjectMeta.TimePeriodRange.Count,
                         Table = universalTable
                     };
-
                     _contentDbContext.Permalinks.Add(permalink);
-
-                    // Upload table CSV
-                    await using var csvStream = new MemoryStream();
-                    await using var csvWriter = new CsvWriter(new StreamWriter(csvStream, leaveOpen: true),
-                        CultureInfo.InvariantCulture);
-                    await WriteCsvHeaderRow(csvWriter, csvMeta);
-                    await WriteCsvRows(csvWriter, tableResult.Results.ToList(), csvMeta, cancellationToken);
-                    await csvWriter.FlushAsync();
-
-                    await _blobStorageService.UploadStream(
-                        containerName: BlobContainers.PermalinkSnapshots,
-                        path: $"{permalink.Id}.csv",
-                        stream: csvStream,
-                        contentType: "text/csv",
-                        cancellationToken: cancellationToken
-                    );
-
-                    // Upload table json
-                    await using var tableStream = new MemoryStream();
-                    await using var jsonWriter = new JsonTextWriter(new StreamWriter(tableStream, leaveOpen: true));
-                    JsonSerializer.CreateDefault().Serialize(jsonWriter, permalink.Table);
-                    await jsonWriter.FlushAsync(cancellationToken);
-
-                    await _blobStorageService.UploadStream(
-                        containerName: BlobContainers.PermalinkSnapshots,
-                        path: $"{permalink.Id}.json",
-                        stream: tableStream,
-                        contentType: MediaTypeNames.Application.Json,
-                        cancellationToken: cancellationToken
-                    );
-
+                    await UploadSnapshot(permalink, tableResult.Results.ToList(), csvMeta, cancellationToken);
                     await _contentDbContext.SaveChangesAsync(cancellationToken);
                     return await BuildViewModel(permalink);
                 });
@@ -518,6 +486,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
 
             return PermalinkStatus.Current;
+        }
+
+        private Task UploadSnapshot(Permalink permalink,
+            List<ObservationViewModel> observations,
+            PermalinkCsvMetaViewModel csvMeta,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.WhenAll(
+                UploadTableCsv(permalink, observations, csvMeta, cancellationToken),
+                UploadTableJson(permalink, cancellationToken)
+            );
+        }
+
+        private async Task UploadTableCsv(Permalink permalink,
+            List<ObservationViewModel> observations,
+            PermalinkCsvMetaViewModel csvMeta,
+            CancellationToken cancellationToken = default)
+        {
+            await using var csvStream = new MemoryStream();
+            await using var csvWriter = new CsvWriter(new StreamWriter(csvStream, leaveOpen: true),
+                CultureInfo.InvariantCulture);
+            await WriteCsvHeaderRow(csvWriter, csvMeta);
+            await WriteCsvRows(csvWriter, observations, csvMeta, cancellationToken);
+            await csvWriter.FlushAsync();
+
+            await _blobStorageService.UploadStream(
+                containerName: BlobContainers.PermalinkSnapshots,
+                path: $"{permalink.Id}.csv",
+                stream: csvStream,
+                contentType: "text/csv",
+                cancellationToken: cancellationToken
+            );
+        }
+
+        private async Task UploadTableJson(Permalink permalink,
+            CancellationToken cancellationToken = default)
+        {
+            await using var tableStream = new MemoryStream();
+            await using var jsonWriter = new JsonTextWriter(new StreamWriter(tableStream, leaveOpen: true));
+            JsonSerializer.CreateDefault().Serialize(jsonWriter, permalink.Table);
+            await jsonWriter.FlushAsync(cancellationToken);
+
+            await _blobStorageService.UploadStream(
+                containerName: BlobContainers.PermalinkSnapshots,
+                path: $"{permalink.Id}.json",
+                stream: tableStream,
+                contentType: MediaTypeNames.Application.Json,
+                cancellationToken: cancellationToken
+            );
         }
     }
 
