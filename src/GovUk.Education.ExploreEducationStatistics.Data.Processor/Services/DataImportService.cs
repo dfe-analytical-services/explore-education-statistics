@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var import = await contentDbContext.DataImports.SingleAsync(import => import.Id == id);
             contentDbContext.Update(import);
 
-            import.ImportedRows = importedRows;
+            import.ExpectedImportedRows = importedRows;
             import.TotalRows = totalRows;
             import.GeographicLevels = geographicLevels;
 

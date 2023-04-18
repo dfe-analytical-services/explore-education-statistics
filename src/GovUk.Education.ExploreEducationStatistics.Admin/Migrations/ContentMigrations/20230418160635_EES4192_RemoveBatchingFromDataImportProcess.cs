@@ -1,0 +1,57 @@
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
+{
+    public partial class EES4192_RemoveBatchingFromDataImportProcess : Migration
+    {
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropColumn(
+                name: "NumBatches",
+                table: "DataImports");
+
+            migrationBuilder.DropColumn(
+                name: "RowsPerBatch",
+                table: "DataImports");
+
+            migrationBuilder.RenameColumn(
+                name: "ImportedRows",
+                table: "DataImports",
+                newName: "ExpectedImportedRows");
+            
+            migrationBuilder.AddColumn<int>(
+                name: "ImportedRows",
+                table: "DataImports",
+                type: "int",
+                nullable: true);
+        }
+
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropColumn(
+                name: "ImportedRows",
+                table: "DataImports");
+            
+            migrationBuilder.RenameColumn(
+                name: "ExpectedImportedRows",
+                table: "DataImports",
+                newName: "ImportedRows");
+
+            migrationBuilder.AddColumn<int>(
+                name: "NumBatches",
+                table: "DataImports",
+                type: "int",
+                nullable: false,
+                defaultValue: 0);
+
+            migrationBuilder.AddColumn<int>(
+                name: "RowsPerBatch",
+                table: "DataImports",
+                type: "int",
+                nullable: false,
+                defaultValue: 0);
+        }
+    }
+}

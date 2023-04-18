@@ -174,7 +174,7 @@ public class ProcessorStage1Tests
             {
                 Assert.Equal(DataImportStatus.STAGE_2, dataImport.Status);
                 Assert.Equal(scenario.GetExpectedTotalRows(), dataImport.TotalRows);
-                Assert.Equal(scenario.GetExpectedTotalRows(), dataImport.ImportedRows);
+                Assert.Equal(scenario.GetExpectedTotalRows(), dataImport.ExpectedImportedRows);
             });
         }
     }

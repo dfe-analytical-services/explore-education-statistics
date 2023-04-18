@@ -126,11 +126,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var observationCount = context.Observation.Count(o => o.SubjectId.Equals(import.SubjectId));
 
-            if (!observationCount.Equals(import.ImportedRows))
+            if (!observationCount.Equals(import.ExpectedImportedRows))
             {
                 await _dataImportService.FailImport(import.Id,
                     $"Number of observations inserted ({observationCount}) " +
-                            $"does not equal that expected ({import.ImportedRows}) : Please delete & retry");
+                            $"does not equal that expected ({import.ExpectedImportedRows}) : Please delete & retry");
             }
             else
             {

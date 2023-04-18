@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
         {
             var import = new DataImport
             {
-                ImportedRows = 1,
+                ExpectedImportedRows = 1,
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             {
                 var updated = await contentDbContext.DataImports.SingleAsync(i => i.Id == import.Id);
 
-                Assert.Equal(5000, updated.ImportedRows);
+                Assert.Equal(5000, updated.ExpectedImportedRows);
                 Assert.Equal(10000, updated.TotalRows);
 
                 Assert.Equal(2, updated.GeographicLevels.Count);

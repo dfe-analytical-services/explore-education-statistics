@@ -51,6 +51,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         /// Note that this means "importable row count" rather than indicating the actual number of rows
         /// already imported.  This is effectively a count of rows that are not excluded from import.
         /// </summary>
+        public int? ExpectedImportedRows { get; set; }
+
+        /// <summary>
+        /// Note that this means "rows imported so far".  This is a running total as the importer inserts more
+        /// batches of CSV rows until complete.
+        /// </summary>
         public int? ImportedRows { get; set; }
 
         public HashSet<GeographicLevel> GeographicLevels { get; set; } = new();
