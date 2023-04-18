@@ -133,7 +133,7 @@ public static class CsvUtils
         bool skipHeaderRow = true)
     {
         var linesInBatch = new List<List<string>>();
-        var batchNumber = 1;
+        var batchIndex = 0;
         var rowsProcessed = 0;
         
         await ForEachRow(
@@ -145,14 +145,14 @@ public static class CsvUtils
 
                 if (lastLine || rowsProcessed % batchSize == 0)
                 {
-                    var result = await func.Invoke(linesInBatch, batchNumber);
+                    var result = await func.Invoke(linesInBatch, batchIndex);
 
                     if (!result)
                     {
                         return false;
                     }
 
-                    batchNumber++;
+                    batchIndex++;
                     linesInBatch.Clear();
                 }
 

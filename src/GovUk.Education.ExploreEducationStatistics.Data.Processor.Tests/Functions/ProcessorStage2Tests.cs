@@ -438,25 +438,20 @@ public class ProcessorStage2Tests
             Mock.Of<ILogger<ProcessorService>>(),
             blobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
             fileImportService ?? Mock.Of<IFileImportService>(Strict),
-            Mock.Of<ISplitFileService>(Strict),
             importerService ?? Mock.Of<IImporterService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             Mock.Of<IValidatorService>(Strict),
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
     }
-    
-    
 
     private static Processor.Functions.Processor BuildFunction(
         IProcessorService? processorService = null,
         IDataImportService? dataImportService = null)
     {
         return new Processor.Functions.Processor(
-            Mock.Of<IFileImportService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             processorService ?? Mock.Of<IProcessorService>(Strict),
-            Mock.Of<IDbContextSupplier>(),
             Mock.Of<ILogger<Processor.Functions.Processor>>());
     }
 }

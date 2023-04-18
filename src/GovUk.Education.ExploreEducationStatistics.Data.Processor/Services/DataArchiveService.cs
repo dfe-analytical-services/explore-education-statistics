@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task ExtractDataFiles(DataImport import)
         {
-            var path = import.ZipFile.Path();
+            var path = import.ZipFile!.Path();
 
             await using var zipBlobFileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, path);
             using var archive = new ZipArchive(zipBlobFileStream);
