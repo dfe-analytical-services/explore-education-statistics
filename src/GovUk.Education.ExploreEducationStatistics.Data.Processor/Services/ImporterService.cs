@@ -324,6 +324,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 importObservationsBatchSize,
                 async (batchOfRows, batchIndex) =>
                 {
+                    // TODO DW - ability to skip already imported rows even within a batch (if batch size changes via configuration)
                     _logger.LogDebug(
                         "Importing Observation batch {BatchNumber} of {TotalBatches}", 
                         batchIndex + 1, 
