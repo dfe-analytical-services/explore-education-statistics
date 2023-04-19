@@ -15,7 +15,6 @@ interface Props {
     attributes: Dictionary<string>,
   ) => Dictionary<string>;
   getGlossaryEntry?: (slug: string) => Promise<GlossaryEntry>;
-  trackContentLinks?: (url: string, newTab?: boolean) => void;
   trackGlossaryLinks?: (glossaryEntrySlug: string) => void;
 }
 
@@ -23,7 +22,6 @@ const ContentBlockRenderer = ({
   block,
   transformImageAttributes,
   getGlossaryEntry,
-  trackContentLinks,
   trackGlossaryLinks,
 }: Props) => {
   const { body = '', type } = block;
@@ -53,7 +51,6 @@ const ContentBlockRenderer = ({
           html={body}
           sanitizeOptions={sanitizeOptions}
           getGlossaryEntry={getGlossaryEntry}
-          trackContentLinks={trackContentLinks}
           trackGlossaryLinks={trackGlossaryLinks}
         />
       );

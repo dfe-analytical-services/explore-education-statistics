@@ -5,6 +5,7 @@ import Link from '@frontend/components/Link';
 import { NextPage } from 'next';
 
 const CookiesPage: NextPage = () => {
+  const trackingId = process.env.GA_TRACKING_ID.replace('G-', '');
   return (
     <Page
       title="Details about cookies"
@@ -91,11 +92,12 @@ const CookiesPage: NextPage = () => {
               <td>24 hours</td>
             </tr>
             <tr>
-              <td>_gat</td>
+              <td>_ga_{trackingId}</td>
               <td>
-                Used to manage the rate at which page view requests are made
+                Used by Google Analytics to find and track an individual session
+                with your device
               </td>
-              <td>1 minute</td>
+              <td>2 years</td>
             </tr>
           </tbody>
         </table>
