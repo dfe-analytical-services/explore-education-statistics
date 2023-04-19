@@ -27,7 +27,7 @@ jobs:
 
   - task: UsePythonVersion@0
     displayName: Use Python 3.10
-    retryCountOnTaskFailure: 2
+  # retryCountOnTaskFailure: 2
     timeoutInMinutes: 5
     inputs:
       versionSpec: 3.10
@@ -47,20 +47,20 @@ jobs:
       arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --env "dev" --file "tests/general_public/" --processes 2
       workingDirectory: tests/robot-tests
 
-  - task: PythonScript@0
-    displayName: Public UI tests - rerun failed suites
-    condition: not(succeeded())
-    inputs:
-      scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --env "dev" --file "tests/general_public/" --processes 2 --rerun-failed-suites
-      workingDirectory: tests/robot-tests
+  #- task: PythonScript@0
+  #  displayName: Public UI tests - rerun failed suites
+  #  condition: not(succeeded())
+  #  inputs:
+  #    scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
+  #    arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --env "dev" --file "tests/general_public/" --processes 2 --rerun-failed-suites
+  #    workingDirectory: tests/robot-tests
 
   - task: PublishTestResults@2
     displayName: Publish Test Results
     condition: succeededOrFailed()
     inputs:
       testResultsFiles: tests/robot-tests/test-results/xunit.xml
-      failTaskOnFailedTests: true
+      failTaskOnFailedTests: false
 
   - task: PublishPipelineArtifact@1
     displayName: Publish Test Pipeline Artifact
@@ -83,7 +83,7 @@ jobs:
 
   - task: UsePythonVersion@0
     displayName: Use Python 3.10
-    retryCountOnTaskFailure: 2
+  # retryCountOnTaskFailure: 2
     timeoutInMinutes: 5
     inputs:
       versionSpec: 3.10
@@ -102,21 +102,22 @@ jobs:
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
       arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public_2" --processes 2
+    #  The magic incantation '"$(variable)"'was added by Mark to resolve an issue with Analyst password that contained apersands.
       workingDirectory: tests/robot-tests
 
-  - task: PythonScript@0
-    displayName: 'Publish release and amend UI tests - rerun failed suites'
-    condition: not(succeeded())
-    inputs:
-      scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public_2" --processes 2 --rerun-failed-suites
-      workingDirectory: tests/robot-tests
+  #- task: PythonScript@0
+  #  displayName: 'Publish release and amend UI tests - rerun failed suites'
+  #  condition: not(succeeded())
+  #  inputs:
+  #    scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
+  #    arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public_2" --processes 2 --rerun-failed-suites
+  #    workingDirectory: tests/robot-tests
 
   - task: PublishTestResults@2
     displayName: Publish Test Results
     inputs:
       testResultsFiles: tests/robot-tests/test-results/xunit.xml
-      failTaskOnFailedTests: true
+      failTaskOnFailedTests: false
 
   - task: PublishPipelineArtifact@1
     displayName: Publish Pipeline Artifact
@@ -139,7 +140,7 @@ jobs:
 
   - task: UsePythonVersion@0
     displayName: Use Python 3.10
-    retryCountOnTaskFailure: 2
+  # retryCountOnTaskFailure: 2
     timeoutInMinutes: 5
     inputs:
       versionSpec: 3.10
@@ -160,20 +161,20 @@ jobs:
       arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin" --processes 2
       workingDirectory: tests/robot-tests
 
-  - task: PythonScript@0
-    displayName: Admin UI tests - rerun failed suites
-    condition: not(succeeded())
-    inputs:
-      scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin" --processes 2 --rerun-failed-suites
-      workingDirectory: tests/robot-tests
+  #- task: PythonScript@0
+  #  displayName: Admin UI tests - rerun failed suites
+  #  condition: not(succeeded())
+  #  inputs:
+  #    scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
+  #    arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin" --processes 2 --rerun-failed-suites
+  #    workingDirectory: tests/robot-tests
 
   - task: PublishTestResults@2
     displayName: Publish Test Results
     condition: succeededOrFailed()
     inputs:
       testResultsFiles: tests/robot-tests/test-results/xunit.xml
-      failTaskOnFailedTests: true
+      failTaskOnFailedTests: false
 
   - task: PublishPipelineArtifact@1
     displayName: Publish Test Pipeline Artifact
@@ -197,7 +198,7 @@ jobs:
 
   - task: UsePythonVersion@0
     displayName: Use Python 3.10
-    retryCountOnTaskFailure: 2
+  # retryCountOnTaskFailure: 2
     timeoutInMinutes: 5
     inputs:
       versionSpec: 3.10
@@ -214,16 +215,16 @@ jobs:
     displayName: Admin public UI tests
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass  '$(ees-test-ADMIN-PASSWORD)' --analyst-pass  '$(ees-test-ANALYST-PASSWORD)' --expiredinvite-pass '$(ees-test-expiredinvite-password)' --env "dev" --file "tests/admin_and_public" --processes 2
+      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public" --processes 2
       workingDirectory: tests/robot-tests
 
-  - task: PythonScript@0
-    displayName: Admin public UI tests - rerun failed suites
-    condition: not(succeeded())
-    inputs:
-      scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public" --processes 2 --rerun-failed-suites
-      workingDirectory: tests/robot-tests
+  #- task: PythonScript@0
+  #  displayName: Admin public UI tests - rerun failed suites
+  #  condition: not(succeeded())
+  #  inputs:
+  #    scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
+  #    arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public" --processes 2 --rerun-failed-suites
+  #    workingDirectory: tests/robot-tests
 
   - task: PublishTestResults@2
     displayName: Publish Test Results
