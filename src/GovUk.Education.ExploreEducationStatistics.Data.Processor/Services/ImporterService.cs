@@ -22,6 +22,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static System.StringComparison;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -199,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var filterGroupsFromCsv = new HashSet<FilterGroupMeta>();
             var locations = new HashSet<Location>();
             
-            await CsvUtils.ForEachRow(dataFileStreamProvider, async (rowValues, index) =>
+            await CsvUtils.ForEachRow(dataFileStreamProvider, async (rowValues, index, _) =>
             {
                 if (index % Stage2RowCheck == 0)
                 {
@@ -214,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     }
 
                     await _dataImportService.UpdateStatus(dataImport.Id,
-                        DataImportStatus.STAGE_2,
+                        STAGE_2,
                         (double) (index + 1) / dataImport.TotalRows!.Value * 100);
                 }
 
@@ -306,22 +307,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 ctxDelegate => _importerLocationService.CreateIfNotExistsAndCache(ctxDelegate, locations.ToList()));
         }
 
-        public async Task ImportObservations(DataImport import,
+        public async Task ImportObservations(
+            DataImport import,
             Func<Task<Stream>> dataFileStreamProvider,
             Subject subject,
             SubjectMeta subjectMeta,
-            int batchNo,
             StatisticsDbContext context)
         {
-            var observations = (await GetObservations(
-                import,
-                context,
+            var importObservationsBatchSize = GetRowsPerBatch();
+            var soleGeographicLevel = import.HasSoleGeographicLevel();
+            var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
+            var totalBatches = Math.Ceiling((decimal) import.TotalRows!.Value / importObservationsBatchSize);
+            
+            await CsvUtils.Batch(
                 dataFileStreamProvider,
-                subject,
-                subjectMeta,
-                batchNo)).ToList();
+                importObservationsBatchSize,
+                async (batchOfRows, batchIndex) =>
+                {
+                    // TODO DW - ability to skip already imported rows even within a batch (if batch size changes via configuration)
+                    _logger.LogDebug(
+                        "Importing Observation batch {BatchNumber} of {TotalBatches}", 
+                        batchIndex + 1, 
+                        totalBatches);
 
-            await _observationBatchImporter.ImportObservationBatch(context, observations);
+                    var allowedRows = batchOfRows.Select((cells, rowIndex) =>
+                    {
+                        if (IsRowAllowed(soleGeographicLevel, cells, csvHeaders))
+                        {
+                            return ObservationFromCsv(
+                                context,
+                                cells,
+                                csvHeaders,
+                                subject,
+                                subjectMeta,
+                                (batchIndex * importObservationsBatchSize) + rowIndex + 2);
+                        }
+
+                        return null;
+                    }).WhereNotNull();
+
+                    await _databaseHelper.DoInTransaction(context, async contextDelegate => 
+                        await _observationBatchImporter.ImportObservationBatch(contextDelegate, allowedRows)
+                    );
+                    
+                    var percentageComplete = (double) ((batchIndex + 1) / totalBatches) * 100;
+
+                    await _dataImportService.UpdateStatus(import.Id, STAGE_3, percentageComplete);
+
+                    return true;
+                });
         }
 
         public TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> rowValues, List<string> colValues)
@@ -349,40 +383,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return int.Parse(tp.Substring(0, 4));
         }
 
-        private async Task<IEnumerable<Observation>> GetObservations(
-            DataImport import,
-            StatisticsDbContext context,
-            Func<Task<Stream>> dataFileStreamProvider,
-            Subject subject,
-            SubjectMeta subjectMeta,
-            int batchNo)
+        private static int GetRowsPerBatch()
         {
-            var soleGeographicLevel = import.HasSoleGeographicLevel();
-            var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
-
-            return (await CsvUtils.Select(dataFileStreamProvider, (rowValues, index) =>
-            {
-                if (IsRowAllowed(soleGeographicLevel, rowValues, csvHeaders))
-                {
-                    return ObservationFromCsv(
-                        context,
-                        rowValues,
-                        csvHeaders,
-                        subject,
-                        subjectMeta,
-                        (batchNo - 1) * import.RowsPerBatch + index + 2);
-                }
-
-                return null;
-            }))
-                .WhereNotNull();
+            return Int32.Parse(Environment.GetEnvironmentVariable("RowsPerBatch") 
+                               ?? throw new InvalidOperationException("RowsPerBatch variable must be specified"));
         }
 
         /// <summary>
         /// Determines if a row should be imported based on geographic level.
         /// If a file contains a sole level then any row is allowed, otherwise rows for 'solo' importable levels are ignored.
         /// </summary>
-        public static bool IsRowAllowed(bool soleGeographicLevel,
+        private static bool IsRowAllowed(bool soleGeographicLevel,
             IReadOnlyList<string> rowValues,
             List<string> colValues)
         {

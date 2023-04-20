@@ -229,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var rowCountByGeographicLevel = new Dictionary<GeographicLevel, int>();
             var errors = new List<DataImportError>();
 
-            await CsvUtils.ForEachRow(dataFileStreamProvider, async (cells, index) =>
+            await CsvUtils.ForEachRow(dataFileStreamProvider, async (cells, index, _) =>
             {
                 if (errors.Count == 100)
                 {
@@ -299,27 +299,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 DataImportStatus.STAGE_1,
                 100);
 
-            var rowsPerBatch = GetRowsPerBatch();
-
             return new ProcessorStatistics
             (
                 TotalRowCount: totalRows,
                 ImportableRowCount: GetImportableRowCount(rowCountByGeographicLevel),
-                RowsPerBatch: rowsPerBatch,
-                NumBatches: GetNumBatches(totalRows, rowsPerBatch),
                 GeographicLevels: rowCountByGeographicLevel.Keys.ToHashSet()
             );
-        }
-
-        private int GetRowsPerBatch()
-        {
-            return Int32.Parse(Environment.GetEnvironmentVariable("RowsPerBatch") 
-                               ?? throw new InvalidOperationException("RowsPerBatch variable must be specified"));
-        }
-
-        private static int GetNumBatches(int rows, int rowsPerBatch)
-        {
-            return (int) Math.Ceiling(rows / (double) rowsPerBatch);
         }
 
         private static int GetImportableRowCount(Dictionary<GeographicLevel, int> rowCountByGeographicLevel)

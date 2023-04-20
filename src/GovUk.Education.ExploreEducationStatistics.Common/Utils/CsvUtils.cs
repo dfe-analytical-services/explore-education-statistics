@@ -88,7 +88,7 @@ public static class CsvUtils
     /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
     public static async Task ForEachRow(
         Func<Task<Stream>> streamProvider,
-        Func<List<string>, int, Task<bool>> func,
+        Func<List<string>, int, bool, Task<bool>> func,
         bool skipHeaderRow = true)
     {
         var config = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -101,8 +101,9 @@ public static class CsvUtils
         using var dataFileReader = new StreamReader(await streamProvider.Invoke());
         using var csvReader = new CsvReader(dataFileReader, config);
         using var csvDataReader = new CsvDataReader(csvReader);
+        var lastLine = !await csvReader.ReadAsync();
 
-        while (await csvReader.ReadAsync())
+        while (!lastLine)
         {
             var cellCount = csvDataReader.FieldCount;
 
@@ -113,14 +114,51 @@ public static class CsvUtils
                 .ToList();
 
             var currentRowIndex = csvReader.Parser.Row + (skipHeaderRow ? -1 : 0);
-
-            var result = await func.Invoke(cells, currentRowIndex);
+            
+            lastLine = !await csvReader.ReadAsync();
+            
+            var result = await func.Invoke(cells, currentRowIndex, lastLine);
 
             if (!result)
             {
                 break;
             }
         }
+    }
+    
+    public static async Task Batch(
+        Func<Task<Stream>> streamProvider,
+        int batchSize,
+        Func<List<List<string>>, int, Task<bool>> func,
+        bool skipHeaderRow = true)
+    {
+        var linesInBatch = new List<List<string>>();
+        var batchIndex = 0;
+        var rowsProcessed = 0;
+        
+        await ForEachRow(
+            streamProvider,
+            async (cells, _, lastLine) =>
+            {
+                rowsProcessed++;
+                linesInBatch.Add(cells);
+
+                if (lastLine || rowsProcessed % batchSize == 0)
+                {
+                    var result = await func.Invoke(linesInBatch, batchIndex);
+
+                    if (!result)
+                    {
+                        return false;
+                    }
+
+                    batchIndex++;
+                    linesInBatch.Clear();
+                }
+
+                return true;
+            },
+            skipHeaderRow);
     }
 
     /// <summary>
@@ -143,7 +181,7 @@ public static class CsvUtils
     {
         return ForEachRow(
             streamProvider,
-            async (cells, index) =>
+            async (cells, index, _) =>
             {
                 await func.Invoke(cells, index);
                 return true;

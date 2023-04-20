@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
@@ -15,15 +14,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 /// </summary>
 public class InMemoryDbContextSupplier : IDbContextSupplier
 {
-    private readonly string? _contentDbContextId;
-    private readonly string? _statisticsDbContextId;
+    private readonly string _contentDbContextId;
+    private readonly string _statisticsDbContextId;
 
     public InMemoryDbContextSupplier(
         string? contentDbContextId = null, 
         string? statisticsDbContextId = null)
     {
-        _contentDbContextId = contentDbContextId;
-        _statisticsDbContextId = statisticsDbContextId;
+        _contentDbContextId = contentDbContextId ?? Guid.NewGuid().ToString();
+        _statisticsDbContextId = statisticsDbContextId ?? Guid.NewGuid().ToString();
     }
 
     public TDbContext CreateDbContext<TDbContext>() where TDbContext : DbContext
