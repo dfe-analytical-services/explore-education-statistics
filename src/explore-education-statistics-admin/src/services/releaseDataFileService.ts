@@ -75,7 +75,6 @@ export type ImportStatusCode =
   | 'STAGE_1'
   | 'STAGE_2'
   | 'STAGE_3'
-  | 'STAGE_4'
   | 'NOT_FOUND'
   | 'FAILED'
   | 'CANCELLING'

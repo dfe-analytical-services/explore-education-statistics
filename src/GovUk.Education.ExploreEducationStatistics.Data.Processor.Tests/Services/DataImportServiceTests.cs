@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Microsoft.EntityFrameworkCore;
@@ -122,9 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
         {
             var import = new DataImport
             {
-                RowsPerBatch = 1,
-                ImportedRows = 1,
-                NumBatches = 1
+                ExpectedImportedRows = 1,
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -138,10 +135,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             var service = BuildDataImportService(contentDbContextId: contentDbContextId);
 
             await service.Update(import.Id,
-                rowsPerBatch: 1000,
                 importedRows: 5000,
                 totalRows: 10000,
-                numBatches: 10,
                 geographicLevels: new HashSet<GeographicLevel>
                 {
                     GeographicLevel.Country,
@@ -152,10 +147,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             {
                 var updated = await contentDbContext.DataImports.SingleAsync(i => i.Id == import.Id);
 
-                Assert.Equal(1000, updated.RowsPerBatch);
-                Assert.Equal(5000, updated.ImportedRows);
+                Assert.Equal(5000, updated.ExpectedImportedRows);
                 Assert.Equal(10000, updated.TotalRows);
-                Assert.Equal(10, updated.NumBatches);
 
                 Assert.Equal(2, updated.GeographicLevels.Count);
                 Assert.Contains(GeographicLevel.Country, updated.GeographicLevels);
@@ -170,9 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             
             return new DataImportService(
                 dbContextSupplier,
-                Mock.Of<ILogger<DataImportService>>(Strict),
-                new InMemoryDatabaseHelper(dbContextSupplier)
-            );
+                Mock.Of<ILogger<DataImportService>>(Strict));
         }
     }
 }
