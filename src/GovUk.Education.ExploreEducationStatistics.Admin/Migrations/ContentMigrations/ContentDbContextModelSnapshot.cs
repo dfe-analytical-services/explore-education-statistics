@@ -173,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ImportedRows")
+                    b.Property<int>("ImportedRows")
                         .HasColumnType("int");
 
                     b.Property<Guid>("MetaFileId")

@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         /// Note that this means "rows imported so far".  This is a running total as the importer inserts more
         /// batches of CSV rows until complete.
         /// </summary>
-        public int? ImportedRows { get; set; }
+        public int ImportedRows { get; set; }
 
         public HashSet<GeographicLevel> GeographicLevels { get; set; } = new();
 
