@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                 Status = STAGE_3
             };
 
-            Assert.Equal(100 * 0.1 + 100 * 0.1 + 100 * 0.1 + StagePercentageComplete * 0.8,
+            Assert.Equal(100 * 0.1 + 100 * 0.1 + StagePercentageComplete * 0.8,
                 import.PercentageComplete());
         }
 

@@ -103,7 +103,7 @@ public class ProcessorStage2Tests
     public async Task ProcessStage2_LocationsAlreadyExist()
     {
         var scenario = new OrderingCsvStage2Scenario();
-
+    
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
         
         // Persist the Locations that are already in the CSV to import.
@@ -141,7 +141,7 @@ public class ProcessorStage2Tests
             scenario.GetExpectedLocations().ForEach(expectedLocation => Assert.Contains(expectedLocation, locations));
         }
     }
-
+    
     private async Task AssertStage2ItemsImportedCorrectly(
         IProcessorStage2TestScenario scenario,
         ImporterFilterCache? memoryCache = null,
@@ -151,12 +151,12 @@ public class ProcessorStage2Tests
         var importerLocationCache = locationCache ?? new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
         
         var metaFileUnderTest = scenario.GetFilenameUnderTest().Replace(".csv", ".meta.csv");
-
+    
         var subject = new Subject
         {
             Id = scenario.GetSubjectId()
         };
-
+    
         var import = new DataImport
         {
             Id = Guid.NewGuid(),
@@ -176,27 +176,27 @@ public class ProcessorStage2Tests
             TotalRows = 16,
             Status = DataImportStatus.STAGE_2
         };
-
+    
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         {
             await contentDbContext.DataImports.AddAsync(import);
             await contentDbContext.SaveChangesAsync();
         }
-
+    
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
             await statisticsDbContext.Subject.AddAsync(subject);
             await statisticsDbContext.SaveChangesAsync();
         }
-
+    
         var blobStorageService = new Mock<IBlobStorageService>(Strict);
-
+    
         var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + scenario.GetFilenameUnderTest());
-
+    
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + metaFileUnderTest);
-
+    
         blobStorageService.SetupStreamBlob(
             PrivateReleaseFiles, 
             import.File.Path(), 
@@ -206,17 +206,16 @@ public class ProcessorStage2Tests
             PrivateReleaseFiles, 
             import.MetaFile.Path(), 
             metaFilePath);
-
+    
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
-
+    
         var transactionHelper = new InMemoryDatabaseHelper(dbContextSupplier);
         
         var dataImportService = new DataImportService(
             dbContextSupplier,
-            Mock.Of<ILogger<DataImportService>>(),
-            transactionHelper);
+            Mock.Of<ILogger<DataImportService>>());
         
         var guidGenerator = new SequentialGuidGenerator();
         
@@ -232,15 +231,13 @@ public class ProcessorStage2Tests
             Mock.Of<ILogger<ImporterService>>(),
             transactionHelper,
             importerFilterCache);
-
+    
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
-            Mock.Of<IBatchService>(Strict),
             blobStorageService.Object,
             dataImportService,
-            importerService,
-            transactionHelper);
-
+            importerService);
+    
         var processorService = BuildProcessorService(
             dbContextSupplier,
             dataImportService: dataImportService,
@@ -249,22 +246,21 @@ public class ProcessorStage2Tests
             fileImportService: fileImportService);
         
         var importMessage = new ImportMessage(import.Id);
-
+    
         var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>(Strict);
-
+    
         importStagesMessageQueue
             .Setup(s => s.Add(importMessage));
-
+    
         var function = BuildFunction(processorService, dataImportService);
         
         await function.ProcessUploads(
             importMessage, 
             new ExecutionContext(),
-            importStagesMessageQueue.Object,
-            Mock.Of<ICollector<ImportObservationsMessage>>(Strict));
+            importStagesMessageQueue.Object);
         
         VerifyAllMocks(blobStorageService, importStagesMessageQueue);
-
+    
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
             var filters = await statisticsDbContext
@@ -273,12 +269,12 @@ public class ProcessorStage2Tests
                 .ThenInclude(fg => fg.FilterItems)
                 .Where(f => f.SubjectId == scenario.GetSubjectId())
                 .ToListAsync();
-
+    
             var filterLabels = filters
                 .Select(f => f.Label)
                 .OrderBy(label => label)
                 .JoinToString(",");
-
+    
             var expectedFilterLabels = scenario
                 .GetExpectedFilters()
                 .Select(f => f.Label)
@@ -291,7 +287,7 @@ public class ProcessorStage2Tests
                 .Select(f => f.Name)
                 .OrderBy(name => name)
                 .JoinToString(",");
-
+    
             var expectedFilterNames = scenario
                 .GetExpectedFilters()
                 .Select(f => f.Name)
@@ -301,48 +297,48 @@ public class ProcessorStage2Tests
             Assert.Equal(expectedFilterNames, filterNames);
             
             filters.ForEach(filter => Assert.Equal(subject.Id, filter.SubjectId));
-
+    
             scenario.GetExpectedFilters().ForEach(expectedFilter =>
             {
                 var matchingFilter = filters.Single(f => f.Label == expectedFilter.Label);
-
+    
                 var filterGroupPrefix = $"Filter Groups for Filter {expectedFilter.Label}: ";
-
+    
                 var filterGroupLabels = matchingFilter
                     .FilterGroups
                     .Select(fg => fg.Label)
                     .OrderBy(label => label)
                     .JoinToString(",");
-
+    
                 var expectedFilterGroupLabels = expectedFilter
                     .FilterGroups
                     .Select(f => f.Label)
                     .OrderBy(label => label)
                     .JoinToString(",");
-
+    
                 Assert.Equal(filterGroupPrefix + expectedFilterGroupLabels, filterGroupPrefix + filterGroupLabels);
-
+    
                 expectedFilter.FilterGroups.ForEach(expectedFilterGroup =>
                 {
                     var matchingFilterGroup = matchingFilter.FilterGroups.Single(f => f.Label == expectedFilterGroup.Label);
-
+    
                     var filterIndexPrefix =
                         $"Filter Items for Filter Group {expectedFilterGroup.Label}, Filter {expectedFilter.Label}: ";
-
+    
                     var filterItemLabels = matchingFilterGroup
                         .FilterItems
                         .Select(fg => fg.Label)
                         .OrderBy(label => label)
                         .JoinToString(",");
-
+    
                     var expectedFilterItemLabels = expectedFilterGroup
                         .FilterItems
                         .Select(fg => fg.Label)
                         .OrderBy(label => label)
                         .JoinToString(",");
-
+    
                     Assert.Equal(filterIndexPrefix + expectedFilterItemLabels, filterIndexPrefix + filterItemLabels);
-
+    
                     var cachedFilterGroup = importerFilterCache.GetOrCacheFilterGroup(
                         matchingFilter.Id, 
                         matchingFilterGroup.Label,
@@ -355,7 +351,7 @@ public class ProcessorStage2Tests
                         var matchingFilterItem = matchingFilterGroup
                             .FilterItems
                             .Single(f => f.Label == expectedFilterItem.Label);
-
+    
                         var cachedFilterItem = importerFilterCache.GetOrCacheFilterItem(
                             matchingFilterGroup.Id, 
                             matchingFilterItem.Label,
@@ -365,7 +361,7 @@ public class ProcessorStage2Tests
                     });
                 });
             });
-
+    
             var indicatorGroups = await statisticsDbContext
                 .IndicatorGroup
                 .Include(ig => ig.Indicators)
@@ -375,31 +371,31 @@ public class ProcessorStage2Tests
             var indicatorGroupLabels = indicatorGroups.Select(ig => ig.Label).OrderBy(label => label);
             var expectedIndicatorGroupLabels = scenario.GetExpectedIndicatorGroups().Select(ig => ig.Label).OrderBy(label => label);
             Assert.Equal(expectedIndicatorGroupLabels, indicatorGroupLabels);
-
+    
             indicatorGroups.ForEach(indicatorGroup => Assert.Equal(subject.Id, indicatorGroup.SubjectId));
             
             scenario.GetExpectedIndicatorGroups().ForEach(expectedIndicatorGroup =>
             {
                 var matchingIndicatorGroup = indicatorGroups.Single(ig => ig.Label == expectedIndicatorGroup.Label);
-
+    
                 var indicatorPrefix = $"Indicators for Indicator Group {expectedIndicatorGroup.Label}: ";
-
+    
                 var indicatorLabels = matchingIndicatorGroup
                     .Indicators
                     .Select(i => i.Label)
                     .OrderBy(label => label)
                     .JoinToString(",");
-
+    
                 var expectedIndicatorLabels = expectedIndicatorGroup
                     .Indicators
                     .Select(i => i.Label)
                     .OrderBy(label => label)
                     .JoinToString(",");
-
+    
                 Assert.Equal(indicatorPrefix + expectedIndicatorLabels, indicatorPrefix + indicatorLabels);
                 
             });
-
+    
             var locations = await statisticsDbContext.Location.ToListAsync();
             
             Assert.Equal(scenario.GetExpectedLocations().Count, locations.Count);
@@ -438,25 +434,20 @@ public class ProcessorStage2Tests
             Mock.Of<ILogger<ProcessorService>>(),
             blobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
             fileImportService ?? Mock.Of<IFileImportService>(Strict),
-            Mock.Of<ISplitFileService>(Strict),
             importerService ?? Mock.Of<IImporterService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             Mock.Of<IValidatorService>(Strict),
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
     }
-    
-    
 
     private static Processor.Functions.Processor BuildFunction(
         IProcessorService? processorService = null,
         IDataImportService? dataImportService = null)
     {
         return new Processor.Functions.Processor(
-            Mock.Of<IFileImportService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             processorService ?? Mock.Of<IProcessorService>(Strict),
-            Mock.Of<IDbContextSupplier>(),
             Mock.Of<ILogger<Processor.Functions.Processor>>());
     }
 }

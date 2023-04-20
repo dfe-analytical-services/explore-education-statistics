@@ -4,15 +4,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 using static Moq.MockBehavior;
@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             .ToList();
 
         [Fact]
-        public async Task CheckComplete_SingleDataFileCompleted()
+        public async Task CheckComplete()
         {
             var file = new File
             {
@@ -47,16 +47,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 FileId = file.Id,
                 File = file,
                 SubjectId = Guid.NewGuid(),
-                Status = STAGE_4,
-                NumBatches = 1,
-                ImportedRows = 2
+                Status = STAGE_3,
+                ExpectedImportedRows = 2
             };
 
             var dataImportService = new Mock<IDataImportService>(Strict);
-
-            dataImportService
-                .Setup(s => s.GetImport(import.Id))
-                .ReturnsAsync(import);
 
             dataImportService
                 .Setup(s => s.UpdateStatus(
@@ -87,20 +82,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildFileImportService(dataImportService: dataImportService.Object);
-
-                var message = new ImportObservationsMessage
-                {
-                    Id = import.Id
-                };
-
-                await service.CheckComplete(message, statisticsDbContext);
+                await service.CheckComplete(import, statisticsDbContext);
             }
 
-            MockUtils.VerifyAllMocks(dataImportService);
+            VerifyAllMocks(dataImportService);
         }
 
         [Fact]
-        public async Task CheckComplete_LastBatchFileCompleted()
+        public async Task CheckComplete_Errors()
         {
             var file = new File
             {
@@ -111,148 +100,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             var import = new DataImport
             {
                 Id = Guid.NewGuid(),
-                Errors = new List<DataImportError>(),
+                Errors = ListOf(new DataImportError("an error")),
                 FileId = file.Id,
                 File = file,
                 SubjectId = Guid.NewGuid(),
-                Status = STAGE_4,
-                NumBatches = 2,
-                ImportedRows = 2
-            };
-
-            var batchService = new Mock<IBatchService>(Strict);
-            var dataImportService = new Mock<IDataImportService>(Strict);
-
-            batchService
-                .Setup(s => s.GetNumBatchesRemaining(import.File))
-                .ReturnsAsync(0);
-
-            dataImportService
-                .Setup(s => s.GetImport(import.Id))
-                .ReturnsAsync(import);
-
-            dataImportService
-                .Setup(s => s.UpdateStatus(
-                    import.Id, COMPLETE, 100))
-                .Returns(Task.CompletedTask);
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.Observation.AddRangeAsync(
-                    new Observation
-                    {
-                        SubjectId = import.SubjectId
-                    },
-                    new Observation
-                    {
-                        SubjectId = import.SubjectId
-                    });
-
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = BuildFileImportService(batchService: batchService.Object,
-                    dataImportService: dataImportService.Object);
-
-                var message = new ImportObservationsMessage
-                {
-                    Id = import.Id
-                };
-
-                await service.CheckComplete(message, statisticsDbContext);
-            }
-
-            MockUtils.VerifyAllMocks(batchService, dataImportService);
-        }
-
-        [Fact]
-        public async Task CheckComplete_BatchedFilesStillProcessing()
-        {
-            var file = new File
-            {
-                Id = Guid.NewGuid(),
-                Filename = "my_data_file.csv"
-            };
-
-            var import = new DataImport
-            {
-                Id = Guid.NewGuid(),
-                Errors = new List<DataImportError>(),
-                FileId = file.Id,
-                File = file,
-                SubjectId = Guid.NewGuid(),
-                Status = STAGE_4,
-                NumBatches = 2,
-                ImportedRows = 2
-            };
-
-            var batchService = new Mock<IBatchService>(Strict);
-            var dataImportService = new Mock<IDataImportService>(Strict);
-
-            batchService
-                .Setup(s => s.GetNumBatchesRemaining(import.File))
-                .ReturnsAsync(1);
-
-            dataImportService
-                .Setup(s => s.GetImport(import.Id))
-                .ReturnsAsync(import);
-
-            dataImportService
-                .Setup(s => s.UpdateStatus(
-                    import.Id, STAGE_4, 50))
-                .Returns(Task.CompletedTask);
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = BuildFileImportService(batchService: batchService.Object,
-                    dataImportService: dataImportService.Object);
-
-                var message = new ImportObservationsMessage
-                {
-                    Id = import.Id
-                };
-
-                await service.CheckComplete(message, statisticsDbContext);
-            }
-
-            MockUtils.VerifyAllMocks(batchService, dataImportService);
-        }
-
-        [Fact]
-        public async Task CheckComplete_SingleDataFileCompleted_HasErrors()
-        {
-            var file = new File
-            {
-                Id = Guid.NewGuid(),
-                Filename = "my_data_file.csv"
-            };
-
-            var import = new DataImport
-            {
-                Id = Guid.NewGuid(),
-                Errors = new List<DataImportError>
-                {
-                    new DataImportError("an error")
-                },
-                FileId = file.Id,
-                File = file,
-                SubjectId = Guid.NewGuid(),
-                Status = STAGE_4,
-                NumBatches = 1,
-                ImportedRows = 2
+                Status = STAGE_3,
+                ExpectedImportedRows = 2
             };
 
             var dataImportService = new Mock<IDataImportService>(Strict);
-
-            dataImportService
-                .Setup(s => s.GetImport(import.Id))
-                .ReturnsAsync(import);
 
             dataImportService
                 .Setup(s => s.UpdateStatus(
@@ -279,20 +135,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildFileImportService(dataImportService: dataImportService.Object);
-
-                var message = new ImportObservationsMessage
-                {
-                    Id = import.Id
-                };
-
-                await service.CheckComplete(message, statisticsDbContext);
+                await service.CheckComplete(import, statisticsDbContext);
             }
 
-            MockUtils.VerifyAllMocks(dataImportService);
+            VerifyAllMocks(dataImportService);
         }
 
         [Fact]
-        public async Task CheckComplete_SingleDataFileCompleted_HasIncorrectObservationCount()
+        public async Task CheckComplete_IncorrectObservationCount()
         {
             var file = new File
             {
@@ -307,20 +157,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 FileId = file.Id,
                 File = file,
                 SubjectId = Guid.NewGuid(),
-                Status = STAGE_4,
-                NumBatches = 1,
-                ImportedRows = 3
+                Status = STAGE_3,
+                ExpectedImportedRows = 3
             };
 
             var dataImportService = new Mock<IDataImportService>(Strict);
-
-            dataImportService
-                .Setup(s => s.GetImport(import.Id))
-                .ReturnsAsync(import);
 
             dataImportService
                 .Setup(s => s.FailImport(import.Id, 
-                    $"Number of observations inserted (2) does not equal that expected ({import.ImportedRows}) : Please delete & retry"))
+                    $"Number of observations inserted (2) does not equal that expected ({import.ExpectedImportedRows}) : Please delete & retry"))
                 .Returns(Task.CompletedTask);
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -343,164 +188,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildFileImportService(dataImportService: dataImportService.Object);
-
-                var message = new ImportObservationsMessage
-                {
-                    Id = import.Id
-                };
-
-                await service.CheckComplete(message, statisticsDbContext);
+                await service.CheckComplete(import, statisticsDbContext);
             }
 
-            MockUtils.VerifyAllMocks(dataImportService);
+            VerifyAllMocks(dataImportService);
         }
 
         [Fact]
-        public async Task CheckComplete_LastBatchFileCompleted_HasErrors()
+        public async Task CheckComplete_AlreadyFinished()
         {
-            var file = new File
-            {
-                Id = Guid.NewGuid(),
-                Filename = "my_data_file.csv"
-            };
-
-            var import = new DataImport
-            {
-                Id = Guid.NewGuid(),
-                Errors = new List<DataImportError>
-                {
-                    new DataImportError("an error")
-                },
-                FileId = file.Id,
-                File = file,
-                SubjectId = Guid.NewGuid(),
-                Status = STAGE_4,
-                NumBatches = 2,
-                ImportedRows = 2
-            };
-            
-            var batchService = new Mock<IBatchService>(Strict);
-            var dataImportService = new Mock<IDataImportService>(Strict);
-
-            batchService
-                .Setup(s => s.GetNumBatchesRemaining(import.File))
-                .ReturnsAsync(0);
-
-            dataImportService
-                .Setup(s => s.GetImport(import.Id))
-                .ReturnsAsync(import);
-
-            dataImportService
-                .Setup(s => s.UpdateStatus(
-                    import.Id, FAILED, 100))
-                .Returns(Task.CompletedTask);
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.Observation.AddRangeAsync(
-                    new Observation
-                    {
-                        SubjectId = import.SubjectId
-                    },
-                    new Observation
-                    {
-                        SubjectId = import.SubjectId
-                    });
-
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = BuildFileImportService(batchService: batchService.Object,
-                    dataImportService: dataImportService.Object);
-
-                var message = new ImportObservationsMessage
-                {
-                    Id = import.Id
-                };
-
-                await service.CheckComplete(message, statisticsDbContext);
-            }
-
-            MockUtils.VerifyAllMocks(batchService, dataImportService);
-        }
-
-        [Fact]
-        public async Task CheckComplete_LastBatchFileCompleted_HasIncorrectObservationCount()
-        {
-            var file = new File
-            {
-                Id = Guid.NewGuid(),
-                Filename = "my_data_file.csv"
-            };
-
-            var import = new DataImport
-            {
-                Id = Guid.NewGuid(),
-                Errors = new List<DataImportError>(),
-                FileId = file.Id,
-                File = file,
-                SubjectId = Guid.NewGuid(),
-                Status = STAGE_4,
-                NumBatches = 2,
-                ImportedRows = 3
-            };
-            
-            var batchService = new Mock<IBatchService>(Strict);
-            var dataImportService = new Mock<IDataImportService>(Strict);
-
-            batchService
-                .Setup(s => s.GetNumBatchesRemaining(import.File))
-                .ReturnsAsync(0);
-
-            dataImportService
-                .Setup(s => s.GetImport(import.Id))
-                .ReturnsAsync(import);
-
-            dataImportService
-                .Setup(s => s.FailImport(import.Id,
-                    $"Number of observations inserted (2) does not equal that expected ({import.ImportedRows}) : Please delete & retry"))
-                .Returns(Task.CompletedTask);
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.Observation.AddRangeAsync(
-                    new Observation
-                    {
-                        SubjectId = import.SubjectId
-                    },
-                    new Observation
-                    {
-                        SubjectId = import.SubjectId
-                    });
-
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = BuildFileImportService(batchService: batchService.Object,
-                    dataImportService: dataImportService.Object);
-
-                var message = new ImportObservationsMessage
-                {
-                    Id = import.Id
-                };
-
-                await service.CheckComplete(message, statisticsDbContext);
-            }
-
-            MockUtils.VerifyAllMocks(batchService, dataImportService);
-        }
-
-        [Fact]
-        public async Task CheckComplete_SingleDataFileCompleted_AlreadyFinished()
-        {
+            // We don't expect to see any further import status updates if the current status is in
+            // any "finished" state  
             await FinishedStatuses
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async finishedStatus =>
@@ -519,86 +217,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                         File = file,
                         SubjectId = Guid.NewGuid(),
                         Status = finishedStatus,
-                        NumBatches = 1,
-                        ImportedRows = 2
+                        ExpectedImportedRows = 2
                     };
-
-                    var dataImportService = new Mock<IDataImportService>(Strict);
-
-                    dataImportService
-                        .Setup(s => s.GetImport(import.Id))
-                        .ReturnsAsync(import);
 
                     var statisticsDbContextId = Guid.NewGuid().ToString();
 
-                    await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-                    {
-                        var service = BuildFileImportService(dataImportService: dataImportService.Object);
-
-                        var message = new ImportObservationsMessage
-                        {
-                            Id = import.Id
-                        };
-
-                        await service.CheckComplete(message, statisticsDbContext);
-                    }
-
-                    MockUtils.VerifyAllMocks(dataImportService);
+                    await using var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId);
+                    var service = BuildFileImportService();
+                    await service.CheckComplete(import, statisticsDbContext);
                 });
         }
 
         [Fact]
-        public async Task CheckComplete_LastBatchFileCompleted_AlreadyFinished()
+        public async Task CheckComplete_Aborting()
         {
-            await FinishedStatuses
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async finishedStatus =>
-                {
-                    var file = new File
-                    {
-                        Id = Guid.NewGuid(),
-                        Filename = "my_data_file.csv"
-                    };
-
-                    var import = new DataImport
-                    {
-                        Id = Guid.NewGuid(),
-                        Errors = new List<DataImportError>(),
-                        FileId = file.Id,
-                        File = file,
-                        SubjectId = Guid.NewGuid(),
-                        Status = finishedStatus,
-                        NumBatches = 2,
-                        ImportedRows = 2
-                    };
-
-                    var dataImportService = new Mock<IDataImportService>(Strict);
-
-                    dataImportService
-                        .Setup(s => s.GetImport(import.Id))
-                        .ReturnsAsync(import);
-
-                    var statisticsDbContextId = Guid.NewGuid().ToString();
-
-                    await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-                    {
-                        var service = BuildFileImportService(dataImportService: dataImportService.Object);
-
-                        var message = new ImportObservationsMessage
-                        {
-                            Id = import.Id
-                        };
-
-                        await service.CheckComplete(message, statisticsDbContext);
-                    }
-
-                    MockUtils.VerifyAllMocks(dataImportService);
-                });
-        }
-
-        [Fact]
-        public async Task CheckComplete_SingleDataFileCompleted_Aborting()
-        {
+            // We expect to see a final import status update if the current status is in an
+            // "aborting" state, updating the import status to be in the associated final
+            // "aborted" state.
             await AbortingStatuses
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async abortingStatus =>
@@ -617,15 +252,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                         File = file,
                         SubjectId = Guid.NewGuid(),
                         Status = abortingStatus,
-                        NumBatches = 1,
-                        ImportedRows = 2
+                        ExpectedImportedRows = 2
                     };
 
                     var dataImportService = new Mock<IDataImportService>(Strict);
-
-                    dataImportService
-                        .Setup(s => s.GetImport(import.Id))
-                        .ReturnsAsync(import);
 
                     dataImportService
                         .Setup(s => s.UpdateStatus(
@@ -637,75 +267,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                     await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
                     {
                         var service = BuildFileImportService(dataImportService: dataImportService.Object);
-
-                        var message = new ImportObservationsMessage
-                        {
-                            Id = import.Id
-                        };
-
-                        await service.CheckComplete(message, statisticsDbContext);
+                        await service.CheckComplete(import, statisticsDbContext);
                     }
 
-                    MockUtils.VerifyAllMocks(dataImportService);
+                    VerifyAllMocks(dataImportService);
                 });
         }
-
-        [Fact]
-        public async Task CheckComplete_LastBatchFileCompleted_Aborting()
-        {
-            await AbortingStatuses
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async abortingStatus =>
-                {
-                    var file = new File
-                    {
-                        Id = Guid.NewGuid(),
-                        Filename = "my_data_file.csv"
-                    };
-
-                    var import = new DataImport
-                    {
-                        Id = Guid.NewGuid(),
-                        Errors = new List<DataImportError>(),
-                        FileId = file.Id,
-                        File = file,
-                        SubjectId = Guid.NewGuid(),
-                        Status = abortingStatus,
-                        NumBatches = 2,
-                        ImportedRows = 2
-                    };
-
-                    var dataImportService = new Mock<IDataImportService>(Strict);
-
-                    dataImportService
-                        .Setup(s => s.GetImport(import.Id))
-                        .ReturnsAsync(import);
-
-                    dataImportService
-                        .Setup(s => s.UpdateStatus(
-                            import.Id, abortingStatus.GetFinishingStateOfAbortProcess(), 100))
-                        .Returns(Task.CompletedTask);
-
-                    var statisticsDbContextId = Guid.NewGuid().ToString();
-
-                    await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-                    {
-                        var service = BuildFileImportService(dataImportService: dataImportService.Object);
-
-                        var message = new ImportObservationsMessage
-                        {
-                            Id = import.Id
-                        };
-
-                        await service.CheckComplete(message, statisticsDbContext);
-                    }
-
-                    MockUtils.VerifyAllMocks(dataImportService);
-                });
-        }
-
+        
         private static FileImportService BuildFileImportService(
-            IBatchService batchService = null,
             IBlobStorageService blobStorageService = null,
             IImporterService importerService = null,
             ILogger<FileImportService> logger = null,
@@ -714,11 +283,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
         {
             return new FileImportService(
                 logger ?? new Mock<ILogger<FileImportService>>().Object,
-                batchService ?? new Mock<IBatchService>(Strict).Object,
                 blobStorageService ?? new Mock<IBlobStorageService>(Strict).Object,
                 dataImportService ?? new Mock<IDataImportService>(Strict).Object,
-                importerService ?? new Mock<IImporterService>(Strict).Object,
-                new InMemoryDatabaseHelper(new InMemoryDbContextSupplier()));
+                importerService ?? new Mock<IImporterService>(Strict).Object);
         }
     }
 }

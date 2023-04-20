@@ -105,8 +105,7 @@ public class ProcessorStage1Tests
         
         var dataImportService = new DataImportService(
             dbContextSupplier,
-            Mock.Of<ILogger<DataImportService>>(),
-            transactionHelper);
+            Mock.Of<ILogger<DataImportService>>());
 
         var importerFilterCache = new ImporterFilterCache();
 
@@ -129,16 +128,10 @@ public class ProcessorStage1Tests
 
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
-            Mock.Of<IBatchService>(Strict),
             blobStorageService.Object,
             dataImportService,
-            importerService,
-            transactionHelper);
+            importerService);
 
-        var rowsPerBatch = 5;
-        
-        Environment.SetEnvironmentVariable("RowsPerBatch", rowsPerBatch.ToString());
-        
         var validatorService = new ValidatorService(
             Mock.Of<ILogger<ValidatorService>>(),
             blobStorageService.Object,
@@ -166,8 +159,7 @@ public class ProcessorStage1Tests
         await function.ProcessUploads(
             importMessage, 
             new ExecutionContext(),
-            importStagesMessageQueue.Object,
-            Mock.Of<ICollector<ImportObservationsMessage>>(Strict));
+            importStagesMessageQueue.Object);
         
         VerifyAllMocks(blobStorageService, importStagesMessageQueue);
 
@@ -182,9 +174,7 @@ public class ProcessorStage1Tests
             {
                 Assert.Equal(DataImportStatus.STAGE_2, dataImport.Status);
                 Assert.Equal(scenario.GetExpectedTotalRows(), dataImport.TotalRows);
-                Assert.Equal(scenario.GetExpectedTotalRows(), dataImport.ImportedRows);
-                Assert.Equal(rowsPerBatch, dataImport.RowsPerBatch);
-                Assert.Equal(4, dataImport.NumBatches);
+                Assert.Equal(scenario.GetExpectedTotalRows(), dataImport.ExpectedImportedRows);
             });
         }
     }
@@ -201,25 +191,20 @@ public class ProcessorStage1Tests
             Mock.Of<ILogger<ProcessorService>>(),
             blobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
             fileImportService ?? Mock.Of<IFileImportService>(Strict),
-            Mock.Of<ISplitFileService>(Strict),
             importerService ?? Mock.Of<IImporterService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             validatorService ?? Mock.Of<IValidatorService>(Strict),
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
     }
-    
-    
 
     private static Processor.Functions.Processor BuildFunction(
         IProcessorService? processorService = null,
         IDataImportService? dataImportService = null)
     {
         return new Processor.Functions.Processor(
-            Mock.Of<IFileImportService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             processorService ?? Mock.Of<IProcessorService>(Strict),
-            Mock.Of<IDbContextSupplier>(),
             Mock.Of<ILogger<Processor.Functions.Processor>>());
     }
 }
