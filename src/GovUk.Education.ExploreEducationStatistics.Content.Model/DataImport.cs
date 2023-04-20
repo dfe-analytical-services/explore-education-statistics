@@ -16,8 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             {
                 {STAGE_1, .1},
                 {STAGE_2, .1},
-                {STAGE_3, .1},
-                {STAGE_4, .7},
+                {STAGE_3, .8},
                 {CANCELLING, 1},
                 {CANCELLED, 1},
                 {COMPLETE, 1},
@@ -48,15 +47,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public int? TotalRows { get; set; }
 
-        public int NumBatches { get; set; }
-
-        public int RowsPerBatch { get; set; }
-
         /// <summary>
         /// Note that this means "importable row count" rather than indicating the actual number of rows
         /// already imported.  This is effectively a count of rows that are not excluded from import.
         /// </summary>
-        public int? ImportedRows { get; set; }
+        public int? ExpectedImportedRows { get; set; }
+
+        /// <summary>
+        /// Note that this means "rows imported so far".  This is a running total as the importer inserts more
+        /// batches of CSV rows until complete.  At the end of the import process, it should match the value of
+        /// ExpectedImportedRows.
+        /// </summary>
+        public int ImportedRows { get; set; }
+
+        /// <summary>
+        /// The index of the last processed row during import.  This is the last row that the Importer considered
+        /// importing, so it may also have been excluded from import.  This allows the Importer to pick up from where
+        /// it left off if an ongoing import is interrupted. 
+        /// </summary>
+        public int LastProcessedRowIndex { get; set; }
 
         public HashSet<GeographicLevel> GeographicLevels { get; set; } = new();
 
@@ -72,10 +81,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 STAGE_3 => ProcessingRatios[STAGE_1] * 100 +
                            ProcessingRatios[STAGE_2] * 100 +
                            StagePercentageComplete * ProcessingRatios[STAGE_3],
-                STAGE_4 => ProcessingRatios[STAGE_1] * 100 +
-                           ProcessingRatios[STAGE_2] * 100 +
-                           ProcessingRatios[STAGE_3] * 100 +
-                           StagePercentageComplete * ProcessingRatios[STAGE_4],
                 CANCELLED => ProcessingRatios[CANCELLED] * 100,
                 COMPLETE => ProcessingRatios[COMPLETE] * 100,
                 _ => 0
@@ -88,11 +93,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public bool HasSoleGeographicLevel()
         {
             return GeographicLevels is {Count: 1};
-        }
-
-        public bool BatchingRequired()
-        {
-            return NumBatches > 1;
         }
 
         public override string ToString()
@@ -108,8 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         PROCESSING_ARCHIVE_FILE,
         STAGE_1, // Basic row validation
         STAGE_2, // Create locations and filters
-        STAGE_3, // Split Files
-        STAGE_4, // Import observations
+        STAGE_3, // Import observations
         COMPLETE,
         FAILED,
         NOT_FOUND,
@@ -127,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             CANCELLED
         };
 
-        private static readonly List<DataImportStatus> AbortingStatuses = new List<DataImportStatus>
+        private static readonly List<DataImportStatus> AbortingStatuses = new()
         {
             CANCELLING
         };

@@ -11,35 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
     public class FileExtensionTests
     {
         [Fact]
-        public void BatchesPath()
-        {
-            var dataFile = new File
-            {
-                Id = Guid.NewGuid(),
-                RootPath = Guid.NewGuid(),
-                Filename = "data.csv",
-                Type = Data
-            };
-
-            Assert.Equal($"{dataFile.RootPath}/data/batches/{dataFile.Id}/", dataFile.BatchesPath());
-        }
-
-        [Fact]
-        public void BatchPath()
-        {
-            var dataFile = new File
-            {
-                Id = Guid.NewGuid(),
-                RootPath = Guid.NewGuid(),
-                Filename = "data.csv",
-                Type = Data
-            };
-
-            Assert.Equal($"{dataFile.RootPath}/data/batches/{dataFile.Id}/{dataFile.Id}_000999",
-                dataFile.BatchPath(999));
-        }
-
-        [Fact]
         public void Path()
         {
             var ancillaryFile = new File

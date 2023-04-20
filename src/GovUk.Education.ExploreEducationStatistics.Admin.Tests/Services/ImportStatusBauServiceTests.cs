@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -76,7 +77,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var import1 = new DataImport
             {
                 File = releaseFile1.File,
-                NumBatches = 1,
                 TotalRows = 100,
                 StagePercentageComplete = 99,
                 Status = FAILED,
@@ -87,7 +87,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var import2 = new DataImport
             {
                 File = releaseFile2.File,
-                NumBatches = 2,
                 TotalRows = 200,
                 StagePercentageComplete = 54,
                 Status = STAGE_1,
@@ -98,10 +97,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var import3 = new DataImport
             {
                 File = releaseFile3.File,
-                NumBatches = 3,
                 TotalRows = 300,
                 StagePercentageComplete = 76,
-                Status = STAGE_4,
+                Status = STAGE_3,
                 SubjectId = Guid.NewGuid(),
                 Created = DateTime.UtcNow.AddDays(-1)
             };
@@ -137,7 +135,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Title, imports[0].ReleaseTitle);
                 Assert.Equal(import2.File.Filename, imports[0].DataFileName);
                 Assert.Equal(import2.TotalRows, imports[0].TotalRows);
-                Assert.Equal(import2.NumBatches, imports[0].Batches);
                 Assert.Equal(import2.Status, imports[0].Status);
                 Assert.Equal(import2.StagePercentageComplete, imports[0].StagePercentageComplete);
                 Assert.Equal(import2.PercentageComplete(), imports[0].PercentageComplete);
@@ -151,7 +148,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Title, imports[1].ReleaseTitle);
                 Assert.Equal(import1.File.Filename, imports[1].DataFileName);
                 Assert.Equal(import1.TotalRows, imports[1].TotalRows);
-                Assert.Equal(import1.NumBatches, imports[1].Batches);
                 Assert.Equal(import1.Status, imports[1].Status);
                 Assert.Equal(import1.StagePercentageComplete, imports[1].StagePercentageComplete);
                 Assert.Equal(import1.PercentageComplete(), imports[1].PercentageComplete);
@@ -165,15 +161,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Title, imports[2].ReleaseTitle);
                 Assert.Equal(import3.File.Filename, imports[2].DataFileName);
                 Assert.Equal(import3.TotalRows, imports[2].TotalRows);
-                Assert.Equal(import3.NumBatches, imports[2].Batches);
                 Assert.Equal(import3.StagePercentageComplete, imports[2].StagePercentageComplete);
                 Assert.Equal(import3.PercentageComplete(), imports[2].PercentageComplete);
             }
         }
 
         internal static ImportStatusBauService BuildImportStatusBauService(
-            IUserService userService = null,
-            ContentDbContext contentDbContext = null)
+            IUserService? userService = null,
+            ContentDbContext? contentDbContext = null)
         {
             return new ImportStatusBauService(
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
