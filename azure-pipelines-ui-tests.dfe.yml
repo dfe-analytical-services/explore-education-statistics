@@ -4,7 +4,10 @@ schedules:
     include:
     - dev
   always: true
+pr: none
+
 name: $(date:yyyyMMdd)$(rev:.r)
+
 resources:
   repositories:
   - repository: self
