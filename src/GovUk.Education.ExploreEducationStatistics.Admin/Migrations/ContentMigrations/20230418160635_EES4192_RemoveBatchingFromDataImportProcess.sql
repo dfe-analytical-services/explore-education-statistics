@@ -1,4 +1,4 @@
-UPDATE DataImport 
+UPDATE DataImports 
 SET 
     ImportedRows = ExpectedImportedRows,
     LastProcessedRowIndex = TotalRows - 1

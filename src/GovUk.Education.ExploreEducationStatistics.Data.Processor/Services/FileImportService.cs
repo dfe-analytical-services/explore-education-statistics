@@ -62,7 +62,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var subject = await context.Subject.FindAsync(import.SubjectId);
 
-            // TODO DW - is this import.File.Path() correct?  What is its value for a Zip upload?  We want the actual data file itself
             var datafileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
             var metaFileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
 
@@ -77,7 +76,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 context
             );
 
-            await CheckComplete(import, context);
+            var completedImport = await _dataImportService.GetImport(import.Id);
+            await CheckComplete(completedImport, context);
         }
 
         public async Task ImportFiltersAndLocations(Guid importId, StatisticsDbContext context)

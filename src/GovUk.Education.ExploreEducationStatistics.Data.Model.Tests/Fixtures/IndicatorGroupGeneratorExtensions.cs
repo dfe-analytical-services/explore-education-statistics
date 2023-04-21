@@ -29,7 +29,7 @@ public static class IndicatorGroupGeneratorExtensions
     public static InstanceSetters<IndicatorGroup> SetDefaults(this InstanceSetters<IndicatorGroup> setters)
         => setters
             .SetDefault(ig => ig.Id)
-            .SetDefault(ig => ig.Label);
+            .Set(ig => ig.Label, "Default");
 
     public static InstanceSetters<IndicatorGroup> SetSubject(
         this InstanceSetters<IndicatorGroup> setters,

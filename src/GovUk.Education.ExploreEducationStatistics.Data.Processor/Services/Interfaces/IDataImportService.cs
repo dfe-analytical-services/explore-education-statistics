@@ -19,9 +19,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 
         Task UpdateStatus(Guid id, DataImportStatus newStatus, double percentageComplete);
 
-        Task Update(Guid id,
-            int importedRows,
-            int totalRows,
-            HashSet<GeographicLevel> geographicLevels);
+        Task Update(
+            Guid id,
+            int? expectedImportedRows = null,
+            int? totalRows = null,
+            HashSet<GeographicLevel>? geographicLevels = null,
+            int? importedRows = null,
+            int? lastProcessedRowIndex = null);
     }
 }

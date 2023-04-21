@@ -76,18 +76,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return import.Status;
         }
 
-        public async Task Update(Guid id,
-            int importedRows,
-            int totalRows,
-            HashSet<GeographicLevel> geographicLevels)
+        public async Task Update(
+            Guid id,
+            int? expectedImportedRows = null,
+            int? totalRows = null,
+            HashSet<GeographicLevel>? geographicLevels = null,
+            int? importedRows = null,
+            int? lastProcessedRowIndex = null)
         {
             await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
             var import = await contentDbContext.DataImports.SingleAsync(import => import.Id == id);
             contentDbContext.Update(import);
 
-            import.ExpectedImportedRows = importedRows;
-            import.TotalRows = totalRows;
-            import.GeographicLevels = geographicLevels;
+            import.ExpectedImportedRows = expectedImportedRows ?? import.ExpectedImportedRows;
+            import.TotalRows = totalRows ?? import.TotalRows;
+            import.GeographicLevels = geographicLevels ?? import.GeographicLevels;
+            import.ImportedRows = importedRows ?? import.ImportedRows;
+            import.LastProcessedRowIndex = lastProcessedRowIndex ?? import.LastProcessedRowIndex;
 
             await contentDbContext.SaveChangesAsync();
         }
@@ -105,8 +110,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var percentageCompleteBefore = import.StagePercentageComplete;
             var percentageCompleteAfter = (int) Math.Clamp(percentageComplete, 0, 100);
 
-            // Ignore updating if already finished or aborting
-            if (import.Status.IsFinished() || import.Status.IsAborting())
+            // Ignore updating if already finished, or in the process of aborting and this status update isn't a
+            // finishing status update. 
+            if (import.Status.IsFinished() || (import.Status.IsAborting() && !newStatus.IsFinished()))
             {
                 _logger.LogWarning(
                     "Update: {Filename} {ImportStatus} ({PercentageCompleteBefore}%) -> " +

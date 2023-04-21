@@ -318,19 +318,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var soleGeographicLevel = import.HasSoleGeographicLevel();
             var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
             var totalBatches = Math.Ceiling((decimal) import.TotalRows!.Value / importObservationsBatchSize);
-            
+            var importedRowsSoFar = import.ImportedRows;
+            var lastProcessedRowIndex = import.LastProcessedRowIndex ?? -1;
+            var startingBatchIndex = (lastProcessedRowIndex + 1) / importObservationsBatchSize;
+
             await CsvUtils.Batch(
                 dataFileStreamProvider,
                 importObservationsBatchSize,
                 async (batchOfRows, batchIndex) =>
                 {
-                    // TODO DW - ability to skip already imported rows even within a batch (if batch size changes via configuration)
-                    _logger.LogDebug(
+                    var currentImportStatus = await _dataImportService.GetImportStatus(import.Id);
+
+                    if (currentImportStatus.IsFinishedOrAborting())
+                    {
+                        _logger.LogInformation(
+                            "Import for {FileName} has finished or is being aborted, " +
+                            "so finishing importing Observations early", import.File.Filename);
+                        return false;
+                    }
+                    
+                    _logger.LogInformation(
                         "Importing Observation batch {BatchNumber} of {TotalBatches}", 
                         batchIndex + 1, 
                         totalBatches);
 
-                    var allowedRows = batchOfRows.Select((cells, rowIndex) =>
+                    // Find the subset of this batch that hasn't yet been processed. We can use the
+                    // lastProcessedRowIndex to work out which rows in this batch have not yet been processed.
+                    var startOfBatchRowIndex = batchIndex * importObservationsBatchSize;
+                    var firstRowOfBatchToProcess = Math.Max(startOfBatchRowIndex, lastProcessedRowIndex + 1) - startOfBatchRowIndex;
+                    var unprocessedRows = batchOfRows.GetRange(
+                        firstRowOfBatchToProcess, batchOfRows.Count - firstRowOfBatchToProcess);
+
+                    if (unprocessedRows.Count != batchOfRows.Count)
+                    {
+                        _logger.LogInformation(
+                            "Skipping first {SkippedRowCount} rows of batch {BatchNumber} as it is already " +
+                            "partially processed", 
+                            importObservationsBatchSize - unprocessedRows.Count,
+                            batchIndex + 1);
+                    }
+                    
+                    var allowedRows = unprocessedRows.Select((cells, rowIndex) =>
                     {
                         if (IsRowAllowed(soleGeographicLevel, cells, csvHeaders))
                         {
@@ -349,13 +377,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     await _databaseHelper.DoInTransaction(context, async contextDelegate => 
                         await _observationBatchImporter.ImportObservationBatch(contextDelegate, allowedRows)
                     );
+
+                    importedRowsSoFar += allowedRows.Count();
+                    lastProcessedRowIndex += unprocessedRows.Count;
+
+                    await _dataImportService.Update(
+                        import.Id, 
+                        importedRows: importedRowsSoFar,
+                        lastProcessedRowIndex: lastProcessedRowIndex);
                     
                     var percentageComplete = (double) ((batchIndex + 1) / totalBatches) * 100;
 
                     await _dataImportService.UpdateStatus(import.Id, STAGE_3, percentageComplete);
 
                     return true;
-                });
+                },
+                startingBatchIndex);
         }
 
         public TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> rowValues, List<string> colValues)

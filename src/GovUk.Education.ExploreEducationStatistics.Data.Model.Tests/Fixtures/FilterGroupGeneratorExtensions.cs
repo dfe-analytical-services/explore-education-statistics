@@ -20,6 +20,9 @@ public static class FilterGroupGeneratorExtensions
     public static Generator<FilterGroup> WithDefaults(this Generator<FilterGroup> generator)
         => generator.ForInstance(s => s.SetDefaults());
 
+    public static Generator<FilterGroup> WithLabel(this Generator<FilterGroup> generator, string label)
+        => generator.ForInstance(s => s.SetLabel(label));
+
     public static Generator<FilterGroup> WithFilter(this Generator<FilterGroup> generator, Filter filter)
         => generator.ForInstance(s => s.SetFilter(filter));
 
@@ -41,7 +44,12 @@ public static class FilterGroupGeneratorExtensions
     public static InstanceSetters<FilterGroup> SetDefaults(this InstanceSetters<FilterGroup> setters)
         => setters
             .SetDefault(fg => fg.Id)
-            .SetDefault(fg => fg.Label);
+            .Set(fg => fg.Label, "Default");
+
+    public static InstanceSetters<FilterGroup> SetLabel(
+        this InstanceSetters<FilterGroup> setters,
+        string label)
+        => setters.Set(fg => fg.Label, label);
 
     public static InstanceSetters<FilterGroup> SetFilter(
         this InstanceSetters<FilterGroup> setters,

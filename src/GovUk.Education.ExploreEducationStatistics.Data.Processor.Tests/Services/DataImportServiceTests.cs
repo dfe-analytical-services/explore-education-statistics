@@ -122,6 +122,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             var import = new DataImport
             {
                 ExpectedImportedRows = 1,
+                ImportedRows = 1,
+                TotalRows = 1
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -132,9 +134,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             }
 
 
-            var service = BuildDataImportService(contentDbContextId: contentDbContextId);
+            var service = BuildDataImportService(contentDbContextId);
 
-            await service.Update(import.Id,
+            await service.Update(
+                import.Id,
+                expectedImportedRows: 3000,
                 importedRows: 5000,
                 totalRows: 10000,
                 geographicLevels: new HashSet<GeographicLevel>
@@ -147,7 +151,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             {
                 var updated = await contentDbContext.DataImports.SingleAsync(i => i.Id == import.Id);
 
-                Assert.Equal(5000, updated.ExpectedImportedRows);
+                Assert.Equal(3000, updated.ExpectedImportedRows);
+                Assert.Equal(5000, updated.ImportedRows);
                 Assert.Equal(10000, updated.TotalRows);
 
                 Assert.Equal(2, updated.GeographicLevels.Count);

@@ -35,8 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 name: "LastProcessedRowIndex",
                 table: "DataImports",
                 type: "int",
-                nullable: false,
-                defaultValue: 0);
+                nullable: true);
             
             migrationBuilder.SqlFromFile(MigrationConstants.ContentMigrationsPath,
                 $"{MigrationId}_EES4192_RemoveBatchingFromDataImportProcess.sql");

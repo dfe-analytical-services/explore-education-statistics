@@ -43,9 +43,15 @@ public static class CsvUtils
     /// </remarks>
     public static async Task<List<List<string>>> GetCsvRows(
         Func<Task<Stream>> streamProvider,
+        int startingBatchIndex = 0,
         bool skipHeaderRow = true)
     {
-        return (await Select(streamProvider, (cells, _) => cells, skipHeaderRow)).ToList();
+        return (await Select(
+            streamProvider, 
+            (cells, _) => cells, 
+            startingBatchIndex,
+            skipHeaderRow))
+            .ToList();
     }
 
     /// <summary>
@@ -85,10 +91,17 @@ public static class CsvUtils
     /// the index of the current row, and returns "true" to continue iterating, or "false" to finish looping early.
     /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
     /// </param>
-    /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
+    /// <param name="startingRowIndex">Optional parameter to skip a number of rows to execute. This value will
+    /// take into account the header and whether or not we have chosen to skip it. For instance, if a header isn't
+    /// being skipped and this is set to 0, the first line executed will be the header row, whereas if this is set to 1,
+    /// the first line being executed will be the first row of data. And if a header is being skipped and this is set to
+    /// 0, the first row being executed will be the first line of data, whereas if this is set to 1, the first row being
+    /// executed will be the second line of data.</param>
+    /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the rows being executed.</param>
     public static async Task ForEachRow(
         Func<Task<Stream>> streamProvider,
         Func<List<string>, int, bool, Task<bool>> func,
+        int startingRowIndex = 0,
         bool skipHeaderRow = true)
     {
         var config = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -105,6 +118,15 @@ public static class CsvUtils
 
         while (!lastLine)
         {
+            var currentRowIndex = csvReader.Parser.Row + (skipHeaderRow ? -1 : 0);
+
+            if (currentRowIndex < startingRowIndex)
+            {
+                // Skipping this row as it is below startingRowIndex
+                lastLine = !await csvReader.ReadAsync();
+                continue;
+            }
+            
             var cellCount = csvDataReader.FieldCount;
 
             var cells = Enumerable
@@ -112,8 +134,6 @@ public static class CsvUtils
                 .Select(csvReader.GetField<string>)
                 .OfType<string>()
                 .ToList();
-
-            var currentRowIndex = csvReader.Parser.Row + (skipHeaderRow ? -1 : 0);
             
             lastLine = !await csvReader.ReadAsync();
             
@@ -130,6 +150,7 @@ public static class CsvUtils
         Func<Task<Stream>> streamProvider,
         int batchSize,
         Func<List<List<string>>, int, Task<bool>> func,
+        int startingBatchIndex,
         bool skipHeaderRow = true)
     {
         var linesInBatch = new List<List<string>>();
@@ -145,7 +166,7 @@ public static class CsvUtils
 
                 if (lastLine || rowsProcessed % batchSize == 0)
                 {
-                    var result = await func.Invoke(linesInBatch, batchIndex);
+                    var result = await func.Invoke(linesInBatch, batchIndex + startingBatchIndex);
 
                     if (!result)
                     {
@@ -158,6 +179,7 @@ public static class CsvUtils
 
                 return true;
             },
+            startingRowIndex: (startingBatchIndex * batchSize) + 1,
             skipHeaderRow);
     }
 
@@ -177,6 +199,7 @@ public static class CsvUtils
     public static Task ForEachRow(
         Func<Task<Stream>> streamProvider,
         Func<List<string>, int, Task> func,
+        int startingBatchIndex = 0,
         bool skipHeaderRow = true)
     {
         return ForEachRow(
@@ -186,6 +209,7 @@ public static class CsvUtils
                 await func.Invoke(cells, index);
                 return true;
             },
+            startingBatchIndex,
             skipHeaderRow
         );
     }
@@ -206,6 +230,7 @@ public static class CsvUtils
     public static Task ForEachRow(
         Func<Task<Stream>> streamProvider,
         Func<List<string>, int, bool> action,
+        int startingBatchIndex = 0,
         bool skipHeaderRow = true)
     {
         return ForEachRow(
@@ -215,6 +240,7 @@ public static class CsvUtils
                 var result = action.Invoke(cells, index);
                 return Task.FromResult(result);
             },
+            startingBatchIndex,
             skipHeaderRow
         );
     }
@@ -235,6 +261,7 @@ public static class CsvUtils
     public static Task ForEachRow(
         Func<Task<Stream>> streamProvider,
         Action<List<string>, int> action,
+        int startingBatchIndex = 0,
         bool skipHeaderRow = true)
     {
         return ForEachRow(
@@ -244,6 +271,7 @@ public static class CsvUtils
                 action.Invoke(cells, index);
                 return Task.FromResult(true);
             },
+            startingBatchIndex,
             skipHeaderRow
         );
     }
@@ -265,6 +293,7 @@ public static class CsvUtils
     public static async Task<List<TResult>> Select<TResult>(
         Func<Task<Stream>> streamProvider,
         Func<List<string>, int, Task<TResult>> func,
+        int startingBatchIndex = 0,
         bool skipHeaderRow = true)
     {
         var list = new List<TResult>();
@@ -272,6 +301,7 @@ public static class CsvUtils
         await ForEachRow(
             streamProvider,
             async (cells, index) => { list.Add(await func.Invoke(cells, index)); },
+            startingBatchIndex,
             skipHeaderRow
         );
 
@@ -295,6 +325,7 @@ public static class CsvUtils
     public static Task<List<TResult>> Select<TResult>(
         Func<Task<Stream>> streamProvider,
         Func<List<string>, int, TResult> func,
+        int startingBatchIndex = 0,
         bool skipHeaderRow = true)
     {
         return Select(
@@ -304,6 +335,7 @@ public static class CsvUtils
                 var result = func.Invoke(cells, index);
                 return Task.FromResult(result);
             },
+            startingBatchIndex,
             skipHeaderRow
         );
     }

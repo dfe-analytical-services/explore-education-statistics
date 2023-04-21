@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         /// importing, so it may also have been excluded from import.  This allows the Importer to pick up from where
         /// it left off if an ongoing import is interrupted. 
         /// </summary>
-        public int LastProcessedRowIndex { get; set; }
+        public int? LastProcessedRowIndex { get; set; }
 
         public HashSet<GeographicLevel> GeographicLevels { get; set; } = new();
 
