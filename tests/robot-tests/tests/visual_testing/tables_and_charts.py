@@ -31,7 +31,6 @@ class DataBlockRow:
         chart_title,
         chart_type,
     ):
-
         self.publication_id = publication_id.lower()
         self.chart_type = chart_type
         self.chart_title = chart_title
@@ -105,7 +104,6 @@ class Release:
 
 
 def generate_releases(data_blocks_csv_filepath):
-
     content_blocks = []
 
     def read_cell(cell_value):
