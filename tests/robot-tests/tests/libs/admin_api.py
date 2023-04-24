@@ -112,7 +112,7 @@ def user_adds_user_invite_via_api(user_email: str, role_name: str, created_date:
         {
             "email": user_email,
             "roleId": _get_global_role_id(role_name),
-            "createdDate": created_date or datetime.today().strftime("%Y-%m-%d %H:%M:%S"),
+            "createdDate": created_date or datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
         },
     )
     assert (

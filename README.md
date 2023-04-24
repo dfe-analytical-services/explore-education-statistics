@@ -196,45 +196,46 @@ The service can be started against a set of non-existent database. If no pre-exi
 3. Start the Admin project and this will configure the contained users' permissions via database migrations. The other 
    projects will then be able to be started, using their own contained users to connect to the databases. 
 
-### Running a different identity provider (optional)
+### Setting up an Identity Provider
 
-> For running the project day-to-day as a team member, you can ignore this step.
+The project uses an OpenID Connect Identity Provider to allow login to the Admin service.
 
-Currently, the project defaults to using Active Directory as its identity provider. Typically, this
-will be used by components such as the admin service to allow users to log in.
+> For team members, Azure AD configuration is available alongside other project passwords with the title `Azure AD IdP 
+configuration`. Place the contents of this into [appsettings.Idp.json](
+src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Idp.json) and start Admin normally.
 
-If you wish use a different identity provider (e.g. working outside the team), you can use:
+An out-of-the-box IdP is provided for ease of setup which runs [Keycloak](https://www.keycloak.org/) in a Docker container 
+and contains a number of users for different roles. The [appsettings.Keycloak.json](
+src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Keycloak.json) configuration file contains the details for 
+connecting Admin to this IdP.
 
-- Our out-of-the-box identity provider called [Keycloak](https://www.keycloak.org/) (as a Docker 
-  container).
-- Any OpenID Connect compatible identity provider e.g. Active Directory. It must have Implicit Flow 
-  enabled and be using the OpenID Connect protocol. It must be set to issue ID Tokens.
+Alternatively, you can provide your own OpenID Connect configuration in the gitignored [appsettings.Idp.json](
+src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Idp.json) file (you can use the Keycloak equivalent as a
+template as to how the configuration in the file should be structured).
 
-#### Using Keycloak identity provider with standard seed data users
+#### Using Keycloak
 
-All the standard seed data users can be supported with Keycloak, and use their standard email addresses and the 
-password `password` to log in.
-
-The [Keycloak Admin login](http://ees.local:5030/auth/admin/) is available with username `admin` and password 
-`admin`.  From here, users and Open ID Connect settings can be administered.
-
-1. To run the out-of-the-box Keycloak identity provider:
+1. Start up Keycloak:
 
   ```bash
   cd useful-scripts/
   ./run.js idp
   ```
-   
-2. To then get Admin to use Keycloak, run:
+
+2. Start up Admin with additional Keycloak configuration:
 
   ```bash
   cd useful-scripts/
   ./run.js adminKeycloak # this sets the environment variable "IdpProviderConfiguration=Keycloak" for us
   ```
 
-The environment variable `IdpProviderConfiguration` lets Admin know to use 
-[appsettings.Keycloak.json](src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Keycloak.json) 
-for its Open ID Connect configuration.
+All the standard seed data users can be supported with Keycloak, and use their standard email addresses and the
+password `password` to log in.
+
+The [Keycloak Admin login](http://ees.local:5030/auth/admin/) is available with username `admin` and password
+`admin`. From here, users and OpenID Connect settings can be administered.
+
+##### Adding additional users to Keycloak manually
 
 Additional seed data users can be added to Keycloak by manually adding new entries to the "users" array in
 [keycloak-ees-realm.json](src/keycloak/keycloak-ees-realm.json), ensuring to supply unique GUIDs to the `user` and
@@ -249,36 +250,47 @@ cd src/
 docker-compose up --build --force-recreate idp
 ```
 
-#### Using Keycloak identity provider with custom users
+#### Using a different Identity Provider
 
-Additionally, if wanting to set up a set of Keycloak users automatically in the service in order
-to start using the service against an empty set of databases, set the following environment variable:
+If you have your own OpenID Connect IdP set up, you can provide its configuration in the gitignored 
+[appsettings.Idp.json](src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Idp.json) file (you can 
+use the Keycloak equivalent as a template as to how the configuration in the file should be structured).
+
+> Note that it must have Implicit Flow enabled and be using the OpenID Connect protocol. It must be set to issue 
+ID Tokens.
+
+#### Bootstrapping Keycloak users into a blank database
+
+If you are wanting to use Keycloak but with a fresh database, set the following environment variable:
 
 ```
 BootstrapUsersConfiguration=KeycloakBootstrapUsers
 ```
 
-The effect of setting these 2 environment variables together will allow authentication of users with 
-Keycloak, and those users specified within the `src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.KeycloakBootstrapUsers.json` 
-will be available for use as "BAU Users", who have the ability to create new Publications and Releases, 
-and invite other users to the system to work on those Publications and Releases.
+The effect of setting this environment variable tells the Admin application to generate a set of BAU users
+on startup that are specified in the 
+[src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.KeycloakBootstrapUsers.json](
+src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.KeycloakBootstrapUsers.json) file.
 
-#### Using your own identity provider
+This allows immediate use of the service with Keycloak against an empty database, as corresponding users will
+now be in both Keycloak and in the SQL Server database.
 
-Alternatively you can create an OpenID Connect compatible Identity Provider like Active Directory 
-and provide its credentials in a file called `src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.{NameOfYourIdentityProvider}.json` 
-and a set of users' email addresses who you want to access the system straight away in a file called 
+#### Using multiple Identity Providers and user configurations
+
+Alternatively you can provide any number of different OpenID Connect IdP configurations and bootstrap user lists 
+by providing files like `src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.{NameOfYourIdentityProvider}.json` 
+and optionally a set of users' email addresses who you want to access the system straight away in a file called 
 `src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.{NameOfYourIdentityProvider}BootstrapUsers.json`.  
 
-Then set the environment variables above like:
+Then set the environment variables:
 
 ```
 IdpProviderConfiguration={NameOfYourIdentityProvider}
 BootstrapUsersConfiguration={NameOfYourIdentityProvider}BootstrapUsers
 ```
 
-If choosing to provide your own OpenID Connect configuration file, you can use the existing Keycloak configuration file
-as a reference, at [appsettings.Keycloak.json](src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Keycloak.json).
+and start up Admin wih these environment variables set. This allows you to more easily switch between different IdP 
+configurations if you have need of more than one for easy reference.
 
 ### Running the backend
 
