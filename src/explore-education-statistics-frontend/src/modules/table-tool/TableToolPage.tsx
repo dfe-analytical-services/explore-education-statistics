@@ -130,7 +130,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         themeMeta={themeMeta}
         initialState={initialState}
         loadingFastTrack={loadingFastTrack}
-        renderFeaturedTable={highlight => (
+        renderFeaturedTableLink={highlight => (
           <Link
             to={`/data-tables/fast-track/${highlight.id}`}
             onClick={() => {

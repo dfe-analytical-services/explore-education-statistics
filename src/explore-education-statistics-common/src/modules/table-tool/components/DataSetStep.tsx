@@ -1,0 +1,181 @@
+import { PublicationReleaseSummary } from '@common/services/publicationService';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
+import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
+import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
+import DataSetStepContent from '@common/modules/table-tool/components/DataSetStepContent';
+import { Subject, FeaturedTable } from '@common/services/tableBuilderService';
+import Yup from '@common/validation/yup';
+import Details from '@common/components/Details';
+import DataSetDetailsList from '@common/modules/table-tool/components/DataSetDetailsList';
+import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
+import React, { ReactNode } from 'react';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+
+const formId = 'publicationDataStepForm';
+
+export type DataSetFormSubmitHandler = (values: { subjectId: string }) => void;
+
+export interface DataSetFormValues {
+  subjectId: string;
+}
+
+interface Props extends InjectedWizardProps {
+  featuredTables?: FeaturedTable[];
+  loadingFastTrack?: boolean;
+  selectedRelease?: Partial<PublicationReleaseSummary>;
+  subjects: Subject[];
+  subjectId?: string;
+  renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
+  onSubmit: DataSetFormSubmitHandler;
+}
+
+const DataSetStep = ({
+  featuredTables = [],
+  loadingFastTrack = false,
+  selectedRelease,
+  subjects,
+  subjectId = '',
+  renderFeaturedTableLink,
+  onSubmit,
+  ...stepProps
+}: Props) => {
+  const { goToNextStep, isActive } = stepProps;
+
+  const stepHeading = (
+    <WizardStepHeading {...stepProps}>
+      {featuredTables.length > 0
+        ? 'Select a data set or featured table'
+        : 'Select a data set'}
+    </WizardStepHeading>
+  );
+
+  const options = subjects.map(subject => ({
+    label: subject.name,
+    value: subject.id,
+    hint: !renderFeaturedTableLink && (
+      <Details
+        summary="More details"
+        className="govuk-!-margin-bottom-2"
+        hiddenText={`for ${subject.name}`}
+      >
+        <h3 className="govuk-heading-s">
+          This subject includes the following data:
+        </h3>
+        <DataSetDetailsList subject={subject} />
+      </Details>
+    ),
+  }));
+
+  if (isActive) {
+    return (
+      <FormProvider
+        enableReinitialize
+        initialValues={{
+          subjectId,
+        }}
+        validationSchema={Yup.object<DataSetFormValues>({
+          subjectId: Yup.string().ensure().required('Choose a data set'),
+        })}
+      >
+        {({ formState }) => {
+          return (
+            <RHFForm
+              id={formId}
+              onSubmit={async ({ subjectId: id }) => {
+                await goToNextStep(async () => {
+                  await onSubmit({ subjectId: id });
+                });
+              }}
+            >
+              {stepHeading}
+
+              <LoadingSpinner loading={loadingFastTrack}>
+                <div className="govuk-grid-row">
+                  <div
+                    className={
+                      !renderFeaturedTableLink
+                        ? 'govuk-grid-column-full'
+                        : 'govuk-grid-column-one-third govuk-grid-column-one-quarter-from-desktop'
+                    }
+                  >
+                    {subjects.length > 0 ? (
+                      <>
+                        <RHFFormFieldRadioGroup
+                          className="govuk-!-margin-bottom-2"
+                          name="subjectId"
+                          order={[]}
+                          legend={
+                            renderFeaturedTableLink && featuredTables.length
+                              ? 'View all featured tables or select a data set'
+                              : 'Select a data set'
+                          }
+                          legendHidden
+                          disabled={formState.isSubmitting}
+                          options={
+                            renderFeaturedTableLink && featuredTables.length
+                              ? [
+                                  {
+                                    divider: 'or select a data set',
+                                    label: 'View all featured tables',
+                                    labelClassName: 'govuk-!-font-weight-bold',
+                                    value: 'all-featured',
+                                  },
+                                  ...options,
+                                ]
+                              : options
+                          }
+                          small={!!renderFeaturedTableLink}
+                          showError={!renderFeaturedTableLink}
+                        />
+                        {!renderFeaturedTableLink && (
+                          <WizardStepFormActions
+                            {...stepProps}
+                            isSubmitting={formState.isSubmitting}
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <p>No data sets available.</p>
+                    )}
+                  </div>
+                  {renderFeaturedTableLink && (
+                    <div className="govuk-grid-column-two-thirds govuk-grid-column-three-quarters-from-desktop">
+                      <DataSetStepContent
+                        {...stepProps}
+                        featuredTables={featuredTables}
+                        isSubmitting={formState.isSubmitting}
+                        release={selectedRelease}
+                        renderFeaturedTableLink={renderFeaturedTableLink}
+                        subjects={subjects}
+                      />
+                    </div>
+                  )}
+                </div>
+              </LoadingSpinner>
+            </RHFForm>
+          );
+        }}
+      </FormProvider>
+    );
+  }
+
+  const subjectName =
+    subjects.find(({ id }) => subjectId === id)?.name ?? 'None';
+
+  return (
+    <WizardStepSummary {...stepProps} goToButtonText="Change data set">
+      {stepHeading}
+
+      <SummaryList noBorder>
+        <SummaryListItem term="Data set">{subjectName}</SummaryListItem>
+      </SummaryList>
+    </WizardStepSummary>
+  );
+};
+
+export default DataSetStep;

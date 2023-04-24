@@ -10,8 +10,9 @@ import PreviousStepModalConfirm from '@common/modules/table-tool/components/Prev
 import PrototypePublicationForm, {
   PublicationFormSubmitHandler,
 } from '@admin/prototypes/components/PrototypePublicationForm';
-import { SubjectFormSubmitHandler } from '@common/modules/table-tool/components/SubjectForm';
-import SubjectStep from '@common/modules/table-tool/components/SubjectStep';
+import DataSetStep, {
+  DataSetFormSubmitHandler,
+} from '@common/modules/table-tool/components/DataSetStep';
 import TimePeriodForm, {
   TimePeriodFormSubmitHandler,
 } from '@common/modules/table-tool/components/TimePeriodForm';
@@ -76,7 +77,7 @@ export interface PrototypeTableToolWizardProps {
   hidePublicationStep?: boolean;
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
   loadingFastTrack?: boolean;
-  renderFeaturedTable?: (featuredTable: FeaturedTable) => ReactNode;
+  renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
   scrollOnMount?: boolean;
   onTableQueryError?: (
     errorCode: TableQueryErrorCode,
@@ -93,7 +94,7 @@ const PrototypeTableToolWizard = ({
   initialState = {},
   scrollOnMount,
   hidePublicationStep,
-  renderFeaturedTable,
+  renderFeaturedTableLink,
   finalStep,
   showTableQueryErrorDownload = true,
   onSubmit,
@@ -171,7 +172,7 @@ const PrototypeTableToolWizard = ({
     }
   };
 
-  const handleSubjectFormSubmit: SubjectFormSubmitHandler = async ({
+  const handleSubjectFormSubmit: DataSetFormSubmitHandler = async ({
     subjectId: selectedSubjectId,
   }) => {
     // const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
@@ -393,12 +394,12 @@ const PrototypeTableToolWizard = ({
             )}
             <WizardStep onBack={handleSubjectStepBack}>
               {stepProps => (
-                <SubjectStep
+                <DataSetStep
                   {...stepProps}
                   featuredTables={state.featuredTables}
                   subjects={state.subjects}
                   subjectId={state.query.subjectId}
-                  renderFeaturedTable={renderFeaturedTable}
+                  renderFeaturedTableLink={renderFeaturedTableLink}
                   onSubmit={handleSubjectFormSubmit}
                   loadingFastTrack={loadingFastTrack}
                 />

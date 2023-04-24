@@ -93,7 +93,7 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
             hidePublicationStep
             initialState={initialState}
             onSubjectStepBack={() => setHighlightId(undefined)}
-            renderFeaturedTable={highlight => (
+            renderFeaturedTableLink={highlight => (
               <ButtonText
                 onClick={() => {
                   setHighlightId(highlight.id);

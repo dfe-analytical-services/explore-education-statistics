@@ -104,16 +104,17 @@ Check that archive-publication subject appears correctly on Data tables page
 
     user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
     user clicks element    id:publicationForm-submit
-    user waits until table tool wizard step is available    2    Choose a subject
+    user waits until table tool wizard step is available    2    Select a data set
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME_ARCHIVE}
 
     user checks page contains    ${SUBJECT_NAME_ARCHIVE}
 
 Generate permalink for archive-publication
-    user clicks element    id:publicationSubjectForm-submit
+    user clicks radio    ${SUBJECT_NAME_ARCHIVE}
+    user clicks element    id:publicationDataStepForm-submit
 
     user waits until table tool wizard step is available    3    Choose locations
-    user checks previous table tool step contains    2    Subject    ${SUBJECT_NAME_ARCHIVE}
+    user checks previous table tool step contains    2    Data set    ${SUBJECT_NAME_ARCHIVE}
     user opens details dropdown    Regional
     user clicks checkbox    North East
     user clicks element    id:locationFiltersForm-submit
@@ -226,7 +227,7 @@ Check public data tables page contains superseding-publication's subject
 
     user clicks radio    ${PUBLICATION_NAME_SUPERSEDE}
     user clicks element    id:publicationForm-submit
-    user waits until table tool wizard step is available    2    Choose a subject
+    user waits until table tool wizard step is available    2    Select a data set
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME_SUPERSEDE}
 
     user checks page contains    ${SUBJECT_NAME_SUPERSEDE}
@@ -420,7 +421,7 @@ Check public data tables page is correct after archive-publication has been unar
 
     user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
     user clicks element    id:publicationForm-submit
-    user waits until table tool wizard step is available    2    Choose a subject
+    user waits until table tool wizard step is available    2    Select a data set
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME_ARCHIVE}
 
     user checks page contains    ${SUBJECT_NAME_ARCHIVE}

@@ -84,12 +84,15 @@ export interface Subject {
   };
   geographicLevels: string[];
   file: FileInfo;
+  filters: string[];
+  indicators: string[];
 }
 
 export interface FeaturedTable {
   id: string;
   name: string;
   description?: string;
+  subjectId: string;
 }
 
 export interface SubjectMeta {

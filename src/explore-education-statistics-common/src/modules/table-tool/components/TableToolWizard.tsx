@@ -10,8 +10,9 @@ import PreviousStepModalConfirm from '@common/modules/table-tool/components/Prev
 import PublicationForm, {
   PublicationFormSubmitHandler,
 } from '@common/modules/table-tool/components/PublicationForm';
-import { SubjectFormSubmitHandler } from '@common/modules/table-tool/components/SubjectForm';
-import SubjectStep from '@common/modules/table-tool/components/SubjectStep';
+import DataSetStep, {
+  DataSetFormSubmitHandler,
+} from '@common/modules/table-tool/components/DataSetStep';
 import TimePeriodForm, {
   TimePeriodFormSubmitHandler,
 } from '@common/modules/table-tool/components/TimePeriodForm';
@@ -71,7 +72,7 @@ export interface TableToolWizardProps {
   hidePublicationStep?: boolean;
   initialState?: Partial<InitialTableToolState>;
   loadingFastTrack?: boolean;
-  renderFeaturedTable?: (featuredTable: FeaturedTable) => ReactNode;
+  renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
   scrollOnMount?: boolean;
   showTableQueryErrorDownload?: boolean;
   themeMeta?: Theme[];
@@ -97,7 +98,7 @@ const TableToolWizard = ({
   hidePublicationStep,
   initialState = {},
   loadingFastTrack = false,
-  renderFeaturedTable,
+  renderFeaturedTableLink,
   scrollOnMount,
   showTableQueryErrorDownload = true,
   themeMeta = [],
@@ -177,12 +178,15 @@ const TableToolWizard = ({
   };
 
   const handleSubjectStepBack = () => {
+    updateState(draft => {
+      draft.query.subjectId = '';
+    });
     if (onSubjectStepBack) {
       onSubjectStepBack(state.selectedPublication);
     }
   };
 
-  const handleSubjectFormSubmit: SubjectFormSubmitHandler = async ({
+  const handleSubjectFormSubmit: DataSetFormSubmitHandler = async ({
     subjectId: selectedSubjectId,
   }) => {
     if (state.selectedPublication) {
@@ -424,7 +428,7 @@ const TableToolWizard = ({
             }}
           >
             {!hidePublicationStep && (
-              <WizardStep onBack={handlePublicationStepBack}>
+              <WizardStep size="l" onBack={handlePublicationStepBack}>
                 {stepProps => (
                   <PublicationForm
                     {...stepProps}
@@ -437,20 +441,21 @@ const TableToolWizard = ({
                 )}
               </WizardStep>
             )}
-            <WizardStep onBack={handleSubjectStepBack}>
+            <WizardStep size="l" onBack={handleSubjectStepBack}>
               {stepProps => (
-                <SubjectStep
+                <DataSetStep
                   {...stepProps}
                   featuredTables={state.featuredTables}
+                  loadingFastTrack={loadingFastTrack}
+                  renderFeaturedTableLink={renderFeaturedTableLink}
+                  selectedRelease={state.selectedPublication?.selectedRelease}
                   subjects={state.subjects}
                   subjectId={state.query.subjectId}
-                  renderFeaturedTable={renderFeaturedTable}
                   onSubmit={handleSubjectFormSubmit}
-                  loadingFastTrack={loadingFastTrack}
                 />
               )}
             </WizardStep>
-            <WizardStep onBack={handleLocationStepBack}>
+            <WizardStep size="l" onBack={handleLocationStepBack}>
               {stepProps => (
                 <LocationFiltersForm
                   {...stepProps}
@@ -460,7 +465,7 @@ const TableToolWizard = ({
                 />
               )}
             </WizardStep>
-            <WizardStep onBack={handleTimePeriodStepBack}>
+            <WizardStep size="l" onBack={handleTimePeriodStepBack}>
               {stepProps => (
                 <TimePeriodForm
                   {...stepProps}
@@ -470,7 +475,7 @@ const TableToolWizard = ({
                 />
               )}
             </WizardStep>
-            <WizardStep onBack={handleFiltersStepBack}>
+            <WizardStep size="l" onBack={handleFiltersStepBack}>
               {stepProps => (
                 <FiltersForm
                   {...stepProps}

@@ -158,6 +158,8 @@ describe('TableToolPage', () => {
         size: '10 Mb',
         type: 'Data',
       },
+      filters: ['Filter 1'],
+      indicators: ['Indicator 1'],
     },
   ];
 

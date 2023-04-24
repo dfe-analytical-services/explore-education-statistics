@@ -16,22 +16,19 @@ Select Exclusions publication
     user clicks radio    Pupils and schools
     user clicks radio    Permanent and fixed-period exclusions in England
     user clicks element    id:publicationForm-submit
-    user waits until table tool wizard step is available    2    Choose a subject
+    user waits until table tool wizard step is available    2    Select a data set
     user checks previous table tool step contains    1    Publication
     ...    Permanent and fixed-period exclusions in England
 
 Validate "Exclusions by geographic level" subject details
-    user opens details dropdown    More details    css:[data-testid="Radio item for Exclusions by geographic level"]
-    ${details}=    user gets details content element    More details
-    ...    css:[data-testid="Radio item for Exclusions by geographic level"]
-    user checks summary list contains    Geographic levels    Local authority; National; Regional    ${details}
-    user checks summary list contains    Time period    2006/07 to 2016/17    ${details}
+    user clicks radio    Exclusions by geographic level
+    user checks summary list contains    Geographic levels    Local authority; National; Regional
+    user checks summary list contains    Time period    2006/07 to 2016/17
 
 Select subject "Exclusions by geographic level"
-    user clicks radio    Exclusions by geographic level
-    user clicks element    id:publicationSubjectForm-submit
+    user clicks element    id:publicationDataStepForm-submit
     user waits until table tool wizard step is available    3    Choose locations
-    user checks previous table tool step contains    2    Subject    Exclusions by geographic level
+    user checks previous table tool step contains    2    Data set    Exclusions by geographic level
 
 Select all LA Locations
     user opens details dropdown    Local authority

@@ -51,7 +51,7 @@ const PrototypeTableTool = ({ fastTrack, themeMeta = themes }: Props) => {
           themeMeta={themeMeta}
           initialState={initialState}
           loadingFastTrack={loadingFastTrack}
-          renderFeaturedTable={highlight => (
+          renderFeaturedTableLink={highlight => (
             <Link
               to={`/data-tables/fast-track/${highlight.id}`}
               onClick={() => {

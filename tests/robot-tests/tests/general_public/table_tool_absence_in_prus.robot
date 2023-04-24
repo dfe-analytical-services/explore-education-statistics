@@ -16,21 +16,18 @@ Select "Pupil absence" publication
     user clicks radio    Pupils and schools
     user clicks radio    Pupil absence in schools in England
     user clicks element    id:publicationForm-submit
-    user waits until table tool wizard step is available    2    Choose a subject
+    user waits until table tool wizard step is available    2    Select a data set
     user checks previous table tool step contains    1    Publication    Pupil absence in schools in England
 
 Validate "Absence in prus" subject details
-    user opens details dropdown    More details    css:[data-testid="Radio item for Absence in prus"]
-    ${details}=    user gets details content element    More details
-    ...    css:[data-testid="Radio item for Absence in prus"]
-    user checks summary list contains    Geographic levels    Local authority; National; Regional    ${details}
-    user checks summary list contains    Time period    2013/14 to 2016/17    ${details}
+    user clicks radio    Absence in prus
+    user checks summary list contains    Geographic levels    Local authority; National; Regional
+    user checks summary list contains    Time period    2013/14 to 2016/17
 
 Select subject "Absence in prus"
-    user clicks radio    Absence in prus
-    user clicks element    id:publicationSubjectForm-submit
+    user clicks element    id:publicationDataStepForm-submit
     user waits until table tool wizard step is available    3    Choose locations
-    user checks previous table tool step contains    2    Subject    Absence in prus
+    user checks previous table tool step contains    2    Data set    Absence in prus
 
 Select Location Country, England
     user opens details dropdown    National
