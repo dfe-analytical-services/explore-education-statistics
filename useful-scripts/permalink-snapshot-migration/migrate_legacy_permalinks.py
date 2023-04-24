@@ -43,59 +43,99 @@ a57e9ae9-b442-4005-caec-08db3b6d5a38,False
 
 
 class MigrateLegacyPermalinks:
-    def __init__(self, data_api_url: str):
+    def __init__(self, data_api_url: str, sleep: float, timeout: float):
         self.data_api_url = data_api_url
+        self.timeout = timeout
+        self.sleep = sleep
         self.http_headers = {}
 
-    def _migrate_permalink(self, permalink_id, timeout):
-        try:
-            start_time = time.monotonic()
-            response = requests.put(
-                f"{self.data_api_url}/permalink/{permalink_id}/snapshot",
-                headers=self.http_headers,
-                timeout=timeout,
-                verify=False,
-            )
-            end_time = time.monotonic()
-            response_time = end_time - start_time
-            print(
-                f"Request for permalink Id {permalink_id} returned status {response.status_code} in {response_time:.2f} seconds"
-            )
-            return response.status_code, response_time
-        except requests.exceptions.RequestException as e:
-            print(f"Request for permalink Id {permalink_id} failed with error: {str(e)}")
-            return None, None
+    def _migrate_permalink(self, permalink_id: str) -> tuple[int, float]:
+        start_time = time.monotonic()
+        response = requests.put(
+            f"{self.data_api_url}/permalink/{permalink_id}/snapshot",
+            headers=self.http_headers,
+            timeout=self.timeout,
+            verify=False,
+        )
+        end_time = time.monotonic()
+        response_time = end_time - start_time
+        print(
+            f"Request to migrate permalink Id {permalink_id} "
+            f"returned status {response.status_code} in {response_time:.2f} seconds"
+        )
+        return response.status_code, response_time
 
-    def _migrate_permalinks(self, permalinks, timeout, sleep):
+    def _migrate_permalinks(self, permalinks: list[list[str]]) -> None:
         with open("migration_results.csv", "w", newline="") as output_file:
             output_writer = csv.writer(output_file)
 
-            output_writer.writerow(["permalink_id", "http_status_code", "response_time"])
+            output_writer.writerow(
+                [
+                    "permalink_id",
+                    "ignored",
+                    "connection_error",
+                    "timeout",
+                    "exception",
+                    "http_status_code",
+                    "response_time",
+                ]
+            )
             output_file.flush()
 
             for permalink_id, migrated in permalinks:
-                # if the permalink does not already have a snapshot, make a request to the Data API to migrate it
-                if migrated == "False":
-                    status_code, response_time = self._migrate_permalink(permalink_id, timeout)
+                ignored: bool = migrated == "True"
+                connection_error: bool | None = None
+                timeout: bool | None = None
+                exception: bool | None = None
+                status_code: int | None = None
+                response_time: float | None = None
 
-                    # write the status code and response time to an output csv file
-                    output_writer.writerow([permalink_id, status_code, f"{response_time:.2f}"])
-                    output_file.flush()
+                if not ignored:
+                    try:
+                        status_code, response_time = self._migrate_permalink(permalink_id)
+                    except requests.exceptions.ConnectionError:
+                        connection_error = True
+                        print(f"Request to migrate permalink Id {permalink_id} failed to connect")
+                    except requests.exceptions.Timeout:
+                        timeout = True
+                        print(f"Request to migrate permalink Id {permalink_id} timed out after {self.timeout} seconds")
+                    except requests.exceptions.RequestException as e:
+                        exception = True
+                        print(f"Request to migrate permalink Id {permalink_id} failed with error: {str(e)}")
 
-                # sleep for the specified amount of time since generating the snapshot is resource intensive
-                time.sleep(sleep)
+                # write a result row to the output csv file
+                output_writer.writerow(
+                    [
+                        permalink_id,
+                        ignored,
+                        connection_error,
+                        timeout,
+                        exception,
+                        status_code,
+                        "" if response_time is None else f"{response_time:.2f}",
+                    ]
+                )
+                output_file.flush()
+
+                # sleep for a specified amount of time since generating the snapshot is resource intensive
+                time.sleep(self.sleep)
 
     def main(self):
         with open("permalinks.csv", "r") as permalinks_csv_file:
             csv_reader = csv.reader(permalinks_csv_file)
-            permalinks = list(csv_reader)
 
-        self._migrate_permalinks(permalinks, timeout=240, sleep=5)
+            # Skip header row
+            next(csv_reader)
+
+            permalinks: list[list[str]] = list(csv_reader)
+
+        self._migrate_permalinks(permalinks)
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(
-        prog=f"python {os.path.basename(__file__)}", description="To migrate legacy permalinks to permalink snapshots"
+        prog=f"pipenv run python {os.path.basename(__file__)}",
+        description="To migrate legacy permalinks to permalink snapshots",
     )
 
     ap.add_argument(
@@ -108,7 +148,27 @@ if __name__ == "__main__":
         required=False,
     )
 
+    ap.add_argument(
+        "--sleep",
+        dest="sleep",
+        default=5.0,
+        nargs="?",
+        help="Delay between migration request executions in number of seconds",
+        type=float,
+        required=False,
+    )
+
+    ap.add_argument(
+        "--timeout",
+        dest="timeout",
+        default=240.0,
+        nargs="?",
+        help="Timout for the migration request in number of seconds",
+        type=float,
+        required=False,
+    )
+
     args = ap.parse_args()
 
-    migrator = MigrateLegacyPermalinks(data_api_url=args.data_api_url)
+    migrator = MigrateLegacyPermalinks(data_api_url=args.data_api_url, sleep=args.sleep, timeout=args.timeout)
     migrator.main()
