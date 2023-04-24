@@ -264,7 +264,7 @@ class SnapshotService:
         else:
             # All snapshots match so send a success message to slack (so we know the workflow has actually ran)
             self._send_slack_notification(
-                "Snapshot test workflow successfully completed for {self.public_url} :white_check_mark:"
+                f"Snapshot test workflow successfully completed for {self.public_url} :white_check_mark:"
             ) if self.slack_webhook_url else print("Snapshot script complete. No differences found.")
 
     def write_snapshots_to_file(self) -> None:
