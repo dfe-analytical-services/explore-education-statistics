@@ -482,7 +482,7 @@ public class ProcessorStage3Tests : IDisposable
     }
     
     [Fact]
-    public async Task ProcessStage3_PartiallyImportedAlready_MidBatch()
+    public async Task ProcessStage3_PartiallyImportedAlready_BatchSizeChanged()
     {
         Environment.SetEnvironmentVariable("RowsPerBatch", "3");
         

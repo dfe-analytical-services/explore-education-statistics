@@ -162,14 +162,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return errors;
             }
 
-            await CsvUtils.ForEachRow(fileStreamProvider, (cells, index) =>
+            await CsvUtils.ForEachRow(fileStreamProvider, (cells, index, _) =>
             {
                 totalRows++;
                 
                 if (cells.Count != columnHeaders.Count)
                 {
                     var errorCode = isMetaFile ? MetaFileHasInvalidNumberOfColumns : DataFileHasInvalidNumberOfColumns;
-                    errors.Add(new DataImportError($"Error at row {index + 1}: {errorCode.GetEnumLabel()}"));
+                    errors.Add(new DataImportError($"Error at data row {index + 1}: {errorCode.GetEnumLabel()}"));
                 }
                 
                 try
@@ -178,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
                 catch (Exception e)
                 {
-                    errors.Add(new DataImportError($"error at row {index}: {MetaFileHasInvalidValues.GetEnumLabel()} : {e.Message}"));
+                    errors.Add(new DataImportError($"error at data row {index + 1}: {MetaFileHasInvalidValues.GetEnumLabel()} : {e.Message}"));
                 }
             });
 
