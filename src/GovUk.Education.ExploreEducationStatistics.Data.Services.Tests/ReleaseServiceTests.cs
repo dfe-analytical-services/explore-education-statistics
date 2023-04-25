@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -44,10 +45,65 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 DataGuidance = "Guidance 2"
             };
 
+            var subject1Filter1 = new Filter
+            {
+                Subject = releaseSubject1.Subject,
+                Label = "subject 1 filter 1",
+            };
+
+            var subject1Filter2 = new Filter
+            {
+                Subject = releaseSubject1.Subject,
+                Label = "subject 1 filter 2",
+            };
+
+            var subject1IndicatorGroup1 = new IndicatorGroup
+            {
+                Subject = releaseSubject1.Subject,
+                Label = "subject 1 indicator group 1",
+                Indicators = new List<Indicator>
+                {
+                    new Indicator { Label = "subject 1 indicator group 1 indicator 1" },
+                    new Indicator { Label = "subject 1 indicator group 1 indicator 2" },
+                    new Indicator { Label = "subject 1 indicator group 1 indicator 3" },
+                }
+            };
+
+            var subject1IndicatorGroup2 = new IndicatorGroup
+            {
+                Subject = releaseSubject1.Subject,
+                Label = "subject 1 indicator group 2",
+                Indicators = new List<Indicator>
+                {
+                    new Indicator { Label = "subject 1 indicator group 2 indicator 1" },
+                    new Indicator { Label = "subject 1 indicator group 2 indicator 2" },
+                }
+            };
+
+            var subject2Filter1 = new Filter
+            {
+                Subject = releaseSubject2.Subject,
+                Label = "subject 2 filter 1",
+            };
+
+            var subject2IndicatorGroup1 = new IndicatorGroup
+            {
+                Subject = releaseSubject2.Subject,
+                Label = "subject 2 indicator group 1",
+                Indicators = new List<Indicator>
+                {
+                    new Indicator { Label = "subject 2 indicator group 1 indicator 1" },
+                }
+            };
+
             var statisticsDbContextId = Guid.NewGuid().ToString();
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1, releaseSubject2);
+                await statisticsDbContext.Filter.AddRangeAsync(
+                    subject1Filter1, subject1Filter2, subject2Filter1);
+                await statisticsDbContext.IndicatorGroup.AddRangeAsync(
+                    subject1IndicatorGroup1, subject1IndicatorGroup2, subject2IndicatorGroup1);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -155,6 +211,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Local Authority", subjects[0].GeographicLevels[0]);
                 Assert.Equal("Local Authority District", subjects[0].GeographicLevels[1]);
 
+                Assert.Equal(2, subjects[0].Filters.Count);
+                Assert.Equal("subject 1 filter 1", subjects[0].Filters[0]);
+                Assert.Equal("subject 1 filter 2", subjects[0].Filters[1]);
+
+                Assert.Equal(2, subjects[0].Indicators.Keys.Count);
+                Assert.Equal(3, subjects[0].Indicators["subject 1 indicator group 1"].Count);
+                Assert.Equal("subject 1 indicator group 1 indicator 1", subjects[0].Indicators["subject 1 indicator group 1"][0]);
+                Assert.Equal("subject 1 indicator group 1 indicator 2", subjects[0].Indicators["subject 1 indicator group 1"][1]);
+                Assert.Equal("subject 1 indicator group 1 indicator 3", subjects[0].Indicators["subject 1 indicator group 1"][2]);
+                Assert.Equal(2, subjects[0].Indicators["subject 1 indicator group 2"].Count);
+                Assert.Equal("subject 1 indicator group 2 indicator 1", subjects[0].Indicators["subject 1 indicator group 2"][0]);
+                Assert.Equal("subject 1 indicator group 2 indicator 2", subjects[0].Indicators["subject 1 indicator group 2"][1]);
+
                 Assert.Equal(releaseSubject2.Subject.Id, subjects[1].Id);
                 Assert.Equal(releaseFile2.Name, subjects[1].Name);
                 Assert.Equal(releaseFile2.File.Id, subjects[1].File.Id);
@@ -168,6 +237,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.Single(subjects[1].GeographicLevels);
                 Assert.Equal("National", subjects[1].GeographicLevels[0]);
+
+                Assert.Single(subjects[1].Filters);
+                Assert.Equal("subject 2 filter 1", subjects[1].Filters[0]);
+
+                Assert.Single(subjects[1].Indicators.Keys);
+                Assert.Single(subjects[1].Indicators["subject 2 indicator group 1"]);
+                Assert.Equal("subject 2 indicator group 1 indicator 1", subjects[1].Indicators["subject 2 indicator group 1"][0]);
             }
         }
 

@@ -19,6 +19,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 
         public List<string> GeographicLevels { get; }
 
+        public List<string> Filters { get; }
+
+        public Dictionary<string, List<string>> Indicators { get; }
+
         public FileInfo File { get; }
 
         public SubjectViewModel(
@@ -28,6 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
             string content,
             TimePeriodLabels timePeriods,
             List<string> geographicLevels,
+            List<string> filters,
+            Dictionary<string, List<string>> indicators,
             FileInfo file)
         {
             Id = id;
@@ -36,6 +42,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
             Content = content;
             TimePeriods = timePeriods;
             GeographicLevels = geographicLevels;
+            Filters = filters;
+            Indicators = indicators;
             File = file;
         }
     }

@@ -88,6 +88,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                                 content: rs.DataGuidance ?? string.Empty,
                                 timePeriods: await _timePeriodService.GetTimePeriodLabels(rs.SubjectId),
                                 geographicLevels: await _dataGuidanceSubjectService.GetGeographicLevels(rs.SubjectId),
+                                filters: await GetFilters(rs.SubjectId),
+                                indicators: await GetIndicators(rs.SubjectId),
                                 file: releaseFile.ToFileInfo()
                             );
                         }
@@ -95,6 +97,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .OrderBy(svm => svm.Order)
                 .ThenBy(svm => svm.Name) // For subjects existing before ordering was added
                 .ToList();
+        }
+
+        private async Task<List<string>> GetFilters(Guid subjectId)
+        {
+            return await _statisticsDbContext.Filter
+                .Where(filter => filter.SubjectId == subjectId)
+                .Select(filter => filter.Label)
+                .OrderBy(filterLabel => filterLabel)
+                .ToListAsync();
+        }
+
+        private async Task<Dictionary<string, List<string>>> GetIndicators(Guid subjectId)
+        {
+            return await _statisticsDbContext.IndicatorGroup
+                .Include(ig => ig.Indicators)
+                .Where(indicatorGroup => indicatorGroup.SubjectId == subjectId)
+                .ToDictionaryAsync(
+                    indicatorGroup => indicatorGroup.Label,
+                    indicatorGroup => indicatorGroup.Indicators
+                        .Select(indicator => indicator.Label)
+                        .OrderBy(indicatorLabel => indicatorLabel)
+                        .ToList());
         }
 
         public async Task<Either<ActionResult, List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseId)
