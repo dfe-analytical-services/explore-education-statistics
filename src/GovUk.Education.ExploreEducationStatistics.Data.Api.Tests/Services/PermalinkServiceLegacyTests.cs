@@ -52,6 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services;
 
 /// <summary>
 /// TODO EES-3755 Remove after Permalink snapshot migration work is complete
+/// and remove __snapshots__/PermalinkServiceLegacyTests.LegacyDownloadCsvToStream.snap
 /// </summary>
 public class PermalinkServiceLegacyTests
 {
@@ -1379,8 +1380,12 @@ public class PermalinkServiceLegacyTests
             .GenerateList(3);
 
         var locations = _fixture.DefaultLocation()
-            .ForRange(..2, l => l.SetPresetRegion())
-            .ForRange(2..4, l => l.SetPresetRegionAndLocalAuthority())
+            .ForRange(..2, l => l
+                .SetPresetRegion()
+                .SetGeographicLevel(GeographicLevel.Region))
+            .ForRange(2..4, l => l
+                .SetPresetRegionAndLocalAuthority()
+                .SetGeographicLevel(GeographicLevel.LocalAuthority))
             .GenerateList(4);
 
         var observations = _fixture.DefaultObservation()

@@ -12,5 +12,5 @@ public interface IFrontendService
 {
     Task<Either<ActionResult, dynamic>> CreateUniversalTable(TableBuilderResultViewModel tableResult,
         TableBuilderConfiguration tableConfiguration,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken = default);
 }

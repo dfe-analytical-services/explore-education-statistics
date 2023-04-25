@@ -190,10 +190,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     policy.Requirements.Add(new ViewSubjectDataRequirement()));
             });
 
-            var publicAppUrl = Configuration.GetValue<string>("PublicAppUrl");
             services.AddHttpClient("PublicApp", httpClient =>
             {
-                httpClient.BaseAddress = new Uri(publicAppUrl);
+                httpClient.BaseAddress = new Uri(Configuration.GetValue<string>("PublicAppUrl"));
                 httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "DataApi");
             });
 

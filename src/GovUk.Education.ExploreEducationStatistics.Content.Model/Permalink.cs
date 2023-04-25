@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System;
-using System.ComponentModel.DataAnnotations.Schema;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -48,12 +47,6 @@ public class Permalink : ICreatedTimestamp<DateTime>
     /// True if the legacy Permalink in blob storage has table configuration headers
     /// </summary>
     public bool? LegacyHasConfigurationHeaders { get; set; }
-
-    /// <summary>
-    /// Table in universal table format
-    /// </summary>
-    [NotMapped]
-    public dynamic? Table { get; set; }
 
     public DateTime Created { get; set; }
 }

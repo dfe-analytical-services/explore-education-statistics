@@ -75,7 +75,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         public async Task<Either<ActionResult, PermalinkViewModel>> GetPermalink(Guid permalinkId,
             CancellationToken cancellationToken = default)
         {
-            return await Find(permalinkId, cancellationToken).OnSuccess(BuildViewModel);
+            return await Find(permalinkId, cancellationToken)
+                .OnSuccessCombineWith(_ => DownloadPermalink(permalinkId, cancellationToken))
+                .OnSuccess(async tuple =>
+                {
+                    var (permalink, universalTable) = tuple;
+
+                    PermalinkViewModel viewModel = await BuildViewModel(permalink, universalTable);
+                    return viewModel;
+                });
         }
 
         private async Task<Either<ActionResult, Permalink>> Find(Guid permalinkId,
@@ -85,24 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 .SingleOrNotFoundAsync(
                     predicate: permalink => permalink.Id == permalinkId &&
                                             (!permalink.Legacy || permalink.LegacyHasSnapshot == true),
-                    cancellationToken: cancellationToken)
-                .OnSuccess<ActionResult, Permalink, Permalink>(async permalink =>
-                {
-                    try
-                    {
-                        var tableJson = await _blobStorageService.DownloadBlobText(
-                            containerName: BlobContainers.PermalinkSnapshots,
-                            path: $"{permalink.Id}.json",
-                            cancellationToken: cancellationToken);
-
-                        permalink.Table = JsonConvert.DeserializeObject<dynamic>(tableJson);
-                        return permalink;
-                    }
-                    catch (FileNotFoundException)
-                    {
-                        return new NotFoundResult();
-                    }
-                });
+                    cancellationToken: cancellationToken);
         }
 
         public async Task<Either<ActionResult, PermalinkViewModel>> CreatePermalink(PermalinkCreateRequest request,
@@ -119,21 +110,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             CancellationToken cancellationToken = default)
         {
             return await _tableBuilderService.Query(releaseId, request.Query, cancellationToken)
-                .OnSuccessCombineWith(tableResult => _frontendService.CreateUniversalTable(tableResult,
-                    request.Configuration,
-                    cancellationToken))
-                .OnSuccessCombineWith(async tuple =>
+                .OnSuccess<ActionResult, TableBuilderResultViewModel, PermalinkViewModel>(async tableResult =>
                 {
-                    var (tableResult, _) = tuple;
-                    return await _permalinkCsvMetaService.GetCsvMeta(request.Query.SubjectId,
+                    var universalTableTask = _frontendService.CreateUniversalTable(
+                        tableResult,
+                        request.Configuration,
+                        cancellationToken
+                    );
+
+                    var csvMetaTask = _permalinkCsvMetaService.GetCsvMeta(
+                        request.Query.SubjectId,
                         tableResult.SubjectMeta.Locations,
                         tableResult.SubjectMeta.Filters,
                         tableResult.SubjectMeta.Indicators,
-                        cancellationToken);
-                })
-                .OnSuccess(async tuple =>
-                {
-                    var (tableResult, universalTable, csvMeta) = tuple;
+                        cancellationToken
+                    );
+
+                    await Task.WhenAll(universalTableTask, csvMetaTask);
+
+                    var universalTableResult = universalTableTask.Result;
+                    var csvMetaResult = csvMetaTask.Result;
+
+                    if (universalTableResult.IsLeft)
+                    {
+                        return universalTableResult.Left;
+                    }
+
+                    if (csvMetaResult.IsLeft)
+                    {
+                        return csvMetaResult.Left;
+                    }
+
+                    var universalTable = universalTableResult.Right;
+                    var csvMeta = csvMetaResult.Right;
+
                     var subjectMeta = tableResult.SubjectMeta;
                     var permalink = new Permalink
                     {
@@ -146,21 +156,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         CountIndicators = subjectMeta.Indicators.Count,
                         CountLocations = CountLocations(subjectMeta.Locations),
                         CountObservations = tableResult.Results.Count(),
-                        CountTimePeriods = subjectMeta.TimePeriodRange.Count,
-                        Table = universalTable
+                        CountTimePeriods = subjectMeta.TimePeriodRange.Count
                     };
                     _contentDbContext.Permalinks.Add(permalink);
-                    await UploadSnapshot(permalink, tableResult.Results.ToList(), csvMeta, cancellationToken);
+
+                    await UploadSnapshot(permalink: permalink,
+                        observations: tableResult.Results.ToList(),
+                        csvMeta: csvMeta,
+                        universalTable: universalTable,
+                        cancellationToken: cancellationToken);
+
                     await _contentDbContext.SaveChangesAsync(cancellationToken);
-                    return await BuildViewModel(permalink);
+
+                    PermalinkViewModel viewModel = await BuildViewModel(permalink, universalTable);
+                    return viewModel;
                 });
         }
 
-        public Task<Either<ActionResult, Unit>> DownloadCsvToStream(Guid permalinkId,
+        public async Task<Either<ActionResult, Unit>> DownloadCsvToStream(Guid permalinkId,
             Stream stream,
             CancellationToken cancellationToken = default)
         {
-            return Find(permalinkId, cancellationToken)
+            return await Find(permalinkId, cancellationToken)
                 .OnSuccessVoid(() => _blobStorageService.DownloadToStream(
                     containerName: BlobContainers.PermalinkSnapshots,
                     path: $"{permalinkId}.csv",
@@ -194,6 +211,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
                         await WriteCsvHeaderRow(csv, meta);
                         await WriteCsvRows(csv, permalink.FullTable.Results, meta, cancellationToken);
+
+                        await writer.FlushAsync();
                     }
                 );
         }
@@ -272,9 +291,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             {
                 var location = meta.Locations[observation.LocationId];
 
-                if (location.ContainsKey(header))
+                if (location.TryGetValue(header, out var value))
                 {
-                    return location[header];
+                    return value;
                 }
             }
 
@@ -303,11 +322,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         // TODO EES-3755 Remove after Permalink snapshot work is complete
-        private Task<Either<ActionResult, LegacyPermalink>> FindLegacy(
+        private async Task<Either<ActionResult, LegacyPermalink>> FindLegacy(
             Guid permalinkId,
             CancellationToken cancellationToken)
         {
-            return _contentDbContext.Permalinks
+            return await _contentDbContext.Permalinks
                 .SingleOrNotFoundAsync(
                     predicate: permalink => permalink.Id == permalinkId &&
                                             permalink.Legacy == true,
@@ -407,12 +426,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        private async Task<PermalinkViewModel> BuildViewModel(Permalink permalink)
+        private async Task<PermalinkViewModel> BuildViewModel(Permalink permalink, dynamic universalTable)
         {
-            var viewModel = _mapper.Map<PermalinkViewModel>(permalink);
-            viewModel.Status = await GetPermalinkStatus(permalink.SubjectId);
-
-            return viewModel;
+            var status = await GetPermalinkStatus(permalink.SubjectId);
+            return new PermalinkViewModel
+            {
+                Id = permalink.Id,
+                Created = permalink.Created,
+                Status = status,
+                Table = universalTable
+            };
         }
 
         // TODO EES-3755 Remove after Permalink snapshot work is complete
@@ -489,14 +512,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
         }
 
-        private Task UploadSnapshot(Permalink permalink,
-            List<ObservationViewModel> observations,
-            PermalinkCsvMetaViewModel csvMeta,
+        private async Task<Either<ActionResult, dynamic>> DownloadPermalink(Guid permalinkId,
             CancellationToken cancellationToken = default)
         {
-            return Task.WhenAll(
+            try
+            {
+                // TODO EES-3753 Any settings needed passing into DeserializeObject here?
+                return JsonConvert.DeserializeObject<dynamic>(
+                    value: await _blobStorageService.DownloadBlobText(
+                        containerName: BlobContainers.PermalinkSnapshots,
+                        path: $"{permalinkId}.json",
+                        cancellationToken: cancellationToken))!;
+            }
+            catch (FileNotFoundException)
+            {
+                return new NotFoundResult();
+            }
+        }
+
+        private async Task UploadSnapshot(Permalink permalink,
+            List<ObservationViewModel> observations,
+            PermalinkCsvMetaViewModel csvMeta,
+            dynamic universalTable,
+            CancellationToken cancellationToken = default)
+        {
+            await Task.WhenAll(
                 UploadTableCsv(permalink, observations, csvMeta, cancellationToken),
-                UploadTableJson(permalink, cancellationToken)
+                UploadTableJson(permalink, universalTable, cancellationToken)
             );
         }
 
@@ -522,11 +564,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         private async Task UploadTableJson(Permalink permalink,
+            dynamic universalTable,
             CancellationToken cancellationToken = default)
         {
             await using var tableStream = new MemoryStream();
             await using var jsonWriter = new JsonTextWriter(new StreamWriter(tableStream, leaveOpen: true));
-            JsonSerializer.CreateDefault().Serialize(jsonWriter, permalink.Table);
+            JsonSerializer.CreateDefault().Serialize(jsonWriter, universalTable);
             await jsonWriter.FlushAsync(cancellationToken);
 
             await _blobStorageService.UploadStream(

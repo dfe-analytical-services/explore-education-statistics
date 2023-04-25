@@ -12,6 +12,7 @@
         public static readonly IBlobContainer PublicReleaseFiles = new BlobContainer("downloads");
         public static readonly IBlobContainer PrivateContent = new PrivateBlobContainer("cache");
         public static readonly IBlobContainer PublicContent = new PublicBlobContainer("cache");
+        // TODO EES-3755 Remove Permalinks container after Permalink snapshot migration work is complete
         public static readonly IBlobContainer Permalinks = new BlobContainer("permalinks");
         public static readonly IBlobContainer PermalinkSnapshots = new BlobContainer("permalink-snapshots");
         public static readonly IBlobContainer PublisherLeases = new BlobContainer("leases");
