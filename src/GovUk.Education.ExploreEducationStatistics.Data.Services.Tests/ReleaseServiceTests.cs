@@ -496,17 +496,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         public async Task ListFeaturedTables()
         {
             var releaseId = Guid.NewGuid();
-            var release = new Release
-            {
-                Id = releaseId
-            };
+            var release = new Release { Id = releaseId };
+            var statRelease = new Data.Model.Release { Id = releaseId };
 
             var releaseSubject1 = new ReleaseSubject
             {
-                Release = new Data.Model.Release
-                {
-                    Id = releaseId
-                },
+                Release = statRelease,
                 Subject = new Subject
                 {
                     Id = Guid.NewGuid()
@@ -514,10 +509,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
             var releaseSubject2 = new ReleaseSubject
             {
-                Release = new Data.Model.Release
-                {
-                    Id = releaseId
-                },
+                Release = statRelease,
                 Subject = new Subject
                 {
                     Id = Guid.NewGuid()
@@ -575,7 +567,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 HighlightDescription = "Test highlight description 2",
                 Query = new ObservationQueryContext
                 {
-                    SubjectId = releaseSubject1.Subject.Id,
+                    SubjectId = releaseSubject2.Subject.Id,
                 }
             };
 
@@ -605,7 +597,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddAsync(releaseSubject1);
+                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -626,10 +618,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(dataBlock1.Id, featuredTables[0].Id);
                 Assert.Equal(dataBlock1.HighlightName, featuredTables[0].Name);
                 Assert.Equal(dataBlock1.HighlightDescription, featuredTables[0].Description);
+                Assert.Equal(releaseSubject1.SubjectId, featuredTables[0].SubjectId);
 
                 Assert.Equal(dataBlock2.Id, featuredTables[1].Id);
                 Assert.Equal(dataBlock2.HighlightName, featuredTables[1].Name);
                 Assert.Equal(dataBlock2.HighlightDescription, featuredTables[1].Description);
+                Assert.Equal(releaseSubject2.SubjectId, featuredTables[1].SubjectId);
             }
         }
 

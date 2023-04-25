@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var featuredTables = new List<FeaturedTableViewModel>
             {
-                new(Guid.NewGuid(), "name", "description")
+                new FeaturedTableViewModel { Id = Guid.NewGuid(), Name = "name", Description = "description", }, // @MarkFix Add SubjectId?
             };
 
             var (controller, mocks) = BuildControllerAndMocks();

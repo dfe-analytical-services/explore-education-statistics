@@ -5,17 +5,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 {
     public record FeaturedTableViewModel
     {
-        public Guid Id { get; }
+        public Guid Id { get; set; }
 
-        public string Name { get; }
+        public string Name { get; set; }
 
-        public string Description { get; }
+        public string Description { get; set; }
 
-        public FeaturedTableViewModel(Guid id, string name, string description = "")
-        {
-            Id = id;
-            Name = name;
-            Description = description;
-        }
+        public Guid SubjectId { get; set; }
     }
 }

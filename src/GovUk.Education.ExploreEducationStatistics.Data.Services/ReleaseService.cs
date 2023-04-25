@@ -113,11 +113,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return releaseContentBlocks
                 .Where(dataBlock => subjectsToInclude.Contains(dataBlock.Query.SubjectId))
                 .Select(
-                    dataBlock => new FeaturedTableViewModel(
-                        id: dataBlock.Id,
-                        name: dataBlock.HighlightName ?? string.Empty,
-                        description: dataBlock.HighlightDescription ?? string.Empty
-                    )
+                    dataBlock => new FeaturedTableViewModel
+                    {
+                        Id = dataBlock.Id,
+                        Name =  dataBlock.HighlightName ?? string.Empty,
+                        Description = dataBlock.HighlightDescription ?? string.Empty,
+                        SubjectId = dataBlock.Query.SubjectId,
+                    }
                 )
                 .OrderBy(featuredTable => featuredTable.Name)
                 .ToList();
