@@ -4,6 +4,7 @@ import ErrorSummary, {
 import { FormIdContextProvider } from '@common/components/form/contexts/FormIdContext';
 import useMountedRef from '@common/hooks/useMountedRef';
 import useToggle from '@common/hooks/useToggle';
+import logger from '@common/services/logger';
 import isErrorLike from '@common/utils/error/isErrorLike';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import { useFormikContext } from 'formik';
@@ -99,12 +100,10 @@ const Form = ({
       try {
         await submitForm();
       } catch (error) {
-        if (!error) {
-          return;
-        }
+        if (showSubmitError && isErrorLike(error)) {
+          logger.error(error);
 
-        if (showSubmitError) {
-          if (isMounted.current && isErrorLike(error)) {
+          if (isMounted.current) {
             setSubmitError({
               id: submitId,
               message: error.message,
