@@ -21,7 +21,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             _logger = logger;
         }
 
-        public async Task<object?> GetItem(IBlobCacheKey cacheKey, Type targetType)
+        public object? GetItem(IBlobCacheKey cacheKey, Type targetType)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<object?> GetItemAsync(IBlobCacheKey cacheKey, Type targetType)
         {
             var blobContainer = cacheKey.Container;
             var key = cacheKey.Key;
@@ -31,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             {
                 var result = await _blobStorageService.GetDeserializedJson(cacheKey.Container, cacheKey.Key, targetType);
 
-                _logger.LogDebug("Blob cache {HitOrMiss} - for key {CacheKey}", 
+                _logger.LogDebug("Blob cache {HitOrMiss} - for key {CacheKey}",
                     result != null ? "hit" : "miss", key);
 
                 return result;
@@ -41,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 // If there's an error deserializing the blob, we should
                 // assume it's not salvageable and delete it so that it's re-built.
                 _logger.LogWarning(e, $"Error deserializing JSON for blobContainer {blobContainer} and cache " +
-                                   $"key {key} - deleting cached JSON");
+                                      $"key {key} - deleting cached JSON");
                 await _blobStorageService.DeleteBlob(blobContainer, key);
             }
             catch (FileNotFoundException)
@@ -56,7 +61,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return default;
         }
 
-        public async Task SetItem<TItem>(
+        public void SetItem<TItem>(
+            IBlobCacheKey cacheKey,
+            TItem item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task SetItemAsync<TItem>(
             IBlobCacheKey cacheKey,
             TItem item)
         {
@@ -65,15 +77,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             _logger.LogDebug("Blob cache set - for key {CacheKey}", cacheKey.Key);
         }
-        
-        public async Task DeleteItem(IBlobCacheKey cacheKey)
+
+        public async Task DeleteItemAsync(IBlobCacheKey cacheKey)
         {
             await _blobStorageService.DeleteBlob(cacheKey.Container, cacheKey.Key);
 
             _logger.LogDebug("Blob cache delete - for key {CacheKey}", cacheKey.Key);
         }
 
-        public async Task DeleteCacheFolder(IBlobCacheKey cacheFolderKey)
+        public async Task DeleteCacheFolderAsync(IBlobCacheKey cacheFolderKey)
         {
             await _blobStorageService.DeleteBlobs(cacheFolderKey.Container, cacheFolderKey.Key);
 

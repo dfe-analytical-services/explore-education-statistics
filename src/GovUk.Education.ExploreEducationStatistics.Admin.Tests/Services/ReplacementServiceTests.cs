@@ -3047,7 +3047,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(cacheKey);
 
             mocks.cacheService
-                .Setup(service => service.DeleteItem(cacheKey))
+                .Setup(service => service.DeleteItemAsync(cacheKey))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))

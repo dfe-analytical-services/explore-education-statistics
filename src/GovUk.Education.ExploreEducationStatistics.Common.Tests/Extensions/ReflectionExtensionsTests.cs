@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -382,6 +383,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             }
 
             [Fact]
+            public void Task_Either()
+            {
+                Assert.True(TestString.TryBoxToResult(typeof(Task<Either<Unit, string>>), out var boxed));
+
+                var value = Assert.IsType<Task<Either<Unit, string>>>(boxed);
+                Assert.Equal(TestString, value.Result.Right);
+            }
+
+            [Fact]
+            public void Task_Either_ActionResult()
+            {
+                Assert.True(TestString.TryBoxToResult(typeof(Task<Either<Unit, ActionResult<string>>>), out var boxed));
+
+                var value = Assert.IsType<Task<Either<Unit, ActionResult<string>>>>(boxed);
+                Assert.Equal(TestString, value.Result.Right.Value);
+            }
+
+            [Fact]
+            public void Task_Task()
+            {
+                Assert.True(TestString.TryBoxToResult(typeof(Task<Task<string>>), out var boxed));
+
+                var value = Assert.IsType<Task<Task<string>>>(boxed);
+                Assert.Equal(TestString, value.Result.Result);
+            }
+
+            [Fact]
             public void Task_List_DoesNotBox()
             {
                 Assert.False(TestString.TryBoxToResult(typeof(Task<List<string>>), out var boxed));
@@ -456,30 +484,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             }
 
             [Fact]
-            public void Task_Either()
+            public void Task_ActionResult()
             {
-                Assert.True(TestString.TryBoxToResult(typeof(Task<Either<Unit, string>>), out var boxed));
+                Assert.True(TestString.TryBoxToResult(typeof(Task<ActionResult<string>>), out var boxed));
 
-                var value = Assert.IsType<Task<Either<Unit, string>>>(boxed);
-                Assert.Equal(TestString, value.Result.Right);
-            }
-
-            [Fact]
-            public void Task_Either_ActionResult()
-            {
-                Assert.True(TestString.TryBoxToResult(typeof(Task<Either<Unit, ActionResult<string>>>), out var boxed));
-
-                var value = Assert.IsType<Task<Either<Unit, ActionResult<string>>>>(boxed);
-                Assert.Equal(TestString, value.Result.Right.Value);
-            }
-
-            [Fact]
-            public void Task_Task()
-            {
-                Assert.True(TestString.TryBoxToResult(typeof(Task<Task<string>>), out var boxed));
-
-                var value = Assert.IsType<Task<Task<string>>>(boxed);
-                Assert.Equal(TestString, value.Result.Result);
+                var value = Assert.IsType<Task<ActionResult<string>>>(boxed);
+                Assert.Equal(TestString, value.Result.Value);
             }
 
             [Fact]
@@ -487,15 +497,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             {
                 Assert.False(TestString.TryBoxToResult(typeof(Task<Task>), out var boxed));
                 Assert.Equal(TestString, boxed);
-            }
-
-            [Fact]
-            public void Task_ActionResult()
-            {
-                Assert.True(TestString.TryBoxToResult(typeof(Task<ActionResult<string>>), out var boxed));
-
-                var value = Assert.IsType<Task<ActionResult<string>>>(boxed);
-                Assert.Equal(TestString, value.Result.Value);
             }
 
             [Fact]
@@ -633,6 +634,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             {
                 var list = ListOf(CompletedTask, CompletedTask);
 
+                // TryUnboxResult doesn't inspect elements of Lists, so this test passes
                 Assert.True(list.TryUnboxResult(out var unboxed));
                 Assert.Equal(list, unboxed);
             }
@@ -766,8 +768,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             {
                 var boxed = FromResult(TestString);
 
-                Assert.True(boxed.TryUnboxResult(out var unboxed));
-                Assert.Equal(TestString, unboxed);
+                var exception = Assert.Throws<ArgumentException>(() => boxed.TryUnboxResult(out var unboxed));
+                Assert.Equal("Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.", exception.Message);
             }
 
             [Fact]
@@ -775,39 +777,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             {
                 var boxed = CompletedTask;
 
-                Assert.False(boxed.TryUnboxResult(out var unboxed));
-                Assert.Null(unboxed);
-
-            }
-
-            [Fact]
-            public void Task_List()
-            {
-                var list = ListOf("test");
-                var boxed = FromResult(list);
-
-                Assert.True(boxed.TryUnboxResult(out var unboxed));
-                Assert.Equal(list, unboxed);
-            }
-
-            [Fact]
-            public void Task_List_Tasks()
-            {
-                var list = ListOf(FromResult("test1"), FromResult("test2"));
-                var boxed = FromResult(list);
-
-                Assert.True(boxed.TryUnboxResult(out var unboxed));
-                Assert.Equal(list, unboxed);
-            }
-
-            [Fact]
-            public void Task_List_Tasks_Void()
-            {
-                var list = ListOf(CompletedTask, CompletedTask);
-                var boxed = FromResult(list);
-
-                Assert.True(boxed.TryUnboxResult(out var unboxed));
-                Assert.Equal(list, unboxed);
+                var exception = Assert.Throws<ArgumentException>(() => boxed.TryUnboxResult(out var unboxed));
+                Assert.Equal("Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.", exception.Message);
             }
 
             [Fact]
@@ -839,39 +810,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             }
 
             [Fact]
-            public void Task_Either()
-            {
-                var boxed = FromResult(new Either<Unit, string>(TestString));
-
-                Assert.True(boxed.TryUnboxResult(out var unboxed));
-                Assert.Equal(TestString, unboxed);
-            }
-
-            [Fact]
-            public void Task_Either_ActionResult()
-            {
-                var boxed = FromResult(new Either<Unit, ActionResult<string>>(TestString));
-
-                Assert.True(boxed.TryUnboxResult(out var unboxed));
-                Assert.Equal(TestString, unboxed);
-            }
-
-            [Fact]
-            public void Task_Task()
-            {
-                var boxed = FromResult(FromResult(TestString));
-
-                Assert.True(boxed.TryUnboxResult(out var unboxed));
-                Assert.Equal(TestString, unboxed);
-            }
-
-            [Fact]
             public void Either_Task()
             {
                 var boxed = new Either<Unit, Task<string>>(FromResult(TestString));
 
-                Assert.True(boxed.TryUnboxResult(out var unboxed));
-                Assert.Equal(TestString, unboxed);
+                var exception = Assert.Throws<ArgumentException>(() => boxed.TryUnboxResult(out var unboxed));
+                Assert.Equal("Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.", exception.Message);
             }
 
             [Fact]
@@ -879,31 +823,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             {
                 var boxed = new Either<Unit, Task>(CompletedTask);
 
-                Assert.False(boxed.TryUnboxResult(out var unboxed));
-                Assert.Null(unboxed);
-            }
-
-            [Fact]
-            public void Either_Task_ActionResult()
-            {
-                var boxed = new Either<Unit, Task<ActionResult<string>>>(
-                    FromResult(new ActionResult<string>(TestString))
-                );
-
-                Assert.True(boxed.TryUnboxResult(out var unboxed));
-                Assert.Equal(TestString, unboxed);
-            }
-
-            [Fact]
-            public void Either_Task_ActionResult_Void()
-            {
-                var result = new OkResult();
-                var boxed = new Either<Unit, Task<ActionResult>>(
-                    FromResult<ActionResult>(result)
-                );
-
-                Assert.True(boxed.TryUnboxResult(out var unboxed));
-                Assert.Equal(result, unboxed);
+                var exception = Assert.Throws<ArgumentException>(() => boxed.TryUnboxResult(out var unboxed));
+                Assert.Equal("Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.", exception.Message);
             }
 
             [Fact]

@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .ReturnsAsync(cacheKey);
 
             mocks.cacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(List<SubjectViewModel>)))
+                .Setup(s => s.GetItemAsync(cacheKey, typeof(List<SubjectViewModel>)))
                 .ReturnsAsync(null);
 
             mocks
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .ReturnsAsync(subjects);
 
             mocks.cacheService
-                .Setup(s => s.SetItem<object>(cacheKey, subjects))
+                .Setup(s => s.SetItemAsync<object>(cacheKey, subjects))
                 .Returns(Task.CompletedTask);
 
             var result = await controller.ListLatestReleaseSubjects(publication.Id);

@@ -75,11 +75,11 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new PublicationCacheKey(PublicationSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(PublicationCacheViewModel)))
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(PublicationCacheViewModel)))
             .ReturnsAsync(null);
 
         PublicBlobCacheService
-            .Setup(s => s.SetItem<object>(cacheKey, _publicationViewModel))
+            .Setup(s => s.SetItemAsync<object>(cacheKey, _publicationViewModel))
             .Returns(Task.CompletedTask);
 
         var publicationService = new Mock<IPublicationService>(Strict);
@@ -103,7 +103,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new PublicationCacheKey(PublicationSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(PublicationCacheViewModel)))
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(PublicationCacheViewModel)))
             .ReturnsAsync(_publicationViewModel);
 
         var service = BuildService();
@@ -121,7 +121,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new PublicationCacheKey(PublicationSlug);
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(PublicationCacheViewModel)))
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(PublicationCacheViewModel)))
             .ReturnsAsync(null);
 
         var publicationService = new Mock<IPublicationService>(Strict);
@@ -160,7 +160,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         });
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(
+            .Setup(s => s.GetItemAsync(
                 new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
             .ReturnsAsync(null);
 
@@ -171,7 +171,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
             .ReturnsAsync(publicationTree);
 
         PublicBlobCacheService
-            .Setup(s => s.SetItem<object>(
+            .Setup(s => s.SetItemAsync<object>(
                 new PublicationTreeCacheKey(), publicationTree))
             .Returns(Task.CompletedTask);
 
@@ -206,7 +206,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         };
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(
+            .Setup(s => s.GetItemAsync(
                 new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
             .ReturnsAsync(ListOf(publicationTree));
 
@@ -396,7 +396,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
             .ReturnsAsync(_publicationViewModel);
 
         PublicBlobCacheService
-            .Setup(s => s.SetItem<object>(cacheKey, _publicationViewModel))
+            .Setup(s => s.SetItemAsync<object>(cacheKey, _publicationViewModel))
             .Returns(Task.CompletedTask);
 
         var service = BuildService(publicationService: publicationService.Object);
@@ -427,7 +427,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         // We should not see any attempt to "get" the cached tree, but rather only see a fresh fetching
         // of the latest tree and then it being cached.
         PublicBlobCacheService
-            .Setup(s => s.SetItem<object>(
+            .Setup(s => s.SetItemAsync<object>(
                 new PublicationTreeCacheKey(), publicationTree))
             .Returns(Task.CompletedTask);
 
@@ -473,7 +473,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         PublicationTreeFilter filter)
     {
         PublicBlobCacheService
-            .Setup(s => s.GetItem(
+            .Setup(s => s.GetItemAsync(
                 new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
             .ReturnsAsync(ListOf(publicationTree));
 
@@ -492,7 +492,7 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
         PublicationTreeFilter filter)
     {
         PublicBlobCacheService
-            .Setup(s => s.GetItem(
+            .Setup(s => s.GetItemAsync(
                 new PublicationTreeCacheKey(), typeof(IList<PublicationTreeThemeViewModel>)))
             .ReturnsAsync(ListOf(publicationTree));
 

@@ -39,7 +39,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public async Task SetItem()
+        public void SetItem()
+        {
+            var entity = new SampleClass();
+
+            var cacheKey = new SampleCacheKey(PublicContent, entity.Id);
+
+            var service = SetupBlobStorageCacheService();
+
+            Assert.Throws<NotImplementedException>(() => service.SetItem(cacheKey, typeof(SampleClass)));
+        }
+
+        [Fact]
+        public async Task SetItemAsync()
         {
             var cacheKey = new SampleCacheKey(PublicContent, Guid.NewGuid());
 
@@ -51,13 +63,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            await service.SetItem(cacheKey, "test item");
+            await service.SetItemAsync(cacheKey, "test item");
 
             VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
-        public async Task DeleteItem()
+        public async Task DeleteItemAsync()
         {
             var cacheKey = new SampleCacheKey(PublicContent, Guid.NewGuid());
 
@@ -69,13 +81,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            await service.DeleteItem(cacheKey);
+            await service.DeleteItemAsync(cacheKey);
 
             VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
-        public async Task GetItem()
+        public void GetItem()
+        {
+            var entity = new SampleClass();
+
+            var cacheKey = new SampleCacheKey(PublicContent, entity.Id);
+
+            var service = SetupBlobStorageCacheService();
+
+            Assert.Throws<NotImplementedException>(() => service.GetItem(cacheKey, typeof(SampleClass)));
+        }
+
+        [Fact]
+        public async Task GetItemAsync()
         {
             var entity = new SampleClass();
 
@@ -90,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetItem(cacheKey, typeof(SampleClass));
+            var result = await service.GetItemAsync(cacheKey, typeof(SampleClass));
             var typedResult = Assert.IsType<SampleClass>(result);
 
             Assert.Equal(entity, typedResult);
@@ -99,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public async Task GetItem_NullIfErrorDeserializingCachedEntity()
+        public async Task GetItemAsync_NullIfErrorDeserializingCachedEntity()
         {
             var cacheKey = new SampleCacheKey(PublicContent, Guid.NewGuid());
 
@@ -117,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetItem(cacheKey, typeof(SampleClass));
+            var result = await service.GetItemAsync(cacheKey, typeof(SampleClass));
 
             Assert.Null(result);
 
@@ -125,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public async Task GetItem_NullIfNoFileFoundException()
+        public async Task GetItemAsync_NullIfNoFileFoundException()
         {
             var cacheKey = new SampleCacheKey(PublicContent, Guid.NewGuid());
 
@@ -138,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetItem(cacheKey, typeof(SampleClass));
+            var result = await service.GetItemAsync(cacheKey, typeof(SampleClass));
 
             Assert.Null(result);
 
@@ -146,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public async Task GetItem_NullIfException()
+        public async Task GetItemAsync_NullIfException()
         {
             var cacheKey = new SampleCacheKey(PublicContent, Guid.NewGuid());
 
@@ -159,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetItem(cacheKey, typeof(SampleClass));
+            var result = await service.GetItemAsync(cacheKey, typeof(SampleClass));
 
             Assert.Null(result);
 
