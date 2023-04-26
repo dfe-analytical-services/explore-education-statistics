@@ -320,7 +320,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var totalBatches = Math.Ceiling((decimal) import.TotalRows!.Value / importObservationsBatchSize);
             var importedRowsSoFar = import.ImportedRows;
             var lastProcessedRowIndex = import.LastProcessedRowIndex ?? -1;
-            var startingBatchIndex = (lastProcessedRowIndex + 1) / importObservationsBatchSize;
+            var startingRowIndex = lastProcessedRowIndex + 1;
+            var startingBatchIndex = startingRowIndex / importObservationsBatchSize;
 
             await CsvUtils.Batch(
                 dataFileStreamProvider,
@@ -344,17 +345,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                     // Find the subset of this batch that hasn't yet been processed. We can use the
                     // lastProcessedRowIndex to work out which rows in this batch have not yet been processed.
+                    // A scenario whereby a given batch of rows could already be partially imported can occur 
+                    // if the import process was stopped mid-import and the "RowsPerBatch" configuration value
+                    // changed, so that there is now some overlap between the rows in a new batch and the end of
+                    // a previous batch using the old batch size. 
                     var startOfBatchRowIndex = batchIndex * importObservationsBatchSize;
-                    var firstRowOfBatchToProcess = Math.Max(startOfBatchRowIndex, lastProcessedRowIndex + 1) - startOfBatchRowIndex;
+                    var firstRowIndexOfBatchToProcess = 
+                        Math.Max(startOfBatchRowIndex, lastProcessedRowIndex + 1) - startOfBatchRowIndex;
                     var unprocessedRows = batchOfRows.GetRange(
-                        firstRowOfBatchToProcess, batchOfRows.Count - firstRowOfBatchToProcess);
+                        firstRowIndexOfBatchToProcess, batchOfRows.Count - firstRowIndexOfBatchToProcess);
 
                     if (unprocessedRows.Count != batchOfRows.Count)
                     {
                         _logger.LogInformation(
                             "Skipping first {SkippedRowCount} rows of batch {BatchNumber} as it is already " +
-                            "partially processed", 
-                            importObservationsBatchSize - unprocessedRows.Count,
+                            "partially imported", 
+                            batchOfRows.Count() - unprocessedRows.Count,
                             batchIndex + 1);
                     }
                     
@@ -362,13 +368,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     {
                         if (IsRowAllowed(soleGeographicLevel, cells, csvHeaders))
                         {
+                            var csvRow = startOfBatchRowIndex + firstRowIndexOfBatchToProcess + rowIndex + 2;
+                            
                             return ObservationFromCsv(
                                 context,
                                 cells,
                                 csvHeaders,
                                 subject,
                                 subjectMeta,
-                                (batchIndex * importObservationsBatchSize) + rowIndex + 2);
+                                csvRow);
                         }
 
                         return null;
