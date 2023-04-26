@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
             Subject subject, 
             StatisticsDbContext context);
 
-        SubjectMeta Get(
+        SubjectMeta GetSubjectMeta(
             List<string> metaFileCsvHeaders,
             List<List<string>> metaFileRows, 
             Subject subject,

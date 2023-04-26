@@ -220,6 +220,8 @@ public class ProcessorStage2Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
+        var importerMetaService = new ImporterMetaService(guidGenerator, transactionHelper);
+        
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterFilterService(importerFilterCache),
@@ -227,7 +229,7 @@ public class ProcessorStage2Tests
                 guidGenerator,
                 importerLocationCache,
                 Mock.Of<ILogger<ImporterLocationCache>>()),
-            new ImporterMetaService(guidGenerator, transactionHelper),
+            importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
             transactionHelper,
@@ -237,8 +239,9 @@ public class ProcessorStage2Tests
             Mock.Of<ILogger<FileImportService>>(),
             blobStorageService.Object,
             dataImportService,
-            importerService);
-
+            importerService,
+            importerMetaService);
+    
         var processorService = BuildProcessorService(
             dbContextSupplier,
             dataImportService: dataImportService,

@@ -83,8 +83,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
             var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
 
-            await _importerService.ImportMeta(metaFileCsvHeaders, metaFileCsvRows, subject, statisticsDbContext);
-            await _fileImportService.ImportFiltersAndLocations(import.Id, statisticsDbContext);
+            var subjectMeta = await _importerService.ImportMeta(metaFileCsvHeaders, metaFileCsvRows, subject, statisticsDbContext);
+            await _fileImportService.ImportFiltersAndLocations(import.Id, subjectMeta, statisticsDbContext);
         }
         
         public async Task ProcessStage3(Guid importId)

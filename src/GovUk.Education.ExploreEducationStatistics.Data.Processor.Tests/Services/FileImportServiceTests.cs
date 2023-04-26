@@ -285,7 +285,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 logger ?? new Mock<ILogger<FileImportService>>().Object,
                 blobStorageService ?? new Mock<IBlobStorageService>(Strict).Object,
                 dataImportService ?? new Mock<IDataImportService>(Strict).Object,
-                importerService ?? new Mock<IImporterService>(Strict).Object);
+                importerService ?? new Mock<IImporterService>(Strict).Object,
+                Mock.Of<IImporterMetaService>(Strict));
         }
     }
 }

@@ -178,7 +178,8 @@ public class ProcessorStage3Tests : IDisposable
             Mock.Of<ILogger<FileImportService>>(),
             blobStorageService.Object,
             dataImportService,
-            importerService);
+            importerService,
+            importerMetaService);
         
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
@@ -323,7 +324,8 @@ public class ProcessorStage3Tests : IDisposable
             Mock.Of<ILogger<FileImportService>>(),
             blobStorageService.Object,
             dataImportService,
-            importerService);
+            importerService,
+            importerMetaService);
         
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
@@ -459,7 +461,8 @@ public class ProcessorStage3Tests : IDisposable
             Mock.Of<ILogger<FileImportService>>(),
             blobStorageService.Object,
             dataImportService,
-            importerService);
+            importerService,
+            importerMetaService);
         
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
@@ -615,7 +618,8 @@ public class ProcessorStage3Tests : IDisposable
             Mock.Of<ILogger<FileImportService>>(),
             blobStorageService.Object,
             dataImportService,
-            importerService);
+            importerService,
+            importerMetaService);
         
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
@@ -755,7 +759,8 @@ public class ProcessorStage3Tests : IDisposable
             Mock.Of<ILogger<FileImportService>>(),
             blobStorageService.Object,
             dataImportService,
-            importerService);
+            importerService,
+            importerMetaService);
         
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
@@ -923,7 +928,8 @@ public class ProcessorStage3Tests : IDisposable
             Mock.Of<ILogger<FileImportService>>(),
             blobStorageService.Object,
             dataImportService,
-            importerService);
+            importerService,
+            importerMetaService);
         
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
@@ -1074,7 +1080,8 @@ public class ProcessorStage3Tests : IDisposable
             Mock.Of<ILogger<FileImportService>>(),
             blobStorageService.Object,
             dataImportService,
-            importerService);
+            importerService,
+            importerMetaService);
         
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
@@ -1202,7 +1209,8 @@ public class ProcessorStage3Tests : IDisposable
             Mock.Of<ILogger<FileImportService>>(),
             blobStorageService.Object,
             dataImportService,
-            importerService);
+            importerService,
+            importerMetaService);
         
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
@@ -1246,6 +1254,7 @@ public class ProcessorStage3Tests : IDisposable
     }
     
     // ReSharper disable once MemberCanBePrivate.Global
+    // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
     public class TestObservationBatchImporter : IObservationBatchImporter
     {
         public virtual async Task ImportObservationBatch(StatisticsDbContext context, IEnumerable<Observation> observations)
