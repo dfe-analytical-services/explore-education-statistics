@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -28,12 +29,15 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
+using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Snapshooter.Xunit;
 using Xunit;
@@ -1046,6 +1050,441 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 MockUtils.VerifyAllMocks(blobStorageService);
 
                 result.AssertNotFound();
+            }
+        }
+
+        [Fact]
+        // TODO EES-3755 Remove after Permalink snapshot migration work is complete
+        // TODO EES-3755 Remove __snapshots__/PermalinkServiceTests.MigratePermalink.snap
+        public async Task MigratePermalink()
+        {
+            var permalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                Legacy = true
+            };
+
+            var subject = _fixture.DefaultSubject().Generate();
+
+            var filters = _fixture.DefaultFilter().GenerateList(2);
+
+            var filterItems = _fixture.DefaultFilterItem()
+                .ForRange(..2, fi => fi
+                    .SetFilterGroup(_fixture.DefaultFilterGroup()
+                        .WithFilter(filters[0])
+                        .Generate()))
+                .ForRange(2..4, fi => fi
+                    .SetFilterGroup(_fixture.DefaultFilterGroup()
+                        .WithFilter(filters[1])
+                        .Generate()))
+                .GenerateArray();
+
+            var indicators = _fixture.DefaultIndicator()
+                .ForRange(..1, i => i
+                    .SetIndicatorGroup(_fixture.DefaultIndicatorGroup()
+                        .WithSubject(subject))
+                )
+                .ForRange(1..3, i => i
+                    .SetIndicatorGroup(_fixture.DefaultIndicatorGroup()
+                        .WithSubject(subject))
+                )
+                .GenerateList(3);
+
+            var locations = _fixture.DefaultLocation()
+                .ForRange(..2, l => l
+                    .SetPresetRegion()
+                    .SetGeographicLevel(GeographicLevel.Region))
+                .ForRange(2..4, l => l
+                    .SetPresetRegionAndLocalAuthority()
+                    .SetGeographicLevel(GeographicLevel.LocalAuthority))
+                .GenerateList(4);
+
+            var observations = _fixture.DefaultObservation()
+                .WithSubject(subject)
+                .WithMeasures(indicators)
+                .ForRange(..2, o => o
+                    .SetFilterItems(filterItems[0], filterItems[2])
+                    .SetLocation(locations[0])
+                    .SetTimePeriod(2022, AcademicYear))
+                .ForRange(2..4, o => o
+                    .SetFilterItems(filterItems[0], filterItems[2])
+                    .SetLocation(locations[1])
+                    .SetTimePeriod(2022, AcademicYear))
+                .ForRange(4..6, o => o
+                    .SetFilterItems(filterItems[1], filterItems[3])
+                    .SetLocation(locations[2])
+                    .SetTimePeriod(2023, AcademicYear))
+                .ForRange(6..8, o => o
+                    .SetFilterItems(filterItems[1], filterItems[3])
+                    .SetLocation(locations[3])
+                    .SetTimePeriod(2023, AcademicYear))
+                .GenerateList(8);
+
+            var legacyPermalink = new LegacyPermalink(
+                permalink.Id,
+                DateTime.UtcNow,
+                new TableBuilderConfiguration(),
+                new PermalinkTableBuilderResult
+                {
+                    Results = observations
+                        .Select(o =>
+                            ObservationViewModelBuilder.BuildObservation(o, indicators.Select(i => i.Id)))
+                        .ToList()
+                },
+                new ObservationQueryContext());
+
+            var csvMeta = new PermalinkCsvMetaViewModel
+            {
+                Filters = FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(filterItems),
+                Indicators = indicators
+                    .Select(i => new IndicatorCsvMetaViewModel(i))
+                    .ToDictionary(i => i.Name),
+                Locations = locations.ToDictionary(l => l.Id, l => l.GetCsvValues()),
+                Headers = new List<string>
+                {
+                    "time_period",
+                    "time_identifier",
+                    "geographic_level",
+                    "country_code",
+                    "country_name",
+                    "region_code",
+                    "region_name",
+                    "new_la_code",
+                    "old_la_code",
+                    "la_name",
+                    filters[0].Name,
+                    filters[1].Name,
+                    indicators[0].Name,
+                    indicators[1].Name,
+                    indicators[2].Name
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Permalinks.AddRangeAsync(permalink);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            blobStorageService.SetupDownloadBlobText(
+                container: BlobContainers.Permalinks,
+                path: permalink.Id.ToString(),
+                blobText: JsonConvert.SerializeObject(legacyPermalink));
+
+            blobStorageService.Setup(s => s.UploadStream(
+                    BlobContainers.PermalinkSnapshots,
+                    $"{permalink.Id}.csv",
+                    It.IsAny<Stream>(),
+                    "text/csv",
+                    It.IsAny<CancellationToken>()
+                ))
+                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, path, stream, _, _) =>
+                {
+                    // Convert captured stream to string
+                    stream.Seek(0L, SeekOrigin.Begin);
+                    var csv = stream.ReadToEnd();
+
+                    // Compare the captured csv upload with the expected csv
+                    Snapshot.Match(csv);
+                })
+                .Returns(Task.CompletedTask);
+
+            blobStorageService.Setup(s => s.UploadStream(
+                    BlobContainers.PermalinkSnapshots,
+                    $"{permalink.Id}.json",
+                    It.IsAny<Stream>(),
+                    MediaTypeNames.Application.Json,
+                    It.IsAny<CancellationToken>()
+                ))
+                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, path, stream, _, _) =>
+                {
+                    // Convert captured stream to string
+                    stream.Seek(0L, SeekOrigin.Begin);
+                    var tableJson = stream.ReadToEnd();
+
+                    // Compare the captured table json upload with the response set up for the frontend service
+                    Assert.Equal("{}", tableJson);
+                })
+                .Returns(Task.CompletedTask);
+
+            var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
+
+            frontendService.Setup(s => s.CreateUniversalTable(
+                ItIs.DeepEqualTo(legacyPermalink),
+                It.IsAny<CancellationToken>())
+            ).ReturnsAsync(new JObject());
+
+            var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(MockBehavior.Strict);
+
+            permalinkCsvMetaService
+                .Setup(s => s
+                    .GetCsvMeta(ItIs.DeepEqualTo(legacyPermalink),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(csvMeta);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object,
+                    frontendService: frontendService.Object,
+                    permalinkCsvMetaService: permalinkCsvMetaService.Object);
+
+                var result = await service.MigratePermalink(permalink.Id);
+
+                result.AssertRight();
+
+                MockUtils.VerifyAllMocks(
+                    blobStorageService,
+                    frontendService,
+                    permalinkCsvMetaService);
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var saved = contentDbContext.Permalinks.Single(p => p.Id == permalink.Id);
+                Assert.True(saved.LegacyHasSnapshot);
+            }
+        }
+
+        [Fact]
+        public async Task MigratePermalink_PermalinkNotFound()
+        {
+            var permalink = new Permalink
+            {
+                Legacy = true
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Permalinks.AddRangeAsync(permalink);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildService(contentDbContext: contentDbContext);
+
+                var result = await service.MigratePermalink(permalinkId: Guid.NewGuid());
+
+                result.AssertNotFound();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var saved = contentDbContext.Permalinks.Single(p => p.Id == permalink.Id);
+                Assert.Null(saved.LegacyHasSnapshot);
+            }
+        }
+
+        [Fact]
+        public async Task MigratePermalink_BlobNotFound()
+        {
+            var permalink = new Permalink
+            {
+                Legacy = true
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Permalinks.AddRangeAsync(permalink);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            blobStorageService.SetupDownloadBlobTextNotFound(
+                container: BlobContainers.Permalinks,
+                path: permalink.Id.ToString());
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildService(contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object);
+
+                var result = await service.MigratePermalink(permalink.Id);
+
+                MockUtils.VerifyAllMocks(blobStorageService);
+
+                result.AssertNotFound();
+            }
+        }
+
+        [Fact]
+        public async Task MigratePermalink_NotLegacyPermalink()
+        {
+            var permalink = new Permalink
+            {
+                Legacy = false
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Permalinks.AddRangeAsync(permalink);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildService(contentDbContext: contentDbContext);
+
+                var result = await service.MigratePermalink(permalink.Id);
+
+                result.AssertNotFound();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var saved = contentDbContext.Permalinks.Single(p => p.Id == permalink.Id);
+                Assert.Null(saved.LegacyHasSnapshot);
+            }
+        }
+
+        [Fact]
+        public async Task MigratePermalink_SnapshotAlreadyExists()
+        {
+            var permalink = new Permalink
+            {
+                Legacy = true,
+                LegacyHasSnapshot = true
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Permalinks.AddRangeAsync(permalink);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildService(contentDbContext: contentDbContext);
+
+                var result = await service.MigratePermalink(permalink.Id);
+
+                result.AssertBadRequest(ValidationErrorMessages.PermalinkSnapshotAlreadyExists);
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var saved = contentDbContext.Permalinks.Single(p => p.Id == permalink.Id);
+                Assert.True(saved.LegacyHasSnapshot);
+            }
+        }
+
+        [Fact]
+        public async Task MigratePermalink_FrontendServiceReturnsNotFound()
+        {
+            var permalink = new Permalink
+            {
+                Legacy = true
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Permalinks.AddRangeAsync(permalink);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            blobStorageService.SetupDownloadBlobText(
+                container: BlobContainers.Permalinks,
+                path: permalink.Id.ToString(),
+                blobText: JsonConvert.SerializeObject(new LegacyPermalink(
+                    permalink.Id,
+                    DateTime.UtcNow,
+                    new TableBuilderConfiguration(),
+                    new PermalinkTableBuilderResult(),
+                    new ObservationQueryContext())));
+
+            var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
+
+            frontendService.Setup(s => s.CreateUniversalTable(
+                It.IsAny<LegacyPermalink>(),
+                It.IsAny<CancellationToken>())
+            ).ReturnsAsync(new NotFoundResult());
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildService(contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object,
+                    frontendService: frontendService.Object);
+
+                var result = await service.MigratePermalink(permalink.Id);
+
+                MockUtils.VerifyAllMocks(blobStorageService,
+                    frontendService);
+
+                result.AssertNotFound();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var saved = contentDbContext.Permalinks.Single(p => p.Id == permalink.Id);
+                Assert.Null(saved.LegacyHasSnapshot);
+            }
+        }
+
+        [Fact]
+        public async Task MigratePermalink_FrontendServiceReturnsError()
+        {
+            var permalink = new Permalink
+            {
+                Legacy = true
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Permalinks.AddRangeAsync(permalink);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            blobStorageService.SetupDownloadBlobText(
+                container: BlobContainers.Permalinks,
+                path: permalink.Id.ToString(),
+                blobText: JsonConvert.SerializeObject(new LegacyPermalink(
+                    permalink.Id,
+                    DateTime.UtcNow,
+                    new TableBuilderConfiguration(),
+                    new PermalinkTableBuilderResult(),
+                    new ObservationQueryContext())));
+
+            var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
+
+            frontendService.Setup(s => s.CreateUniversalTable(
+                It.IsAny<LegacyPermalink>(),
+                It.IsAny<CancellationToken>())
+            ).ReturnsAsync(new StatusCodeResult(StatusCodes.Status500InternalServerError));
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildService(contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object,
+                    frontendService: frontendService.Object);
+
+                var result = await service.MigratePermalink(permalink.Id);
+
+                MockUtils.VerifyAllMocks(blobStorageService,
+                    frontendService);
+
+                result.AssertInternalServerError();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var saved = contentDbContext.Permalinks.Single(p => p.Id == permalink.Id);
+                Assert.Null(saved.LegacyHasSnapshot);
             }
         }
 
