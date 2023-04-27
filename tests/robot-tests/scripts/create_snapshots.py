@@ -64,9 +64,9 @@ class SnapshotService:
 
         return result
 
-    def _send_slack_notification(self, text: Optional[str], blocks=None) -> None:
+    def _send_slack_notification(self, text: Optional[str] = None, blocks=None) -> None:
         webhook = WebhookClient(self.slack_webhook_url)
-        response = webhook.send(text=text if text else None, blocks=blocks)
+        response = webhook.send(text=text, blocks=blocks)
         assert (
             response.status_code == 200 and response.body == "ok"
         ), f"Slack notification failed with status code: {response.status_code}"
