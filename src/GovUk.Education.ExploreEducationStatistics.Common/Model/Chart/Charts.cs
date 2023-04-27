@@ -32,6 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         bool IncludeNonNumericData { get; set; }
 
         Dictionary<string, ChartAxisConfiguration>? Axes { get; set; }
+        public List<ChartDataSetConfig>? Map { get; set; }
         public ChartLegend? Legend { get; set; }
 
     }
@@ -47,6 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public abstract ChartType Type { get; }
 
         public Dictionary<string, ChartAxisConfiguration>? Axes { get; set; }
+
+        public List<ChartDataSetConfig>? Map { get; set; }
         public ChartLegend? Legend { get; set; }
     }
 
@@ -79,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
     public class MapChart : Chart
     {
-        public override ChartType Type => Map;
+        public override ChartType Type => ChartType.Map;
 
         // TODO EES-3319 - make mandatory when all Map Charts are migrated to have a Boundary Level set
         public long? BoundaryLevel { get; set; }

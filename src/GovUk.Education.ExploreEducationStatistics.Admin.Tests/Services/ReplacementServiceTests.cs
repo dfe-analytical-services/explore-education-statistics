@@ -2270,7 +2270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var dataBlockIndividualSchoolTypeFilterGroupPlan =
                     dataBlockSchoolTypeFilterPlan.Value.Groups.First(g =>
                         g.Key == originalIndividualSchoolTypeFilterGroup.Id);
-                    dataBlockSchoolTypeFilterPlan.Value.Groups.First(g => g.Key == originalIndividualSchoolTypeFilterGroup.Id);
+                dataBlockSchoolTypeFilterPlan.Value.Groups.First(g => g.Key == originalIndividualSchoolTypeFilterGroup.Id);
 
                 Assert.Equal(originalIndividualSchoolTypeFilterGroup.Id,
                     dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Id);
@@ -2937,9 +2937,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                     }
                                 }
                             }
-                        }
-                    }
-                }
+                        },
+                        Map = new List<ChartDataSetConfig>
+                        {
+                            new()
+                            {
+                                DataSet = new ChartDataSetConfigDataSet
+                                {
+                                    Filters = new List<Guid>
+                                    {
+                                        originalFilterItem1.Id
+                                    },
+                                    Indicator = originalIndicator.Id,
+                                    Location = new ChartDataSetLocation
+                                    {
+                                        Level = GeographicLevel.LocalAuthority.ToString().CamelCase(),
+                                        Value = originalLocation.Id
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
             };
 
             var releaseContentBlock = new ReleaseContentBlock
@@ -3142,6 +3161,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var filter = Assert.Single(chartLegendItem!.DataSet.Filters);
                 Assert.Equal(replacementFilterItem1.Id, filter);
                 Assert.Equal(replacementIndicator.Id, chartLegendItem.DataSet.Indicator);
+                Assert.NotNull(chartLegendItem.DataSet.Location);
+                Assert.Equal(replacementLocation.Id, chartLegendItem.DataSet.Location!.Value);
+
+                var chartDataSetConfigs = replacedDataBlock.Charts[0].Map;
+                Assert.NotNull(chartDataSetConfigs);
+                var chartDataSetConfig = Assert.Single(chartDataSetConfigs);
+                var filterId = Assert.Single(chartDataSetConfig.DataSet.Filters);
+                Assert.Equal(replacementFilterItem1.Id, filterId);
+                Assert.Equal(replacementIndicator.Id, chartDataSetConfig.DataSet.Indicator);
                 Assert.NotNull(chartLegendItem.DataSet.Location);
                 Assert.Equal(replacementLocation.Id, chartLegendItem.DataSet.Location!.Value);
 
