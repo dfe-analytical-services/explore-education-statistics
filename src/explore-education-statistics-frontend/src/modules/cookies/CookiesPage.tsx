@@ -8,7 +8,7 @@ import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import { useCookies } from '@frontend/hooks/useCookies';
 import { Formik } from 'formik';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { parseCookies } from 'nookies';
 import React, { useState } from 'react';
@@ -23,7 +23,7 @@ interface Props {
   cookies: Dictionary<string>;
 }
 
-function CookiesPage({ cookies }: Props) {
+const CookiesPage: NextPage<Props> = ({ cookies }) => {
   const [submitted, setSubmitted] = useState(false);
   const { back } = useRouter();
 
@@ -177,7 +177,7 @@ function CookiesPage({ cookies }: Props) {
       </div>
     </Page>
   );
-}
+};
 
 export const getServerSideProps: GetServerSideProps<Props> = async context => {
   return {

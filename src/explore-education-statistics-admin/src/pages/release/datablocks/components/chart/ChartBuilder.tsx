@@ -103,7 +103,7 @@ interface Props {
   initialChart?: Chart;
   tableTitle: string;
   onChartSave: (chart: Chart, file?: File) => Promise<void>;
-  onChartDelete: (chart: Chart) => void;
+  onChartDelete: (chart: Chart) => Promise<void>;
   onTableQueryUpdate: TableQueryUpdateHandler;
 }
 
@@ -236,7 +236,6 @@ const ChartBuilder = ({
 
     try {
       await onChartDelete(filterChartProps(chartProps));
-
       actions.resetState();
     } finally {
       setDeleting(false);

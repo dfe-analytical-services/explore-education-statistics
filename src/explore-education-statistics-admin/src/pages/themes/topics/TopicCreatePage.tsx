@@ -7,8 +7,8 @@ import topicService from '@admin/services/topicService';
 import appendQuery from '@common/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
 import { RouteComponentProps } from 'react-router';
+import React from 'react';
 
 const TopicCreatePage = ({
   history,

@@ -1,9 +1,9 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ContentHtml from '@common/components/ContentHtml';
 import { GlossaryEntry } from '@common/services/types/glossary';
 import { within } from '@testing-library/dom';
+import React from 'react';
 
 describe('ContentHtml', () => {
   test('renders correctly with required props', () => {

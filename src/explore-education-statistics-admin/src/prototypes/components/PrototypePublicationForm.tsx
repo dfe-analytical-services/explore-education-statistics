@@ -18,7 +18,7 @@ import WizardStepHeading from '@common/modules/table-tool/components/WizardStepH
 import Button from '@common/components/Button';
 import styles from '@admin/prototypes/components/PrototypePublicationForm.module.scss';
 import PrototypeFormTextSearchInput from '@admin/prototypes/components/PrototypeFormTextSearchInput';
-import { orderBy } from 'lodash';
+import orderBy from 'lodash/orderBy';
 import { Formik } from 'formik';
 import React, { useMemo, useState } from 'react';
 

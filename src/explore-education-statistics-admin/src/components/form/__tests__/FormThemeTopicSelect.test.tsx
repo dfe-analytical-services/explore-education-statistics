@@ -1,8 +1,8 @@
+import React from 'react';
 import FormThemeTopicSelect from '@admin/components/form/FormThemeTopicSelect';
 import { Theme } from '@admin/services/themeService';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 
 describe('FormThemeTopicSelect', () => {
   const testThemes: Theme[] = [

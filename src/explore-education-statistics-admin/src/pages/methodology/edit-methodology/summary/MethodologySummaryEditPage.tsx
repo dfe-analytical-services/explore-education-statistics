@@ -7,8 +7,8 @@ import {
 } from '@admin/routes/methodologyRoutes';
 import methodologyService from '@admin/services/methodologyService';
 import { useMethodologyContext } from '@admin/pages/methodology/contexts/MethodologyContext';
-import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
+import React from 'react';
 
 const MethodologySummaryEditPage = ({
   history,

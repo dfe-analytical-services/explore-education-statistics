@@ -11,7 +11,6 @@ import { waitFor } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React from 'react';
 
 describe('TableHeadersForm', () => {
   test('shows and hides the form', async () => {

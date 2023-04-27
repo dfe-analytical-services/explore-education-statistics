@@ -1,5 +1,4 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
 import _methodologyService, {
   MethodologyVersion,
 } from '@admin/services/methodologyService';
@@ -14,6 +13,7 @@ import {
 import userEvent from '@testing-library/user-event';
 import { Route } from 'react-router-dom';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
+import React from 'react';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/permissionService');

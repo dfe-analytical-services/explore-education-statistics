@@ -8,6 +8,7 @@ describe('useDebouncedCallback', () => {
 
   afterEach(() => {
     jest.useRealTimers();
+    jest.runOnlyPendingTimers();
   });
 
   test('does not run callback until specified timeout', () => {

@@ -13,8 +13,8 @@ import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
+import React from 'react';
 
 const PreReleaseMethodologyPage = ({
   match,

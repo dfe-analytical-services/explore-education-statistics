@@ -1,11 +1,11 @@
 import PageTitle from '@admin/components/PageTitle';
-import React from 'react';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import ContentHtml from '@common/components/ContentHtml';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import WarningMessage from '@common/components/WarningMessage';
+import React from 'react';
 import MetaVariables from './PrototypeMetaVariables';
 
 interface Props {

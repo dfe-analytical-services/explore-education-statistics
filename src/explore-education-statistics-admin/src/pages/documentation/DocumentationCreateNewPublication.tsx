@@ -12,6 +12,7 @@ import imageProductionTeamPublication from './images/guidance/guidance-publicati
 import imageCreateReleasePublication from './images/guidance/guidance-publication-create-new-release.png';
 
 const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
+  // TODO: clean the below up
   const query = new URLSearchParams(window.location.search);
   const step = Number(query.get('step'));
 

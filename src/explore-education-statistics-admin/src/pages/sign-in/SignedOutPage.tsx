@@ -1,5 +1,6 @@
 import Page from '@admin/components/Page';
 import loginService from '@admin/services/loginService';
+import Link from '@admin/components/Link';
 import React from 'react';
 
 const SignedOutPage = () => {
@@ -7,8 +8,8 @@ const SignedOutPage = () => {
     <Page title="Signed out" caption="Explore education statistics">
       <p>You have successfully signed out.</p>
 
-      <a
-        href={loginService.getSignInLink()}
+      <Link
+        to={loginService.getSignInLink()}
         className="govuk-button govuk-button--start"
       >
         Sign in
@@ -23,7 +24,7 @@ const SignedOutPage = () => {
         >
           <path fill="currentColor" d="M0 0h13l20 20-20 20H0l20-20z" />
         </svg>
-      </a>
+      </Link>
     </Page>
   );
 };

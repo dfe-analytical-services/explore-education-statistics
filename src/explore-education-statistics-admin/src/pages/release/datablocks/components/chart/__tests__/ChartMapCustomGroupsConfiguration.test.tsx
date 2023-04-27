@@ -97,8 +97,8 @@ describe('ChartMapCustomGroupsConfiguration', () => {
       />,
     );
 
-    await userEvent.type(screen.getByLabelText('Min'), '0');
-    await userEvent.type(screen.getByLabelText('Max'), '10');
+    userEvent.type(screen.getByLabelText('Min'), '0');
+    userEvent.type(screen.getByLabelText('Max'), '10');
 
     expect(handleAddGroup).not.toHaveBeenCalled();
 
@@ -108,8 +108,8 @@ describe('ChartMapCustomGroupsConfiguration', () => {
       expect(handleAddGroup).toHaveBeenCalledWith({ min: 0, max: 10 });
     });
 
-    await userEvent.type(screen.getByLabelText('Min'), '11');
-    await userEvent.type(screen.getByLabelText('Max'), '20');
+    userEvent.type(screen.getByLabelText('Min'), '11');
+    userEvent.type(screen.getByLabelText('Max'), '20');
 
     userEvent.click(screen.getByRole('button', { name: 'Add group' }));
 

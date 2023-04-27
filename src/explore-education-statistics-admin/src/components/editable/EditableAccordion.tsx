@@ -6,6 +6,7 @@ import { OmitStrict } from '@common/types';
 import reorder from '@common/utils/reorder';
 import classNames from 'classnames';
 import React, {
+  Children,
   cloneElement,
   isValidElement,
   ReactElement,
@@ -39,7 +40,7 @@ const EditableAccordion = (props: EditableAccordionProps) => {
   >([]);
 
   useEffect(() => {
-    const nextSections = React.Children.toArray(children).filter(
+    const nextSections = Children.toArray(children).filter(
       isValidElement,
     ) as ReactElement<EditableAccordionSectionProps>[];
 

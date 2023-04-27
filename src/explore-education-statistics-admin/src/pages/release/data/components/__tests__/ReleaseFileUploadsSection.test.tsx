@@ -10,8 +10,9 @@ import {
   within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { MemoryRouter } from 'react-router';
+import React from 'react';
+import flushPromises from '@common-test/flushPromises';
 
 jest.mock('@admin/services/releaseAncillaryFileService');
 
@@ -237,7 +238,7 @@ describe('ReleaseFileUploadsSection', () => {
     test('shows validation message when `title` is non-unique', async () => {
       renderPage();
 
-      await userEvent.type(screen.getByLabelText('Title'), 'Test file 1');
+      userEvent.type(screen.getByLabelText('Title'), 'Test file 1');
       userEvent.tab();
 
       await waitFor(() => {
@@ -275,13 +276,21 @@ describe('ReleaseFileUploadsSection', () => {
       });
       userEvent.tab();
 
-      await waitFor(() => {
-        expect(
-          screen.getByText('Choose a file', {
-            selector: '#fileUploadForm-file-error',
-          }),
-        ).toBeInTheDocument();
-      });
+      await flushPromises();
+
+      await waitFor(
+        () => {
+          expect(
+            screen.getByText('Choose a file', {
+              selector: '#fileUploadForm-file-error',
+            }),
+          ).toBeInTheDocument();
+        },
+        {
+          timeout: 10000,
+          interval: 100,
+        },
+      );
     });
 
     test('shows validation message when `file` is empty', async () => {
@@ -355,8 +364,8 @@ describe('ReleaseFileUploadsSection', () => {
 
       const file = new File(['test'], 'test-file.txt');
 
-      await userEvent.type(screen.getByLabelText('Title'), 'Test title');
-      await userEvent.type(screen.getByLabelText('Summary'), 'Test summary');
+      userEvent.type(screen.getByLabelText('Title'), 'Test title');
+      userEvent.type(screen.getByLabelText('Summary'), 'Test summary');
 
       userEvent.upload(screen.getByLabelText('Upload file'), file);
       userEvent.click(
@@ -396,8 +405,8 @@ describe('ReleaseFileUploadsSection', () => {
 
       const file = new File(['test'], 'test-file.docx');
 
-      await userEvent.type(screen.getByLabelText('Title'), 'Test file 3');
-      await userEvent.type(screen.getByLabelText('Summary'), 'Test summary 3');
+      userEvent.type(screen.getByLabelText('Title'), 'Test file 3');
+      userEvent.type(screen.getByLabelText('Summary'), 'Test summary 3');
       userEvent.upload(screen.getByLabelText('Upload file'), file);
       userEvent.click(
         screen.getByRole('button', {

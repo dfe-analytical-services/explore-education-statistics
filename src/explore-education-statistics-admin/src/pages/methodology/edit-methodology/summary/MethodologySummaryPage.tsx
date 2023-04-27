@@ -8,13 +8,13 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import WarningMessage from '@common/components/WarningMessage';
 import { useMethodologyContext } from '@admin/pages/methodology/contexts/MethodologyContext';
-import React from 'react';
 import { generatePath } from 'react-router';
 import {
   publicationReleasesRoute,
   PublicationRouteParams,
 } from '@admin/routes/publicationRoutes';
 import Link from '@admin/components/Link';
+import React from 'react';
 
 const MethodologySummaryPage = () => {
   const { methodologyId, methodology } = useMethodologyContext();

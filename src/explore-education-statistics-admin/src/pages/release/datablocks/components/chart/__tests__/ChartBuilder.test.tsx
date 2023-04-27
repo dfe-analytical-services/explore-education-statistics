@@ -5,8 +5,8 @@ import {
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import noop from 'lodash/noop';
 import React from 'react';
+import flushPromises from '@common-test/flushPromises';
 import ChartBuilder from '../ChartBuilder';
 
 describe('ChartBuilder', () => {
@@ -34,7 +34,7 @@ describe('ChartBuilder', () => {
           meta={testFullTable.subjectMeta}
           tableTitle="Table title"
           onChartSave={jest.fn()}
-          onChartDelete={noop}
+          onChartDelete={jest.fn()}
           onTableQueryUpdate={jest.fn()}
         />
       </ChartBuilderFormsContextProvider>,
@@ -70,7 +70,7 @@ describe('ChartBuilder', () => {
           meta={testFullTable.subjectMeta}
           tableTitle="Table title"
           onChartSave={jest.fn()}
-          onChartDelete={noop}
+          onChartDelete={jest.fn()}
           onTableQueryUpdate={jest.fn()}
         />
       </ChartBuilderFormsContextProvider>,
@@ -116,7 +116,7 @@ describe('ChartBuilder', () => {
             meta={testFullTable.subjectMeta}
             tableTitle="Table title"
             onChartSave={jest.fn()}
-            onChartDelete={noop}
+            onChartDelete={jest.fn()}
             onTableQueryUpdate={jest.fn()}
           />
         </ChartBuilderFormsContextProvider>,
@@ -200,7 +200,7 @@ describe('ChartBuilder', () => {
             meta={testFullTable.subjectMeta}
             tableTitle="Table title"
             onChartSave={jest.fn()}
-            onChartDelete={noop}
+            onChartDelete={jest.fn()}
             onTableQueryUpdate={jest.fn()}
           />
         </ChartBuilderFormsContextProvider>,
@@ -264,7 +264,7 @@ describe('ChartBuilder', () => {
             meta={testFullTable.subjectMeta}
             tableTitle="Table title"
             onChartSave={jest.fn()}
-            onChartDelete={noop}
+            onChartDelete={jest.fn()}
             onTableQueryUpdate={jest.fn()}
           />
         </ChartBuilderFormsContextProvider>,
@@ -273,6 +273,19 @@ describe('ChartBuilder', () => {
       userEvent.click(screen.getByRole('button', { name: 'Line' }));
 
       userEvent.click(screen.getByRole('tab', { name: 'Data sets' }));
+
+      await flushPromises();
+
+      // await waitFor(() => {
+      //   screen.getByRole('heading', { name: 'Data sets' }),
+
+      // });
+
+      await waitFor(() => {
+        screen.getByRole('heading', {
+          name: 'Data sets',
+        });
+      });
 
       expect(
         screen.getByRole('heading', { name: 'Data sets' }),

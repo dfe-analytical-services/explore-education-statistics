@@ -16,8 +16,8 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import Tag from '@common/components/Tag';
-import React from 'react';
 import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
+import React from 'react';
 
 const navRoutes: MethodologyRouteProps[] = [
   methodologySummaryRoute,

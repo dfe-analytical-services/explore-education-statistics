@@ -1,5 +1,5 @@
-import Tag from '@common/components/Tag';
 import React from 'react';
+import Tag from '@common/components/Tag';
 
 export type StatusBlockColors = 'blue' | 'orange' | 'red' | 'green';
 

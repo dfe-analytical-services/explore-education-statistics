@@ -14,9 +14,10 @@ import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
-import Yup from '@common/validation/yup';
-import React from 'react';
 import { generatePath, RouteComponentProps, withRouter } from 'react-router';
+import React from 'react';
+import { ReleaseType } from '@common/services/types/releaseType';
+import Yup from '@common/validation/yup';
 
 export interface FormValues extends ReleaseSummaryFormValues {
   templateReleaseId: string;
@@ -125,16 +126,17 @@ const ReleaseCreatePage = ({
                 .value ?? '',
             timePeriodCoverageStartYear: '',
             templateReleaseId: '',
-            releaseType: undefined,
+            releaseType: (undefined as unknown) as ReleaseType,
           } as FormValues)
         }
-        validationSchema={baseRules =>
-          baseRules.shape({
-            templateReleaseId: model?.templateRelease
-              ? Yup.string().required('Choose a template')
-              : Yup.string(),
-          })
-        }
+        validationSchema={baseSchema => {
+          return baseSchema.shape({
+            templateReleaseId: Yup.string().defined().when('templateReleaseId', {
+              is: (v: string) => v !== undefined,
+              then: s => s.required(),
+            }),
+          });
+        }}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
         additionalFields={

@@ -1,3 +1,4 @@
+import React from 'react';
 import CommentEditForm from '@admin/components/comments/CommentEditForm';
 import { testComments } from '@admin/components/comments/__data__/testComments';
 import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
@@ -5,7 +6,6 @@ import { Comment } from '@admin/services/types/content';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React from 'react';
 
 describe('CommentEditForm', () => {
   test('renders the form', () => {
@@ -122,7 +122,7 @@ describe('CommentEditForm', () => {
       </CommentsContextProvider>,
     );
 
-    await userEvent.type(
+    userEvent.type(
       screen.getByRole('textbox', {
         name: 'Comment',
       }),

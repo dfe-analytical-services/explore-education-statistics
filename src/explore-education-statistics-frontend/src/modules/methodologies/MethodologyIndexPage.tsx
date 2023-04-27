@@ -7,9 +7,9 @@ import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import MethodologyList from '@frontend/modules/methodologies/components/MethodologyList';
 import { GetServerSideProps, NextPage } from 'next';
-import React from 'react';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import Accordion from '@common/components/Accordion';
+import React from 'react';
 
 interface Props {
   themes: MethodologyTheme[];

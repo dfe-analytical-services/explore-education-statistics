@@ -147,7 +147,7 @@ export default function ChartReferenceLinesConfiguration({
                     : `Enter a position within the ${
                         axis === 'x' ? 'Y' : 'X'
                       } axis min/max range`,
-                test: (value: number) => {
+                test: value => {
                   if (typeof value !== 'number') {
                     return true;
                   }
@@ -160,7 +160,7 @@ export default function ChartReferenceLinesConfiguration({
                     : true;
                 },
               }),
-              position: Yup.string()
+              position: Yup.number()
                 .required('Enter position')
                 .test({
                   name: 'axisPosition',

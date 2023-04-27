@@ -10,8 +10,8 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import ReleaseDataGuidancePageContent from '@common/modules/release/components/ReleaseDataGuidancePageContent';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import Link from '@admin/components/Link';
-import React from 'react';
 import { RouteComponentProps, StaticContext } from 'react-router';
+import React from 'react';
 
 interface LocationState {
   backLink: string;

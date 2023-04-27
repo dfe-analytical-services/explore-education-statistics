@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import constants from './constants';
 
-export default {
+const loggingUtils = {
   logDashboardUrls: () => {
     console.log(
       `\n\nEES performance results available at: ${constants.grafanaEesDashboardUrl}`,
@@ -11,3 +11,4 @@ export default {
     );
   },
 };
+export default loggingUtils;

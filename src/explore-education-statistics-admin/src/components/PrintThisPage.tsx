@@ -1,6 +1,6 @@
+import React from 'react';
 import Button from '@common/components/Button';
 import classNames from 'classnames';
-import React from 'react';
 import styles from './PrintThisPage.module.scss';
 
 const PrintThisPage = () => {

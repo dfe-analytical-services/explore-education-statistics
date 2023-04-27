@@ -19,9 +19,9 @@ import _tableBuilderService, {
 import { waitFor } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { MemoryRouter } from 'react-router';
 import { generatePath, Route } from 'react-router-dom';
+import React from 'react';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/permissionService');

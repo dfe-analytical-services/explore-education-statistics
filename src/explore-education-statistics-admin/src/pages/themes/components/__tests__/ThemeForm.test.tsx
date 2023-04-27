@@ -56,8 +56,8 @@ describe('ThemeForm', () => {
 
     render(<ThemeForm onSubmit={handleSubmit} />);
 
-    await userEvent.type(screen.getByLabelText('Title'), 'Test title');
-    await userEvent.type(screen.getByLabelText('Summary'), 'Test summary');
+    userEvent.type(screen.getByLabelText('Title'), 'Test title');
+    userEvent.type(screen.getByLabelText('Summary'), 'Test summary');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
@@ -111,8 +111,8 @@ describe('ThemeForm', () => {
 
       render(<ThemeForm onSubmit={handleSubmit} />);
 
-      await userEvent.type(screen.getByLabelText('Title'), 'Updated title');
-      await userEvent.type(screen.getByLabelText('Summary'), 'Updated summary');
+      userEvent.type(screen.getByLabelText('Title'), 'Updated title');
+      userEvent.type(screen.getByLabelText('Summary'), 'Updated summary');
 
       expect(handleSubmit).not.toHaveBeenCalled();
 

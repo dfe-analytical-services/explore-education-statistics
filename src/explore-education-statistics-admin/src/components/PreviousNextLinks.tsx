@@ -1,5 +1,5 @@
-import Link from '@admin/components/Link';
 import React from 'react';
+import Link from '@admin/components/Link';
 import styles from './PreviousNextLinks.module.scss';
 
 export interface PreviousNextLink {

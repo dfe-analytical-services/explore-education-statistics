@@ -172,7 +172,7 @@ describe('ChartMapConfiguration', () => {
       { wrapper },
     );
 
-    await userEvent.type(screen.getByLabelText('Number of data groups'), '0');
+    userEvent.type(screen.getByLabelText('Number of data groups'), '0');
     userEvent.tab();
 
     await waitFor(() => {
@@ -197,7 +197,7 @@ describe('ChartMapConfiguration', () => {
       { wrapper },
     );
 
-    await userEvent.type(screen.getByLabelText('Number of data groups'), '101');
+    userEvent.type(screen.getByLabelText('Number of data groups'), '101');
     userEvent.tab();
 
     await waitFor(() => {
@@ -256,7 +256,7 @@ describe('ChartMapConfiguration', () => {
 
     userEvent.selectOptions(screen.getByLabelText('Boundary level'), ['2']);
     userEvent.click(screen.getByLabelText('Quantiles'));
-    await userEvent.type(screen.getByLabelText('Number of data groups'), '7');
+    userEvent.type(screen.getByLabelText('Number of data groups'), '7');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 

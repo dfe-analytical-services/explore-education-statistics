@@ -1,9 +1,9 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import ImporterStatus from '@admin/pages/release/data/components/ImporterStatus';
+import React from 'react';
 import _releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
-import React from 'react';
 
 jest.mock('@admin/services/releaseDataFileService');
 
@@ -31,7 +31,9 @@ describe('ImporterStatus', () => {
   };
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    jest.useFakeTimers({
+      legacyFakeTimers: true,
+    });
   });
 
   test('renders initial complete status correctly', () => {
@@ -190,6 +192,8 @@ describe('ImporterStatus', () => {
       expect(screen.getByText('Failed')).toBeInTheDocument();
 
       const details = within(screen.getByRole('group'));
+
+      screen.debug();
 
       expect(
         details.getByRole('button', { name: 'See errors' }),

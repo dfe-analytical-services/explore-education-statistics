@@ -8,8 +8,8 @@ import publicationService, {
   ExternalMethodology,
   Publication,
 } from '@admin/services/publicationService';
-import React from 'react';
 import { RouteComponentProps } from 'react-router';
+import React from 'react';
 
 interface Model {
   publication: Publication;

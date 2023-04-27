@@ -15,8 +15,8 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
-import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
+import React from 'react';
 
 const ReleaseFootnotesPage = ({
   match,

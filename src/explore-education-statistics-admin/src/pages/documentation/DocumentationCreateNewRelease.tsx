@@ -17,6 +17,7 @@ import imageCreateReleaseManageContent from './images/guidance/guidance-content-
 import imageSelectTheme from './images/guidance/guidance-publication-select-theme.png';
 
 const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
+  // TODO: clean this up
   const query = new URLSearchParams(window.location.search);
   const step = Number(query.get('step'));
 

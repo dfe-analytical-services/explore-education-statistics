@@ -14,10 +14,10 @@ import {
   waitFor,
   within,
 } from '@testing-library/react';
-import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<

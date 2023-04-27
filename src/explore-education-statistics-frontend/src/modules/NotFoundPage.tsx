@@ -1,8 +1,9 @@
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
+import { NextPage } from 'next';
 import React from 'react';
 
-const NotFoundPage = () => {
+const NotFoundPage: NextPage = () => {
   return (
     <Page title="Page not found">
       <p>If you typed the web address, check it's correct.</p>

@@ -1,3 +1,4 @@
+import React from 'react';
 import Link from '@admin/components/Link';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import releaseService, {
@@ -12,7 +13,6 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
 import { generatePath } from 'react-router';
 
 interface Props {
@@ -25,9 +25,9 @@ const DraftReleaseRow = ({ publicationId, release, onDelete }: Props) => {
   const {
     value: checklist,
     isLoading: isLoadingChecklist,
-  } = useAsyncHandledRetry(() =>
-    releaseService.getReleaseChecklist(release.id),
-  );
+  } = useAsyncHandledRetry(async () => {
+    return releaseService.getReleaseChecklist(release.id);
+  });
 
   return (
     <tr>

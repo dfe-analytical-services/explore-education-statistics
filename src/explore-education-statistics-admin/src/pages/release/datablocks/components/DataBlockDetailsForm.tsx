@@ -65,11 +65,11 @@ const DataBlockDetailsForm = ({
         isHighlight: Yup.boolean(),
         highlightName: Yup.string().when('isHighlight', {
           is: true,
-          then: Yup.string().required('Enter a featured table name'),
+          then: s => s.required('Enter a featured table name'),
         }),
         highlightDescription: Yup.string().when('isHighlight', {
           is: true,
-          then: Yup.string().required('Enter a featured table description'),
+          then: s => s.required('Enter a featured table description'),
         }),
         heading: Yup.string().required('Enter a table title'),
         source: Yup.string(),
@@ -96,7 +96,9 @@ const DataBlockDetailsForm = ({
                 hint="Use a concise descriptive title that summarises the main message in the table."
                 rows={3}
                 onChange={e => {
-                  if (onTitleChange) onTitleChange(e.target.value);
+                  if (onTitleChange) {
+                    onTitleChange(e.target.value);
+                  }
                 }}
               />
 

@@ -7,8 +7,8 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import ReleasePreviewTableTool from '@admin/pages/release/content/components/ReleasePreviewTableTool';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import publicationService from '@admin/services/publicationService';
-import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router-dom';
+import React from 'react';
 
 const ReleaseTableToolPage = ({
   match,

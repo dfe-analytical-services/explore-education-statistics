@@ -5,10 +5,9 @@ import BaseDocument, {
   Main,
   NextScript,
 } from 'next/document';
-import React from 'react';
 
 class Document extends BaseDocument {
-  public static async getInitialProps(ctx: DocumentContext) {
+  static async getInitialProps(ctx: DocumentContext) {
     const initialProps = await BaseDocument.getInitialProps(ctx);
     return { ...initialProps };
   }

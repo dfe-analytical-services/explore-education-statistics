@@ -205,7 +205,7 @@ const ChartAxisConfiguration = ({
   );
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
-    let schema: ObjectSchema<FormValues> = Yup.object({
+    let schema = Yup.object<FormValues>({
       size: Yup.number().positive('Size of axis must be positive'),
       tickConfig: Yup.string().oneOf<TickConfig>(
         ['default', 'startEnd', 'custom'],
@@ -213,9 +213,10 @@ const ChartAxisConfiguration = ({
       ),
       tickSpacing: Yup.number().when('tickConfig', {
         is: 'custom',
-        then: Yup.number()
-          .required('Enter tick spacing')
-          .positive('Tick spacing must be positive'),
+        then: s =>
+          s
+            .required('Enter tick spacing')
+            .positive('Tick spacing must be positive'),
       }),
       max: Yup.number(),
       min: Yup.number(),

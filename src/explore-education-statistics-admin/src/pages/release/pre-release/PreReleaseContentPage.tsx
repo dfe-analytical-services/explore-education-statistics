@@ -5,8 +5,8 @@ import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import releaseContentService from '@admin/services/releaseContentService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
 import { RouteComponentProps } from 'react-router';
+import React from 'react';
 
 const PreReleaseContentPage = ({
   match,

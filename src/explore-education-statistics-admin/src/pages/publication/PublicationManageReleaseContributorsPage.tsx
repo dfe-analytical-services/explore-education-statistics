@@ -7,8 +7,8 @@ import releasePermissionService, {
 import releaseService, { Release } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
 import { RouteComponentProps } from 'react-router';
+import React from 'react';
 
 interface Model {
   release: Release;
@@ -33,7 +33,7 @@ const PublicationManageReleaseContributorsPage = ({
       release,
       publicationContributors,
       releaseContributors: releaseRoles.filter(
-        role => role.role === 'Contributor',
+        ({ role }) => role === 'Contributor',
       ),
     };
   }, [publicationId, releaseId]);

@@ -2,6 +2,7 @@ import useMounted from '@common/hooks/useMounted';
 import { Dictionary } from '@common/types';
 import classNames from 'classnames';
 import React, {
+  Children,
   cloneElement,
   isValidElement,
   ReactElement,
@@ -44,7 +45,7 @@ const Accordion = ({
 
   const sections = useMemo(
     () =>
-      React.Children.toArray(children)
+      Children.toArray(children)
         .filter<ReactElement<AccordionSectionProps>>(isValidElement)
         .map((element, index) => {
           return {

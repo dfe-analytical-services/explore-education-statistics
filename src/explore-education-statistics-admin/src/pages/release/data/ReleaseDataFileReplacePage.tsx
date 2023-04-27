@@ -22,8 +22,8 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useToggle from '@common/hooks/useToggle';
-import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
+import React from 'react';
 
 const ReleaseDataFileReplacePage = ({
   history,

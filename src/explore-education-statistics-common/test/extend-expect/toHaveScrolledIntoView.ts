@@ -3,7 +3,7 @@ import {
   matcherHint,
   printReceived,
   RECEIVED_COLOR as receivedColor,
-} from 'jest-matcher-utils/build';
+} from 'jest-matcher-utils';
 
 const toHaveScrolledIntoView: jest.CustomMatcher = function toHaveScrolledIntoView(
   element: HTMLElement,

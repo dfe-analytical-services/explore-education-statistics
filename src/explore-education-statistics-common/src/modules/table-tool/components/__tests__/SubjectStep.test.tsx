@@ -1,3 +1,5 @@
+/* eslint-disable @next/next/no-html-link-for-pages */
+import flushPromises from '@common-test/flushPromises';
 import { getDescribedBy } from '@common-test/queries';
 import { SubjectFormValues } from '@common/modules/table-tool/components/SubjectForm';
 import SubjectStep from '@common/modules/table-tool/components/SubjectStep';
@@ -384,7 +386,7 @@ describe('SubjectStep', () => {
     const expected: SubjectFormValues = {
       subjectId: 'subject-1',
     };
-
+    await flushPromises();
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);
       expect(handleSubmit).toHaveBeenCalledWith(expected);

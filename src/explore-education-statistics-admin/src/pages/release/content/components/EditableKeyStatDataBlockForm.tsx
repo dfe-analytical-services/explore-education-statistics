@@ -10,8 +10,8 @@ import styles from '@common/modules/find-statistics/components/KeyStat.module.sc
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import { KeyStatisticDataBlock } from '@common/services/publicationService';
 import { Formik } from 'formik';
-import React from 'react';
 import Yup from '@common/validation/yup';
+import React from 'react';
 
 export interface KeyStatDataBlockFormValues {
   trend: string;
@@ -25,7 +25,7 @@ export interface EditableKeyStatDataBlockFormProps {
   statistic: string;
   isReordering?: boolean;
   testId: string;
-  onSubmit: (values: KeyStatDataBlockFormValues) => void;
+  onSubmit: (values: KeyStatDataBlockFormValues) => Promise<void>;
   onCancel: () => void;
 }
 

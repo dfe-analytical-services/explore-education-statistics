@@ -1,10 +1,10 @@
+import React from 'react';
 import ScheduledReleasesTable from '@admin/pages/admin-dashboard/components/ScheduledReleasesTable';
 import _releaseService, {
   ReleaseWithPermissions,
 } from '@admin/services/releaseService';
 import { waitFor, within } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 import { MemoryRouter } from 'react-router';
 
 jest.mock('@admin/services/releaseService');

@@ -31,6 +31,7 @@ import Yup from '@common/validation/yup';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo, useState } from 'react';
+import { ObjectSchema } from 'yup';
 
 export interface FormValues {
   indicators: string[];
@@ -167,28 +168,28 @@ const FiltersForm = ({
     'order',
   );
 
-  const validationSchema = useMemo(
-    () =>
-      Yup.object<FormValues>({
-        indicators: Yup.array()
-          .of(Yup.string())
-          .required('Select at least one option from indicators'),
-        filters: Yup.object(
-          mapValues(subjectMeta.filters, filter =>
-            Yup.array()
-              .typeError(
-                `Select at least one option from ${filter.legend.toLowerCase()}`,
-              )
-              .of(Yup.string())
-              .min(
-                1,
-                `Select at least one option from ${filter.legend.toLowerCase()}`,
-              ),
-          ),
+  const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
+    const schema: ObjectSchema<FormValues> = Yup.object({
+      indicators: Yup.array<FormValues['indicators']>().required(
+        'Select at least one option from indicators',
+      ),
+      filters: Yup.object<FormValues['filters']>(
+        mapValues(subjectMeta.filters, filter =>
+          Yup.array()
+            .typeError(
+              `Select at least one option from ${filter.legend.toLowerCase()}`,
+            )
+            .of(Yup.string())
+            .min(
+              1,
+              `Select at least one option from ${filter.legend.toLowerCase()}`,
+            ),
         ),
-      }),
-    [subjectMeta.filters],
-  );
+      ),
+    });
+
+    return schema;
+  }, [subjectMeta.filters]);
 
   return (
     <FormProvider

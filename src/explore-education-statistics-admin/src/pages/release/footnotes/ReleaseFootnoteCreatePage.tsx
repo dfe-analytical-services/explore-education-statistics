@@ -7,8 +7,8 @@ import {
 import footnoteService from '@admin/services/footnoteService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
+import React from 'react';
 
 const ReleaseFootnoteCreatePage = ({
   match,

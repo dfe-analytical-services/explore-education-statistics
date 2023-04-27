@@ -1,7 +1,7 @@
-import React from 'react';
 import Details from '@common/components/Details';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import React from 'react';
 
 interface Props {
   title?: string;

@@ -2,6 +2,7 @@ import { useDesktopMedia } from '@common/hooks/useMedia';
 import isComponentType from '@common/utils/type-guards/components/isComponentType';
 import classNames from 'classnames';
 import React, {
+  Children,
   cloneElement,
   HTMLAttributes,
   ReactElement,
@@ -29,7 +30,7 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
 
   const { onMedia } = useDesktopMedia();
 
-  const filteredChildren = React.Children.toArray(children).filter(child =>
+  const filteredChildren = Children.toArray(children).filter(child =>
     isComponentType(child, TabsSection),
   ) as ReactElement<TabsSectionProps>[];
 

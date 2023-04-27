@@ -17,6 +17,7 @@ import {
   ChartDefinition,
   BarChartDataLabelPosition,
   LineChartDataLabelPosition,
+  TitleType,
 } from '@common/modules/charts/types/chart';
 import { LegendPosition } from '@common/modules/charts/types/legend';
 import {
@@ -98,14 +99,13 @@ const ChartConfiguration = ({
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     let schema: ObjectSchema<FormValues> = Yup.object<FormValues>({
-      titleType: Yup.mixed<FormValues['titleType']>()
+      titleType: Yup.mixed<TitleType>()
         .oneOf(['default', 'alternative'])
         .required('Choose a title type'),
       title: Yup.string()
         .when('titleType', {
           is: 'alternative',
-          then: Yup.string().required('Enter a chart title'),
-          otherwise: Yup.string,
+          then: s => s.required('Enter chart title'),
         })
         .required('Enter chart title'),
       alt: Yup.string()
@@ -137,12 +137,11 @@ const ChartConfiguration = ({
       schema = schema.shape({
         fileId: Yup.string(),
         file: Yup.file()
-          .nullable()
           .when('fileId', {
-            is: value => !value,
-            then: Yup.file().required('Select an infographic file to upload'),
+            is: (value: string) => !value,
+            then: s => s.required('Select an infographic file to upload'),
           })
-          .minSize(0, 'The infographic cannot be an empty file'),
+          .minSize(0, 'The infographic cannot be an empty file')
       });
     }
 

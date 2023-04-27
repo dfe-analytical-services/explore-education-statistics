@@ -7,11 +7,11 @@ import _releaseDataFileService, {
 } from '@admin/services/releaseDataFileService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { MemoryRouter } from 'react-router';
 import _permissionService, {
   DataFilePermissions,
 } from '@admin/services/permissionService';
+import React from 'react';
 
 jest.mock('@admin/services/releaseDataFileService');
 jest.mock('@admin/services/permissionService');
@@ -252,9 +252,11 @@ describe('ReleaseDataUploadsSection', () => {
       expect(screen.queryAllByTestId('accordionSection')).toHaveLength(0);
     });
 
-    expect(
-      screen.getByText('No data files have been uploaded.'),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByText('No data files have been uploaded.'),
+      ).toBeInTheDocument();
+    });
   });
 
   describe('deleting data file', () => {
@@ -561,10 +563,7 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      await userEvent.type(
-        screen.getByLabelText('Subject title'),
-        'Test data 1',
-      );
+      userEvent.type(screen.getByLabelText('Subject title'), 'Test data 1');
       userEvent.tab();
 
       await waitFor(() => {
@@ -690,10 +689,7 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'text/csv',
       });
 
-      await userEvent.type(
-        screen.getByLabelText('Subject title'),
-        'Test title',
-      );
+      userEvent.type(screen.getByLabelText('Subject title'), 'Test title');
 
       userEvent.upload(screen.getByLabelText('Upload data file'), dataFile);
       userEvent.upload(
@@ -790,10 +786,7 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'application/zip',
       });
 
-      await userEvent.type(
-        screen.getByLabelText('Subject title'),
-        'Test zip title',
-      );
+      userEvent.type(screen.getByLabelText('Subject title'), 'Test zip title');
 
       userEvent.click(screen.getByLabelText('ZIP file'));
 
@@ -891,10 +884,7 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'text/csv',
       });
 
-      await userEvent.type(
-        screen.getByLabelText('Subject title'),
-        'Test title',
-      );
+      userEvent.type(screen.getByLabelText('Subject title'), 'Test title');
 
       userEvent.upload(screen.getByLabelText('Upload data file'), dataFile);
       userEvent.upload(
@@ -958,10 +948,7 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'application/zip',
       });
 
-      await userEvent.type(
-        screen.getByLabelText('Subject title'),
-        'Test title',
-      );
+      userEvent.type(screen.getByLabelText('Subject title'), 'Test title');
 
       userEvent.click(screen.getByLabelText('ZIP file'));
 

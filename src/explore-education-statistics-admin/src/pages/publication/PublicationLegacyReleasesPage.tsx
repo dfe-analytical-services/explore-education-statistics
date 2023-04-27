@@ -16,12 +16,8 @@ const PublicationLegacyReleasesPage = () => {
     publicationId,
   ]);
 
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
-
   return (
-    <>
+    <LoadingSpinner loading={isLoading}>
       <h2>Legacy releases</h2>
       <LegacyReleasesTable
         canManageLegacyReleases={
@@ -30,7 +26,7 @@ const PublicationLegacyReleasesPage = () => {
         legacyReleases={legacyReleases}
         publicationId={publicationId}
       />
-    </>
+    </LoadingSpinner>
   );
 };
 

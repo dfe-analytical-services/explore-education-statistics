@@ -33,10 +33,10 @@ import glossaryService from '@frontend/services/glossaryService';
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
-import React from 'react';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import ScrollableContainer from '@common/components/ScrollableContainer';
 import WarningMessage from '@common/components/WarningMessage';
+import React from 'react';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 

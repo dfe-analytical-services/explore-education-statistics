@@ -1,7 +1,7 @@
 import { EditableContentBlock } from '@admin/services/types/content';
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 import noop from 'lodash/noop';
+import React from 'react';
 import MethodologyEditableBlock from '@admin/pages/methodology/edit-methodology/content/components/MethodologyEditableBlock';
 
 describe('MethodologyEditableBlock', () => {

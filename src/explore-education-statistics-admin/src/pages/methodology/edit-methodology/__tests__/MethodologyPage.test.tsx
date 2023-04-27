@@ -14,9 +14,9 @@ import _permissionService from '@admin/services/permissionService';
 import { generatePath, MemoryRouter } from 'react-router';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { Route } from 'react-router-dom';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
+import React from 'react';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/methodologyContentService');

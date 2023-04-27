@@ -1,8 +1,8 @@
 import Page from '@frontend/components/Page';
-import React from 'react';
 import { allowedCookies } from '@frontend/hooks/useCookies';
 import Link from '@frontend/components/Link';
 import { NextPage } from 'next';
+import React from 'react';
 
 const CookiesPage: NextPage = () => {
   return (
@@ -39,9 +39,7 @@ const CookiesPage: NextPage = () => {
       </p>
       <p>
         Find out more about{' '}
-        <a rel="external" href="http://www.aboutcookies.org/">
-          how to manage cookies.
-        </a>
+        <Link to="http://www.aboutcookies.org/">how to manage cookies.</Link>
       </p>
 
       <h2>How cookies are used on this service</h2>

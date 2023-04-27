@@ -16,7 +16,7 @@ import {
   ChartSymbol,
   LineStyle,
 } from '@common/modules/charts/types/chart';
-import { DataSetCategory } from '@common/modules/charts/types/dataSet';
+import { DataSet, DataSetCategory } from '@common/modules/charts/types/dataSet';
 import {
   LegendConfiguration,
   LegendItem,
@@ -173,8 +173,8 @@ const ChartLegendConfiguration = ({
   }, [hasSubmitted, initialValues.items]);
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
-    let itemSchema = Yup.object<LegendItem>({
-      dataSet: Yup.object(),
+    let itemSchema: ObjectSchema<LegendItem> = Yup.object({
+      dataSet: Yup.mixed<DataSet>().defined(),
       colour: Yup.string().required(
         params =>
           `Enter colour for legend item ${getLegendItemNumber(
@@ -187,7 +187,10 @@ const ChartLegendConfiguration = ({
             params.path as string,
           )}`,
       ),
-    });
+      symbol: Yup.string<ChartSymbol>().optional(),
+      lineStyle: Yup.string<LineStyle>().optional(),
+      inlinePosition: Yup.string<LegendInlinePosition>().optional(),
+    })
 
     if (capabilities.canPositionLegendInline) {
       itemSchema = itemSchema.shape({
@@ -234,14 +237,18 @@ const ChartLegendConfiguration = ({
       });
     }
 
-    let baseSchema = Yup.object<FormValues>({
-      items: Yup.array().of(itemSchema),
+    let baseSchema: ObjectSchema<FormValues> = Yup.object({
+      items: Yup.array().defined().of(itemSchema),
+      position: Yup.string<LegendPosition>().optional(),
     });
 
     if (capabilities.hasLegendPosition) {
       baseSchema = baseSchema.shape({
         position: Yup.string()
-          .oneOf<LegendPosition>(
+        .required(
+         'Select a legend position',
+        )
+        .oneOf<LegendPosition>(
             ['none', 'bottom', 'top', 'inline'],
             'Select a valid legend position',
           )
@@ -265,7 +272,7 @@ const ChartLegendConfiguration = ({
   ]);
 
   const handleChange = useCallback(
-    values => {
+    (values: FormValues) => {
       if (validationSchema.isValidSync(values)) {
         onChange(values);
       }

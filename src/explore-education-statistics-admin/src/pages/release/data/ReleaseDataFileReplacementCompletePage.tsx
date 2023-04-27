@@ -11,8 +11,8 @@ import dataReplacementService from '@admin/services/dataReplacementService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
+import React from 'react';
 
 const ReleaseDataFileReplacementCompletePage = ({
   match,

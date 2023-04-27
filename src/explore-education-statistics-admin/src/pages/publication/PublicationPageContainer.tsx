@@ -25,8 +25,8 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
 import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
+import React from 'react';
 
 const navRoutes = [
   publicationReleasesRoute,

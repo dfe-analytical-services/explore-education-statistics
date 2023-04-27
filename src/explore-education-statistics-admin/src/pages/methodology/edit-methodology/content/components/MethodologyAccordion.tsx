@@ -59,8 +59,9 @@ const MethodologyAccordion = ({
     sectionKey === 'annexes' &&
     editingMode !== 'edit' &&
     methodology.annexes.length < 1
-  )
+  ) {
     return null;
+  }
   return (
     <EditableAccordion
       id={id}

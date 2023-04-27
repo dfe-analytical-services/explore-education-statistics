@@ -43,7 +43,7 @@ const SubscriptionPage: NextPage<Props> = ({
       const { id, title } = data;
 
       await notificationService.subscribeToPublication({
-        email,
+        email: email.trim(),
         id,
         slug,
         title,
@@ -53,8 +53,8 @@ const SubscriptionPage: NextPage<Props> = ({
     }
   };
 
-  let message;
-  let title;
+  let message = '';
+  let title = '';
 
   if (unsubscribed) {
     title = 'Unsubscribed';

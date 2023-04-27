@@ -29,10 +29,10 @@ import releaseService from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
 import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
 import { publicationReleasesRoute } from '@admin/routes/publicationRoutes';
 import { PublicationRouteParams } from '@admin/routes/routes';
+import React from 'react';
 
 const navRoutes = [
   releaseSummaryRoute,

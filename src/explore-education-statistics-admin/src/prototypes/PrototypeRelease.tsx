@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-html-link-for-pages */
 import Link from '@admin/components/Link';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import Accordion from '@common/components/Accordion';

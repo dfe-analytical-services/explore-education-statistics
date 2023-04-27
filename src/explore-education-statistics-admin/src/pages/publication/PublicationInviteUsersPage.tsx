@@ -4,8 +4,8 @@ import { PublicationManageTeamRouteParams } from '@admin/routes/publicationRoute
 import publicationService from '@admin/services/publicationService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
 import { RouteComponentProps } from 'react-router';
+import React from 'react';
 
 const PublicationInviteUsersPage = ({
   match,
@@ -21,7 +21,7 @@ const PublicationInviteUsersPage = ({
     publicationService.listReleases(publicationId),
   );
 
-  const releases = allReleases.results;
+  const { results: releases } = allReleases;
 
   return (
     <LoadingSpinner loading={isLoading}>

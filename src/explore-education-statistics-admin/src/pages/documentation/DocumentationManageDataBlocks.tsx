@@ -1,7 +1,7 @@
-import React from 'react';
 import Link from '@admin/components/Link';
 import { RouteChildrenProps } from 'react-router';
 import Page from '@admin/components/Page';
+import React from 'react';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
 import imageDataBlockCreate from './images/guidance/guidance-datablocks-create.png';
@@ -20,6 +20,7 @@ import imageDataBlockViewChart from './images/guidance/guidance-datablocks-view-
 import imageDataBlockDelete from './images/guidance/guidance-datablocks-delete.png';
 
 const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
+  // TODO: clean this up
   const query = new URLSearchParams(window.location.search);
   const step = Number(query.get('step'));
 

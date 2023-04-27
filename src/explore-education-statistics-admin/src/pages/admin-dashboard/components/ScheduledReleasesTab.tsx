@@ -1,7 +1,7 @@
+import React from 'react';
 import ScheduledReleasesTable from '@admin/pages/admin-dashboard/components/ScheduledReleasesTable';
 import { Release } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import React from 'react';
 
 interface Props {
   isLoading: boolean;

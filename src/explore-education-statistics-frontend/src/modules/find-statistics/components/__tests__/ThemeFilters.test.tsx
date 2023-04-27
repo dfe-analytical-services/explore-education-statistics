@@ -1,9 +1,9 @@
 import ThemeFilters from '@frontend/modules/find-statistics/components/ThemeFilters';
 import { testThemeSummaries } from '@frontend/modules/find-statistics/__tests__/__data__/testThemeData';
 import { render, screen, within } from '@testing-library/react';
-import React from 'react';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 describe('ThemeFilters', () => {
   test('renders correctly', () => {

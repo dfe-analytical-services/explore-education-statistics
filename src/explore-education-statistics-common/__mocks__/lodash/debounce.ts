@@ -1,7 +1,9 @@
 type Callback = (...args: unknown[]) => void;
 
-export default (fn: Callback, timeout: number) => (...args: unknown[]) => {
+const debounce = (fn: Callback, timeout: number) => (...args: unknown[]) => {
   setTimeout(() => {
     fn(...args);
   }, timeout);
 };
+
+export default debounce;

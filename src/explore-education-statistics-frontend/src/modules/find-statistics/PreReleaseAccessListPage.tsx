@@ -5,14 +5,14 @@ import publicationService, {
 } from '@common/services/publicationService';
 import glossaryService from '@frontend/services/glossaryService';
 import Page from '@frontend/components/Page';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 
 interface Props {
   release: PreReleaseAccessListSummary;
 }
 
-const PreReleaseAccessListPage = ({ release }: Props) => {
+const PreReleaseAccessListPage: NextPage<Props> = ({ release }) => {
   return (
     <Page
       title={release.publication.title}

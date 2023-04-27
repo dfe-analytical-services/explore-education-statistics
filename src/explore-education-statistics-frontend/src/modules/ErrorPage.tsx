@@ -2,7 +2,7 @@ import { useApplicationInsights } from '@common/contexts/ApplicationInsightsCont
 import Link from '@frontend/components/Link';
 import NotFoundPage from '@frontend/modules/NotFoundPage';
 import { AxiosError } from 'axios';
-import { NextPageContext } from 'next';
+import { NextPage, NextPageContext } from 'next';
 import React, { useEffect } from 'react';
 import Page from '../components/Page';
 
@@ -11,7 +11,7 @@ interface Props {
   statusCode: number;
 }
 
-const ErrorPage = ({ statusCode, error }: Props) => {
+const ErrorPage: NextPage<Props> = ({ statusCode, error }) => {
   const appInsights = useApplicationInsights();
 
   useEffect(() => {

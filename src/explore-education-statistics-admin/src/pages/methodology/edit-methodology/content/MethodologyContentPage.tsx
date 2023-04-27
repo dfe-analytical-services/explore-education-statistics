@@ -20,8 +20,8 @@ import {
 } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContext';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import React from 'react';
 import { RouteComponentProps } from 'react-router';
+import React from 'react';
 
 export const MethodologyContentPageInternal = () => {
   const {

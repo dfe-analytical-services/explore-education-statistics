@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-html-link-for-pages */
 import { getDescribedBy } from '@common-test/queries';
 import FeaturedTablesList from '@common/modules/table-tool/components/FeaturedTablesList';
 import { FeaturedTable } from '@common/services/tableBuilderService';
@@ -34,6 +35,7 @@ describe('FeaturedTablesList', () => {
 
   afterEach(() => {
     jest.useRealTimers();
+    jest.runOnlyPendingTimers();
   });
 
   test('renders highlights in correct order', () => {
@@ -111,7 +113,7 @@ describe('FeaturedTablesList', () => {
       />,
     );
 
-    await userEvent.type(screen.getByRole('textbox'), 'unique name');
+    userEvent.type(screen.getByRole('textbox'), 'unique name');
 
     jest.runOnlyPendingTimers();
 
@@ -133,7 +135,7 @@ describe('FeaturedTablesList', () => {
       />,
     );
 
-    await userEvent.type(screen.getByRole('textbox'), 'similar name');
+    userEvent.type(screen.getByRole('textbox'), 'similar name');
 
     jest.runOnlyPendingTimers();
 
@@ -156,7 +158,7 @@ describe('FeaturedTablesList', () => {
       />,
     );
 
-    await userEvent.type(screen.getByRole('textbox'), 'unique description');
+    userEvent.type(screen.getByRole('textbox'), 'unique description');
 
     jest.runOnlyPendingTimers();
 
@@ -183,7 +185,7 @@ describe('FeaturedTablesList', () => {
       />,
     );
 
-    await userEvent.type(screen.getByRole('textbox'), 'unique description');
+    userEvent.type(screen.getByRole('textbox'), 'unique description');
 
     jest.runOnlyPendingTimers();
 
@@ -205,7 +207,7 @@ describe('FeaturedTablesList', () => {
       />,
     );
 
-    await userEvent.type(screen.getByRole('textbox'), 'does not exist');
+    userEvent.type(screen.getByRole('textbox'), 'does not exist');
 
     jest.runOnlyPendingTimers();
 

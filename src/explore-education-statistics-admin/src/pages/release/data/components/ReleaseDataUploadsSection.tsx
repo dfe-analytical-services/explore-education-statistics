@@ -74,7 +74,7 @@ const ReleaseDataUploadsSection = ({
     setState: setDataFilesState,
     isLoading,
   } = useAsyncHandledRetry(
-    () => releaseDataFileService.getDataFiles(releaseId),
+    async () => releaseDataFileService.getDataFiles(releaseId),
     [releaseId],
   );
 
@@ -190,8 +190,9 @@ const ReleaseDataUploadsSection = ({
           }}
           errorMappings={errorMappings}
           onSubmit={handleSubmit}
-          validationSchema={baseSchema =>
-            baseSchema.shape({
+ 
+          validationSchema={baseSchema => {
+            return baseSchema.shape({
               subjectTitle: Yup.string()
                 .trim()
                 .required('Enter a subject title')
@@ -210,8 +211,8 @@ const ReleaseDataUploadsSection = ({
                     );
                   },
                 }),
-            })
-          }
+            });
+          }}
           beforeFields={
             <FormFieldTextInput<FormValues>
               name="subjectTitle"
@@ -295,16 +296,17 @@ const ReleaseDataUploadsSection = ({
                           )}
 
                           <ButtonText
-                            onClick={() =>
-                              releaseDataFileService
-                                .getDeleteDataFilePlan(releaseId, dataFile)
-                                .then(plan => {
-                                  setDeleteDataFile({
-                                    plan,
-                                    file: dataFile,
-                                  });
-                                })
-                            }
+                            onClick={async () => {
+                              const plan = await releaseDataFileService.getDeleteDataFilePlan(
+                                releaseId,
+                                dataFile,
+                              );
+
+                              setDeleteDataFile({
+                                plan,
+                                file: dataFile,
+                              });
+                            }}
                           >
                             Delete files
                           </ButtonText>

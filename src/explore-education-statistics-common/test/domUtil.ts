@@ -1,4 +1,4 @@
-export default {
+const domUtil = {
   elementContainingText(
     container: HTMLElement,
     selector: string,
@@ -18,3 +18,4 @@ export default {
     );
   },
 };
+export default domUtil;

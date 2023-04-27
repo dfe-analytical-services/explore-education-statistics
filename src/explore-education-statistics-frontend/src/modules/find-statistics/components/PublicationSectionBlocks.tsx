@@ -13,8 +13,8 @@ import {
   logEvent,
   logOutboundLink,
 } from '@frontend/services/googleAnalyticsService';
-import React from 'react';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import React from 'react';
 
 export interface PublicationSectionBlocksProps {
   release: Release;

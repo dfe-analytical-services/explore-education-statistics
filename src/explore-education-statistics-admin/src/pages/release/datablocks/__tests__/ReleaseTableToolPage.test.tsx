@@ -8,8 +8,8 @@ import _publicationService, {
 } from '@admin/services/publicationService';
 import _tableBuilderService from '@common/services/tableBuilderService';
 import { render, screen, waitFor, within } from '@testing-library/react';
-import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router-dom';
+import React from 'react';
 
 jest.mock('@admin/services/publicationService');
 jest.mock('@admin/services/permissionService');

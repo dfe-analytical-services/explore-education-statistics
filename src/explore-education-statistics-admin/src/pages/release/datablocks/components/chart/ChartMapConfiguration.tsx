@@ -73,7 +73,7 @@ export default function ChartMapConfiguration({
         .max(100, 'The number of data groups cannot be greater than 100')
         .when('dataClassification', {
           is: 'Custom',
-          then: Yup.array().required('There must be at least 1 data group'),
+          then: s => s.required('There must be at least 1 data group'),
         }),
       dataClassification: Yup.string()
         .required('Choose a data classification')

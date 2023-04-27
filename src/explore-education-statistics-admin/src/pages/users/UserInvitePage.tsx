@@ -15,7 +15,6 @@ import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import orderBy from 'lodash/orderBy';
-import React from 'react';
 import { RouteComponentProps } from 'react-router';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -25,6 +24,7 @@ import InviteUserReleaseRoleForm from '@admin/pages/users/components/InviteUserR
 import publicationService from '@admin/services/publicationService';
 import { PublicationSummary } from '@common/services/publicationService';
 import InviteUserPublicationRoleForm from '@admin/pages/users/components/InviteUserPublicationRoleForm';
+import React from 'react';
 
 export interface InviteUserReleaseRole {
   releaseId: string;
@@ -77,8 +77,6 @@ const UserInvitePage = ({
     ]);
     return { roles, resourceRoles, releases, publications };
   }, []);
-
-  const cancelHandler = () => history.push('/administration/users/invites');
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
     const userReleaseRoles = values.userReleaseRoles.map(userReleaseRole => {
@@ -202,7 +200,13 @@ const UserInvitePage = ({
 
                 <ButtonGroup className="govuk-!-margin-top-6">
                   <Button type="submit">Send invite</Button>
-                  <ButtonText onClick={cancelHandler}>Cancel</ButtonText>
+                  <ButtonText
+                    onClick={() =>
+                      history.push('/administration/users/invites')
+                    }
+                  >
+                    Cancel
+                  </ButtonText>
                 </ButtonGroup>
               </Form>
             );

@@ -1,9 +1,9 @@
+import React from 'react';
 import Comment from '@admin/components/comments/Comment';
 import styles from '@admin/components/comments/CommentsList.module.scss';
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import Details from '@common/components/Details';
 import sortBy from 'lodash/sortBy';
-import React from 'react';
 
 interface Props {
   className?: string;

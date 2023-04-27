@@ -1,6 +1,6 @@
 import classNames from 'classnames';
-import React from 'react';
 import PageSearchForm from '@common/components/PageSearchForm';
+import React from 'react';
 
 const PrototypeHighlightsLinks = () => {
   return (

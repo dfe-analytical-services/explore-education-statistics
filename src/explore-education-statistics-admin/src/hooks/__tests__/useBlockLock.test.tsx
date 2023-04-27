@@ -12,6 +12,7 @@ describe('useBlockLock', () => {
   });
 
   afterEach(() => {
+    jest.runOnlyPendingTimers();
     jest.useRealTimers();
   });
 

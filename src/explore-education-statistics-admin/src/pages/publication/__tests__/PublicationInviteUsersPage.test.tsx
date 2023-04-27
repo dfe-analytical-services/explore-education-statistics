@@ -9,9 +9,9 @@ import {
 import _publicationService from '@admin/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
 import { generatePath, Route } from 'react-router';
-import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
+import React from 'react';
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<

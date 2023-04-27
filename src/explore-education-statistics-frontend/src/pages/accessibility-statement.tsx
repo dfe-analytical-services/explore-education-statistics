@@ -1,8 +1,9 @@
 import Page from '@frontend/components/Page';
-import React from 'react';
 import Link from '@frontend/components/Link';
+import React from 'react';
+import { NextPage } from 'next';
 
-function AcccessibilityStatementPage() {
+const AcccessibilityStatementPage: NextPage = () => {
   return (
     <Page
       title="Accessibility statement for Explore education statistics"
@@ -13,9 +14,9 @@ function AcccessibilityStatementPage() {
           <section>
             <p className="govuk-body">
               This website is run by{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education">
+              <Link to="https://www.gov.uk/government/organisations/department-for-education">
                 the Department for Education (DfE)
-              </a>
+              </Link>
               . We want as many people as possible to be able to use this
               website. For example, that means you should be able to:
             </p>
@@ -111,9 +112,9 @@ function AcccessibilityStatementPage() {
               Applications) (No. 2) Accessibility Regulations 2018 (the
               ‘accessibility regulations’). If you’re not happy with how we
               respond to your complaint,{' '}
-              <a rel="external" href="https://www.equalityadvisoryservice.com/">
+              <Link to="https://www.equalityadvisoryservice.com/">
                 contact the Equality Advisory and Support Service (EASS)
-              </a>
+              </Link>
               .
             </p>
           </section>
@@ -283,6 +284,6 @@ function AcccessibilityStatementPage() {
       </div>
     </Page>
   );
-}
+};
 
 export default AcccessibilityStatementPage;

@@ -1,57 +1,48 @@
-import { mixed } from 'yup';
+import * as Yup from 'yup';
 
-const MixedSchema = mixed;
-
-class FileSchema extends MixedSchema {
-  private isNullable = true;
-
+export default class FileSchema extends Yup.MixedSchema<File> {
   constructor() {
-    super({ type: 'file' });
+    super();
+
+    this.required = this.required.bind(this);
 
     this.withMutation(() => {
-      this.transform(value => {
-        if (this.isType(value)) {
-          return value;
+      // eslint-disable-next-line func-names, @typescript-eslint/no-explicit-any
+      this.transform(function (value: any, originalValue: any) {
+        if (originalValue === null || originalValue === undefined) {
+          return this.notRequired();
         }
 
-        return null;
+        return value;
       });
     });
   }
 
-  // eslint-disable-next-line no-underscore-dangle,class-methods-use-this
-  private _typeCheck(value: unknown): boolean {
-    if (this.isNullable && value === null) {
-      return true;
-    }
-
-    return value instanceof File;
+  required(message?: string) {
+    return this.test({
+      name: 'required',
+      message: message || 'Required',
+      exclusive: true,
+      test(value) {
+        return !!value;
+      },
+    });
   }
 
-  public nullable(isNullable = true): FileSchema {
-    const clone = this.clone();
-    clone.isNullable = isNullable;
-    return clone;
-  }
-
-  public required(message: string): FileSchema {
-    return super.required(message) as this;
-  }
-
-  public minSize(minBytes: number, message: string): FileSchema {
+  minSize(minBytes: number, message?: string) {
     return this.test({
       name: 'minSize',
-      message,
+      message: message || 'File must be larger than 0 bytes',
       exclusive: true,
-      test(value?: File) {
+      test(value) {
         if (!value) {
           return true;
         }
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         return value.size > minBytes;
       },
     });
   }
 }
-
-export default FileSchema;

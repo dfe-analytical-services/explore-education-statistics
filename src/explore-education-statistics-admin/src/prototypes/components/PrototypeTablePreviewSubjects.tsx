@@ -1,10 +1,10 @@
 import classNames from 'classnames';
-import React from 'react';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Details from '@common/components/Details';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import React from 'react';
 
 const PrototypeMoreDetails = () => {
   return (

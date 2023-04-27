@@ -14,8 +14,8 @@ import { useMethodologyContext } from '@admin/pages/methodology/contexts/Methodo
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import MethodologyStatusEditPage from '@admin/pages/methodology/edit-methodology/status/MethodologyStatusEditPage';
-import React from 'react';
 import UrlContainer from '@common/components/UrlContainer';
+import React from 'react';
 
 interface FormValues {
   status: MethodologyStatus;

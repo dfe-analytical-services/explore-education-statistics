@@ -70,13 +70,15 @@ describe('PublicationDraftReleases', () => {
 
   const testReleases = [testRelease1, testRelease2, testRelease3];
 
-  beforeAll(() => {
-    jest.useFakeTimers();
-  });
+  // beforeAll(() => {
+  //   jest.useFakeTimers({
+  //     legacyFakeTimers: true,
+  //   });
+  // });
 
-  afterAll(() => {
-    jest.useRealTimers();
-  });
+  // afterAll(() => {
+  //   jest.useRealTimers();
+  // });
 
   beforeEach(() => {
     releaseService.getReleaseChecklist.mockResolvedValue({
@@ -113,6 +115,7 @@ describe('PublicationDraftReleases', () => {
     await waitFor(() => {
       // Errors
       expect(within(row1Cells[2]).getByText('2')).toBeInTheDocument();
+
       // Warnings
       expect(within(row1Cells[3]).getByText('1')).toBeInTheDocument();
     });

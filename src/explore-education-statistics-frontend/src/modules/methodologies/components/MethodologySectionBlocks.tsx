@@ -6,8 +6,8 @@ import {
   logOutboundLink,
 } from '@frontend/services/googleAnalyticsService';
 import { ContentBlock } from '@common/services/types/blocks';
-import React from 'react';
 import useMethodologyImageAttributeTransformer from '@common/modules/methodology/hooks/useMethodologyImageAttributeTransformer';
+import React from 'react';
 
 interface Props {
   blocks: ContentBlock[];

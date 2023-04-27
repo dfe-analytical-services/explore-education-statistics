@@ -1,6 +1,6 @@
 import flushPromises from '@common-test/flushPromises';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
@@ -81,11 +81,14 @@ describe('WizardStepFormActions', () => {
   });
 
   test('clicking `Previous step` button does not call `goToPreviousStep` until `onPreviousStep` completes', async () => {
-    jest.useFakeTimers();
+    jest.useFakeTimers({
+      legacyFakeTimers: true,
+    });
 
     const handlePreviousStep = jest.fn(
       () => new Promise(resolve => setTimeout(resolve, 500)),
     );
+
     const goToPreviousStep = jest.fn();
 
     render(
@@ -101,12 +104,15 @@ describe('WizardStepFormActions', () => {
 
     userEvent.click(screen.getByText('Previous step'));
 
-    await flushPromises();
-    expect(goToPreviousStep).not.toHaveBeenCalled();
+    // await flushPromises();
+    await waitFor(() => {
+      expect(goToPreviousStep).not.toHaveBeenCalled();
+    });
 
     jest.advanceTimersByTime(500);
 
     await flushPromises();
+
     expect(goToPreviousStep).toHaveBeenCalled();
 
     jest.useRealTimers();

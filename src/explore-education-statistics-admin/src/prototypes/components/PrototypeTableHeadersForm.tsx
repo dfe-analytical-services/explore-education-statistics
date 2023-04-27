@@ -212,10 +212,28 @@ const TableHeadersForm = ({
           }}
           validationSchema={Yup.object<FormValues>({
             rowGroups: Yup.array()
-              .of(Yup.array().of<Filter>(Yup.object()).ensure())
+              .of(
+                Yup.array()
+                  .of<Omit<Filter, 'id'>>(
+                    Yup.object().shape({
+                      label: Yup.string().required('Label is required'),
+                      value: Yup.string().required('Value is required'),
+                    }),
+                  )
+                  .ensure(),
+              )
               .min(1, 'Must have at least one row group'),
             columnGroups: Yup.array()
-              .of(Yup.array().of<Filter>(Yup.object()).ensure())
+              .of(
+                Yup.array()
+                  .of<Omit<Filter, 'id'>>(
+                    Yup.object().shape({
+                      label: Yup.string().required('Label is required'),
+                      value: Yup.string().required('Value is required'),
+                    }),
+                  )
+                  .ensure(),
+              )
               .min(1, 'Must have at least one column group'),
           })}
           onSubmit={handleSubmit}

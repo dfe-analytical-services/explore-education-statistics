@@ -654,7 +654,7 @@ describe('ChartLegendConfiguration', () => {
     const legendItem1 = within(legendItems[0]);
 
     userEvent.clear(legendItem1.getByLabelText('Label'));
-    await userEvent.type(
+    userEvent.type(
       legendItem1.getByLabelText('Label'),
       'Updated legend item 1',
     );
@@ -923,7 +923,7 @@ describe('ChartLegendConfiguration', () => {
     const legendItem1 = within(legendItems[0]);
 
     userEvent.clear(legendItem1.getByLabelText('Label'));
-    await userEvent.type(
+    userEvent.type(
       legendItem1.getByLabelText('Label'),
       'Updated legend item 1',
     );

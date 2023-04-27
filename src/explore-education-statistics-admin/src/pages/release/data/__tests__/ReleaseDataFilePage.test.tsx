@@ -9,8 +9,8 @@ import _releaseDataFileService, {
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory, MemoryHistory } from 'history';
-import React from 'react';
 import { generatePath, Route, Router } from 'react-router-dom';
+import React from 'react';
 
 jest.mock('@admin/services/releaseDataFileService');
 
@@ -99,7 +99,7 @@ describe('ReleaseDataFilePage', () => {
     const input = screen.getByLabelText('Title');
 
     userEvent.clear(input);
-    await userEvent.type(input, 'Updated test data file');
+    userEvent.type(input, 'Updated test data file');
 
     userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
 

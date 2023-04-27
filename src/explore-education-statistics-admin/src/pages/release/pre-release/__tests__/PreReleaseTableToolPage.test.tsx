@@ -16,9 +16,9 @@ import _tableBuilderService, {
   Subject,
 } from '@common/services/tableBuilderService';
 import { render, screen, waitFor, within } from '@testing-library/react';
-import React from 'react';
 import { MemoryRouter, Route } from 'react-router';
 import { generatePath } from 'react-router-dom';
+import React from 'react';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/publicationService');

@@ -7,8 +7,8 @@ import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ContentHtml from '@common/components/ContentHtml';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
 import { RouteComponentProps, StaticContext } from 'react-router';
+import React from 'react';
 
 interface LocationState {
   backLink: string;

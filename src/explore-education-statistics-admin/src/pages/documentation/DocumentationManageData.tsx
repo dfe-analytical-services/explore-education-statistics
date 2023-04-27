@@ -1,7 +1,7 @@
-import React from 'react';
 import Link from '@admin/components/Link';
 import { RouteChildrenProps } from 'react-router';
 import Page from '@admin/components/Page';
+import React from 'react';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
 import imageDataTab from './images/guidance/guidance-data-tab.png';
@@ -26,6 +26,7 @@ import imageFileSummary from './images/guidance/guidance-file-summary.png';
 import imageFileDelete from './images/guidance/guidance-file-delete.png';
 
 const DocumentationManageContent = ({ location: _ }: RouteChildrenProps) => {
+  // TODO: clean this up
   const query = new URLSearchParams(window.location.search);
   const step = Number(query.get('step'));
 

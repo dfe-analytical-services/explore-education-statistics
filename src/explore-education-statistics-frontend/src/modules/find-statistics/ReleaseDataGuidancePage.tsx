@@ -4,14 +4,13 @@ import releaseDataGuidanceService, {
 } from '@common/services/releaseDataGuidanceService';
 import Page from '@frontend/components/Page';
 import Link from '@frontend/components/Link';
-import { GetServerSideProps } from 'next';
-import React from 'react';
+import { GetServerSideProps, NextPage } from 'next';
 
 interface Props {
   release: ReleaseDataGuidanceSummary;
 }
 
-const ReleaseDataGuidancePage = ({ release }: Props) => {
+const ReleaseDataGuidancePage: NextPage<Props> = ({ release }) => {
   return (
     <Page
       title={release.publication.title}

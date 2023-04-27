@@ -17,8 +17,8 @@ import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import ReleasePreviewTableTool from '@admin/pages/release/content/components/ReleasePreviewTableTool';
 import getUnresolvedComments from '@admin/pages/release/content/utils/getUnresolvedComments';
 import classNames from 'classnames';
-import React from 'react';
 import { RouteComponentProps } from 'react-router';
+import React from 'react';
 
 const ReleaseContentPageLoaded = () => {
   const { canUpdateRelease, release } = useReleaseContentState();

@@ -1,7 +1,7 @@
 import flushPromises from '@common-test/flushPromises';
 import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { render, screen } from '@testing-library/react';
 import ButtonText from '../ButtonText';
 
 describe('ButtonText', () => {
@@ -48,7 +48,9 @@ describe('ButtonText', () => {
   });
 
   test('disabled if current `onClick` handler is processing', async () => {
-    jest.useFakeTimers();
+    jest.useFakeTimers({
+      legacyFakeTimers: true,
+    });
 
     const handleClick = jest.fn(
       () => new Promise(resolve => setTimeout(resolve, 2000)),
@@ -67,10 +69,11 @@ describe('ButtonText', () => {
 
     jest.advanceTimersByTime(1000);
     // Flushes promise queue so any state change is triggered
-    await flushPromises();
-
-    // Button is still disabled
-    expect(button).toBeDisabled();
+    // await flushPromises();
+    await waitFor(() => {
+      // Button is still disabled
+      expect(button).toBeDisabled();
+    });
 
     jest.runOnlyPendingTimers();
     jest.useRealTimers();

@@ -1,7 +1,7 @@
 import NavLink from '@admin/components/NavLink';
 import classNames from 'classnames';
-import React from 'react';
 import styles from '@admin/components/NavBar.module.scss';
+import React from 'react';
 
 const PrototypeNavBar = () => {
   return (
