@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             methodologyFileRepository.Setup(mock => mock.GetByFileType(_methodologyVersion.Id, Image))
                 .ReturnsAsync(new List<MethodologyFile>
                 {
-                    new ()
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         FileId = Guid.NewGuid()
