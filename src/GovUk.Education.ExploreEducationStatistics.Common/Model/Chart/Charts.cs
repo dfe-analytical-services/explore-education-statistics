@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using Newtonsoft.Json;
@@ -32,7 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         bool IncludeNonNumericData { get; set; }
 
         Dictionary<string, ChartAxisConfiguration>? Axes { get; set; }
-        public List<ChartDataSetConfig>? Map { get; set; }
         public ChartLegend? Legend { get; set; }
 
     }
@@ -49,7 +49,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
         public Dictionary<string, ChartAxisConfiguration>? Axes { get; set; }
 
-        public List<ChartDataSetConfig>? Map { get; set; }
         public ChartLegend? Legend { get; set; }
     }
 
@@ -87,13 +86,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         // TODO EES-3319 - make mandatory when all Map Charts are migrated to have a Boundary Level set
         public long? BoundaryLevel { get; set; }
 
+        // TODO EES-4271
+        [Obsolete("Migrate to `DataSetConfigs` in EES-4271")]
         [JsonConverter(typeof(StringEnumConverter))]
         public ChartDataClassification? DataClassification { get; set; }
 
+        // TODO EES-4271
+        [Obsolete("Migrate to `DataSetConfigs` in EES-4271")]
         public int? DataGroups { get; set; }
 
-        public List<ChartCustomDataGroup>? CustomDataGroups { get; set; }
+        public MapChartConfig Map { get; set; } = new();
+    }
 
+    public class MapChartConfig
+    {
+        public List<ChartDataSetConfig> DataSetConfigs { get; set; } = new();
     }
 
     public class InfographicChart : Chart

@@ -784,26 +784,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         locationTargets: locationTargets,
                         dataBlock,
                         chart);
-                    ReplaceChartDataSetConfigs(
-                        filterItemTargets: filterItemTargets,
-                        indicatorTargets: indicatorTargets,
-                        locationTargets: locationTargets,
-                        dataBlock,
-                        chart);
+                    if (chart is MapChart mapChart)
+                    {
+                        ReplaceMapChartDataSetConfigs(
+                            filterItemTargets: filterItemTargets,
+                            indicatorTargets: indicatorTargets,
+                            locationTargets: locationTargets,
+                            dataBlock,
+                            mapChart);
+                    }
                 }
             );
         }
 
-        private static void ReplaceChartDataSetConfigs(
+        private static void ReplaceMapChartDataSetConfigs(
             IReadOnlyDictionary<Guid, Guid> filterItemTargets,
             IReadOnlyDictionary<Guid, Guid> indicatorTargets,
             IReadOnlyDictionary<Guid, Guid> locationTargets,
             DataBlock dataBlock,
-            IChart chart)
+            MapChart mapChart)
         {
-            if (chart.Map == null) { return; }
-
-            chart.Map.ForEach(
+            mapChart.Map.DataSetConfigs.ForEach(
                 dataSetConfig =>
                 {
                     var dataSet = dataSetConfig.DataSet;
@@ -822,7 +823,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         }
                     ).ToList();
 
-                    if (indicatorTargets.TryGetValue(dataSet.Indicator, out var targetIndicatorId))
+                    if (dataSet.Indicator.HasValue
+                        && indicatorTargets.TryGetValue(dataSet.Indicator.Value, out var targetIndicatorId))
                     {
                         dataSet.Indicator = targetIndicatorId;
                     }
@@ -833,14 +835,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         );
                     }
 
-                    if (locationTargets.TryGetValue(dataSet.Location.Value, out var targetLocationId))
+                    if (dataSet.Location != null
+                        && locationTargets.TryGetValue(dataSet.Location.Value, out var targetLocationId))
                     {
                         dataSet.Location.Value = targetLocationId;
                     }
                     else
                     {
                         throw new InvalidOperationException(
-                            $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set config location: {dataSet.Location.Value}"
+                            $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set config location: {dataSet.Location?.Value}"
                         );
                     }
                 });
@@ -928,7 +931,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         }
                     ).ToList();
 
-                    if (indicatorTargets.TryGetValue(dataSet.Indicator, out var targetIndicatorId))
+                    if (dataSet.Indicator.HasValue
+                        && indicatorTargets.TryGetValue(dataSet.Indicator.Value, out var targetIndicatorId))
                     {
                         dataSet.Indicator = targetIndicatorId;
                     }
