@@ -288,7 +288,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             IBlobContainer containerName,
             string path,
             Stream stream,
-            string contentType)
+            string contentType,
+            CancellationToken cancellationToken = default)
         {
             var blobContainer = await GetBlobContainer(containerName);
             var blob = blobContainer.GetBlockBlobClient(path);
@@ -305,7 +306,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 httpHeaders: new BlobHttpHeaders
                 {
                     ContentType = contentType,
-                }
+                },
+                cancellationToken: cancellationToken
             );
         }
 

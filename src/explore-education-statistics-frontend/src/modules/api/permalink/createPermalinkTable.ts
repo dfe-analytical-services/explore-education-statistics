@@ -7,6 +7,8 @@ import generateTableTitle from '@common/modules/table-tool/utils/generateTableTi
 import logger from '@common/services/logger';
 import { ErrorBody } from '@frontend/modules/api/types/error';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
+import { TableDataResponse } from '@common/services/tableBuilderService';
 
 interface SuccessBody {
   table: TableJson;
@@ -15,17 +17,19 @@ interface SuccessBody {
 
 /**
  * Endpoint to generate table json and title for permalinks.
- *
- * Expects req.body to be:
- * {
- *  fullTable: TableDataResponse,
- *  configuration: {
- *   tableHeaders: UnmappedTableHeadersConfig
- *  }
- * }
  */
+
+interface Request extends NextApiRequest {
+  body: {
+    fullTable: TableDataResponse;
+    configuration: {
+      tableHeaders: UnmappedTableHeadersConfig;
+    };
+  };
+}
+
 export default async function createPermalinkTable(
-  req: NextApiRequest,
+  req: Request,
   res: NextApiResponse<SuccessBody | ErrorBody>,
 ) {
   const {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using AutoMapper;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
@@ -31,16 +32,17 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Thinktecture;
@@ -121,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "Explore education statistics - Data API", Version = "v1"});
             });
-            
+
             //
             // Services
             //
@@ -150,6 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IFilterItemRepository, FilterItemRepository>();
             services.AddTransient<IFilterRepository, FilterRepository>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();
+            services.AddTransient<IFrontendService, FrontendService>();
             services.AddTransient<IGeoJsonRepository, GeoJsonRepository>();
             services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
             services.AddTransient<IIndicatorRepository, IndicatorRepository>();
@@ -185,6 +188,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 // does this user have permission to view the subject data of a specific Release?
                 options.AddPolicy(DataSecurityPolicies.CanViewSubjectData.ToString(), policy =>
                     policy.Requirements.Add(new ViewSubjectDataRequirement()));
+            });
+
+            services.AddHttpClient("PublicApp", httpClient =>
+            {
+                httpClient.BaseAddress = new Uri(Configuration.GetValue<string>("PublicAppUrl"));
+                httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "DataApi");
             });
 
             services.AddTransient<IAuthorizationHandler, ViewReleaseAuthorizationHandler>();
@@ -246,6 +255,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 
             app.UseMvc();
             app.UseHealthChecks("/api/health");
+
+            var serverAddressesFeature = app.ServerFeatures.Get<IServerAddressesFeature>();
+            foreach (var address in serverAddressesFeature.Addresses)
+            {
+                Console.WriteLine($"Server listening on address: {address}");
+            }
         }
     }
 }

@@ -8,9 +8,9 @@ public class Permalink : ICreatedTimestamp<DateTime>
 {
     public Guid Id { get; init; }
 
-    public string PublicationTitle { get; init; }
+    public string PublicationTitle { get; init; } = string.Empty;
 
-    public string DataSetTitle { get; init; }
+    public string DataSetTitle { get; init; } = string.Empty;
 
     public Guid? ReleaseId { get; init; }
 
