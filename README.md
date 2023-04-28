@@ -209,9 +209,9 @@ and contains a number of users for different roles. The [appsettings.Keycloak.js
 src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Keycloak.json) configuration file contains the details for 
 connecting Admin to this IdP.
 
-Alternatively, you can provide your own OpenID Connect configuration in the gitignored [appsettings.Idp.json](
-src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Idp.json) file (you can use the Keycloak equivalent as a
-template as to how the configuration in the file should be structured).
+Alternatively, you can provide your own OpenID Connect configuration in the [appsettings.Idp.json](
+src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Idp.json) file that is ignored from Git. You can use the 
+Keycloak equivalent as a template as to how the configuration in the file should be structured.
 
 #### Using Keycloak
 
@@ -252,9 +252,10 @@ docker-compose up --build --force-recreate idp
 
 #### Using a different Identity Provider
 
-If you have your own OpenID Connect IdP set up, you can provide its configuration in the gitignored 
-[appsettings.Idp.json](src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Idp.json) file (you can 
-use the Keycloak equivalent as a template as to how the configuration in the file should be structured).
+If you have your own OpenID Connect IdP set up, you can provide its configuration in the 
+[appsettings.Idp.json](src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Idp.json) file that is 
+ignored from Git. You can use the Keycloak equivalent as a template as to how the configuration in the file should
+be structured.
 
 > Note that it must have Implicit Flow enabled and be using the OpenID Connect protocol. It must be set to issue 
 ID Tokens.
@@ -289,7 +290,7 @@ IdpProviderConfiguration={NameOfYourIdentityProvider}
 BootstrapUsersConfiguration={NameOfYourIdentityProvider}BootstrapUsers
 ```
 
-and start up Admin wih these environment variables set. This allows you to more easily switch between different IdP 
+and start up Admin wih these environment variables set. This allows you to easily switch between different IdP 
 configurations if you have need of more than one for easy reference.
 
 ### Running the backend
