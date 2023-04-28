@@ -49,7 +49,7 @@ import {
   isServerValidationError,
   ServerValidationErrorResponse,
 } from '@common/validation/serverValidations';
-import produce from 'immer';
+import { produce } from 'immer';
 import omit from 'lodash/omit';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 

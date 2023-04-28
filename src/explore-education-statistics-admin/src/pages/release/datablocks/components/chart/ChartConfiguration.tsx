@@ -141,7 +141,7 @@ const ChartConfiguration = ({
             is: (value: string) => !value,
             then: s => s.required('Select an infographic file to upload'),
           })
-          .minSize(0, 'The infographic cannot be an empty file')
+          .minSize(0, 'The infographic cannot be an empty file'),
       });
     }
 

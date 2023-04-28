@@ -131,10 +131,12 @@ const ReleaseCreatePage = ({
         }
         validationSchema={baseSchema => {
           return baseSchema.shape({
-            templateReleaseId: Yup.string().defined().when('templateReleaseId', {
-              is: (v: string) => v !== undefined,
-              then: s => s.required(),
-            }),
+            templateReleaseId: Yup.string()
+              .defined()
+              .when('templateReleaseId', {
+                is: (v: string) => v !== undefined,
+                then: s => s.required(),
+              }),
           });
         }}
         onSubmit={handleSubmit}

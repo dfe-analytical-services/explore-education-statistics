@@ -14,7 +14,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import noop from 'lodash/noop';
-import produce from 'immer';
+import { produce } from 'immer';
 import React from 'react';
 
 jest.mock('@admin/services/methodologyService');

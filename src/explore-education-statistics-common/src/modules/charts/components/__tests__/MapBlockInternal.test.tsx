@@ -13,7 +13,7 @@ import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { within } from '@testing-library/dom';
 import { render, screen, waitFor } from '@testing-library/react';
-import produce from 'immer';
+import { produce } from 'immer';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 

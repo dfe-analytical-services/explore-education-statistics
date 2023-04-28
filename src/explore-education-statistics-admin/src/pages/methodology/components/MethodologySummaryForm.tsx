@@ -63,8 +63,8 @@ const MethodologySummaryForm = ({
       }
       validationSchema={Yup.object<MethodologySummaryFormValues>({
         titleType: Yup.string<MethodologySummaryFormValues['titleType']>()
-        .required('Choose a title type')
-        .oneOf(['default', 'alternative']),
+          .required('Choose a title type')
+          .oneOf(['default', 'alternative']),
 
         title: Yup.string().when('titleType', {
           is: 'alternative',

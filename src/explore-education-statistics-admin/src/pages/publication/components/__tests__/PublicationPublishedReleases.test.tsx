@@ -9,7 +9,7 @@ import { PaginatedList } from '@common/services/types/pagination';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
-import produce from 'immer';
+import { produce } from 'immer';
 import React, { ReactElement } from 'react';
 import { MemoryRouter, Router } from 'react-router-dom';
 

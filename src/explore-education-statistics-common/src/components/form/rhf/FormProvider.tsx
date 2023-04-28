@@ -6,7 +6,7 @@ import {
   UseFormReturn,
 } from 'react-hook-form';
 import React, { ReactNode, useEffect, useRef } from 'react';
-import { Schema } from 'yup';
+import { AnyObject, ObjectSchema } from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import isEqual from 'lodash/isEqual';
 
@@ -14,7 +14,7 @@ interface FormProviderProps<TFormValues extends FieldValues> {
   children: ReactNode | ((form: UseFormReturn<TFormValues>) => ReactNode);
   enableReinitialize?: boolean;
   initialValues?: UseFormProps<TFormValues>['defaultValues'];
-  validationSchema?: Schema<TFormValues>;
+  validationSchema?: ObjectSchema<AnyObject, TFormValues, AnyObject>;
 }
 
 export default function FormProvider<TFormValues extends FieldValues>({

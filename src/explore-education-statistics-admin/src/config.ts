@@ -1,5 +1,5 @@
 import client from '@admin/services/utils/service';
-import produce from 'immer';
+import { produce } from 'immer';
 
 export interface Config {
   readonly AppInsightsKey: string;

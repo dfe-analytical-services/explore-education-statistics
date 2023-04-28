@@ -190,7 +190,7 @@ const ChartLegendConfiguration = ({
       symbol: Yup.string<ChartSymbol>().optional(),
       lineStyle: Yup.string<LineStyle>().optional(),
       inlinePosition: Yup.string<LegendInlinePosition>().optional(),
-    })
+    });
 
     if (capabilities.canPositionLegendInline) {
       itemSchema = itemSchema.shape({
@@ -245,10 +245,8 @@ const ChartLegendConfiguration = ({
     if (capabilities.hasLegendPosition) {
       baseSchema = baseSchema.shape({
         position: Yup.string()
-        .required(
-         'Select a legend position',
-        )
-        .oneOf<LegendPosition>(
+          .required('Select a legend position')
+          .oneOf<LegendPosition>(
             ['none', 'bottom', 'top', 'inline'],
             'Select a valid legend position',
           )

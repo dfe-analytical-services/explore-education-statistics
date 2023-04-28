@@ -190,7 +190,6 @@ const ReleaseDataUploadsSection = ({
           }}
           errorMappings={errorMappings}
           onSubmit={handleSubmit}
- 
           validationSchema={baseSchema => {
             return baseSchema.shape({
               subjectTitle: Yup.string()
