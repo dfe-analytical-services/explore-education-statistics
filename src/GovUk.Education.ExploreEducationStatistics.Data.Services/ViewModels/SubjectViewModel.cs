@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 
         public List<string> Filters { get; }
 
-        public Dictionary<string, List<string>> Indicators { get; }
+        public List<string> Indicators { get; }
 
         public FileInfo File { get; }
 
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
             TimePeriodLabels timePeriods,
             List<string> geographicLevels,
             List<string> filters,
-            Dictionary<string, List<string>> indicators,
+            List<string> indicators,
             FileInfo file)
         {
             Id = id;

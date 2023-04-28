@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                                 timePeriods: new TimePeriodLabels(),
                                 geographicLevels: new List<string>(),
                                 filters: new List<string>(),
-                                indicators: new Dictionary<string, List<string>>(),
+                                indicators: new List<string>(),
                                 file: new FileInfo
                                 {
                                     Id = Guid.NewGuid(),
