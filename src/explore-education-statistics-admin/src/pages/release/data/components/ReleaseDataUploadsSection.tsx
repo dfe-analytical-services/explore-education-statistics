@@ -383,6 +383,7 @@ const ReleaseDataUploadsSection = ({
                           also be removed.
                         </p>
                       )}
+                      {/* @MarkFix text here if removes associated featured table? */}
                     </li>
                   ),
                 )}

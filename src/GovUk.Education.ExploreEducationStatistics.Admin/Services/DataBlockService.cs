@@ -98,6 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var keyStats = _context.KeyStatisticsDataBlock
                         .Where(ks => dataBlockIds.Contains(ks.DataBlockId));
                     _context.KeyStatisticsDataBlock.RemoveRange(keyStats);
+                    // @MarkFix Remove featured tables here?
                     await _context.SaveChangesAsync();
 
                     await RemoveChartFileReleaseLinks(deletePlan);
@@ -178,6 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             _mapper.Map(dataBlockUpdate, dataBlock);
 
                             _context.DataBlocks.Update(dataBlock);
+
                             await _context.SaveChangesAsync();
                         })
                         .OnSuccessDo(() => InvalidateCachedDataBlock(rcb.ReleaseId, rcb.ContentBlockId)))
@@ -252,6 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }).ToList(),
                 IsKeyStatistic = await _context.KeyStatisticsDataBlock
                     .AnyAsync(ks => ks.DataBlockId == block.Id),
+                // @MarkFix IsFeaturedTable?
             };
         }
 

@@ -79,6 +79,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 return amendmentKeyStatistic;
             }).ToList();
 
+            // @MarkFix Copy featured tables here?
+
             amendment.RelatedInformation = amendment
                 .RelatedInformation
                 .Select(link => link.Clone())

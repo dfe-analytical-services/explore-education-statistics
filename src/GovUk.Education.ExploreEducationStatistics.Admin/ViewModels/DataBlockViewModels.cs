@@ -21,8 +21,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Name { get; init; } = string.Empty;
 
+        // EES-4273 Remove
         public string? HighlightName { get; init; }
 
+        // EES-4273 Remove
         public string? HighlightDescription { get; init; }
 
         public string Source { get; init; }  = string.Empty;
@@ -48,8 +50,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         [Required] public string Name { get; init; } = string.Empty;
 
+        // EES-4273 Remove
         public string? HighlightName { get; init; }
 
+        // EES-4273 Remove
         public string? HighlightDescription { get; init; }
 
         public string Source { get; init; } = string.Empty;
@@ -69,8 +73,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [Required]
         public string Name { get; init; } = string.Empty;
 
+        // EES-4273 Remove
         public string? HighlightName { get; init; }
 
+        // EES-4273 Remove
         public string? HighlightDescription { get; init; }
 
         public string Source { get; init; } = string.Empty;
