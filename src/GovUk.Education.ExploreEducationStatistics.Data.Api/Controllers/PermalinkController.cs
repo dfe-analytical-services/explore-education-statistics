@@ -58,7 +58,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         // TODO EES-3755 Remove after Permalink snapshot migration work is complete
-        // TODO EES-3753 Was this actually being used / is the "permalink" route correct?
         [HttpPost("permalink")]
         public async Task<ActionResult<LegacyPermalinkViewModel>> CreateLegacyPermalink(
             [FromBody] PermalinkCreateRequest request)
@@ -117,6 +116,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         {
             return await _permalinkService
                 .CreatePermalink(request, cancellationToken)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPost("permalink-snapshot/release/{releaseId:guid}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<PermalinkViewModel>> CreatePermalink(
+            Guid releaseId,
+            [FromBody] PermalinkCreateRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            return await _permalinkService
+                .CreatePermalink(releaseId, request, cancellationToken)
                 .HandleFailuresOrOk();
         }
     }

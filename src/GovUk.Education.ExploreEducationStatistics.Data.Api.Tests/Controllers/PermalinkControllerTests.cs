@@ -109,6 +109,32 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
     }
 
     [Fact]
+    public async Task CreatePermalink_WithReleaseId()
+    {
+        var releaseId = Guid.NewGuid();
+        var createRequest = new PermalinkCreateRequest();
+        var expectedResult = new PermalinkViewModel();
+
+        var permalinkService = new Mock<IPermalinkService>(Strict);
+
+        permalinkService
+            .Setup(s => s.CreatePermalink(releaseId, It.Is<PermalinkCreateRequest>(r => r.IsDeepEqualTo(createRequest)),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(expectedResult);
+
+        var client = SetupApp(permalinkService: permalinkService.Object)
+            .CreateClient();
+
+        var response = await client.PostAsync(
+            requestUri: $"/api/permalink-snapshot/release/{releaseId}",
+            content: new JsonNetContent(createRequest));
+
+        VerifyAllMocks(permalinkService);
+
+        response.AssertOk(expectedResult);
+    }
+
+    [Fact]
     // TODO EES-3755 Remove after Permalink snapshot migration work is complete
     public async Task GetLegacyPermalink()
     {
