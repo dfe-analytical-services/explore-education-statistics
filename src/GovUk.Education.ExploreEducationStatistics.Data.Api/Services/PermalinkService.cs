@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -26,6 +27,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
+using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
@@ -215,6 +217,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         await writer.FlushAsync();
                     }
                 );
+        }
+
+        // TODO EES-3755 Remove after Permalink snapshot work is complete
+        public async Task<Either<ActionResult, Unit>> MigratePermalink(Guid permalinkId,
+            CancellationToken cancellationToken = default)
+        {
+            return await _contentDbContext.Permalinks
+                .SingleOrNotFoundAsync(
+                    predicate: permalink => permalink.Id == permalinkId && permalink.Legacy,
+                    cancellationToken: cancellationToken)
+                .OnSuccess(async permalink =>
+                {
+                    // Return a bad request result if the Permalink already has a snapshot
+                    if (permalink.LegacyHasSnapshot == true)
+                    {
+                        return ValidationUtils.ValidationResult(ValidationErrorMessages.PermalinkSnapshotAlreadyExists);
+                    }
+
+                    return await DownloadLegacyPermalink(permalinkId, cancellationToken)
+                        .OnSuccessCombineWith(legacyPermalink =>
+                            _frontendService.CreateUniversalTable(legacyPermalink, cancellationToken))
+                        .OnSuccessCombineWith(tuple =>
+                        {
+                            var (legacyPermalink, _) = tuple;
+                            return _permalinkCsvMetaService.GetCsvMeta(legacyPermalink, cancellationToken);
+                        })
+                        .OnSuccessVoid(async tuple =>
+                        {
+                            var (legacyPermalink, universalTable, csvMeta) = tuple;
+
+                            await UploadSnapshot(permalink,
+                                legacyPermalink.FullTable.Results,
+                                csvMeta,
+                                universalTable,
+                                cancellationToken);
+                        });
+                });
         }
 
         private async Task WriteCsvHeaderRow(CsvWriter csv, PermalinkCsvMetaViewModel meta)
@@ -540,6 +579,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 UploadTableCsv(permalink, observations, csvMeta, cancellationToken),
                 UploadTableJson(permalink, universalTable, cancellationToken)
             );
+
+            if (permalink.Legacy)
+            {
+                // Flag the legacy permalink as having a snapshot so that it can be accessed by the new routes
+                _contentDbContext.Permalinks.Update(permalink);
+                permalink.LegacyHasSnapshot = true;
+                await _contentDbContext.SaveChangesAsync(cancellationToken);
+            }
         }
 
         private async Task UploadTableCsv(Permalink permalink,

@@ -13,6 +13,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         // Updating Indicators
         IndicatorGroupsDifferFromSubject,
-        IndicatorsDifferFromSubject
+        IndicatorsDifferFromSubject,
+
+        // Permalink snapshot migration
+        PermalinkSnapshotAlreadyExists
     }
 }

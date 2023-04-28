@@ -50,5 +50,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
             TimePeriodRange = subjectResultMeta.TimePeriodRange;
             GeoJsonAvailable = subjectResultMeta.GeoJsonAvailable;
         }
+
+        public SubjectResultMetaViewModel AsSubjectResultMetaViewModel()
+        {
+            return new SubjectResultMetaViewModel
+            {
+                Filters = Filters,
+                Footnotes = Footnotes,
+                Indicators = Indicators,
+                Locations = LocationsHierarchical,
+                BoundaryLevels = BoundaryLevels,
+                PublicationName = PublicationName,
+                SubjectName = SubjectName,
+                TimePeriodRange = TimePeriodRange,
+                GeoJsonAvailable = GeoJsonAvailable
+            };
+        }
     }
 }
