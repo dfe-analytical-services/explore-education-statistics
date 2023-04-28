@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Http;
@@ -26,6 +27,14 @@ public class FrontendService : IFrontendService
     {
         _httpClientFactory = httpClientFactory;
         _logger = logger;
+    }
+
+    public Task<Either<ActionResult, dynamic>> CreateUniversalTable(LegacyPermalink legacyPermalink,
+        CancellationToken cancellationToken = default)
+    {
+        return CreateUniversalTable(legacyPermalink.FullTable.AsTableBuilderResultViewModel(),
+            legacyPermalink.Configuration,
+            cancellationToken);
     }
 
     public async Task<Either<ActionResult, dynamic>> CreateUniversalTable(TableBuilderResultViewModel tableResult,

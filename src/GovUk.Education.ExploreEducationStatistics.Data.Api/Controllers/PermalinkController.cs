@@ -3,6 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
@@ -128,6 +129,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         {
             return await _permalinkService
                 .CreatePermalink(releaseId, request, cancellationToken)
+                .HandleFailuresOrOk();
+        }
+
+        // TODO EES-3755 Remove after Permalink snapshot migration work is complete
+        [HttpPut("permalink/{permalinkId:guid}/snapshot")]
+        public async Task<ActionResult<Unit>> MigratePermalink(Guid permalinkId,
+            CancellationToken cancellationToken = default)
+        {
+            return await _permalinkService
+                .MigratePermalink(permalinkId, cancellationToken)
                 .HandleFailuresOrOk();
         }
     }

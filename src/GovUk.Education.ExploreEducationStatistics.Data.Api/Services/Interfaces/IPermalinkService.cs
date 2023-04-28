@@ -29,6 +29,10 @@ public interface IPermalinkService
     Task<Either<ActionResult, LegacyPermalinkViewModel>> CreateLegacy(Guid releaseId,
         PermalinkCreateRequest request);
 
+    // TODO EES-3755 Remove after Permalink snapshot migration work is complete
+    Task<Either<ActionResult, Unit>> MigratePermalink(Guid permalinkId,
+        CancellationToken cancellationToken = default);
+
     Task<Either<ActionResult, PermalinkViewModel>> CreatePermalink(PermalinkCreateRequest request,
         CancellationToken cancellationToken = default);
 

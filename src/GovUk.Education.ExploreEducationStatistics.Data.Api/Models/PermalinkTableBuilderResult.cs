@@ -21,5 +21,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
             SubjectMeta = new PermalinkResultSubjectMeta(tableBuilderResult.SubjectMeta);
             Results = tableBuilderResult.Results.ToList();
         }
+
+        public TableBuilderResultViewModel AsTableBuilderResultViewModel()
+        {
+            return new TableBuilderResultViewModel
+            {
+                SubjectMeta = SubjectMeta.AsSubjectResultMetaViewModel(),
+                Results = Results
+            };
+        }
     }
 }
