@@ -96,125 +96,317 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             result.AssertNotFound();
         }
 
-        // [Fact]
-        // public async Task CreatePermalink_UploadsPermalink_WithoutReleaseId()
-        // {
-        //     var subject = new Subject
-        //     {
-        //         Id = Guid.NewGuid()
-        //     };
-        //
-        //     var request = new PermalinkCreateRequest
-        //     {
-        //         Query =
-        //         {
-        //             SubjectId = subject.Id
-        //         }
-        //     };
-        //
-        //     var release = new Release
-        //     {
-        //         Id = Guid.NewGuid(),
-        //         PublicationId = _publicationId,
-        //         TimePeriodCoverage = AcademicYear,
-        //         ReleaseName = "2000",
-        //         Published = DateTime.UtcNow,
-        //     };
-        //
-        //     var publication = new Publication
-        //     {
-        //         Id = _publicationId,
-        //         LatestPublishedRelease = release
-        //     };
-        //
-        //     var tableResult = new TableBuilderResultViewModel
-        //     {
-        //         SubjectMeta = new SubjectResultMetaViewModel
-        //         {
-        //             SubjectName = "Test data set",
-        //             PublicationName = "Test publication"
-        //         }
-        //     };
-        //
-        //     var blobStorageService = new Mock<IBlobStorageService>(Strict);
-        //     var releaseRepository = new Mock<IReleaseRepository>(Strict);
-        //     var subjectRepository = new Mock<ISubjectRepository>(Strict);
-        //     var tableBuilderService = new Mock<ITableBuilderService>(Strict);
-        //
-        //     // Permalink id is assigned on creation and used as the blob path
-        //     // Capture it so we can compare it with the view model result
-        //     Guid? expectedPermalinkId = null;
-        //     var blobPathCapture = new CaptureMatch<string>(callback => expectedPermalinkId = Guid.Parse(callback));
-        //
-        //     blobStorageService.Setup(s => s.UploadStream(
-        //             BlobContainers.PermalinkSnapshots,
-        //             Capture.With(blobPathCapture),
-        //             It.IsAny<Stream>(),
-        //             MediaTypeNames.Application.Json,
-        //             It.IsAny<CancellationToken>()
-        //         ))
-        //         .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, _, stream, _, _) =>
-        //         {
-        //             // Convert captured stream to string
-        //             using var reader = new StreamReader(stream);
-        //             var content = reader.ReadToEnd();
-        //
-        //             // Deserialize captured JSON and compare with attributes expected of the permalink
-        //             var uploadedPermalink = JsonConvert.DeserializeObject<LegacyPermalink>(content);
-        //             Assert.NotNull(uploadedPermalink);
-        //             request.Configuration.AssertDeepEqualTo(uploadedPermalink.Configuration);
-        //             new PermalinkTableBuilderResult(tableResult).AssertDeepEqualTo(uploadedPermalink.FullTable);
-        //             request.Query.AssertDeepEqualTo(uploadedPermalink.Query);
-        //         })
-        //         .Returns(Task.CompletedTask);
-        //
-        //     releaseRepository
-        //         .Setup(s => s.GetLatestPublishedRelease(_publicationId))
-        //         .ReturnsAsync(release);
-        //
-        //     subjectRepository
-        //         .Setup(s => s.FindPublicationIdForSubject(subject.Id))
-        //         .ReturnsAsync(_publicationId);
-        //
-        //     tableBuilderService
-        //         .Setup(s => s.Query(release.Id, request.Query, CancellationToken.None))
-        //         .ReturnsAsync(tableResult);
-        //
-        //     var contentDbContextId = Guid.NewGuid().ToString();
-        //     await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        //     {
-        //         await contentDbContext.Publications.AddAsync(publication);
-        //         await contentDbContext.Releases.AddAsync(release);
-        //         await contentDbContext.ReleaseFiles.AddRangeAsync(ReleaseDataFile(release, subject.Id));
-        //
-        //         await contentDbContext.SaveChangesAsync();
-        //     }
-        //
-        //     await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        //     {
-        //         var service = BuildService(
-        //             contentDbContext: contentDbContext,
-        //             blobStorageService: blobStorageService.Object,
-        //             releaseRepository: releaseRepository.Object,
-        //             subjectRepository: subjectRepository.Object,
-        //             tableBuilderService: tableBuilderService.Object);
-        //
-        //         var result = (await service.CreatePermalink(request)).AssertRight();
-        //
-        //         MockUtils.VerifyAllMocks(
-        //             blobStorageService,
-        //             releaseRepository,
-        //             subjectRepository,
-        //             tableBuilderService);
-        //
-        //         Assert.Equal(expectedPermalinkId, result.Id);
-        //         Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
-        //         Assert.Equal(PermalinkStatus.Current, result.Status);
-        //     }
-        // }
+        [Fact]
+        public async Task CreatePermalink_WithoutReleaseId()
+        {
+            var subject = _fixture.DefaultSubject().Generate();
+
+            var filters = _fixture.DefaultFilter().GenerateList(2);
+
+            var filterItems = _fixture.DefaultFilterItem()
+                .ForRange(..2, fi => fi
+                    .SetFilterGroup(_fixture.DefaultFilterGroup()
+                        .WithFilter(filters[0])
+                        .Generate()))
+                .ForRange(2..4, fi => fi
+                    .SetFilterGroup(_fixture.DefaultFilterGroup()
+                        .WithFilter(filters[1])
+                        .Generate()))
+                .GenerateArray();
+
+            var indicators = _fixture.DefaultIndicator()
+                .ForRange(..1, i => i
+                    .SetIndicatorGroup(_fixture.DefaultIndicatorGroup()
+                        .WithSubject(subject))
+                )
+                .ForRange(1..3, i => i
+                    .SetIndicatorGroup(_fixture.DefaultIndicatorGroup()
+                        .WithSubject(subject))
+                )
+                .GenerateList(3);
+
+            var locations = _fixture.DefaultLocation()
+                .ForRange(..2, l => l
+                    .SetPresetRegion()
+                    .SetGeographicLevel(GeographicLevel.Region))
+                .ForRange(2..4, l => l
+                    .SetPresetRegionAndLocalAuthority()
+                    .SetGeographicLevel(GeographicLevel.LocalAuthority))
+                .GenerateList(4);
+
+            var observations = _fixture.DefaultObservation()
+                .WithSubject(subject)
+                .WithMeasures(indicators)
+                .ForRange(..2, o => o
+                    .SetFilterItems(filterItems[0], filterItems[2])
+                    .SetLocation(locations[0])
+                    .SetTimePeriod(2022, AcademicYear))
+                .ForRange(2..4, o => o
+                    .SetFilterItems(filterItems[0], filterItems[2])
+                    .SetLocation(locations[1])
+                    .SetTimePeriod(2022, AcademicYear))
+                .ForRange(4..6, o => o
+                    .SetFilterItems(filterItems[1], filterItems[3])
+                    .SetLocation(locations[2])
+                    .SetTimePeriod(2023, AcademicYear))
+                .ForRange(6..8, o => o
+                    .SetFilterItems(filterItems[1], filterItems[3])
+                    .SetLocation(locations[3])
+                    .SetTimePeriod(2023, AcademicYear))
+                .GenerateList(8);
+
+            var footnotes = _fixture
+                .DefaultFootnote()
+                .GenerateList(2);
+
+            var request = new PermalinkCreateRequest
+            {
+                Configuration = new TableBuilderConfiguration
+                {
+                    TableHeaders = new TableHeaders()
+                },
+                Query =
+                {
+                    SubjectId = subject.Id
+                }
+            };
+
+            var tableResult = new TableBuilderResultViewModel
+            {
+                SubjectMeta = new SubjectResultMetaViewModel
+                {
+                    SubjectName = "Test data set",
+                    PublicationName = "Test publication",
+                    Locations = LocationViewModelBuilder
+                        .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
+                        .ToDictionary(
+                            level => level.Key.ToString().CamelCase(),
+                            level => level.Value),
+                    Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
+                    Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
+                    Footnotes = footnotes.Select(
+                        footnote => new FootnoteViewModel(footnote.Id, footnote.Content)
+                    ).ToList(),
+                    TimePeriodRange = new List<TimePeriodMetaViewModel>
+                    {
+                        new(2022, AcademicYear)
+                        {
+                            Label = "2022/23"
+                        },
+                        new(2023, AcademicYear)
+                        {
+                            Label = "2023/24"
+                        }
+                    }
+                },
+                Results = observations
+                    .Select(o =>
+                        ObservationViewModelBuilder.BuildObservation(o, indicators.Select(i => i.Id)))
+                    .ToList()
+            };
+
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                PublicationId = _publicationId,
+                ReleaseName = "2000",
+                TimePeriodCoverage = AcademicYear,
+                Published = DateTime.UtcNow,
+            };
+
+            var publication = new Publication
+            {
+                Id = _publicationId,
+                LatestPublishedRelease = release
+            };
+
+            var csvMeta = new PermalinkCsvMetaViewModel
+            {
+                Filters = FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(filterItems),
+                Indicators = indicators
+                    .Select(i => new IndicatorCsvMetaViewModel(i))
+                    .ToDictionary(i => i.Name),
+                Locations = locations.ToDictionary(l => l.Id, l => l.GetCsvValues()),
+                Headers = new List<string>
+                {
+                    "time_period",
+                    "time_identifier",
+                    "geographic_level",
+                    "country_code",
+                    "country_name",
+                    "region_code",
+                    "region_name",
+                    "new_la_code",
+                    "old_la_code",
+                    "la_name",
+                    filters[0].Name,
+                    filters[1].Name,
+                    indicators[0].Name,
+                    indicators[1].Name,
+                    indicators[2].Name
+                }
+            };
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            Guid expectedPermalinkId;
+
+            string? capturedTableCsvBlobPath = null;
+            blobStorageService.Setup(s => s.UploadStream(
+                    BlobContainers.PermalinkSnapshots,
+                    It.Is<string>(path => path.EndsWith(".csv")),
+                    It.IsAny<Stream>(),
+                    "text/csv",
+                    It.IsAny<CancellationToken>()
+                ))
+                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, path, stream, _, _) =>
+                {
+                    // Capture the blob path
+                    capturedTableCsvBlobPath = path;
+
+                    // Convert captured stream to string
+                    stream.Seek(0L, SeekOrigin.Begin);
+                    var csv = stream.ReadToEnd();
+
+                    // Compare the captured csv upload with the expected csv
+                    Snapshot.Match(csv);
+                })
+                .Returns(Task.CompletedTask);
+
+            string? capturedTableJsonBlobPath = null;
+            blobStorageService.Setup(s => s.UploadStream(
+                    BlobContainers.PermalinkSnapshots,
+                    It.Is<string>(path => path.EndsWith(".json")),
+                    It.IsAny<Stream>(),
+                    MediaTypeNames.Application.Json,
+                    It.IsAny<CancellationToken>()
+                ))
+                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, path, stream, _, _) =>
+                {
+                    // Capture the blob path
+                    capturedTableJsonBlobPath = path;
+
+                    // Convert captured stream to string
+                    stream.Seek(0L, SeekOrigin.Begin);
+                    var tableJson = stream.ReadToEnd();
+
+                    // Compare the captured table json upload with the response set up for the frontend service
+                    Assert.Equal("{}", tableJson);
+                })
+                .Returns(Task.CompletedTask);
+
+            var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
+
+            frontendService.Setup(s => s.CreateUniversalTable(
+                tableResult,
+                request.Configuration,
+                It.IsAny<CancellationToken>())
+            ).ReturnsAsync(new JObject());
+
+            var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(MockBehavior.Strict);
+
+            permalinkCsvMetaService
+                .Setup(s => s
+                    .GetCsvMeta(
+                        subject.Id,
+                        tableResult.SubjectMeta.Locations,
+                        tableResult.SubjectMeta.Filters,
+                        tableResult.SubjectMeta.Indicators,
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(csvMeta);
+
+            var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
+
+            releaseRepository
+                .Setup(s => s.GetLatestPublishedRelease(_publicationId))
+                .ReturnsAsync(release);
+
+            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
+
+            subjectRepository
+                .Setup(s => s.FindPublicationIdForSubject(subject.Id))
+                .ReturnsAsync(_publicationId);
+
+            var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
+
+            tableBuilderService
+                .Setup(s => s.Query(release.Id, request.Query, CancellationToken.None))
+                .ReturnsAsync(tableResult);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(ReleaseDataFile(release, subject.Id));
+
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object,
+                    frontendService: frontendService.Object,
+                    permalinkCsvMetaService: permalinkCsvMetaService.Object,
+                    releaseRepository: releaseRepository.Object,
+                    subjectRepository: subjectRepository.Object,
+                    tableBuilderService: tableBuilderService.Object);
+
+                var result = (await service.CreatePermalink(request)).AssertRight();
+
+                MockUtils.VerifyAllMocks(
+                    blobStorageService,
+                    frontendService,
+                    permalinkCsvMetaService,
+                    releaseRepository,
+                    subjectRepository,
+                    tableBuilderService);
+
+                // Expect the uploaded blob paths to be the same apart from the extension
+                var tableCsvBlobPathWithoutExtension = Path.GetFileNameWithoutExtension(capturedTableCsvBlobPath);
+                var tableJsonBlobPathWithoutExtension = Path.GetFileNameWithoutExtension(capturedTableJsonBlobPath);
+                Assert.Equal(tableJsonBlobPathWithoutExtension, tableCsvBlobPathWithoutExtension);
+
+                // Expect the blob paths to contain a parseable Guid which is the generated permalink Id
+                Assert.True(Guid.TryParse(tableCsvBlobPathWithoutExtension, out expectedPermalinkId));
+
+                Assert.Equal(expectedPermalinkId, result.Id);
+                Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
+                Assert.Equal(PermalinkStatus.Current, result.Status);
+                Assert.Equal("{}", result.Table.ToString());
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                // Verify details of the created permalink have been saved
+                var permalink = contentDbContext.Permalinks.Single(p => p.Id == expectedPermalinkId);
+
+                Assert.Equal(expectedPermalinkId, permalink.Id);
+                Assert.InRange(DateTime.UtcNow.Subtract(permalink.Created).Milliseconds, 0, 1500);
+                Assert.Equal("Test publication", permalink.PublicationTitle);
+                Assert.Equal("Test data set", permalink.DataSetTitle);
+                Assert.Equal(release.Id, permalink.ReleaseId);
+                Assert.Equal(subject.Id, permalink.SubjectId);
+
+                // Statistics about the permalink should be set
+                Assert.Equal(4, permalink.CountFilterItems);
+                Assert.Equal(2, permalink.CountFootnotes);
+                Assert.Equal(3, permalink.CountIndicators);
+                Assert.Equal(4, permalink.CountLocations);
+                Assert.Equal(8, permalink.CountObservations);
+                Assert.Equal(2, permalink.CountTimePeriods);
+
+                // TODO EES-3755 Remove after Permalink snapshot migration work is complete
+                Assert.False(permalink.Legacy);
+                Assert.Null(permalink.LegacyContentLength);
+                Assert.Null(permalink.LegacyHasConfigurationHeaders);
+            }
+        }
 
         [Fact]
-        public async Task CreatePermalink_UploadsPermalink_WithReleaseId()
+        public async Task CreatePermalink_WithReleaseId()
         {
             var subject = _fixture.DefaultSubject().Generate();
 
