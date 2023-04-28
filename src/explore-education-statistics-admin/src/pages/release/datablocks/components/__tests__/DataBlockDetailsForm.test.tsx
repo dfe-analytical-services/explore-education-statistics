@@ -77,6 +77,37 @@ describe('DataBlockDetailsForm', () => {
     });
   });
 
+  test('shows validation error if has whitespace featured table name', async () => {
+    render(
+      <DataBlockDetailsForm
+        initialValues={{
+          name: 'Test name',
+          heading: 'Test heading',
+          highlightName: '',
+          highlightDescription: 'Test highlight description',
+          source: 'Test source',
+        }}
+        onSubmit={noop}
+      />,
+    );
+
+    userEvent.click(
+      screen.getByLabelText('Set as a featured table for this publication'),
+    );
+
+    expect(screen.getByLabelText('Featured table name')).toBeInTheDocument();
+
+    await userEvent.type(screen.getByLabelText('Featured table name'), '     ');
+
+    userEvent.click(screen.getByRole('button', { name: 'Save data block' }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('link', { name: 'Enter a featured table name' }),
+      ).toHaveAttribute('href', '#dataBlockDetailsForm-highlightName');
+    });
+  });
+
   test('shows validation error if no description when featured table checkbox is checked', async () => {
     render(<DataBlockDetailsForm onSubmit={noop} />);
 
@@ -177,6 +208,45 @@ describe('DataBlockDetailsForm', () => {
     await userEvent.type(
       screen.getByLabelText('Featured table description'),
       'Test highlight description',
+    );
+
+    expect(handleSubmit).not.toHaveBeenCalled();
+
+    userEvent.click(screen.getByRole('button', { name: 'Save data block' }));
+
+    const expected: DataBlockDetailsFormValues = {
+      name: 'Test name',
+      heading: 'Test title',
+      highlightName: 'Test highlight name',
+      highlightDescription: 'Test highlight description',
+      source: 'Test source',
+    };
+
+    await waitFor(() => {
+      expect(handleSubmit).toHaveBeenCalledWith(expected);
+    });
+  });
+
+  test('trim featured table name and description values', async () => {
+    const handleSubmit = jest.fn();
+
+    render(<DataBlockDetailsForm onSubmit={handleSubmit} />);
+
+    await userEvent.type(screen.getByLabelText('Name'), 'Test name');
+    await userEvent.type(screen.getByLabelText('Table title'), 'Test title');
+    await userEvent.type(screen.getByLabelText('Source'), 'Test source');
+
+    userEvent.click(
+      screen.getByLabelText('Set as a featured table for this publication'),
+    );
+
+    await userEvent.type(
+      screen.getByLabelText('Featured table name'),
+      '   Test highlight name   ',
+    );
+    await userEvent.type(
+      screen.getByLabelText('Featured table description'),
+      '    Test highlight description    ',
     );
 
     expect(handleSubmit).not.toHaveBeenCalled();
