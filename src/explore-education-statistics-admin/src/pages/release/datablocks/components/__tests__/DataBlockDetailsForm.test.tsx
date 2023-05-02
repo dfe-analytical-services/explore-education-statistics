@@ -77,7 +77,7 @@ describe('DataBlockDetailsForm', () => {
     });
   });
 
-  test('shows validation error if has whitespace featured table name', async () => {
+  test('shows validation error if featured table name is entirely a whitespace string', async () => {
     render(
       <DataBlockDetailsForm
         initialValues={{

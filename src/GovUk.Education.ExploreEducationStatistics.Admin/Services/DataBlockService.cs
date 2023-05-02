@@ -66,8 +66,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var dataBlock = _mapper.Map<DataBlock>(dataBlockCreate);
                     dataBlock.Created = DateTime.UtcNow;
-                    dataBlock.HighlightName = dataBlock.HighlightName?.Trim();
-                    dataBlock.HighlightDescription = dataBlock.HighlightDescription?.Trim();
 
                     var added = (await _context.DataBlocks.AddAsync(dataBlock)).Entity;
 
@@ -178,8 +176,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             }
 
                             _mapper.Map(dataBlockUpdate, dataBlock);
-                            dataBlock.HighlightName = dataBlock.HighlightName?.Trim();
-                            dataBlock.HighlightDescription = dataBlock.HighlightDescription?.Trim();
 
                             _context.DataBlocks.Update(dataBlock);
                             await _context.SaveChangesAsync();
