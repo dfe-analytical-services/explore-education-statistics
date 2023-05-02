@@ -3,6 +3,7 @@ import csv
 import os
 import time
 
+import certifi
 import requests
 
 """
@@ -10,7 +11,7 @@ This is the script for migrating legacy permalinks to permalink snapshots.
 It uses a Data API migration endpoint `PUT /api/permalink/{permalinkId}/snapshot`.
 It reads a CSV file named 'permalinks.csv' and outputs a CSV file named 'migration_results.csv'.
 
-Usage: `pipenv run python migrate_legacy_permalinks.py`
+Usage: `pipenv run python migrate_legacy_permalinks.py [-h] [--data-api-url [DATA_API_URL]] [--sleep [SLEEP]] [--timeout [TIMEOUT]]`
 
 Instructions:
 
@@ -45,17 +46,18 @@ a57e9ae9-b442-4005-caec-08db3b6d5a38,False
 class MigrateLegacyPermalinks:
     def __init__(self, data_api_url: str, sleep: float, timeout: float):
         self.data_api_url = data_api_url
+        self.session = requests.Session()
         self.timeout = timeout
         self.sleep = sleep
         self.http_headers = {}
 
     def _migrate_permalink(self, permalink_id: str) -> tuple[int, float]:
         start_time = time.monotonic()
-        response = requests.put(
+        response = self.session.put(
             f"{self.data_api_url}/permalink/{permalink_id}/snapshot",
             headers=self.http_headers,
             timeout=self.timeout,
-            verify=False,
+            verify=certifi.where(),
         )
         end_time = time.monotonic()
         response_time = end_time - start_time
