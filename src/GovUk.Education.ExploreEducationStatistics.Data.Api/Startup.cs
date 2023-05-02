@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+using System.Net.Http.Headers;
+using System.Text;
 using AutoMapper;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
@@ -192,7 +193,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 
             services.AddHttpClient("PublicApp", httpClient =>
             {
-                httpClient.BaseAddress = new Uri(Configuration.GetValue<string>("PublicAppUrl"));
+                var publicAppOptions = new PublicAppOptions();
+                Configuration.GetSection("PublicApp").Bind(publicAppOptions);
+
+                httpClient.BaseAddress = new Uri(publicAppOptions.Url);
+
+                if (publicAppOptions.BasicAuth)
+                {
+                    httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Basic",
+                            Convert.ToBase64String(Encoding.UTF8.GetBytes(
+                                $"{publicAppOptions.BasicAuthUsername}:{publicAppOptions.BasicAuthPassword}")));
+                }
+
                 httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "DataApi");
             });
 
@@ -261,6 +274,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             {
                 Console.WriteLine($"Server listening on address: {address}");
             }
+        }
+
+        private record PublicAppOptions
+        {
+            public string Url { get; init; } = string.Empty;
+
+            public bool BasicAuth { get; init; }
+
+            public string BasicAuthUsername { get; init; } = string.Empty;
+
+            public string BasicAuthPassword { get; init; } = string.Empty;
         }
     }
 }
