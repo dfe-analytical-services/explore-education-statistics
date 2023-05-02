@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         NoNextReleaseDate,
         NoDataFiles,
         NoFootnotesOnSubjects,
-        NoTableHighlights,
+        NoFeaturedTables,
         NoPublicPreReleaseAccessList,
         MethodologyNotApproved,
 

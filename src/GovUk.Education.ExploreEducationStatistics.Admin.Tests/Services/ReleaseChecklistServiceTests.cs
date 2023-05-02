@@ -338,7 +338,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(NoFootnotesOnSubjects, noFootnotesWarning.Code);
                 Assert.Equal(1, noFootnotesWarning.TotalSubjects);
 
-                Assert.Equal(NoTableHighlights, checklist.Warnings[3].Code);
+                Assert.Equal(NoFeaturedTables, checklist.Warnings[3].Code);
                 Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[4].Code);
             }
 

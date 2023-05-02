@@ -189,11 +189,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     warnings.Add(new NoFootnotesOnSubjectsWarning(subjectsWithNoFootnotes.Count));
                 }
 
-                var tableHighlights = await GetDataBlocksWithHighlights(release);
+                var featuredTableList = await GetDataBlocksWithFeaturedTable(release);
 
-                if (!tableHighlights.Any())
+                if (!featuredTableList.Any())
                 {
-                    warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoTableHighlights));
+                    warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoFeaturedTables));
                 }
             }
 
@@ -218,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        private async Task<List<DataBlockSummaryViewModel>> GetDataBlocksWithHighlights(Release release)
+        private async Task<List<DataBlockSummaryViewModel>> GetDataBlocksWithFeaturedTable(Release release)
         {
             return (await _dataBlockService.List(release.Id))
                 .FoldRight(
