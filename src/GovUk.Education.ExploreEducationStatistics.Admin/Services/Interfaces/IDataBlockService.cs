@@ -39,5 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, List<DataBlockViewModel>>> GetUnattachedDataBlocks(Guid releaseId);
 
         Task<bool> IsUnattachedDataBlock(Guid releaseId, DataBlock dataBlock);
+
+        Task<List<DataBlock>> ListDataBlocks(Guid releaseId);
     }
 }

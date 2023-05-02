@@ -161,6 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .Where(rcb => rcb.ReleaseId == releaseId)
                 .Select(rcb => rcb.ContentBlock)
                 .OfType<DataBlock>()
+                // @MarkFix use new FeaturedTable table here
                 .Where(dataBlock => !string.IsNullOrEmpty(dataBlock.HighlightName))
                 .ToListAsync();
 

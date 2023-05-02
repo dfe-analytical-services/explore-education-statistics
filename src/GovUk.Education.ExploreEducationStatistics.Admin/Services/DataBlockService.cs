@@ -31,7 +31,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _context;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IReleaseFileService _releaseFileService;
-        private readonly IReleaseContentBlockRepository _releaseContentBlockRepository;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
         private readonly IBlobCacheService _cacheService;
@@ -40,7 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public DataBlockService(ContentDbContext context,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IReleaseFileService releaseFileService,
-            IReleaseContentBlockRepository releaseContentBlockRepository,
             IUserService userService,
             IMapper mapper,
             IBlobCacheService cacheService,
@@ -49,7 +47,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context = context;
             _persistenceHelper = persistenceHelper;
             _releaseFileService = releaseFileService;
-            _releaseContentBlockRepository = releaseContentBlockRepository;
             _userService = userService;
             _mapper = mapper;
             _cacheService = cacheService;
@@ -126,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async release =>
                     {
-                        var dataBlocks = await _releaseContentBlockRepository.GetAll<DataBlock>(release.Id);
+                        var dataBlocks = await ListDataBlocks(release.Id);
 
                         var dataBlockIdsAttachedToKeyStats = await _context.KeyStatisticsDataBlock
                             .Where(ks => ks.ReleaseId == release.Id)
@@ -411,6 +408,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                        .Where(ks =>ks.ReleaseId == releaseId)
                        .AllAsync(ks =>
                            ks.DataBlockId != dataBlock.Id);
+        }
+
+        public async Task<List<DataBlock>> ListDataBlocks(Guid releaseId)
+        {
+            return await _context
+                .ReleaseContentBlocks
+                .AsQueryable()
+                .Where(releaseContentBlock => releaseContentBlock.ReleaseId == releaseId)
+                .Select(releaseContentBlock => releaseContentBlock.ContentBlock)
+                .OfType<DataBlock>()
+                .ToListAsync();
         }
     }
 

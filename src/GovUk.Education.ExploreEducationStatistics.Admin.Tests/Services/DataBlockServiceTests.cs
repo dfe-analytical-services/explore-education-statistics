@@ -1486,7 +1486,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext? contentDbContext = null,
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             IReleaseFileService? releaseFileService = null,
-            IReleaseContentBlockRepository? releaseContentBlockRepository = null,
             IUserService? userService = null,
             IBlobCacheService? cacheService = null,
             ICacheKeyService? cacheKeyService = null)
@@ -1495,7 +1494,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext ?? Mock.Of<ContentDbContext>(Strict),
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
-                releaseContentBlockRepository ?? new ReleaseContentBlockRepository(contentDbContext),
                 userService ?? AlwaysTrueUserService().Object,
                 AdminMapper(),
                 cacheService ?? Mock.Of<IBlobCacheService>(Strict),

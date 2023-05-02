@@ -42,6 +42,7 @@ const ReleaseDataBlocksPage = ({
     const [dataBlocks, canUpdateRelease] = await Promise.all([
       dataBlocksService.listDataBlocks(releaseId),
       permissionService.canUpdateRelease(releaseId),
+      // @MarkFix list featured tables here?
     ]);
 
     return {
