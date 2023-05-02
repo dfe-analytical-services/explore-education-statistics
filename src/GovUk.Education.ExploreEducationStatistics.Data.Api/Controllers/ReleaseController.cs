@@ -40,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("releases/{releaseId}/featured-tables")]
         public async Task<ActionResult<List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseId)
         {
+            // @MarkFix Compare with PublicationController#ListFeaturedTables
             return await _releaseService
                 .ListFeaturedTables(releaseId)
                 .HandleFailuresOrOk();
