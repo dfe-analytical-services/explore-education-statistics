@@ -1403,10 +1403,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
-            blobStorageService.Setup(mock =>
-                    mock.DownloadToStream(PrivateReleaseFiles, releaseFile.Path(),
-                        It.IsAny<MemoryStream>(), null))
-                .ReturnsAsync(new MemoryStream());
+            blobStorageService
+                .SetupDownloadToStream(PrivateReleaseFiles, releaseFile.Path(), "Test file content");
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -1417,17 +1415,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 MockUtils.VerifyAllMocks(blobStorageService);
 
-                Assert.True(result.IsRight);
+                var fileStreamResult = result.AssertRight();
 
-                blobStorageService.Verify(
-                    mock =>
-                        mock.DownloadToStream(PrivateReleaseFiles, releaseFile.Path(),
-                        It.IsAny<MemoryStream>(), null),
-                    Times.Once());
-
-                Assert.Equal("application/pdf", result.Right.ContentType);
-                Assert.Equal("ancillary.pdf", result.Right.FileDownloadName);
-                Assert.IsType<MemoryStream>(result.Right.FileStream);
+                Assert.Equal("application/pdf", fileStreamResult.ContentType);
+                Assert.Equal("ancillary.pdf", fileStreamResult.FileDownloadName);
+                Assert.Equal("Test file content", fileStreamResult.FileStream.ReadToEnd());
             }
         }
 
@@ -1459,10 +1451,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
-            blobStorageService.Setup(mock =>
-                    mock.DownloadToStream(PrivateReleaseFiles, releaseFile.Path(),
-                        It.IsAny<MemoryStream>(), null))
-                .ReturnsAsync(new MemoryStream());
+            blobStorageService
+                .SetupDownloadToStream(PrivateReleaseFiles, releaseFile.Path(), "Test file content");
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -1473,17 +1463,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 MockUtils.VerifyAllMocks(blobStorageService);
 
-                Assert.True(result.IsRight);
+                var fileStreamResult = result.AssertRight();
 
-                blobStorageService.Verify(
-                    mock =>
-                        mock.DownloadToStream(PrivateReleaseFiles, releaseFile.Path(),
-                        It.IsAny<MemoryStream>(), null),
-                    Times.Once());
-
-                Assert.Equal("application/pdf", result.Right.ContentType);
-                Assert.Equal("Ancillary 1.pdf", result.Right.FileDownloadName);
-                Assert.IsType<MemoryStream>(result.Right.FileStream);
+                Assert.Equal("application/pdf", fileStreamResult.ContentType);
+                Assert.Equal("Ancillary 1.pdf", fileStreamResult.FileDownloadName);
+                Assert.Equal("Test file content", fileStreamResult.FileStream.ReadToEnd());
             }
         }
 
@@ -2271,7 +2255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .SetupDownloadToStream(
                     container: PrivateReleaseFiles,
                     path: releaseFile1.Path(),
-                    blobText: "Test ancillary blob",
+                    content: "Test ancillary blob",
                     cancellationToken: tokenSource.Token)
                 .Callback(() => tokenSource.Cancel());
 
@@ -2613,7 +2597,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 Assert.NotNull(releaseFile);
-                var file = releaseFile!.File;
+                var file = releaseFile.File;
 
                 Assert.Equal(10240, file.ContentLength);
                 Assert.Equal("application/pdf", file.ContentType);
@@ -2693,7 +2677,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 Assert.NotNull(releaseFile);
-                var file = releaseFile!.File;
+                var file = releaseFile.File;
 
                 Assert.Equal(10240, file.ContentLength);
                 Assert.Equal("image/png", file.ContentType);

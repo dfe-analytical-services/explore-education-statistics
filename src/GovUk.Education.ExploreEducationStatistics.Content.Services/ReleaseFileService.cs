@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             Guid releaseId,
             Stream outputStream,
             IEnumerable<Guid>? fileIds = null,
-            CancellationToken? cancellationToken = null)
+            CancellationToken cancellationToken = default)
         {
             return await _persistenceHelper.CheckEntityExists<Release>(
                     releaseId,
@@ -118,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private async Task<bool> TryStreamCachedAllFilesZip(
             Release release,
             Stream outputStream,
-            CancellationToken? cancellationToken = null)
+            CancellationToken cancellationToken)
         {
             var path = release.AllFilesZipPath();
             var allFilesZip = await _blobStorageService.FindBlob(PublicReleaseFiles, path);
@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private async Task ZipAllFilesToStream(
             Release release,
             Stream outputStream,
-            CancellationToken? cancellationToken = null)
+            CancellationToken cancellationToken)
         {
             var releaseFiles = (await QueryReleaseFiles(release.Id).ToListAsync())
                 .OrderBy(rf => rf.File.ZipFileEntryName())
@@ -181,14 +181,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             List<ReleaseFile> releaseFiles,
             Release release,
             Stream outputStream,
-            CancellationToken? cancellationToken)
+            CancellationToken cancellationToken)
         {
             using var archive = new ZipArchive(outputStream, ZipArchiveMode.Create);
 
             foreach (var releaseFile in releaseFiles)
             {
                 // Stop immediately if we receive a cancellation request
-                if (cancellationToken?.IsCancellationRequested == true)
+                if (cancellationToken.IsCancellationRequested)
                 {
                     return;
                 }

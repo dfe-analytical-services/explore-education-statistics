@@ -19,7 +19,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
@@ -37,7 +36,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Snapshooter.Xunit;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -148,9 +146,10 @@ public class PermalinkServiceLegacyTests
                 Capture.With(blobPathCapture),
                 It.IsAny<Stream>(),
                 MediaTypeNames.Application.Json,
+                null,
                 It.IsAny<CancellationToken>()
             ))
-            .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, _, stream, _, _) =>
+            .Callback<IBlobContainer, string, Stream, string, string, CancellationToken>((_, _, stream, _, _, _) =>
             {
                 // Convert captured stream to string
                 using var reader = new StreamReader(stream);
@@ -269,9 +268,10 @@ public class PermalinkServiceLegacyTests
                 Capture.With(blobPathCapture),
                 It.IsAny<Stream>(),
                 MediaTypeNames.Application.Json,
+                null,
                 It.IsAny<CancellationToken>()
             ))
-            .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, _, stream, _, _) =>
+            .Callback<IBlobContainer, string, Stream, string, string, CancellationToken>((_, _, stream, _, _, _) =>
             {
                 // Convert captured stream to string
                 using var reader = new StreamReader(stream);
@@ -491,9 +491,10 @@ public class PermalinkServiceLegacyTests
                 Capture.With(blobPathCapture),
                 It.IsAny<Stream>(),
                 MediaTypeNames.Application.Json,
+                null,
                 It.IsAny<CancellationToken>()
             ))
-            .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, _, stream, _, _) =>
+            .Callback<IBlobContainer, string, Stream, string, string, CancellationToken>((_, _, stream, _, _, _) =>
             {
                 // Convert captured stream to string
                 using var reader = new StreamReader(stream);
@@ -625,10 +626,11 @@ public class PermalinkServiceLegacyTests
 
         var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
-        blobStorageService.SetupDownloadBlobText(
+        blobStorageService.SetupGetDeserializedJson(
             container: Permalinks,
             path: permalink.Id.ToString(),
-            blobText: JsonConvert.SerializeObject(permalinkForSerialization));
+            value: permalinkForSerialization,
+            settings: PermalinkService.LegacyPermalinkSerializerSettings);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -667,129 +669,6 @@ public class PermalinkServiceLegacyTests
     }
 
     [Fact]
-    public async Task GetLegacy_LegacyLocationsFieldIsTransformed()
-    {
-        var releaseId = Guid.NewGuid();
-
-        // Until old Permalinks are migrated to permanently transform their legacy 'Locations' field,
-        // test that legacy locations are transformed to 'LocationsHierarchical' and then mapped to 'Locations'
-        // in the view model.
-
-        var subjectId = Guid.NewGuid();
-
-        // Setup a list of legacy locations to be added to the Permalink table subject meta during serialization
-        var legacyLocations = new List<LegacyLocationAttributeViewModel>
-        {
-            new()
-            {
-                Level = GeographicLevel.LocalAuthority,
-                Label = "Blackpool",
-                Value = "E06000009",
-                GeoJson = JToken.Parse(@"[{""properties"": {""code"": ""E06000009""}}]")
-            },
-            new()
-            {
-                Level = GeographicLevel.LocalAuthority,
-                Label = "Derby",
-                Value = "E06000015",
-                GeoJson = JToken.Parse(@"[{""properties"": {""code"": ""E06000015""}}]")
-            },
-            new()
-            {
-                Level = GeographicLevel.LocalAuthority,
-                Label = "Nottingham",
-                Value = "E06000018",
-                GeoJson = JToken.Parse(@"[{""properties"": {""code"": ""E06000018""}}]")
-            }
-        };
-
-        var permalink = new Permalink
-        {
-            Id = Guid.NewGuid(),
-            Created = DateTime.UtcNow,
-            Legacy = true
-        };
-
-        var permalinkForSerialization = new LegacyPermalink(
-            permalink.Id,
-            permalink.Created,
-            new TableBuilderConfiguration(),
-            new PermalinkTableBuilderResult
-            {
-                SubjectMeta = new PermalinkResultSubjectMeta()
-            },
-            new ObservationQueryContext
-            {
-                SubjectId = subjectId
-            });
-
-        // Set the legacy locations field on the Permalink table subject meta
-        var permalinkJsonObject = JObject.FromObject(permalinkForSerialization);
-        var subjectMetaJsonObject = permalinkJsonObject.SelectToken("FullTable.SubjectMeta") as JObject;
-        var legacyLocationsJsonArray = JArray.FromObject(legacyLocations);
-        subjectMetaJsonObject!.Add("Locations", legacyLocationsJsonArray);
-
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
-
-        blobStorageService.SetupDownloadBlobText(
-            container: Permalinks,
-            path: permalink.Id.ToString(),
-            blobText: permalinkJsonObject.ToString(Formatting.None));
-
-        var contentDbContextId = Guid.NewGuid().ToString();
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        {
-            await contentDbContext.Permalinks.AddAsync(permalink);
-            await contentDbContext.ReleaseFiles.AddRangeAsync(
-                new ReleaseFile
-                {
-                    ReleaseId = releaseId,
-                    File = new File
-                    {
-                        SubjectId = subjectId,
-                        Type = FileType.Data,
-                    }
-                });
-
-            await contentDbContext.SaveChangesAsync();
-        }
-
-        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-        {
-            var service = BuildService(
-                contentDbContext: contentDbContext,
-                blobStorageService: blobStorageService.Object);
-
-            var result = (await service.GetLegacy(permalink.Id)).AssertRight();
-
-            MockUtils.VerifyAllMocks(blobStorageService);
-
-            Assert.Equal(permalink.Id, result.Id);
-
-            var subjectMeta = result.FullTable.SubjectMeta;
-
-            // Expect Locations to have been transformed
-            Assert.Single(subjectMeta.Locations);
-            Assert.True(subjectMeta.Locations.ContainsKey("localAuthority"));
-
-            var localAuthorities = subjectMeta.Locations["localAuthority"];
-            Assert.Equal(3, localAuthorities.Count);
-
-            Assert.Equal(legacyLocations[0].Label, localAuthorities[0].Label);
-            Assert.Equal(legacyLocations[0].Value, localAuthorities[0].Value);
-            Assert.Equal(legacyLocations[0].GeoJson, localAuthorities[0].GeoJson);
-
-            Assert.Equal(legacyLocations[1].Label, localAuthorities[1].Label);
-            Assert.Equal(legacyLocations[1].Value, localAuthorities[1].Value);
-            Assert.Equal(legacyLocations[1].GeoJson, localAuthorities[1].GeoJson);
-
-            Assert.Equal(legacyLocations[2].Label, localAuthorities[2].Label);
-            Assert.Equal(legacyLocations[2].Value, localAuthorities[2].Value);
-            Assert.Equal(legacyLocations[2].GeoJson, localAuthorities[2].GeoJson);
-        }
-    }
-
-    [Fact]
     public async Task GetLegacy_PermalinkNotFound()
     {
         var service = BuildService();
@@ -818,9 +697,10 @@ public class PermalinkServiceLegacyTests
 
         var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
-        blobStorageService.SetupDownloadBlobTextNotFound(
+        blobStorageService.SetupGetDeserializedJsonNotFound<LegacyPermalink>(
             container: Permalinks,
-            path: permalink.Id.ToString());
+            path: permalink.Id.ToString(),
+            settings: PermalinkService.LegacyPermalinkSerializerSettings);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -860,10 +740,11 @@ public class PermalinkServiceLegacyTests
 
         var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
-        blobStorageService.SetupDownloadBlobText(
+        blobStorageService.SetupGetDeserializedJson(
             container: Permalinks,
             path: permalink.Id.ToString(),
-            blobText: JsonConvert.SerializeObject(permalinkForSerialization));
+            value: permalinkForSerialization,
+            settings: PermalinkService.LegacyPermalinkSerializerSettings);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -940,10 +821,11 @@ public class PermalinkServiceLegacyTests
 
         var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
-        blobStorageService.SetupDownloadBlobText(
+        blobStorageService.SetupGetDeserializedJson(
             container: Permalinks,
             path: permalink.Id.ToString(),
-            blobText: JsonConvert.SerializeObject(permalinkForSerialization));
+            value: permalinkForSerialization,
+            settings: PermalinkService.LegacyPermalinkSerializerSettings);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1040,10 +922,11 @@ public class PermalinkServiceLegacyTests
 
         var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
-        blobStorageService.SetupDownloadBlobText(
+        blobStorageService.SetupGetDeserializedJson(
             container: Permalinks,
             path: permalink.Id.ToString(),
-            blobText: JsonConvert.SerializeObject(permalinkForSerialization));
+            value: permalinkForSerialization,
+            settings: PermalinkService.LegacyPermalinkSerializerSettings);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1131,10 +1014,11 @@ public class PermalinkServiceLegacyTests
 
         var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
-        blobStorageService.SetupDownloadBlobText(
+        blobStorageService.SetupGetDeserializedJson(
             container: Permalinks,
             path: permalink.Id.ToString(),
-            blobText: JsonConvert.SerializeObject(permalinkForSerialization));
+            value: permalinkForSerialization,
+            settings: PermalinkService.LegacyPermalinkSerializerSettings);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1224,10 +1108,11 @@ public class PermalinkServiceLegacyTests
 
         var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
-        blobStorageService.SetupDownloadBlobText(
+        blobStorageService.SetupGetDeserializedJson(
             container: Permalinks,
             path: permalink.Id.ToString(),
-            blobText: JsonConvert.SerializeObject(permalinkForSerialization));
+            value: permalinkForSerialization,
+            settings: PermalinkService.LegacyPermalinkSerializerSettings);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1310,10 +1195,11 @@ public class PermalinkServiceLegacyTests
 
         var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
-        blobStorageService.SetupDownloadBlobText(
+        blobStorageService.SetupGetDeserializedJson(
             container: Permalinks,
             path: permalink.Id.ToString(),
-            blobText: JsonConvert.SerializeObject(permalinkForSerialization));
+            value: permalinkForSerialization,
+            settings: PermalinkService.LegacyPermalinkSerializerSettings);
 
         var contentDbContextId = Guid.NewGuid().ToString();
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1461,10 +1347,11 @@ public class PermalinkServiceLegacyTests
 
         var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
-        blobStorageService.SetupDownloadBlobText(
+        blobStorageService.SetupGetDeserializedJson(
             container: Permalinks,
             path: permalink.Id.ToString(),
-            blobText: JsonConvert.SerializeObject(permalinkForSerialization));
+            value: permalinkForSerialization,
+            settings: PermalinkService.LegacyPermalinkSerializerSettings);
 
         var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(Strict);
 
@@ -1499,7 +1386,7 @@ public class PermalinkServiceLegacyTests
 
             result.AssertRight();
 
-            stream.Seek(0L, SeekOrigin.Begin);
+            stream.SeekToBeginning();
             var csv = stream.ReadToEnd();
 
             Snapshot.Match(csv);
@@ -1535,9 +1422,10 @@ public class PermalinkServiceLegacyTests
 
         var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
-        blobStorageService.SetupDownloadBlobTextNotFound(
+        blobStorageService.SetupGetDeserializedJsonNotFound<LegacyPermalink>(
             container: Permalinks,
-            path: permalink.Id.ToString());
+            path: permalink.Id.ToString(),
+            settings: PermalinkService.LegacyPermalinkSerializerSettings);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {

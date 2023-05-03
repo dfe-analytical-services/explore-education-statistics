@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseId,
             Stream outputStream,
             IEnumerable<Guid>? fileIds = null,
-            CancellationToken? cancellationToken = null);
+            CancellationToken cancellationToken = default);
 
         Task<Either<ActionResult, Unit>> Update(Guid releaseId, Guid fileId, ReleaseFileUpdateViewModel update);
 
