@@ -1,7 +1,4 @@
-import {
-  CustomDataGroup,
-  DataClassification,
-} from '@common/modules/charts/types/chart';
+import { DataGroupingConfig } from '@common/modules/charts/types/chart';
 import subtract from '@common/utils/math/subtract';
 import countDecimalPlaces from '@common/utils/number/countDecimalPlaces';
 import formatPretty, {
@@ -26,10 +23,8 @@ export interface LegendDataGroup {
 
 interface Options {
   colour: string;
-  classification?: DataClassification;
-  customDataGroups?: CustomDataGroup[];
+  dataGrouping: DataGroupingConfig;
   decimalPlaces?: number;
-  groups: number;
   values: number[];
   unit?: string;
 }
@@ -43,13 +38,13 @@ interface Options {
  */
 export default function generateLegendDataGroups({
   colour,
-  classification = 'EqualIntervals',
-  customDataGroups,
+  dataGrouping,
   decimalPlaces: explicitDecimalPlaces,
-  groups,
   values: initialValues,
   unit,
 }: Options): LegendDataGroup[] {
+  const { customGroups, numberOfGroups = 5, type } = dataGrouping;
+
   let implicitDecimalPlaces = 0;
 
   const values = orderBy(initialValues, value => {
@@ -102,22 +97,25 @@ export default function generateLegendDataGroups({
   // overlapping one another e.g. for a range of 0.4, we need an
   // increment of 0.01 rather than 0.1 as we would get group boundaries
   // like 0.1, 0.2, 0.2, 0.3, 0.4, which would not look right.
-  if (valueRange !== 0 && valueRange < valueIncrement * groups) {
+  if (valueRange !== 0 && valueRange < valueIncrement * numberOfGroups) {
     decimalPlaces += 1;
     valueIncrement = 1 / 10 ** decimalPlaces;
   }
 
   const colourScale = getScale('#fff', colour);
 
-  const groupProportion = 1 / groups;
-  const lastGroupIndex = groups - 1;
+  const groupProportion = 1 / numberOfGroups;
+  const lastGroupIndex = numberOfGroups - 1;
 
-  switch (classification) {
+  switch (type) {
     case 'EqualIntervals': {
-      const groupSize = roundUpToNearest(valueRange / groups, valueIncrement);
+      const groupSize = roundUpToNearest(
+        valueRange / numberOfGroups,
+        valueIncrement,
+      );
 
-      return times(groups, index => {
-        const i = index / groups;
+      return times(numberOfGroups, index => {
+        const i = index / numberOfGroups;
         // If not the last group, we want to offset the group's max
         // so that it does not overlap with the next group's min.
         const maxOffset = index < lastGroupIndex ? valueIncrement : 0;
@@ -143,7 +141,7 @@ export default function generateLegendDataGroups({
       });
     }
     case 'Quantiles': {
-      const limits = getQuantileLimits(values, groups);
+      const limits = getQuantileLimits(values, numberOfGroups);
 
       return limits.reduce<LegendDataGroup[]>((acc, limit, index) => {
         const nextLimit = limits[index + 1];
@@ -174,7 +172,7 @@ export default function generateLegendDataGroups({
     }
     case 'Custom':
       return (
-        customDataGroups?.map((group, index) => {
+        customGroups?.map((group, index) => {
           const groupDecimals = Math.max(
             countDecimalPlaces(group.min) ?? 0,
             countDecimalPlaces(group.max) ?? 0,
@@ -207,7 +205,7 @@ export default function generateLegendDataGroups({
               : group.max;
 
           return {
-            colour: colourScale((index + 1) * (1 / customDataGroups.length)),
+            colour: colourScale((index + 1) * (1 / customGroups.length)),
             decimalPlaces: groupDecimals,
             min: formatPretty(group.min, unit, countDecimalPlaces(group.min)),
             max: formatPretty(group.max, unit, countDecimalPlaces(group.max)),

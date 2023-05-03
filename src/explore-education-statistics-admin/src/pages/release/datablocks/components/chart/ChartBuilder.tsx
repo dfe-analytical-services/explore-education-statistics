@@ -5,7 +5,8 @@ import ChartConfiguration from '@admin/pages/release/datablocks/components/chart
 import ChartDataSetsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartDataSetsConfiguration';
 import ChartDefinitionSelector from '@admin/pages/release/datablocks/components/chart/ChartDefinitionSelector';
 import ChartLegendConfiguration from '@admin/pages/release/datablocks/components/chart/ChartLegendConfiguration';
-import ChartMapConfiguration from '@admin/pages/release/datablocks/components/chart/ChartMapConfiguration';
+import ChartBoundaryLevelsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartBoundaryLevelsConfiguration';
+import ChartDataGroupingsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartDataGroupingsConfiguration';
 import { ChartBuilderFormsContextProvider } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { useChartBuilderReducer } from '@admin/pages/release/datablocks/components/chart/reducers/chartBuilderReducer';
 import Button from '@common/components/Button';
@@ -129,7 +130,7 @@ const ChartBuilder = ({
     tableTitle,
   );
 
-  const { axes, definition, options, legend } = chartBuilderState;
+  const { axes, map, definition, options, legend } = chartBuilderState;
 
   const getChartFile = useGetChartFile(releaseId);
 
@@ -159,6 +160,7 @@ const ChartBuilder = ({
     const baseProps: ChartProps = {
       ...options,
       data,
+      map,
       legend,
       axes,
       meta,
@@ -192,13 +194,16 @@ const ChartBuilder = ({
       case 'map':
         return {
           ...(baseProps as MapBlockProps),
+          map: map ?? {
+            dataSetConfigs: [],
+          },
           boundaryLevel: options.boundaryLevel ?? 0,
           type: 'map',
         };
       default:
         return undefined;
     }
-  }, [axes, data, definition, getChartFile, legend, meta, options]);
+  }, [axes, data, definition, getChartFile, legend, meta, options, map]);
 
   const handleSubmit = useCallback(async () => {
     if (!chartProps) {
@@ -267,6 +272,11 @@ const ChartBuilder = ({
 
   const [handleLegendConfigurationChange] = useDebouncedCallback(
     actions.updateChartLegend,
+    200,
+  );
+
+  const [handleMapConfigurationChange] = useDebouncedCallback(
+    actions.updateChartMapConfiguration,
     200,
   );
 
@@ -339,7 +349,6 @@ const ChartBuilder = ({
                   />
                 </TabsSection>
               )}
-
               {forms.dataSets && definition.axes.major && (
                 <TabsSection
                   title="Data sets"
@@ -356,23 +365,57 @@ const ChartBuilder = ({
                 </TabsSection>
               )}
 
-              {forms.map && definition?.type === 'map' && options && (
-                <TabsSection
-                  title="Map configuration"
-                  headingTitle="Map configuration"
-                  id={forms.map.id}
-                >
-                  <ChartMapConfiguration
-                    buttons={deleteButton}
-                    dataSetsUnits={dataSetsUnits}
-                    meta={meta}
-                    options={options}
-                    onBoundaryLevelChange={handleBoundaryLevelChange}
-                    onChange={handleChartConfigurationChange}
-                    onSubmit={actions.updateChartOptions}
-                  />
-                </TabsSection>
-              )}
+              {forms.boundaryLevels &&
+                definition?.type === 'map' &&
+                options &&
+                meta.boundaryLevels.length && (
+                  <TabsSection
+                    title="Boundary levels"
+                    headingTitle="Boundary levels"
+                    id={forms.boundaryLevels.id}
+                  >
+                    <ChartBoundaryLevelsConfiguration
+                      buttons={deleteButton}
+                      meta={meta}
+                      options={options}
+                      onBoundaryLevelChange={handleBoundaryLevelChange}
+                      onChange={handleChartConfigurationChange}
+                      onSubmit={actions.updateChartOptions}
+                    />
+                  </TabsSection>
+                )}
+              {axes.major &&
+                forms.dataGroupings &&
+                definition?.type === 'map' &&
+                options &&
+                legend && (
+                  <TabsSection
+                    title="Data groupings"
+                    headingTitle="Data groupings"
+                    id={forms.dataGroupings.id}
+                  >
+                    <ChartDataGroupingsConfiguration
+                      axisMajor={axes.major}
+                      buttons={deleteButton}
+                      data={data}
+                      map={map}
+                      legend={legend}
+                      meta={meta}
+                      options={options}
+                      onChange={handleMapConfigurationChange}
+                      onSubmit={values => {
+                        actions.updateChartMapConfiguration(values);
+                        if (options.dataClassification) {
+                          actions.updateChartOptions({
+                            ...options,
+                            dataClassification: undefined,
+                            dataGroups: undefined,
+                          });
+                        }
+                      }}
+                    />
+                  </TabsSection>
+                )}
 
               {forms.legend && axes.major && legend && (
                 <TabsSection

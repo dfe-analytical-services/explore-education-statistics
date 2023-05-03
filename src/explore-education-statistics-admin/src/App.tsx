@@ -42,6 +42,8 @@ function ApplicationInsightsTracking() {
         });
       });
     }
+
+    document.body.classList.add('js-enabled');
   }, [appInsights, history]);
 
   return null;

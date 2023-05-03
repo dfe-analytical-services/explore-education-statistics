@@ -189,8 +189,8 @@ user configures basic chart
     user enters text into element    id:chartConfigurationForm-width    ${CHART_WIDTH}
 
     IF    "${CHART_TYPE}" == "Geographic"
-        user clicks link    Map configuration
-        user waits until h3 is visible    Map configuration    %{WAIT_MEDIUM}
+        user clicks link    Boundary levels
+        user waits until h3 is visible    Boundary levels    %{WAIT_MEDIUM}
         user chooses select option at index    name:boundaryLevel    1
     END
 

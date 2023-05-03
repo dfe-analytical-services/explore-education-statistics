@@ -26,13 +26,16 @@ export type ChartBuilderFormKeys =
   | 'options'
   | 'dataSets'
   | 'legend'
-  | 'map'
+  | 'boundaryLevels'
+  | 'dataGroupings'
   | AxisType;
 
 export interface ChartBuilderForms {
   options: ChartBuilderForm;
   dataSets?: ChartBuilderForm;
   legend?: ChartBuilderForm;
+  boundaryLevels?: ChartBuilderForm;
+  dataGroupings?: ChartBuilderForm;
   map?: ChartBuilderForm;
   major?: ChartBuilderForm;
   minor?: ChartBuilderForm;
@@ -110,11 +113,18 @@ export const ChartBuilderFormsContextProvider = ({
       }
 
       if (definition.type === 'map') {
-        nextForms.map = {
+        nextForms.boundaryLevels = {
           ...defaultFormState(),
-          ...(prevForms.map ?? {}),
-          id: `${id}-map`,
-          title: 'Map configuration',
+          ...(prevForms.boundaryLevels ?? {}),
+          id: `${id}-boundaryLevels`,
+          title: 'Boundary levels',
+        };
+
+        nextForms.dataGroupings = {
+          ...defaultFormState(),
+          ...(prevForms.dataGroupings ?? {}),
+          id: `${id}-dataGroupings`,
+          title: 'Data groupings',
         };
       }
 
