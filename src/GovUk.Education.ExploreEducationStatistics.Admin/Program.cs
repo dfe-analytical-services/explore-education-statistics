@@ -18,12 +18,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((ctx, builder) =>
                 {
+                    var idpConfigFileRequired = ctx.HostingEnvironment.IsDevelopment();
+                    
                     var idpConfiguration = 
                         Environment.GetEnvironmentVariable("IdpProviderConfiguration") ?? "Idp";
                     
                     builder.AddJsonFile(
                         $"appsettings.{idpConfiguration}.json", 
-                        optional: false, 
+                        optional: !idpConfigFileRequired, 
                         reloadOnChange: true);
                     
                     builder.AddJsonFile(
