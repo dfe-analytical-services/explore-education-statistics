@@ -21,8 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
         Task ImportObservations(
             DataImport dataImport,
             Func<Task<Stream>> dataFileStreamProvider,
+            Func<Task<Stream>> metaFileStreamProvider,
             Subject subject,
-            SubjectMeta subjectMeta,
             StatisticsDbContext context);
 
         Task ImportFiltersAndLocations(

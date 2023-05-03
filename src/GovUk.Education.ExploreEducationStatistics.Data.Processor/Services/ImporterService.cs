@@ -24,35 +24,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     {
         private readonly IGuidGenerator _guidGenerator;
         private readonly ImporterLocationService _importerLocationService;
-        private readonly ImporterFilterService _importerFilterService;
         private readonly IImporterMetaService _importerMetaService;
         private readonly IDataImportService _dataImportService;
         private readonly ILogger<ImporterService> _logger;
         private readonly IDatabaseHelper _databaseHelper;
-        private readonly ImporterFilterCache _importerFilterCache;
         private readonly IObservationBatchImporter _observationBatchImporter;
 
         private const int Stage2RowCheck = 1000;
 
         public ImporterService(
             IGuidGenerator guidGenerator,
-            ImporterFilterService importerFilterService,
             ImporterLocationService importerLocationService,
             IImporterMetaService importerMetaService,
             IDataImportService dataImportService, 
             ILogger<ImporterService> logger, 
             IDatabaseHelper databaseHelper, 
-            ImporterFilterCache importerFilterCache, 
             IObservationBatchImporter? observationBatchImporter = null)
         {
             _guidGenerator = guidGenerator;
-            _importerFilterService = importerFilterService;
             _importerLocationService = importerLocationService;
             _importerMetaService = importerMetaService;
             _dataImportService = dataImportService;
             _logger = logger;
             _databaseHelper = databaseHelper;
-            _importerFilterCache = importerFilterCache;
             _observationBatchImporter = observationBatchImporter ?? new StoredProcedureObservationBatchImporter();
         }
 
@@ -136,8 +130,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     foreach (var filterMeta in subjectMeta.Filters)
                     {
-                        var filterItemLabel = reader.GetFilterItemValue(rowValues, filterMeta.Filter.Id);
-                        var filterGroupLabel = reader.GetFilterGroupValue(rowValues, filterMeta.Filter.Id);
+                        var filterItemLabel = reader.GetFilterItemLabel(rowValues, filterMeta.Filter.Id);
+                        var filterGroupLabel = reader.GetFilterGroupLabel(rowValues, filterMeta.Filter.Id);
 
                         filterGroupsFromCsv.Add(new FilterGroupMeta(filterMeta.Filter.Id, filterGroupLabel));
                         filterItemsFromCsv.Add(new FilterItemMeta(filterMeta.Filter.Id, filterGroupLabel, filterItemLabel));
@@ -173,9 +167,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await ctxDelegate.SaveChangesAsync();
             });
 
-            filterGroups.ForEach(filterGroup => _importerFilterCache.AddFilterGroup(filterGroup));
-            filterItems.ForEach(filterItem => _importerFilterCache.AddFilterItem(filterItem));
-
             // Add any new Locations that are being introduced by this import process exclusively.  Other concurrent 
             // import processes reaching this stage will wait before adding their own new Locations, if any.
             //
@@ -191,11 +182,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 ctxDelegate => _importerLocationService.CreateIfNotExistsAndCache(ctxDelegate, locations.ToList()));
         }
 
-        public async Task ImportObservations(
-            DataImport import,
+        public async Task ImportObservations(DataImport import,
             Func<Task<Stream>> dataFileStreamProvider,
+            Func<Task<Stream>> metaFileStreamProvider,
             Subject subject,
-            SubjectMeta subjectMeta,
             StatisticsDbContext context)
         {
             var importObservationsBatchSize = GetRowsPerBatch();
@@ -206,19 +196,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var lastProcessedRowIndex = import.LastProcessedRowIndex ?? -1;
             var startingRowIndex = lastProcessedRowIndex + 1;
             var startingBatchIndex = startingRowIndex / importObservationsBatchSize;
-
-            var filters = await context
-                .Filter
-                .AsNoTracking()
-                .Include(filter => filter.FilterGroups)
-                .ThenInclude(group => group.FilterItems)
-                .Where(filter => filter.SubjectId == import.SubjectId)
-                .ToListAsync();
-
-            // TODO DW - do away with this!
-            _importerFilterService.Fill(filters);
-
             
+            var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
+            var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
+
+            var subjectMeta = await _importerMetaService.GetSubjectMeta(
+                metaFileCsvHeaders,
+                metaFileCsvRows,
+                subject,
+                context);
+
             var reader = new DataFileReader(csvHeaders, subjectMeta);
             
             await CsvUtils.Batch(
@@ -269,11 +256,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                             var csvRow = startOfBatchRowIndex + firstRowIndexOfBatchToProcess + rowIndex + 2;
                             
                             return ObservationFromCsv(
-                                context,
                                 cells,
-                                csvHeaders,
                                 subject,
-                                filters,
+                                subjectMeta
+                                    .Filters
+                                    .Select(meta => meta.Filter)
+                                    .ToList(),
                                 reader,
                                 csvRow);
                         }
@@ -320,9 +308,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         }
 
         private Observation ObservationFromCsv(
-            StatisticsDbContext context,
             List<string> rowValues,
-            List<string> colValues,
             Subject subject,
             List<Filter> filters,
             DataFileReader reader,
@@ -351,9 +337,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             return filters.Select(filter =>
             {
-                var filterItemLabel = reader.GetFilterItemValue(rowValues, filter.Id);
-                var filterGroupLabel = reader.GetFilterGroupValue(rowValues, filter.Id);
-                var filterItem = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filter.Label);
+                var filterItem = reader.GetFilterItem(rowValues, filter);
 
                 return new ObservationFilterItem
                 {

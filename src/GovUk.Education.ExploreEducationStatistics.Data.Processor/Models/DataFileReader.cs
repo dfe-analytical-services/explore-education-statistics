@@ -8,12 +8,20 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Exceptions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 
+/// <summary>
+/// Class responsible for up-front calculation of the column indexes to look up particular
+/// pieces of information from a given data file. This includes column indexes like the
+/// various pieces of information to read a Location, the grouping and filter item columns
+/// for each Filter, and the column indexes for all mandatory information like Time Periods.
+///
+/// This class also keeps an efficient lookup cache for Filter Items based upon its owning Filter
+/// and FilterGroup labels and its own label.
+/// </summary>
 public class DataFileReader
 {
     private const string DefaultFilterGroupLabel = "Default";
@@ -135,8 +143,12 @@ public class DataFileReader
     private readonly Dictionary<Guid, int>? _indicatorColumnIndexes;
     private readonly Dictionary<Guid, int>? _filterColumnIndexes;
     private readonly Dictionary<Guid, int>? _filterGroupColumnIndexes;
+    
+    private readonly Dictionary<string, FilterItem>? _filterItemCache;
 
-    public DataFileReader(List<string> csvHeaders, SubjectMeta? subjectMeta = null)
+    public DataFileReader(
+        List<string> csvHeaders, 
+        SubjectMeta? subjectMeta = null)
     {
         _timeIdentifierColumnIndex = csvHeaders.FindIndex(h => h.Equals("time_identifier"));
         _yearColumnIndex = csvHeaders.FindIndex(h => h.Equals("time_period"));
@@ -164,9 +176,17 @@ public class DataFileReader
                 .ToDictionary(
                     filterMeta => filterMeta.Filter.Id,
                     filterMeta => csvHeaders.FindIndex(h => h.Equals(filterMeta.FilterGroupingColumn)));
+            
+            _filterItemCache = subjectMeta
+                .Filters
+                .Select(meta => meta.Filter)
+                .SelectMany(f => f.FilterGroups)
+                .SelectMany(fg => fg.FilterItems)
+                .ToDictionary(
+                    fi => $"{fi.FilterGroup.Filter.Label}_{fi.FilterGroup.Label}_{fi.Label}".ToLower(), 
+                    fi => fi);
         }
     }
-
 
     public TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> rowValues)
     {
@@ -216,19 +236,26 @@ public class DataFileReader
                 indicatorMeta => rowValues[indicatorMeta.Value]);
     }
 
-    public string GetFilterItemValue(
+    public string GetFilterItemLabel(
         IReadOnlyList<string> rowValues,
         Guid filterId)
     {
         return rowValues[_filterColumnIndexes![filterId]].Trim().NullIfWhiteSpace() ?? DefaultFilterItemLabel;
     }
 
-    public string GetFilterGroupValue(
+    public string GetFilterGroupLabel(
         IReadOnlyList<string> rowValues,
         Guid filterId)
     {
         var value = _filterGroupColumnIndexes![filterId] != -1 ? rowValues[_filterGroupColumnIndexes[filterId]] : null;
         return value?.Trim().NullIfWhiteSpace() ?? DefaultFilterGroupLabel;
+    }
+    
+    public FilterItem GetFilterItem(IReadOnlyList<string> rowValues, Filter filter)
+    {
+        var filterItemLabel = GetFilterItemLabel(rowValues, filter.Id);
+        var filterGroupLabel = GetFilterGroupLabel(rowValues, filter.Id);
+        return LookupCachedFilterItem(filterItemLabel, filterGroupLabel, filter.Label);
     }
     
     public Location GetLocation(IReadOnlyList<string> rowValues)
@@ -389,5 +416,10 @@ public class DataFileReader
         where TLocationAttribute : LocationAttribute
     {
         return !attributeValues.All(v => v.IsNullOrEmpty()) ? creatorFunc.Invoke() : default;
+    }
+
+    private FilterItem LookupCachedFilterItem(string filterItemLabel, string filterGroupLabel, string filterLabel)
+    {
+        return _filterItemCache![$"{filterLabel}_{filterGroupLabel}_{filterItemLabel}".ToLower()];
     }
 }

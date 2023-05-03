@@ -278,15 +278,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             IBlobStorageService blobStorageService = null,
             IImporterService importerService = null,
             ILogger<FileImportService> logger = null,
-            IDataImportService dataImportService = null
+            IDataImportService dataImportService = null,
+            IImporterMetaService importerMetaService = null
             )
         {
             return new FileImportService(
-                logger ?? new Mock<ILogger<FileImportService>>().Object,
-                blobStorageService ?? new Mock<IBlobStorageService>(Strict).Object,
-                dataImportService ?? new Mock<IDataImportService>(Strict).Object,
-                importerService ?? new Mock<IImporterService>(Strict).Object,
-                Mock.Of<IImporterMetaService>(Strict));
+                logger ?? Mock.Of<ILogger<FileImportService>>(),
+                blobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
+                dataImportService ?? Mock.Of<IDataImportService>(Strict),
+                importerService ?? Mock.Of<IImporterService>(Strict),
+                importerMetaService ?? Mock.Of<IImporterMetaService>(Strict));
         }
     }
 }

@@ -73,10 +73,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     });
             }
 
-            return GetSubjectMeta(metaFileCsvHeaders, metaFileRows, subject, context);
+            return await GetSubjectMeta(metaFileCsvHeaders, metaFileRows, subject, context);
         }
 
-        public SubjectMeta GetSubjectMeta(
+        public async Task<SubjectMeta> GetSubjectMeta(
             List<string> metaFileCsvHeaders,
             List<List<string>> metaFileRows,
             Subject subject,
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var metaFileReader = new MetaDataFileReader(metaFileCsvHeaders);
             var metaRows = metaFileReader.GetMetaRows(metaFileRows);
-            var filters = GetFilters(metaRows, subject, context).ToList();
+            var filters = (await GetFilters(metaRows, subject, context)).ToList();
             var indicators = GetIndicators(metaRows, subject, context).ToList();
 
             return new SubjectMeta
@@ -94,13 +94,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             };
         }
 
-        private IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> GetFilters(
+        private async Task<IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)>> GetFilters(
             IEnumerable<MetaRow> metaRows, Subject subject, StatisticsDbContext context)
         {
+            var filters = await context
+                .Filter
+                .AsNoTracking()
+                .Include(filter => filter.FilterGroups)
+                .ThenInclude(group => group.FilterItems)
+                .Where(filter => filter.SubjectId == subject.Id)
+                .ToListAsync();
+            
             return metaRows
                 .Where(row => row.ColumnType == ColumnType.Filter)
                 .Select(filter => (
-                    filter: context.Filter.Single(f => f.SubjectId == subject.Id && f.Name == filter.ColumnName),
+                    filter: filters.Single(f => f.Name == filter.ColumnName),
                     column: filter.ColumnName,
                     filterGroupingColumn: filter.FilterGroupingColumn))
                 .ToList();

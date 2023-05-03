@@ -69,14 +69,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var datafileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
             var metaFileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
 
-            var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
-            var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
-
             await _importerService.ImportObservations(
                 import,
                 datafileStreamProvider,
+                metaFileStreamProvider,
                 subject,
-                _importerMetaService.GetSubjectMeta(metaFileCsvHeaders, metaFileCsvRows, subject, context),
                 context
             );
 
@@ -92,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var import = await _dataImportService.GetImport(importId);
 
             var datafileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
-            
+
             await _importerService.ImportFiltersAndLocations(
                 import,
                 datafileStreamProvider,

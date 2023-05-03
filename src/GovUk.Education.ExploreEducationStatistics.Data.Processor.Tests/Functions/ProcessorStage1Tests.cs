@@ -107,8 +107,6 @@ public class ProcessorStage1Tests
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
 
-        var importerFilterCache = new ImporterFilterCache();
-
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
         
         var guidGenerator = new SequentialGuidGenerator();
@@ -117,7 +115,6 @@ public class ProcessorStage1Tests
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(importerFilterCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
@@ -125,8 +122,7 @@ public class ProcessorStage1Tests
             importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
-            transactionHelper,
-            importerFilterCache);
+            transactionHelper);
 
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),

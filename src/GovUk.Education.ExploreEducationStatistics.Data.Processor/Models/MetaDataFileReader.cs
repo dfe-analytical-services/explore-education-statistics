@@ -9,6 +9,11 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 
+/// <summary>
+/// Class responsible for up-front calculation of the column indexes to look up particular
+/// pieces of information from a given metadata file, and for reading of Subject metadata
+/// from the file.
+/// </summary>
 public class MetaDataFileReader
 {
     private readonly Dictionary<MetaColumns, int> _metaColumnIndexes;
@@ -43,22 +48,10 @@ public class MetaDataFileReader
             DecimalPlaces = !indicatorDp.IsNullOrEmpty() ? int.Parse(indicatorDp!) : null
         };
     }
-
-    private string? ReadMetaColumnValue(MetaColumns column, IReadOnlyList<string> rowValues)
-    {
-        var columnIndex = _metaColumnIndexes[column];
-        
-        if (columnIndex == -1)
-        {
-            return null;
-        }
-
-        return rowValues[columnIndex].Trim().NullIfWhiteSpace();
-    }
     
     public List<(Filter Filter, string Column, string FilterGroupingColumn)> ReadFiltersFromCsv(
-            IEnumerable<MetaRow> metaRows, 
-            Subject subject)
+        IEnumerable<MetaRow> metaRows, 
+        Subject subject)
     {
         return metaRows
             .Where(row => row.ColumnType == ColumnType.Filter)
@@ -108,5 +101,17 @@ public class MetaDataFileReader
                 );
             })
             .ToList();
+    }
+
+    private string? ReadMetaColumnValue(MetaColumns column, IReadOnlyList<string> rowValues)
+    {
+        var columnIndex = _metaColumnIndexes[column];
+        
+        if (columnIndex == -1)
+        {
+            return null;
+        }
+
+        return rowValues[columnIndex].Trim().NullIfWhiteSpace();
     }
 }

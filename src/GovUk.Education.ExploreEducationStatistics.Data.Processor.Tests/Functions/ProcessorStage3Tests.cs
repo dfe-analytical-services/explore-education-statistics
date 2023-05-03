@@ -141,8 +141,6 @@ public class ProcessorStage3Tests : IDisposable
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
     
-        var memoryCache = new ImporterFilterCache();
-    
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
     
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -162,7 +160,6 @@ public class ProcessorStage3Tests : IDisposable
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(memoryCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
@@ -171,7 +168,6 @@ public class ProcessorStage3Tests : IDisposable
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
-            memoryCache,
             observationBatchImporter);
     
         var fileImportService = new FileImportService(
@@ -287,8 +283,6 @@ public class ProcessorStage3Tests : IDisposable
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
     
-        var memoryCache = new ImporterFilterCache();
-    
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
     
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -308,7 +302,6 @@ public class ProcessorStage3Tests : IDisposable
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(memoryCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
@@ -317,7 +310,6 @@ public class ProcessorStage3Tests : IDisposable
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
-            memoryCache,
             observationBatchImporter);
     
         var fileImportService = new FileImportService(
@@ -424,8 +416,6 @@ public class ProcessorStage3Tests : IDisposable
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
     
-        var memoryCache = new ImporterFilterCache();
-    
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
     
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -445,7 +435,6 @@ public class ProcessorStage3Tests : IDisposable
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(memoryCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
@@ -454,7 +443,6 @@ public class ProcessorStage3Tests : IDisposable
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
-            memoryCache,
             observationBatchImporter);
     
         var fileImportService = new FileImportService(
@@ -581,8 +569,6 @@ public class ProcessorStage3Tests : IDisposable
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
     
-        var memoryCache = new ImporterFilterCache();
-    
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
     
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -602,7 +588,6 @@ public class ProcessorStage3Tests : IDisposable
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(memoryCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
@@ -611,7 +596,6 @@ public class ProcessorStage3Tests : IDisposable
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
-            memoryCache,
             observationBatchImporter);
     
         var fileImportService = new FileImportService(
@@ -722,8 +706,6 @@ public class ProcessorStage3Tests : IDisposable
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
     
-        var memoryCache = new ImporterFilterCache();
-    
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
     
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -743,7 +725,6 @@ public class ProcessorStage3Tests : IDisposable
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(memoryCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
@@ -752,7 +733,6 @@ public class ProcessorStage3Tests : IDisposable
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
-            memoryCache,
             observationBatchImporter);
     
         var fileImportService = new FileImportService(
@@ -891,8 +871,6 @@ public class ProcessorStage3Tests : IDisposable
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
     
-        var memoryCache = new ImporterFilterCache();
-    
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
     
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -912,7 +890,6 @@ public class ProcessorStage3Tests : IDisposable
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(memoryCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
@@ -921,7 +898,6 @@ public class ProcessorStage3Tests : IDisposable
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
-            memoryCache,
             observationBatchImporter);
     
         var fileImportService = new FileImportService(
@@ -1040,8 +1016,6 @@ public class ProcessorStage3Tests : IDisposable
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
     
-        var memoryCache = new ImporterFilterCache();
-    
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
     
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -1064,7 +1038,6 @@ public class ProcessorStage3Tests : IDisposable
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(memoryCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
@@ -1073,7 +1046,6 @@ public class ProcessorStage3Tests : IDisposable
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
-            memoryCache,
             observationBatchImporterMock.Object);
         
         var fileImportService = new FileImportService(
@@ -1172,8 +1144,6 @@ public class ProcessorStage3Tests : IDisposable
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
     
-        var memoryCache = new ImporterFilterCache();
-    
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
     
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -1193,7 +1163,6 @@ public class ProcessorStage3Tests : IDisposable
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(memoryCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
@@ -1202,7 +1171,6 @@ public class ProcessorStage3Tests : IDisposable
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
-            memoryCache,
             observationBatchImporter);
         
         var fileImportService = new FileImportService(
