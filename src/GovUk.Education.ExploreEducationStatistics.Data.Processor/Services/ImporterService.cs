@@ -22,7 +22,6 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static System.StringComparison;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -215,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     }
 
                     await _dataImportService.UpdateStatus(dataImport.Id,
-                        STAGE_2,
+                        DataImportStatus.STAGE_2,
                         (double) (index + 1) / dataImport.TotalRows!.Value * 100);
                 }
 
@@ -396,7 +395,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     
                     var percentageComplete = (double) ((batchIndex + 1) / totalBatches) * 100;
 
-                    await _dataImportService.UpdateStatus(import.Id, STAGE_3, percentageComplete);
+                    await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_3, percentageComplete);
 
                     return true;
                 },

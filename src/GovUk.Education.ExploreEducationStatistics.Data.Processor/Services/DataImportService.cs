@@ -30,7 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task FailImport(Guid id, List<DataImportError> errors)
         {
             await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
-            var import = (await contentDbContext.DataImports.FindAsync(id))!;
+            
+            var import = await contentDbContext.DataImports.SingleAsync(d => d.Id == id);
             
             if (import.Status != COMPLETE && import.Status != FAILED)
             {

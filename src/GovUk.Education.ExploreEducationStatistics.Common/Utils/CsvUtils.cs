@@ -136,6 +136,26 @@ public static class CsvUtils
         }
     }
     
+    /// <summary>
+    /// Execute a given function against batches of rows from the provided CSV. The batch
+    /// of rows (a list of lists of cells) and the index of the current batch being processed are
+    /// provided to the function.
+    /// </summary>
+    /// <param name="streamProvider">The Stream of the CSV.</param>
+    /// <param name="batchSize">The number of rows in each batch.</param>
+    /// <param name="func">
+    /// The function to execute against each batch of CSV rows. The function takes the rows 
+    /// the index of the current batch, and returns "true" to continue iterating, or "false" to finish looping early.
+    /// The index is a zero-based index. Therefore the first batch of rows will have the index of "0".
+    ///
+    /// Note that if using "startingBatchIndex", this will be included in the index provided to the function. For
+    /// example, if "startingBatchIndex" is "10", the first batch of rows provided to the first function execution will
+    /// be the 11th batch of rows from the CSV, and the index provided to the first function execution will be "10".  
+    /// </param>
+    /// <param name="startingBatchIndex">Optional parameter to skip a number of batches to be processed by the function.
+    /// For instance, if this is set to 0, the first batch being presented to the function will be the 1st X number
+    /// of rows (determined by "batchSize"), whereas if this is set to 1, the first batch being presented to the
+    /// function will contain the 2nd X number of rows of data.</param>
     public static async Task Batch(
         Func<Task<Stream>> streamProvider,
         int batchSize,

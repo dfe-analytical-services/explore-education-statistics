@@ -16,17 +16,17 @@ public static class DataImportGeneratorExtensions
     public static InstanceSetters<DataImport> SetDefaults(this InstanceSetters<DataImport> setters)
         => setters
             .SetDefault(d => d.Id)
-            .SetDefaultFiles("data");
+            .SetFiles("data");
     
     public static Generator<DataImport> WithSubjectId(
         this Generator<DataImport> generator,
         Guid subjectId)
         => generator.ForInstance(s => s.Set(d => d.SubjectId, subjectId));
     
-    public static Generator<DataImport> WithDefaultFiles(
+    public static Generator<DataImport> WithFiles(
         this Generator<DataImport> generator,
-        string filename)
-        => generator.ForInstance(s => s.SetDefaultFiles(filename));
+        string dataFileName)
+        => generator.ForInstance(s => s.SetFiles(dataFileName));
 
     public static Generator<DataImport> WithStatus(
         this Generator<DataImport> generator,
@@ -45,23 +45,21 @@ public static class DataImportGeneratorExtensions
             .Set(d => d.ImportedRows, importedRows ?? 0)
             .Set(d => d.LastProcessedRowIndex, lastProcessedRowIndex));
     
-    public static InstanceSetters<DataImport> SetDefaultFiles(
+    public static InstanceSetters<DataImport> SetFiles(
         this InstanceSetters<DataImport> setters,
-        string filename)
+        string dataFileName)
         => setters
             .Set(d => d.File, new File
             {
                 Id = Guid.NewGuid(),
-                Filename = $"{filename}.csv",
+                Filename = $"{dataFileName}.csv",
                 Type = FileType.Data
-
             })
             .Set(d => d.MetaFile, new File
             {
                 Id = Guid.NewGuid(),
-                Filename = $"{filename}.meta.csv",
-                Type = FileType.Data
-
+                Filename = $"{dataFileName}.meta.csv",
+                Type = FileType.Metadata
             });
 
 }

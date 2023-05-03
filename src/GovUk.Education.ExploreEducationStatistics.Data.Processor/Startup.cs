@@ -68,7 +68,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         private static void HandleRestart(IServiceProvider serviceProvider)
         {
             var storageQueueService = serviceProvider.GetRequiredService<IStorageQueueService>();
-            storageQueueService.Clear(ImportsAvailableQueue).Wait();
             storageQueueService.Clear(ImportsPendingQueue).Wait();
             storageQueueService.Clear(RestartImportsQueue).Wait();
 

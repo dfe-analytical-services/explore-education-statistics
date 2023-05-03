@@ -36,21 +36,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                 _logger.LogError(ex, $"Exception caught whilst processing ProcessUploadsPoisonQueueHandler function: {ex.StackTrace}");
             }
         }
-
-        [FunctionName("ImportObservationsPoisonHandler")]
-        public async Task ImportObservationsPoisonQueueHandler(
-            [QueueTrigger(ImportsAvailablePoisonQueue)]
-            ImportMessage message)
-        {
-            try
-            {
-                await _dataImportService.FailImport(message.Id,
-                    "File failed to import for unknown reason in upload processing stage.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Exception caught whilst processing ImportObservationsPoisonHandler function: {ex.StackTrace}");
-            }
-        }
     }
 }

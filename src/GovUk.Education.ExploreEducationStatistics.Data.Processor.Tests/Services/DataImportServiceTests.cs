@@ -160,6 +160,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Contains(GeographicLevel.Region, updated.GeographicLevels);
             }
         }
+        
+        [Fact]
+        public async Task Update_Partial()
+        {
+            var import = new DataImport
+            {
+                ExpectedImportedRows = 1,
+                ImportedRows = 1,
+                TotalRows = 1
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(import);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+
+            var service = BuildDataImportService(contentDbContextId);
+
+            await service.Update(
+                import.Id,
+                importedRows: 5000,
+                geographicLevels: new HashSet<GeographicLevel>
+                {
+                    GeographicLevel.Country,
+                    GeographicLevel.Region
+                });
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var updated = await contentDbContext.DataImports.SingleAsync(i => i.Id == import.Id);
+
+                Assert.Equal(1, updated.ExpectedImportedRows);
+                Assert.Equal(5000, updated.ImportedRows);
+                Assert.Equal(1, updated.TotalRows);
+
+                Assert.Equal(2, updated.GeographicLevels.Count);
+                Assert.Contains(GeographicLevel.Country, updated.GeographicLevels);
+                Assert.Contains(GeographicLevel.Region, updated.GeographicLevels);
+            }
+        }
 
         private static DataImportService BuildDataImportService(
             string? contentDbContextId = null)

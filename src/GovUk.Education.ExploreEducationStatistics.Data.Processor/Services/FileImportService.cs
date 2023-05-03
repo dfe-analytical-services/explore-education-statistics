@@ -1,6 +1,5 @@
 # nullable enable
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -8,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return;
             }
 
-            var subject = await context.Subject.FindAsync(import.SubjectId);
+            var subject = await context.Subject.SingleAsync(s => s.Id.Equals(import.SubjectId));
 
             var datafileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
             var metaFileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
@@ -71,8 +71,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await _importerService.ImportObservations(
                 import,
                 datafileStreamProvider,
-                subject!,
-                _importerService.GetMeta(metaFileCsvHeaders, metaFileCsvRows, subject!, context),
+                subject,
+                _importerService.GetMeta(metaFileCsvHeaders, metaFileCsvRows, subject, context),
                 context
             );
 
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var import = await _dataImportService.GetImport(importId);
 
-            var subject = await context.Subject.FindAsync(import.SubjectId);
+            var subject = await context.Subject.SingleAsync(s => s.Id.Equals(import.SubjectId));
 
             var datafileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
             var metaFileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
@@ -95,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await _importerService.ImportFiltersAndLocations(
                 import,
                 datafileStreamProvider,
-                _importerService.GetMeta(metaFileCsvHeaders, metaFileCsvRows, subject!, context),
+                _importerService.GetMeta(metaFileCsvHeaders, metaFileCsvRows, subject, context),
                 context);
         }
 
@@ -124,9 +124,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return;
             }
 
-            var observationCount = context.Observation.Count(o => o.SubjectId.Equals(import.SubjectId));
+            var observationCount = await context
+                .Observation
+                .CountAsync(o => o.SubjectId.Equals(import.SubjectId));
 
-            if (!observationCount.Equals(import.ExpectedImportedRows))
+            if (observationCount != import.ExpectedImportedRows)
             {
                 await _dataImportService.FailImport(import.Id,
                     $"Number of observations inserted ({observationCount}) " +
