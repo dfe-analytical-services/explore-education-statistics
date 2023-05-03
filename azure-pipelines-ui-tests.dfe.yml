@@ -1,5 +1,5 @@
 schedules:
-- cron: 0 5,7,19 * * 1,2,3,4,5
+- cron: 0 4,6,12,18 * * 1,2,3,4,5
   branches:
     include:
     - dev
