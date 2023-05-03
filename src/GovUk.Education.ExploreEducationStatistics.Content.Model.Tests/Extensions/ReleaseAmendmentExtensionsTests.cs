@@ -557,7 +557,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 },
                 ContentBlocks = new List<ReleaseContentBlock>
                 {
-                    new ()
+                    new()
                     {
                         ContentBlock = dataBlock,
                     },

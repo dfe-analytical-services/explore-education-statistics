@@ -275,7 +275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             }
                         }
                     },
-                    new ()
+                    new()
                     {
                         ReleaseId = Guid.NewGuid(),
                         ContentSection = new ContentSection
