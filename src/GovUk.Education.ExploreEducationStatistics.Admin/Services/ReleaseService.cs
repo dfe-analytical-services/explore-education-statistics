@@ -631,6 +631,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ThenInclude(r => r.ContentBlock)
                 .Include(r => r.KeyStatistics)
                 .ThenInclude(ks => (ks as KeyStatisticDataBlock)!.DataBlock);
+                // @MarkFix need to include FeaturedTables here
         }
 
         private IList<MethodologyVersion> GetMethodologiesScheduledWithRelease(Guid releaseId)

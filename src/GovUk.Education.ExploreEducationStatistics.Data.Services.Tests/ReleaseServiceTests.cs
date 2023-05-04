@@ -858,22 +858,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var dataBlock1 = new DataBlock
             {
                 Name = "Test data block 1",
-                HighlightName = "Test highlight name 1",
-                HighlightDescription = "Test highlight description 1",
                 Query = new ObservationQueryContext
                 {
                     SubjectId = releaseSubject1.Subject.Id,
                 }
             };
+            var featuredTable1 = new FeaturedTable
+            {
+                DataBlock = dataBlock1,
+                Name = "Test featured table name 1",
+                Description = "Test featured table description 1",
+            };
+
             var dataBlock2 = new DataBlock
             {
                 Name = "Test data block 2",
-                HighlightName = "Test highlight name 2",
-                HighlightDescription = "Test highlight description 2",
                 Query = new ObservationQueryContext
                 {
                     SubjectId = releaseSubject2.Subject.Id,
                 }
+            };
+            var featuredTable2 = new FeaturedTable
+            {
+                DataBlock = dataBlock2,
+                Name = "Test featured table name 2",
+                Description = "Test featured table description 2",
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -881,11 +890,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(release);
-                await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2);
-                await contentDbContext.AddRangeAsync(import1, import2);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile1, releaseFile2);
+                await contentDbContext.FeaturedTables.AddRangeAsync(featuredTable1, featuredTable2);
+                await contentDbContext.DataImports.AddRangeAsync(import1, import2);
                 // Order is reversed
-                await contentDbContext.AddRangeAsync(
+                await contentDbContext.ReleaseContentBlocks.AddRangeAsync(
                     new ReleaseContentBlock
                     {
                         Release = release,
@@ -920,14 +929,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.Equal(2, featuredTables.Count);
 
-                Assert.Equal(dataBlock1.Id, featuredTables[0].Id);
-                Assert.Equal(dataBlock1.HighlightName, featuredTables[0].Name);
-                Assert.Equal(dataBlock1.HighlightDescription, featuredTables[0].Description);
+                Assert.Equal(featuredTable1.Id, featuredTables[0].Id);
+                Assert.Equal(featuredTable1.Name, featuredTables[0].Name);
+                Assert.Equal(featuredTable1.Description, featuredTables[0].Description);
                 Assert.Equal(releaseSubject1.SubjectId, featuredTables[0].SubjectId);
 
-                Assert.Equal(dataBlock2.Id, featuredTables[1].Id);
-                Assert.Equal(dataBlock2.HighlightName, featuredTables[1].Name);
-                Assert.Equal(dataBlock2.HighlightDescription, featuredTables[1].Description);
+                Assert.Equal(featuredTable2.Id, featuredTables[1].Id);
+                Assert.Equal(featuredTable2.Name, featuredTables[1].Name);
+                Assert.Equal(featuredTable2.Description, featuredTables[1].Description);
                 Assert.Equal(releaseSubject2.SubjectId, featuredTables[1].SubjectId);
             }
         }
@@ -974,8 +983,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var dataBlock1 = new DataBlock
             {
                 Name = "Test data block",
-                HighlightName = "Test highlight name",
-                HighlightDescription = "Test highlight description",
                 Query = new ObservationQueryContext
                 {
                     SubjectId = releaseSubject1.Subject.Id,
@@ -1061,7 +1068,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Status = DataImportStatus.NOT_FOUND
             };
 
-            // No highlight name - not featured
             var dataBlock1 = new DataBlock
             {
                 Name = "Test data block",
@@ -1154,12 +1160,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var dataBlock1 = new DataBlock
             {
                 Name = "Test data block",
-                HighlightName = "Test highlight name",
-                HighlightDescription = "Test highlight description",
                 Query = new ObservationQueryContext
                 {
                     SubjectId = Guid.NewGuid(),
                 }
+            };
+            var featuredTable1 = new FeaturedTable
+            {
+                DataBlock = dataBlock1,
+                Name = "Test featured table name",
+                Description = "Test featured table description",
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1167,10 +1177,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(release);
-                await contentDbContext.AddAsync(releaseFile1);
-                await contentDbContext.AddAsync(import1);
-                await contentDbContext.AddRangeAsync(
+                await contentDbContext.ReleaseFiles.AddAsync(releaseFile1);
+                await contentDbContext.FeaturedTables.AddAsync(featuredTable1);
+                await contentDbContext.DataImports.AddAsync(import1);
+                await contentDbContext.ReleaseContentBlocks.AddRangeAsync(
                     new ReleaseContentBlock
                     {
                         Release = release,

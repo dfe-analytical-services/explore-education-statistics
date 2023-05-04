@@ -154,31 +154,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public async Task<Either<ActionResult, List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseId)
         {
-            var subjectsToInclude = GetPublishedSubjectIds(releaseId);
+            // @MarkFix check this method after merge conflict resolving
+            var publishedSubjectIds = GetPublishedSubjectIds(releaseId);
 
-            var releaseContentBlocks = await _contentDbContext.ReleaseContentBlocks
+            var releaseDataBlockList = (await _contentDbContext.ReleaseContentBlocks
                 .Include(rcb => rcb.ContentBlock)
                 .Where(rcb => rcb.ReleaseId == releaseId)
                 .Select(rcb => rcb.ContentBlock)
                 .OfType<DataBlock>()
-                // @MarkFix use new FeaturedTable table here
-                .Where(dataBlock => !string.IsNullOrEmpty(dataBlock.HighlightName))
-                .ToListAsync();
-
-            // Need to query on materialized list due to JSON serialized query
-            return releaseContentBlocks
-                .Where(dataBlock => subjectsToInclude.Contains(dataBlock.Query.SubjectId))
-                .Select(
-                    dataBlock => new FeaturedTableViewModel
-                    (
-                        dataBlock.Id,
-                        dataBlock.HighlightName ?? string.Empty,
-                        dataBlock.HighlightDescription ?? string.Empty,
-                        dataBlock.Query.SubjectId
-                    )
-                )
-                .OrderBy(featuredTable => featuredTable.Name)
+                .ToListAsync()) // we need to materialise the list access `dataBlock.Query.SubjectId` as `Query` is json
+                .Where(dataBlock => publishedSubjectIds.Contains(dataBlock.Query.SubjectId))
                 .ToList();
+
+
+            return await _contentDbContext.FeaturedTables
+                .Include(ft => ft.DataBlock)
+                .Where(ft => releaseDataBlockList.Select(db => db.Id).Contains(ft.DataBlockId))
+                .Select(ft => new FeaturedTableViewModel(
+                    ft.Id, ft.Name, ft.Description, ft.DataBlock.Query.SubjectId))
+                .OrderBy(ft => ft.Name)
+                .ToListAsync();
         }
 
         private List<Guid> GetPublishedSubjectIds(Guid releaseId)
