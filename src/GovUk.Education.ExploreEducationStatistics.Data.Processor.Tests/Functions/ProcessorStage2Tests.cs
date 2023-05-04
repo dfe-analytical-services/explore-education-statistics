@@ -43,6 +43,12 @@ public class ProcessorStage2Tests
     }
 
     [Fact]
+    public async Task ProcessStage2_AdditionalFiltersInMetaFile()
+    {
+        await AssertStage2ItemsImportedCorrectly(new AdditionalFiltersAndIndicatorsScenario());
+    }
+
+    [Fact]
     public async Task ProcessStage2_SubjectMetaAlreadyImported()
     {
         var subjectId = Guid.NewGuid();

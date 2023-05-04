@@ -105,7 +105,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var filterGroupsFromCsv = new HashSet<FilterGroupMeta>();
             var locations = new HashSet<Location>();
 
-            var reader = new DataFileReader(csvHeaders, subjectMeta);
+            var filterAndIndicatorReader = new FilterAndIndicatorValuesReader(csvHeaders, subjectMeta);
+            var fixedInformationReader = new FixedInformationDataFileReader(csvHeaders);
             
             await CsvUtils.ForEachRow(dataFileStreamProvider, async (rowValues, index, _) =>
             {
@@ -126,18 +127,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         (double) (index + 1) / dataImport.TotalRows!.Value * 100);
                 }
 
-                if (IsRowAllowed(soleGeographicLevel, rowValues, reader))
+                if (IsRowAllowed(soleGeographicLevel, rowValues, fixedInformationReader))
                 {
                     foreach (var filterMeta in subjectMeta.Filters)
                     {
-                        var filterItemLabel = reader.GetFilterItemLabel(rowValues, filterMeta.Filter.Id);
-                        var filterGroupLabel = reader.GetFilterGroupLabel(rowValues, filterMeta.Filter.Id);
+                        var filterItemLabel = filterAndIndicatorReader.GetFilterItemLabel(rowValues, filterMeta.Filter.Id);
+                        var filterGroupLabel = filterAndIndicatorReader.GetFilterGroupLabel(rowValues, filterMeta.Filter.Id);
 
                         filterGroupsFromCsv.Add(new FilterGroupMeta(filterMeta.Filter.Id, filterGroupLabel));
                         filterItemsFromCsv.Add(new FilterItemMeta(filterMeta.Filter.Id, filterGroupLabel, filterItemLabel));
                     }
 
-                    locations.Add(reader.GetLocation(rowValues));
+                    locations.Add(fixedInformationReader.GetLocation(rowValues));
                 }
 
                 return true;
@@ -206,7 +207,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 subject,
                 context);
 
-            var reader = new DataFileReader(csvHeaders, subjectMeta);
+            var fixedInformationReader = new FixedInformationDataFileReader(csvHeaders);
+            var filterAndIndicatorReader = new FilterAndIndicatorValuesReader(csvHeaders, subjectMeta);
             
             await CsvUtils.Batch(
                 dataFileStreamProvider,
@@ -251,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     
                     var allowedRows = unprocessedRows.Select((cells, rowIndex) =>
                     {
-                        if (IsRowAllowed(soleGeographicLevel, cells, reader))
+                        if (IsRowAllowed(soleGeographicLevel, cells, fixedInformationReader))
                         {
                             var csvRow = startOfBatchRowIndex + firstRowIndexOfBatchToProcess + rowIndex + 2;
                             
@@ -262,7 +264,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                                     .Filters
                                     .Select(meta => meta.Filter)
                                     .ToList(),
-                                reader,
+                                fixedInformationReader,
+                                filterAndIndicatorReader,
                                 csvRow);
                         }
 
@@ -302,16 +305,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         /// </summary>
         private static bool IsRowAllowed(bool soleGeographicLevel,
             IReadOnlyList<string> rowValues,
-            DataFileReader reader)
+            FixedInformationDataFileReader fixedInformationReader)
         {
-            return soleGeographicLevel || !reader.GetGeographicLevel(rowValues).IsSoloImportableLevel();
+            return soleGeographicLevel || !fixedInformationReader.GetGeographicLevel(rowValues).IsSoloImportableLevel();
         }
 
         private Observation ObservationFromCsv(
             List<string> rowValues,
             Subject subject,
             List<Filter> filters,
-            DataFileReader reader,
+            FixedInformationDataFileReader fixedInformationReader,
+            FilterAndIndicatorValuesReader filterAndIndicatorReader,
             int csvRowNum)
         {
             var observationId = _guidGenerator.NewGuid();
@@ -319,12 +323,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return new Observation
             {
                 Id = observationId,
-                FilterItems = GetFilterItems(rowValues, filters, reader, observationId),
-                LocationId = GetLocationId(rowValues, reader),
-                Measures = reader.GetMeasures(rowValues),
+                FilterItems = GetFilterItems(rowValues, filters, filterAndIndicatorReader, observationId),
+                LocationId = GetLocationId(rowValues, fixedInformationReader),
+                Measures = filterAndIndicatorReader.GetMeasures(rowValues),
                 SubjectId = subject.Id,
-                TimeIdentifier = reader.GetTimeIdentifier(rowValues),
-                Year = reader.GetYear(rowValues),
+                TimeIdentifier = fixedInformationReader.GetTimeIdentifier(rowValues),
+                Year = fixedInformationReader.GetYear(rowValues),
                 CsvRow = csvRowNum
             };
         }
@@ -332,12 +336,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private List<ObservationFilterItem> GetFilterItems(
             IReadOnlyList<string> rowValues,
             List<Filter> filters,
-            DataFileReader reader,
+            FilterAndIndicatorValuesReader filterAndIndicatorReader,
             Guid observationId)
         {
             return filters.Select(filter =>
             {
-                var filterItem = reader.GetFilterItem(rowValues, filter);
+                var filterItem = filterAndIndicatorReader.GetFilterItem(rowValues, filter);
 
                 return new ObservationFilterItem
                 {
@@ -348,9 +352,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }).ToList();
         }
 
-        private Guid GetLocationId(IReadOnlyList<string> rowValues, DataFileReader reader)
+        private Guid GetLocationId(IReadOnlyList<string> rowValues, FixedInformationDataFileReader fixedInformationReader)
         {
-            var location = reader.GetLocation(rowValues);
+            var location = fixedInformationReader.GetLocation(rowValues);
             return _importerLocationService.Get(location).Id;
         }
     }

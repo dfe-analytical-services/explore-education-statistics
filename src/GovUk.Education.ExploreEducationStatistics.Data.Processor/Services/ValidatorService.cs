@@ -227,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var rowCountByGeographicLevel = new Dictionary<GeographicLevel, int>();
             var errors = new List<DataImportError>();
             
-            var reader = new DataFileReader(csvHeaders);
+            var fixedInformationReader = new FixedInformationDataFileReader(csvHeaders);
 
             await CsvUtils.ForEachRow(dataFileStreamProvider, async (rowValues, index, _) =>
             {
@@ -259,10 +259,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 try
                 {
-                    reader.GetTimeIdentifier(rowValues);
-                    reader.GetYear(rowValues);
+                    fixedInformationReader.GetTimeIdentifier(rowValues);
+                    fixedInformationReader.GetYear(rowValues);
 
-                    var level = reader.GetGeographicLevel(rowValues);
+                    var level = fixedInformationReader.GetGeographicLevel(rowValues);
                     
                     if (rowCountByGeographicLevel.ContainsKey(level))
                     {
