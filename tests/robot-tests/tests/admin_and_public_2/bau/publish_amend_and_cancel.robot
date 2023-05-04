@@ -117,7 +117,6 @@ Add data block to first accordion section
     user adds data block to editable accordion section    Dates data block    ${DATABLOCK_NAME}
     ...    id:releaseMainContent
     ${datablock}=    set variable    xpath://*[@data-testid="Data block - ${DATABLOCK_NAME}"]
-    user scrolls to element    ${datablock}
     user waits until page contains element    ${datablock}    %{WAIT_SMALL}
     user waits until element contains infographic chart    ${datablock}
     user checks chart title contains    ${datablock}    Dates table title
