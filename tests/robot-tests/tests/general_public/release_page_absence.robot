@@ -44,6 +44,8 @@ Validate Email alerts link
     ...    /subscriptions?slug=pupil-absence-in-schools-in-england
 
 Validate "About these statistics" -- Number of other releases
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    Failing
     user checks number of other releases is correct    6
     user opens details dropdown    View releases (6)
     user checks other release is shown in position    Academic year 2014/15    1
@@ -102,7 +104,8 @@ Validate absence_in_prus.csv file can be downloaded
     user closes details dropdown    Download data files
 
 Validate headlines -- Summary tab key stats
-    [Documentation]    DFE-915    EES-806    EES-1508
+    [Documentation]    DFE-915    EES-806    EES-1508    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    Failing
     user scrolls to element    xpath://h2[contains(text(), "Headline facts and figures")]
 
     user checks key stat contents    1    Overall absence rate    4.7%    Up from 4.6% in 2015/16    %{WAIT_MEDIUM}
@@ -118,14 +121,16 @@ Validate headlines -- Summary tab key stats
     ...    Number of unauthorised absences as a percentage of the overall school population.
 
 Validate headlines -- Summary tab content
-    [Documentation]    EES-718
-    [Tags]    NotAgainstPreProd
+    [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    NotAgainstPreProd    Failing
     user checks headline summary contains    pupils missed on average 8.2 school days
     user checks headline summary contains    overall and unauthorised absence rates up on 2015/16
     user checks headline summary contains    unauthorised absence rise due to higher rates of unauthorised holidays
     user checks headline summary contains    10% of pupils persistently absent during 2016/17
 
 Validate Key Statistics data block -- Charts tab
+    [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    Failing
     user scrolls to element    css:#releaseHeadlines-charts-tab
     user clicks element    id:releaseHeadlines-charts-tab
     ${headline_chart}=    set variable    css:#releaseHeadlines-chart    # must be css selector
@@ -177,6 +182,8 @@ Validate Key Statistics data block -- Charts tab
     ...    x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.    ${headline_chart}
 
 Validate Key Statistics data block -- Data tables tab
+    [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    Failing
     user clicks element    id:releaseHeadlines-tables-tab
     user waits until element contains    css:[data-testid="dataTableCaption"]
     ...    'Absence by characteristic' in England between 2012/13 and 2016/17    %{WAIT_SMALL}
@@ -225,6 +232,8 @@ Validate Key Statistics data block -- Data tables tab
     ...    x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.    id:releaseHeadlines-tables
 
 Validate accordion sections order
+    [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    Failing
     user checks accordion is in position    About these statistics    1    id:content
     user checks accordion is in position    Pupil absence rates    2    id:content
     user checks accordion is in position    Persistent absence    3    id:content
@@ -244,7 +253,7 @@ Validate accordion sections order
     user checks there are x accordion sections    3    id:help-and-support-accordion
 
 Validate Regional and local authority (LA) breakdown table
-    [Documentation]    BAU-540
+    [Documentation]    BAU-540    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
     [Tags]    Failing
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user waits until element contains    css:#content_9_datablock-tables [data-testid="dataTableCaption"]
@@ -292,6 +301,8 @@ Validate Regional and local authority (LA) breakdown table
     user checks row cell contains text    ${row}    1    1.7%
 
 Check Regional and local authority (LA) breakdown table has footnotes
+    [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    Failing
     ${accordion}=    user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user scrolls down    500
     user waits until page does not contain loading spinner
@@ -311,6 +322,7 @@ Check Regional and local authority (LA) breakdown table has footnotes
     ...    ${data_block_table}
 
 Validate Regional and local authority (LA) breakdown chart
+    [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
     [Tags]    Failing
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user scrolls to accordion section content    Regional and local authority (LA) breakdown    id:content
@@ -348,6 +360,8 @@ Validate Regional and local authority (LA) breakdown chart
     user checks map chart indicator tile contains    ${datablock}    Unauthorised absence rate    1.7%
 
 Check Regional and local authority (LA) breakdown chart has footnotes
+    [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    Failing
     ${accordion}=    user opens accordion section    Regional and local authority (LA) breakdown    id:content
     ${data_block_chart}=    user gets data block chart from parent    LAD map    ${accordion}
 
@@ -369,7 +383,8 @@ Check Regional and local authority (LA) breakdown chart has footnotes
     ...    ${data_block_chart}
 
 Clicking "Create tables" takes user to Table Tool page with absence publication selected
-    [Documentation]    DFE-898
+    [Documentation]    DFE-898    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    Failing
     user clicks link    View or create your own tables
     user waits until h1 is visible    Create your own tables    %{WAIT_MEDIUM}
     user waits for page to finish loading
