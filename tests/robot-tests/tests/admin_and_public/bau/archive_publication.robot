@@ -302,11 +302,17 @@ Check data catalogue page contains superseded warning for archived publication (
     user checks page contains element    testid:superseded-by-link
 
 Check that superseded warning link takes user to superseding-publication data-catalogue step 1
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    Failing
+
     user navigates to data catalogue page on public frontend
 
     user clicks radio    %{TEST_THEME_NAME}
 
+    user scrolls to the bottom of the page
+
     user checks page contains radio    ${PUBLICATION_NAME_ARCHIVE}
+
     user checks page contains radio    ${PUBLICATION_NAME_SUPERSEDE}
 
     user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
@@ -315,6 +321,8 @@ Check that superseded warning link takes user to superseding-publication data-ca
     user checks summary list contains    Publication    ${PUBLICATION_NAME_ARCHIVE}
 
     user waits until page contains    Choose a release
+
+    # failing here
     user checks page contains radio    ${RELEASE_NAME_ARCHIVE}
 
     user checks page contains element    testid:superseded-warning
@@ -337,6 +345,9 @@ Check that superseded warning link takes user to superseding-publication data-ca
     user checks page does not contain element    testid:superseded-by-link
 
 Check archive-publication permalink has out-of-date warning
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    Failing
+
     user navigates to public frontend    ${PERMALINK_URL}
 
     user waits until h1 is visible
@@ -346,6 +357,9 @@ Check archive-publication permalink has out-of-date warning
     ...    WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.
 
 Set archive-publication to be no longer be superseded
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    Failing
+
     user navigates to publication page from dashboard    ${PUBLICATION_NAME_ARCHIVE}
 
     user clicks link    Details
@@ -363,26 +377,41 @@ Set archive-publication to be no longer be superseded
     sleep    %{WAIT_MEMORY_CACHE_EXPIRY}
 
 Check can create a release for archive-publication which is no longer archived
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    Failing
+
     user clicks link    Releases
     user waits until h2 is visible    Manage releases
     user waits until page contains link    Create new release
 
 Check can create a methodology for archive-publication which is no longer archived
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    Failing
+
     user clicks link    Methodologies
     user waits until h2 is visible    Manage methodologies
     user checks page contains button    Create new methodology
 
 Check public Find stats page and check archive-publication is no longer archived
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    Failing
+
     user checks publication is on find statistics page    ${PUBLICATION_NAME_SUPERSEDE}
     user checks publication is on find statistics page    ${PUBLICATION_NAME_ARCHIVE}
 
 Check public archive-publication release page displays correctly after being unarchived
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    Failing
+
     user clicks link    ${PUBLICATION_NAME_ARCHIVE}
 
     user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
     user waits until page contains    This is the latest data
 
 Check public data tables page is correct after archive-publication has been unarchived
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    Failing
+
     user navigates to data tables page on public frontend
 
     user clicks radio    %{TEST_THEME_NAME}
@@ -397,6 +426,9 @@ Check public data tables page is correct after archive-publication has been unar
     user checks page contains    ${SUBJECT_NAME_ARCHIVE}
 
 Check data catalogue page is correct after archive-publication has been unarchived
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    Failing
+
     user navigates to data catalogue page on public frontend
 
     user clicks radio    %{TEST_THEME_NAME}
@@ -440,6 +472,9 @@ Check data catalogue page is correct after archive-publication has been unarchiv
     user checks page does not contain    This is not the latest data
 
 Check archive-publication permalink no longer has out-of-date warning after archive-publication has been unarchived
+    [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
+    [Tags]    Failing
+
     user navigates to public frontend    ${PERMALINK_URL}
 
     user waits until h1 is visible
