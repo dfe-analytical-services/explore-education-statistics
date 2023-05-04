@@ -63,11 +63,11 @@ Select subject "UI test subject"
     user checks previous table tool step contains    1    Subject    UI test subject
 
 Select locations
-    user opens details dropdown    Opportunity area
-    user clicks checkbox    Bolton 001
-    user clicks checkbox    Bolton 002
-    user clicks checkbox    Bolton 003
-    user clicks checkbox    Bolton 004
+    user clicks element    testid:Expand Details Section Local authority
+    user clicks checkbox    Barnsley
+    user clicks checkbox    Birmingham
+    user clicks checkbox    Camden
+    user clicks checkbox    Greenwich
 
     user opens details dropdown    Ward
     user clicks checkbox    Nailsea Youngwood
@@ -80,16 +80,16 @@ Select time period
     ${timePeriodStartList}=    get list items    id:timePeriodForm-start
     ${timePeriodEndList}=    get list items    id:timePeriodForm-end
 
-    ${expectedList}=    create list    Please select    2005    2006    2007    2008    2009    2010    2011    2012
-    ...    2014    2016    2017    2018    2019    2020
+    ${expectedList}=    create list    Please select    2005    2007    2008    2010    2011    2012
+    ...    2014    2015    2016    2017    2018
     lists should be equal    ${timePeriodStartList}    ${expectedList}
     lists should be equal    ${timePeriodEndList}    ${expectedList}
 
     user chooses select option    id:timePeriodForm-start    2005
-    user chooses select option    id:timePeriodForm-end    2020
+    user chooses select option    id:timePeriodForm-end    2018
     user clicks element    id:timePeriodForm-submit
     user waits until table tool wizard step is available    4    Choose your filters
-    user checks previous table tool step contains    3    Time period    2005 to 2020    %{WAIT_MEDIUM}
+    user checks previous table tool step contains    3    Time period    2005 to 2018    %{WAIT_MEDIUM}
 
 Select indicators
     user checks indicator checkbox is checked    Admission Numbers
@@ -99,37 +99,10 @@ Create table
     user clicks element    id:filtersForm-submit
     user waits until results table appears    %{WAIT_LONG}
     user waits until element contains    css:[data-testid="dataTableCaption"]
-    ...    Admission Numbers for 'UI test subject' in Bolton 001, Bolton 002, Bolton 003, Bolton 004, Nailsea Youngwood and 1 other location between 2005 and 2020
+    ...    Admission Numbers for 'UI test subject' in Barnsley, Birmingham, Camden, Greenwich, Nailsea Youngwood and 1 other location between 2005 and 2018
 
 Validate table rows
     user checks table column heading contains    1    1    Admission Numbers
-
-    ${row}=    user gets row number with heading    Bolton 001
-    user checks table heading in offset row contains    ${row}    0    2    2009
-
-    user checks table cell in offset row contains    ${row}    0    1    5,815
-
-    ${row}=    user gets row number with heading    Bolton 001
-    user checks table heading in offset row contains    ${row}    0    2    2009
-    user checks table heading in offset row contains    ${row}    1    1    2010
-    user checks table heading in offset row contains    ${row}    2    1    2017
-
-    user checks table cell in offset row contains    ${row}    1    1    5,595
-    user checks table cell in offset row contains    ${row}    2    1    6,373
-
-    ${row}=    user gets row number with heading    Bolton 004
-    user checks table heading in offset row contains    ${row}    0    2    2005
-
-    user checks table cell in offset row contains    ${row}    0    1    8,557
-
-    ${row}=    user gets row number with heading    Bolton 004
-    user checks table heading in offset row contains    ${row}    0    2    2005
-    user checks table heading in offset row contains    ${row}    1    1    2017
-    user checks table heading in offset row contains    ${row}    2    1    2018
-
-    user checks table cell in offset row contains    ${row}    0    1    8,557
-    user checks table cell in offset row contains    ${row}    1    1    3,481
-    user checks table cell in offset row contains    ${row}    2    1    8,630
 
     ${row}=    user gets row number with heading    Nailsea Youngwood
     user checks table heading in offset row contains    ${row}    0    2    2005
@@ -156,6 +129,58 @@ Validate table rows
     user checks table cell in offset row contains    ${row}    2    1    6,060
     user checks table cell in offset row contains    ${row}    3    1    1,109
     user checks table cell in offset row contains    ${row}    4    1    1,959
+
+    ${row}=    user gets row number with heading    Barnsley
+    user checks table heading in offset row contains    ${row}    0    2    2014
+    user checks table heading in offset row contains    ${row}    1    1    2015
+    user checks table heading in offset row contains    ${row}    2    1    2016
+    user checks table heading in offset row contains    ${row}    3    1    2017
+    user checks table heading in offset row contains    ${row}    4    1    2018
+
+    user checks table cell in offset row contains    ${row}    0    1    9,854
+    user checks table cell in offset row contains    ${row}    1    1    1,134
+    user checks table cell in offset row contains    ${row}    2    1    7,419
+    user checks table cell in offset row contains    ${row}    3    1    5,032
+    user checks table cell in offset row contains    ${row}    4    1    8,123
+
+    ${row}=    user gets row number with heading    Birmingham
+    user checks table heading in offset row contains    ${row}    0    2    2014
+    user checks table heading in offset row contains    ${row}    1    1    2015
+    user checks table heading in offset row contains    ${row}    2    1    2016
+    user checks table heading in offset row contains    ${row}    3    1    2017
+    user checks table heading in offset row contains    ${row}    4    1    2018
+
+    user checks table cell in offset row contains    ${row}    0    1    3,708
+    user checks table cell in offset row contains    ${row}    1    1    9,303
+    user checks table cell in offset row contains    ${row}    2    1    8,856
+    user checks table cell in offset row contains    ${row}    3    1    8,530
+    user checks table cell in offset row contains    ${row}    4    1    3,962
+
+    ${row}=    user gets row number with heading    Camden
+    user checks table heading in offset row contains    ${row}    0    2    2014
+    user checks table heading in offset row contains    ${row}    1    1    2015
+    user checks table heading in offset row contains    ${row}    2    1    2016
+    user checks table heading in offset row contains    ${row}    3    1    2017
+    user checks table heading in offset row contains    ${row}    4    1    2018
+
+    user checks table cell in offset row contains    ${row}    0    1    1,054
+    user checks table cell in offset row contains    ${row}    1    1    9,790
+    user checks table cell in offset row contains    ${row}    2    1    3,548
+    user checks table cell in offset row contains    ${row}    3    1    4,180
+    user checks table cell in offset row contains    ${row}    4    1    2,399
+
+    ${row}=    user gets row number with heading    Greenwich
+    user checks table heading in offset row contains    ${row}    0    2    2014
+    user checks table heading in offset row contains    ${row}    1    1    2015
+    user checks table heading in offset row contains    ${row}    2    1    2016
+    user checks table heading in offset row contains    ${row}    3    1    2017
+    user checks table heading in offset row contains    ${row}    4    1    2018
+
+    user checks table cell in offset row contains    ${row}    0    1    8,247
+    user checks table cell in offset row contains    ${row}    1    1    6,114
+    user checks table cell in offset row contains    ${row}    2    1    8,427
+    user checks table cell in offset row contains    ${row}    3    1    6,981
+    user checks table cell in offset row contains    ${row}    4    1    5,669
 
 Save data block
     user enters text into element    id:dataBlockDetailsForm-name    ${DATABLOCK_NAME}
@@ -244,35 +269,6 @@ Validate embedded table rows
     user waits until page contains element    ${table}    30
     user checks table column heading contains    1    1    Admission Numbers    ${table}
 
-    ${row}=    user gets row number with heading    Bolton 001    ${table}
-    user checks table heading in offset row contains    ${row}    0    2    2009    ${table}
-
-    user checks table cell in offset row contains    ${row}    0    1    5,815    ${table}
-
-    ${row}=    user gets row number with heading    Bolton 001    ${table}
-    user checks table heading in offset row contains    ${row}    0    2    2009    ${table}
-    user checks table heading in offset row contains    ${row}    1    1    2010    ${table}
-    user checks table heading in offset row contains    ${row}    2    1    2017    ${table}
-
-    user checks table cell in offset row contains    ${row}    0    1    5,815    ${table}
-    user checks table cell in offset row contains    ${row}    1    1    5,595    ${table}
-    user checks table cell in offset row contains    ${row}    2    1    6,373    ${table}
-    user checks table cell in offset row contains    ${row}    3    1    8,533    ${table}
-
-    ${row}=    user gets row number with heading    Bolton 004    ${table}
-    user checks table heading in offset row contains    ${row}    0    2    2005    ${table}
-
-    user checks table cell in offset row contains    ${row}    0    1    8,557    ${table}
-
-    ${row}=    user gets row number with heading    Bolton 004    ${table}
-    user checks table heading in offset row contains    ${row}    0    2    2005    ${table}
-    user checks table heading in offset row contains    ${row}    1    1    2017    ${table}
-    user checks table heading in offset row contains    ${row}    2    1    2018    ${table}
-
-    user checks table cell in offset row contains    ${row}    0    1    8,557    ${table}
-    user checks table cell in offset row contains    ${row}    1    1    3,481    ${table}
-    user checks table cell in offset row contains    ${row}    2    1    8,630    ${table}
-
     ${row}=    user gets row number with heading    Nailsea Youngwood    ${table}
     user checks table heading in offset row contains    ${row}    0    2    2005    ${table}
     user checks table heading in offset row contains    ${row}    1    1    2010    ${table}
@@ -298,6 +294,58 @@ Validate embedded table rows
     user checks table cell in offset row contains    ${row}    2    1    6,060    ${table}
     user checks table cell in offset row contains    ${row}    3    1    1,109    ${table}
     user checks table cell in offset row contains    ${row}    4    1    1,959    ${table}
+
+    ${row}=    user gets row number with heading    Barnsley    ${table}
+    user checks table heading in offset row contains    ${row}    0    2    2014    ${table}
+    user checks table heading in offset row contains    ${row}    1    1    2015    ${table}
+    user checks table heading in offset row contains    ${row}    2    1    2016    ${table}
+    user checks table heading in offset row contains    ${row}    3    1    2017    ${table}
+    user checks table heading in offset row contains    ${row}    4    1    2018    ${table}
+
+    user checks table cell in offset row contains    ${row}    0    1    9,854    ${table}
+    user checks table cell in offset row contains    ${row}    1    1    1,134    ${table}
+    user checks table cell in offset row contains    ${row}    2    1    7,419    ${table}
+    user checks table cell in offset row contains    ${row}    3    1    5,032    ${table}
+    user checks table cell in offset row contains    ${row}    4    1    8,123    ${table}
+
+    ${row}=    user gets row number with heading    Birmingham    ${table}
+    user checks table heading in offset row contains    ${row}    0    2    2014    ${table}
+    user checks table heading in offset row contains    ${row}    1    1    2015    ${table}
+    user checks table heading in offset row contains    ${row}    2    1    2016    ${table}
+    user checks table heading in offset row contains    ${row}    3    1    2017    ${table}
+    user checks table heading in offset row contains    ${row}    4    1    2018    ${table}
+
+    user checks table cell in offset row contains    ${row}    0    1    3,708    ${table}
+    user checks table cell in offset row contains    ${row}    1    1    9,303    ${table}
+    user checks table cell in offset row contains    ${row}    2    1    8,856    ${table}
+    user checks table cell in offset row contains    ${row}    3    1    8,530    ${table}
+    user checks table cell in offset row contains    ${row}    4    1    3,962    ${table}
+
+    ${row}=    user gets row number with heading    Camden    ${table}
+    user checks table heading in offset row contains    ${row}    0    2    2014    ${table}
+    user checks table heading in offset row contains    ${row}    1    1    2015    ${table}
+    user checks table heading in offset row contains    ${row}    2    1    2016    ${table}
+    user checks table heading in offset row contains    ${row}    3    1    2017    ${table}
+    user checks table heading in offset row contains    ${row}    4    1    2018    ${table}
+
+    user checks table cell in offset row contains    ${row}    0    1    1,054    ${table}
+    user checks table cell in offset row contains    ${row}    1    1    9,790    ${table}
+    user checks table cell in offset row contains    ${row}    2    1    3,548    ${table}
+    user checks table cell in offset row contains    ${row}    3    1    4,180    ${table}
+    user checks table cell in offset row contains    ${row}    4    1    2,399    ${table}
+
+    ${row}=    user gets row number with heading    Greenwich    ${table}
+    user checks table heading in offset row contains    ${row}    0    2    2014    ${table}
+    user checks table heading in offset row contains    ${row}    1    1    2015    ${table}
+    user checks table heading in offset row contains    ${row}    2    1    2016    ${table}
+    user checks table heading in offset row contains    ${row}    3    1    2017    ${table}
+    user checks table heading in offset row contains    ${row}    4    1    2018    ${table}
+
+    user checks table cell in offset row contains    ${row}    0    1    8,247    ${table}
+    user checks table cell in offset row contains    ${row}    1    1    6,114    ${table}
+    user checks table cell in offset row contains    ${row}    2    1    8,427    ${table}
+    user checks table cell in offset row contains    ${row}    3    1    6,981    ${table}
+    user checks table cell in offset row contains    ${row}    4    1    5,669    ${table}
 
 Validate marked as 'In content' on data block list
     user clicks link    Data blocks
@@ -345,12 +393,12 @@ Validate changing data sets
     user chooses select option    id:chartDataSetsConfigurationForm-location    Syon
     user clicks button    Add data set
 
-    user chooses select option    id:chartDataSetsConfigurationForm-location    Bolton 001
+    user chooses select option    id:chartDataSetsConfigurationForm-location    Barnsley
     user clicks button    Add data set
 
     user checks chart legend item contains    id:chartBuilderPreview    1    Admission Numbers (Nailsea Youngwood)
     user checks chart legend item contains    id:chartBuilderPreview    2    Admission Numbers (Syon)
-    user checks chart legend item contains    id:chartBuilderPreview    3    Admission Numbers (Bolton 001)
+    user checks chart legend item contains    id:chartBuilderPreview    3    Admission Numbers (Barnsley)
 
     user checks table body has x rows    3    testid:chart-data-sets
 
@@ -656,22 +704,37 @@ Configure basic geographic chart
     user clicks link    Chart
     user configures basic chart    Geographic    700    600
 
+    user clicks link    Data sets
+    user waits until h3 is visible    Data sets
+
+    user clicks button    Remove all
+    user clicks button    Confirm
+
+    user chooses select option    id:chartDataSetsConfigurationForm-location    Barnsley
+    user clicks button    Add data set
+    user chooses select option    id:chartDataSetsConfigurationForm-location    Birmingham
+    user clicks button    Add data set
+    user chooses select option    id:chartDataSetsConfigurationForm-location    Camden
+    user clicks button    Add data set
+    user chooses select option    id:chartDataSetsConfigurationForm-location    Greenwich
+    user clicks button    Add data set
+
 Change geographic chart legend
     user clicks link    Legend
     user waits until h3 is visible    Legend    %{WAIT_MEDIUM}
 
     user counts legend form item rows    5
-    user checks element value should be    id:chartLegendConfigurationForm-items-0-label    Admission Numbers (2005)
-    user checks element value should be    id:chartLegendConfigurationForm-items-1-label    Admission Numbers (2010)
-    user checks element value should be    id:chartLegendConfigurationForm-items-2-label    Admission Numbers (2011)
-    user checks element value should be    id:chartLegendConfigurationForm-items-3-label    Admission Numbers (2012)
-    user checks element value should be    id:chartLegendConfigurationForm-items-4-label    Admission Numbers (2016)
+    user checks element value should be    id:chartLegendConfigurationForm-items-0-label    Admission Numbers (2014)
+    user checks element value should be    id:chartLegendConfigurationForm-items-1-label    Admission Numbers (2015)
+    user checks element value should be    id:chartLegendConfigurationForm-items-2-label    Admission Numbers (2016)
+    user checks element value should be    id:chartLegendConfigurationForm-items-3-label    Admission Numbers (2017)
+    user checks element value should be    id:chartLegendConfigurationForm-items-4-label    Admission Numbers (2018)
 
-    user enters text into element    id:chartLegendConfigurationForm-items-0-label    Admissions in 2005
-    user enters text into element    id:chartLegendConfigurationForm-items-1-label    Admissions in 2010
-    user enters text into element    id:chartLegendConfigurationForm-items-2-label    Admissions in 2011
-    user enters text into element    id:chartLegendConfigurationForm-items-3-label    Admissions in 2012
-    user enters text into element    id:chartLegendConfigurationForm-items-4-label    Admissions in 2016
+    user enters text into element    id:chartLegendConfigurationForm-items-0-label    Admissions in 2014
+    user enters text into element    id:chartLegendConfigurationForm-items-1-label    Admissions in 2015
+    user enters text into element    id:chartLegendConfigurationForm-items-2-label    Admissions in 2016
+    user enters text into element    id:chartLegendConfigurationForm-items-3-label    Admissions in 2017
+    user enters text into element    id:chartLegendConfigurationForm-items-4-label    Admissions in 2018
 
     user waits until page does not contain loading spinner
 
@@ -682,16 +745,90 @@ Validate basic geographic chart preview
     user checks map chart height    id:chartBuilderPreview    700
     user checks map chart width    id:chartBuilderPreview    600
 
-    user chooses select option    id:chartBuilderPreview-map-selectedLocation    Nailsea Youngwood
+    user chooses select option    id:chartBuilderPreview-map-selectedLocation    Barnsley
 
     user mouses over selected map feature    id:chartBuilderPreview
-    user checks map tooltip label contains    id:chartBuilderPreview    Nailsea Youngwood
+    user checks map tooltip label contains    id:chartBuilderPreview    Barnsley
 
-    user checks map chart indicator tile contains    id:chartBuilderPreview    Admissions in 2005    3,612
+    user checks map chart indicator tile contains    id:chartBuilderPreview    Admissions in 2014    9,854
+
+    user checks list has x items    testid:mapBlock-legend    5
+    user checks list item contains    testid:mapBlock-legend    1    1,054 to 2,813
+    user checks list item contains    testid:mapBlock-legend    2    2,814 to 4,573
+    user checks list item contains    testid:mapBlock-legend    3    4,574 to 6,333
+    user checks list item contains    testid:mapBlock-legend    4    6,334 to 8,093
+    user checks list item contains    testid:mapBlock-legend    5    8,094 to 9,854
+
+Change geographic chart data groupings
+    user clicks link    Data groupings
+    user waits until h3 is visible    Data groupings
+
+    user checks table body has x rows    5    testid:chart-data-groupings
+    user checks table cell contains    1    1    Admission Numbers (All locations, 2014)    testid:chart-data-groupings
+    user checks table cell contains    1    2    5 equal intervals    testid:chart-data-groupings
+    user checks table cell contains    2    1    Admission Numbers (All locations, 2015)    testid:chart-data-groupings
+    user checks table cell contains    2    2    5 equal intervals    testid:chart-data-groupings
+    user checks table cell contains    3    1    Admission Numbers (All locations, 2016)    testid:chart-data-groupings
+    user checks table cell contains    3    2    5 equal intervals    testid:chart-data-groupings
+    user checks table cell contains    4    1    Admission Numbers (All locations, 2017)    testid:chart-data-groupings
+    user checks table cell contains    4    2    5 equal intervals    testid:chart-data-groupings
+    user checks table cell contains    5    1    Admission Numbers (All locations, 2018)    testid:chart-data-groupings
+    user checks table cell contains    5    2    5 equal intervals    testid:chart-data-groupings
+
+    user clicks button in table cell    1    3    Edit    testid:chart-data-groupings
+    user clicks radio    New custom groups
+    user enters text into element    label:Min    0
+    user enters text into element    label:Max    3000
+    user clicks button    Add group
+    user enters text into element    label:Min    3001
+    user enters text into element    label:Max    10000
+    user clicks button    Add group
+    user clicks button    Done
+    user checks table cell contains    1    2    Custom    testid:chart-data-groupings
+
+    user clicks button in table cell    2    3    Edit    testid:chart-data-groupings
+    user clicks radio    Quantiles
+    user enters text into element    id:chartDataGroupingForm-numberOfGroupsQuantiles    4
+    user clicks button    Done
+    user checks table cell contains    2    2    4 quantiles    testid:chart-data-groupings
+
+    user clicks button in table cell    3    3    Edit    testid:chart-data-groupings
+    user enters text into element    id:chartDataGroupingForm-numberOfGroups    3
+    user clicks button    Done
+    user checks table cell contains    3    2    3 equal intervals    testid:chart-data-groupings
+
+    user clicks button in table cell    4    3    Edit    testid:chart-data-groupings
+    user clicks radio    Copy custom groups
+    user chooses select option    id:chartDataGroupingForm-copyCustomGroups    Admission Numbers (All locations, 2014)
+    user clicks button    Done
+    user checks table cell contains    4    2    Custom    testid:chart-data-groupings
+
+Validate basic geographic chart preview updates correctly
+    user checks list has x items    testid:mapBlock-legend    2
+    user checks list item contains    testid:mapBlock-legend    1    0 to 3,000
+    user checks list item contains    testid:mapBlock-legend    2    3,001 to 10,000
+
+    user chooses select option    id:chartBuilderPreview-map-selectedDataSet    Admissions in 2015
+    user checks list has x items    testid:mapBlock-legend    4
+    user checks list item contains    testid:mapBlock-legend    1    1,134 to 4,869
+    user checks list item contains    testid:mapBlock-legend    2    4,870 to 7,709
+    user checks list item contains    testid:mapBlock-legend    3    7,710 to 9,425
+    user checks list item contains    testid:mapBlock-legend    4    9,426 to 9,790
+
+    user chooses select option    id:chartBuilderPreview-map-selectedDataSet    Admissions in 2016
+    user checks list has x items    testid:mapBlock-legend    3
+    user checks list item contains    testid:mapBlock-legend    1    3,548 to 5,317
+    user checks list item contains    testid:mapBlock-legend    2    5,318 to 7,087
+    user checks list item contains    testid:mapBlock-legend    3    7,088 to 8,856
+
+    user chooses select option    id:chartBuilderPreview-map-selectedDataSet    Admissions in 2017
+    user checks list has x items    testid:mapBlock-legend    2
+    user checks list item contains    testid:mapBlock-legend    1    0 to 3,000
+    user checks list item contains    testid:mapBlock-legend    2    3,001 to 10,000
 
 Save and validate geographic chart embeds correctly
     user scrolls to the bottom of the page
-    user clicks element    //*[@id="chartLegendConfigurationForm-submit"]
+    user clicks element    //*[@id="chartDataGroupingsConfigurationForm-submit"]
     user waits until page does not contain loading spinner
 
     user clicks link    Content
@@ -710,12 +847,12 @@ Save and validate geographic chart embeds correctly
     user checks map chart height    ${datablock}    700
     user checks map chart width    ${datablock}    600
 
-    user chooses select option    ${datablock} >> name:selectedLocation    Nailsea Youngwood
+    user chooses select option    ${datablock} >> name:selectedLocation    Barnsley
 
     user mouses over selected map feature    ${datablock}
-    user checks map tooltip label contains    ${datablock}    Nailsea Youngwood
+    user checks map tooltip label contains    ${datablock}    Barnsley
 
-    user checks map chart indicator tile contains    ${datablock}    Admissions in 2005    3,612
+    user checks map chart indicator tile contains    ${datablock}    Admissions in 2014    9,854
 
 Configure basic infographic chart
     user navigates to admin frontend    ${DATABLOCK_URL}

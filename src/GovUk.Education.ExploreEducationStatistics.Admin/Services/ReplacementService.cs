@@ -784,8 +784,69 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         locationTargets: locationTargets,
                         dataBlock,
                         chart);
+                    if (chart is MapChart mapChart)
+                    {
+                        ReplaceMapChartDataSetConfigs(
+                            filterItemTargets: filterItemTargets,
+                            indicatorTargets: indicatorTargets,
+                            locationTargets: locationTargets,
+                            dataBlock,
+                            mapChart);
+                    }
                 }
             );
+        }
+
+        private static void ReplaceMapChartDataSetConfigs(
+            IReadOnlyDictionary<Guid, Guid> filterItemTargets,
+            IReadOnlyDictionary<Guid, Guid> indicatorTargets,
+            IReadOnlyDictionary<Guid, Guid> locationTargets,
+            DataBlock dataBlock,
+            MapChart mapChart)
+        {
+            mapChart.Map.DataSetConfigs.ForEach(
+                dataSetConfig =>
+                {
+                    var dataSet = dataSetConfig.DataSet;
+
+                    dataSet.Filters = dataSet.Filters.Select(
+                        filter =>
+                        {
+                            if (filterItemTargets.TryGetValue(filter, out var targetFilterId))
+                            {
+                                return targetFilterId;
+                            }
+
+                            throw new InvalidOperationException(
+                                $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set config filter: {filter}"
+                            );
+                        }
+                    ).ToList();
+
+                    if (dataSet.Indicator.HasValue
+                        && indicatorTargets.TryGetValue(dataSet.Indicator.Value, out var targetIndicatorId))
+                    {
+                        dataSet.Indicator = targetIndicatorId;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException(
+                            $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set config indicator: {dataSet.Indicator}"
+                        );
+                    }
+
+                    if (dataSet.Location != null
+                        && locationTargets.TryGetValue(dataSet.Location.Value, out var targetLocationId))
+                    {
+                        dataSet.Location.Value = targetLocationId;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException(
+                            $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set config location: {dataSet.Location?.Value}"
+                        );
+                    }
+                });
         }
 
         private static void ReplaceChartLegendDataSets(
@@ -870,7 +931,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         }
                     ).ToList();
 
-                    if (indicatorTargets.TryGetValue(dataSet.Indicator, out var targetIndicatorId))
+                    if (dataSet.Indicator.HasValue
+                        && indicatorTargets.TryGetValue(dataSet.Indicator.Value, out var targetIndicatorId))
                     {
                         dataSet.Indicator = targetIndicatorId;
                     }
@@ -1108,7 +1170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _cacheKeyService
                 .CreateCacheKeyForDataBlock(releaseId, plan.Id)
-                .OnSuccessVoid(_cacheService.DeleteItem);
+                .OnSuccessVoid(_cacheService.DeleteItemAsync);
         }
 
         private static Guid ReplacementPlanOriginalId(TargetableReplacementViewModel plan)

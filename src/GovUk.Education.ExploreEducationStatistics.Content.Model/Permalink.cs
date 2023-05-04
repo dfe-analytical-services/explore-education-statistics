@@ -8,9 +8,9 @@ public class Permalink : ICreatedTimestamp<DateTime>
 {
     public Guid Id { get; init; }
 
-    public string PublicationTitle { get; init; }
+    public string PublicationTitle { get; init; } = string.Empty;
 
-    public string DataSetTitle { get; init; }
+    public string DataSetTitle { get; init; } = string.Empty;
 
     public Guid? ReleaseId { get; init; }
 
@@ -27,6 +27,16 @@ public class Permalink : ICreatedTimestamp<DateTime>
     public int CountObservations { get; set; }
 
     public int CountTimePeriods { get; set; }
+
+    /// <summary>
+    /// True if this is a legacy Permalink
+    /// </summary>
+    public bool Legacy { get; set; }
+
+    /// <summary>
+    /// True if the legacy Permalink snapshot (Universal table and CSV) has been generated
+    /// </summary>
+    public bool? LegacyHasSnapshot { get; set; }
 
     /// <summary>
     /// Content length in bytes of the legacy Permalink in blob storage 

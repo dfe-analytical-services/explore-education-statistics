@@ -62,7 +62,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
     public async Task GetSummariesTree_NoCachedTreeExists()
     {
         PublicBlobCacheService
-            .Setup(s => s.GetItem(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
+            .Setup(s => s.GetItemAsync(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
             .ReturnsAsync(null);
 
         var methodologyService = new Mock<IMethodologyService>(Strict);
@@ -72,7 +72,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
             .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(_methodologyTree));
 
         PublicBlobCacheService
-            .Setup(s => s.SetItem<object>(new AllMethodologiesCacheKey(), _methodologyTree))
+            .Setup(s => s.SetItemAsync<object>(new AllMethodologiesCacheKey(), _methodologyTree))
             .Returns(Task.CompletedTask);
 
         var service = SetupService(methodologyService: methodologyService.Object);
@@ -88,7 +88,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
     public async Task GetSummariesTree_CachedTreeExists()
     {
         PublicBlobCacheService
-            .Setup(s => s.GetItem(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
+            .Setup(s => s.GetItemAsync(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
             .ReturnsAsync(_methodologyTree);
 
         var service = SetupService();
@@ -106,7 +106,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
         var publicationId = _methodologyTree[1].Topics[0].Publications[0].Id;
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
+            .Setup(s => s.GetItemAsync(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
             .ReturnsAsync(null);
 
         var methodologyService = new Mock<IMethodologyService>(Strict);
@@ -116,7 +116,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
             .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(_methodologyTree));
 
         PublicBlobCacheService
-            .Setup(s => s.SetItem<object>(new AllMethodologiesCacheKey(), _methodologyTree))
+            .Setup(s => s.SetItemAsync<object>(new AllMethodologiesCacheKey(), _methodologyTree))
             .Returns(Task.CompletedTask);
 
         var service = SetupService(methodologyService: methodologyService.Object);
@@ -143,7 +143,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
         // We should not see any attempt to "get" the cached tree, but rather only see a fresh fetching
         // of the latest tree and then it being cached.
         PublicBlobCacheService
-            .Setup(s => s.SetItem<object>(new AllMethodologiesCacheKey(), _methodologyTree))
+            .Setup(s => s.SetItemAsync<object>(new AllMethodologiesCacheKey(), _methodologyTree))
             .Returns(Task.CompletedTask);
 
         var service = SetupService(methodologyService: methodologyService.Object);
@@ -161,7 +161,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
         var publicationId = _methodologyTree[1].Topics[0].Publications[0].Id;
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
+            .Setup(s => s.GetItemAsync(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
             .ReturnsAsync(_methodologyTree);
 
         var service = SetupService();
@@ -182,7 +182,7 @@ public class MethodologyCacheServiceTests : CacheServiceTestFixture
         var publicationId = Guid.NewGuid();
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
+            .Setup(s => s.GetItemAsync(new AllMethodologiesCacheKey(), typeof(List<AllMethodologiesThemeViewModel>)))
             .ReturnsAsync(_methodologyTree);
 
         var service = SetupService();

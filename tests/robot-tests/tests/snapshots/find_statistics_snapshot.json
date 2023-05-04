@@ -7,7 +7,7 @@
     "theme": "Destination of pupils and students"
   },
   {
-    "publication_summary": "Attainment and retention data for A level and other qualifications by age 16 to 18 in England. Includes region, institution type, characteristics, and subject.",
+    "publication_summary": "Attainment and retention data for A level and other qualifications by age 16-18 in England. Includes region, institution type, characteristics, and subject.",
     "publication_title": "A level and other 16 to 18 results",
     "published": "30 Mar 2023",
     "release_type": "National statistics",
@@ -30,7 +30,7 @@
   {
     "publication_summary": "Apprenticeship and traineeship starts, achievements and participation. Includes breakdowns by age, sex, ethnicity, subject, provider, geography etc.",
     "publication_title": "Apprenticeships and traineeships",
-    "published": "30 Mar 2023",
+    "published": "13 Apr 2023",
     "release_type": "National statistics",
     "theme": "Further education"
   },
@@ -317,7 +317,7 @@
   {
     "publication_summary": "Annual level 2 and 3 attainment figures age 16 to 25 in England. Includes qualification type, institution type, characteristics and geographical breakdowns.",
     "publication_title": "Level 2 and 3 attainment age 16 to 25",
-    "published": "28 Apr 2022",
+    "published": "27 Apr 2023",
     "release_type": "National statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -429,7 +429,7 @@
   {
     "publication_summary": "Data on permanent exclusions and suspensions, including by reason for exclusion, duration, by pupil characteristics and data on independent review panels.",
     "publication_title": "Permanent exclusions and suspensions in England",
-    "published": "24 Nov 2022",
+    "published": "20 Apr 2023",
     "release_type": "National statistics",
     "theme": "Pupils and schools"
   },
@@ -443,7 +443,7 @@
   {
     "publication_summary": "Annual target for the number of trainees to start postgraduate initial teacher training in the relevant academic year, in England, by subject.",
     "publication_title": "Postgraduate initial teacher training targets",
-    "published": "21 Apr 2022",
+    "published": "27 Apr 2023",
     "release_type": "Official statistics",
     "theme": "Teachers and school workforce"
   },
@@ -485,7 +485,7 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly experimental statistics derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "6 Apr 2023",
+    "published": "20 Apr 2023",
     "release_type": "Experimental statistics",
     "theme": "Pupils and schools"
   },

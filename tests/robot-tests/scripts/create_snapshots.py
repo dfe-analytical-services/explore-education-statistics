@@ -3,6 +3,7 @@ import base64
 import json
 import math
 import os
+from typing import Optional
 
 import requests
 from bs4 import BeautifulSoup
@@ -45,27 +46,33 @@ class SnapshotService:
 
     def _gets_parsed_html_from_page(self, url: str) -> BeautifulSoup:
         response = self.session.get(url, stream=True)
-        assert response.status_code == 200, f"Requests response wasn't 200!\nResponse: {response}"
+        assert response.status_code == 200, f"Failed to get page: {url}. Status code: {response.status_code}"
         return BeautifulSoup(response.text, "html.parser")
 
     def _get_create_snapshot_func(self, name: str):
-        if name == "data_catalogue_snapshot.json":
-            return self._create_data_catalogue_snapshot
-        elif name == "find_statistics_snapshot.json":
-            return self._create_find_statistics_snapshot
-        elif name == "methodologies_snapshot.json":
-            return self._create_methodologies_snapshot
-        elif name == "table_tool_snapshot.json":
-            return self._create_table_tool_snapshot
-        else:
+        switcher = {
+            "data_catalogue_snapshot.json": self._create_data_catalogue_snapshot,
+            "find_statistics_snapshot.json": self._create_find_statistics_snapshot,
+            "methodologies_snapshot.json": self._create_methodologies_snapshot,
+            "table_tool_snapshot.json": self._create_table_tool_snapshot,
+        }
+
+        result = switcher.get(name)
+
+        if result is None:
             raise Exception(f"Invalid snapshot name: {name}")
 
-    def _send_slack_notification(self, text: str) -> None:
+        return result
+
+    def _send_slack_notification(self, text: Optional[str] = None, blocks=None) -> None:
         webhook = WebhookClient(self.slack_webhook_url)
-        response = webhook.send(text=text)
-        assert response.status_code == 200 and response.body == "ok"
+        response = webhook.send(text=text, blocks=blocks)
+        assert (
+            response.status_code == 200 and response.body == "ok"
+        ), f"Slack notification failed with status code: {response.status_code}"
 
     def _validate_snapshot(self, name: str) -> bool:
+        print(f"Validating snapshot: {name}")
         create_snapshot_func = self._get_create_snapshot_func(name)
         path_to_file = os.path.join(os.getcwd(), "tests/snapshots", name)
         with open(path_to_file, "r") as file:
@@ -84,9 +91,9 @@ class SnapshotService:
 
         with open(path_to_file, "w") as file:
             file.write(snapshot)
+            file.close()
 
     def _create_find_statistics_snapshot(self) -> str:
-        print("Creating find statistics snapshot")
         driver.get(f"{self.public_url}/find-statistics")
 
         total_results = driver.find_element(By.XPATH, "//*[@data-testid='total-results']").text.split(" ")[0]
@@ -102,11 +109,13 @@ class SnapshotService:
             print(f"Adding page {page + 1} of {total_pages} to find statistics snapshot")
 
             WebDriverWait(driver, self.timeout).until(
-                lambda driver: driver.find_element(By.CSS_SELECTOR, "form[id='sortControlsForm']")
+                lambda driver: driver.find_element(By.CSS_SELECTOR, "form[id='sortControlsForm']"),
+                message=f"Failed to find sort controls form on page {page + 1}",
             )
 
             WebDriverWait(driver, self.timeout).until(
-                lambda driver: driver.find_element(By.XPATH, "//*[@data-testid='publicationsList']")
+                lambda driver: driver.find_element(By.XPATH, "//*[@data-testid='publicationsList']"),
+                message=f"Failed to find publications list on page {page + 1}",
             )
 
             publications_list_items = driver.find_elements(By.XPATH, "//*[@data-testid='publicationsList']/li")
@@ -136,7 +145,8 @@ class SnapshotService:
                 )
 
                 WebDriverWait(driver, self.timeout).until(
-                    lambda driver: driver.find_element(By.XPATH, "//*[@data-testid='publicationsList']")
+                    lambda driver: driver.find_element(By.XPATH, "//*[@data-testid='publicationsList']"),
+                    message=f"Failed to find publications list on page {page + 1}",
                 )
 
             try:
@@ -147,7 +157,6 @@ class SnapshotService:
         return json.dumps(publications, sort_keys=True, indent=2)
 
     def _create_table_tool_snapshot(self) -> str:
-        print("Creating table tool snapshot")
         driver.get(f"{self.public_url}/data-tables")
 
         theme_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-themes-"]')
@@ -168,7 +177,6 @@ class SnapshotService:
         return json.dumps(themes, sort_keys=True, indent=2)
 
     def _create_data_catalogue_snapshot(self) -> str:
-        print("Creating data catalogue snapshot")
         driver.get(f"{self.public_url}/data-catalogue")
 
         theme_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-themes-"]')
@@ -189,7 +197,6 @@ class SnapshotService:
         return json.dumps(themes, sort_keys=True, indent=2)
 
     def _create_methodologies_snapshot(self) -> str:
-        print("Creating methodologies snapshot")
         parsed_html = self._gets_parsed_html_from_page(f"{self.public_url}/methodology")
 
         methodologies_accordion = parsed_html.find(id="themes")
@@ -219,18 +226,48 @@ class SnapshotService:
             themes.append(theme)
         return json.dumps(themes, sort_keys=True, indent=2)
 
-    def validate_snapshots(self):
+    def validate_snapshots(self) -> None:
+        failed = False
+
         for name in self.snapshots:
             if self._validate_snapshot(name):
                 print(f"Snapshot {name} matches for {self.public_url}")
             else:
                 print(f"Snapshot {name} does not match for {self.public_url}")
-                if self.slack_webhook_url is not None:
-                    self._send_slack_notification(f"Snapshot {name} does not match for {self.public_url}")
-        if self.slack_webhook_url is not None:
-            self._send_slack_notification(f"Snapshot test workflow successfully completed for {self.public_url} ✅")
+                failed = True
 
-    def write_snapshots_to_file(self):
+        if failed:
+            # At least one snapshot did not match so send a failure message to slack
+            self._send_slack_notification(
+                blocks=[
+                    {
+                        "type": "header",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "Snapshots do not match. See pull request for more details",
+                        },
+                    },
+                    {
+                        "type": "actions",
+                        "elements": [
+                            {
+                                "type": "button",
+                                "style": "danger",
+                                "text": {"type": "plain_text", "text": "View pull request"},
+                                "url": "https://github.com/dfe-analytical-services/explore-education-statistics/pulls/dfe-sdt",
+                            }
+                        ],
+                    },
+                ]
+            ) if self.slack_webhook_url else print("Snapshot script complete. Snapshots do not match")
+
+        else:
+            # All snapshots match so send a success message to slack (so we know the workflow has actually ran)
+            self._send_slack_notification(
+                f"Snapshot test workflow successfully completed for {self.public_url} :white_check_mark:"
+            ) if self.slack_webhook_url else print("Snapshot script complete. No differences found.")
+
+    def write_snapshots_to_file(self) -> None:
         for name in self.snapshots:
             self._write_snapshot_to_file(name)
 
@@ -239,7 +276,8 @@ if __name__ == "__main__":
     from get_webdriver import get_webdriver
 
     ap = argparse.ArgumentParser(
-        prog=f"python {os.path.basename(__file__)}", description="To create snapshots of specific public frontend pages"
+        prog=f"pipenv run python {os.path.basename(__file__)}",
+        description="To create snapshots of specific public frontend pages",
     )
 
     ap.add_argument(
@@ -262,7 +300,7 @@ if __name__ == "__main__":
 
     ap.add_argument(
         "--basic-auth-pass",
-        dest="basic_auth_pass",
+        dest="basic_auth_password",
         help="Password for basic auth",
         type=str,
         required=False,
@@ -273,6 +311,7 @@ if __name__ == "__main__":
         dest="validate",
         action="store_true",
         help="Compares the latest snapshots to the existing versions and does not write any snapshot files",
+        required=False,
     )
 
     ap.add_argument(
@@ -280,6 +319,7 @@ if __name__ == "__main__":
         dest="ci",
         action="store_true",
         help="Signifies that the test is running in a CI environment, which will make the test validate snapshots and write any snapshot files which have changed",
+        required=False,
     )
 
     ap.add_argument(
@@ -304,17 +344,18 @@ if __name__ == "__main__":
 
     assert os.path.basename(os.getcwd()) == "robot-tests", "Must run from the robot-tests directory!"
 
-    get_webdriver("latest")
     chrome_options = Options()
 
     if not args.visual:
         chrome_options.add_argument("--headless")
 
+    get_webdriver("latest")
+
     driver = webdriver.Chrome(options=chrome_options)
 
-    if args.basic_auth_user and args.basic_auth_pass:
+    if args.basic_auth_user and args.basic_auth_password:
         driver.execute_cdp_cmd("Network.enable", {})
-        token = base64.b64encode(f"{args.basic_auth_user}:{args.basic_auth_pass}".encode())
+        token = base64.b64encode(f"{args.basic_auth_user}:{args.basic_auth_password}".encode())
         driver.execute_cdp_cmd("Network.setExtraHTTPHeaders", {"headers": {"Authorization": f"Basic {token.decode()}"}})
 
     snapshot_service = SnapshotService(public_url=args.public_url, slack_webhook_url=args.slack_webhook_url)

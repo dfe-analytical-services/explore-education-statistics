@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
@@ -21,6 +22,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         public static void AssertConflict<T>(this Either<ActionResult, T> result)
         {
             result.AssertActionResultOfType<ConflictResult, T>();
+        }
+
+        public static void AssertInternalServerError<T>(this Either<ActionResult, T> result)
+        {
+            result.AssertStatusCodeResult(HttpStatusCode.InternalServerError);
+        }
+
+        public static void AssertStatusCodeResult<T>(this Either<ActionResult, T> result, HttpStatusCode statusCode)
+        {
+            var statusCodeResult = result.AssertActionResultOfType<StatusCodeResult, T>();
+            Assert.Equal((int) statusCode, statusCodeResult.StatusCode);
         }
 
         public static TRight AssertRight<TLeft, TRight>(this Either<TLeft, TRight> either, string message = null)

@@ -41,7 +41,6 @@ class Release:
 
 class ReleaseFilesGenerator(object):
     def __init__(self):
-
         # Instantiate a new ContainerClient for the emulator
         self.blob_service_client = BlobServiceClient.from_connection_string(
             "DefaultEndpointsProtocol=http;"

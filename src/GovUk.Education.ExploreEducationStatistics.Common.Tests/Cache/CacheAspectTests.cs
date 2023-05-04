@@ -178,14 +178,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             {
             }
 
-            public override async Task<object?> Get(ICacheKey cacheKey, Type returnType)
+            public override object? Get(ICacheKey cacheKey, Type returnType)
             {
-                return await CacheService.Object.GetItem(cacheKey, returnType);
+                return CacheService.Object.GetItem(cacheKey, returnType);
             }
 
-            public override async Task Set(ICacheKey cacheKey, object value)
+            public override async Task<object?> GetAsync(ICacheKey cacheKey, Type returnType)
             {
-                await CacheService.Object.SetItem(cacheKey, value);
+                return await CacheService.Object.GetItemAsync(cacheKey, returnType);
+            }
+
+            public override void Set(ICacheKey cacheKey, object value)
+            {
+                CacheService.Object.SetItem(cacheKey, value);
+            }
+
+            public override async Task SetAsync(ICacheKey cacheKey, object value)
+            {
+                await CacheService.Object.SetItemAsync(cacheKey, value);
             }
         }
 
@@ -227,9 +237,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             }
 
             [TestCache(typeof(TestCacheKey))]
-            public static Task<TestValue> NoParams_Task()
+            public static async Task<TestValue> NoParams_Task()
             {
-                return Task.FromResult(new TestValue());
+                return await Task.FromResult(new TestValue());
             }
 
             [TestCache(typeof(TestCacheKey))]
@@ -374,8 +384,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             [TestCache(typeof(TestCacheKeyWithTwoStrings))]
             public static TestValue TwoParamsOfSameType_KeyWithTwoParamsOfSameType_BothParamAttributes_SingleAmbiguous(
-                    [CacheKeyParam] string param1,
-                    [CacheKeyParam] string key2)
+                [CacheKeyParam] string param1,
+                [CacheKeyParam] string key2)
             {
                 return new();
             }
@@ -545,20 +555,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
                 return new();
             }
 
-            [TestCache(typeof(TestCacheKeyWithString))]
-            [TestCache(typeof(TestCacheKeyWithInt))]
-            public static TestValue TwoCaches(string param1, int param2)
-            {
-                return new();
-            }
-
-            [TestCache(typeof(TestCacheKeyWithString))]
-            [TestCache(typeof(TestCacheKeyWithInt), Priority = 100)]
-            public static TestValue TwoCaches_CustomOrder(string param1, int param2)
-            {
-                return new();
-            }
-
             [TestCache(null!)]
             public static TestValue NullKeyType()
             {
@@ -627,7 +623,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
         {
             var cacheKey = new TestCacheKey();
 
-            AssertCacheMiss(cacheKey, () => TestMethods.NoParams_ActionResult().Value);
+            AssertCacheMiss(cacheKey, () => TestMethods.NoParams_ActionResult().Value!);
         }
 
         [Fact]
@@ -637,7 +633,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             CacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-                .ReturnsAsync(null);
+                .Returns(null);
 
             TestMethods.NoParams_ActionResult_NotFound().AssertNotFoundResult();
 
@@ -645,11 +641,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
         }
 
         [Fact]
-        public void NoParams_Task_CacheMiss()
+        public async Task NoParams_Task_CacheMiss()
         {
             var cacheKey = new TestCacheKey();
 
-            AssertCacheMiss(cacheKey, () => TestMethods.NoParams_Task().Result);
+            await AssertCacheMissAsync(cacheKey, async () => await TestMethods.NoParams_Task());
         }
 
         [Fact]
@@ -658,7 +654,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             var cacheKey = new TestCacheKey();
 
             CacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
+                .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
                 .ReturnsAsync(null);
 
             var exception = await Assert.ThrowsAsync<Exception>(TestMethods.NoParams_Task_Failure);
@@ -669,20 +665,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
         }
 
         [Fact]
-        public void NoParams_TaskEither_CacheHit()
+        public async Task NoParams_TaskEither_CacheHit()
         {
             var cacheKey = new TestCacheKey();
             var expected = new TestValue();
 
-            AssertCacheHit(cacheKey, expected, () => TestMethods.NoParams_TaskEither().Result.Right);
+            await AssertCacheHitAsync(cacheKey, expected, async () => (await TestMethods.NoParams_TaskEither()).Right);
         }
 
         [Fact]
-        public void NoParams_TaskEither_CacheMiss()
+        public async Task NoParams_TaskEither_CacheMiss()
         {
             var cacheKey = new TestCacheKey();
 
-            AssertCacheMiss(cacheKey, () => TestMethods.NoParams_TaskEither().Result.Right);
+            await AssertCacheMissAsync(cacheKey, async () => (await TestMethods.NoParams_TaskEither()).Right);
         }
 
         [Fact]
@@ -691,7 +687,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             var cacheKey = new TestCacheKey();
 
             CacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
+                .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
                 .ReturnsAsync(null);
 
             var exception = await Assert.ThrowsAsync<Exception>(TestMethods.NoParams_TaskEither_Failure);
@@ -707,7 +703,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             var cacheKey = new TestCacheKey();
 
             CacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
+                .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
                 .ReturnsAsync(null);
 
             var result = await TestMethods.NoParams_TaskEither_Left();
@@ -718,11 +714,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
         }
 
         [Fact]
-        public void NoParams_TaskActionResult()
+        public async Task NoParams_TaskActionResult()
         {
             var cacheKey = new TestCacheKey();
 
-            AssertCacheMiss(cacheKey, () => TestMethods.NoParams_TaskActionResult().Result.Value);
+            await AssertCacheMissAsync(cacheKey,
+                async () => (await TestMethods.NoParams_TaskActionResult()).Value!);
         }
 
         [Fact]
@@ -731,7 +728,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             var cacheKey = new TestCacheKey();
 
             CacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
+                .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
                 .ReturnsAsync(null);
 
             var result = await TestMethods.NoParams_TaskActionResult_NotFound();
@@ -742,11 +739,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
         }
 
         [Fact]
-        private void NoParams_NestedTaskEither()
+        private async Task NoParams_NestedTaskEither()
         {
             var cacheKey = new TestCacheKey();
+            var returnType = typeof(TestValue);
 
-            AssertCacheMiss(cacheKey, () => TestMethods.NoParams_NestedTaskEither().Result.Right.Result);
+            CacheService
+                .Setup(s => s.GetItemAsync(cacheKey, returnType))
+                .ReturnsAsync(null);
+
+            // TryUnboxResult unboxes the Either, but then throws an exception on hitting the Task
+            var exception = await Assert.ThrowsAsync<ArgumentException>(TestMethods.NoParams_NestedTaskEither);
+            Assert.Equal(
+                "Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.",
+                exception.Message);
+
+            VerifyAllMocks(CacheService);
         }
 
         [Fact]
@@ -1208,150 +1216,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
         }
 
         [Fact]
-        public void TwoCaches_CacheHitOnFirst()
-        {
-            var cacheKey1 = new TestCacheKeyWithString("test");
-
-            var expected = new TestValue();
-
-            CacheService
-                .Setup(s => s.GetItem(cacheKey1, typeof(TestValue)))
-                .ReturnsAsync(expected);
-
-            var result = TestMethods.TwoCaches("test", 10);
-
-            Assert.Equal(expected, result);
-
-            VerifyAllMocks(CacheService);
-        }
-
-        [Fact]
-        public void TwoCaches_CacheHitOnSecond()
-        {
-            var cacheKey1 = new TestCacheKeyWithString("test");
-            var cacheKey2 = new TestCacheKeyWithInt(10);
-
-            var expected = new TestValue();
-
-            CacheService
-                .Setup(s => s.GetItem(cacheKey1, typeof(TestValue)))
-                .ReturnsAsync(null);
-            CacheService
-                .Setup(s => s.GetItem(cacheKey2, typeof(TestValue)))
-                .ReturnsAsync(expected);
-
-            var result = TestMethods.TwoCaches("test", 10);
-
-            Assert.Equal(expected, result);
-
-            VerifyAllMocks(CacheService);
-        }
-
-        [Fact]
-        public void TwoCaches_CacheMissAll()
-        {
-            var cacheKey1 = new TestCacheKeyWithString("test");
-            var cacheKey2 = new TestCacheKeyWithInt(10);
-
-            CacheService
-                .Setup(s => s.GetItem(cacheKey1, typeof(TestValue)))
-                .ReturnsAsync(null);
-            CacheService
-                .Setup(s => s.GetItem(cacheKey2, typeof(TestValue)))
-                .ReturnsAsync(null);
-
-            var args = new List<object>();
-
-            CacheService
-                .Setup(s => s.SetItem(cacheKey1, Capture.In(args)))
-                .Returns(Task.CompletedTask);
-            CacheService
-                .Setup(s => s.SetItem(cacheKey2, Capture.In(args)))
-                .Returns(Task.CompletedTask);
-
-            var result = TestMethods.TwoCaches("test", 10);
-
-            Assert.Equal(args[0], result);
-            Assert.Equal(args[1], result);
-
-            VerifyAllMocks(CacheService);
-        }
-
-        [Fact]
-        public void TwoCaches_CustomOrder_CacheHitOnFirst()
-        {
-            // Due to the custom cache order, we are
-            // using the second cache first.
-            var cacheKey = new TestCacheKeyWithInt(10);
-
-            var expected = new TestValue();
-
-            CacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-                .ReturnsAsync(expected);
-
-            var result = TestMethods.TwoCaches_CustomOrder("test", 10);
-
-            Assert.Equal(expected, result);
-
-            VerifyAllMocks(CacheService);
-        }
-
-        [Fact]
-        public void TwoCaches_CustomOrder_CacheHitOnSecond()
-        {
-            // Due to the custom cache order, we are
-            // using the first cache last.
-            var cacheKey1 = new TestCacheKeyWithInt(10);
-            var cacheKey2 = new TestCacheKeyWithString("test");
-
-            var expected = new TestValue();
-
-            CacheService
-                .Setup(s => s.GetItem(cacheKey1, typeof(TestValue)))
-                .ReturnsAsync(null);
-            CacheService
-                .Setup(s => s.GetItem(cacheKey2, typeof(TestValue)))
-                .ReturnsAsync(expected);
-
-            var result = TestMethods.TwoCaches_CustomOrder("test", 10);
-
-            Assert.Equal(expected, result);
-
-            VerifyAllMocks(CacheService);
-        }
-
-        [Fact]
-        public void TwoCaches_CustomOrder_CacheMissAll()
-        {
-            var cacheKey1 = new TestCacheKeyWithString("test");
-            var cacheKey2 = new TestCacheKeyWithInt(10);
-
-            CacheService
-                .Setup(s => s.GetItem(cacheKey1, typeof(TestValue)))
-                .ReturnsAsync(null);
-            CacheService
-                .Setup(s => s.GetItem(cacheKey2, typeof(TestValue)))
-                .ReturnsAsync(null);
-
-            var args = new List<object>();
-
-            CacheService
-                .Setup(s => s.SetItem(cacheKey1, Capture.In(args)))
-                .Returns(Task.CompletedTask);
-            CacheService
-                .Setup(s => s.SetItem(cacheKey2, Capture.In(args)))
-                .Returns(Task.CompletedTask);
-
-            var result = TestMethods.TwoCaches_CustomOrder("test", 10);
-
-            Assert.Equal(args[0], result);
-            Assert.Equal(args[1], result);
-
-            VerifyAllMocks(CacheService);
-        }
-
-        [Fact]
         public void NullCacheKeyType()
         {
             var exception = Assert.Throws<ArgumentException>(TestMethods.NullKeyType);
@@ -1381,8 +1245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             // This means that we're only ever getting fresh values for the item and then setting or updating the cached
             // entry with that new value rather than ever attempting to retrieve it.
             CacheService
-                .Setup(s => s.SetItem(cacheKey, Capture.In(args)))
-                .Returns(Task.CompletedTask);
+                .Setup(s => s.SetItem(cacheKey, Capture.In(args)));
 
             var returnedItem = TestMethods.ForceUpdate();
 
@@ -1396,9 +1259,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
         {
             CacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-                .ReturnsAsync(expectedResult);
+                .Returns(expectedResult);
 
             var result = run();
+
+            Assert.Equal(expectedResult, result);
+
+            VerifyAllMocks(CacheService);
+        }
+
+        private static async Task AssertCacheHitAsync(ICacheKey cacheKey, object expectedResult, Func<Task<TestValue>> run)
+        {
+            CacheService
+                .Setup(s => s.GetItemAsync(cacheKey, typeof(TestValue)))
+                .ReturnsAsync(expectedResult);
+
+            var result = await run();
 
             Assert.Equal(expectedResult, result);
 
@@ -1410,17 +1286,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             AssertCacheMiss(cacheKey, typeof(TestValue), run);
         }
 
+        private static async Task AssertCacheMissAsync(ICacheKey cacheKey, Func<Task<object>> run)
+        {
+            await AssertCacheMissAsync(cacheKey, typeof(TestValue), run);
+        }
+
         private static void AssertCacheMiss(ICacheKey cacheKey, Type returnType, Func<object> run)
         {
             CacheService
                 .Setup(s => s.GetItem(cacheKey, returnType))
-                .ReturnsAsync(null);
+                .Returns(null);
 
             var args = new List<object>();
 
             CacheService
-                .Setup(s => s.SetItem(cacheKey, Capture.In(args)))
-                .Returns(Task.CompletedTask);
+                .Setup(s => s.SetItem(cacheKey, Capture.In(args)));
 
             var result = run();
 
@@ -1429,7 +1309,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             VerifyAllMocks(CacheService);
         }
 
-        private static MissingMemberException AssertNoMatchingConstructorException(
+        private static async Task AssertCacheMissAsync(ICacheKey cacheKey, Type returnType, Func<Task<object>> run)
+        {
+            CacheService
+                .Setup(s => s.GetItemAsync(cacheKey, returnType))
+                .ReturnsAsync(null);
+
+            var args = new List<object>();
+
+            CacheService
+                .Setup(s => s.SetItemAsync(cacheKey, Capture.In(args)))
+                .Returns(Task.CompletedTask);
+
+            var result = await run();
+
+            Assert.Equal(args[0], result);
+
+            VerifyAllMocks(CacheService);
+        }
+
+        private static void AssertNoMatchingConstructorException(
             Type cacheKeyType,
             Func<object> run)
         {
@@ -1439,8 +1338,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
                 $"No matching constructor for cache key {cacheKeyType.GetPrettyFullName()}",
                 exception.Message
             );
-
-            return exception;
         }
 
         private static AmbiguousMatchException AssertNoUnambiguousMatchException(Type cacheKeyType, Func<TestValue> run)

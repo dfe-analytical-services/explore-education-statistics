@@ -2039,25 +2039,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var releaseFiles = new List<ReleaseFile>
             {
-                new ()
+                new()
                 {
                     Release = release,
                     File = new File { Type = FileType.Data },
                     Order = 0,
                 },
-                new ()
+                new()
                 {
                     Release = release,
                     File = new File { Type = FileType.Data },
                     Order = 1,
                 },
-                new ()
+                new()
                 {
                     Release = release,
                     File = new File { Type = FileType.Data },
                     Order = 3,
                 },
-                new () // Ancillary files should be ignored
+                new() // Ancillary files should be ignored
                 {
                     Release = release,
                     File = new File { Type = FileType.Ancillary },
@@ -2347,25 +2347,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var releaseFiles = new List<ReleaseFile>
             {
-                new ()
+                new()
                 {
                     Release = release,
                     File = new File { Type = FileType.Data },
                     Order = 0,
                 },
-                new ()
+                new()
                 {
                     Release = release,
                     File = new File { Type = FileType.Data },
                     Order = 1,
                 },
-                new ()
+                new()
                 {
                     Release = release,
                     File = new File { Type = FileType.Data },
                     Order = 3,
                 },
-                new () // Ancillary files should be ignored
+                new() // Ancillary files should be ignored
                 {
                     Release = release,
                     File = new File { Type = FileType.Ancillary },

@@ -618,10 +618,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("Legacy")
+                        .HasColumnType("bit");
+
                     b.Property<long?>("LegacyContentLength")
                         .HasColumnType("bigint");
 
                     b.Property<bool?>("LegacyHasConfigurationHeaders")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("LegacyHasSnapshot")
                         .HasColumnType("bit");
 
                     b.Property<string>("PublicationTitle")

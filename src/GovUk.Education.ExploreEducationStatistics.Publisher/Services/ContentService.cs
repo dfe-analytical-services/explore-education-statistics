@@ -71,11 +71,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task DeleteLazilyCachedReleaseResults(Guid releaseId, string publicationSlug, string releaseSlug)
         {
-            await _privateBlobCacheService.DeleteCacheFolder(new PrivateReleaseContentFolderCacheKey(releaseId));
+            await _privateBlobCacheService.DeleteCacheFolderAsync(new PrivateReleaseContentFolderCacheKey(releaseId));
 
-            await _publicBlobCacheService.DeleteCacheFolder(new ReleaseDataBlockResultsFolderCacheKey(publicationSlug, releaseSlug));
-            await _publicBlobCacheService.DeleteItem(new ReleaseSubjectsCacheKey(publicationSlug, releaseSlug));
-            await _publicBlobCacheService.DeleteCacheFolder(new ReleaseSubjectMetaFolderCacheKey(publicationSlug, releaseSlug));
+            await _publicBlobCacheService.DeleteCacheFolderAsync(new ReleaseDataBlockResultsFolderCacheKey(publicationSlug, releaseSlug));
+            await _publicBlobCacheService.DeleteItemAsync(new ReleaseSubjectsCacheKey(publicationSlug, releaseSlug));
+            await _publicBlobCacheService.DeleteCacheFolderAsync(new ReleaseSubjectMetaFolderCacheKey(publicationSlug, releaseSlug));
         }
 
         public async Task DeletePreviousVersionsDownloadFiles(params Guid[] releaseIds)

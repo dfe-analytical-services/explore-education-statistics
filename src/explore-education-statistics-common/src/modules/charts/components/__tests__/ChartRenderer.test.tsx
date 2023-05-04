@@ -52,6 +52,7 @@ describe('ChartRenderer', () => {
       items: [],
     },
     boundaryLevel: 1,
+    map: { dataSetConfigs: [] },
   };
 
   test('renders auto-generated boundary level footnote successfully', async () => {

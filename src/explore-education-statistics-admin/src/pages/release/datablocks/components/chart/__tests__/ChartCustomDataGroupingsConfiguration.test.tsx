@@ -1,17 +1,17 @@
-import ChartMapCustomGroupsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartMapCustomGroupsConfiguration';
+import ChartCustomDataGroupingsConfiguration from '@admin/pages/release/datablocks/components/chart/ChartCustomDataGroupingsConfiguration';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
 
-describe('ChartMapCustomGroupsConfiguration', () => {
+describe('ChartCustomDataGroupingsConfiguration', () => {
   const testGroups = [
     { min: 0, max: 50 },
     { min: 51, max: 100 },
   ];
   test('renders correctly without initial values', () => {
     render(
-      <ChartMapCustomGroupsConfiguration
+      <ChartCustomDataGroupingsConfiguration
         groups={[]}
         id="testId"
         onAddGroup={noop}
@@ -19,7 +19,6 @@ describe('ChartMapCustomGroupsConfiguration', () => {
       />,
     );
 
-    expect(screen.getByText('Custom groups')).toBeInTheDocument();
     const table = within(screen.getByRole('table'));
     const rows = table.getAllByRole('row');
     expect(rows).toHaveLength(2);
@@ -32,7 +31,7 @@ describe('ChartMapCustomGroupsConfiguration', () => {
 
   test('renders correctly with initial values', () => {
     render(
-      <ChartMapCustomGroupsConfiguration
+      <ChartCustomDataGroupingsConfiguration
         groups={testGroups}
         id="testId"
         onAddGroup={noop}
@@ -40,7 +39,6 @@ describe('ChartMapCustomGroupsConfiguration', () => {
       />,
     );
 
-    expect(screen.getByText('Custom groups')).toBeInTheDocument();
     const table = within(screen.getByRole('table'));
     const rows = table.getAllByRole('row');
     expect(rows).toHaveLength(4);
@@ -66,7 +64,7 @@ describe('ChartMapCustomGroupsConfiguration', () => {
 
   test('shows the unit if available', () => {
     render(
-      <ChartMapCustomGroupsConfiguration
+      <ChartCustomDataGroupingsConfiguration
         groups={[]}
         id="testId"
         unit="%"
@@ -75,7 +73,6 @@ describe('ChartMapCustomGroupsConfiguration', () => {
       />,
     );
 
-    expect(screen.getByText('Custom groups')).toBeInTheDocument();
     const table = within(screen.getByRole('table'));
     const rows = table.getAllByRole('row');
     expect(rows).toHaveLength(2);
@@ -89,7 +86,7 @@ describe('ChartMapCustomGroupsConfiguration', () => {
   test('calls onAddGroup when add groups', async () => {
     const handleAddGroup = jest.fn();
     render(
-      <ChartMapCustomGroupsConfiguration
+      <ChartCustomDataGroupingsConfiguration
         groups={[]}
         id="testId"
         onAddGroup={handleAddGroup}
@@ -122,7 +119,7 @@ describe('ChartMapCustomGroupsConfiguration', () => {
   test('calls onRemoveGroup when remove groups', async () => {
     const handleRemoveGroup = jest.fn();
     render(
-      <ChartMapCustomGroupsConfiguration
+      <ChartCustomDataGroupingsConfiguration
         groups={testGroups}
         id="testId"
         onAddGroup={noop}
@@ -157,7 +154,7 @@ describe('ChartMapCustomGroupsConfiguration', () => {
 
   test('shows a validation errors when submit without min and max values', async () => {
     render(
-      <ChartMapCustomGroupsConfiguration
+      <ChartCustomDataGroupingsConfiguration
         groups={[]}
         id="testId"
         onAddGroup={noop}
@@ -175,7 +172,7 @@ describe('ChartMapCustomGroupsConfiguration', () => {
 
   test('shows a validation error when the max is not greater than the min', async () => {
     render(
-      <ChartMapCustomGroupsConfiguration
+      <ChartCustomDataGroupingsConfiguration
         groups={[]}
         id="testId"
         onAddGroup={noop}
@@ -194,7 +191,7 @@ describe('ChartMapCustomGroupsConfiguration', () => {
 
   test('shows a validation error when the minimum value is in an existing group', async () => {
     render(
-      <ChartMapCustomGroupsConfiguration
+      <ChartCustomDataGroupingsConfiguration
         groups={testGroups}
         id="testId"
         onAddGroup={noop}
@@ -225,7 +222,7 @@ describe('ChartMapCustomGroupsConfiguration', () => {
 
   test('shows a validation error when the maximum value is in an existing group', async () => {
     render(
-      <ChartMapCustomGroupsConfiguration
+      <ChartCustomDataGroupingsConfiguration
         groups={testGroups}
         id="testId"
         onAddGroup={noop}
@@ -257,7 +254,7 @@ describe('ChartMapCustomGroupsConfiguration', () => {
 
   test('shows validation errors when both values are in an existing group', async () => {
     render(
-      <ChartMapCustomGroupsConfiguration
+      <ChartCustomDataGroupingsConfiguration
         groups={testGroups}
         id="testId"
         onAddGroup={noop}
@@ -288,7 +285,7 @@ describe('ChartMapCustomGroupsConfiguration', () => {
 
   test('shows validation errors when the new group contains an existing group', async () => {
     render(
-      <ChartMapCustomGroupsConfiguration
+      <ChartCustomDataGroupingsConfiguration
         groups={testGroups}
         id="testId"
         onAddGroup={noop}
@@ -319,7 +316,7 @@ describe('ChartMapCustomGroupsConfiguration', () => {
 
   test('shows a validation error when groups with negative values overlap', async () => {
     render(
-      <ChartMapCustomGroupsConfiguration
+      <ChartCustomDataGroupingsConfiguration
         groups={[{ min: -2, max: 2 }]}
         id="testId"
         onAddGroup={noop}
@@ -342,21 +339,5 @@ describe('ChartMapCustomGroupsConfiguration', () => {
         within(minCell).getByText('Min cannot overlap another group'),
       ).toBeInTheDocument();
     });
-  });
-
-  test('shows the minimum number of groups error when showError is true', () => {
-    render(
-      <ChartMapCustomGroupsConfiguration
-        groups={[]}
-        id="testId"
-        showError
-        onAddGroup={noop}
-        onRemoveGroup={noop}
-      />,
-    );
-
-    expect(
-      screen.getByText('There must be at least 1 data group'),
-    ).toBeInTheDocument();
   });
 });

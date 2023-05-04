@@ -20,6 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
             ConfigureForLegacyPermalinks();
         }
 
+        // TODO EES-3755 Remove after Permalink snapshot migration work is complete
         private void ConfigureForLegacyPermalinks()
         {
             CreateMap<LegacyPermalink, LegacyPermalinkViewModel>();

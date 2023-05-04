@@ -37,7 +37,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (createdDate != null && createdDate > DateTime.UtcNow)
             {
-                throw new ArgumentException($"{nameof(UserInvite)} created date cannot be a future date");
+                throw new ArgumentException($"{nameof(UserInvite)} created date cannot be a future date " +
+                                            $"- {createdDate} is more than {DateTime.UtcNow}");
             }
             
             var existingInvite = await _usersAndRolesDbContext

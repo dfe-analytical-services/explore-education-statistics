@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -29,6 +30,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
+using ExecutionContext = Microsoft.Azure.WebJobs.ExecutionContext;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functions;
@@ -213,7 +215,8 @@ public class ProcessorStage3Tests
                     $"{import.File.BatchesPath()}{import.File.Id}_00000{i}", 
                     Capture.With(CaptureStreamAsArrayOfLines(lines => 
                         uploadedFileContents.Add(lines))), 
-                    "text/csv"))
+                    "text/csv", 
+                    It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
         });
         
@@ -371,7 +374,8 @@ public class ProcessorStage3Tests
                     $"{import.File.BatchesPath()}{import.File.Id}_00000{i}", 
                     Capture.With(CaptureStreamAsArrayOfLines(lines => 
                                 uploadedFileContents.Add(lines))), 
-                    "text/csv"))
+                    "text/csv",
+                    It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
         });
         

@@ -106,6 +106,7 @@ describe('ChartBuilderPreview', () => {
       items: [],
     },
     boundaryLevel: 1,
+    map: { dataSetConfigs: [] },
   };
 
   test('renders the loading spinner when the loading flag is indicating that it is loading', () => {
