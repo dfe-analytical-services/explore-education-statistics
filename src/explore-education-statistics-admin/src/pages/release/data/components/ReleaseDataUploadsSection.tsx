@@ -380,10 +380,15 @@ const ReleaseDataUploadsSection = ({
                       {block.isKeyStatistic && (
                         <p>
                           A key statistic associated with this data block will
-                          also be removed.
+                          be removed.
                         </p>
                       )}
-                      {/* @MarkFix text here if removes associated featured table? */}
+                      {block.isFeaturedTable && (
+                        <p>
+                          A featured table associated with this data block will
+                          be removed.
+                        </p>
+                      )}
                     </li>
                   ),
                 )}

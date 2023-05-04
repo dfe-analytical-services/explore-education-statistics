@@ -27,6 +27,7 @@ export interface DependentDataBlock {
   contentSectionHeading?: string;
   infographicFilesInfo: InfographicFileInfo[];
   isKeyStatistic: boolean;
+  isFeaturedTable: boolean;
 }
 
 export interface InfographicFileInfo {

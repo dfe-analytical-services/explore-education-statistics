@@ -533,6 +533,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock.Name, dependentBlocks[0].Name);
                 Assert.Equal(dataBlock.ContentSection.Heading, dependentBlocks[0].ContentSectionHeading);
                 Assert.False(dependentBlocks[0].IsKeyStatistic);
+                Assert.False(dependentBlocks[0].IsFeaturedTable);
 
                 Assert.Single(dependentBlocks[0].InfographicFilesInfo);
 
@@ -587,6 +588,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task GetDeletePlan_DependentDataBlockIsFeaturedTable()
+        {
+            var release = new Release();
+
+            var dataBlock = new DataBlock();
+
+            var featuredTable = new FeaturedTable
+            {
+                DataBlock = dataBlock,
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddAsync(
+                    new ReleaseContentBlock
+                    {
+                        Release = release,
+                        ContentBlock = dataBlock
+                    }
+                );
+                await context.FeaturedTables.AddAsync(featuredTable);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildDataBlockService(context);
+                var result = await service.GetDeletePlan(release.Id, dataBlock.Id);
+
+                var deletePlan = result.AssertRight();
+
+                Assert.Equal(release.Id, deletePlan.ReleaseId);
+
+                var dependentBlocks = deletePlan.DependentDataBlocks;
+
+                Assert.Single(dependentBlocks);
+
+                Assert.Equal(dataBlock.Id, dependentBlocks[0].Id);
+                Assert.Equal(dataBlock.Name, dependentBlocks[0].Name);
+                Assert.Null(dataBlock.ContentSection);
+                Assert.True(dependentBlocks[0].IsFeaturedTable);
+            }
+        }
 
         [Fact]
         public async Task GetDeletePlan_NotFound()

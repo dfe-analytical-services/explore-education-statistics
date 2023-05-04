@@ -256,7 +256,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }).ToList(),
                 IsKeyStatistic = await _context.KeyStatisticsDataBlock
                     .AnyAsync(ks => ks.DataBlockId == block.Id),
-                // @MarkFix IsFeaturedTable?
+                IsFeaturedTable = await _context.FeaturedTables
+                    .AnyAsync(ft => ft.DataBlockId == block.Id)
             };
         }
 
@@ -434,6 +435,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public string? ContentSectionHeading { get; set; }
         public List<InfographicFileInfo> InfographicFilesInfo { get; set; } = new();
         public bool IsKeyStatistic { get; set; }
+        public bool IsFeaturedTable { get; set; }
     }
 
     public class InfographicFileInfo
