@@ -92,10 +92,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var dataBlockIds = deletePlan.DependentDataBlocks
                         .Select(db => db.Id)
                         .ToList();
+
                     var keyStats = _context.KeyStatisticsDataBlock
                         .Where(ks => dataBlockIds.Contains(ks.DataBlockId));
                     _context.KeyStatisticsDataBlock.RemoveRange(keyStats);
-                    // @MarkFix Remove featured tables here?
+
+                    var featuredTables = _context.FeaturedTables
+                        .Where(ft => dataBlockIds.Contains(ft.DataBlockId));
+                    _context.FeaturedTables.RemoveRange(featuredTables);
+
                     await _context.SaveChangesAsync();
 
                     await RemoveChartFileReleaseLinks(deletePlan);
