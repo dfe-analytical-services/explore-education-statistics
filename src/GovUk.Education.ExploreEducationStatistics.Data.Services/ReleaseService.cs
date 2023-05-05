@@ -11,11 +11,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -88,6 +90,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                                 content: rs.DataGuidance ?? string.Empty,
                                 timePeriods: await _timePeriodService.GetTimePeriodLabels(rs.SubjectId),
                                 geographicLevels: await _dataGuidanceSubjectService.GetGeographicLevels(rs.SubjectId),
+                                filters: await GetFilters(rs.SubjectId, rs.FilterSequence),
+                                indicators: await GetIndicators(rs.SubjectId, rs.IndicatorSequence),
                                 file: releaseFile.ToFileInfo()
                             );
                         }
@@ -96,6 +100,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ThenBy(svm => svm.Name) // For subjects existing before ordering was added
                 .ToList();
         }
+
+        private async Task<List<string>> GetFilters(Guid subjectId, List<FilterSequenceEntry>? filterSequence)
+        {
+            var unorderedFilterList = await _statisticsDbContext.Filter
+                .Where(filter => filter.SubjectId == subjectId)
+                .ToListAsync();
+
+            if (filterSequence == null)
+            {
+                return unorderedFilterList
+                    .Select(filter => filter.Label)
+                    .OrderBy(label => label)
+                    .ToList();
+            }
+
+            var filterIdSequence = filterSequence
+                .Select(filter => filter.Id)
+                .ToList();
+
+            return unorderedFilterList
+                .OrderBy(filter => filterIdSequence.IndexOf(filter.Id))
+                .Select(filter => filter.Label)
+                .ToList();
+        }
+
+        private async Task<List<string>> GetIndicators(
+            Guid subjectId,
+            List<IndicatorGroupSequenceEntry>? indicatorGroupSequence)
+        {
+            var unorderedIndicators= await _statisticsDbContext.Indicator
+                .Where(indicator => indicator.IndicatorGroup.SubjectId == subjectId)
+                .ToListAsync();
+
+            if (indicatorGroupSequence == null)
+            {
+                return unorderedIndicators
+                    .Select(indicator => indicator.Label)
+                    .OrderBy(label => label)
+                    .ToList();
+            }
+
+            var indicatorIdSequence = indicatorGroupSequence
+                .SelectMany(indicatorGroup => indicatorGroup.ChildSequence)
+                .ToList();
+
+            return unorderedIndicators
+                .OrderBy(indicator => indicatorIdSequence.IndexOf(indicator.Id))
+                .Select(indicator => indicator.Label)
+                .ToList();
+        }
+
 
         public async Task<Either<ActionResult, List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseId)
         {
@@ -113,10 +168,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return releaseContentBlocks
                 .Where(dataBlock => subjectsToInclude.Contains(dataBlock.Query.SubjectId))
                 .Select(
-                    dataBlock => new FeaturedTableViewModel(
-                        id: dataBlock.Id,
-                        name: dataBlock.HighlightName ?? string.Empty,
-                        description: dataBlock.HighlightDescription ?? string.Empty
+                    dataBlock => new FeaturedTableViewModel
+                    (
+                        dataBlock.Id,
+                        dataBlock.HighlightName ?? string.Empty,
+                        dataBlock.HighlightDescription ?? string.Empty,
+                        dataBlock.Query.SubjectId
                     )
                 )
                 .OrderBy(featuredTable => featuredTable.Name)
