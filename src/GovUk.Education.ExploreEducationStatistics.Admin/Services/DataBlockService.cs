@@ -19,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Documents.SystemFunctions;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -119,7 +120,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await GetReleaseContentBlock(id)
                 .OnSuccessDo(rcb => _userService.CheckCanViewRelease(rcb.Release))
                 .OnSuccess(CheckIsDataBlock)
-                .OnSuccess(dataBlock => _mapper.Map<DataBlockViewModel>(dataBlock));
+                .OnSuccess(async dataBlock =>
+                {
+                    // @MarkFix check this singleordefault is working as expected
+                    var featuredTable = await _context.FeaturedTables.SingleOrDefaultAsync(ft => ft.DataBlockId == dataBlock.Id);
+
+                    var viewModel = _mapper.Map<DataBlockViewModel>(dataBlock);
+
+                    if (featuredTable != null)
+                    {
+                        viewModel.HighlightName = featuredTable.Name;
+                        viewModel.HighlightDescription = featuredTable.Description;
+                    }
+
+                    return viewModel;
+                });
         }
 
         public async Task<Either<ActionResult, List<DataBlockSummaryViewModel>>> List(Guid releaseId)

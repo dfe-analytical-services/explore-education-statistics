@@ -21,11 +21,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Name { get; init; } = string.Empty;
 
-        // EES-4273 Remove
-        public string? HighlightName { get; init; }
+        public string? HighlightName { get; set; } // @MarkFix hydrate from FeaturedTable when returning
 
-        // EES-4273 Remove
-        public string? HighlightDescription { get; init; }
+        public string? HighlightDescription { get; set; } // @MarkFix hydrate from FeaturedTable when returning
 
         public string Source { get; init; }  = string.Empty;
 
@@ -50,12 +48,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         [Required] public string Name { get; init; } = string.Empty;
 
-        // EES-4273 Remove
-        public string? HighlightName { get; init; }
-
-        // EES-4273 Remove
-        public string? HighlightDescription { get; init; }
-
         public string Source { get; init; } = string.Empty;
 
         public ObservationQueryContext Query { get; init; } = null!;
@@ -72,12 +64,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         [Required]
         public string Name { get; init; } = string.Empty;
-
-        // EES-4273 Remove
-        public string? HighlightName { get; init; }
-
-        // EES-4273 Remove
-        public string? HighlightDescription { get; init; }
 
         public string Source { get; init; } = string.Empty;
 

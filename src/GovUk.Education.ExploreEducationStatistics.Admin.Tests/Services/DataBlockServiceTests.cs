@@ -18,8 +18,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -104,8 +102,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(dataBlock.Heading, retrievedResult.Heading);
                 Assert.Equal(dataBlock.Name, retrievedResult.Name);
-                Assert.Equal(dataBlock.HighlightName, retrievedResult.HighlightName);
-                Assert.Equal(dataBlock.HighlightDescription, retrievedResult.HighlightDescription);
                 Assert.Equal(dataBlock.Source, retrievedResult.Source);
                 Assert.Equal(dataBlock.Order, retrievedResult.Order);
 
@@ -889,8 +885,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Heading = "Test heading",
                 Name = "Test name",
-                HighlightName = "Test highlight name",
-                HighlightDescription = "Test highlight description",
                 Source = "Test source",
                 Query = new ObservationQueryContext
                 {
@@ -937,8 +931,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(createRequest.Heading, viewModel.Heading);
                 Assert.Equal(createRequest.Name, viewModel.Name);
-                Assert.Equal(createRequest.HighlightName, viewModel.HighlightName);
-                Assert.Equal(createRequest.HighlightDescription, viewModel.HighlightDescription);
                 Assert.Equal(createRequest.Source, viewModel.Source);
 
                 createRequest.Query.AssertDeepEqualTo(viewModel.Query);
@@ -961,8 +953,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(createRequest.Heading, dataBlock.Heading);
                 Assert.Equal(createRequest.Name, dataBlock.Name);
-                Assert.Equal(createRequest.HighlightName, dataBlock.HighlightName);
-                Assert.Equal(createRequest.HighlightDescription, dataBlock.HighlightDescription);
                 Assert.Equal(createRequest.Source, dataBlock.Source);
 
                 createRequest.Query.AssertDeepEqualTo(dataBlock.Query);
@@ -1134,8 +1124,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Heading = "New heading",
                 Name = "New name",
-                HighlightName = "New highlight name",
-                HighlightDescription = "New highlight description",
                 Source = "New source",
                 Charts = new List<IChart>
                 {
@@ -1178,8 +1166,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock.Id, updateResult.Id);
                 Assert.Equal(updateRequest.Heading, updateResult.Heading);
                 Assert.Equal(updateRequest.Name, updateResult.Name);
-                Assert.Equal(updateRequest.HighlightName, updateResult.HighlightName);
-                Assert.Equal(updateRequest.HighlightDescription, updateResult.HighlightDescription);
                 Assert.Equal(updateRequest.Source, updateResult.Source);
                 Assert.Equal(dataBlock.Order, updateResult.Order);
 
@@ -1194,8 +1180,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(updateRequest.Heading, updatedDataBlock!.Heading);
                 Assert.Equal(updateRequest.Name, updatedDataBlock.Name);
-                Assert.Equal(updateRequest.HighlightName, updatedDataBlock.HighlightName);
-                Assert.Equal(updateRequest.HighlightDescription, updatedDataBlock.HighlightDescription);
                 Assert.Equal(updateRequest.Source, updatedDataBlock.Source);
 
                 updateRequest.Query.AssertDeepEqualTo(updatedDataBlock.Query);
