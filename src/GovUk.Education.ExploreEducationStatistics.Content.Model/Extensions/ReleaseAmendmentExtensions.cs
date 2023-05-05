@@ -79,7 +79,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 return amendmentKeyStatistic;
             }).ToList();
 
-            // @MarkFix Copy featured tables here?
+            amendment.FeaturedTables = amendment.FeaturedTables.Select(originalFeaturedTable =>
+            {
+                var amendmentFeaturedTable = originalFeaturedTable.Clone(context.NewRelease);
+
+                var originalDataBlock = originalFeaturedTable.DataBlock;
+                var amendmentDataBlock = (DataBlock)context.OriginalToAmendmentContentBlockMap[originalDataBlock];
+                amendmentFeaturedTable.DataBlock = amendmentDataBlock;
+                amendmentFeaturedTable.DataBlockId = amendmentDataBlock.Id;
+
+                return amendmentFeaturedTable;
+            }).ToList();
 
             amendment.RelatedInformation = amendment
                 .RelatedInformation
