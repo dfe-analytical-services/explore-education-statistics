@@ -32,6 +32,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             ExecutionContext executionContext,
             [Queue(ImportsPendingQueue)] ICollector<ImportMessage> importStagesMessageQueue)
         {
+            await ProcessUploads(message, executionContext, importStagesMessageQueue, rethrowExceptions: false);
+        }
+
+        public async Task ProcessUploads(
+            [QueueTrigger(ImportsPendingQueue)] ImportMessage message,
+            ExecutionContext executionContext,
+            [Queue(ImportsPendingQueue)] ICollector<ImportMessage> importStagesMessageQueue,
+            bool rethrowExceptions)
+        {
             try
             {
                 var import = await _dataImportService.GetImport(message.Id);
@@ -100,6 +109,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
                     mainException.Message);
 
                 await _dataImportService.FailImport(message.Id);
+
+                if (rethrowExceptions)
+                {
+                    throw;
+                }
             }
         }
 

@@ -157,7 +157,8 @@ public class ProcessorStage1Tests
         await function.ProcessUploads(
             importMessage, 
             new ExecutionContext(),
-            importStagesMessageQueue.Object);
+            importStagesMessageQueue.Object,
+            rethrowExceptions: true);
         
         VerifyAllMocks(blobStorageService, importStagesMessageQueue);
 

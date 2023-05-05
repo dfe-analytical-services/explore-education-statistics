@@ -49,6 +49,12 @@ public class ProcessorStage2Tests
     }
 
     [Fact]
+    public async Task ProcessStage2_SpecialFilterItemValues()
+    {
+        await AssertStage2ItemsImportedCorrectly(new SpecialFilterItemsScenario());
+    }
+
+    [Fact]
     public async Task ProcessStage2_SubjectMetaAlreadyImported()
     {
         var subjectId = Guid.NewGuid();
@@ -260,7 +266,8 @@ public class ProcessorStage2Tests
         await function.ProcessUploads(
             importMessage,
             new ExecutionContext(),
-            importStagesMessageQueue.Object);
+            importStagesMessageQueue.Object,
+            rethrowExceptions: true);
 
         VerifyAllMocks(blobStorageService, importStagesMessageQueue);
 
