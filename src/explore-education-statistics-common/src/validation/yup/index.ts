@@ -2,9 +2,8 @@
 import * as yup from 'yup';
 
 import './number';
-import FileSchema from './file';
+import './file';
 
 export default {
   ...yup,
-  file: () => new FileSchema(),
 };

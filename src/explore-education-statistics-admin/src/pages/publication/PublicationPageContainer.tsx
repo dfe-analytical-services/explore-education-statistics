@@ -56,7 +56,7 @@ const PublicationPageContainer = ({
     setState: setPublication,
     isLoading: loadingPublication,
     retry: reloadPublication,
-  } = useAsyncHandledRetry(() =>
+  } = useAsyncHandledRetry(async () =>
     publicationService.getPublication<PublicationWithPermissions>(
       publicationId,
       true,

@@ -211,7 +211,7 @@ const ChartAxisConfiguration = ({
         ['default', 'startEnd', 'custom'],
         'Select a valid tick display type',
       ),
-      tickSpacing: Yup.number().when('tickConfig', {
+      tickSpacing: Yup.number().when(['tickConfig'], {
         is: 'custom',
         then: s =>
           s

@@ -87,11 +87,12 @@ const ReleaseNotesSection = ({ release }: Props) => {
         validationSchema={Yup.object<CreateFormValues>({
           reason: Yup.string().required('Release note must be provided'),
         })}
-        onSubmit={releaseNote =>
-          addReleaseNote(releaseNote).then(() => {
-            setAddFormOpen(false);
-          })
-        }
+        onSubmit={async ({ reason }) => {
+          await addReleaseNote({
+            reason,
+          });
+          setAddFormOpen(false);
+        }}
       >
         {form => {
           return (
@@ -140,14 +141,10 @@ const ReleaseNotesSection = ({ release }: Props) => {
           on: Yup.date().required('Enter a valid edit date'),
           reason: Yup.string().required('Release note must be provided'),
         })}
-        onSubmit={releaseNote =>
-          editReleaseNote(
-            selectedReleaseNote.id,
-            releaseNote as EditFormValues,
-          ).then(() => {
-            setEditFormOpen(false);
-          })
-        }
+        onSubmit={async values => {
+          await editReleaseNote(selectedReleaseNote.id, values);
+          setEditFormOpen(false);
+        }}
       >
         {form => {
           return (
@@ -191,30 +188,30 @@ const ReleaseNotesSection = ({ release }: Props) => {
           open={editingMode === 'edit'}
         >
           <ol className="govuk-list">
-            {releaseNotes.map(elem => (
-              <li key={elem.id}>
+            {releaseNotes.map(note => (
+              <li key={note.id}>
                 {editingMode === 'edit' &&
                 editFormOpen &&
-                selectedReleaseNote.id === elem.id ? (
+                selectedReleaseNote.id === note.id ? (
                   renderEditForm()
                 ) : (
                   <>
                     <FormattedDate className="govuk-body govuk-!-font-weight-bold">
-                      {elem.on}
+                      {note.on}
                     </FormattedDate>
-                    <p>{elem.reason}</p>
+                    <p>{note.reason}</p>
 
                     {editingMode === 'edit' && (
                       <ButtonGroup>
                         <Button
                           variant="secondary"
-                          onClick={() => openEditForm(elem)}
+                          onClick={() => openEditForm(note)}
                         >
                           Edit note
                         </Button>
                         <Button
                           variant="warning"
-                          onClick={() => setDeletedReleaseNote(elem)}
+                          onClick={() => setDeletedReleaseNote(note)}
                         >
                           Remove note
                         </Button>

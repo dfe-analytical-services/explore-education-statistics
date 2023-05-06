@@ -14,7 +14,9 @@ const DraftReleaseRowIssues = ({ releaseId }: Props) => {
   const {
     value: checklist,
     isLoading: isLoadingChecklist,
-  } = useAsyncHandledRetry(() => releaseService.getReleaseChecklist(releaseId));
+  } = useAsyncHandledRetry(async () =>
+    releaseService.getReleaseChecklist(releaseId),
+  );
 
   const totalIssues = checklist
     ? checklist?.errors?.length + checklist?.warnings.length

@@ -4,6 +4,7 @@ import 'core-js/features/array/flat-map';
 import 'core-js/features/string/replace-all';
 import 'cross-fetch/polyfill';
 
+// TODO: can probably get rid of this since next 13 doesn't support IE 11
 if (typeof window !== 'undefined') {
   // NodeList.forEach
   if (window.NodeList && !NodeList.prototype.forEach) {

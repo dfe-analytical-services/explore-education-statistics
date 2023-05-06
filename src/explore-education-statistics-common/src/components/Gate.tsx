@@ -1,20 +1,19 @@
 import usePrevious from '@common/hooks/usePrevious';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface GateProps {
   condition: boolean | (() => Promise<boolean>) | (() => boolean);
-  children: ReactNode;
+  children: JSX.Element;
   /**
    * Fallback to render if the {@property condition}
    * has not passed yet.
    */
-  fallback?: ReactNode | ((error?: unknown) => ReactNode);
+  fallback?: JSX.Element | ((error?: unknown) => JSX.Element | null);
   /**
    * Loading state to render if the {@property condition}
    * is dependent on an asynchronous task.
    */
-  loading?: ReactNode;
+  loading?: JSX.Element;
   /**
    * If the {@property condition} passes once, then we
    * consider the gate 'closed' and will not try to
@@ -32,8 +31,8 @@ interface GateProps {
 const Gate = ({
   children,
   condition,
-  fallback = null,
-  loading = null,
+  fallback = <div />,
+  loading = <></>,
   passOnce = true,
 }: GateProps) => {
   const previousCondition = usePrevious(condition);

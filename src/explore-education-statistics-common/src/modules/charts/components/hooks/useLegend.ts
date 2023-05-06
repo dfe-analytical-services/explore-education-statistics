@@ -7,7 +7,7 @@ export default function useLegend(): [LegendProps | undefined, ContentType] {
   const [legendProps, setLegendProps] = useState<LegendProps>();
 
   const renderLegend: ContentType = useCallback(
-    nextProps => {
+    (nextProps: object) => {
       const nextLegendProps = omit(nextProps, 'content');
 
       // Need to do a deep comparison of the props to

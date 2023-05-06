@@ -130,8 +130,8 @@ const UserInvitePage = ({
               .required('Provide the users email')
               .email('Provide a valid email address'),
             roleId: Yup.string().required('Choose role for the user'),
-            userReleaseRoles: Yup.array(),
-            userPublicationRoles: Yup.array(),
+            userReleaseRoles: Yup.array<InviteUserReleaseRole>(),
+            userPublicationRoles: Yup.array<InviteUserPublicationRole>(),
           })}
           onSubmit={handleSubmit}
         >

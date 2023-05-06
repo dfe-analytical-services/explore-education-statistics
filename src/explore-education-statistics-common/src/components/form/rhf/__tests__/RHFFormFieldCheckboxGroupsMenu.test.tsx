@@ -5,6 +5,7 @@ import Yup from '@common/validation/yup';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import flushPromises from '@common-test/flushPromises';
 
 describe('FormFieldCheckboxGroupsMenu', () => {
   test('renders multiple checkbox groups in correct order with search input', () => {
@@ -191,8 +192,10 @@ describe('FormFieldCheckboxGroupsMenu', () => {
 
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
+    await flushPromises();
+
     await waitFor(() => {
-      expect(screen.getByText('Option 1')).toBeVisible();
+      expect(screen.getByText(/Option 1/)).toBeVisible();
     });
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');

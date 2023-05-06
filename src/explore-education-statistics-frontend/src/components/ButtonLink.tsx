@@ -48,7 +48,7 @@ const ButtonLink = ({
   }
 
   return (
-    <Link {...props} prefetch={prefetch} href={to} passHref>
+    <Link {...props} prefetch={prefetch} href={to} passHref legacyBehavior>
       {link}
     </Link>
   );

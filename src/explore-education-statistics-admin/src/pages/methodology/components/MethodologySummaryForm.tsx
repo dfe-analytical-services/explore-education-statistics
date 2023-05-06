@@ -66,7 +66,7 @@ const MethodologySummaryForm = ({
           .required('Choose a title type')
           .oneOf(['default', 'alternative']),
 
-        title: Yup.string().when('titleType', {
+        title: Yup.string().when(['titleType'], {
           is: 'alternative',
           then: s => s.required('Enter a methodology title'),
         }),

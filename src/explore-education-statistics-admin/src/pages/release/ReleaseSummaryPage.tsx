@@ -67,7 +67,11 @@ const ReleaseSummaryPage = () => {
             </SummaryListItem>
           </SummaryList>
 
-          <Gate condition={() => permissionService.canUpdateRelease(releaseId)}>
+          <Gate
+            condition={async () =>
+              permissionService.canUpdateRelease(releaseId)
+            }
+          >
             <ButtonLink
               to={generatePath<ReleaseRouteParams>(
                 releaseSummaryEditRoute.path,

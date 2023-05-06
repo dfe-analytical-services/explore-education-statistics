@@ -3,12 +3,13 @@ import { renderHook } from '@testing-library/react-hooks';
 
 describe('useDebouncedCallback', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    jest.useFakeTimers({
+      legacyFakeTimers: true,
+    });
   });
 
   afterEach(() => {
     jest.useRealTimers();
-    jest.runOnlyPendingTimers();
   });
 
   test('does not run callback until specified timeout', () => {

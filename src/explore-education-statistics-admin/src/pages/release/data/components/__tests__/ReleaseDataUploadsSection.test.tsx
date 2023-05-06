@@ -563,8 +563,11 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      userEvent.type(screen.getByLabelText('Subject title'), 'Test data 1');
+      userEvent.type(screen.getByLabelText('Subject title'), 'Test zip title');
+
       userEvent.tab();
+
+      screen.debug();
 
       await waitFor(() => {
         expect(

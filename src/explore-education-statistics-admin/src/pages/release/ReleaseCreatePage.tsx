@@ -17,7 +17,6 @@ import { mapFieldErrors } from '@common/validation/serverValidations';
 import { generatePath, RouteComponentProps, withRouter } from 'react-router';
 import React from 'react';
 import { ReleaseType } from '@common/services/types/releaseType';
-import Yup from '@common/validation/yup';
 
 export interface FormValues extends ReleaseSummaryFormValues {
   templateReleaseId: string;
@@ -129,16 +128,16 @@ const ReleaseCreatePage = ({
             releaseType: (undefined as unknown) as ReleaseType,
           } as FormValues)
         }
-        validationSchema={baseSchema => {
-          return baseSchema.shape({
-            templateReleaseId: Yup.string()
-              .defined()
-              .when('templateReleaseId', {
-                is: (v: string) => v !== undefined,
-                then: s => s.required(),
-              }),
-          });
-        }}
+        // validationSchema={baseSchema => {
+        //   return baseSchema.shape({
+        //     templateReleaseId: Yup.string()
+        //       .defined()
+        //       .when('templateReleaseId', {
+        //         is: (v: string) => v !== undefined,
+        //         then: s => s.required(),
+        //       }),
+        //   });
+        // }}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
         additionalFields={

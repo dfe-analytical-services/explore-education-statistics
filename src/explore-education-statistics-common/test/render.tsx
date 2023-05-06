@@ -4,9 +4,13 @@ import {
   RenderOptions,
   RenderResult,
 } from '@testing-library/react';
-import React, { FC, ReactElement } from 'react';
+import React, { ReactElement, ReactNode } from 'react';
 
-const DefaultWrapper: FC = ({ children }) => {
+interface Props {
+  children: ReactNode;
+}
+
+const DefaultWrapper = ({ children }: Props) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {

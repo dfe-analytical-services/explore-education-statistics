@@ -113,7 +113,7 @@ describe('DataFileUploadForm', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('Choose a ZIP file that is not empty', {
+        screen.getByText('Choose a zip file that is not empty', {
           selector: '#dataFileUploadForm-zipFile-error',
         }),
       ).toBeInTheDocument();

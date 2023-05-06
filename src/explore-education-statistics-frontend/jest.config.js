@@ -1,6 +1,11 @@
-/** @type {import('jest').Config} */
+const nextJest = require('next/jest');
 
-const config = {
+const createJestConfig = nextJest({
+  dir: './',
+});
+
+/** @type {import('jest').Config} */
+const customJestConfig = {
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
   setupFilesAfterEnv: ['<rootDir>/test/setupTests.js'],
   testMatch: [
@@ -50,4 +55,4 @@ const config = {
   snapshotSerializers: ['jest-serializer-html'],
 };
 
-module.exports = config;
+module.exports = createJestConfig(customJestConfig);

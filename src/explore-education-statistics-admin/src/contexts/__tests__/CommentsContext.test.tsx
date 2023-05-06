@@ -4,19 +4,18 @@ import {
   useCommentsContext,
 } from '@admin/contexts/CommentsContext';
 import { CommentCreate } from '@admin/services/releaseContentCommentService';
-import { OmitStrict } from '@common/types';
 import {
   testComments,
   testCommentUser1,
 } from '@admin/components/comments/__data__/testComments';
 import { Comment } from '@admin/services/types/content';
-import React, { FC } from 'react';
+import React from 'react';
 import { act, renderHook } from '@testing-library/react-hooks';
 
 describe('CommentsContext', () => {
-  type Props = OmitStrict<CommentsContextProviderProps, 'children'>;
+  type Props = CommentsContextProviderProps;
 
-  const wrapper: FC<Props> = ({ ...props }) => (
+  const wrapper = ({ ...props }: Props) => (
     <CommentsContextProvider {...props}>
       {props.children}
     </CommentsContextProvider>
@@ -48,13 +47,14 @@ describe('CommentsContext', () => {
   const handlePendingDelete = jest.fn();
   const handlePendingDeleteUndo = jest.fn();
 
-  const initialProps: Props = {
+  const initialProps = {
     comments: testComments,
     onCreate: handleCreate,
     onDelete: handleDelete,
     onUpdate: handleUpdate,
     onPendingDelete: handlePendingDelete,
     onPendingDeleteUndo: handlePendingDeleteUndo,
+    children: <div />,
   };
 
   test('updating `comments` prop updates the returned comments', () => {

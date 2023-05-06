@@ -24,7 +24,9 @@ import { Formik } from 'formik';
 interface DownloadFormValues {
   files: string[];
 }
-export type DownloadFormSubmitHandler = (values: { files: string[] }) => void;
+export type DownloadFormSubmitHandler = (values: {
+  files: DownloadFormValues['files'];
+}) => void;
 
 interface Props {
   release?: ReleaseSummary;

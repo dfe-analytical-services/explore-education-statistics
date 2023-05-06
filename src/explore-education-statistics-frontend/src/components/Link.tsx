@@ -1,6 +1,6 @@
 import { OmitStrict } from '@common/types';
 import classNames from 'classnames';
-import RouterLink, { LinkProps as RouterLinkProps } from 'next/link';
+import NextLink, { LinkProps as RouterLinkProps } from 'next/link';
 import React, { AnchorHTMLAttributes, ReactNode } from 'react';
 
 export type LinkProps = {
@@ -51,15 +51,16 @@ const Link = ({
   }
 
   return (
-    <RouterLink
+    <NextLink
       href={to}
       prefetch={prefetch}
       scroll={scroll}
       shallow={shallow}
       passHref
+      legacyBehavior
     >
       {link}
-    </RouterLink>
+    </NextLink>
   );
 };
 

@@ -29,6 +29,7 @@ import {
   ReleaseDataFileRouteParams,
 } from '@admin/routes/releaseRoutes';
 import FormattedDate from '@common/components/FormattedDate';
+import isErrorLike from '@common/utils/error/isErrorLike';
 
 interface FormValues {
   title: string;
@@ -77,7 +78,7 @@ const ReleaseFileUploadsSection = ({
     setState: setFiles,
     isLoading,
   } = useAsyncHandledRetry(
-    () => releaseAncillaryFileService.getAncillaryFiles(releaseId),
+    async () => releaseAncillaryFileService.getAncillaryFiles(releaseId),
     [releaseId],
   );
 
@@ -95,9 +96,8 @@ const ReleaseFileUploadsSection = ({
   };
 
   const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
-    setIsUploading(true);
-
     try {
+      setIsUploading(true);
       const newFile = await releaseAncillaryFileService.uploadAncillaryFile(
         releaseId,
         {
@@ -111,8 +111,11 @@ const ReleaseFileUploadsSection = ({
       setFiles({
         value: [...files, newFile],
       });
-    } finally {
       setIsUploading(false);
+    } catch (e) {
+      if (isErrorLike(e)) {
+        logger.error(e);
+      }
     }
   }, errorMappings);
 
@@ -153,7 +156,7 @@ const ReleaseFileUploadsSection = ({
               },
             }),
           summary: Yup.string().required('Enter a summary'),
-          file: Yup.file()
+          file: Yup.mixed()
             .required('Choose a file')
             .minSize(0, 'Choose a file that is not empty'),
         })}
@@ -242,7 +245,7 @@ const ReleaseFileUploadsSection = ({
 
                     <SummaryListItem term="File">
                       <ButtonText
-                        onClick={() =>
+                        onClick={async () =>
                           releaseAncillaryFileService.downloadFile(
                             releaseId,
                             file.id,

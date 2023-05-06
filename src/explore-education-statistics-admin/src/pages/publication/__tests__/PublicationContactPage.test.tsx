@@ -147,39 +147,55 @@ describe('PublicationContactPage', () => {
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
 
-    userEvent.clear(screen.getByLabelText('Team name'));
+    userEvent.clear(
+      screen.getByLabelText('Team name', {
+        selector: '#publicationContactForm-teamName',
+      }),
+    );
     userEvent.tab();
 
-    userEvent.clear(screen.getByLabelText('Team email'));
+    userEvent.clear(
+      screen.getByLabelText('Team email', {
+        selector: '#publicationContactForm-teamEmail',
+      }),
+    );
     userEvent.tab();
 
-    userEvent.clear(screen.getByLabelText('Contact name'));
+    userEvent.clear(
+      screen.getByLabelText('Contact name', {
+        selector: '#publicationContactForm-contactName',
+      }),
+    );
     userEvent.tab();
 
-    userEvent.clear(screen.getByLabelText('Contact telephone'));
+    userEvent.clear(
+      screen.getByLabelText('Contact telephone', {
+        selector: '#publicationContactForm-contactTelNo',
+      }),
+    );
     userEvent.tab();
 
     await waitFor(() => {
       expect(
-        screen.getByText('Enter a team name', {
+        screen.getByText(/Enter a team name/, {
           selector: '#publicationContactForm-teamName-error',
         }),
       ).toBeInTheDocument();
 
       expect(
-        screen.getByText('Enter a team email', {
+        screen.getByText(/Enter a team email/, {
           selector: '#publicationContactForm-teamEmail-error',
         }),
       ).toBeInTheDocument();
 
       expect(
-        screen.getByText('Enter a contact name', {
+        screen.getByText(/Enter a contact name/, {
           selector: '#publicationContactForm-contactName-error',
         }),
       ).toBeInTheDocument();
 
       expect(
-        screen.getByText('Enter a contact telephone', {
+        screen.getByText(/Enter a contact telephone/, {
           selector: '#publicationContactForm-contactTelNo-error',
         }),
       ).toBeInTheDocument();

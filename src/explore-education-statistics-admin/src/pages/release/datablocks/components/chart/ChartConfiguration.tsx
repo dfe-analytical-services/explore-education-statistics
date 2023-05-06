@@ -98,12 +98,12 @@ const ChartConfiguration = ({
   }, [definition.type]);
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
-    let schema: ObjectSchema<FormValues> = Yup.object<FormValues>({
+    let schema = Yup.object<FormValues>({
       titleType: Yup.mixed<TitleType>()
         .oneOf(['default', 'alternative'])
         .required('Choose a title type'),
       title: Yup.string()
-        .when('titleType', {
+        .when(['titleType'], {
           is: 'alternative',
           then: s => s.required('Enter chart title'),
         })
@@ -133,15 +133,32 @@ const ChartConfiguration = ({
       });
     }
 
+    // if (definition.type === 'infographic') {
+    //   schema = schema.shape({
+    //     fileId: Yup.string(),
+    //     file: Yup.mixed()
+    //       .when(['fileId'], {
+    //         is: (value: string) => !value,
+    //         then(schema) {
+    //           return schema.required('Select an infographic file to upload');
+    //         },
+    //       })
+    //       .minSize(0, 'The infographic cannot be an empty file'),
+    //   });
+    // }
+
     if (definition.type === 'infographic') {
       schema = schema.shape({
         fileId: Yup.string(),
-        file: Yup.file()
-          .when('fileId', {
-            is: (value: string) => !value,
-            then: s => s.required('Select an infographic file to upload'),
-          })
-          .minSize(0, 'The infographic cannot be an empty file'),
+        file: Yup.mixed().when('fileId', {
+          is: (value: string) => !value,
+          // eslint-disable-next-line @typescript-eslint/no-shadow
+          then(schema) {
+            return schema
+              .required('Select an infographic file to upload')
+              .minSize(0, 'The infographic cannot be an empty file');
+          },
+        }),
       });
     }
 

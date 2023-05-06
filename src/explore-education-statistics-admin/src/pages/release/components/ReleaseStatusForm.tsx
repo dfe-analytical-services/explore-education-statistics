@@ -144,16 +144,16 @@ const ReleaseStatusForm = ({
   const validationSchema = useMemo(() => {
     const schema = Yup.object<ReleaseStatusFormValues>({
       approvalStatus: Yup.string().required('Choose a status'),
-      internalReleaseNote: Yup.string().when('approvalStatus', {
+      internalReleaseNote: Yup.string().when(['approvalStatus'], {
         is: (value: string) =>
           ['Approved', 'HigherLevelReview'].includes(value),
         then: s => s.required('Enter an internal note'),
       }),
-      publishMethod: Yup.string().when('approvalStatus', {
+      publishMethod: Yup.string().when(['approvalStatus'], {
         is: 'Approved',
         then: s => s.required('Choose when to publish'),
       }),
-      publishScheduled: Yup.date().when('publishMethod', {
+      publishScheduled: Yup.date().when(['publishMethod'], {
         is: 'Scheduled',
         then: s =>
           s.required('Enter a valid publish date').test({

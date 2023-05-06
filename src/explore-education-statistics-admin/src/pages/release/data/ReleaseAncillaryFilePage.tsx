@@ -35,7 +35,7 @@ const ReleaseAncillaryFilePage = ({
     value: ancillaryFile,
     isLoading: ancillaryFileLoading,
   } = useAsyncHandledRetry(
-    () => releaseAncillaryFileService.getAncillaryFile(releaseId, fileId),
+    async () => releaseAncillaryFileService.getAncillaryFile(releaseId, fileId),
     [releaseId, fileId],
   );
 

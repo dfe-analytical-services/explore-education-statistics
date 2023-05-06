@@ -6,6 +6,16 @@ import './extend-expect';
 
 jest.setTimeout(10000);
 
+// jest.mock('next/head', () => {
+//   return {
+//     __esModule: true,
+//     default: (props) => {
+//       // eslint-disable-next-line react/jsx-filename-extension
+//       return <>{props.children}</>;
+//     },
+//   };
+// })
+
 if (typeof window !== 'undefined') {
   // fetch polyfill for making API calls.
   require('cross-fetch');

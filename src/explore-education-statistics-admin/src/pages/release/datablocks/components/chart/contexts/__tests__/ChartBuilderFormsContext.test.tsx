@@ -5,14 +5,13 @@ import {
   useChartBuilderFormsContext,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
 import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
-import { OmitStrict } from '@common/types';
 import { renderHook } from '@testing-library/react-hooks';
-import React, { FC } from 'react';
+import React from 'react';
 
 describe('useChartBuilderFormsContext', () => {
-  type Props = OmitStrict<ChartBuilderFormContextProviderProps, 'children'>;
+  type Props = ChartBuilderFormContextProviderProps;
 
-  const wrapper: FC<Props> = ({ ...props }) => (
+  const wrapper = ({ ...props }: Props) => (
     <ChartBuilderFormsContextProvider {...props}>
       {props.children}
     </ChartBuilderFormsContextProvider>
@@ -37,6 +36,7 @@ describe('useChartBuilderFormsContext', () => {
     const { result } = renderHook(() => useChartBuilderFormsContext(), {
       wrapper,
       initialProps: {
+        children: <div />,
         definition: {
           axes: {},
           name: '',
@@ -86,6 +86,7 @@ describe('useChartBuilderFormsContext', () => {
     });
 
     rerender({
+      children: <div />,
       definition: {
         axes: {},
         name: '',
@@ -121,6 +122,7 @@ describe('useChartBuilderFormsContext', () => {
       {
         wrapper,
         initialProps: {
+          children: <div />,
           initialForms: {
             options: {
               title: 'Chart configuration',
@@ -156,6 +158,7 @@ describe('useChartBuilderFormsContext', () => {
     });
 
     rerender({
+      children: <div />,
       definition: {
         axes: {},
         name: '',
@@ -191,6 +194,7 @@ describe('useChartBuilderFormsContext', () => {
       {
         wrapper,
         initialProps: {
+          children: <div />,
           definition: {
             axes: {},
             name: '',
@@ -222,6 +226,7 @@ describe('useChartBuilderFormsContext', () => {
     });
 
     rerender({
+      children: <div />,
       definition: {
         axes: {},
         name: '',
@@ -250,6 +255,7 @@ describe('useChartBuilderFormsContext', () => {
     const { result } = renderHook(() => useChartBuilderFormsContext(), {
       wrapper,
       initialProps: {
+        children: <div />,
         definition: {
           axes: {
             major: {
@@ -316,6 +322,7 @@ describe('useChartBuilderFormsContext', () => {
     });
 
     rerender({
+      children: <div />,
       definition: {
         axes: {
           major: {
@@ -368,6 +375,7 @@ describe('useChartBuilderFormsContext', () => {
       {
         wrapper,
         initialProps: {
+          children: <div />,
           initialForms: {
             options: {
               title: 'Chart configuration',
@@ -415,6 +423,7 @@ describe('useChartBuilderFormsContext', () => {
     });
 
     rerender({
+      children: <div />,
       definition: {
         axes: {
           major: {
@@ -467,6 +476,7 @@ describe('useChartBuilderFormsContext', () => {
       {
         wrapper,
         initialProps: {
+          children: <div />,
           definition: {
             axes: {
               major: {
@@ -515,6 +525,7 @@ describe('useChartBuilderFormsContext', () => {
     });
 
     rerender({
+      children: <div />,
       definition: {
         axes: {},
         name: '',
@@ -543,6 +554,7 @@ describe('useChartBuilderFormsContext', () => {
     const { result } = renderHook(() => useChartBuilderFormsContext(), {
       wrapper,
       initialProps: {
+        children: <div />,
         definition: {
           axes: {
             minor: {
@@ -603,6 +615,7 @@ describe('useChartBuilderFormsContext', () => {
     });
 
     rerender({
+      children: <div />,
       definition: {
         axes: {
           minor: {
@@ -649,6 +662,7 @@ describe('useChartBuilderFormsContext', () => {
       {
         wrapper,
         initialProps: {
+          children: <div />,
           initialForms: {
             options: {
               title: 'Chart configuration',
@@ -684,6 +698,7 @@ describe('useChartBuilderFormsContext', () => {
     });
 
     rerender({
+      children: <div />,
       definition: {
         axes: {
           minor: {
@@ -730,6 +745,7 @@ describe('useChartBuilderFormsContext', () => {
       {
         wrapper,
         initialProps: {
+          children: <div />,
           definition: {
             axes: {
               minor: {
@@ -772,6 +788,7 @@ describe('useChartBuilderFormsContext', () => {
     });
 
     rerender({
+      children: <div />,
       definition: {
         axes: {},
         name: '',
@@ -800,6 +817,7 @@ describe('useChartBuilderFormsContext', () => {
     const { result } = renderHook(() => useChartBuilderFormsContext(), {
       wrapper,
       initialProps: {
+        children: <div />,
         definition: {
           axes: {},
           name: '',
@@ -841,6 +859,7 @@ describe('useChartBuilderFormsContext', () => {
     const { result } = renderHook(() => useChartBuilderFormsContext(), {
       wrapper,
       initialProps: {
+        children: <div />,
         onSubmit: handleSubmit,
       },
     });
@@ -860,6 +879,7 @@ describe('useChartBuilderFormsContext', () => {
       {
         wrapper,
         initialProps: {
+          children: <div />,
           initialForms: {
             options: {
               title: 'Chart configuration',

@@ -26,7 +26,7 @@ const ReleaseDataPage = () => {
     value: canUpdateRelease = false,
     isLoading,
   } = useAsyncHandledRetry(
-    () => permissionService.canUpdateRelease(releaseId),
+    async () => permissionService.canUpdateRelease(releaseId),
     [releaseId],
   );
 

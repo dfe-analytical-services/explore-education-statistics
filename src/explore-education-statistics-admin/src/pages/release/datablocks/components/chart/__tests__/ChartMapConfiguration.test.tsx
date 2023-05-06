@@ -9,7 +9,7 @@ import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React, { FC } from 'react';
+import React, { ReactNode } from 'react';
 
 describe('ChartMapConfiguration', () => {
   const testDefaultChartOptions: ChartOptions = {
@@ -52,7 +52,11 @@ describe('ChartMapConfiguration', () => {
     },
   };
 
-  const wrapper: FC = ({ children }) => (
+  interface Props {
+    children: ReactNode;
+  }
+
+  const wrapper = ({ children }: Props) => (
     <ChartBuilderFormsContextProvider
       initialForms={{
         ...testFormState,

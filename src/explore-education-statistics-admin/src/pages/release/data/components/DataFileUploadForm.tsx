@@ -15,6 +15,12 @@ import { Formik } from 'formik';
 import React, { ReactNode } from 'react';
 import { ObjectSchema } from 'yup';
 
+// export type YupSafeFormValues = OmitStrict<DataFileUploadFormValues, 'dataFile' | 'metadataFile' | 'zipFile'> & {
+//   dataFile?: object;
+//   metadataFile?: object;
+//   zipFile?: object;
+// }
+
 export interface DataFileUploadFormValues {
   uploadType: 'csv' | 'zip';
   dataFile: File | null;
@@ -85,7 +91,7 @@ interface Props<FormValues extends DataFileUploadFormValues> {
   id?: string;
   initialValues?: FormValues;
   validationSchema?: (
-    baseSchema: ObjectSchema<DataFileUploadFormValues>,
+    baseSchema: ObjectSchema<FormValues>,
   ) => ObjectSchema<FormValues>;
   submitText?: string;
   onSubmit: (values: FormValues) => void;
@@ -136,101 +142,106 @@ const DataFileUploadForm = <FormValues extends DataFileUploadFormValues>({
       }}
       onSubmit={handleSubmit}
       validationSchema={() => {
-        const baseSchema: ObjectSchema<DataFileUploadFormValues> = Yup.object({
-          uploadType: Yup.mixed<DataFileUploadFormValues['uploadType']>()
-            .required()
-            .oneOf(['csv', 'zip'])
-            .defined(),
-          dataFile: Yup.file().when('uploadType', {
-            is: 'csv',
-            then: s =>
-              s.required().minSize(0, 'Choose a data file that is not empty'),
+        const baseSchema = ({
+          uploadType: Yup.mixed().defined().oneOf(['csv', 'zip']),
+
+          dataFile: Yup.mixed().when('uploadType', ([uploadType], s) => {
+            if (uploadType === 'zip') {
+              return s.notRequired();
+            }
+
+            return s
+              .required('Choose a data file')
+              .minSize(0, 'Choose a data file that is not empty');
           }),
-          metadataFile: Yup.file().when('uploadType', {
-            is: 'csv',
-            then: s =>
-              s
-                .required('Choose a metadata file')
-                .minSize(0, 'Choose a metadata file that is not empty'),
+          metadataFile: Yup.mixed().when('uploadType', ([uploadType], s) => {
+            if (uploadType === 'zip') {
+              return s.notRequired();
+            }
+
+            return s
+              .required('Choose a metadata file')
+              .minSize(0, 'Choose a metadata file that is not empty');
           }),
-          zipFile: Yup.file().when('uploadType', {
-            is: 'zip',
-            then: s =>
-              s
-                .required('Choose a zip file')
-                .minSize(0, 'Choose a ZIP file that is not empty'),
+
+          zipFile: Yup.mixed().when('uploadType', ([uploadType], s) => {
+            if (uploadType === 'csv') {
+              return s.notRequired();
+            }
+
+            return s
+              .required('Choose a zip file')
+              .minSize(0, 'Choose a zip file that is not empty');
           }),
-        });
+        } as unknown) as ObjectSchema<FormValues>;
 
         return validationSchema ? validationSchema(baseSchema) : baseSchema;
       }}
     >
       {form => (
-        <>
-          <Form id={id}>
-            <div style={{ position: 'relative' }}>
-              {form.isSubmitting && (
-                <LoadingSpinner text="Uploading files" overlay />
-              )}
+        <Form id={id}>
+          <div style={{ position: 'relative' }}>
+            {form.isSubmitting && (
+              <LoadingSpinner text="Uploading files" overlay />
+            )}
 
-              {beforeFields}
+            {beforeFields}
 
-              <FormFieldRadioGroup<DataFileUploadFormValues>
-                name="uploadType"
-                legend="Choose upload method"
-                options={[
-                  {
-                    label: 'CSV files',
-                    value: 'csv',
-                    conditional: (
-                      <>
-                        <FormFieldFileInput<DataFileUploadFormValues>
-                          name="dataFile"
-                          label="Upload data file"
-                          accept=".csv"
-                        />
-
-                        <FormFieldFileInput<DataFileUploadFormValues>
-                          name="metadataFile"
-                          label="Upload metadata file"
-                          accept=".csv"
-                        />
-                      </>
-                    ),
-                  },
-                  {
-                    label: 'ZIP file',
-                    hint: 'Recommended for larger data files',
-                    value: 'zip',
-                    conditional: (
+            <FormFieldRadioGroup<DataFileUploadFormValues>
+              name="uploadType"
+              legend="Choose upload method"
+              options={[
+                {
+                  label: 'CSV files',
+                  value: 'csv',
+                  conditional: (
+                    <>
                       <FormFieldFileInput<DataFileUploadFormValues>
-                        hint="Must contain both the data and metadata CSV files"
-                        name="zipFile"
-                        label="Upload ZIP file"
-                        accept=".zip"
+                        name="dataFile"
+                        label="Upload data file"
+                        accept=".csv"
                       />
-                    ),
-                  },
-                ]}
-              />
 
-              <ButtonGroup>
-                <Button type="submit" disabled={form.isSubmitting}>
-                  {submitText}
-                </Button>
+                      <FormFieldFileInput<DataFileUploadFormValues>
+                        name="metadataFile"
+                        label="Upload metadata file"
+                        accept=".csv"
+                      />
+                    </>
+                  ),
+                },
+                {
+                  label: 'ZIP file',
+                  hint: 'Recommended for larger data files',
+                  value: 'zip',
+                  conditional: (
+                    <FormFieldFileInput<DataFileUploadFormValues>
+                      hint="Must contain both the data and metadata CSV files"
+                      name="zipFile"
+                      label="Upload ZIP file"
+                      accept=".zip"
+                    />
+                  ),
+                },
+              ]}
+            />
 
-                <ButtonText
-                  disabled={form.isSubmitting}
-                  onClick={() => {
-                    form.resetForm();
-                  }}
-                >
-                  Cancel
-                </ButtonText>
-              </ButtonGroup>
-            </div>
-          </Form>
-        </>
+            <ButtonGroup>
+              <Button type="submit" disabled={form.isSubmitting}>
+                {submitText}
+              </Button>
+
+              <ButtonText
+                disabled={form.isSubmitting}
+                onClick={() => {
+                  form.resetForm();
+                }}
+              >
+                Cancel
+              </ButtonText>
+            </ButtonGroup>
+          </div>
+        </Form>
       )}
     </Formik>
   );

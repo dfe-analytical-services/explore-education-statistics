@@ -7,6 +7,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
+import flushPromises from '@common-test/flushPromises';
 
 describe('DownloadStep', () => {
   const wizardProps: InjectedWizardProps = {
@@ -240,6 +241,8 @@ describe('DownloadStep', () => {
     userEvent.click(
       screen.getByRole('button', { name: 'Download selected files' }),
     );
+
+    await flushPromises();
 
     await waitFor(() => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();

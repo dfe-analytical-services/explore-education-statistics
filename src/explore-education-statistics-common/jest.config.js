@@ -42,7 +42,7 @@ const config = {
   snapshotSerializers: ['jest-serializer-html'],
   fakeTimers: {
     legacyFakeTimers: true,
-    // enableGlobally: true,
+    enableGlobally: true,
   },
 };
 

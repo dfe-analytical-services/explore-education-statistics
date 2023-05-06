@@ -185,11 +185,11 @@ const ReleaseDataFileReplacePage = ({
             <section className="govuk-!-margin-bottom-8">
               <h2>Data file details</h2>
 
-              {replacementDataFileError && (
+              {replacementDataFileError ? (
                 <WarningMessage>
                   There was a problem loading the replacement file details.
                 </WarningMessage>
-              )}
+              ) : null}
 
               <DataFileDetailsTable
                 dataFile={dataFile}

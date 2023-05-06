@@ -1,19 +1,19 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import Head from 'next/head';
 
-class ErrorPrefixPageTitle extends Component {
-  public componentWillUnmount() {
-    document.title = document.title.replace(/ERROR: /g, '');
-  }
-
-  public render() {
+const ErrorPrefixPageTitle = () => {
+  useEffect(() => {
     document.title = `ERROR: ${document.title.replace(/ERROR: /g, '')}`;
-    return (
-      <Head>
-        <title>ERROR: {document.title.replace(/ERROR: /g, '')}</title>
-      </Head>
-    );
-  }
-}
+    return () => {
+      document.title = document.title.replace(/ERROR: /g, '');
+    };
+  }, []);
+
+  return (
+    <Head>
+      <title>ERROR: {document.title.replace(/ERROR: /g, '')}</title>
+    </Head>
+  );
+};
 
 export default ErrorPrefixPageTitle;

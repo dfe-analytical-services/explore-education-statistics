@@ -2,13 +2,17 @@ import { ErrorControlContextProvider } from '@common/contexts/ErrorControlContex
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import { renderHook } from '@testing-library/react-hooks';
 import noop from 'lodash/noop';
-import React, { FunctionComponent } from 'react';
+import React, { ReactNode } from 'react';
+
+interface Props {
+  children: ReactNode;
+}
 
 describe('useAsyncHandledRetry', () => {
   test('calls `handleError` if callback promise is rejected', async () => {
     const handleError = jest.fn();
 
-    const wrapper: FunctionComponent = ({ children }) => (
+    const wrapper = ({ children }: Props) => (
       <ErrorControlContextProvider
         value={{
           handleError,
@@ -37,7 +41,7 @@ describe('useAsyncHandledRetry', () => {
   test('does not call `handleError` if callback promise is resolved', async () => {
     const handleError = jest.fn();
 
-    const wrapper: FunctionComponent = ({ children }) => (
+    const wrapper = ({ children }: Props) => (
       <ErrorControlContextProvider
         value={{
           handleError,
@@ -64,7 +68,7 @@ describe('useAsyncHandledRetry', () => {
   });
 
   test('cannot set error via initial state', async () => {
-    const wrapper: FunctionComponent = ({ children }) => (
+    const wrapper = ({ children }: Props) => (
       <ErrorControlContextProvider
         value={{
           handleError: noop,
@@ -93,7 +97,7 @@ describe('useAsyncHandledRetry', () => {
   });
 
   test('cannot set error via setter', async () => {
-    const wrapper: FunctionComponent = ({ children }) => (
+    const wrapper = ({ children }: Props) => (
       <ErrorControlContextProvider
         value={{
           handleError: noop,

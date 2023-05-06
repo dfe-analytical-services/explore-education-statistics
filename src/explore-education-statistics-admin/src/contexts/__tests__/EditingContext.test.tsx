@@ -3,12 +3,11 @@ import {
   EditingContextProviderProps,
   useEditingContext,
 } from '@admin/contexts/EditingContext';
-import { OmitStrict } from '@common/types';
 import React, { FC } from 'react';
 import { act, renderHook } from '@testing-library/react-hooks';
 
 describe('EditingContext', () => {
-  type Props = OmitStrict<EditingContextProviderProps, 'children'>;
+  type Props = EditingContextProviderProps;
 
   const wrapper: FC<Props> = ({ ...props }) => (
     <EditingContextProvider {...props}>{props.children}</EditingContextProvider>
@@ -18,6 +17,7 @@ describe('EditingContext', () => {
     const { result } = renderHook(() => useEditingContext(), {
       wrapper,
       initialProps: {
+        children: <div />,
         editingMode: 'edit',
       },
     });
@@ -45,6 +45,7 @@ describe('EditingContext', () => {
     const { result } = renderHook(() => useEditingContext(), {
       wrapper,
       initialProps: {
+        children: <div />,
         editingMode: 'edit',
         unsavedBlocks: ['block-1', 'block-2', 'block-3'],
       },
@@ -81,6 +82,7 @@ describe('EditingContext', () => {
     const { result } = renderHook(() => useEditingContext(), {
       wrapper,
       initialProps: {
+        children: <div />,
         editingMode: 'edit',
         unresolvedComments: { 'block-1': ['comment-1'] },
       },
@@ -99,6 +101,7 @@ describe('EditingContext', () => {
     const { result } = renderHook(() => useEditingContext(), {
       wrapper,
       initialProps: {
+        children: <div />,
         editingMode: 'edit',
         unresolvedComments: { 'block-1': ['comment-1', 'comment-2'] },
       },
@@ -118,6 +121,7 @@ describe('EditingContext', () => {
     const { result } = renderHook(() => useEditingContext(), {
       wrapper,
       initialProps: {
+        children: <div />,
         editingMode: 'edit',
         unresolvedComments: { 'block-1': ['comment-1', 'comment-2'] },
       },
@@ -153,6 +157,7 @@ describe('EditingContext', () => {
     const { result } = renderHook(() => useEditingContext(), {
       wrapper,
       initialProps: {
+        children: <div />,
         editingMode: 'edit',
         unsavedCommentDeletions: { 'block-1': ['comment-1'] },
       },
@@ -174,6 +179,7 @@ describe('EditingContext', () => {
     const { result } = renderHook(() => useEditingContext(), {
       wrapper,
       initialProps: {
+        children: <div />,
         editingMode: 'edit',
         unsavedCommentDeletions: { 'block-1': ['comment-1', 'comment-2'] },
       },
@@ -196,6 +202,7 @@ describe('EditingContext', () => {
     const { result } = renderHook(() => useEditingContext(), {
       wrapper,
       initialProps: {
+        children: <div />,
         editingMode: 'edit',
         unsavedCommentDeletions: { 'block-1': ['comment-1', 'comment-2'] },
       },

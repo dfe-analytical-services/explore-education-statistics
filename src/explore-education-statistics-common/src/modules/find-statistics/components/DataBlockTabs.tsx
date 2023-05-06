@@ -73,7 +73,7 @@ const DataBlockTabs = ({
             }
             title="Chart"
           >
-            {error && errorMessage}
+            {error ? errorMessage : null}
 
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>
@@ -131,7 +131,7 @@ const DataBlockTabs = ({
             }
             title="Table"
           >
-            {error && errorMessage}
+            {error ? errorMessage : null}
 
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>

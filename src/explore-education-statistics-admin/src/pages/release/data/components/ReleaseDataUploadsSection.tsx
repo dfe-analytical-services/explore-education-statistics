@@ -198,7 +198,7 @@ const ReleaseDataUploadsSection = ({
                 .test({
                   name: 'unique',
                   message: 'Enter a unique subject title',
-                  test(value: string) {
+                  test(value?: string) {
                     if (!value) {
                       return true;
                     }

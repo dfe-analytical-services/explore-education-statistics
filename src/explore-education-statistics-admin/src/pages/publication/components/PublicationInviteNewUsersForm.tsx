@@ -84,7 +84,9 @@ const PublicationInviteNewUsersForm = ({
           email: Yup.string()
             .required('Enter an email address')
             .email('Enter a valid email address'),
-          releaseIds: Yup.array().min(1, 'Select at least one release'),
+          releaseIds: Yup.array<
+            InviteContributorFormValues['releaseIds']
+          >().min(1, 'Select at least one release'),
         })}
         onSubmit={handleSubmit}
       >

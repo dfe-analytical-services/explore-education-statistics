@@ -3,7 +3,7 @@ import useMounted from '@common/hooks/useMounted';
 import { GlossaryEntry } from '@common/services/types/glossary';
 import sanitizeHtml, { SanitizeHtmlOptions } from '@common/utils/sanitizeHtml';
 import classNames from 'classnames';
-import { Element } from 'domhandler/lib/node';
+import { Element } from 'domhandler';
 import parseHtmlString, {
   DOMNode,
   domToReact,

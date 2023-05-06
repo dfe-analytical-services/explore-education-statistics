@@ -240,6 +240,7 @@ describe('ReleaseFileUploadsSection', () => {
 
       userEvent.type(screen.getByLabelText('Title'), 'Test file 1');
       userEvent.tab();
+      screen.debug();
 
       await waitFor(() => {
         expect(

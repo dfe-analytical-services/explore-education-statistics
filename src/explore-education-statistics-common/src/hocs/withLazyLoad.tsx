@@ -2,6 +2,8 @@ import { OmitStrict } from '@common/types';
 import React, { ComponentType, ReactNode } from 'react';
 import LazyLoad, { LazyLoadProps as BaseLazyLoadProps } from 'react-lazyload';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 interface LazyLoadProps<P> extends OmitStrict<BaseLazyLoadProps, 'children'> {
   placeholder?: ((props: P) => ReactNode) | ReactNode;
 }

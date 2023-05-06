@@ -48,15 +48,15 @@ const MethodologyStatusForm = ({
       onSubmit={useFormSubmit<FormValues>(onSubmit)}
       validationSchema={Yup.object<FormValues>({
         status: Yup.mixed().required('Choose a status'),
-        latestInternalReleaseNote: Yup.string().when('status', {
+        latestInternalReleaseNote: Yup.string().when(['status'], {
           is: 'Approved',
           then: s => s.required('Enter an internal note'),
         }),
-        publishingStrategy: Yup.string().when('status', {
+        publishingStrategy: Yup.string().when(['status'], {
           is: 'Approved',
           then: s => s.required('Choose when to publish'),
         }),
-        withReleaseId: Yup.string().when('publishingStrategy', {
+        withReleaseId: Yup.string().when(['publishingStrategy'], {
           is: 'WithRelease',
           then: s => s.required('Choose a release'),
         }),

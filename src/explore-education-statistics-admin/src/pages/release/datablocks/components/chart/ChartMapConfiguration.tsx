@@ -71,7 +71,7 @@ export default function ChartMapConfiguration({
           }),
         )
         .max(100, 'The number of data groups cannot be greater than 100')
-        .when('dataClassification', {
+        .when(['dataClassification'], {
           is: 'Custom',
           then: s => s.required('There must be at least 1 data group'),
         }),

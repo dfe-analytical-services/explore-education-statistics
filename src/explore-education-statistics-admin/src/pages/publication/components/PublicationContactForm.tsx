@@ -9,6 +9,7 @@ import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import React from 'react';
+import { ObjectSchema } from 'yup';
 
 export interface PublicationContactFormValues {
   teamName: string;
@@ -30,14 +31,16 @@ const PublicationContactForm = ({
 }: Props) => {
   const [showConfirmModal, toggleConfirmModal] = useToggle(false);
 
-  const validationSchema = Yup.object<PublicationContactFormValues>({
-    teamName: Yup.string().required('Enter a team name'),
-    teamEmail: Yup.string()
-      .required('Enter a team email')
-      .email('Enter a valid team email'),
-    contactName: Yup.string().required('Enter a contact name'),
-    contactTelNo: Yup.string().required('Enter a contact telephone'),
-  });
+  const validationSchema: ObjectSchema<PublicationContactFormValues> = Yup.object(
+    {
+      teamName: Yup.string().required('Enter a team name'),
+      teamEmail: Yup.string()
+        .required('Enter a team email')
+        .email('Enter a valid team email'),
+      contactName: Yup.string().required('Enter a contact name'),
+      contactTelNo: Yup.string().required('Enter a contact telephone'),
+    },
+  );
 
   return (
     <Formik<PublicationContactFormValues>
@@ -78,11 +81,12 @@ const PublicationContactForm = ({
                 type="submit"
                 onClick={async e => {
                   e.preventDefault();
+
                   if (form.isValid) {
                     toggleConfirmModal.on();
-                  } else {
-                    await form.submitForm();
                   }
+
+                  await form.submitForm();
                 }}
               >
                 Update contact details

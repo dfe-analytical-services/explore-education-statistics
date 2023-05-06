@@ -1,15 +1,13 @@
 import classNames from 'classnames';
-import React, { FunctionComponent } from 'react';
+import React, { ReactNode } from 'react';
 import styles from './FluidWidthContainer.module.scss';
 
 interface Props {
   className?: string;
+  children: ReactNode;
 }
 
-const FluidWidthContainer: FunctionComponent<Props> = ({
-  children,
-  className,
-}) => {
+const FluidWidthContainer = ({ children, className }: Props) => {
   return (
     <div className={classNames(styles.wrapper, className)}>{children}</div>
   );

@@ -108,17 +108,19 @@ function FormField<Value, Props = Record<string, unknown>>({
       );
     }
 
-    return typeof children === 'function'
-      ? children({
-          id,
-          field: {
-            ...field,
-            error,
-          },
-          helpers,
-          meta,
-        })
-      : children;
+    return typeof children === 'function' ? (
+      children({
+        id,
+        field: {
+          ...field,
+          error,
+        },
+        helpers,
+        meta,
+      })
+    ) : (
+      <>{children}</>
+    );
   }, [
     as,
     children,
@@ -138,7 +140,7 @@ function FormField<Value, Props = Record<string, unknown>>({
       {component}
     </FormGroup>
   ) : (
-    component
+    <>{component}</>
   );
 }
 

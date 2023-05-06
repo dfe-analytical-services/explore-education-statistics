@@ -5,11 +5,15 @@ import {
 import connectionMock from '@admin/services/hubs/utils/__mocks__/connectionMock';
 import { HubConnectionState } from '@microsoft/signalr';
 import { renderHook } from '@testing-library/react-hooks';
-import React, { FC } from 'react';
+import React, { ReactNode } from 'react';
 
 jest.mock('@admin/services/hubs/utils/createConnection');
 
-const wrapper: FC = ({ children }) => (
+interface Props {
+  children: ReactNode;
+}
+
+const wrapper = ({ children }: Props) => (
   <ReleaseContentHubContextProvider releaseId="release-1">
     {children}
   </ReleaseContentHubContextProvider>

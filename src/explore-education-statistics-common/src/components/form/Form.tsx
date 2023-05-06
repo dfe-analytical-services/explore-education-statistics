@@ -11,6 +11,7 @@ import camelCase from 'lodash/camelCase';
 import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
 import React, {
+  FormEvent,
   ReactNode,
   useCallback,
   useEffect,
@@ -91,7 +92,7 @@ const Form = ({
   }, [getAllErrors, id, submitError, touched]);
 
   const handleSubmit = useCallback(
-    async event => {
+    async (event: FormEvent<HTMLFormElement>) => {
       toggleSummaryFocus.off();
       setSubmitError(undefined);
       event.preventDefault();

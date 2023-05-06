@@ -63,11 +63,11 @@ const DataBlockDetailsForm = ({
       validationSchema={Yup.object<FormValues>({
         name: Yup.string().required('Enter a data block name'),
         isHighlight: Yup.boolean(),
-        highlightName: Yup.string().when('isHighlight', {
+        highlightName: Yup.string().when(['isHighlight'], {
           is: true,
           then: s => s.required('Enter a featured table name'),
         }),
-        highlightDescription: Yup.string().when('isHighlight', {
+        highlightDescription: Yup.string().when(['isHighlight'], {
           is: true,
           then: s => s.required('Enter a featured table description'),
         }),
