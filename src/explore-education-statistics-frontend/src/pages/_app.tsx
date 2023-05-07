@@ -1,7 +1,6 @@
 // Import order is important - these should be at the top
 import '@frontend/polyfill';
 import '../styles/_all.scss';
-
 import {
   ApplicationInsightsContextProvider,
   useApplicationInsights,
@@ -20,6 +19,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
+import getConfig from 'next/config';
 
 const ApplicationInsightsTracking = () => {
   const appInsights = useApplicationInsights();
@@ -58,7 +58,7 @@ const App = ({ Component, pageProps, cookies }: Props) => {
     process.env.NEXT_PUBLIC_NOTIFICATION_API_BASE_URL;
 
   useMounted(() => {
-    if (process.env.GA_TRACKING_ID && getCookie('disableGA') !== 'true') {
+    if (process.env.NEXT_PUBLIC_GA_TRACKING_ID && getCookie('disableGA') !== 'true') {
       import('@frontend/services/googleAnalyticsService').then(
         ({ initGoogleAnalytics, logPageView }) => {
           initGoogleAnalytics(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
@@ -92,15 +92,5 @@ const App = ({ Component, pageProps, cookies }: Props) => {
   );
 };
 
-// App.getInitialProps = async (appContext: AppContext) => {
-//   const appProps = await NextApp.getInitialProps(appContext);
-
-//   loadEnv();
-
-//   return {
-//     ...appProps,
-//     cookies: parseCookies(appContext.ctx),
-//   };
-// };
 
 export default App;

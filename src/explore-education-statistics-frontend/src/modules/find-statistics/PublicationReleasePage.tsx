@@ -39,12 +39,14 @@ import WarningMessage from '@common/components/WarningMessage';
 import React from 'react';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
+import getConfig from 'next/config';
 
 interface Props {
   release: Release;
 }
 
 const PublicationReleasePage: NextPage<Props> = ({ release }) => {
+  const config = getConfig();
   const otherPublicationReleases = release.publication.releases.filter(
     r => r.id !== release.id,
   );
@@ -241,7 +243,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                   <li>
                     <ButtonLink
                       className="govuk-button  govuk-!-margin-bottom-3"
-                      to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files`}
+                      to={`${config.NEXT_PUBLIC_CONTENT_API_BASE_URL}/releases/${release.id}/files`}
                       onClick={() => {
                         logEvent({
                           category: `${release.publication.title} release page - Useful information`,

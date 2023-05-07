@@ -99,17 +99,17 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
   },
   transpilePackages: ['explore-education-statistics-common'],
-  env: {
-    NEXT_PUBLIC_BUILD_NUMBER: process.env.BUILD_BUILDNUMBER,
-  },
+  // env: {
+  //   NEXT_PUBLIC_BUILD_NUMBER: process.env.BUILD_BUILDNUMBER,
+  // },
   // publicRuntimeConfig: {
+  //   NEXT_PUBLIC_CONTENT_API_BASE_URL: process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL,
+  //   NEXT_PUBLIC_DATA_API_BASE_URL: process.env.NEXT_PUBLIC_DATA_API_BASE_URL,
+  //   NEXT_PUBLIC_NOTIFICATION_API_BASE_URL: process.env.NEXT_PUBLIC_NOTIFICATION_API_BASE_URL,
+  //   NEXT_PUBLIC_GA_TRACKING_ID: process.env.NEXT_PUBLIC_GA_TRACKING_ID,
+  //   NEXT_PUBLIC_PUBLIC_URL: process.env.NEXT_PUBLIC_URL,
   //   APP_ENV: process.env.APP_ENV,
-  //   CONTENT_API_BASE_URL: process.env.CONTENT_API_BASE_URL,
-  //   DATA_API_BASE_URL: process.env.DATA_API_BASE_URL,
-  //   NOTIFICATION_API_BASE_URL: process.env.NOTIFICATION_API_BASE_URL,
   //   APPINSIGHTS_INSTRUMENTATIONKEY: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
-  //   GA_TRACKING_ID: process.env.GA_TRACKING_ID,
-  //   PUBLIC_URL: process.env.PUBLIC_URL,
   // },
   async redirects() {
     return [
@@ -151,46 +151,46 @@ const nextConfig = {
     const { dev, isServer } = options;
 
     if (isServer) {
-      const ForkTsCheckerPlugin = require('fork-ts-checker-webpack-plugin');
+      // const ForkTsCheckerPlugin = require('fork-ts-checker-webpack-plugin');
 
-      config.plugins.push(
-        new ForkTsCheckerPlugin({
-          typescript: {
-            configFile: path.resolve(__dirname, 'tsconfig.json'),
-          },
-        }),
-      );
+      // config.plugins.push(
+      //   new ForkTsCheckerPlugin({
+      //     typescript: {
+      //       configFile: path.resolve(__dirname, 'tsconfig.json'),
+      //     },
+      //   }),
+      // );
 
       config.externals = [...config.externals, 'react', 'react-dom'];
     }
 
-    if (dev) {
-      const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
+    // if (dev) {
+    //   const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 
-      config.plugins.push(new CaseSensitivePathsPlugin());
+    //   config.plugins.push(new CaseSensitivePathsPlugin());
 
-      if (process.env.STYLELINT_DISABLE !== 'true') {
-        const StylelintPlugin = require('stylelint-webpack-plugin');
+    //   if (process.env.STYLELINT_DISABLE !== 'true') {
+    //     const StylelintPlugin = require('stylelint-webpack-plugin');
 
-        config.plugins.push(
-          new StylelintPlugin({
-            // Next doesn't play nicely with emitted errors
-            // so we'll just display warnings instead
-            emitErrors: false,
-          }),
-        );
-      }
+    //     config.plugins.push(
+    //       new StylelintPlugin({
+    //         // Next doesn't play nicely with emitted errors
+    //         // so we'll just display warnings instead
+    //         emitErrors: false,
+    //       }),
+    //     );
+    //   }
 
-      if (dev && process.env.ESLINT_DISABLE !== 'true') {
-        const ESLintPlugin = require('eslint-webpack-plugin');
+    //   if (dev && process.env.ESLINT_DISABLE !== 'true') {
+    //     const ESLintPlugin = require('eslint-webpack-plugin');
 
-        config.plugins.push(
-          new ESLintPlugin({
-            extensions: ['js', 'jsx', 'ts', 'tsx'],
-          }),
-        );
-      }
-    }
+    //     config.plugins.push(
+    //       new ESLintPlugin({
+    //         extensions: ['js', 'jsx', 'ts', 'tsx'],
+    //       }),
+    //     );
+    //   }
+    // }
 
     config.resolve.alias = {
       ...config.resolve.alias,

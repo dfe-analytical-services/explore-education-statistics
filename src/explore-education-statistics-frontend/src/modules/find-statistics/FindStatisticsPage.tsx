@@ -32,6 +32,7 @@ import compact from 'lodash/compact';
 import omit from 'lodash/omit';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
+import logEnvVars from '@frontend/logEnvVars';
 
 export interface FindStatisticsPageQuery {
   page?: number;
@@ -42,6 +43,7 @@ export interface FindStatisticsPageQuery {
 }
 
 const FindStatisticsPage: NextPage = () => {
+  logEnvVars('FindStatisticsPage');
   const router = useRouter();
   const { isMedia: isMobileMedia } = useMobileMedia();
   const mobileFilterButtonRef = useRef<HTMLButtonElement>(null);

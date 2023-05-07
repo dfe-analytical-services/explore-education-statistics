@@ -1,10 +1,11 @@
 import ButtonLink from '@frontend/components/ButtonLink';
-import { NextPage } from 'next';
 import React from 'react';
 import Link from '../components/Link';
 import Page from '../components/Page';
+import logEnvVars from '@frontend/logEnvVars';
 
-const HomePage: NextPage = () => {
+const HomePage = () => {
+  logEnvVars('HOMEPAGE');
   return (
     <Page title="Explore our statistics and data" isHomepage>
       <div className="govuk-grid-row dfe-card__container">
@@ -175,3 +176,12 @@ const HomePage: NextPage = () => {
 };
 
 export default HomePage;
+
+// export const getServerSideProps: GetServerSideProps = async (ctx) => {
+//   const env = process.env;
+//   return {
+//     props: {
+//       env
+//     }
+//   }
+// }
