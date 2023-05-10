@@ -7,6 +7,9 @@ export const contentApi = new Client(
   axios.create({
     baseURL: process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL,
     paramsSerializer: commaSeparated,
+    headers: {
+      
+    }
   }),
 );
 

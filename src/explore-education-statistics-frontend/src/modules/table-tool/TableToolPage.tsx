@@ -1,3 +1,5 @@
+/* eslint-disable react/no-unstable-nested-components */
+/* eslint-disable react/function-component-definition */
 import TableToolWizard, {
   InitialTableToolState,
 } from '@common/modules/table-tool/components/TableToolWizard';

@@ -1,3 +1,4 @@
+/* eslint-disable react/function-component-definition */
 import GoToTopLink from '@common/components/GoToTopLink';
 import {
   publicationFilters,

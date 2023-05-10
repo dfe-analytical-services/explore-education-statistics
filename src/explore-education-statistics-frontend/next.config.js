@@ -1,9 +1,6 @@
 /* eslint-disable no-param-reassign */
 const path = require('path');
 
-/**
- * @type {import('next').NextConfig}
- */
 
 const cspConnectSrc = [
   "'self'",
@@ -80,6 +77,10 @@ const securityHeaders = [
   },
 ];
 
+
+/**
+ * @type {import('next').NextConfig}
+ */
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
