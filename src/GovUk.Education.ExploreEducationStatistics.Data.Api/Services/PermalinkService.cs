@@ -472,6 +472,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             {
                 Id = permalink.Id,
                 Created = permalink.Created,
+                DataSetTitle = permalink.DataSetTitle,
+                PublicationTitle = permalink.PublicationTitle,
                 Status = status,
                 Table = universalTable
             };
