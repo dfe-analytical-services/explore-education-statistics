@@ -374,6 +374,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
                 Assert.Equal(expectedPermalinkId, result.Id);
                 Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
+                Assert.Equal("Test data set", result.DataSetTitle);
+                Assert.Equal("Test publication", result.PublicationTitle);
                 Assert.Equal(PermalinkStatus.Current, result.Status);
                 Assert.Equal("{}", result.Table.ToString());
             }
@@ -667,6 +669,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
                 Assert.Equal(expectedPermalinkId, result.Id);
                 Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
+                Assert.Equal("Test data set", result.DataSetTitle);
+                Assert.Equal("Test publication", result.PublicationTitle);
                 Assert.Equal(PermalinkStatus.Current, result.Status);
                 Assert.Equal("{}", result.Table.ToString());
             }
@@ -720,6 +724,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 Id = Guid.NewGuid(),
                 Created = DateTime.UtcNow,
+                DataSetTitle = "Test data set",
+                PublicationTitle = "Test publication",
                 SubjectId = Guid.NewGuid()
             };
 
@@ -754,6 +760,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
                 Assert.Equal(permalink.Id, result.Id);
                 Assert.Equal(permalink.Created, result.Created);
+                Assert.Equal("Test data set", result.DataSetTitle);
+                Assert.Equal("Test publication", result.PublicationTitle);
                 Assert.Equal(PermalinkStatus.Current, result.Status);
                 Assert.Equal("{}", result.Table.ToString());
             }
