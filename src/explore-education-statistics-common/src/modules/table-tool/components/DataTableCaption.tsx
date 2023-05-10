@@ -5,12 +5,12 @@ import React, { useMemo } from 'react';
 interface Props {
   id?: string;
   title?: string;
-  meta: FullTableMeta;
+  meta?: FullTableMeta;
 }
 
 const DataTableCaption = ({ id, title, meta }: Props) => {
   const generatedTitle = useMemo<string>(
-    () => (title ? '' : generateTableTitle(meta)),
+    () => (!title && meta ? generateTableTitle(meta) : ''),
     [meta, title],
   );
 
