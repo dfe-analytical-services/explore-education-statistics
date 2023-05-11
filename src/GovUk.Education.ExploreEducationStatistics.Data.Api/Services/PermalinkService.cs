@@ -112,6 +112,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return await _tableBuilderService.Query(releaseId, request.Query, cancellationToken)
                 .OnSuccess<ActionResult, TableBuilderResultViewModel, PermalinkViewModel>(async tableResult =>
                 {
+                    var subjectMeta = tableResult.SubjectMeta;
+
                     var frontendTableTask = _frontendService.CreateTable(
                         tableResult,
                         request.Configuration,
@@ -144,7 +146,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     var table = frontendTableResult.Right;
                     var csvMeta = csvMetaResult.Right;
 
-                    var subjectMeta = tableResult.SubjectMeta;
+                    // To avoid the frontend processing and returning the footnotes unnecessarily,
+                    // create a new view model with the footnotes added directly
+                    var tableWithFootnotes = table with
+                    {
+                        Footnotes = subjectMeta.Footnotes
+                    };
+
                     var permalink = new Permalink
                     {
                         ReleaseId = releaseId,
@@ -163,11 +171,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     await UploadSnapshot(permalink: permalink,
                         observations: tableResult.Results.ToList(),
                         csvMeta: csvMeta,
-                        table: table,
+                        table: tableWithFootnotes,
                         cancellationToken: cancellationToken);
 
                     await _contentDbContext.SaveChangesAsync(cancellationToken);
-                    return await BuildViewModel(permalink, table);
+                    return await BuildViewModel(permalink, tableWithFootnotes);
                 });
         }
 
@@ -242,6 +250,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         .OnSuccessVoid(async tuple =>
                         {
                             var (legacyPermalink, table, csvMeta) = tuple;
+
+                            // To avoid the frontend processing and returning the footnotes unnecessarily,
+                            // add them to the table view model directly
+                            table = table with
+                            {
+                                Footnotes = legacyPermalink.FullTable.SubjectMeta.Footnotes
+                            };
 
                             await UploadSnapshot(permalink,
                                 observations: legacyPermalink.FullTable.Results,

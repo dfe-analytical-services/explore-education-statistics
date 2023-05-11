@@ -1,5 +1,7 @@
 ﻿#nullable enable
 
+using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Newtonsoft.Json.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
@@ -10,6 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 public record PermalinkTableViewModel
 {
     public string Caption { get; init; } = string.Empty;
+
+    public List<FootnoteViewModel> Footnotes { get; init; } = new();
 
     /// <summary>
     /// Json representation of the table markup.

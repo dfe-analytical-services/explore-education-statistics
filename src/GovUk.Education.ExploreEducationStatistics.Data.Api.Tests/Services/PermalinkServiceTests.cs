@@ -98,8 +98,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             ]
           ]
         }";
- 
-        private readonly PermalinkTableViewModel _permalinkTable = new()
+
+        private readonly PermalinkTableViewModel _frontendTableResponse = new()
         {
             Caption = "Admission Numbers for 'Sample publication' in North East between 2022 and 2023",
             Json = JObject.Parse(TableJson)
@@ -202,6 +202,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .DefaultFootnote()
                 .GenerateList(2);
 
+            var footnoteViewModels = FootnotesViewModelBuilder.BuildFootnotes(footnotes);
+
             var request = new PermalinkCreateRequest
             {
                 Configuration = new TableBuilderConfiguration
@@ -227,9 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                             level => level.Value),
                     Filters = FiltersMetaViewModelBuilder.BuildFilters(subject.Filters),
                     Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
-                    Footnotes = footnotes.Select(
-                        footnote => new FootnoteViewModel(footnote.Id, footnote.Content)
-                    ).ToList(),
+                    Footnotes = footnoteViewModels,
                     TimePeriodRange = new List<TimePeriodMetaViewModel>
                     {
                         new(2022, AcademicYear)
@@ -345,7 +345,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 tableResult,
                 request.Configuration,
                 It.IsAny<CancellationToken>())
-            ).ReturnsAsync(_permalinkTable);
+            ).ReturnsAsync(_frontendTableResponse);
 
             var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(MockBehavior.Strict);
 
@@ -421,7 +421,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Assert.Equal("Test data set", result.DataSetTitle);
                 Assert.Equal("Test publication", result.PublicationTitle);
                 Assert.Equal(PermalinkStatus.Current, result.Status);
-                Assert.Equal(_permalinkTable, result.Table);
+                Assert.Equal(_frontendTableResponse.Caption, result.Table.Caption);
+                Assert.Equal(_frontendTableResponse.Json, result.Table.Json);
+                Assert.Equal(footnoteViewModels, result.Table.Footnotes);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -513,6 +515,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .DefaultFootnote()
                 .GenerateList(2);
 
+            var footnoteViewModels = FootnotesViewModelBuilder.BuildFootnotes(footnotes);
+
             var request = new PermalinkCreateRequest
             {
                 Configuration = new TableBuilderConfiguration
@@ -538,9 +542,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                             level => level.Value),
                     Filters = FiltersMetaViewModelBuilder.BuildFilters(subject.Filters),
                     Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
-                    Footnotes = footnotes.Select(
-                        footnote => new FootnoteViewModel(footnote.Id, footnote.Content)
-                    ).ToList(),
+                    Footnotes = footnoteViewModels,
                     TimePeriodRange = new List<TimePeriodMetaViewModel>
                     {
                         new(2022, AcademicYear)
@@ -656,7 +658,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 tableResult,
                 request.Configuration,
                 It.IsAny<CancellationToken>())
-            ).ReturnsAsync(_permalinkTable);
+            ).ReturnsAsync(_frontendTableResponse);
 
             var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(MockBehavior.Strict);
 
@@ -716,7 +718,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Assert.Equal("Test data set", result.DataSetTitle);
                 Assert.Equal("Test publication", result.PublicationTitle);
                 Assert.Equal(PermalinkStatus.Current, result.Status);
-                Assert.Equal(_permalinkTable, result.Table);
+                Assert.Equal(_frontendTableResponse.Caption, result.Table.Caption);
+                Assert.Equal(_frontendTableResponse.Json, result.Table.Json);
+                Assert.Equal(footnoteViewModels, result.Table.Footnotes);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -773,6 +777,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 SubjectId = Guid.NewGuid()
             };
 
+            var table = _frontendTableResponse with
+            {
+                Footnotes = FootnotesViewModelBuilder.BuildFootnotes(_fixture
+                    .DefaultFootnote()
+                    .GenerateList(2))
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -789,7 +800,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             blobStorageService.SetupDownloadBlobText(
                 container: BlobContainers.PermalinkSnapshots,
                 path: $"{permalink.Id}.json",
-                blobText: JsonConvert.SerializeObject(_permalinkTable));
+                blobText: JsonConvert.SerializeObject(table));
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -806,8 +817,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Assert.Equal("Test data set", result.DataSetTitle);
                 Assert.Equal("Test publication", result.PublicationTitle);
                 Assert.Equal(PermalinkStatus.Current, result.Status);
-                Assert.Equal(_permalinkTable.Caption, result.Table.Caption);
-                Assert.Equal(_permalinkTable.Json, result.Table.Json);
+                Assert.Equal(table.Caption, result.Table.Caption);
+                Assert.Equal(table.Json, result.Table.Json);
+                Assert.Equal(table.Footnotes, result.Table.Footnotes);
             }
         }
 
@@ -1364,12 +1376,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     .SetTimePeriod(2023, AcademicYear))
                 .GenerateList(8);
 
+            var footnotes = _fixture
+                .DefaultFootnote()
+                .GenerateList(2);
+
             var legacyPermalink = new LegacyPermalink(
                 permalink.Id,
                 DateTime.UtcNow,
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
+                    SubjectMeta = new PermalinkResultSubjectMeta
+                    {
+                        Footnotes = FootnotesViewModelBuilder.BuildFootnotes(footnotes)
+                    },
                     Results = observations
                         .Select(o =>
                             ObservationViewModelBuilder.BuildObservation(o, indicators.Select(i => i.Id)))
@@ -1459,7 +1479,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             frontendService.Setup(s => s.CreateTable(
                 ItIs.DeepEqualTo(legacyPermalink),
                 It.IsAny<CancellationToken>())
-            ).ReturnsAsync(_permalinkTable);
+            ).ReturnsAsync(_frontendTableResponse);
 
             var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(MockBehavior.Strict);
 
