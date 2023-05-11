@@ -39,6 +39,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Snapshooter;
 using Snapshooter.Xunit;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -61,6 +62,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         };
 
         private readonly Guid _publicationId = Guid.NewGuid();
+
+        private const string TableJson = @"
+        {
+          ""thead"": [
+            [
+              { ""colSpan"": 1, ""rowSpan"": 1, ""tag"": ""td"" },
+              {
+                ""colSpan"": 1,
+                ""rowSpan"": 1,
+                ""scope"": ""col"",
+                ""text"": ""2022"",
+                ""tag"": ""th""
+              },
+              {
+                ""colSpan"": 1,
+                ""rowSpan"": 1,
+                ""scope"": ""col"",
+                ""text"": ""2023"",
+                ""tag"": ""th""
+              }
+            ]
+          ],
+          ""tbody"": [
+            [
+              {
+                ""rowSpan"": 1,
+                ""colSpan"": 1,
+                ""scope"": ""row"",
+                ""text"": ""Admission Numbers"",
+                ""tag"": ""th""
+              },
+              { ""tag"": ""td"", ""text"": ""7,731"" },
+              { ""tag"": ""td"", ""text"": ""7,357"" }
+            ]
+          ]
+        }";
+ 
+        private readonly PermalinkTableViewModel _permalinkTable = new()
+        {
+            Caption = "Admission Numbers for 'Sample publication' in North East between 2022 and 2023",
+            Json = JObject.Parse(TableJson)
+        };
 
         [Fact]
         public async Task CreatePermalink_LatestPublishedReleaseForSubjectNotFound()
@@ -270,7 +313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     var csv = stream.ReadToEnd();
 
                     // Compare the captured csv upload with the expected csv
-                    Snapshot.Match(csv);
+                    Snapshot.Match(csv, SnapshotNameExtension.Create("csv"));
                 })
                 .Returns(Task.CompletedTask);
 
@@ -291,18 +334,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     stream.Seek(0L, SeekOrigin.Begin);
                     var tableJson = stream.ReadToEnd();
 
-                    // Compare the captured table json upload with the response set up for the frontend service
-                    Assert.Equal("{}", tableJson);
+                    // Compare the captured table json upload with the expected json
+                    Snapshot.Match(tableJson, SnapshotNameExtension.Create("json"));
                 })
                 .Returns(Task.CompletedTask);
 
             var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
 
-            frontendService.Setup(s => s.CreateUniversalTable(
+            frontendService.Setup(s => s.CreateTable(
                 tableResult,
                 request.Configuration,
                 It.IsAny<CancellationToken>())
-            ).ReturnsAsync(new JObject());
+            ).ReturnsAsync(_permalinkTable);
 
             var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(MockBehavior.Strict);
 
@@ -378,7 +421,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Assert.Equal("Test data set", result.DataSetTitle);
                 Assert.Equal("Test publication", result.PublicationTitle);
                 Assert.Equal(PermalinkStatus.Current, result.Status);
-                Assert.Equal("{}", result.Table.ToString());
+                Assert.Equal(_permalinkTable, result.Table);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -581,7 +624,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     var csv = stream.ReadToEnd();
 
                     // Compare the captured csv upload with the expected csv
-                    Snapshot.Match(csv);
+                    Snapshot.Match(csv, SnapshotNameExtension.Create("csv"));
                 })
                 .Returns(Task.CompletedTask);
 
@@ -602,18 +645,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     stream.Seek(0L, SeekOrigin.Begin);
                     var tableJson = stream.ReadToEnd();
 
-                    // Compare the captured table json upload with the response set up for the frontend service
-                    Assert.Equal("{}", tableJson);
+                    // Compare the captured table json upload with the expected json
+                    Snapshot.Match(tableJson, SnapshotNameExtension.Create("json"));
                 })
                 .Returns(Task.CompletedTask);
 
             var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
 
-            frontendService.Setup(s => s.CreateUniversalTable(
+            frontendService.Setup(s => s.CreateTable(
                 tableResult,
                 request.Configuration,
                 It.IsAny<CancellationToken>())
-            ).ReturnsAsync(new JObject());
+            ).ReturnsAsync(_permalinkTable);
 
             var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(MockBehavior.Strict);
 
@@ -673,7 +716,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Assert.Equal("Test data set", result.DataSetTitle);
                 Assert.Equal("Test publication", result.PublicationTitle);
                 Assert.Equal(PermalinkStatus.Current, result.Status);
-                Assert.Equal("{}", result.Table.ToString());
+                Assert.Equal(_permalinkTable, result.Table);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -743,11 +786,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            // TODO EES-3753 Add some realistic table json here
             blobStorageService.SetupDownloadBlobText(
                 container: BlobContainers.PermalinkSnapshots,
                 path: $"{permalink.Id}.json",
-                blobText: "{}");
+                blobText: JsonConvert.SerializeObject(_permalinkTable));
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -764,7 +806,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Assert.Equal("Test data set", result.DataSetTitle);
                 Assert.Equal("Test publication", result.PublicationTitle);
                 Assert.Equal(PermalinkStatus.Current, result.Status);
-                Assert.Equal("{}", result.Table.ToString());
+                Assert.Equal(_permalinkTable.Caption, result.Table.Caption);
+                Assert.Equal(_permalinkTable.Json, result.Table.Json);
             }
         }
 
@@ -1256,7 +1299,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
         [Fact]
         // TODO EES-3755 Remove after Permalink snapshot migration work is complete
-        // TODO EES-3755 Remove __snapshots__/PermalinkServiceTests.MigratePermalink.snap
+        // TODO EES-3755 Remove __snapshots__/PermalinkServiceTests.MigratePermalink_*.snap files
         public async Task MigratePermalink()
         {
             var permalink = new Permalink
@@ -1389,7 +1432,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     var csv = stream.ReadToEnd();
 
                     // Compare the captured csv upload with the expected csv
-                    Snapshot.Match(csv);
+                    Snapshot.Match(csv, SnapshotNameExtension.Create("csv"));
                 })
                 .Returns(Task.CompletedTask);
 
@@ -1406,17 +1449,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     stream.Seek(0L, SeekOrigin.Begin);
                     var tableJson = stream.ReadToEnd();
 
-                    // Compare the captured table json upload with the response set up for the frontend service
-                    Assert.Equal("{}", tableJson);
+                    // Compare the captured table json upload with the expected json
+                    Snapshot.Match(tableJson, SnapshotNameExtension.Create("json"));
                 })
                 .Returns(Task.CompletedTask);
 
             var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
 
-            frontendService.Setup(s => s.CreateUniversalTable(
+            frontendService.Setup(s => s.CreateTable(
                 ItIs.DeepEqualTo(legacyPermalink),
                 It.IsAny<CancellationToken>())
-            ).ReturnsAsync(new JObject());
+            ).ReturnsAsync(_permalinkTable);
 
             var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(MockBehavior.Strict);
 
@@ -1608,7 +1651,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
 
-            frontendService.Setup(s => s.CreateUniversalTable(
+            frontendService.Setup(s => s.CreateTable(
                 It.IsAny<LegacyPermalink>(),
                 It.IsAny<CancellationToken>())
             ).ReturnsAsync(new NotFoundResult());
@@ -1663,7 +1706,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
 
-            frontendService.Setup(s => s.CreateUniversalTable(
+            frontendService.Setup(s => s.CreateTable(
                 It.IsAny<LegacyPermalink>(),
                 It.IsAny<CancellationToken>())
             ).ReturnsAsync(new StatusCodeResult(StatusCodes.Status500InternalServerError));
