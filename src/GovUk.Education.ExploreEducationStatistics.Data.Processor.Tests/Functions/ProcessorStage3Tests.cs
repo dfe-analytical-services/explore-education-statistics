@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -27,6 +28,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Utils.ComparerUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
@@ -64,21 +66,34 @@ public class ProcessorStage3Tests : IDisposable
             .DefaultSubject()
             .WithFilters(_fixture
                 .DefaultFilter()
-                .WithLabel("Filter one")
-                .WithFilterGroups(_fixture
-                    .DefaultFilterGroup()
-                    .WithFilterItems(_fixture
-                        .DefaultFilterItem()
-                        .WithLabel("Total")
-                        .Generate(1))
-                    .Generate(1))
-                .Generate(1))
+                .ForIndex(0, s => s
+                    .SetLabel("Filter one")
+                    .SetFilterGroups(_fixture
+                        .DefaultFilterGroup()
+                        .WithFilterItems(_fixture
+                            .DefaultFilterItem()
+                            .WithLabel("Total")
+                            .Generate(1))
+                        .Generate(1)))
+                .ForIndex(1, s => s
+                    .SetLabel("Filter two")
+                    .SetFilterGroups(_fixture
+                        .DefaultFilterGroup()
+                        .WithFilterItems(_fixture
+                            .DefaultFilterItem()
+                            .ForInstance(s => s.Set(
+                                fi => fi.Label, 
+                                (_, _, context) => $"Choice {context.Index + 1}"))
+                            .Generate(16))
+                        .Generate(1)))
+                .GenerateList())
             .WithIndicatorGroups(_fixture
                 .DefaultIndicatorGroup()
                 .WithIndicators(_fixture
                     .DefaultIndicator()
-                    .WithLabel("Indicator one")
-                    .Generate(1))
+                    .ForIndex(0, s => s.SetLabel("Indicator one"))
+                    .ForIndex(1, s => s.SetLabel("Indicator two"))
+                    .GenerateList())
                 .Generate(1))
             .Generate();
     }
@@ -141,8 +156,6 @@ public class ProcessorStage3Tests : IDisposable
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
     
-        var memoryCache = new ImporterFilterCache();
-    
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
     
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -162,7 +175,6 @@ public class ProcessorStage3Tests : IDisposable
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(memoryCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
@@ -171,14 +183,14 @@ public class ProcessorStage3Tests : IDisposable
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
-            memoryCache,
             observationBatchImporter);
     
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             blobStorageService.Object,
             dataImportService,
-            importerService);
+            importerService,
+            importerMetaService);
         
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
@@ -197,7 +209,8 @@ public class ProcessorStage3Tests : IDisposable
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
-            Mock.Of<ICollector<ImportMessage>>(Strict));
+            Mock.Of<ICollector<ImportMessage>>(Strict),
+            rethrowExceptions: true);
         
         VerifyAllMocks(blobStorageService);
         
@@ -215,15 +228,67 @@ public class ProcessorStage3Tests : IDisposable
 
             var observations = await statisticsDbContext
                 .Observation
+                .Include(o => o.FilterItems)
                 .ToListAsync();
             
             Assert.Equal(16, observations.Count);
             
+            var expectedIndicatorIds = _subject
+                .IndicatorGroups
+                .SelectMany(ig => ig.Indicators)
+                .Select(i => i.Id);
+            
+            var expectedFilterItemIds = _subject
+                .Filters
+                .Select(f => f.Id);
+
+            observations.ForEach(observation =>
+            {
+                // Check that measures for each Indicator are present.
+                var indicatorIds = observation.Measures.Keys;
+                Assert.True(SequencesAreEqualIgnoringOrder(expectedIndicatorIds, indicatorIds));
+                    
+                // Check that a Filter Item for each Filter is present in each row
+                var filterItemIds = 
+                    observation.FilterItems.Select(ofi => ofi.FilterId!.Value);
+                Assert.True(SequencesAreEqualIgnoringOrder(expectedFilterItemIds, filterItemIds));
+            });
+
             // Check the CsvRow values. They should equal the 1-based position in the
             // CSV, *including* the header row. So the first data row will have CsvRow
             // of 2. 
             Enumerable.Range(0, 16).ForEach(i => 
                 Assert.Equal(i + 2, observations[i].CsvRow));
+
+            // Thoroughly check the first Observation row for correct details.
+            var firstObservation = observations[0];
+            var expectedLocation = _locations.Single(l => l.LocalAuthority!.Name == "Birmingham");
+            Assert.Equal(expectedLocation.Id, firstObservation.LocationId);
+            Assert.Equal(2018, firstObservation.Year);
+            Assert.Equal(TimeIdentifier.CalendarYear, firstObservation.TimeIdentifier);
+            Assert.Equal(
+                _subject.Filters[0].FilterGroups[0].FilterItems[0].Id,
+                firstObservation.FilterItems[0].FilterItemId);
+            Assert.Equal(
+                _subject.Filters[1].FilterGroups[0].FilterItems[0].Id,
+                firstObservation.FilterItems[1].FilterItemId);
+            Assert.Equal("1", firstObservation.Measures[_subject.IndicatorGroups[0].Indicators[0].Id]);
+            Assert.Equal("2", firstObservation.Measures[_subject.IndicatorGroups[0].Indicators[1].Id]);
+            
+            // Thoroughly check the last Observation row for correct details.
+            var lastObservation = observations[15];
+            var expectedLocation2 = _locations.Single(l => l.LocalAuthority!.Name == "Camden");
+            Assert.Equal(expectedLocation2.Id, lastObservation.LocationId);
+            Assert.Equal(2025, lastObservation.Year);
+            Assert.Equal(TimeIdentifier.CalendarYear, lastObservation.TimeIdentifier);
+            Assert.Equal(
+                _subject.Filters[0].FilterGroups[0].FilterItems[0].Id,
+                lastObservation.FilterItems[0].FilterItemId);
+            Assert.Equal(
+                _subject.Filters[1].FilterGroups[0].FilterItems[15].Id,
+                lastObservation.FilterItems[1].FilterItemId);
+            Assert.Equal("16", lastObservation.Measures[_subject.IndicatorGroups[0].Indicators[0].Id]);
+            Assert.Equal("32", lastObservation.Measures[_subject.IndicatorGroups[0].Indicators[1].Id]);
         }
     }
     
@@ -286,8 +351,6 @@ public class ProcessorStage3Tests : IDisposable
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
     
-        var memoryCache = new ImporterFilterCache();
-    
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
     
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -307,7 +370,6 @@ public class ProcessorStage3Tests : IDisposable
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(memoryCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
@@ -316,14 +378,14 @@ public class ProcessorStage3Tests : IDisposable
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
-            memoryCache,
             observationBatchImporter);
     
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             blobStorageService.Object,
             dataImportService,
-            importerService);
+            importerService,
+            importerMetaService);
         
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
@@ -342,7 +404,8 @@ public class ProcessorStage3Tests : IDisposable
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
-            Mock.Of<ICollector<ImportMessage>>(Strict));
+            Mock.Of<ICollector<ImportMessage>>(Strict),
+            rethrowExceptions: true);
         
         VerifyAllMocks(blobStorageService);
         
@@ -422,8 +485,6 @@ public class ProcessorStage3Tests : IDisposable
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
     
-        var memoryCache = new ImporterFilterCache();
-    
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
     
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -443,7 +504,6 @@ public class ProcessorStage3Tests : IDisposable
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(memoryCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
@@ -452,14 +512,14 @@ public class ProcessorStage3Tests : IDisposable
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
-            memoryCache,
             observationBatchImporter);
     
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             blobStorageService.Object,
             dataImportService,
-            importerService);
+            importerService,
+            importerMetaService);
         
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
@@ -478,7 +538,8 @@ public class ProcessorStage3Tests : IDisposable
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
-            Mock.Of<ICollector<ImportMessage>>(Strict));
+            Mock.Of<ICollector<ImportMessage>>(Strict),
+            rethrowExceptions: true);
         
         VerifyAllMocks(blobStorageService);
         
@@ -578,8 +639,6 @@ public class ProcessorStage3Tests : IDisposable
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
     
-        var memoryCache = new ImporterFilterCache();
-    
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
     
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -599,7 +658,6 @@ public class ProcessorStage3Tests : IDisposable
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(memoryCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
@@ -608,14 +666,14 @@ public class ProcessorStage3Tests : IDisposable
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
-            memoryCache,
             observationBatchImporter);
     
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             blobStorageService.Object,
             dataImportService,
-            importerService);
+            importerService,
+            importerMetaService);
         
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
@@ -634,7 +692,8 @@ public class ProcessorStage3Tests : IDisposable
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
-            Mock.Of<ICollector<ImportMessage>>(Strict));
+            Mock.Of<ICollector<ImportMessage>>(Strict),
+            rethrowExceptions: true);
         
         VerifyAllMocks(blobStorageService);
         
@@ -718,8 +777,6 @@ public class ProcessorStage3Tests : IDisposable
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
     
-        var memoryCache = new ImporterFilterCache();
-    
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
     
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -739,7 +796,6 @@ public class ProcessorStage3Tests : IDisposable
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(memoryCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
@@ -748,14 +804,14 @@ public class ProcessorStage3Tests : IDisposable
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
-            memoryCache,
             observationBatchImporter);
     
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             blobStorageService.Object,
             dataImportService,
-            importerService);
+            importerService,
+            importerMetaService);
         
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
@@ -774,7 +830,8 @@ public class ProcessorStage3Tests : IDisposable
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
-            Mock.Of<ICollector<ImportMessage>>(Strict));
+            Mock.Of<ICollector<ImportMessage>>(Strict),
+            rethrowExceptions: true);
         
         VerifyAllMocks(blobStorageService);
         
@@ -886,8 +943,6 @@ public class ProcessorStage3Tests : IDisposable
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
     
-        var memoryCache = new ImporterFilterCache();
-    
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
     
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -907,7 +962,6 @@ public class ProcessorStage3Tests : IDisposable
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(memoryCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
@@ -916,14 +970,14 @@ public class ProcessorStage3Tests : IDisposable
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
-            memoryCache,
             observationBatchImporter);
     
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             blobStorageService.Object,
             dataImportService,
-            importerService);
+            importerService,
+            importerMetaService);
         
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
@@ -942,7 +996,8 @@ public class ProcessorStage3Tests : IDisposable
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
-            Mock.Of<ICollector<ImportMessage>>(Strict));
+            Mock.Of<ICollector<ImportMessage>>(Strict),
+            rethrowExceptions: true);
         
         VerifyAllMocks(blobStorageService);
         
@@ -1034,8 +1089,6 @@ public class ProcessorStage3Tests : IDisposable
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
     
-        var memoryCache = new ImporterFilterCache();
-    
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
     
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -1058,7 +1111,6 @@ public class ProcessorStage3Tests : IDisposable
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(memoryCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
@@ -1067,14 +1119,14 @@ public class ProcessorStage3Tests : IDisposable
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
-            memoryCache,
             observationBatchImporterMock.Object);
         
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             blobStorageService.Object,
             dataImportService,
-            importerService);
+            importerService,
+            importerMetaService);
         
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
@@ -1101,7 +1153,8 @@ public class ProcessorStage3Tests : IDisposable
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
-            Mock.Of<ICollector<ImportMessage>>(Strict));
+            Mock.Of<ICollector<ImportMessage>>(Strict),
+            rethrowExceptions: true);
         
         VerifyAllMocks(blobStorageService);
         
@@ -1165,8 +1218,6 @@ public class ProcessorStage3Tests : IDisposable
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
     
-        var memoryCache = new ImporterFilterCache();
-    
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
     
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -1186,7 +1237,6 @@ public class ProcessorStage3Tests : IDisposable
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(memoryCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
@@ -1195,14 +1245,14 @@ public class ProcessorStage3Tests : IDisposable
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
-            memoryCache,
             observationBatchImporter);
         
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             blobStorageService.Object,
             dataImportService,
-            importerService);
+            importerService,
+            importerMetaService);
         
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
@@ -1221,7 +1271,8 @@ public class ProcessorStage3Tests : IDisposable
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
-            Mock.Of<ICollector<ImportMessage>>(Strict));
+            Mock.Of<ICollector<ImportMessage>>(Strict),
+            rethrowExceptions: true);
         
         VerifyAllMocks(blobStorageService);
         
@@ -1245,7 +1296,351 @@ public class ProcessorStage3Tests : IDisposable
         }
     }
     
+    [Fact]
+    public async Task ProcessStage3_AdditionalFiltersAndIndicators()
+    {
+        var additionalFilter = _fixture
+            .DefaultFilter()
+            .WithSubject(_subject)
+            .WithLabel("Additional filter")
+            .WithFilterGroups(_fixture
+                .DefaultFilterGroup()
+                .WithFilterItems(_fixture
+                    .DefaultFilterItem()
+                    .ForIndex(1, s => s.SetLabel("Not specified"))
+                    .Generate(3))
+                .Generate(1))
+            .Generate();
+
+        // Add an additional Indicator to the existing Indicator Group
+        var additionalIndicator = _fixture
+            .DefaultIndicator()
+            .WithIndicatorGroup(_subject.IndicatorGroups[0])
+            .WithLabel("Additional indicator")
+            .Generate();
+        
+        var import = _fixture
+            .DefaultDataImport()
+            .WithSubjectId(_subject.Id)
+            .WithFiles("additional-filters-and-indicators")
+            .WithStatus(STAGE_3)
+            .WithRowCounts(
+                totalRows: 16,
+                expectedImportedRows: 16
+            )
+            .Generate();
+    
+        await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+        {
+            await contentDbContext.DataImports.AddAsync(import);
+            await contentDbContext.SaveChangesAsync();
+            
+            await statisticsDbContext.Subject.AddAsync(_subject);
+            await statisticsDbContext.Location.AddRangeAsync(_locations);
+            await statisticsDbContext.Filter.AddRangeAsync(additionalFilter);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+    
+        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+    
+        var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+            "Resources" + Path.DirectorySeparatorChar + import.File.Filename);
+    
+        var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+            "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
+        
+        blobStorageService.SetupStreamBlob(
+            PrivateReleaseFiles, 
+            import.File.Path(), 
+            dataFilePath);
+        
+        blobStorageService.SetupStreamBlob(
+            PrivateReleaseFiles, 
+            import.MetaFile.Path(), 
+            metaFilePath);
+        
+        var dbContextSupplier = new InMemoryDbContextSupplier(
+            contentDbContextId: _contentDbContextId,
+            statisticsDbContextId: _statisticsDbContextId);
+    
+        var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
+        
+        var dataImportService = new DataImportService(
+            dbContextSupplier,
+            Mock.Of<ILogger<DataImportService>>());
+    
+        var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
+    
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+        {
+            // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
+            // Note that this occurs in Startup.cs.
+            importerLocationCache.LoadLocations(statisticsDbContext);
+        }
+    
+        var guidGenerator = new SequentialGuidGenerator();
+    
+        var importerMetaService = new ImporterMetaService(
+            guidGenerator, 
+            databaseHelper);
+    
+        var observationBatchImporter = new TestObservationBatchImporter();
+        
+        var importerService = new ImporterService(
+            guidGenerator,
+            new ImporterLocationService(
+                guidGenerator, 
+                importerLocationCache,
+                Mock.Of<ILogger<ImporterLocationCache>>()),
+            importerMetaService,
+            dataImportService,
+            Mock.Of<ILogger<ImporterService>>(),
+            databaseHelper,
+            observationBatchImporter);
+    
+        var fileImportService = new FileImportService(
+            Mock.Of<ILogger<FileImportService>>(),
+            blobStorageService.Object,
+            dataImportService,
+            importerService,
+            importerMetaService);
+        
+        var processorService = new ProcessorService(
+            Mock.Of<ILogger<ProcessorService>>(Strict),
+            blobStorageService.Object,
+            fileImportService,
+            importerService,
+            dataImportService,
+            Mock.Of<IValidatorService>(Strict),
+            Mock.Of<IDataArchiveService>(Strict),
+            dbContextSupplier);
+        
+        var function = BuildFunction(
+            processorService: processorService, 
+            dataImportService: dataImportService);
+    
+        await function.ProcessUploads(
+            new ImportMessage(import.Id),
+            new ExecutionContext(),
+            Mock.Of<ICollector<ImportMessage>>(Strict),
+            rethrowExceptions: true);
+        
+        VerifyAllMocks(blobStorageService);
+        
+        await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+        {
+            var dataImport = await contentDbContext
+                .DataImports
+                .SingleAsync();
+            
+            // Verify that the import status has completed successfully.
+            Assert.Equal(16, dataImport.ImportedRows);
+            Assert.Equal(15, dataImport.LastProcessedRowIndex);
+            Assert.Equal(COMPLETE, dataImport.Status);
+
+            var observations = await statisticsDbContext
+                .Observation
+                .Include(o => o.FilterItems)
+                .ToListAsync();
+            
+            Assert.Equal(16, observations.Count);
+            
+            // Check that the additional Filter's values are "Not specified" for each row.
+            var notSpecifiedFilterItem = additionalFilter.FilterGroups[0].FilterItems[1];
+            observations.ForEach(observation => 
+                Assert.Equal(notSpecifiedFilterItem.Id, observation.FilterItems[1].FilterItemId));
+            
+            // Check that the additional Indicator's Measure is null for each row.
+            observations.ForEach(observation => 
+                Assert.Null(observation.Measures[additionalIndicator.Id]));
+        }
+    }
+    
+    [Fact]
+    public async Task ProcessStage3_SpecialFilterItemAndIndicatorValues()
+    {
+        var subject = _fixture
+            .DefaultSubject()
+            .WithFilters(_fixture
+                .DefaultFilter()
+                .WithLabel("Filter one")
+                .WithFilterGroups(_fixture
+                    .DefaultFilterGroup()
+                    .WithFilterItems(_fixture
+                        .DefaultFilterItem()
+                        
+                        // Despite various variations of case and additional whitespace in the CSV values
+                        // for this Filter, they will all resolve to a single "Value 1" Filter Item.
+                        .ForIndex(0, s => s.SetLabel("Value 1"))
+                        
+                        // Blank values for this Filter in the CSV will be assigned the special "Not specified"
+                        // Filter Item, as created during Stage 2 of the import.
+                        .ForIndex(1, s => s.SetLabel("Not specified"))
+                        
+                        .GenerateList())
+                    .Generate(1))
+                .GenerateList(1))
+            .WithIndicatorGroups(_fixture
+                .DefaultIndicatorGroup()
+                .WithIndicators(_fixture
+                    .DefaultIndicator()
+                    .WithLabel("Indicator one")
+                    .GenerateList(1))
+                .Generate(1))
+            .Generate();
+        
+        var import = _fixture
+            .DefaultDataImport()
+            .WithSubjectId(subject.Id)
+            .WithFiles("small-csv-with-special-data")
+            .WithStatus(STAGE_3)
+            .WithRowCounts(
+                totalRows: 5,
+                expectedImportedRows: 5
+            )
+            .Generate();
+    
+        await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+        {
+            await contentDbContext.DataImports.AddAsync(import);
+            await contentDbContext.SaveChangesAsync();
+            
+            await statisticsDbContext.Subject.AddAsync(subject);
+            await statisticsDbContext.Location.AddRangeAsync(_locations);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+    
+        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+    
+        var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+            "Resources" + Path.DirectorySeparatorChar + import.File.Filename);
+    
+        var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+            "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
+        
+        blobStorageService.SetupStreamBlob(
+            PrivateReleaseFiles, 
+            import.File.Path(), 
+            dataFilePath);
+        
+        blobStorageService.SetupStreamBlob(
+            PrivateReleaseFiles, 
+            import.MetaFile.Path(), 
+            metaFilePath);
+        
+        var dbContextSupplier = new InMemoryDbContextSupplier(
+            contentDbContextId: _contentDbContextId,
+            statisticsDbContextId: _statisticsDbContextId);
+    
+        var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
+        
+        var dataImportService = new DataImportService(
+            dbContextSupplier,
+            Mock.Of<ILogger<DataImportService>>());
+    
+        var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
+    
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+        {
+            // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
+            // Note that this occurs in Startup.cs.
+            importerLocationCache.LoadLocations(statisticsDbContext);
+        }
+    
+        var guidGenerator = new SequentialGuidGenerator();
+    
+        var importerMetaService = new ImporterMetaService(
+            guidGenerator, 
+            databaseHelper);
+    
+        var observationBatchImporter = new TestObservationBatchImporter();
+        
+        var importerService = new ImporterService(
+            guidGenerator,
+            new ImporterLocationService(
+                guidGenerator, 
+                importerLocationCache,
+                Mock.Of<ILogger<ImporterLocationCache>>()),
+            importerMetaService,
+            dataImportService,
+            Mock.Of<ILogger<ImporterService>>(),
+            databaseHelper,
+            observationBatchImporter);
+    
+        var fileImportService = new FileImportService(
+            Mock.Of<ILogger<FileImportService>>(),
+            blobStorageService.Object,
+            dataImportService,
+            importerService,
+            importerMetaService);
+        
+        var processorService = new ProcessorService(
+            Mock.Of<ILogger<ProcessorService>>(Strict),
+            blobStorageService.Object,
+            fileImportService,
+            importerService,
+            dataImportService,
+            Mock.Of<IValidatorService>(Strict),
+            Mock.Of<IDataArchiveService>(Strict),
+            dbContextSupplier);
+        
+        var function = BuildFunction(
+            processorService: processorService, 
+            dataImportService: dataImportService);
+    
+        await function.ProcessUploads(
+            new ImportMessage(import.Id),
+            new ExecutionContext(),
+            Mock.Of<ICollector<ImportMessage>>(Strict),
+            rethrowExceptions: true);
+        
+        VerifyAllMocks(blobStorageService);
+        
+        await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+        {
+            var dataImport = await contentDbContext
+                .DataImports
+                .SingleAsync();
+            
+            // Verify that the import status has completed successfully.
+            Assert.Equal(5, dataImport.ImportedRows);
+            Assert.Equal(4, dataImport.LastProcessedRowIndex);
+            Assert.Equal(COMPLETE, dataImport.Status);
+
+            var observations = await statisticsDbContext
+                .Observation
+                .Include(o => o.FilterItems)
+                .ToListAsync();
+            
+            Assert.Equal(5, observations.Count);
+            
+            // Assert that every permutation of "Value 1" in the data CSV is trimmed and case-ignored 
+            // to match with the appropriate available "Value 1" Filter Item.
+            observations.GetRange(0, 4).ForEach(observation => 
+                Assert.Equal(
+                    subject.Filters[0].FilterGroups[0].FilterItems[0].Id,
+                    observation.FilterItems[0].FilterItemId));
+            
+            // Assert that the blank value for Filter one in the last CSV row will be assigned the
+            // special "Not specified" Filter Item.
+            Assert.Equal(
+                subject.Filters[0].FilterGroups[0].FilterItems[1].Id,
+                observations[4].FilterItems[0].FilterItemId);
+            
+            // Assert that the special Indicator values are saved appropriately.
+            Assert.Equal("", observations[0].Measures.Values.ToList()[0]);
+            Assert.Equal("~", observations[1].Measures.Values.ToList()[0]);
+            Assert.Equal("a", observations[2].Measures.Values.ToList()[0]);
+            Assert.Equal(" ", observations[3].Measures.Values.ToList()[0]);
+        }
+    }
+    
     // ReSharper disable once MemberCanBePrivate.Global
+    // ReSharper disable once ClassWithVirtualMembersNeverInherited.Global
     public class TestObservationBatchImporter : IObservationBatchImporter
     {
         public virtual async Task ImportObservationBatch(StatisticsDbContext context, IEnumerable<Observation> observations)

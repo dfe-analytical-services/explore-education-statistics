@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -20,17 +21,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IBlobStorageService _blobStorageService;
         private readonly IDataImportService _dataImportService;
         private readonly IImporterService _importerService;
+        private readonly IImporterMetaService _importerMetaService;
 
         public FileImportService(
             ILogger<FileImportService> logger,
             IBlobStorageService blobStorageService,
             IDataImportService dataImportService,
-            IImporterService importerService)
+            IImporterService importerService,
+            IImporterMetaService importerMetaService)
         {
             _logger = logger;
             _blobStorageService = blobStorageService;
             _dataImportService = dataImportService;
             _importerService = importerService;
+            _importerMetaService = importerMetaService;
         }
 
         public async Task ImportObservations(DataImport import, StatisticsDbContext context)
@@ -65,14 +69,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var datafileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
             var metaFileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
 
-            var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
-            var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
-
             await _importerService.ImportObservations(
                 import,
                 datafileStreamProvider,
+                metaFileStreamProvider,
                 subject,
-                _importerService.GetMeta(metaFileCsvHeaders, metaFileCsvRows, subject, context),
                 context
             );
 
@@ -80,22 +81,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await CheckComplete(completedImport, context);
         }
 
-        public async Task ImportFiltersAndLocations(Guid importId, StatisticsDbContext context)
+        public async Task ImportFiltersAndLocations(
+            Guid importId,
+            SubjectMeta subjectMeta,
+            StatisticsDbContext context)
         {
             var import = await _dataImportService.GetImport(importId);
 
-            var subject = await context.Subject.SingleAsync(s => s.Id.Equals(import.SubjectId));
-
             var datafileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
-            var metaFileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
-
-            var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
-            var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
 
             await _importerService.ImportFiltersAndLocations(
                 import,
                 datafileStreamProvider,
-                _importerService.GetMeta(metaFileCsvHeaders, metaFileCsvRows, subject, context),
+                subjectMeta,
                 context);
         }
 

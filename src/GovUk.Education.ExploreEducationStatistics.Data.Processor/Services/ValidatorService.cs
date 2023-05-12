@@ -12,13 +12,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Models.SoloImportableLevels;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
@@ -56,20 +55,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private readonly IBlobStorageService _blobStorageService;
         private readonly IFileTypeService _fileTypeService;
         private readonly IDataImportService _dataImportService;
-        private readonly IImporterService _importerService;
         
         public ValidatorService(
             ILogger<ValidatorService> logger,
             IBlobStorageService blobStorageService,
             IFileTypeService fileTypeService,
-            IDataImportService dataImportService, 
-            IImporterService importerService)
+            IDataImportService dataImportService)
         {
             _logger = logger;
             _blobStorageService = blobStorageService;
             _fileTypeService = fileTypeService;
             _dataImportService = dataImportService;
-            _importerService = importerService;
         }
 
         /// <summary>
@@ -143,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             _logger.LogDebug("Determining if CSV file {FileName} is correct shape", file.Filename);
 
-            var columnHeaders = await CsvUtils.GetCsvHeaders(fileStreamProvider);
+            var csvHeaders = await CsvUtils.GetCsvHeaders(fileStreamProvider);
 
             var totalRows = 0;
             var errors = new List<DataImportError>();
@@ -151,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             // Check for unexpected column names
             Array.ForEach(Enum.GetNames(typeof(MetaColumns)), col =>
             {
-                if (!columnHeaders.Contains(col))
+                if (!csvHeaders.Contains(col))
                 {
                     errors.Add(new DataImportError($"{MetaFileMissingExpectedColumn.GetEnumLabel()} : {col}"));
                 }
@@ -162,11 +158,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 return errors;
             }
 
+            var reader = new MetaDataFileReader(csvHeaders);
+
             await CsvUtils.ForEachRow(fileStreamProvider, (cells, index, _) =>
             {
                 totalRows++;
                 
-                if (cells.Count != columnHeaders.Count)
+                if (cells.Count != csvHeaders.Count)
                 {
                     var errorCode = isMetaFile ? MetaFileHasInvalidNumberOfColumns : DataFileHasInvalidNumberOfColumns;
                     errors.Add(new DataImportError($"Error at data row {index + 1}: {errorCode.GetEnumLabel()}"));
@@ -174,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 
                 try
                 {
-                    ImporterMetaService.GetMetaRow(columnHeaders, cells);
+                    reader.GetMetaRow(cells);
                 }
                 catch (Exception e)
                 {
@@ -190,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             
             _logger.LogDebug("CSV metadata file {FileName} is valid", file.Filename);
             
-            return (columnHeaders, totalRows);
+            return (csvHeaders, totalRows);
         }
 
         private static async Task<Either<List<DataImportError>, Unit>> ValidateObservationHeaders(List<string> cols)
@@ -222,14 +220,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private async Task<Either<List<DataImportError>, ProcessorStatistics>>
             ValidateAndCountObservations(
                 DataImport import,
-                List<string> columnHeaders,
+                List<string> csvHeaders,
                 int totalRows,
                 Func<Task<Stream>> dataFileStreamProvider)
         {
             var rowCountByGeographicLevel = new Dictionary<GeographicLevel, int>();
             var errors = new List<DataImportError>();
+            
+            var fixedInformationReader = new FixedInformationDataFileReader(csvHeaders);
 
-            await CsvUtils.ForEachRow(dataFileStreamProvider, async (cells, index, _) =>
+            await CsvUtils.ForEachRow(dataFileStreamProvider, async (rowValues, index, _) =>
             {
                 if (errors.Count == 100)
                 {
@@ -237,10 +237,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     return false;
                 }
                 
-                if (cells.Count != columnHeaders.Count)
+                if (rowValues.Count != csvHeaders.Count)
                 {
-                    errors.Add(new DataImportError($"Error at row {index + 1}: cell count {cells.Count} " +
-                                                   $"does not match column header count of {columnHeaders.Count}"));
+                    errors.Add(new DataImportError($"Error at row {index + 1}: cell count {rowValues.Count} " +
+                                                   $"does not match column header count of {csvHeaders.Count}"));
                     return true;
                 }
                 
@@ -259,10 +259,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 try
                 {
-                    _importerService.GetTimeIdentifier(cells, columnHeaders);
-                    _importerService.GetYear(cells, columnHeaders);
+                    fixedInformationReader.GetTimeIdentifier(rowValues);
+                    fixedInformationReader.GetYear(rowValues);
 
-                    var level = GeographicLevelCsvUtils.GetGeographicLevel(cells, columnHeaders);
+                    var level = fixedInformationReader.GetGeographicLevel(rowValues);
+                    
                     if (rowCountByGeographicLevel.ContainsKey(level))
                     {
                         rowCountByGeographicLevel[level]++;

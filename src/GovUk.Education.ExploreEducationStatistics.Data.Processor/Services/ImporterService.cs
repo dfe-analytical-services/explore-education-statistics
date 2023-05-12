@@ -5,19 +5,14 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -27,111 +22,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class ImporterService : IImporterService
     {
-        private const string DefaultFilterGroupLabel = "Default";
-        private const string DefaultFilterItemLabel = "Not specified";
-
-        private static readonly EnumToEnumLabelConverter<TimeIdentifier> TimeIdentifierLookup = new();
-        
         private readonly IGuidGenerator _guidGenerator;
         private readonly ImporterLocationService _importerLocationService;
-        private readonly ImporterFilterService _importerFilterService;
         private readonly IImporterMetaService _importerMetaService;
         private readonly IDataImportService _dataImportService;
         private readonly ILogger<ImporterService> _logger;
         private readonly IDatabaseHelper _databaseHelper;
-        private readonly ImporterFilterCache _importerFilterCache;
         private readonly IObservationBatchImporter _observationBatchImporter;
 
         private const int Stage2RowCheck = 1000;
 
-        private static readonly Dictionary<GeographicLevel, string[]> ColumnValues =
-            new()
-            {
-                {
-                    GeographicLevel.Country,
-                    new[] {"country_code", "country_name"}
-                },
-                {
-                    GeographicLevel.EnglishDevolvedArea,
-                    new[] {"english_devolved_area_code", "english_devolved_area_name"}
-                },
-                {
-                    GeographicLevel.Institution,
-                    new[] {"institution_id", "institution_name"}
-                },
-                {
-                    GeographicLevel.LocalAuthority,
-                    new[] {"new_la_code", "old_la_code", "la_name"}
-                },
-                {
-                    GeographicLevel.LocalAuthorityDistrict,
-                    new[] {"lad_code", "lad_name"}
-                },
-                {
-                    GeographicLevel.LocalEnterprisePartnership,
-                    new[] {"local_enterprise_partnership_code", "local_enterprise_partnership_name"}
-                },
-                {
-                    GeographicLevel.MayoralCombinedAuthority,
-                    new[] {"mayoral_combined_authority_code", "mayoral_combined_authority_name"}
-                },
-                {
-                    GeographicLevel.MultiAcademyTrust,
-                    new[] {"trust_id", "trust_name"}
-                },
-                {
-                    GeographicLevel.OpportunityArea,
-                    new[] {"opportunity_area_code", "opportunity_area_name"}
-                },
-                {
-                    GeographicLevel.ParliamentaryConstituency,
-                    new[] {"pcon_code", "pcon_name"}
-                },
-                {
-                    GeographicLevel.Provider,
-                    new[] {"provider_ukprn", "provider_name"}
-                },
-                {
-                    GeographicLevel.Region,
-                    new[] {"region_code", "region_name"}
-                },
-                {
-                    GeographicLevel.School,
-                    new[] {"school_urn", "school_name"}
-                },
-                {
-                    GeographicLevel.Sponsor,
-                    new[] {"sponsor_id", "sponsor_name"}
-                },
-                {
-                    GeographicLevel.Ward,
-                    new[] {"ward_code", "ward_name"}
-                },
-                {
-                    GeographicLevel.PlanningArea,
-                    new[] {"planning_area_code", "planning_area_name"}
-                }
-            };
-
         public ImporterService(
             IGuidGenerator guidGenerator,
-            ImporterFilterService importerFilterService,
             ImporterLocationService importerLocationService,
             IImporterMetaService importerMetaService,
             IDataImportService dataImportService, 
             ILogger<ImporterService> logger, 
             IDatabaseHelper databaseHelper, 
-            ImporterFilterCache importerFilterCache, 
             IObservationBatchImporter? observationBatchImporter = null)
         {
             _guidGenerator = guidGenerator;
-            _importerFilterService = importerFilterService;
             _importerLocationService = importerLocationService;
             _importerMetaService = importerMetaService;
             _dataImportService = dataImportService;
             _logger = logger;
             _databaseHelper = databaseHelper;
-            _importerFilterCache = importerFilterCache;
             _observationBatchImporter = observationBatchImporter ?? new StoredProcedureObservationBatchImporter();
         }
 
@@ -142,15 +57,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             StatisticsDbContext context)
         {
             return _importerMetaService.Import(metaFileCsvHeaders, metaFileRows, subject, context);
-        }
-
-        public SubjectMeta GetMeta(
-            List<string> metaFileCsvHeaders,
-            List<List<string>> metaFileRows, 
-            Subject subject,
-            StatisticsDbContext context)
-        {
-            return _importerMetaService.Get(metaFileCsvHeaders, metaFileRows, subject, context);
         }
 
         private record FilterItemMeta(Guid FilterId, string FilterGroupLabel, string FilterItemLabel)
@@ -192,12 +98,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             SubjectMeta subjectMeta,
             StatisticsDbContext context)
         {
-            var colValues = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
+            var csvHeaders = await CsvUtils.GetCsvHeaders(dataFileStreamProvider);
             var soleGeographicLevel = dataImport.HasSoleGeographicLevel();
 
             var filterItemsFromCsv = new HashSet<FilterItemMeta>();
             var filterGroupsFromCsv = new HashSet<FilterGroupMeta>();
             var locations = new HashSet<Location>();
+
+            var filterAndIndicatorReader = new FilterAndIndicatorValuesReader(csvHeaders, subjectMeta);
+            var fixedInformationReader = new FixedInformationDataFileReader(csvHeaders);
             
             await CsvUtils.ForEachRow(dataFileStreamProvider, async (rowValues, index, _) =>
             {
@@ -218,47 +127,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         (double) (index + 1) / dataImport.TotalRows!.Value * 100);
                 }
 
-                if (IsRowAllowed(soleGeographicLevel, rowValues, colValues))
+                if (IsRowAllowed(soleGeographicLevel, rowValues, fixedInformationReader))
                 {
                     foreach (var filterMeta in subjectMeta.Filters)
                     {
-                        var filterItemLabel = CsvUtils.Value(
-                            rowValues, 
-                            colValues, 
-                            filterMeta.Column, 
-                            defaultValue: DefaultFilterItemLabel)!;
-                        
-                        var filterGroupLabel = CsvUtils.Value(
-                            rowValues, 
-                            colValues, 
-                            filterMeta.FilterGroupingColumn,
-                            defaultValue: DefaultFilterGroupLabel)!;
+                        var filterItemLabel = filterAndIndicatorReader.GetFilterItemLabel(rowValues, filterMeta.Filter.Id);
+                        var filterGroupLabel = filterAndIndicatorReader.GetFilterGroupLabel(rowValues, filterMeta.Filter.Id);
 
                         filterGroupsFromCsv.Add(new FilterGroupMeta(filterMeta.Filter.Id, filterGroupLabel));
                         filterItemsFromCsv.Add(new FilterItemMeta(filterMeta.Filter.Id, filterGroupLabel, filterItemLabel));
                     }
 
-                    locations.Add(
-                        ReadLocationFromCsv(
-                            GeographicLevelCsvUtils.GetGeographicLevel(rowValues, colValues),
-                            GetCountry(rowValues, colValues),
-                            GetEnglishDevolvedArea(rowValues, colValues),
-                            GetInstitution(rowValues, colValues),
-                            GetLocalAuthority(rowValues, colValues),
-                            GetLocalAuthorityDistrict(rowValues, colValues),
-                            GetLocalEnterprisePartnership(rowValues, colValues),
-                            GetMayoralCombinedAuthority(rowValues, colValues),
-                            GetMultiAcademyTrust(rowValues, colValues),
-                            GetOpportunityArea(rowValues, colValues),
-                            GetParliamentaryConstituency(rowValues, colValues),
-                            GetPlanningArea(rowValues, colValues),
-                            GetProvider(rowValues, colValues),
-                            GetRegion(rowValues, colValues),
-                            GetRscRegion(rowValues, colValues),
-                            GetSchool(rowValues, colValues),
-                            GetSponsor(rowValues, colValues),
-                            GetWard(rowValues, colValues)
-                        ));
+                    locations.Add(fixedInformationReader.GetLocation(rowValues));
                 }
 
                 return true;
@@ -288,9 +168,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await ctxDelegate.SaveChangesAsync();
             });
 
-            filterGroups.ForEach(filterGroup => _importerFilterCache.AddFilterGroup(filterGroup));
-            filterItems.ForEach(filterItem => _importerFilterCache.AddFilterItem(filterItem));
-
             // Add any new Locations that are being introduced by this import process exclusively.  Other concurrent 
             // import processes reaching this stage will wait before adding their own new Locations, if any.
             //
@@ -306,11 +183,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 ctxDelegate => _importerLocationService.CreateIfNotExistsAndCache(ctxDelegate, locations.ToList()));
         }
 
-        public async Task ImportObservations(
-            DataImport import,
+        public async Task ImportObservations(DataImport import,
             Func<Task<Stream>> dataFileStreamProvider,
+            Func<Task<Stream>> metaFileStreamProvider,
             Subject subject,
-            SubjectMeta subjectMeta,
             StatisticsDbContext context)
         {
             var importObservationsBatchSize = GetRowsPerBatch();
@@ -321,7 +197,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var lastProcessedRowIndex = import.LastProcessedRowIndex ?? -1;
             var startingRowIndex = lastProcessedRowIndex + 1;
             var startingBatchIndex = startingRowIndex / importObservationsBatchSize;
+            
+            var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
+            var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
 
+            var subjectMeta = await _importerMetaService.GetSubjectMeta(
+                metaFileCsvHeaders,
+                metaFileCsvRows,
+                subject,
+                context);
+
+            var fixedInformationReader = new FixedInformationDataFileReader(csvHeaders);
+            var filterAndIndicatorReader = new FilterAndIndicatorValuesReader(csvHeaders, subjectMeta);
+            
             await CsvUtils.Batch(
                 dataFileStreamProvider,
                 importObservationsBatchSize,
@@ -365,16 +253,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     
                     var allowedRows = unprocessedRows.Select((cells, rowIndex) =>
                     {
-                        if (IsRowAllowed(soleGeographicLevel, cells, csvHeaders))
+                        if (IsRowAllowed(soleGeographicLevel, cells, fixedInformationReader))
                         {
                             var csvRow = startOfBatchRowIndex + firstRowIndexOfBatchToProcess + rowIndex + 2;
                             
                             return ObservationFromCsv(
-                                context,
                                 cells,
-                                csvHeaders,
                                 subject,
-                                subjectMeta,
+                                subjectMeta
+                                    .Filters
+                                    .Select(meta => meta.Filter)
+                                    .ToList(),
+                                fixedInformationReader,
+                                filterAndIndicatorReader,
                                 csvRow);
                         }
 
@@ -402,31 +293,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 startingBatchIndex);
         }
 
-        public TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> rowValues, List<string> colValues)
-        {
-            var value = CsvUtils.Value(rowValues, colValues, "time_identifier");
-            
-            try
-            {
-                return (TimeIdentifier) TimeIdentifierLookup.ConvertFromProvider.Invoke(value)!;
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                throw new InvalidTimeIdentifierException(value);
-            }
-        }
-
-        public int GetYear(IReadOnlyList<string> rowValues, List<string> colValues)
-        {
-            var tp = CsvUtils.Value(rowValues, colValues, "time_period");
-            if (tp == null)
-            {
-                throw new InvalidTimePeriodException(null);
-            }
-
-            return int.Parse(tp.Substring(0, 4));
-        }
-
         private static int GetRowsPerBatch()
         {
             return Int32.Parse(Environment.GetEnvironmentVariable("RowsPerBatch") 
@@ -439,18 +305,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         /// </summary>
         private static bool IsRowAllowed(bool soleGeographicLevel,
             IReadOnlyList<string> rowValues,
-            List<string> colValues)
+            FixedInformationDataFileReader fixedInformationReader)
         {
-            return soleGeographicLevel ||
-                   !GeographicLevelCsvUtils.GetGeographicLevel(rowValues, colValues).IsSoloImportableLevel();
+            return soleGeographicLevel || !fixedInformationReader.GetGeographicLevel(rowValues).IsSoloImportableLevel();
         }
 
         private Observation ObservationFromCsv(
-            StatisticsDbContext context,
             List<string> rowValues,
-            List<string> colValues,
             Subject subject,
-            SubjectMeta subjectMeta,
+            List<Filter> filters,
+            FixedInformationDataFileReader fixedInformationReader,
+            FilterAndIndicatorValuesReader filterAndIndicatorReader,
             int csvRowNum)
         {
             var observationId = _guidGenerator.NewGuid();
@@ -458,233 +323,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return new Observation
             {
                 Id = observationId,
-                FilterItems = GetFilterItems(context, rowValues, colValues, subjectMeta.Filters, observationId),
-                LocationId = GetLocationId(rowValues, colValues),
-                Measures = GetMeasures(rowValues, colValues, subjectMeta.Indicators),
+                FilterItems = GetFilterItems(rowValues, filters, filterAndIndicatorReader, observationId),
+                LocationId = GetLocationId(rowValues, fixedInformationReader),
+                Measures = filterAndIndicatorReader.GetMeasures(rowValues),
                 SubjectId = subject.Id,
-                TimeIdentifier = GetTimeIdentifier(rowValues, colValues),
-                Year = GetYear(rowValues, colValues),
+                TimeIdentifier = fixedInformationReader.GetTimeIdentifier(rowValues),
+                Year = fixedInformationReader.GetYear(rowValues),
                 CsvRow = csvRowNum
             };
         }
 
         private List<ObservationFilterItem> GetFilterItems(
-            StatisticsDbContext context,
             IReadOnlyList<string> rowValues,
-            List<string> colValues,
-            IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)> filtersMeta,
+            List<Filter> filters,
+            FilterAndIndicatorValuesReader filterAndIndicatorReader,
             Guid observationId)
         {
-            return filtersMeta.Select(filterMeta =>
+            return filters.Select(filter =>
             {
-                var (filter, column, filterGroupingColumn) = filterMeta;
-                
-                var filterItemLabel = CsvUtils.Value(
-                    rowValues, 
-                    colValues, 
-                    column, 
-                    DefaultFilterItemLabel);
-                
-                var filterGroupLabel = CsvUtils.Value(
-                    rowValues, 
-                    colValues, 
-                    filterGroupingColumn, 
-                    DefaultFilterGroupLabel);
+                var filterItem = filterAndIndicatorReader.GetFilterItem(rowValues, filter);
 
                 return new ObservationFilterItem
                 {
                     ObservationId = observationId,
-                    FilterItemId = _importerFilterService.Find(filterItemLabel, filterGroupLabel, filter, context).Id,
+                    FilterItemId = filterItem.Id,
                     FilterId = filter.Id
                 };
             }).ToList();
         }
 
-        private Guid GetLocationId(IReadOnlyList<string> rowValues, List<string> colValues)
+        private Guid GetLocationId(IReadOnlyList<string> rowValues, FixedInformationDataFileReader fixedInformationReader)
         {
-            var location = ReadLocationFromCsv(
-                GeographicLevelCsvUtils.GetGeographicLevel(rowValues, colValues),
-                GetCountry(rowValues, colValues),
-                GetEnglishDevolvedArea(rowValues, colValues),
-                GetInstitution(rowValues, colValues),
-                GetLocalAuthority(rowValues, colValues),
-                GetLocalAuthorityDistrict(rowValues, colValues),
-                GetLocalEnterprisePartnership(rowValues, colValues),
-                GetMayoralCombinedAuthority(rowValues, colValues),
-                GetMultiAcademyTrust(rowValues, colValues),
-                GetOpportunityArea(rowValues, colValues),
-                GetParliamentaryConstituency(rowValues, colValues),
-                GetPlanningArea(rowValues, colValues),
-                GetProvider(rowValues, colValues),
-                GetRegion(rowValues, colValues),
-                GetRscRegion(rowValues, colValues),
-                GetSchool(rowValues, colValues),
-                GetSponsor(rowValues, colValues),
-                GetWard(rowValues, colValues));
-                
+            var location = fixedInformationReader.GetLocation(rowValues);
             return _importerLocationService.Get(location).Id;
-        }
-
-        private static Dictionary<Guid, string> GetMeasures(IReadOnlyList<string> rowValues,
-            List<string> colValues,
-            IEnumerable<(Indicator Indicator, string Column)> indicators)
-        {
-            var valueTuples = indicators.ToList();
-            var columns = valueTuples.Select(tuple => tuple.Column);
-            var values = CsvUtils.Values(rowValues, colValues, columns);
-
-            return valueTuples.Zip(values, (tuple, value) => new {tuple, value})
-                .ToDictionary(item => item.tuple.Indicator.Id, item => item.value)!;
-        }
-
-        private static Country? GetCountry(IReadOnlyList<string> rowValues, List<string> colValues)
-        {
-            return CsvUtils.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.Country], values =>
-                new Country(values[0], values[1]));
-        }
-
-        private static EnglishDevolvedArea? GetEnglishDevolvedArea(IReadOnlyList<string> rowValues, List<string> colValues)
-        {
-            return CsvUtils.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.EnglishDevolvedArea], values =>
-                new EnglishDevolvedArea(values[0], values[1]));
-        }
-
-        private static Institution? GetInstitution(IReadOnlyList<string> rowValues,
-            List<string> colValues)
-        {
-            return CsvUtils.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.Institution], values =>
-                new Institution(values[0], values[1]));
-        }
-
-        private static LocalAuthority? GetLocalAuthority(IReadOnlyList<string> rowValues, List<string> colValues)
-        {
-            return CsvUtils.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.LocalAuthority], values =>
-                new LocalAuthority(values[0], values[1], values[2]));
-        }
-
-        private static LocalAuthorityDistrict? GetLocalAuthorityDistrict(IReadOnlyList<string> rowValues,
-            List<string> colValues)
-        {
-            return CsvUtils.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.LocalAuthorityDistrict], values =>
-                new LocalAuthorityDistrict(values[0], values[1]));
-        }
-
-        private static LocalEnterprisePartnership? GetLocalEnterprisePartnership(IReadOnlyList<string> rowValues,
-            List<string> colValues)
-        {
-            return CsvUtils.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.LocalEnterprisePartnership], values =>
-                new LocalEnterprisePartnership(values[0], values[1]));
-        }
-
-        private static MayoralCombinedAuthority? GetMayoralCombinedAuthority(IReadOnlyList<string> rowValues,
-            List<string> colValues)
-        {
-            return CsvUtils.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.MayoralCombinedAuthority], values =>
-                new MayoralCombinedAuthority(values[0], values[1]));
-        }
-
-        private static MultiAcademyTrust? GetMultiAcademyTrust(IReadOnlyList<string> rowValues, List<string> colValues)
-        {
-            return CsvUtils.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.MultiAcademyTrust], values =>
-                new MultiAcademyTrust(values[0], values[1]));
-        }
-
-        private static OpportunityArea? GetOpportunityArea(IReadOnlyList<string> rowValues, List<string> colValues)
-        {
-            return CsvUtils.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.OpportunityArea], values =>
-                new OpportunityArea(values[0], values[1]));
-        }
-
-        private static ParliamentaryConstituency? GetParliamentaryConstituency(IReadOnlyList<string> rowValues,
-            List<string> colValues)
-        {
-            return CsvUtils.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.ParliamentaryConstituency], values =>
-                new ParliamentaryConstituency(values[0], values[1]));
-        }
-
-        private static Provider? GetProvider(IReadOnlyList<string> rowValues,
-            List<string> colValues)
-        {
-            return CsvUtils.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.Provider], values =>
-                new Provider(values[0], values[1]));
-        }
-
-        private static Region? GetRegion(IReadOnlyList<string> rowValues, List<string> colValues)
-        {
-            return CsvUtils.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.Region], values =>
-                new Region(values[0], values[1]));
-        }
-
-        private static RscRegion? GetRscRegion(IReadOnlyList<string> rowValues, List<string> colValues)
-        {
-            return CsvUtils.BuildType(rowValues, colValues, "rsc_region_lead_name", value => new RscRegion(value));
-        }
-
-        private static School? GetSchool(IReadOnlyList<string> rowValues, List<string> colValues)
-        {
-            return CsvUtils.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.School], values =>
-                new School(values[0], values[1]));
-        }
-
-        private static Sponsor? GetSponsor(IReadOnlyList<string> rowValues, List<string> colValues)
-        {
-            return CsvUtils.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.Sponsor], values =>
-                new Sponsor(values[0], values[1]));
-        }
-
-        private static Ward? GetWard(IReadOnlyList<string> rowValues, List<string> colValues)
-        {
-            return CsvUtils.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.Ward], values =>
-                new Ward(values[0], values[1]));
-        }
-
-        private static PlanningArea? GetPlanningArea(IReadOnlyList<string> rowValues, List<string> colValues)
-        {
-            return CsvUtils.BuildType(rowValues, colValues, ColumnValues[GeographicLevel.PlanningArea], values =>
-                new PlanningArea(values[0], values[1]));
-        }
-        
-        private Location ReadLocationFromCsv(
-            GeographicLevel geographicLevel,
-            Country? country,
-            EnglishDevolvedArea? englishDevolvedArea = null,
-            Institution? institution = null,
-            LocalAuthority? localAuthority = null,
-            LocalAuthorityDistrict? localAuthorityDistrict = null,
-            LocalEnterprisePartnership? localEnterprisePartnership = null,
-            MayoralCombinedAuthority? mayoralCombinedAuthority = null,
-            MultiAcademyTrust? multiAcademyTrust = null,
-            OpportunityArea? opportunityArea = null,
-            ParliamentaryConstituency? parliamentaryConstituency = null,
-            PlanningArea? planningArea = null,
-            Provider? provider = null,
-            Region? region = null,
-            RscRegion? rscRegion = null,
-            School? school = null,
-            Sponsor? sponsor = null,
-            Ward? ward = null)
-        {
-            return new Location
-            {
-                GeographicLevel = geographicLevel,
-                Country = country,
-                EnglishDevolvedArea = englishDevolvedArea,
-                Institution = institution,
-                LocalAuthority = localAuthority,
-                LocalAuthorityDistrict = localAuthorityDistrict,
-                LocalEnterprisePartnership = localEnterprisePartnership,
-                MayoralCombinedAuthority = mayoralCombinedAuthority,
-                MultiAcademyTrust = multiAcademyTrust,
-                OpportunityArea = opportunityArea,
-                ParliamentaryConstituency = parliamentaryConstituency,
-                PlanningArea = planningArea,
-                Provider = provider,
-                Region = region,
-                RscRegion = rscRegion,
-                School = school,
-                Sponsor = sponsor,
-                Ward = ward
-            };
         }
     }
 

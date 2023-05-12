@@ -107,37 +107,35 @@ public class ProcessorStage1Tests
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
 
-        var importerFilterCache = new ImporterFilterCache();
-
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
         
         var guidGenerator = new SequentialGuidGenerator();
+
+        var importerMetaService = new ImporterMetaService(guidGenerator, transactionHelper);
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(importerFilterCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
                 Mock.Of<ILogger<ImporterLocationCache>>()),
-            new ImporterMetaService(guidGenerator, transactionHelper),
+            importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
-            transactionHelper,
-            importerFilterCache);
+            transactionHelper);
 
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
             blobStorageService.Object,
             dataImportService,
-            importerService);
+            importerService,
+            importerMetaService);
 
         var validatorService = new ValidatorService(
             Mock.Of<ILogger<ValidatorService>>(),
             blobStorageService.Object,
             new FileTypeService(Mock.Of<ILogger<FileTypeService>>()),
-            dataImportService,
-            importerService);
+            dataImportService);
 
         var processorService = BuildProcessorService(
             dbContextSupplier,
@@ -159,7 +157,8 @@ public class ProcessorStage1Tests
         await function.ProcessUploads(
             importMessage, 
             new ExecutionContext(),
-            importStagesMessageQueue.Object);
+            importStagesMessageQueue.Object,
+            rethrowExceptions: true);
         
         VerifyAllMocks(blobStorageService, importStagesMessageQueue);
 
