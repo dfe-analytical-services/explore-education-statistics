@@ -140,8 +140,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 await _fileRepository.Delete(zipFile.Id);
                             }
                         }
-
-                        await DeleteBatchFiles(file);
                     }
                 });
         }
@@ -506,11 +504,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                              && rf.File.SubjectId == dataFile.SubjectId)
                 .Select(rf => rf.File)
                 .SingleAsync();
-        }
-
-        private async Task DeleteBatchFiles(File dataFile)
-        {
-            await _blobStorageService.DeleteBlobs(PrivateReleaseFiles, dataFile.BatchesPath());
         }
 
         private async Task<int> GetNextDataFileOrder(File? replacingFile, Guid releaseId)

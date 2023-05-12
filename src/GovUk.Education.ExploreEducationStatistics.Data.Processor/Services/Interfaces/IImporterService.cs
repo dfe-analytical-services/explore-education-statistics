@@ -1,10 +1,8 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -16,22 +14,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
     {
         Task<SubjectMeta> ImportMeta(
             List<string> metaFileCsvHeaders,
-            List<List<string>> metaFileRows, 
-            Subject subject, 
-            StatisticsDbContext context);
-
-        SubjectMeta GetMeta(
-            List<string> metaFileCsvHeaders,
-            List<List<string>> metaFileRows, 
-            Subject subject, 
+            List<List<string>> metaFileRows,
+            Subject subject,
             StatisticsDbContext context);
 
         Task ImportObservations(
             DataImport dataImport,
             Func<Task<Stream>> dataFileStreamProvider,
+            Func<Task<Stream>> metaFileStreamProvider,
             Subject subject,
-            SubjectMeta subjectMeta,
-            int batchNo,
             StatisticsDbContext context);
 
         Task ImportFiltersAndLocations(
@@ -39,9 +30,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
             Func<Task<Stream>> dataFileStreamProvider,
             SubjectMeta subjectMeta,
             StatisticsDbContext context);
-
-        TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> rowValues, List<string> colValues);
-
-        int GetYear(IReadOnlyList<string> rowValues, List<string> colValues);
     }
 }

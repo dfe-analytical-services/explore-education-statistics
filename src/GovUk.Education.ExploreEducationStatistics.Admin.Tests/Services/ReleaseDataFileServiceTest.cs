@@ -147,14 +147,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         releaseDataFile.Path(), releaseMetaFile.Path(), zipFile.Path())))
                 .Returns(Task.CompletedTask);
 
-            // test that the deletion of any remaining batch files went ahead for this particular data file
-            blobStorageService
-                .Setup(mock => mock.DeleteBlobs(
-                    PrivateReleaseFiles,
-                    releaseDataFile.BatchesPath(),
-                    null))
-                .Returns(Task.CompletedTask);
-
             releaseFileService.Setup(mock => mock.CheckFileExists(release.Id,
                     releaseDataFile.File.Id,
                     FileType.Data))
@@ -325,13 +317,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     It.IsIn(replacementDataFile.Path(), replacementMetaFile.Path(), replacementZipFile.Path())))
                 .Returns(Task.CompletedTask);
 
-            blobStorageService
-                .Setup(mock => mock.DeleteBlobs(
-                    PrivateReleaseFiles,
-                    replacementDataFile.BatchesPath(),
-                    null))
-                .Returns(Task.CompletedTask);
-
             releaseFileService.Setup(mock => mock.CheckFileExists(release.Id,
                     replacementDataFile.Id,
                     FileType.Data))
@@ -470,13 +455,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataImportService = new Mock<IDataImportService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
-            blobStorageService
-                .Setup(mock => mock.DeleteBlobs(
-                    PrivateReleaseFiles,
-                    dataFile.BatchesPath(),
-                    null))
-                .Returns(Task.CompletedTask);
-
             releaseFileService.Setup(mock => mock.CheckFileExists(amendmentRelease.Id,
                     dataFile.Id,
                     FileType.Data))
@@ -598,13 +576,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             blobStorageService.Setup(mock => mock.DeleteBlob(PrivateReleaseFiles,
                     It.IsIn(dataReleaseFile.Path(), metaReleaseFile.Path(), zipFile.Path())))
-                .Returns(Task.CompletedTask);
-
-            blobStorageService
-                .Setup(mock => mock.DeleteBlobs(
-                    PrivateReleaseFiles,
-                    dataReleaseFile.BatchesPath(),
-                    null))
                 .Returns(Task.CompletedTask);
 
             releaseFileService.Setup(mock => mock.CheckFileExists(release.Id,
@@ -740,12 +711,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
-
-            blobStorageService.Setup(mock => mock.DeleteBlobs(
-                    PrivateReleaseFiles,
-                    dataFile.BatchesPath(),
-                    null))
-                .Returns(Task.CompletedTask);
 
             releaseFileService.Setup(mock => mock.CheckFileExists(amendmentRelease.Id,
                     dataFile.Id,
@@ -1256,49 +1221,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var dbDataFile1 = dbDataFiles.Find(rf => rf.Id == releaseDataFile1.Id);
                 Assert.NotNull(dbDataFile1);
-                Assert.Equal(0, dbDataFile1!.Order);
+                Assert.Equal(0, dbDataFile1.Order);
 
                 var dbDataFile2 = dbDataFiles.Find(rf => rf.Id == releaseDataFile2.Id);
                 Assert.NotNull(dbDataFile2);
-                Assert.Equal(1, dbDataFile2!.Order);
+                Assert.Equal(1, dbDataFile2.Order);
 
                 var dbDataFile3 = dbDataFiles.Find(rf => rf.Id == releaseDataFile3.Id);
                 Assert.NotNull(dbDataFile3);
-                Assert.Equal(2, dbDataFile3!.Order);
+                Assert.Equal(2, dbDataFile3.Order);
 
                 var dbDataFile4 = dbDataFiles.Find(rf => rf.Id == releaseDataFile4.Id);
                 Assert.NotNull(dbDataFile4);
-                Assert.Equal(3, dbDataFile4!.Order);
+                Assert.Equal(3, dbDataFile4.Order);
 
                 var dbDataFile5 = dbDataFiles.Find(rf => rf.Id == releaseDataFile5.Id);
                 Assert.NotNull(dbDataFile5);
-                Assert.Equal(4, dbDataFile5!.Order);
+                Assert.Equal(4, dbDataFile5.Order);
 
                 var dbMetaFiles = contentDbContext.ReleaseFiles
                     .Include(rf => rf.File)
-                    .Where(rf => rf.ReleaseId == release.Id && rf.File.Type == FileType.Metadata)
+                    .Where(rf => rf.ReleaseId == release.Id && rf.File.Type == Metadata)
                     .ToList();
 
                 // Non-FileType.Data files should default to Order 0
                 var dbMetaFile1 = dbMetaFiles.Find(rf => rf.Id == releaseMetaFile1.Id);
                 Assert.NotNull(dbMetaFile1);
-                Assert.Equal(0, dbMetaFile1!.Order);
+                Assert.Equal(0, dbMetaFile1.Order);
 
                 var dbMetaFile2 = dbMetaFiles.Find(rf => rf.Id == releaseMetaFile2.Id);
                 Assert.NotNull(dbMetaFile2);
-                Assert.Equal(0, dbMetaFile2!.Order);
+                Assert.Equal(0, dbMetaFile2.Order);
 
                 var dbMetaFile3 = dbMetaFiles.Find(rf => rf.Id == releaseMetaFile3.Id);
                 Assert.NotNull(dbMetaFile3);
-                Assert.Equal(0, dbMetaFile3!.Order);
+                Assert.Equal(0, dbMetaFile3.Order);
 
                 var dbMetaFile4 = dbMetaFiles.Find(rf => rf.Id == releaseMetaFile4.Id);
                 Assert.NotNull(dbMetaFile4);
-                Assert.Equal(0, dbMetaFile4!.Order);
+                Assert.Equal(0, dbMetaFile4.Order);
 
                 var dbMetaFile5 = dbMetaFiles.Find(rf => rf.Id == releaseMetaFile5.Id);
                 Assert.NotNull(dbMetaFile5);
-                Assert.Equal(0, dbMetaFile5!.Order);
+                Assert.Equal(0, dbMetaFile5.Order);
             }
         }
 
@@ -1959,7 +1924,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         && rs.ReleaseId == release.Id);
                 Assert.Contains(releaseSubjects,
                     rs =>
-                        rs.SubjectId == replacementSubject!.Id
+                        rs.SubjectId == replacementSubject.Id
                         && rs.ReleaseId == release.Id);
             }
 
@@ -2631,7 +2596,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         && rs.ReleaseId == release.Id);
                 Assert.Contains(releaseSubjects,
                     rs =>
-                        rs.SubjectId == replacementSubject!.Id
+                        rs.SubjectId == replacementSubject.Id
                         && rs.ReleaseId == release.Id);
             }
 

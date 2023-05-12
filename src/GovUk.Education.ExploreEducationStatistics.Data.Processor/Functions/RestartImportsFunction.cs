@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -19,14 +20,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         private readonly ContentDbContext _contentDbContext;
         private readonly IStorageQueueService _storageQueueService;
 
-        private static readonly List<DataImportStatus> IncompleteStatuses = new List<DataImportStatus>
+        private static readonly List<DataImportStatus> IncompleteStatuses = new()
         {
             QUEUED,
             PROCESSING_ARCHIVE_FILE,
             STAGE_1,
             STAGE_2,
             STAGE_3,
-            STAGE_4,
             CANCELLING
         };
 
@@ -44,9 +44,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
+            logger.LogInformation("{FunctionName} triggered", executionContext.FunctionName);
 
-            var incompleteImports = await _contentDbContext.DataImports
+            var incompleteImports = await _contentDbContext
+                .DataImports
                 .AsQueryable()
                 .Where(import => IncompleteStatuses.Contains(import.Status))
                 .ToListAsync();
@@ -57,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
             await _storageQueueService.AddMessages(ImportsPendingQueue, messages);
 
-            logger.LogInformation($"{executionContext.FunctionName} completed");
+            logger.LogInformation("{FunctionName} completed", executionContext.FunctionName);
         }
     }
 }

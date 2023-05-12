@@ -557,7 +557,7 @@ To generate a migration for the content db:
 
 ```
 cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.Admin
-dotnet ef migrations add EES1234MigrationNameHere --context ContentDbContext --output-dir Migrations/ContentMigrations -v
+dotnet ef migrations add EES1234_MigrationNameHere --context ContentDbContext --output-dir Migrations/ContentMigrations -v
 ```
 
 #### Statistics DB migrations
@@ -566,7 +566,7 @@ To generate a migration for the statistics db:
 
 ```
 cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.Data.Api
-dotnet ef migrations add EES1234MigrationNameHere --context StatisticsDbContext --project ../GovUk.Education.ExploreEducationStatistics.Data.Model -v
+dotnet ef migrations add EES1234_MigrationNameHere --context StatisticsDbContext --project ../GovUk.Education.ExploreEducationStatistics.Data.Model -v
 ```
 
 #### Users and Roles DB migrations
@@ -575,7 +575,7 @@ To generate a migration for the UsersAndRolesDbContext:
 
 ```
 cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.Admin
-dotnet ef migrations add EES1234MigrationNameGoesHere --context UsersAndRolesDbContext --output-dir Migrations/UsersAndRolesMigrations -v
+dotnet ef migrations add EES1234_MigrationNameGoesHere --context UsersAndRolesDbContext --output-dir Migrations/UsersAndRolesMigrations -v
 ```
 
 ### Resetting the storage emulator
