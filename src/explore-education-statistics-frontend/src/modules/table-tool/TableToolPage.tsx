@@ -33,6 +33,7 @@ export interface TableToolPageProps {
   subjects?: Subject[];
   subjectMeta?: SubjectMeta;
   themeMeta: Theme[];
+  newPermalinks?: boolean; // TO DO - EES-4259 remove `newPermalinks` param and tidy up
 }
 
 const TableToolPage: NextPage<TableToolPageProps> = ({
@@ -42,6 +43,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   subjects,
   subjectMeta,
   themeMeta,
+  newPermalinks,
 }) => {
   const router = useRouter();
   const [loadingFastTrack, setLoadingFastTrack] = useState(false);
@@ -170,6 +172,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
                         table={table}
                         tableHeaders={tableHeaders}
                         onReorderTableHeaders={onReorder}
+                        newPermalinks={newPermalinks}
                       />
                     )}
                 </>
@@ -178,15 +181,27 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
           );
         }}
         onPublicationFormSubmit={publication => {
-          router.push(`/data-tables/${publication.slug}`, undefined, {
-            shallow: true,
-            scroll: false,
-          });
+          router.push(
+            {
+              pathname: `/data-tables/${publication.slug}`,
+              query: newPermalinks ? { newPermalinks } : undefined,
+            },
+            undefined,
+            {
+              shallow: true,
+              scroll: false,
+            },
+          );
         }}
         onStepChange={() => setCurrentStep(undefined)}
         onSubjectFormSubmit={({ publication, release, subjectId }) => {
           router.push(
-            `/data-tables/${publication.slug}/${release.slug}?subjectId=${subjectId}`,
+            {
+              pathname: `/data-tables/${publication.slug}/${release.slug}`,
+              query: newPermalinks
+                ? { subjectId, newPermalinks }
+                : { subjectId },
+            },
             undefined,
             {
               shallow: true,
@@ -195,10 +210,17 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
           );
         }}
         onSubjectStepBack={publication => {
-          router.push(`/data-tables/${publication?.slug}`, undefined, {
-            shallow: true,
-            scroll: false,
-          });
+          router.push(
+            {
+              pathname: `/data-tables/${publication?.slug}`,
+              query: newPermalinks ? { newPermalinks } : undefined,
+            },
+            undefined,
+            {
+              shallow: true,
+              scroll: false,
+            },
+          );
         }}
         onSubmit={table => {
           logEvent({
@@ -242,9 +264,13 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
 export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async ({
   query,
 }) => {
-  const { publicationSlug = '', releaseSlug = '' } = query as Dictionary<
-    string
-  >;
+  const {
+    publicationSlug = '',
+    releaseSlug = '',
+    newPermalinks,
+  } = query as Dictionary<string>;
+
+  console.log('query', query, newPermalinks);
 
   const themeMeta = await publicationService.getPublicationTree({
     publicationFilter: 'DataTables',
@@ -259,6 +285,7 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
     return {
       props: {
         themeMeta,
+        newPermalinks: !!newPermalinks,
       },
     };
   }
@@ -299,6 +326,7 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
       },
       subjects,
       featuredTables,
+      newPermalinks: !!newPermalinks,
     },
   };
 };

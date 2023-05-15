@@ -64,7 +64,7 @@ describe('TableToolShare', () => {
     const urlInput = screen.getByTestId('permalink-generated-url');
     expect(urlInput).toBeInTheDocument();
     expect(urlInput).toHaveValue(
-      'http://localhost/data-tables/permalink/permalink-id',
+      'http://localhost:3000/data-tables/permalink/permalink-id',
     );
 
     expect(
@@ -110,7 +110,7 @@ describe('TableToolShare', () => {
     );
 
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-      'http://localhost/data-tables/permalink/permalink-id',
+      'http://localhost:3000/data-tables/permalink/permalink-id',
     );
   });
 });

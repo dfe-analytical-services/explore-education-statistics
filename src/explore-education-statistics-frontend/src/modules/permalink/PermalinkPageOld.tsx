@@ -1,43 +1,36 @@
 import FormattedDate from '@common/components/FormattedDate';
 import WarningMessage from '@common/components/WarningMessage';
+import useToggle from '@common/hooks/useToggle';
 import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
+import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import permalinkService, { Permalink } from '@common/services/permalinkService';
-import permalinkSnapshotService, {
-  PermalinkSnapshot,
-} from '@common/services/permalinkSnapshotService';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
 import styles from '@frontend/modules/permalink/PermalinkPage.module.scss';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import FixedMultiHeaderDataTable from '@common/modules/table-tool/components/FixedMultiHeaderDataTable';
-import PermalinkPageOld from '@frontend/modules/permalink/PermalinkPageOld';
-import { GetServerSideProps, NextPage } from 'next';
 import React, { useRef } from 'react';
-import { Dictionary } from '@common/types';
-import DataTableCaption from '@common/modules/table-tool/components/DataTableCaption';
-
-const captionId = 'dataTableCaption';
-const footnotesId = 'dataTableFootnotes';
 
 interface Props {
-  data: PermalinkSnapshot | Permalink; // TO DO - EES-4259 change to only PermalinkSnapshot and remove old Permalink type
-  newPermalinks: boolean; // TO DO - EES-4259 remove `newPermalinks` param and tidy up
+  data: Permalink;
 }
 
-const PermalinkPage: NextPage<Props> = ({ data, newPermalinks }) => {
+const PermalinkPage = ({ data }: Props) => {
+  const [hasTableError, toggleHasTableError] = useToggle(false);
   const tableRef = useRef<HTMLDivElement>(null);
-  if (!newPermalinks) {
-    return <PermalinkPageOld data={data as Permalink} />;
-  }
+  const fullTable = mapFullTable(data.fullTable);
+  const tableHeadersConfig = mapTableHeadersConfig(
+    data.configuration.tableHeaders,
+    fullTable,
+  );
 
-  const { dataSetTitle, publicationTitle, table } = data as PermalinkSnapshot;
-
-  const { caption, footnotes, json } = table;
+  const { subjectName, publicationName } = fullTable.subjectMeta;
 
   return (
     <Page
-      title={`'${dataSetTitle}' from '${publicationTitle}'`}
+      title={`'${subjectName}' from '${publicationName}'`}
       caption="Permanent data table"
       className={styles.permalinkPage}
       wide
@@ -87,40 +80,49 @@ const PermalinkPage: NextPage<Props> = ({ data, newPermalinks }) => {
       )}
 
       <div ref={tableRef}>
-        <FixedMultiHeaderDataTable
-          caption={<DataTableCaption title={caption} id={captionId} />}
-          captionId={captionId}
-          footnotes={footnotes}
+        <TimePeriodDataTable
           footnotesClassName="govuk-!-width-two-thirds"
-          footnotesId={footnotesId}
-          source={`${publicationTitle}, ${dataSetTitle}`}
-          tableJson={json}
-          ref={tableRef}
+          fullTable={fullTable}
+          source={`${publicationName}, ${subjectName}`}
+          tableHeadersConfig={tableHeadersConfig}
+          onError={message => {
+            toggleHasTableError.on();
+            logEvent({
+              category: 'Permalink page',
+              action: 'Table rendering error',
+              label: message,
+            });
+          }}
         />
       </div>
 
       <div className="dfe-hide-print">
-        <DownloadTable
-          fileName={`permalink-${data.id}`}
-          footnotes={footnotes}
-          headingSize="m"
-          headingTag="h2"
-          tableRef={tableRef}
-          tableTitle={caption}
-          onCsvDownload={() =>
-            permalinkSnapshotService.getPermalinkCsv(data.id)
-          }
-          onSubmit={fileFormat =>
-            logEvent({
-              category: 'Permalink page',
-              action:
-                fileFormat === 'csv'
-                  ? 'CSV download button clicked'
-                  : 'ODS download button clicked',
-              label: caption,
-            })
-          }
-        />
+        {!hasTableError && (
+          <DownloadTable
+            fullTable={fullTable}
+            fileName={`permalink-${data.id}`}
+            onCsvDownload={() => permalinkService.getPermalinkCsv(data.id)}
+            headingSize="m"
+            headingTag="h2"
+            tableRef={tableRef}
+            onSubmit={fileFormat =>
+              logEvent({
+                category: 'Permalink page',
+                action:
+                  fileFormat === 'csv'
+                    ? 'CSV download button clicked'
+                    : 'ODS download button clicked',
+                label: `${fullTable.subjectMeta.publicationName} between ${
+                  fullTable.subjectMeta.timePeriodRange[0].label
+                } and ${
+                  fullTable.subjectMeta.timePeriodRange[
+                    fullTable.subjectMeta.timePeriodRange.length - 1
+                  ].label
+                }`,
+              })
+            }
+          />
+        )}
 
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Create your own tables
@@ -133,26 +135,6 @@ const PermalinkPage: NextPage<Props> = ({ data, newPermalinks }) => {
       </div>
     </Page>
   );
-};
-
-export const getServerSideProps: GetServerSideProps<Props> = async ({
-  query,
-}) => {
-  const { newPermalinks, permalink } = query as Dictionary<string>;
-  // TO DO - EES-4259 remove `newPermalinks` and tidy up
-  let data: Permalink | PermalinkSnapshot;
-  if (newPermalinks) {
-    data = await permalinkSnapshotService.getPermalink(permalink);
-  } else {
-    data = await permalinkService.getPermalink(permalink);
-  }
-
-  return {
-    props: {
-      data,
-      newPermalinks: !!newPermalinks,
-    },
-  };
 };
 
 export default PermalinkPage;

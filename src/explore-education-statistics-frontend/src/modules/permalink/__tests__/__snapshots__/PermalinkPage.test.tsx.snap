@@ -1,0 +1,140 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PermalinkPage with newPermalinks renders correctly with permalink 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        colspan="1"
+        rowspan="1"
+      />
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2014/15 Autumn term
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2015/16 Autumn term
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2016/17 Autumn term
+      </th>
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2017/18 Autumn term
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        State-funded primary
+      </th>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        420,194
+      </td>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        385,676
+      </td>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        403,409
+      </td>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        402,755
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        State-funded primary and secondary
+      </th>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        567,279
+      </td>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        516,897
+      </td>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        543,325
+      </td>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        540,135
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        State-funded secondary
+      </th>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        147,085
+      </td>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        131,221
+      </td>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        139,916
+      </td>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        137,380
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
