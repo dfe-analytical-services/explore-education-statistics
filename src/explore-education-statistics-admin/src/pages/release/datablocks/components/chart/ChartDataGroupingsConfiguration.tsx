@@ -65,14 +65,14 @@ const ChartDataGroupingsConfiguration = ({
   );
 
   const initialValues = useMemo<FormValues>(() => {
-    const dataSetCategories = createDataSetCategories(
-      {
+    const dataSetCategories = createDataSetCategories({
+      axisConfiguration: {
         ...axisMajor,
         groupBy: 'locations',
       },
       data,
       meta,
-    );
+    });
 
     const dataSetCategoryConfigs = getDataSetCategoryConfigs({
       dataSetCategories,

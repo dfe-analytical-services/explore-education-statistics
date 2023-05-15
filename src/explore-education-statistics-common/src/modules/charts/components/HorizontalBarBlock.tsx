@@ -69,12 +69,12 @@ const HorizontalBarBlock = ({
     return <div>Unable to render chart, chart incorrectly configured</div>;
   }
 
-  const dataSetCategories: DataSetCategory[] = createDataSetCategories(
-    axes.major,
+  const dataSetCategories: DataSetCategory[] = createDataSetCategories({
+    axisConfiguration: axes.major,
     data,
     meta,
     includeNonNumericData,
-  );
+  });
 
   const chartData = dataSetCategories.map(toChartData);
 

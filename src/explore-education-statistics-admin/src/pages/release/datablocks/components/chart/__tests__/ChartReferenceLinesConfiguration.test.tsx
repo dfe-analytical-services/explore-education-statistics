@@ -87,14 +87,14 @@ describe('ChartReferenceLinesConfiguration', () => {
   };
 
   const testTable = testFullTable;
-  const testTimePeriodDataSetCategories = createDataSetCategories(
-    {
+  const testTimePeriodDataSetCategories = createDataSetCategories({
+    axisConfiguration: {
       ...testAxisConfiguration,
       groupBy: 'timePeriod',
     },
-    testTable.results,
-    testTable.subjectMeta,
-  );
+    data: testTable.results,
+    meta: testTable.subjectMeta,
+  });
 
   const testMinorAxisDomain: MinorAxisDomainValues = { min: 0, max: 50000 };
 
@@ -141,14 +141,14 @@ describe('ChartReferenceLinesConfiguration', () => {
   test('renders correctly with existing lines when grouped by filters', () => {
     render(
       <ChartReferenceLinesConfiguration
-        dataSetCategories={createDataSetCategories(
-          {
+        dataSetCategories={createDataSetCategories({
+          axisConfiguration: {
             ...testAxisConfiguration,
             groupBy: 'filters',
           },
-          testTable.results,
-          testTable.subjectMeta,
-        )}
+          data: testTable.results,
+          meta: testTable.subjectMeta,
+        })}
         axisDefinition={testMajorAxisDefinition}
         lines={[
           { position: 'ethnicity-major-chinese', label: 'Test label 1' },
@@ -191,14 +191,14 @@ describe('ChartReferenceLinesConfiguration', () => {
   test('renders correctly with existing lines when grouped by locations', () => {
     render(
       <ChartReferenceLinesConfiguration
-        dataSetCategories={createDataSetCategories(
-          {
+        dataSetCategories={createDataSetCategories({
+          axisConfiguration: {
             ...testAxisConfiguration,
             groupBy: 'locations',
           },
-          testTable.results,
-          testTable.subjectMeta,
-        )}
+          data: testTable.results,
+          meta: testTable.subjectMeta,
+        })}
         axisDefinition={testMajorAxisDefinition}
         lines={[{ position: barnetId, label: 'Test label 1' }]}
         minorAxisDomain={testMinorAxisDomain}
@@ -230,14 +230,14 @@ describe('ChartReferenceLinesConfiguration', () => {
   test('renders correctly with existing lines when grouped by indicators', () => {
     render(
       <ChartReferenceLinesConfiguration
-        dataSetCategories={createDataSetCategories(
-          {
+        dataSetCategories={createDataSetCategories({
+          axisConfiguration: {
             ...testAxisConfiguration,
             groupBy: 'indicators',
           },
-          testTable.results,
-          testTable.subjectMeta,
-        )}
+          data: testTable.results,
+          meta: testTable.subjectMeta,
+        })}
         axisDefinition={testMajorAxisDefinition}
         lines={[
           { position: 'overall-absence-sessions', label: 'Test label 1' },
@@ -576,14 +576,14 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     render(
       <ChartReferenceLinesConfiguration
-        dataSetCategories={createDataSetCategories(
-          {
+        dataSetCategories={createDataSetCategories({
+          axisConfiguration: {
             ...testAxisConfiguration,
             groupBy: 'filters',
           },
-          testTable.results,
-          testTable.subjectMeta,
-        )}
+          data: testTable.results,
+          meta: testTable.subjectMeta,
+        })}
         axisDefinition={testMajorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
@@ -622,14 +622,14 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     render(
       <ChartReferenceLinesConfiguration
-        dataSetCategories={createDataSetCategories(
-          {
+        dataSetCategories={createDataSetCategories({
+          axisConfiguration: {
             ...testAxisConfiguration,
             groupBy: 'locations',
           },
-          testTable.results,
-          testTable.subjectMeta,
-        )}
+          data: testTable.results,
+          meta: testTable.subjectMeta,
+        })}
         axisDefinition={testMajorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
@@ -669,14 +669,14 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     render(
       <ChartReferenceLinesConfiguration
-        dataSetCategories={createDataSetCategories(
-          {
+        dataSetCategories={createDataSetCategories({
+          axisConfiguration: {
             ...testAxisConfiguration,
             groupBy: 'indicators',
           },
-          testTable.results,
-          testTable.subjectMeta,
-        )}
+          data: testTable.results,
+          meta: testTable.subjectMeta,
+        })}
         axisDefinition={testMajorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
@@ -862,14 +862,14 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     render(
       <ChartReferenceLinesConfiguration
-        dataSetCategories={createDataSetCategories(
-          {
+        dataSetCategories={createDataSetCategories({
+          axisConfiguration: {
             ...testAxisConfiguration,
             groupBy: 'filters',
           },
-          testTable.results,
-          testTable.subjectMeta,
-        )}
+          data: testTable.results,
+          meta: testTable.subjectMeta,
+        })}
         axisDefinition={testMajorAxisDefinition}
         lines={[
           { position: 'state-funded-primary', label: 'Test label 1' },
@@ -908,14 +908,14 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     render(
       <ChartReferenceLinesConfiguration
-        dataSetCategories={createDataSetCategories(
-          {
+        dataSetCategories={createDataSetCategories({
+          axisConfiguration: {
             ...testAxisConfiguration,
             groupBy: 'locations',
           },
-          testTable.results,
-          testTable.subjectMeta,
-        )}
+          data: testTable.results,
+          meta: testTable.subjectMeta,
+        })}
         axisDefinition={testMajorAxisDefinition}
         lines={[
           { position: barnetId, label: 'Test label 1' },
@@ -953,14 +953,14 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     render(
       <ChartReferenceLinesConfiguration
-        dataSetCategories={createDataSetCategories(
-          {
+        dataSetCategories={createDataSetCategories({
+          axisConfiguration: {
             ...testAxisConfiguration,
             groupBy: 'indicators',
           },
-          testTable.results,
-          testTable.subjectMeta,
-        )}
+          data: testTable.results,
+          meta: testTable.subjectMeta,
+        })}
         axisDefinition={testMajorAxisDefinition}
         lines={[
           { position: 'authorised-absence-sessions', label: 'Test label 1' },
