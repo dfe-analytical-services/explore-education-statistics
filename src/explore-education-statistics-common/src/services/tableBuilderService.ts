@@ -93,6 +93,7 @@ export interface FeaturedTable {
   name: string;
   description?: string;
   subjectId: string;
+  dataBlockId: string;
 }
 
 export interface SubjectMeta {

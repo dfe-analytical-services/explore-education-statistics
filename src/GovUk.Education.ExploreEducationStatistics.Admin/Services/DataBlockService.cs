@@ -16,10 +16,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Documents.SystemFunctions;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -122,11 +120,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(CheckIsDataBlock)
                 .OnSuccess(async dataBlock =>
                 {
-                    // @MarkFix check this singleordefault is working as expected
-                    var featuredTable = await _context.FeaturedTables.SingleOrDefaultAsync(ft => ft.DataBlockId == dataBlock.Id);
-
                     var viewModel = _mapper.Map<DataBlockViewModel>(dataBlock);
 
+                    var featuredTable = await _context.FeaturedTables.SingleOrDefaultAsync(
+                        ft => ft.DataBlockId == dataBlock.Id);
                     if (featuredTable != null)
                     {
                         viewModel.HighlightName = featuredTable.Name;
@@ -149,8 +146,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .Where(ks => ks.ReleaseId == release.Id)
                             .Select(ks => ks.DataBlockId)
                             .ToListAsync();
+
+                        var featuredTables = await _context.FeaturedTables
+                            .Where(ks => ks.ReleaseId == release.Id)
+                            .ToListAsync();
+
                         return dataBlocks.Select(block =>
                             {
+                                var featuredTable = featuredTables
+                                        .SingleOrDefault(ft => ft.DataBlockId == block.Id);
+
                                 var inContent = block.ContentSectionId != null
                                                 || dataBlockIdsAttachedToKeyStats.Contains(block.Id);
                                 return new DataBlockSummaryViewModel
@@ -159,8 +164,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     Heading = block.Heading,
                                     Name = block.Name,
                                     Created = block.Created,
-                                    HighlightName = block.HighlightName,
-                                    HighlightDescription = block.HighlightDescription,
+                                    HighlightName = featuredTable?.Name ?? null,
+                                    HighlightDescription = featuredTable?.Description ?? null,
                                     Source = block.Source,
                                     ChartsCount = block.Charts.Count,
                                     InContent = inContent,

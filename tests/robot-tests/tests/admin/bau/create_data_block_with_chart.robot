@@ -211,6 +211,7 @@ Validate data block is in list
     user checks table cell contains    1    1    ${DATABLOCK_NAME}
     user checks table cell contains    1    2    No
     user checks table cell contains    1    3    No
+    # TODO EES-4310 Fails because featured table entity isn't created when data block is created
     user checks table cell contains    1    4    UI test highlight name
 
 Embed data block into release content

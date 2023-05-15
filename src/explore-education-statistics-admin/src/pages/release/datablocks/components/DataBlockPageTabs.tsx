@@ -202,8 +202,6 @@ const DataBlockPageTabs = ({
         },
       });
 
-      // @MarkFix handle featured table update/removal here?
-
       setTableState({
         value: {
           ...tableState,

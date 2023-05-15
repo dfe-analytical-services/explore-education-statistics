@@ -63,12 +63,10 @@ const DataBlockDetailsForm = ({
       validationSchema={Yup.object<FormValues>({
         name: Yup.string().required('Enter a data block name'),
         isHighlight: Yup.boolean(),
-        // @MarkFix highlightName accepts a space, when it should probably fail
         highlightName: Yup.string().when('isHighlight', {
           is: true,
           then: Yup.string().trim().required('Enter a featured table name'),
         }),
-        // @MarkFix highlightDescription accepts a space, when it should probably fail
         highlightDescription: Yup.string().when('isHighlight', {
           is: true,
           then: Yup.string()

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
@@ -42,12 +43,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _mapper = mapper;
         }
 
-        public async Task<Either<ActionResult, FeaturedTableViewModel>> Get(Guid releaseId, Guid id)
+        public async Task<Either<ActionResult, FeaturedTableViewModel>> Get(Guid releaseId, Guid dataBlockId)
         {
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async _ =>
-                    await _persistenceHelper.CheckEntityExists<FeaturedTable>(id))
+                    await _persistenceHelper.CheckEntityExists<FeaturedTable>(query =>
+                        query.Where(ft => ft.DataBlockId == dataBlockId)))
                 .OnSuccess(async featuredTable =>
                 {
                     if (!await FeaturedTableIsAssociatedWithRelease(featuredTable, releaseId))
@@ -66,9 +68,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async release =>
                 {
-                    var featuredTableList = await GetFeaturedTableList(release.Id);
+                    var featuredTableList = await ListFeaturedTables(release.Id);
                     return _mapper.Map<List<FeaturedTableViewModel>>(
-                        featuredTableList.OrderBy(ft => ft.Order));
+                        featuredTableList.OrderBy(ft => ft.Order)
+                            .ThenBy(ft => ft.Name));
                 });
         }
 
@@ -97,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     featuredTable.ReleaseId = releaseId;
                     featuredTable.CreatedById = _userService.GetUserId();
 
-                    var featuredTableList = await GetFeaturedTableList(releaseId);
+                    var featuredTableList = await ListFeaturedTables(releaseId);
 
                     var order = featuredTableList
                         .Select(ft => ft.Order)
@@ -114,13 +117,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, FeaturedTableViewModel>> Update(
             Guid releaseId,
-            Guid id,
+            Guid dataBlockId,
             FeaturedTableUpdateRequest request)
         {
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async _ =>
-                    await _persistenceHelper.CheckEntityExists<FeaturedTable>(id))
+                    await _persistenceHelper.CheckEntityExists<FeaturedTable>(query =>
+                        query.Where(ft => ft.DataBlockId == dataBlockId)))
                 .OnSuccess(featuredTable =>
                 {
                     if (featuredTable.ReleaseId != releaseId)
@@ -144,12 +148,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> Delete(Guid releaseId, Guid id)
+        public async Task<Either<ActionResult, Unit>> Delete(Guid releaseId, Guid dataBlockId)
         {
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(async _ =>
-                    await _persistenceHelper.CheckEntityExists<FeaturedTable>(id))
+                    await _persistenceHelper.CheckEntityExists<FeaturedTable>(query =>
+                        query.Where(ft => ft.DataBlockId == dataBlockId)))
                 .OnSuccess(featuredTable =>
                 {
                     if (featuredTable.ReleaseId != releaseId)
@@ -173,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async release => await GetFeaturedTableList(release.Id))
+                .OnSuccess(async release => await ListFeaturedTables(release.Id))
                 .OnSuccess(async featuredTableList =>
                 {
                     if (!ComparerUtils.SequencesAreEqualIgnoringOrder(
@@ -211,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     && rcb.ReleaseId == releaseId);
         }
 
-        private async Task<List<FeaturedTable>> GetFeaturedTableList(Guid releaseId)
+        private async Task<List<FeaturedTable>> ListFeaturedTables(Guid releaseId)
         {
             var releaseDataBlocks = await _dataBlockService.ListDataBlocks(releaseId);
 

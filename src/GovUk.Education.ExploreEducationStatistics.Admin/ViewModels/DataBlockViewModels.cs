@@ -21,9 +21,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Name { get; init; } = string.Empty;
 
-        public string? HighlightName { get; set; } // @MarkFix hydrate from FeaturedTable when returning
+        public string? HighlightName { get; set; }
 
-        public string? HighlightDescription { get; set; } // @MarkFix hydrate from FeaturedTable when returning
+        public string? HighlightDescription { get; set; }
 
         public string Source { get; init; }  = string.Empty;
 

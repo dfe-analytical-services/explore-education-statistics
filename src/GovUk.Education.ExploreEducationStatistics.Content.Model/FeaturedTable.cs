@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public class FeaturedTable : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 {
-    public Guid Id { get; set; } // @MarkFix remove this?
+    public Guid Id { get; set; }
 
     public string Name { get; set; } = null!;
 

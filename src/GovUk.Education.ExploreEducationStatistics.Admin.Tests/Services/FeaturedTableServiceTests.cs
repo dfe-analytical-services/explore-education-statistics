@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -65,7 +65,7 @@ public class FeaturedTableServiceTests
 
             var result = await featuredTableService.Get(
                 release.Id,
-                featuredTable.Id);
+                dataBlock.Id);
 
             var viewModel = result.AssertRight();
 
@@ -160,7 +160,7 @@ public class FeaturedTableServiceTests
 
             var result = await featuredTableService.Get(
                 release.Id,
-                featuredTable.Id);
+                featuredTable.DataBlock.Id);
 
             result.AssertBadRequest(FeaturedTableIsNotAssociatedWithRelease);
         }
@@ -526,7 +526,7 @@ public class FeaturedTableServiceTests
 
             var result = await featuredTableService.Update(
                 release.Id,
-                featuredTable.Id,
+                dataBlock.Id,
                 new FeaturedTableUpdateRequest
                 {
                     Name = "Updated featured table name",
@@ -654,7 +654,7 @@ public class FeaturedTableServiceTests
 
             var result = await featuredTableService.Update(
                 release.Id,
-                featuredTable.Id,
+                dataBlock.Id,
                 new FeaturedTableUpdateRequest
                 {
                     Name = "Updated featured table name",
@@ -708,7 +708,7 @@ public class FeaturedTableServiceTests
 
             var result = await featuredTableService.Delete(
                 release.Id,
-                featuredTable.Id);
+                dataBlock.Id);
 
             result.AssertRight();
         }
@@ -820,7 +820,7 @@ public class FeaturedTableServiceTests
 
             var result = await featuredTableService.Delete(
                 release.Id,
-                featuredTable.Id);
+                featuredTable.DataBlock.Id);
 
             result.AssertBadRequest(FeaturedTableIsNotAssociatedWithRelease);
         }

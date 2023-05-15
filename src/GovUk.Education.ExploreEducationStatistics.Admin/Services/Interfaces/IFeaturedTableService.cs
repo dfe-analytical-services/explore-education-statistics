@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IFeaturedTableService
     {
-        public Task<Either<ActionResult, FeaturedTableViewModel>> Get(Guid releaseId, Guid id);
+        public Task<Either<ActionResult, FeaturedTableViewModel>> Get(Guid releaseId, Guid dataBlockId);
 
         public Task<Either<ActionResult, List<FeaturedTableViewModel>>> List(Guid releaseId);
 
@@ -23,10 +24,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         public Task<Either<ActionResult, FeaturedTableViewModel>> Update(
             Guid releaseId,
-            Guid id,
+            Guid dataBlockId,
             FeaturedTableUpdateRequest request);
 
-        public Task<Either<ActionResult, Unit>> Delete(Guid releaseId, Guid id);
+        public Task<Either<ActionResult, Unit>> Delete(Guid releaseId, Guid dataBlockId);
 
         public Task<Either<ActionResult, List<FeaturedTableViewModel>>> Reorder(
             Guid releaseId,

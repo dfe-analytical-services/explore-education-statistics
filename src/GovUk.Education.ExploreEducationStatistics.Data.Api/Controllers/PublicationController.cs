@@ -47,8 +47,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         public async Task<ActionResult<List<FeaturedTableViewModel>>> ListLatestReleaseFeaturedTables(
             Guid publicationId)
         {
-            // @MarkFix is this endpoint needed?
-            // Compare with ReleaseController#ListFeaturedTables
             return await GetLatestPublishedReleaseId(publicationId)
                 .OnSuccess(_releaseService.ListFeaturedTables)
                 .HandleFailuresOrOk();

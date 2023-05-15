@@ -105,7 +105,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     Id: Guid.NewGuid(),
                     Name: "name",
                     Description: "description",
-                    SubjectId: Guid.NewGuid()
+                    SubjectId: Guid.NewGuid(),
+                    DataBlockId: Guid.NewGuid()
                 ),
             };
 

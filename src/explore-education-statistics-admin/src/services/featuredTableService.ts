@@ -21,7 +21,7 @@ export interface FeaturedTableUpdateRequest {
 
 const featuredTableService = {
   get(releaseId: string, dataBlockId: string): Promise<FeaturedTable> {
-    return client.get(`/releases/${releaseId}/data-blocks/${dataBlockId}`);
+    return client.get(`/releases/${releaseId}/featured-tables/${dataBlockId}`);
   },
 
   list(releaseId: string): Promise<FeaturedTable[]> {
@@ -37,17 +37,19 @@ const featuredTableService = {
 
   update(
     releaseId: string,
-    id: string,
+    dataBlockId: string,
     featuredTable: FeaturedTableUpdateRequest,
   ): Promise<FeaturedTable> {
     return client.post(
-      `/releases/${releaseId}/featured-tables/${id}`,
+      `/releases/${releaseId}/featured-tables/${dataBlockId}`,
       featuredTable,
     );
   },
 
-  delete(releaseId: string, id: string): Promise<void> {
-    return client.delete(`/releases/${releaseId}/featured-tables/${id}`);
+  delete(releaseId: string, dataBlockId: string): Promise<void> {
+    return client.delete(
+      `/releases/${releaseId}/featured-tables/${dataBlockId}`,
+    );
   },
 
   reorder(releaseId: string, newOrder: string[]): Promise<FeaturedTable[]> {

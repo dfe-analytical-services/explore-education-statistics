@@ -33,8 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [HttpGet("data/releases/{releaseId}/featured-tables")]
         public async Task<ActionResult<List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseId)
         {
-            // @MarkFix Remove this in favour of FeaturedTablesController#List
-            // I think this endpoint isn't being used and can be removed
             return await _releaseService
                 .ListFeaturedTables(releaseId)
                 .HandleFailuresOrOk();

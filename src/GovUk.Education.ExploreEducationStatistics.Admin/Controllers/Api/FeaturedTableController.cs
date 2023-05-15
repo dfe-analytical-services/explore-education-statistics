@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -21,13 +22,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _featuredTableService = featuredTableService;
         }
 
-        [HttpGet("releases/{releaseId:guid}/featured-tables/{id:guid}")]
-        public async Task<ActionResult<FeaturedTableViewModel>> Get(Guid releaseId, Guid id)
+        [HttpGet("releases/{releaseId:guid}/featured-tables/{dataBlockId:guid}")]
+        public async Task<ActionResult<FeaturedTableViewModel>> Get(Guid releaseId, Guid dataBlockId)
         {
             return await _featuredTableService
                 .Get(
                     releaseId: releaseId,
-                    id: id)
+                    dataBlockId: dataBlockId)
                 .HandleFailuresOrOk();
         }
 
@@ -49,25 +50,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("releases/{releaseId:guid}/featured-tables/{id:guid}")]
+        [HttpPost("releases/{releaseId:guid}/featured-tables/{dataBlockId:guid}")]
         public async Task<ActionResult<FeaturedTableViewModel>> Update(
             Guid releaseId,
-            Guid id,
+            Guid dataBlockId,
             FeaturedTableUpdateRequest request)
         {
             return await _featuredTableService
                 .Update(
                     releaseId: releaseId,
-                    id: id,
+                    dataBlockId: dataBlockId,
                     request: request)
-                .HandleFailuresOrNoContent();
+                .HandleFailuresOrOk();
         }
 
-        [HttpDelete("releases/{releaseId:guid}/featured-tables/{id:guid}")]
-        public async Task<ActionResult> Delete(Guid releaseId, Guid id)
+        [HttpDelete("releases/{releaseId:guid}/featured-tables/{dataBlockId:guid}")]
+        public async Task<ActionResult> Delete(Guid releaseId, Guid dataBlockId)
         {
             return await _featuredTableService
-                .Delete(releaseId: releaseId, id: id)
+                .Delete(releaseId: releaseId, dataBlockId: dataBlockId)
                 .HandleFailuresOrNoContent();
         }
 

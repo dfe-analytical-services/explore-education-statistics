@@ -933,11 +933,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(featuredTable1.Name, featuredTables[0].Name);
                 Assert.Equal(featuredTable1.Description, featuredTables[0].Description);
                 Assert.Equal(releaseSubject1.SubjectId, featuredTables[0].SubjectId);
+                Assert.Equal(dataBlock1.Id, featuredTables[0].DataBlockId);
 
                 Assert.Equal(featuredTable2.Id, featuredTables[1].Id);
                 Assert.Equal(featuredTable2.Name, featuredTables[1].Name);
                 Assert.Equal(featuredTable2.Description, featuredTables[1].Description);
                 Assert.Equal(releaseSubject2.SubjectId, featuredTables[1].SubjectId);
+                Assert.Equal(dataBlock2.Id, featuredTables[1].DataBlockId);
             }
         }
 
