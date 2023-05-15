@@ -12,18 +12,12 @@ Force Tags          GeneralPublic    Local    Dev
 Navigate to Pupil absence in schools in England methodology page
     user navigates to public methodologies page
     user opens accordion section    Pupils and schools
-    user opens details dropdown    Pupil absence
 
 Go to Pupil absence methodology page
-    user checks page contains methodology link
-    ...    Pupil absence
-    ...    Pupil absence in schools in England
+    user checks page contains link with text and url
     ...    Pupil absence statistics: methodology
-    ...    %{PUBLIC_URL}/methodology/pupil-absence-in-schools-in-england
-    user clicks methodology link
-    ...    Pupil absence
-    ...    Pupil absence in schools in England
-    ...    Pupil absence statistics: methodology
+    ...    /methodology/pupil-absence-in-schools-in-england
+    user clicks link    Pupil absence statistics: methodology
     user waits until h1 is visible    Pupil absence statistics: methodology
     user waits until page contains title caption    Methodology
 
