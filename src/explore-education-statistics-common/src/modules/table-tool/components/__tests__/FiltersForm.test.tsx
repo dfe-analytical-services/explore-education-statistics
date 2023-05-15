@@ -1011,4 +1011,64 @@ describe('FiltersForm', () => {
       }),
     ).not.toBeVisible();
   });
+
+  test('shows additional hint text if any filters contain a "Total"', async () => {
+    render(
+      <FiltersForm
+        {...testWizardStepProps}
+        subject={testSubject}
+        subjectMeta={{
+          ...testSubjectMeta,
+          filters: {
+            ...testSubjectMeta.filters,
+            Characteristic: {
+              ...testSubjectMeta.filters.Characteristic,
+              totalValue: 'total',
+            },
+          },
+        }}
+        onSubmit={noop}
+      />,
+    );
+
+    expect(
+      screen.getByText(/Select at least one option from all categories./),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /If no options are selected from a category then a 'Total' option may be selected automatically when creating a table./,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Where present, the 'Total' option is usually an aggregate of all other options within a category./,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  test('does not show additional hint text if no filters contain a "Total"', async () => {
+    render(
+      <FiltersForm
+        {...testWizardStepProps}
+        subject={testSubject}
+        subjectMeta={testSubjectMeta}
+        onSubmit={noop}
+      />,
+    );
+
+    expect(
+      screen.getByText('Select at least one option from all categories.'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByText(
+        /If no options are selected from a category then a 'Total' option may be selected automatically when creating a table./,
+      ),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        /Where present, the 'Total' option is usually an aggregate of all other options within a category./,
+      ),
+    ).not.toBeInTheDocument();
+  });
 });
