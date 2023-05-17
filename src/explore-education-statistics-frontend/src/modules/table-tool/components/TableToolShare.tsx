@@ -69,8 +69,8 @@ const TableToolShare = ({
     }
 
     const url = newPermalinks
-      ? `${process.env.PUBLIC_URL}/data-tables/permalink/${id}?newPermalinks=true`
-      : `${process.env.PUBLIC_URL}/data-tables/permalink/${id}`;
+      ? `${process.env.PUBLIC_URL}data-tables/permalink/${id}?newPermalinks=true`
+      : `${process.env.PUBLIC_URL}data-tables/permalink/${id}`;
 
     setPermalinkUrl(url);
     setPermalinkLoading(false);
