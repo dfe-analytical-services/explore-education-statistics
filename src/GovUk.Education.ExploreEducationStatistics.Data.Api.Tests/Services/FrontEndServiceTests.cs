@@ -1,6 +1,8 @@
 ﻿#nullable enable
+using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -18,41 +20,10 @@ public class FrontEndServiceTests
 {
     private const string HttpClientName = "PublicApp";
 
-    private const string TableJson = @"
-    {
-      ""thead"": [
-        [
-          { ""colSpan"": 1, ""rowSpan"": 1, ""tag"": ""td"" },
-          {
-            ""colSpan"": 1,
-            ""rowSpan"": 1,
-            ""scope"": ""col"",
-            ""text"": ""2022"",
-            ""tag"": ""th""
-          },
-          {
-            ""colSpan"": 1,
-            ""rowSpan"": 1,
-            ""scope"": ""col"",
-            ""text"": ""2023"",
-            ""tag"": ""th""
-          }
-        ]
-      ],
-      ""tbody"": [
-        [
-          {
-            ""rowSpan"": 1,
-            ""colSpan"": 1,
-            ""scope"": ""row"",
-            ""text"": ""Admission Numbers"",
-            ""tag"": ""th""
-          },
-          { ""tag"": ""td"", ""text"": ""7,731"" },
-          { ""tag"": ""td"", ""text"": ""7,357"" }
-        ]
-      ]
-    }";
+    private readonly string _tableJson = File.ReadAllText(
+        Path.Combine(
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+            $"Resources{Path.DirectorySeparatorChar}permalink-table.json"));
 
     [Fact]
     public async Task CreateTable_ClientReturnsOk()
@@ -75,7 +46,7 @@ public class FrontEndServiceTests
 
         Assert.Equal("Admission Numbers for 'Sample publication' in North East between 2022 and 2023",
             viewModel.Caption);
-        Assert.Equal(JObject.Parse(TableJson), viewModel.Json);
+        Assert.Equal(JObject.Parse(_tableJson), viewModel.Json);
     }
 
     [Fact]
@@ -118,7 +89,7 @@ public class FrontEndServiceTests
         result.AssertInternalServerError();
     }
 
-    private static Mock<HttpMessageHandler> SetupFrontendHttpMessageHandler(HttpStatusCode httpStatusCode)
+    private Mock<HttpMessageHandler> SetupFrontendHttpMessageHandler(HttpStatusCode httpStatusCode)
     {
         var httpResponseMessage = new HttpResponseMessage
         {
@@ -126,7 +97,7 @@ public class FrontEndServiceTests
             Content = new StringContent(@$"
             {{
               ""caption"": ""Admission Numbers for 'Sample publication' in North East between 2022 and 2023"",
-              ""json"": {TableJson}
+              ""json"": {_tableJson}
             }}")
         };
 

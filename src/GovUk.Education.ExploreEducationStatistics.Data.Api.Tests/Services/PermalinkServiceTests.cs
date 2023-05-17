@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Mime;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
@@ -63,46 +64,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
         private readonly Guid _publicationId = Guid.NewGuid();
 
-        private const string TableJson = @"
-        {
-          ""thead"": [
-            [
-              { ""colSpan"": 1, ""rowSpan"": 1, ""tag"": ""td"" },
-              {
-                ""colSpan"": 1,
-                ""rowSpan"": 1,
-                ""scope"": ""col"",
-                ""text"": ""2022"",
-                ""tag"": ""th""
-              },
-              {
-                ""colSpan"": 1,
-                ""rowSpan"": 1,
-                ""scope"": ""col"",
-                ""text"": ""2023"",
-                ""tag"": ""th""
-              }
-            ]
-          ],
-          ""tbody"": [
-            [
-              {
-                ""rowSpan"": 1,
-                ""colSpan"": 1,
-                ""scope"": ""row"",
-                ""text"": ""Admission Numbers"",
-                ""tag"": ""th""
-              },
-              { ""tag"": ""td"", ""text"": ""7,731"" },
-              { ""tag"": ""td"", ""text"": ""7,357"" }
-            ]
-          ]
-        }";
-
         private readonly PermalinkTableViewModel _frontendTableResponse = new()
         {
             Caption = "Admission Numbers for 'Sample publication' in North East between 2022 and 2023",
-            Json = JObject.Parse(TableJson)
+            Json = JObject.Parse(
+                System.IO.File.ReadAllText(
+                    Path.Combine(
+                        Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                        $"Resources{Path.DirectorySeparatorChar}permalink-table.json")))
         };
 
         [Fact]
@@ -156,12 +125,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .IndicatorGroups
                 .SelectMany(ig => ig.Indicators)
                 .ToList();
-            
+
             var filter1Items = subject
                 .Filters[0].FilterGroups
                 .SelectMany(fg => fg.FilterItems)
                 .ToList();
-            
+
             var filter2Items = subject
                 .Filters[1].FilterGroups
                 .SelectMany(fg => fg.FilterItems)
@@ -470,12 +439,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .IndicatorGroups
                 .SelectMany(ig => ig.Indicators)
                 .ToList();
-            
+
             var filter1Items = subject
                 .Filters[0].FilterGroups
                 .SelectMany(fg => fg.FilterItems)
                 .ToList();
-            
+
             var filter2Items = subject
                 .Filters[1].FilterGroups
                 .SelectMany(fg => fg.FilterItems)
@@ -1445,7 +1414,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     "text/csv",
                     It.IsAny<CancellationToken>()
                 ))
-                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, path, stream, _, _) =>
+                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, _, stream, _, _) =>
                 {
                     // Convert captured stream to string
                     stream.Seek(0L, SeekOrigin.Begin);
@@ -1463,7 +1432,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     MediaTypeNames.Application.Json,
                     It.IsAny<CancellationToken>()
                 ))
-                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, path, stream, _, _) =>
+                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, _, stream, _, _) =>
                 {
                     // Convert captured stream to string
                     stream.Seek(0L, SeekOrigin.Begin);
