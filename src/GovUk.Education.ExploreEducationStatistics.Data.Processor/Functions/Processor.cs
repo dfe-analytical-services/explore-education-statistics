@@ -15,15 +15,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
         private readonly IDataImportService _dataImportService;
         private readonly IProcessorService _processorService;
         private readonly ILogger<Processor> _logger;
+        private readonly bool _rethrowExceptions;
 
         public Processor(
             IDataImportService dataImportService,
             IProcessorService processorService,
-            ILogger<Processor> logger)
+            ILogger<Processor> logger, 
+            bool rethrowExceptions = false)
         {
             _dataImportService = dataImportService;
             _processorService = processorService;
             _logger = logger;
+            _rethrowExceptions = rethrowExceptions;
         }
 
         [FunctionName("ProcessUploads")]
@@ -31,15 +34,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             [QueueTrigger(ImportsPendingQueue)] ImportMessage message,
             ExecutionContext executionContext,
             [Queue(ImportsPendingQueue)] ICollector<ImportMessage> importStagesMessageQueue)
-        {
-            await ProcessUploads(message, executionContext, importStagesMessageQueue, rethrowExceptions: false);
-        }
-
-        public async Task ProcessUploads(
-            [QueueTrigger(ImportsPendingQueue)] ImportMessage message,
-            ExecutionContext executionContext,
-            [Queue(ImportsPendingQueue)] ICollector<ImportMessage> importStagesMessageQueue,
-            bool rethrowExceptions)
         {
             try
             {
@@ -110,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
 
                 await _dataImportService.FailImport(message.Id);
 
-                if (rethrowExceptions)
+                if (_rethrowExceptions)
                 {
                     throw;
                 }

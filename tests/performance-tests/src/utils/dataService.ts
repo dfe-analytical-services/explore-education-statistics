@@ -1,42 +1,9 @@
 import HttpClient from './httpClient';
+import { SubjectMeta, TableQuery } from './types';
 
 const applicationJsonHeaders = {
   'Content-Type': 'application/json',
 };
-
-export interface SubjectMeta {
-  filters: {
-    [filter: string]: {
-      options: {
-        [filterGroup: string]: {
-          options: {
-            value: string;
-          }[];
-        };
-      };
-    };
-  };
-  indicators: {
-    [indicatorGroup: string]: {
-      options: {
-        value: string;
-      }[];
-    };
-  };
-  timePeriod: {
-    options: {
-      code: string;
-      year: number;
-    }[];
-  };
-  locations: {
-    [geographicLevel: string]: {
-      options: {
-        id: string;
-      }[];
-    };
-  };
-}
 
 class DataService {
   private readonly client: HttpClient;
@@ -64,43 +31,10 @@ class DataService {
     };
   }
 
-  tableQuery({
-    publicationId,
-    subjectId,
-    filterIds,
-    indicatorIds,
-    locationIds,
-    startYear,
-    startCode,
-    endYear,
-    endCode,
-  }: {
-    publicationId: string;
-    subjectId: string;
-    filterIds: string[];
-    indicatorIds: string[];
-    locationIds: string[];
-    startYear: number;
-    startCode: string;
-    endYear: number;
-    endCode: string;
-  }) {
+  tableQuery(query: TableQuery) {
     const { response, json } = this.client.post<{ results: { id: string }[] }>(
       '/tablebuilder',
-      JSON.stringify({
-        filters: filterIds,
-        includeGeoJson: false,
-        indicators: indicatorIds,
-        locationIds,
-        subjectId,
-        publicationId,
-        timePeriod: {
-          startYear,
-          startCode,
-          endYear,
-          endCode,
-        },
-      }),
+      JSON.stringify(query),
       applicationJsonHeaders,
     );
     return {

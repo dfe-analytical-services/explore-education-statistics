@@ -209,8 +209,7 @@ public class ProcessorStage3Tests : IDisposable
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
-            Mock.Of<ICollector<ImportMessage>>(Strict),
-            rethrowExceptions: true);
+            Mock.Of<ICollector<ImportMessage>>(Strict));
         
         VerifyAllMocks(blobStorageService);
         
@@ -404,8 +403,7 @@ public class ProcessorStage3Tests : IDisposable
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
-            Mock.Of<ICollector<ImportMessage>>(Strict),
-            rethrowExceptions: true);
+            Mock.Of<ICollector<ImportMessage>>(Strict));
         
         VerifyAllMocks(blobStorageService);
         
@@ -538,8 +536,7 @@ public class ProcessorStage3Tests : IDisposable
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
-            Mock.Of<ICollector<ImportMessage>>(Strict),
-            rethrowExceptions: true);
+            Mock.Of<ICollector<ImportMessage>>(Strict));
         
         VerifyAllMocks(blobStorageService);
         
@@ -692,8 +689,7 @@ public class ProcessorStage3Tests : IDisposable
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
-            Mock.Of<ICollector<ImportMessage>>(Strict),
-            rethrowExceptions: true);
+            Mock.Of<ICollector<ImportMessage>>(Strict));
         
         VerifyAllMocks(blobStorageService);
         
@@ -830,8 +826,7 @@ public class ProcessorStage3Tests : IDisposable
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
-            Mock.Of<ICollector<ImportMessage>>(Strict),
-            rethrowExceptions: true);
+            Mock.Of<ICollector<ImportMessage>>(Strict));
         
         VerifyAllMocks(blobStorageService);
         
@@ -996,8 +991,7 @@ public class ProcessorStage3Tests : IDisposable
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
-            Mock.Of<ICollector<ImportMessage>>(Strict),
-            rethrowExceptions: true);
+            Mock.Of<ICollector<ImportMessage>>(Strict));
         
         VerifyAllMocks(blobStorageService);
         
@@ -1148,13 +1142,12 @@ public class ProcessorStage3Tests : IDisposable
                 s.ImportObservationBatch(
                     It.IsAny<StatisticsDbContext>(),
                     It.IsAny<IEnumerable<Observation>>()))
-            .Callback(async () => await function.CancelImports(new CancelImportMessage(import.Id)));
+            .Callback(() => function.CancelImports(new CancelImportMessage(import.Id)));
             
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
-            Mock.Of<ICollector<ImportMessage>>(Strict),
-            rethrowExceptions: true);
+            Mock.Of<ICollector<ImportMessage>>(Strict));
         
         VerifyAllMocks(blobStorageService);
         
@@ -1271,8 +1264,7 @@ public class ProcessorStage3Tests : IDisposable
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
-            Mock.Of<ICollector<ImportMessage>>(Strict),
-            rethrowExceptions: true);
+            Mock.Of<ICollector<ImportMessage>>(Strict));
         
         VerifyAllMocks(blobStorageService);
         
@@ -1423,8 +1415,7 @@ public class ProcessorStage3Tests : IDisposable
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
-            Mock.Of<ICollector<ImportMessage>>(Strict),
-            rethrowExceptions: true);
+            Mock.Of<ICollector<ImportMessage>>(Strict));
         
         VerifyAllMocks(blobStorageService);
         
@@ -1594,8 +1585,7 @@ public class ProcessorStage3Tests : IDisposable
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
-            Mock.Of<ICollector<ImportMessage>>(Strict),
-            rethrowExceptions: true);
+            Mock.Of<ICollector<ImportMessage>>(Strict));
         
         VerifyAllMocks(blobStorageService);
         
@@ -1657,6 +1647,7 @@ public class ProcessorStage3Tests : IDisposable
         return new Processor.Functions.Processor(
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             processorService ?? Mock.Of<IProcessorService>(Strict),
-            Mock.Of<ILogger<Processor.Functions.Processor>>());
+            Mock.Of<ILogger<Processor.Functions.Processor>>(),
+            rethrowExceptions: true);
     }
 }
