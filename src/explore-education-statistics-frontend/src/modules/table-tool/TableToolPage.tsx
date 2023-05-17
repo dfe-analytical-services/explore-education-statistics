@@ -270,8 +270,6 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
     newPermalinks,
   } = query as Dictionary<string>;
 
-  console.log('query', query, newPermalinks);
-
   const themeMeta = await publicationService.getPublicationTree({
     publicationFilter: 'DataTables',
   });
