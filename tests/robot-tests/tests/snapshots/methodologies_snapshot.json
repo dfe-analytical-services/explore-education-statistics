@@ -217,6 +217,13 @@
       },
       {
         "methodologies": [
+          "Children missing education",
+          "Elective home education"
+        ],
+        "topic_heading": "Elective home education and children missing education"
+      },
+      {
+        "methodologies": [
           "Permanent exclusions and suspensions in England"
         ],
         "topic_heading": "Exclusions"
