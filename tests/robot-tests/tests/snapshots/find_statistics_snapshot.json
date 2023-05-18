@@ -79,7 +79,7 @@
   {
     "publication_summary": "Children accommodated in secure children's homes in England and Wales including approved places, availability, occupancy, sex, age, ethnicity, length of stay",
     "publication_title": "Children accommodated in secure children's homes",
-    "published": "26 May 2022",
+    "published": "18 May 2023",
     "release_type": "National statistics",
     "theme": "Children's social care"
   },
@@ -89,6 +89,13 @@
     "published": "17 Nov 2022",
     "release_type": "National statistics",
     "theme": "Children's social care"
+  },
+  {
+    "publication_summary": "This publication provides data reported by local authorities on children missing education (CME) in England.",
+    "publication_title": "Children missing education",
+    "published": "18 May 2023",
+    "release_type": "Ad hoc statistics",
+    "theme": "Pupils and schools"
   },
   {
     "publication_summary": "Statistics on children\u2019s social workers, including agency workers, in England. Includes figures on caseload, vacancies, sickness absence, starters and leavers.",
@@ -179,6 +186,13 @@
     "publication_title": "Education, health and care plans",
     "published": "12 May 2022",
     "release_type": "National statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "This publication provides data reported by local authorities on children in\u202felective home education (EHE) in England.",
+    "publication_title": "Elective home education",
+    "published": "18 May 2023",
+    "release_type": "Ad hoc statistics",
     "theme": "Pupils and schools"
   },
   {
@@ -464,7 +478,7 @@
   {
     "publication_summary": "Pupil absence, including overall, authorised and unauthorised absence and persistent absence by reason and pupil characteristics for the full academic year.",
     "publication_title": "Pupil absence in schools in England",
-    "published": "16 Mar 2023",
+    "published": "18 May 2023",
     "release_type": "National statistics",
     "theme": "Pupils and schools"
   },
@@ -485,7 +499,7 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly experimental statistics derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "4 May 2023",
+    "published": "18 May 2023",
     "release_type": "Experimental statistics",
     "theme": "Pupils and schools"
   },
