@@ -11,6 +11,7 @@ import ReleaseEditableBlock from '@admin/pages/release/content/components/Releas
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableBlock } from '@admin/services/types/content';
+import { ReleaseDataBlockSummary } from '@admin/services/dataBlockService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Modal from '@common/components/Modal';
@@ -24,9 +25,11 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 export interface ReleaseContentAccordionSectionProps {
   id: string;
   section: ContentSection<EditableBlock>;
+  featuredTables?: ReleaseDataBlockSummary[];
 }
 
 const ReleaseContentAccordionSection = ({
+  featuredTables,
   section,
   ...props
 }: ReleaseContentAccordionSectionProps) => {
@@ -202,6 +205,7 @@ const ReleaseContentAccordionSection = ({
                 allowComments
                 allowImages
                 block={block}
+                featuredTables={featuredTables}
                 sectionId={sectionId}
                 sectionKey="content"
                 editable={!isReordering}

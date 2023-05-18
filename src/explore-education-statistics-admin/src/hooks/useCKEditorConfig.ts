@@ -19,6 +19,7 @@ const useCKEditorConfig = ({
   allowComments,
   allowedHeadings,
   editorInstance,
+  featuredTables,
   toolbarConfig = toolbarConfigs.full,
   onAutoSave,
   onCancelComment,
@@ -29,6 +30,10 @@ const useCKEditorConfig = ({
   allowComments?: boolean;
   allowedHeadings?: string[];
   editorInstance?: MutableRefObject<Editor | undefined>;
+  featuredTables?: {
+    id: string;
+    label: string;
+  }[];
   toolbarConfig?: string[];
   onAutoSave?: (content: string) => void;
   onCancelComment?: () => void;
@@ -178,11 +183,13 @@ const useCKEditorConfig = ({
           }
         : undefined,
       alignment: alignmentOptions,
+      featuredTables: featuredTables ? { tables: featuredTables } : undefined,
     };
   }, [
     allowComments,
     allowedHeadings,
     editorInstance,
+    featuredTables,
     hasImageUpload,
     onAutoSave,
     onCancelComment,

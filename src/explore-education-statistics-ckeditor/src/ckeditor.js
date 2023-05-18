@@ -28,6 +28,7 @@ import TableToolbar from '@ckeditor/ckeditor5-table/src/tabletoolbar.js';
 import TableCaption from '@ckeditor/ckeditor5-table/src/tablecaption.js';
 import TextTransformation from '@ckeditor/ckeditor5-typing/src/texttransformation.js';
 import Comments from '../plugins/comments/Comments';
+import FeaturedTables from '../plugins/featuredTables/FeaturedTables';
 
 class Editor extends ClassicEditor {}
 
@@ -40,6 +41,7 @@ Editor.builtinPlugins = [
   Bold,
   Comments,
   Essentials,
+  FeaturedTables,
   Heading,
   Image,
   ImageCaption,

@@ -17,6 +17,7 @@ import {
 } from '@admin/routes/releaseRoutes';
 import { CommentCreate } from '@admin/services/releaseContentCommentService';
 import { Comment, EditableBlock } from '@admin/services/types/content';
+import { ReleaseDataBlockSummary } from '@admin/services/dataBlockService';
 import Gate from '@common/components/Gate';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
@@ -30,6 +31,7 @@ interface Props {
   allowImages?: boolean;
   block: EditableBlock;
   editable?: boolean;
+  featuredTables?: ReleaseDataBlockSummary[];
   publicationId: string;
   releaseId: string;
   sectionId: string;
@@ -42,6 +44,7 @@ const ReleaseEditableBlock = ({
   allowImages = false,
   block,
   editable = true,
+  featuredTables,
   publicationId,
   releaseId,
   sectionId,
@@ -363,6 +366,7 @@ const ReleaseEditableBlock = ({
             actionThrottle={lockThrottle}
             allowComments={allowComments}
             editable={editable && !isBrowser('IE')}
+            featuredTables={featuredTables}
             hideLabel
             id={blockId}
             isEditing={isLockedByUser}

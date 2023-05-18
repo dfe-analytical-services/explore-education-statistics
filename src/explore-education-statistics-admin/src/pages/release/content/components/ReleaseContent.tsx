@@ -44,7 +44,7 @@ const ReleaseContent = () => {
     unsavedBlocks,
     unsavedCommentDeletions,
   } = useEditingContext();
-  const { release } = useReleaseContentState();
+  const { featuredTables, release } = useReleaseContentState();
   const { addContentSectionBlock } = useReleaseContentActions();
 
   const blockRouteChange = useMemo(() => {
@@ -391,6 +391,7 @@ const ReleaseContent = () => {
                   <ReleaseEditableBlock
                     allowComments
                     block={block}
+                    featuredTables={featuredTables}
                     publicationId={release.publication.id}
                     releaseId={release.id}
                     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -412,7 +413,11 @@ const ReleaseContent = () => {
           </div>
         )}
 
-      <ReleaseContentAccordion release={release} sectionName="Contents" />
+      <ReleaseContentAccordion
+        release={release}
+        sectionName="Contents"
+        featuredTables={featuredTables}
+      />
 
       <ReleaseHelpAndSupportSection release={release} />
       <PrintThisPage />

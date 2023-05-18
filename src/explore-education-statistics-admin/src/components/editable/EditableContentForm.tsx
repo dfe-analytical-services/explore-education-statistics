@@ -8,6 +8,7 @@ import {
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
 import CommentAddForm from '@admin/components/comments/CommentAddForm';
 import CommentsList from '@admin/components/comments/CommentsList';
+import { ReleaseDataBlockSummary } from '@admin/services/dataBlockService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form } from '@common/components/form';
@@ -29,6 +30,7 @@ export interface Props {
   actionThrottle?: number;
   allowComments?: boolean;
   content: string;
+  featuredTables?: ReleaseDataBlockSummary[];
   hideLabel?: boolean;
   id: string;
   idleTimeout?: number;
@@ -47,6 +49,7 @@ const EditableContentForm = ({
   actionThrottle = 5_000,
   allowComments = false,
   content,
+  featuredTables,
   hideLabel = false,
   id,
   idleTimeout = 600_000,
@@ -155,6 +158,7 @@ const EditableContentForm = ({
                 <FormFieldEditor<FormValues>
                   allowComments={allowComments}
                   error={autoSaveError ? 'Could not save content' : undefined}
+                  featuredTables={featuredTables}
                   focusOnInit
                   hideLabel={hideLabel}
                   label={label}

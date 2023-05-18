@@ -1,0 +1,8 @@
+.ck.ck-featured-tables-form {
+  padding: var(--ck-spacing-large);
+  width: 300px;
+}
+
+.ck.ck-featured-tables-form .ck-dropdown {
+  width: 100%;
+}

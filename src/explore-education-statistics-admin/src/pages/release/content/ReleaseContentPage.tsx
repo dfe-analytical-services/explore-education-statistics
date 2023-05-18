@@ -11,6 +11,7 @@ import {
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import permissionService from '@admin/services/permissionService';
 import releaseContentService from '@admin/services/releaseContentService';
+import dataBlockService from '@admin/services/dataBlockService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
@@ -123,10 +124,16 @@ const ReleaseContentPage = ({
       releaseId,
     );
 
+    // Get all data blocks and filter down to just featured.
+    // EES-4253 may change how do this.
+    const dataBlocks = await dataBlockService.listDataBlocks(releaseId);
+    const featuredTables = dataBlocks.filter(block => !!block.highlightName);
+
     return {
       release,
       unattachedDataBlocks,
       canUpdateRelease,
+      featuredTables,
     };
   }, [releaseId]);
 

@@ -43,6 +43,15 @@ export interface AlignmentConfig {
   options: AlignmentFormat['name'][];
 }
 
+interface FeaturedTable {
+  id: string;
+  label: string;
+}
+
+export interface FeaturedTablesConfig {
+  tables: FeaturedTable[];
+}
+
 export interface EditorConfig {
   toolbar: string[];
   extraPlugins?: Plugin[];
@@ -62,6 +71,7 @@ export interface EditorConfig {
   comments?: CommentsPluginConfig;
   autosave?: AutoSavePluginConfig;
   alignment?: AlignmentConfig;
+  featuredTables?: FeaturedTablesConfig;
 }
 
 export interface PluginCollection {

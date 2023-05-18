@@ -8,6 +8,7 @@ import {
 } from '@admin/types/ckeditor';
 import { defaultAllowedHeadings } from '@admin/config/ckEditorConfig';
 import useCKEditorConfig from '@admin/hooks/useCKEditorConfig';
+import { ReleaseDataBlockSummary } from '@admin/services/dataBlockService';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
@@ -36,6 +37,7 @@ export interface FormEditorProps {
   allowComments?: boolean;
   allowedHeadings?: string[];
   error?: string;
+  featuredTables?: ReleaseDataBlockSummary[];
   focusOnInit?: boolean;
   hideLabel?: boolean;
   hint?: string;
@@ -59,6 +61,7 @@ const FormEditor = ({
   allowComments = false,
   allowedHeadings = defaultAllowedHeadings,
   error,
+  featuredTables = [],
   focusOnInit,
   hideLabel,
   hint,
@@ -85,10 +88,15 @@ const FormEditor = ({
     selectedComment,
     setMarkersOrder,
   } = useCommentsContext();
+
   const config = useCKEditorConfig({
     allowComments,
     allowedHeadings,
     editorInstance,
+    featuredTables: featuredTables?.map(table => ({
+      id: table.id,
+      label: table.highlightName || '',
+    })),
     toolbarConfig,
     onAutoSave,
     onCancelComment,

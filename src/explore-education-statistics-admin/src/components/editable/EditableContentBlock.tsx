@@ -4,6 +4,7 @@ import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrappe
 import EditableContentForm from '@admin/components/editable/EditableContentForm';
 import styles from '@admin/components/editable/EditableContentBlock.module.scss';
 import { UserDetails } from '@admin/services/types/user';
+import { ReleaseDataBlockSummary } from '@admin/services/dataBlockService';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
@@ -26,6 +27,7 @@ interface EditableContentBlockProps {
   actionThrottle?: number;
   allowComments?: boolean;
   editable?: boolean;
+  featuredTables?: ReleaseDataBlockSummary[];
   id: string;
   idleTimeout?: number;
   isEditing?: boolean;
@@ -55,6 +57,7 @@ const EditableContentBlock = ({
   actionThrottle,
   allowComments = false,
   editable = true,
+  featuredTables,
   id,
   idleTimeout,
   isLoading,
@@ -125,6 +128,7 @@ const EditableContentBlock = ({
         actionThrottle={actionThrottle}
         allowComments={allowComments}
         content={content ? sanitizeHtml(content, sanitizeOptions) : ''}
+        featuredTables={featuredTables}
         label={label}
         hideLabel={hideLabel}
         id={id}

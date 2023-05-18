@@ -1,6 +1,7 @@
 import EditableAccordion from '@admin/components/editable/EditableAccordion';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableRelease } from '@admin/services/releaseContentService';
+import { ReleaseDataBlockSummary } from '@admin/services/dataBlockService';
 import { Dictionary } from '@common/types';
 import orderBy from 'lodash/orderBy';
 import React, { useCallback } from 'react';
@@ -10,12 +11,14 @@ interface ReleaseContentAccordionProps {
   id?: string;
   sectionName: string;
   release: EditableRelease;
+  featuredTables?: ReleaseDataBlockSummary[];
 }
 
 const ReleaseContentAccordion = ({
   release,
   id = 'releaseMainContent',
   sectionName,
+  featuredTables,
 }: ReleaseContentAccordionProps) => {
   const {
     addContentSection,
@@ -56,6 +59,7 @@ const ReleaseContentAccordion = ({
           key={section.id}
           id={`${id}-${section.id}`}
           section={section}
+          featuredTables={featuredTables}
         />
       ))}
     </EditableAccordion>

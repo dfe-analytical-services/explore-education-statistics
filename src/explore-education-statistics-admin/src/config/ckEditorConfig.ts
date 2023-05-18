@@ -26,6 +26,7 @@ export const toolbarConfigs: Dictionary<string[]> = {
     'undo',
     '|',
     'comment',
+    'featuredTables',
   ],
   simple: [
     'bold',
