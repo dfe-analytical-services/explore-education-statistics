@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,22 +30,23 @@ public class FrontendService : IFrontendService
         _logger = logger;
     }
 
-    public Task<Either<ActionResult, dynamic>> CreateUniversalTable(LegacyPermalink legacyPermalink,
+    public Task<Either<ActionResult, PermalinkTableViewModel>> CreateTable(LegacyPermalink legacyPermalink,
         CancellationToken cancellationToken = default)
     {
-        return CreateUniversalTable(legacyPermalink.FullTable.AsTableBuilderResultViewModel(),
+        return CreateTable(legacyPermalink.FullTable.AsTableBuilderResultViewModel(),
             legacyPermalink.Configuration,
             cancellationToken);
     }
 
-    public async Task<Either<ActionResult, dynamic>> CreateUniversalTable(TableBuilderResultViewModel tableResult,
+    public async Task<Either<ActionResult, PermalinkTableViewModel>> CreateTable(
+        TableBuilderResultViewModel tableResult,
         TableBuilderConfiguration configuration,
         CancellationToken cancellationToken = default)
     {
         var httpClient = _httpClientFactory.CreateClient("PublicApp");
 
         var request = new JsonNetContent(
-            content: new UniversalTableFormatCreateRequest(tableResult, configuration),
+            content: new TableCreateRequest(tableResult, configuration),
             settings: new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
@@ -57,8 +59,8 @@ public class FrontendService : IFrontendService
 
         if (response.IsSuccessStatusCode)
         {
-            var tableJson = await response.Content.ReadAsStringAsync(cancellationToken);
-            return JsonConvert.DeserializeObject<dynamic>(tableJson)!;
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
+            return JsonConvert.DeserializeObject<PermalinkTableViewModel>(content)!;
         }
 
         if (response.StatusCode == HttpStatusCode.NotFound)
@@ -76,6 +78,6 @@ public class FrontendService : IFrontendService
         return new StatusCodeResult(StatusCodes.Status500InternalServerError);
     }
 
-    private record UniversalTableFormatCreateRequest(
+    private record TableCreateRequest(
         TableBuilderResultViewModel FullTable, TableBuilderConfiguration Configuration);
 }

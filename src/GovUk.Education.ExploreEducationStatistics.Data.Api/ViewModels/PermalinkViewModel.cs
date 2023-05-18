@@ -19,5 +19,5 @@ public record PermalinkViewModel
     [JsonConverter(typeof(StringEnumConverter))]
     public PermalinkStatus Status { get; init; }
 
-    public dynamic Table { get; init; }
+    public PermalinkTableViewModel Table { get; init; } = new();
 }

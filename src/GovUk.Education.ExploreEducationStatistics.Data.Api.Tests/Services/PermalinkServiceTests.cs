@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Mime;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
@@ -39,6 +40,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Snapshooter;
 using Snapshooter.Xunit;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -61,6 +63,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         };
 
         private readonly Guid _publicationId = Guid.NewGuid();
+
+        private readonly PermalinkTableViewModel _frontendTableResponse = new()
+        {
+            Caption = "Admission Numbers for 'Sample publication' in North East between 2022 and 2023",
+            Json = JObject.Parse(
+                System.IO.File.ReadAllText(
+                    Path.Combine(
+                        Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
+                        $"Resources{Path.DirectorySeparatorChar}permalink-table.json")))
+        };
 
         [Fact]
         public async Task CreatePermalink_LatestPublishedReleaseForSubjectNotFound()
@@ -113,12 +125,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .IndicatorGroups
                 .SelectMany(ig => ig.Indicators)
                 .ToList();
-            
+
             var filter1Items = subject
                 .Filters[0].FilterGroups
                 .SelectMany(fg => fg.FilterItems)
                 .ToList();
-            
+
             var filter2Items = subject
                 .Filters[1].FilterGroups
                 .SelectMany(fg => fg.FilterItems)
@@ -159,6 +171,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .DefaultFootnote()
                 .GenerateList(2);
 
+            var footnoteViewModels = FootnotesViewModelBuilder.BuildFootnotes(footnotes);
+
             var request = new PermalinkCreateRequest
             {
                 Configuration = new TableBuilderConfiguration
@@ -184,9 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                             level => level.Value),
                     Filters = FiltersMetaViewModelBuilder.BuildFilters(subject.Filters),
                     Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
-                    Footnotes = footnotes.Select(
-                        footnote => new FootnoteViewModel(footnote.Id, footnote.Content)
-                    ).ToList(),
+                    Footnotes = footnoteViewModels,
                     TimePeriodRange = new List<TimePeriodMetaViewModel>
                     {
                         new(2022, AcademicYear)
@@ -270,7 +282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     var csv = stream.ReadToEnd();
 
                     // Compare the captured csv upload with the expected csv
-                    Snapshot.Match(csv);
+                    Snapshot.Match(csv, SnapshotNameExtension.Create("csv"));
                 })
                 .Returns(Task.CompletedTask);
 
@@ -291,18 +303,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     stream.Seek(0L, SeekOrigin.Begin);
                     var tableJson = stream.ReadToEnd();
 
-                    // Compare the captured table json upload with the response set up for the frontend service
-                    Assert.Equal("{}", tableJson);
+                    // Compare the captured table json upload with the expected json
+                    Snapshot.Match(tableJson, SnapshotNameExtension.Create("json"));
                 })
                 .Returns(Task.CompletedTask);
 
             var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
 
-            frontendService.Setup(s => s.CreateUniversalTable(
+            frontendService.Setup(s => s.CreateTable(
                 tableResult,
                 request.Configuration,
                 It.IsAny<CancellationToken>())
-            ).ReturnsAsync(new JObject());
+            ).ReturnsAsync(_frontendTableResponse);
 
             var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(MockBehavior.Strict);
 
@@ -378,7 +390,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Assert.Equal("Test data set", result.DataSetTitle);
                 Assert.Equal("Test publication", result.PublicationTitle);
                 Assert.Equal(PermalinkStatus.Current, result.Status);
-                Assert.Equal("{}", result.Table.ToString());
+                Assert.Equal(_frontendTableResponse.Caption, result.Table.Caption);
+                Assert.Equal(_frontendTableResponse.Json, result.Table.Json);
+                Assert.Equal(footnoteViewModels, result.Table.Footnotes);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -425,12 +439,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .IndicatorGroups
                 .SelectMany(ig => ig.Indicators)
                 .ToList();
-            
+
             var filter1Items = subject
                 .Filters[0].FilterGroups
                 .SelectMany(fg => fg.FilterItems)
                 .ToList();
-            
+
             var filter2Items = subject
                 .Filters[1].FilterGroups
                 .SelectMany(fg => fg.FilterItems)
@@ -470,6 +484,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .DefaultFootnote()
                 .GenerateList(2);
 
+            var footnoteViewModels = FootnotesViewModelBuilder.BuildFootnotes(footnotes);
+
             var request = new PermalinkCreateRequest
             {
                 Configuration = new TableBuilderConfiguration
@@ -495,9 +511,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                             level => level.Value),
                     Filters = FiltersMetaViewModelBuilder.BuildFilters(subject.Filters),
                     Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
-                    Footnotes = footnotes.Select(
-                        footnote => new FootnoteViewModel(footnote.Id, footnote.Content)
-                    ).ToList(),
+                    Footnotes = footnoteViewModels,
                     TimePeriodRange = new List<TimePeriodMetaViewModel>
                     {
                         new(2022, AcademicYear)
@@ -581,7 +595,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     var csv = stream.ReadToEnd();
 
                     // Compare the captured csv upload with the expected csv
-                    Snapshot.Match(csv);
+                    Snapshot.Match(csv, SnapshotNameExtension.Create("csv"));
                 })
                 .Returns(Task.CompletedTask);
 
@@ -602,18 +616,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     stream.Seek(0L, SeekOrigin.Begin);
                     var tableJson = stream.ReadToEnd();
 
-                    // Compare the captured table json upload with the response set up for the frontend service
-                    Assert.Equal("{}", tableJson);
+                    // Compare the captured table json upload with the expected json
+                    Snapshot.Match(tableJson, SnapshotNameExtension.Create("json"));
                 })
                 .Returns(Task.CompletedTask);
 
             var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
 
-            frontendService.Setup(s => s.CreateUniversalTable(
+            frontendService.Setup(s => s.CreateTable(
                 tableResult,
                 request.Configuration,
                 It.IsAny<CancellationToken>())
-            ).ReturnsAsync(new JObject());
+            ).ReturnsAsync(_frontendTableResponse);
 
             var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(MockBehavior.Strict);
 
@@ -673,7 +687,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Assert.Equal("Test data set", result.DataSetTitle);
                 Assert.Equal("Test publication", result.PublicationTitle);
                 Assert.Equal(PermalinkStatus.Current, result.Status);
-                Assert.Equal("{}", result.Table.ToString());
+                Assert.Equal(_frontendTableResponse.Caption, result.Table.Caption);
+                Assert.Equal(_frontendTableResponse.Json, result.Table.Json);
+                Assert.Equal(footnoteViewModels, result.Table.Footnotes);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -730,6 +746,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 SubjectId = Guid.NewGuid()
             };
 
+            var table = _frontendTableResponse with
+            {
+                Footnotes = FootnotesViewModelBuilder.BuildFootnotes(_fixture
+                    .DefaultFootnote()
+                    .GenerateList(2))
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -743,11 +766,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            // TODO EES-3753 Add some realistic table json here
             blobStorageService.SetupDownloadBlobText(
                 container: BlobContainers.PermalinkSnapshots,
                 path: $"{permalink.Id}.json",
-                blobText: "{}");
+                blobText: JsonConvert.SerializeObject(table));
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -764,7 +786,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Assert.Equal("Test data set", result.DataSetTitle);
                 Assert.Equal("Test publication", result.PublicationTitle);
                 Assert.Equal(PermalinkStatus.Current, result.Status);
-                Assert.Equal("{}", result.Table.ToString());
+                Assert.Equal(table.Caption, result.Table.Caption);
+                Assert.Equal(table.Json, result.Table.Json);
+                Assert.Equal(table.Footnotes, result.Table.Footnotes);
             }
         }
 
@@ -1256,7 +1280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
         [Fact]
         // TODO EES-3755 Remove after Permalink snapshot migration work is complete
-        // TODO EES-3755 Remove __snapshots__/PermalinkServiceTests.MigratePermalink.snap
+        // TODO EES-3755 Remove __snapshots__/PermalinkServiceTests.MigratePermalink_*.snap files
         public async Task MigratePermalink()
         {
             var permalink = new Permalink
@@ -1321,12 +1345,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     .SetTimePeriod(2023, AcademicYear))
                 .GenerateList(8);
 
+            var footnotes = _fixture
+                .DefaultFootnote()
+                .GenerateList(2);
+
             var legacyPermalink = new LegacyPermalink(
                 permalink.Id,
                 DateTime.UtcNow,
                 new TableBuilderConfiguration(),
                 new PermalinkTableBuilderResult
                 {
+                    SubjectMeta = new PermalinkResultSubjectMeta
+                    {
+                        Footnotes = FootnotesViewModelBuilder.BuildFootnotes(footnotes)
+                    },
                     Results = observations
                         .Select(o =>
                             ObservationViewModelBuilder.BuildObservation(o, indicators.Select(i => i.Id)))
@@ -1382,14 +1414,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     "text/csv",
                     It.IsAny<CancellationToken>()
                 ))
-                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, path, stream, _, _) =>
+                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, _, stream, _, _) =>
                 {
                     // Convert captured stream to string
                     stream.Seek(0L, SeekOrigin.Begin);
                     var csv = stream.ReadToEnd();
 
                     // Compare the captured csv upload with the expected csv
-                    Snapshot.Match(csv);
+                    Snapshot.Match(csv, SnapshotNameExtension.Create("csv"));
                 })
                 .Returns(Task.CompletedTask);
 
@@ -1400,23 +1432,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     MediaTypeNames.Application.Json,
                     It.IsAny<CancellationToken>()
                 ))
-                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, path, stream, _, _) =>
+                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, _, stream, _, _) =>
                 {
                     // Convert captured stream to string
                     stream.Seek(0L, SeekOrigin.Begin);
                     var tableJson = stream.ReadToEnd();
 
-                    // Compare the captured table json upload with the response set up for the frontend service
-                    Assert.Equal("{}", tableJson);
+                    // Compare the captured table json upload with the expected json
+                    Snapshot.Match(tableJson, SnapshotNameExtension.Create("json"));
                 })
                 .Returns(Task.CompletedTask);
 
             var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
 
-            frontendService.Setup(s => s.CreateUniversalTable(
+            frontendService.Setup(s => s.CreateTable(
                 ItIs.DeepEqualTo(legacyPermalink),
                 It.IsAny<CancellationToken>())
-            ).ReturnsAsync(new JObject());
+            ).ReturnsAsync(_frontendTableResponse);
 
             var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(MockBehavior.Strict);
 
@@ -1608,7 +1640,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
 
-            frontendService.Setup(s => s.CreateUniversalTable(
+            frontendService.Setup(s => s.CreateTable(
                 It.IsAny<LegacyPermalink>(),
                 It.IsAny<CancellationToken>())
             ).ReturnsAsync(new NotFoundResult());
@@ -1663,7 +1695,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
 
-            frontendService.Setup(s => s.CreateUniversalTable(
+            frontendService.Setup(s => s.CreateTable(
                 It.IsAny<LegacyPermalink>(),
                 It.IsAny<CancellationToken>())
             ).ReturnsAsync(new StatusCodeResult(StatusCodes.Status500InternalServerError));
