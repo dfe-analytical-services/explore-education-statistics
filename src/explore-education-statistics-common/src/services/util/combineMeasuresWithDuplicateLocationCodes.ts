@@ -128,7 +128,7 @@ export default function combineMeasuresWithDuplicateLocationCodes(
           );
           const allAvailableFilterCombinations = uniqWith(
             rowsForTimePeriod.map(result => result.filters.sort()),
-            (a1, a2) => isEqual(a1, a2),
+            (filters, filtersOther) => isEqual(filters, filtersOther),
           );
           const allAvailableMeasures = uniq(
             rowsForTimePeriod.flatMap(result => Object.keys(result.measures)),
@@ -151,7 +151,7 @@ export default function combineMeasuresWithDuplicateLocationCodes(
                 }),
                 {},
               ),
-            } as TableDataResult;
+            };
           });
         },
       );
