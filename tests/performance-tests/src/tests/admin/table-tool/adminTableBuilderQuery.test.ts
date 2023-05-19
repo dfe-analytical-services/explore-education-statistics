@@ -4,14 +4,16 @@ import { check } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
+import exec from 'k6/execution';
 import createAdminService, {
   getDataFileUploadStrategy,
-  SubjectMeta,
 } from '../../../utils/adminService';
 import testData from '../../testData';
 import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
 import loggingUtils from '../../../utils/loggingUtils';
+import { createTableBuilderQuery } from '../../../utils/tableQueries';
+import { SubjectMeta } from '../../../utils/types';
 
 const tearDownData = false;
 const publicationTitle =
@@ -34,7 +36,6 @@ export const options: Options = {
   },
   noConnectionReuse: true,
   insecureSkipTLSVerify: true,
-  linger: true,
   setupTimeout: uploadFileStrategy.isZip ? '30m' : '10m',
 };
 
@@ -96,12 +97,18 @@ function getOrCreateReleaseWithSubject() {
     timePeriodCoverage: 'AY',
   });
 
-  const { id: fileId } = uploadFileStrategy.getOrImportSubject(
-    adminService,
+  const { subjects: existingSubjects } = adminService.getSubjects({
     releaseId,
-  );
+  });
 
-  adminService.waitForDataFileToImport({ releaseId, fileId });
+  if (!existingSubjects.length) {
+    const { id: fileId } = uploadFileStrategy.getOrImportSubject(
+      adminService,
+      releaseId,
+    );
+
+    adminService.waitForDataFileToImport({ releaseId, fileId });
+  }
 
   const { subjects } = adminService.getSubjects({ releaseId });
   const subjectId = subjects[0].id;
@@ -148,44 +155,16 @@ const performTest = ({ releaseId, subjectId, subjectMeta }: SetupData) => {
 
   const adminService = createAdminService(adminUrl, accessToken);
 
-  const allFilterIds = Object.values(subjectMeta.filters).flatMap(filter =>
-    Object.values(filter.options).flatMap(filterGroup =>
-      filterGroup.options.flatMap(filterItem => filterItem.value),
-    ),
-  );
-
-  const allIndicationIds = Object.values(
-    subjectMeta.indicators,
-  ).flatMap(indicatorGroup =>
-    indicatorGroup.options.map(indicator => indicator.value),
-  );
-
-  const allLocationIds = Object.values(subjectMeta.locations).flatMap(
-    geographicLevel =>
-      geographicLevel.options.flatMap(location => {
-        if (location.options) {
-          return location.options.flatMap(o => o.id);
-        }
-        return [location.id];
-      }),
-  );
-
-  const someTimePeriods = {
-    startYear: subjectMeta.timePeriod.options[0].year,
-    startCode: subjectMeta.timePeriod.options[0].code,
-    endYear: subjectMeta.timePeriod.options[1].year,
-    endCode: subjectMeta.timePeriod.options[1].code,
-  };
+  const query = createTableBuilderQuery({
+    subjectId,
+    subjectMeta,
+  });
 
   const startTimeMillis = Date.now();
 
   const { response, results } = adminService.tableQuery({
     releaseId,
-    subjectId,
-    filterIds: allFilterIds,
-    indicatorIds: allIndicationIds,
-    locationIds: allLocationIds as string[],
-    ...someTimePeriods,
+    query,
   });
 
   if (
@@ -194,8 +173,15 @@ const performTest = ({ releaseId, subjectId, subjectMeta }: SetupData) => {
       'response should contain table builder results': _ => results.length > 0,
     })
   ) {
+    const tableQuerySpeed = Date.now() - startTimeMillis;
     tableQueryCompleteCount.add(1);
-    tableQuerySpeedTrend.add(Date.now() - startTimeMillis);
+    tableQuerySpeedTrend.add(tableQuerySpeed);
+
+    console.log(
+      `Table query ${exec.scenario.iterationInTest} completed in ${
+        tableQuerySpeed / 1000
+      } seconds`,
+    );
   } else {
     tableQueryFailureCount.add(1);
   }

@@ -157,8 +157,7 @@ public class ProcessorStage1Tests
         await function.ProcessUploads(
             importMessage, 
             new ExecutionContext(),
-            importStagesMessageQueue.Object,
-            rethrowExceptions: true);
+            importStagesMessageQueue.Object);
         
         VerifyAllMocks(blobStorageService, importStagesMessageQueue);
 
@@ -204,6 +203,7 @@ public class ProcessorStage1Tests
         return new Processor.Functions.Processor(
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             processorService ?? Mock.Of<IProcessorService>(Strict),
-            Mock.Of<ILogger<Processor.Functions.Processor>>());
+            Mock.Of<ILogger<Processor.Functions.Processor>>(),
+            rethrowExceptions: true);
     }
 }
