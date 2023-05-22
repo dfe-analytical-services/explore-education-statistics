@@ -38,6 +38,7 @@ public class CompressionUtilsTests
 
         Assert.Equal(0, compressedStream.Position);
         Assert.True(compressedStream.Length > 0);
+        Assert.NotEqual(Content.ToStream(), compressedStream);
 
         // Decompress the stream using the compression class directly and assert it contains the original content
         await using var decompressedStream = new MemoryStream();
@@ -62,6 +63,7 @@ public class CompressionUtilsTests
 
         Assert.Equal(0, compressedStream.Position);
         Assert.True(compressedStream.Length > 0);
+        Assert.NotEqual(Content.ToStream(), compressedStream);
 
         // Decompress the stream using the compression class directly and assert it contains the original content
         await using var decompressedStream = new MemoryStream();

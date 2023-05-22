@@ -220,5 +220,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                     s.GetDeserializedJson(container, path, type, settings, cancellationToken))
                 .ThrowsAsync(exception);
         }
+
+        public static IReturnsResult<IBlobStorageService> SetupUploadAsJson<T>(
+            this Mock<IBlobStorageService> service,
+            IBlobContainer container,
+            string path,
+            T content,
+            string? contentEncoding = null,
+            JsonSerializerSettings? settings = null,
+            CancellationToken cancellationToken = default)
+        {
+            return service.Setup(s =>
+                    s.UploadAsJson(container, path, content, contentEncoding, settings, cancellationToken))
+                .Returns(Task.CompletedTask);
+        }
     }
 }

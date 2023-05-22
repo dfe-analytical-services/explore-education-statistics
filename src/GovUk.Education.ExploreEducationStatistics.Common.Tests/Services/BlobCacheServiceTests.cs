@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -50,14 +49,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.Setup(mock => mock.UploadAsJson(
-                    PublicContent,
-                    cacheKey.Key,
-                    "test item",
-                    null,
-                    null,
-                    It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
+            blobStorageService.SetupUploadAsJson(
+                container: PublicContent,
+                path: cacheKey.Key,
+                content: "test item");
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
